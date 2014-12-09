@@ -17,21 +17,27 @@ namespace NJsonSchema.Version4
             Initialize();
         }
 
+        /// <summary>Gets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Schema { get; set; }
 
+        /// <summary>Gets the id. </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Id { get; set; }
 
+        /// <summary>Gets the title. </summary>
         [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Title { get; set; }
 
+        /// <summary>Gets the description. </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Description { get; set; }
 
+        /// <summary>Gets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Format { get; set; } // TODO: This is missing in JSON Schema schema
 
+        /// <summary>Gets the default value. </summary>
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Default { get; set; }
 
@@ -97,6 +103,8 @@ namespace NJsonSchema.Version4
 
         [JsonIgnore]
         public SimpleType Type { get; set; }
+
+        #region Raw properties
 
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object TypeRaw
@@ -168,6 +176,8 @@ namespace NJsonSchema.Version4
             get { return OneOf != null && OneOf.Count > 0 ? OneOf : null; }
             set { OneOf = value ?? new Collection<JsonSchemaBase>(); }
         }
+
+        #endregion
 
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchemaBase Not { get; private set; }
