@@ -1,0 +1,13 @@
+**/bin/**
+**/obj/**
+**/packages/**
+
+**.suo
+**.user
+**.DotSettings
+
+MyToolkit/**
+NuGetReferenceSwitcher/**
+VisualJsonEditor/**
+ProjectDependencyBrowser/**
+Exceptional/**
