@@ -1,4 +1,4 @@
 NJsonSchema
 ===========
 
-JSON Schema parser and generator for .NET
+JSON Schema draft v4 reader and generator for .NET
