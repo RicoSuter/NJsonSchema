@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 
-namespace NJsonSchema.Version4
+namespace NJsonSchema.DraftV4
 {
     internal class SimpleTypeDescription
     {

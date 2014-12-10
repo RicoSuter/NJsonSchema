@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace NJsonSchema.Version4
+namespace NJsonSchema.DraftV4
 {
     [Flags]
     public enum SimpleType

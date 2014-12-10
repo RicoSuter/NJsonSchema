@@ -62,14 +62,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Version4\JsonProperty.cs" />
-    <Compile Include="Version4\JsonSchema.cs" />
-    <Compile Include="Version4\JsonSchemaBase.cs" />
+    <Compile Include="DraftV4\JsonProperty.cs" />
+    <Compile Include="DraftV4\JsonSchema.cs" />
+    <Compile Include="DraftV4\JsonSchemaBase.cs" />
     <Compile Include="Collections\ObservableCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Version4\JsonSchemaGenerator.cs" />
-    <Compile Include="Version4\SimpleType.cs" />
-    <Compile Include="Version4\SimpleTypeDescription.cs" />
+    <Compile Include="DraftV4\JsonSchemaGenerator.cs" />
+    <Compile Include="DraftV4\SimpleType.cs" />
+    <Compile Include="DraftV4\SimpleTypeDescription.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

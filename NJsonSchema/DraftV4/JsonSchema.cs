@@ -1,4 +1,4 @@
-﻿namespace NJsonSchema.Version4
+﻿namespace NJsonSchema.DraftV4
 {
     public class JsonSchema : JsonSchemaBase
     {

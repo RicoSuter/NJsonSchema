@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema", "NJsonSchema\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E66DF721-CEA3-4EA1-8C14-A78D0C92853F}"
+	ProjectSection(SolutionItems) = preProject
+		NJsonSchema\NJsonSchema.nuspec = NJsonSchema\NJsonSchema.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
