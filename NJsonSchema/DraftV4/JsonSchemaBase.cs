@@ -97,6 +97,8 @@ namespace NJsonSchema.DraftV4
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
+        /// <summary>Gets the collection of required properties. </summary>
+        /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
 
@@ -130,6 +132,9 @@ namespace NJsonSchema.DraftV4
 
         [JsonIgnore]
         public SimpleType Type { get; internal set; }
+
+        [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public JsonSchemaBase Not { get; internal set; }
 
         #region Raw properties
 
@@ -215,9 +220,6 @@ namespace NJsonSchema.DraftV4
         }
 
         #endregion
-
-        [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonSchemaBase Not { get; internal set; }
 
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext ctx)
