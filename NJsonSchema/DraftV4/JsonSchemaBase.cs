@@ -9,7 +9,7 @@ using NJsonSchema.Collections;
 
 namespace NJsonSchema.DraftV4
 {
-    /// <summary>A JSON Schema describing a type. </summary>
+    /// <summary>A base class for describing a JSON schema. </summary>
     public class JsonSchemaBase
     {
         private IDictionary<string, JsonProperty> _properties;

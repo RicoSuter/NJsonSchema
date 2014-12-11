@@ -2,6 +2,7 @@
 
 namespace NJsonSchema.DraftV4
 {
+    /// <summary>A description of a JSON property of a JSON object. </summary>
     public class JsonProperty : JsonSchemaBase
     {
         /// <summary>Initializes a new instance of the <see cref="JsonProperty"/> class. </summary>

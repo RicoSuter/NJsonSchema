@@ -1,5 +1,6 @@
 ﻿namespace NJsonSchema.DraftV4
 {
+    /// <summary>A JSON schema describing a type. </summary>
     public class JsonSchema : JsonSchemaBase
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchema"/> class. </summary>
