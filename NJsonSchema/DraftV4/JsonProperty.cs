@@ -22,7 +22,7 @@ namespace NJsonSchema.DraftV4
         [JsonIgnore]
         public string Key { get; internal set; }
 
-        /// <summary>Gets the parent schema if this is a property schema. </summary>
+        /// <summary>Gets the parent schema of this property schema. </summary>
         [JsonIgnore]
         public JsonSchemaBase Parent { get; internal set; }
 
