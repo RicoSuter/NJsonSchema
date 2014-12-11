@@ -186,7 +186,7 @@ namespace NJsonSchema.DraftV4
             set
             {
                 Properties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => new JsonProperty(p.Key, p.Value))) : 
+                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) : 
                     new ObservableDictionary<string, JsonProperty>();
             }
         }
