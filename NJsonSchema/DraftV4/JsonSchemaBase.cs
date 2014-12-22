@@ -223,61 +223,10 @@ namespace NJsonSchema.DraftV4
 
         #endregion
 
-        public virtual List<ValidationError> Validate(JToken token, string propertyName = null, string propertyPath = null)
+        public List<ValidationError> Validate(JToken token)
         {
-            var errors = new List<ValidationError>();
-            if (Type.HasFlag(SimpleType.String))
-            {
-                if (token.Type != JTokenType.String)
-                    errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
-            }
-            else if (Type.HasFlag(SimpleType.Number))
-            {
-                if (token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath));
-            }
-            else if (Type.HasFlag(SimpleType.Integer))
-            {
-                if (token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.IntegerExpected, propertyName, propertyPath));
-            }
-            else if (Type.HasFlag(SimpleType.Boolean))
-            {
-                if (token.Type != JTokenType.Boolean)
-                    errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath));
-            }
-            else if (Type.HasFlag(SimpleType.Object))
-            {
-                var obj = token as JObject;
-                if (obj != null)
-                {
-                    foreach (var propertyInfo in Properties)
-                    {
-                        var newPropertyPath = propertyName != null ? propertyName + "." + propertyInfo.Key : propertyInfo.Key;
-                        var property = obj.Property(propertyInfo.Key);
-                        if (property != null)
-                        {
-                            var propertyErrors = propertyInfo.Value.Validate(property.Value, propertyInfo.Key, newPropertyPath);
-                            errors.AddRange(propertyErrors);
-                        }
-                        else if (propertyInfo.Value.IsRequired)
-                            errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath));
-                    }
-                }
-                else
-                    errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, null, null));
-            }
-            else if (Type.HasFlag(SimpleType.Array))
-            {
-                var array = token as JArray;
-                if (array != null)
-                {
-                    
-                }
-
-                throw new NotImplementedException();
-            }
-            return errors;
+            var validator = new JsonSchemaValidator(this);
+            return validator.Validate(token, null, null);
         }
 
         [OnDeserialized]
