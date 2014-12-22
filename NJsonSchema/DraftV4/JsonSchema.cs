@@ -1,4 +1,9 @@
-﻿namespace NJsonSchema.DraftV4
+﻿using System.Collections;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using NJsonSchema.Validation;
+
+namespace NJsonSchema.DraftV4
 {
     /// <summary>A JSON schema describing a type. </summary>
     public class JsonSchema : JsonSchemaBase
