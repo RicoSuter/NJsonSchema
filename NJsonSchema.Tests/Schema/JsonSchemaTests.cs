@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.DraftV4;
 
-namespace JsonSchema4.Tests
+namespace JsonSchema4.Tests.Schema
 {
     [TestClass]
     public class JsonSchemaTests

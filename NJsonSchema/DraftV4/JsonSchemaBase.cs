@@ -5,7 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using NJsonSchema.Collections;
+using NJsonSchema.Validation;
 
 namespace NJsonSchema.DraftV4
 {
@@ -220,6 +222,12 @@ namespace NJsonSchema.DraftV4
         }
 
         #endregion
+
+        public List<ValidationError> Validate(JToken token)
+        {
+            var validator = new JsonSchemaValidator(this);
+            return validator.Validate(token, null, null);
+        }
 
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext ctx)

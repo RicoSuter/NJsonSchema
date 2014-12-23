@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NJsonSchema.Validation;
 
 namespace NJsonSchema.DraftV4
 {

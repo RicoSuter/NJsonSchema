@@ -62,14 +62,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="DraftV4\JsonProperty.cs" />
     <Compile Include="DraftV4\JsonSchema.cs" />
     <Compile Include="DraftV4\JsonSchemaBase.cs" />
-    <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="DraftV4\JsonSchemaValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DraftV4\JsonSchemaGenerator.cs" />
     <Compile Include="DraftV4\SimpleType.cs" />
     <Compile Include="DraftV4\SimpleTypeDescription.cs" />
+    <Compile Include="Validation\ValidationError.cs" />
+    <Compile Include="Validation\ValidationErrorKind.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

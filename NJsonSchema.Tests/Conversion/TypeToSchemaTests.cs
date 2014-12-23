@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.DraftV4;
 
-namespace JsonSchema4.Tests
+namespace JsonSchema4.Tests.Conversion
 {
     [TestClass]
     public class TypeToSchemaTests
