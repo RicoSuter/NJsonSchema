@@ -5,5 +5,7 @@
     <version>$version$</version>
     <authors>$author$</authors>
     <description>$description$</description>
+    <projectUrl>https://github.com/rsuter/NJsonSchema</projectUrl>
+    <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
   </metadata>
 </package>
