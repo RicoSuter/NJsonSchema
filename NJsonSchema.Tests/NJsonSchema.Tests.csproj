@@ -55,10 +55,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="Schema\JsonSchemaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Conversion\TypeToSchemaTests.cs" />
     <Compile Include="Validation\ArrayValidationTests.cs" />
+    <Compile Include="Validation\InheritanceTests.cs" />
     <Compile Include="Validation\ObjectValidationTests.cs" />
     <Compile Include="Validation\ValueTypeValidationTests.cs" />
   </ItemGroup>

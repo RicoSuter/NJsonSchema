@@ -62,7 +62,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_deserializing_schema_then_it_should_be_read_correctly()
         {
             //// Arrange
-            var data = 
+            var data =
 @"{
 	""title"": ""Example Schema"",
 	""type"": ""object"",
@@ -96,7 +96,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_deserializing_multiple_types_then_flags_should_be_set_correctly()
         {
             //// Arrange
-            var data = 
+            var data =
 @"{
   ""type"": [
     ""string"",
@@ -116,7 +116,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_deserializing_single_type_then_flags_should_be_set_correctly()
         {
             //// Arrange
-            var data = 
+            var data =
 @"{
   ""type"": ""string""
 }";
@@ -163,7 +163,7 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var schema = new JsonSchema4();
-            
+
             //// Act
             schema.Properties.Add("test", new JsonProperty());
 
@@ -180,7 +180,7 @@ namespace NJsonSchema.Tests.Schema
             schema.Properties["test"] = new JsonProperty();
 
             //// Act
-            schema.Properties["test"].IsRequired = true; 
+            schema.Properties["test"].IsRequired = true;
 
             //// Assert
             Assert.IsTrue(schema.RequiredProperties.Contains("test"));
@@ -192,7 +192,7 @@ namespace NJsonSchema.Tests.Schema
             //// Arrange
             var schema = new JsonSchema4();
             schema.Properties["test"] = new JsonProperty();
-            schema.RequiredProperties.Add("test"); 
+            schema.RequiredProperties.Add("test");
 
             //// Act
             schema.Properties["test"].IsRequired = false;

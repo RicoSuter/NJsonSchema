@@ -30,6 +30,14 @@ namespace NJsonSchema
 
             // TODO: If multiple flags check whether it is either one of them...
 
+            if (ValidateAnyOf(token, propertyName, propertyPath, errors))
+                return errors;
+            if (ValidateAllOf(token, propertyName, propertyPath, errors))
+                return errors;
+            if (ValidateOneOf(token, propertyName, propertyPath, errors))
+                return errors;
+
+            ValidateNot(token, propertyName, propertyPath, errors);
             ValidateString(token, propertyName, propertyPath, errors);
             ValidateNumber(token, propertyName, propertyPath, errors);
             ValidateInteger(token, propertyName, propertyPath, errors);
@@ -41,6 +49,51 @@ namespace NJsonSchema
             return errors;
         }
 
+        private bool ValidateAnyOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.AnyOf.Count > 0)
+            {
+                if (_schema.AnyOf.All(s => s.Validate(token).Count != 0))
+                    errors.Add(new ValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath));
+
+                return true;
+            }
+            return false; 
+        }
+
+        private bool ValidateAllOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.AnyOf.Count > 0)
+            {
+                if (_schema.AnyOf.Any(s => s.Validate(token).Count != 0))
+                    errors.Add(new ValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath));
+
+                return true;
+            }
+            return false;
+        }
+
+        private bool ValidateOneOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.AnyOf.Count > 0)
+            {
+                if (_schema.AnyOf.Count(s => s.Validate(token).Count == 0) != 1)
+                    errors.Add(new ValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath));
+
+                return true;
+            }
+            return false;
+        }
+
+        private void ValidateNot(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.Not != null)
+            {
+                if (_schema.Not.Validate(token).Count == 0)
+                    errors.Add(new ValidationError(ValidationErrorKind.ExcludedSchemaValidates, propertyName, propertyPath));
+            }
+        }
+        
         private void ValidateNull(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (_schema.Type.HasFlag(JsonObjectType.Null))

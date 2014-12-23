@@ -24,14 +24,12 @@ namespace NJsonSchema
         [JsonIgnore]
         public string Key { get; internal set; }
 
-        /// <summary>Gets the parent schema of this property schema. </summary>
-        [JsonIgnore]
-        public JsonSchema4 Parent
+        public override JsonSchema4 Parent
         {
             get { return _parent; }
             internal set
             {
-                var initialize = _parent == null; 
+                var initialize = _parent == null;
                 _parent = value;
 
                 if (initialize && InitialIsRequired)

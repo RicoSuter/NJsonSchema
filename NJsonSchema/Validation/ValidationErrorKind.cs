@@ -19,6 +19,12 @@
         TooManyItems,
         TooFewItems,
         ItemsNotUnique,
-        DateTimeExpected
+        DateTimeExpected,
+
+        NotAnyOf,
+        NotAllOf,
+        NotOneOf,
+
+        ExcludedSchemaValidates
     }
 }
