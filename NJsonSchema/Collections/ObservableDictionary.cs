@@ -18,40 +18,53 @@ namespace NJsonSchema.Collections
     /// <summary>An implementation of an observable dictionary. </summary>
     /// <typeparam name="TKey">The type of the key. </typeparam>
     /// <typeparam name="TValue">The type of the value. </typeparam>
-    internal class ObservableDictionary<TKey, TValue> :
+    public class ObservableDictionary<TKey, TValue> :
         IDictionary<TKey, TValue>, INotifyCollectionChanged,
         INotifyPropertyChanged, IDictionary
 #if !LEGACY
-        , IReadOnlyDictionary<TKey, TValue>
+, IReadOnlyDictionary<TKey, TValue>
 #endif
     {
         private IDictionary<TKey, TValue> _dictionary;
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         public ObservableDictionary()
         {
             _dictionary = new Dictionary<TKey, TValue>();
         }
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
+        /// <param name="dictionary">The dictionary to initialize this dictionary. </param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
             _dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
+        /// <param name="comparer">The comparer. </param>
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
             _dictionary = new Dictionary<TKey, TValue>(comparer);
         }
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
+        /// <param name="capacity">The capacity. </param>
         public ObservableDictionary(int capacity)
         {
             _dictionary = new Dictionary<TKey, TValue>(capacity);
         }
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
+        /// <param name="dictionary">The dictionary to initialize this dictionary. </param>
+        /// <param name="comparer">The comparer. </param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
             _dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 
+        /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
+        /// <param name="capacity">The capacity. </param>
+        /// <param name="comparer">The comparer. </param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
             _dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
