@@ -7,11 +7,6 @@ namespace NJsonSchema
     {
         private JsonSchema4 _parent;
 
-        /// <summary>Initializes a new instance of the <see cref="JsonProperty"/> class. </summary>
-        public JsonProperty()
-        {
-        }
-
         internal static JsonProperty FromJsonSchema(string key, JsonSchema4 type)
         {
             var data = JsonConvert.SerializeObject(type);

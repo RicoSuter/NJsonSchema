@@ -61,6 +61,7 @@ namespace NJsonSchema
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Description { get; set; }
 
+        /// <summary>Gets the object type. </summary>
         [JsonIgnore]
         public JsonObjectType Type { get; internal set; }
 
@@ -77,7 +78,7 @@ namespace NJsonSchema
         public object Default { get; set; }
 
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int MultipleOf { get; set; } // TODO: Whats MultipleOf?
+        public double? MultipleOf { get; set; } // TODO: Whats MultipleOf?
 
         /// <summary>Gets or sets the maximum allowed value. </summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -129,6 +130,8 @@ namespace NJsonSchema
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
+
+        #region Child JSON schemas
 
         /// <summary>Gets the properties of the type. </summary>
         [JsonIgnore]
@@ -226,6 +229,8 @@ namespace NJsonSchema
                 }
             }
         }
+
+        #endregion
 
         #region Raw properties
 
@@ -349,6 +354,12 @@ namespace NJsonSchema
             Initialize();
         }
 
+        private static JsonObjectType ConvertSimpleTypeFromString(string value)
+        {
+            // TODO: Improve performance
+            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\""); 
+        }
+
         private void Initialize()
         {
             if (Properties == null)
@@ -429,11 +440,6 @@ namespace NJsonSchema
                 foreach (var item in collection.Values)
                     item.Parent = this;
             }
-        }
-
-        private static JsonObjectType ConvertSimpleTypeFromString(string value)
-        {
-            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\""); // TODO: Improve performance
         }
     }
 }

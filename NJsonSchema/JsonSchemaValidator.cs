@@ -150,10 +150,13 @@ namespace NJsonSchema
                     var value = token.Value<double>();
 
                     if (_schema.Minimum.HasValue && (_schema.IsExclusiveMinimum ? value <= _schema.Minimum : value < _schema.Minimum))
-                        errors.Add(new ValidationError(ValidationErrorKind.IntegerTooSmall, propertyName, propertyPath));
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooSmall, propertyName, propertyPath));
 
                     if (_schema.Maximum.HasValue && (_schema.IsExclusiveMaximum ? value >= _schema.Maximum : value > _schema.Maximum))
-                        errors.Add(new ValidationError(ValidationErrorKind.IntegerTooBig, propertyName, propertyPath));
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooBig, propertyName, propertyPath));
+
+                    if (_schema.MultipleOf.HasValue && value % _schema.MultipleOf != 0)
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberNotMultipleOf, propertyName, propertyPath));
                 }
             }
         }
@@ -173,6 +176,9 @@ namespace NJsonSchema
 
                     if (_schema.Maximum.HasValue && (_schema.IsExclusiveMaximum ? value >= _schema.Maximum : value > _schema.Maximum))
                         errors.Add(new ValidationError(ValidationErrorKind.IntegerTooBig, propertyName, propertyPath));
+
+                    if (_schema.MultipleOf.HasValue && value % _schema.MultipleOf != 0)
+                        errors.Add(new ValidationError(ValidationErrorKind.IntegerNotMultipleOf, propertyName, propertyPath));
                 }
             }
         }
