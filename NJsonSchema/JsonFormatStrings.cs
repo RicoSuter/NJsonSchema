@@ -1,4 +1,4 @@
-﻿namespace NJsonSchema.DraftV4
+﻿namespace NJsonSchema
 {
     /// <summary>Class containing the constants available as format string. </summary>
     public static class JsonFormatStrings

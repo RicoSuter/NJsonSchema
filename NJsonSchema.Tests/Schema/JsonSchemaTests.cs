@@ -3,9 +3,8 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.DraftV4;
 
-namespace JsonSchema4.Tests.Schema
+namespace NJsonSchema.Tests.Schema
 {
     [TestClass]
     public class JsonSchemaTests
@@ -52,7 +51,7 @@ namespace JsonSchema4.Tests.Schema
 ";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
+            var schema = JsonSchema4.FromJson(data);
 
             //// Assert
             Assert.IsNotNull(schema.Definitions["diskDevice"]);
@@ -84,9 +83,9 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data, new JsonSerializerSettings { ConstructorHandling = ConstructorHandling.Default});
+            var schema = JsonSchema4.FromJson(data);
 
-            var x = JsonConvert.SerializeObject(schema, Formatting.Indented);
+            var x = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(3, schema.Properties.Count);
@@ -106,7 +105,7 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
+            var schema = JsonSchema4.FromJson(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -123,7 +122,7 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
+            var schema = JsonSchema4.FromJson(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -134,7 +133,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer;
@@ -147,7 +146,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
@@ -163,7 +162,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             
             //// Act
             schema.Properties.Add("test", new JsonProperty());
@@ -177,7 +176,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Properties["test"] = new JsonProperty();
 
             //// Act
@@ -191,7 +190,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Properties["test"] = new JsonProperty();
             schema.RequiredProperties.Add("test"); 
 

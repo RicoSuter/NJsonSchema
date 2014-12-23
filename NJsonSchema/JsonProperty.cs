@@ -1,18 +1,18 @@
 ﻿using Newtonsoft.Json;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     /// <summary>A description of a JSON property of a JSON object. </summary>
-    public class JsonProperty : JsonSchemaBase
+    public class JsonProperty : JsonSchema4
     {
-        private JsonSchemaBase _parent;
+        private JsonSchema4 _parent;
 
         /// <summary>Initializes a new instance of the <see cref="JsonProperty"/> class. </summary>
         public JsonProperty()
         {
         }
 
-        internal static JsonProperty FromJsonSchema(string key, JsonSchemaBase type)
+        internal static JsonProperty FromJsonSchema(string key, JsonSchema4 type)
         {
             var data = JsonConvert.SerializeObject(type);
             var property = JsonConvert.DeserializeObject<JsonProperty>(data);
@@ -26,7 +26,7 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets the parent schema of this property schema. </summary>
         [JsonIgnore]
-        public JsonSchemaBase Parent
+        public JsonSchema4 Parent
         {
             get { return _parent; }
             internal set

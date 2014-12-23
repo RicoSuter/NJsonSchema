@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.DraftV4;
 using NJsonSchema.Validation;
 
-namespace JsonSchema4.Tests.Validation
+namespace NJsonSchema.Tests.Validation
 {
     [TestClass]
     public class ObjectValidationTests
@@ -13,7 +12,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_token_is_not_object_then_validation_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
 
@@ -30,7 +29,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_required_property_is_missing_then_it_should_be_in_error_list()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -53,7 +52,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_optional_property_is_missing_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -73,7 +72,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_property_is_available_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -95,7 +94,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_property_required_but_integer_provided_then_it_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {

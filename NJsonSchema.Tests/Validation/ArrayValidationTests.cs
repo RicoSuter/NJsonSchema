@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.DraftV4;
 using NJsonSchema.Validation;
 
-namespace JsonSchema4.Tests.Validation
+namespace NJsonSchema.Tests.Validation
 {
     [TestClass]
     public class ArrayValidationTests
@@ -13,7 +12,7 @@ namespace JsonSchema4.Tests.Validation
         public void When_token_is_not_array_then_validation_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             
             var token = new JValue(10);
@@ -29,9 +28,9 @@ namespace JsonSchema4.Tests.Validation
         public void When_array_items_are_valid_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
-            schema.Items = new JsonSchemaBase();
+            schema.Items = new JsonSchema4();
             schema.Items.Type = JsonObjectType.String;
 
             var token = new JArray();
@@ -49,9 +48,9 @@ namespace JsonSchema4.Tests.Validation
         public void When_second_item_validation_fails_then_path_should_be_correct()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
-            schema.Items = new JsonSchemaBase();
+            schema.Items = new JsonSchema4();
             schema.Items.Type = JsonObjectType.String;
 
             var token = new JArray();
@@ -72,10 +71,10 @@ namespace JsonSchema4.Tests.Validation
         public void When_max_items_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.MaxItems = 1;
-            schema.Items = new JsonSchemaBase();
+            schema.Items = new JsonSchema4();
             schema.Items.Type = JsonObjectType.String;
 
             var token = new JArray();
@@ -94,10 +93,10 @@ namespace JsonSchema4.Tests.Validation
         public void When_min_items_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.MinItems = 2;
-            schema.Items = new JsonSchemaBase();
+            schema.Items = new JsonSchema4();
             schema.Items.Type = JsonObjectType.String;
 
             var token = new JArray();
@@ -115,10 +114,10 @@ namespace JsonSchema4.Tests.Validation
         public void When_unique_items_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.UniqueItems = true;
-            schema.Items = new JsonSchemaBase();
+            schema.Items = new JsonSchema4();
             schema.Items.Type = JsonObjectType.String;
 
             var token = new JArray();

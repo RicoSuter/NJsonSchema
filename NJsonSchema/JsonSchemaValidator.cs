@@ -5,16 +5,16 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
     internal class JsonSchemaValidator
     {
-        private readonly JsonSchemaBase _schema;
+        private readonly JsonSchema4 _schema;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaValidator"/> class. </summary>
         /// <param name="schema">The schema. </param>
-        public JsonSchemaValidator(JsonSchemaBase schema)
+        public JsonSchemaValidator(JsonSchema4 schema)
         {
             _schema = schema;
         }

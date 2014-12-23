@@ -8,17 +8,34 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
 using NJsonSchema.Validation;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    public class JsonSchemaBase
+    public class JsonSchema4
     {
         private IDictionary<string, JsonProperty> _properties;
 
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaBase"/> class. </summary>
-        public JsonSchemaBase()
+        /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
+        public JsonSchema4()
         {
             Initialize();
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema4"/> from a given type. </summary>
+        /// <typeparam name="TType">The type to create the schema for. </typeparam>
+        /// <returns>The <see cref="JsonSchema4"/>. </returns>
+        public static JsonSchema4 FromType<TType>()
+        {
+            var generator = new JsonSchemaGenerator();
+            return generator.Generate<JsonSchema4>(typeof(TType));
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
+        /// <param name="data">The JSON string. </param>
+        /// <returns></returns>
+        public static JsonSchema4 FromJson(string data)
+        {
+            return JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings { ConstructorHandling = ConstructorHandling.Default});
         }
 
         /// <summary>Gets or sets the schema. </summary>
@@ -78,7 +95,7 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets or sets the schema of an array item. </summary>
         [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonSchemaBase Items { get; set; }
+        public JsonSchema4 Items { get; set; }
 
         /// <summary>Gets or sets the maximum length of the array. </summary>
         [JsonProperty("maxItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -122,22 +139,22 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets the other schema definitions of this schema. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonSchemaBase> Definitions { get; internal set; }
+        public IDictionary<string, JsonSchema4> Definitions { get; internal set; }
 
         [JsonIgnore]
-        public ICollection<JsonSchemaBase> AllOf { get; internal set; }
+        public ICollection<JsonSchema4> AllOf { get; internal set; }
 
         [JsonIgnore]
-        public ICollection<JsonSchemaBase> AnyOf { get; internal set; }
+        public ICollection<JsonSchema4> AnyOf { get; internal set; }
 
         [JsonIgnore]
-        public ICollection<JsonSchemaBase> OneOf { get; internal set; }
+        public ICollection<JsonSchema4> OneOf { get; internal set; }
 
         [JsonIgnore]
         public JsonObjectType Type { get; internal set; }
 
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonSchemaBase Not { get; internal set; }
+        public JsonSchema4 Not { get; internal set; }
 
         #region Raw properties
 
@@ -178,12 +195,12 @@ namespace NJsonSchema.DraftV4
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchemaBase> PropertiesRaw
+        internal IDictionary<string, JsonSchema4> PropertiesRaw
         {
             get
             {
                 return Properties != null && Properties.Count > 0 ? 
-                    Properties.ToDictionary(p => p.Key, p => (JsonSchemaBase)p.Value) : 
+                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : 
                     null;
             }
             set
@@ -195,34 +212,45 @@ namespace NJsonSchema.DraftV4
         }
 
         [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchemaBase> DefinitionsRaw
+        internal IDictionary<string, JsonSchema4> DefinitionsRaw
         {
             get { return Definitions != null && Definitions.Count > 0 ? Definitions : null; }
-            set { Definitions = value ?? new Dictionary<string, JsonSchemaBase>(); }
+            set { Definitions = value ?? new Dictionary<string, JsonSchema4>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchemaBase> AllOfRaw
+        internal ICollection<JsonSchema4> AllOfRaw
         {
             get { return AllOf != null && AllOf.Count > 0 ? AllOf : null; }
-            set { AllOf = value ?? new Collection<JsonSchemaBase>(); }
+            set { AllOf = value ?? new Collection<JsonSchema4>(); }
         }
 
         [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchemaBase> AnyOfRaw
+        internal ICollection<JsonSchema4> AnyOfRaw
         {
             get { return AnyOf != null && AnyOf.Count > 0 ? AnyOf : null; }
-            set { AnyOf = value ?? new Collection<JsonSchemaBase>(); }
+            set { AnyOf = value ?? new Collection<JsonSchema4>(); }
         }
 
         [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchemaBase> OneOfRaw
+        internal ICollection<JsonSchema4> OneOfRaw
         {
             get { return OneOf != null && OneOf.Count > 0 ? OneOf : null; }
-            set { OneOf = value ?? new Collection<JsonSchemaBase>(); }
+            set { OneOf = value ?? new Collection<JsonSchema4>(); }
         }
 
         #endregion
+
+        /// <summary>Serializes the <see cref="JsonSchema4"/> to a JSON string. </summary>
+        /// <returns>The JSON string. </returns>
+        public string ToJson()
+        {
+            var oldSchema = Schema;
+            Schema = "http://json-schema.org/draft-04/schema#";
+            var data = JsonConvert.SerializeObject(this, Formatting.Indented);
+            Schema = oldSchema;
+            return data;
+        }
 
         /// <summary>Validates the given JSON token against this schema. </summary>
         /// <param name="token">The token to validate. </param>
@@ -245,19 +273,19 @@ namespace NJsonSchema.DraftV4
                 Properties = new ObservableDictionary<string, JsonProperty>();
 
             if (Definitions == null)
-                Definitions = new Dictionary<string, JsonSchemaBase>();
+                Definitions = new Dictionary<string, JsonSchema4>();
 
             if (RequiredProperties == null)
                 RequiredProperties = new Collection<string>();
 
             if (AllOf == null)
-                AllOf = new Collection<JsonSchemaBase>();
+                AllOf = new Collection<JsonSchema4>();
 
             if (AnyOf == null)
-                AnyOf = new Collection<JsonSchemaBase>();
+                AnyOf = new Collection<JsonSchema4>();
 
             if (OneOf == null)
-                OneOf = new Collection<JsonSchemaBase>();
+                OneOf = new Collection<JsonSchema4>();
 
             InitializeProperties();
         }

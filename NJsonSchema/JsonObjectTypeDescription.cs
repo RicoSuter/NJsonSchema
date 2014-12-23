@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     internal class JsonObjectTypeDescription
     {

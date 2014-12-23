@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     [Flags]
     public enum JsonObjectType

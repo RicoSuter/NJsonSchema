@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Reflection;
 
-namespace NJsonSchema.DraftV4
+namespace NJsonSchema
 {
     internal class JsonSchemaGenerator
     {
         public TSchemaType Generate<TSchemaType>(Type type)
-            where TSchemaType : JsonSchemaBase, new()
+            where TSchemaType : JsonSchema4, new()
         {
             var schema = new TSchemaType();
 
@@ -25,14 +25,14 @@ namespace NJsonSchema.DraftV4
             {
                 schema.Type = JsonObjectType.Array;
                 var itemType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
-                schema.Items = Generate<JsonSchemaBase>(itemType);
+                schema.Items = Generate<JsonSchema4>(itemType);
             }
 
             return schema;
         }
 
         private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema)
-            where TSchemaType : JsonSchemaBase, new()
+            where TSchemaType : JsonSchema4, new()
         {
             var propertyType = property.PropertyType;
 

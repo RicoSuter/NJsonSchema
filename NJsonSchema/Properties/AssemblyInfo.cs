@@ -8,4 +8,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2014")]
 [assembly: AssemblyVersion("0.1.*")]
 
-[assembly: InternalsVisibleTo("JsonSchema4.Tests")]
+[assembly: InternalsVisibleTo("NJsonSchema.Tests")]
