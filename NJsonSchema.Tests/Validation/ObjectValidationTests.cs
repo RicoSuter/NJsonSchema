@@ -32,8 +32,10 @@ namespace JsonSchema4.Tests.Validation
             //// Arrange
             var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Foo"].IsRequired = true;
+            schema.Properties["Foo"] = new JsonProperty
+            {
+                IsRequired = true,
+            };
 
             var token = new JObject();
 
@@ -53,8 +55,10 @@ namespace JsonSchema4.Tests.Validation
             //// Arrange
             var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Foo"].IsRequired = false;
+            schema.Properties["Foo"] = new JsonProperty
+            {
+                IsRequired = false,
+            };
 
             var token = new JObject();
 
@@ -71,9 +75,11 @@ namespace JsonSchema4.Tests.Validation
             //// Arrange
             var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Foo"].IsRequired = true;
-            schema.Properties["Foo"].Type = JsonObjectType.String;
+            schema.Properties["Foo"] = new JsonProperty
+            {
+                IsRequired = true,
+                Type = JsonObjectType.String
+            };
 
             var token = new JObject();
             token["Foo"] = new JValue("Bar");
@@ -91,9 +97,11 @@ namespace JsonSchema4.Tests.Validation
             //// Arrange
             var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Foo"].IsRequired = true;
-            schema.Properties["Foo"].Type = JsonObjectType.String;
+            schema.Properties["Foo"] = new JsonProperty
+            {
+                IsRequired = true,
+                Type = JsonObjectType.String
+            };
 
             var token = new JObject();
             token["Foo"] = new JValue(10);

@@ -5,6 +5,8 @@ namespace NJsonSchema.DraftV4
     /// <summary>A description of a JSON property of a JSON object. </summary>
     public class JsonProperty : JsonSchemaBase
     {
+        private JsonSchemaBase _parent;
+
         /// <summary>Initializes a new instance of the <see cref="JsonProperty"/> class. </summary>
         public JsonProperty()
         {
@@ -24,7 +26,18 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets the parent schema of this property schema. </summary>
         [JsonIgnore]
-        public JsonSchemaBase Parent { get; internal set; }
+        public JsonSchemaBase Parent
+        {
+            get { return _parent; }
+            internal set
+            {
+                var initialize = _parent == null; 
+                _parent = value;
+
+                if (initialize && InitialIsRequired)
+                    IsRequired = InitialIsRequired;
+            }
+        }
 
         /// <summary>Gets or sets a value indicating whether the property is required. </summary>
         [JsonIgnore]
@@ -33,17 +46,26 @@ namespace NJsonSchema.DraftV4
             get { return Parent.RequiredProperties.Contains(Key); }
             set
             {
-                if (value)
-                {
-                    if (!Parent.RequiredProperties.Contains(Key))
-                        Parent.RequiredProperties.Add(Key);
-                }
+                if (Parent == null)
+                    InitialIsRequired = value;
                 else
                 {
-                    if (Parent.RequiredProperties.Contains(Key))
-                        Parent.RequiredProperties.Remove(Key);
+                    if (value)
+                    {
+                        if (!Parent.RequiredProperties.Contains(Key))
+                            Parent.RequiredProperties.Add(Key);
+                    }
+                    else
+                    {
+                        if (Parent.RequiredProperties.Contains(Key))
+                            Parent.RequiredProperties.Remove(Key);
+                    }
                 }
             }
         }
+
+        /// <remarks>Value used to set <see cref="IsRequired"/> property even if parent is not set yet. </remarks>
+        [JsonIgnore]
+        internal bool InitialIsRequired { get; set; }
     }
 }
