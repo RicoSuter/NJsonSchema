@@ -25,10 +25,10 @@ namespace NJsonSchema.DraftV4
                 return new JsonObjectTypeDescription(JsonObjectType.String, false);
 
             if (type == typeof(DateTime))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, "date-time");
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, JsonFormatStrings.DateTime);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, "uri");
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, JsonFormatStrings.Uri);
 
             if (IsArrayType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Array, false);

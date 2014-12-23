@@ -8,5 +8,8 @@
 
         /// <summary>Format for an email. </summary>
         public static string Email = "email";
+
+        /// <summary>Format for an URI. </summary>
+        public static string Uri = "uri";
     }
 }
