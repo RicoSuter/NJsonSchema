@@ -52,7 +52,7 @@ namespace JsonSchema4.Tests.Schema
 ";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<JsonSchema>(data);
+            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
 
             //// Assert
             Assert.IsNotNull(schema.Definitions["diskDevice"]);
@@ -84,13 +84,13 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<JsonSchema>(data, new JsonSerializerSettings { ConstructorHandling = ConstructorHandling.Default});
+            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data, new JsonSerializerSettings { ConstructorHandling = ConstructorHandling.Default});
 
             var x = JsonConvert.SerializeObject(schema, Formatting.Indented);
 
             //// Assert
             Assert.AreEqual(3, schema.Properties.Count);
-            Assert.AreEqual(SimpleType.Object, schema.Type);
+            Assert.AreEqual(JsonObjectType.Object, schema.Type);
         }
 
         [TestMethod]
@@ -106,11 +106,11 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<JsonSchema>(data);
+            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
 
             //// Assert
-            Assert.IsTrue(schema.Type.HasFlag(SimpleType.String));
-            Assert.IsTrue(schema.Type.HasFlag(SimpleType.Null));
+            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
+            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.Null));
         }
 
         [TestMethod]
@@ -123,21 +123,21 @@ namespace JsonSchema4.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonConvert.DeserializeObject<JsonSchema>(data);
+            var schema = JsonConvert.DeserializeObject<NJsonSchema.DraftV4.JsonSchema4>(data);
 
             //// Assert
-            Assert.IsTrue(schema.Type.HasFlag(SimpleType.String));
-            Assert.AreEqual(SimpleType.String, schema.Type);
+            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
+            Assert.AreEqual(JsonObjectType.String, schema.Type);
         }
 
         [TestMethod]
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new JsonSchema();
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
 
             //// Act
-            schema.Type = SimpleType.Integer;
+            schema.Type = JsonObjectType.Integer;
 
             //// Assert
             Assert.AreEqual("integer", schema.TypeRaw.ToString());
@@ -147,10 +147,10 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new JsonSchema();
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
 
             //// Act
-            schema.Type = SimpleType.Integer | SimpleType.Object;
+            schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
 
             //// Assert
             var types = (JArray)schema.TypeRaw;
@@ -163,7 +163,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
-            var schema = new JsonSchema();
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
             
             //// Act
             schema.Properties.Add("test", new JsonProperty());
@@ -177,7 +177,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new JsonSchema();
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Properties["test"] = new JsonProperty();
 
             //// Act
@@ -191,7 +191,7 @@ namespace JsonSchema4.Tests.Schema
         public void When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new JsonSchema();
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
             schema.Properties["test"] = new JsonProperty();
             schema.RequiredProperties.Add("test"); 
 

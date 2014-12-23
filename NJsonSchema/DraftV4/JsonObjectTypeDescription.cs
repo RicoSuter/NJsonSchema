@@ -4,34 +4,34 @@ using System.Reflection;
 
 namespace NJsonSchema.DraftV4
 {
-    internal class SimpleTypeDescription
+    internal class JsonObjectTypeDescription
     {
-        /// <summary>Creates a <see cref="SimpleTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <summary>Creates a <see cref="JsonObjectTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="type">The type. </param>
-        /// <returns>The <see cref="SimpleTypeDescription"/>. </returns>
-        public static SimpleTypeDescription FromType(Type type)
+        /// <returns>The <see cref="JsonObjectTypeDescription"/>. </returns>
+        public static JsonObjectTypeDescription FromType(Type type)
         {
             if ((type == typeof(int) || type == typeof(long) || type == typeof(short)) ||
                 (type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort)))
-                return new SimpleTypeDescription(SimpleType.Integer, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, true);
 
             if (type == typeof(double) || type == typeof(decimal) || type == typeof(float))
-                return new SimpleTypeDescription(SimpleType.Number, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Number, true);
 
             if (type == typeof(bool))
-                return new SimpleTypeDescription(SimpleType.Boolean, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Boolean, true);
 
             if (type == typeof(string))
-                return new SimpleTypeDescription(SimpleType.String, false);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false);
 
             if (type == typeof(DateTime))
-                return new SimpleTypeDescription(SimpleType.String, true, "date-time");
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, "date-time");
 
             if (type == typeof(Uri))
-                return new SimpleTypeDescription(SimpleType.String, true, "uri");
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, "uri");
 
             if (IsArrayType(type))
-                return new SimpleTypeDescription(SimpleType.Array, false);
+                return new JsonObjectTypeDescription(JsonObjectType.Array, false);
 
             if (type.Name == "Nullable`1")
             {
@@ -40,10 +40,10 @@ namespace NJsonSchema.DraftV4
                 return typeDescription;
             }
 
-            return new SimpleTypeDescription(SimpleType.Object, false);
+            return new JsonObjectTypeDescription(JsonObjectType.Object, false);
         }
 
-        private SimpleTypeDescription(SimpleType type, bool isAlwaysRequired, string format = null)
+        private JsonObjectTypeDescription(JsonObjectType type, bool isAlwaysRequired, string format = null)
         {
             Type = type;
             IsAlwaysRequired = isAlwaysRequired;
@@ -51,7 +51,7 @@ namespace NJsonSchema.DraftV4
         }
 
         /// <summary>Gets the type. </summary>
-        public SimpleType Type { get; private set; }
+        public JsonObjectType Type { get; private set; }
 
         /// <summary>Gets a value indicating whether the type must always required. </summary>
         public bool IsAlwaysRequired { get; private set; }

@@ -13,8 +13,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_token_is_not_object_then_validation_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Object;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
 
             var token = new JValue(10);
@@ -30,8 +30,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_required_property_is_missing_then_it_should_be_in_error_list()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Object;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
             schema.Properties["Foo"].IsRequired = true;
 
@@ -51,8 +51,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_optional_property_is_missing_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Object;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
             schema.Properties["Foo"].IsRequired = false;
 
@@ -69,11 +69,11 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_property_is_available_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Object;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
             schema.Properties["Foo"].IsRequired = true;
-            schema.Properties["Foo"].Type = SimpleType.String;
+            schema.Properties["Foo"].Type = JsonObjectType.String;
 
             var token = new JObject();
             token["Foo"] = new JValue("Bar");
@@ -89,11 +89,11 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_property_required_but_integer_provided_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Object;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
             schema.Properties["Foo"].IsRequired = true;
-            schema.Properties["Foo"].Type = SimpleType.String;
+            schema.Properties["Foo"].Type = JsonObjectType.String;
 
             var token = new JObject();
             token["Foo"] = new JValue(10);

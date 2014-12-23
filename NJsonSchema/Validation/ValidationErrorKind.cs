@@ -10,6 +10,15 @@
         ObjectExpected,
         PropertyRequired,
         ArrayExpected,
-        NullExpected
+        NullExpected,
+        PatternMismatch,
+        StringTooShort,
+        StringTooLong,
+        IntegerTooSmall,
+        IntegerTooBig,
+        TooManyItems,
+        TooFewItems,
+        ItemsNotUnique,
+        DateTimeExpected
     }
 }

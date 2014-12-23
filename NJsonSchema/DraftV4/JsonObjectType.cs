@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace NJsonSchema.DraftV4
 {
     [Flags]
-    public enum SimpleType
+    public enum JsonObjectType
     {
         [JsonProperty("none")]
         None = 0, 

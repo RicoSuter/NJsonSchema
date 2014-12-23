@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using NJsonSchema.Collections;
 using NJsonSchema.Validation;
 
@@ -47,11 +46,11 @@ namespace NJsonSchema.DraftV4
         public object Default { get; set; }
 
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int MultipleOf { get; set; }
+        public int MultipleOf { get; set; } // TODO: Whats MultipleOf?
 
         /// <summary>Gets or sets the maximum allowed value. </summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int Maximum { get; set; }
+        public double? Maximum { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -59,7 +58,7 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets or sets the minimum allowed value. </summary>
         [JsonProperty("minimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int Minimum { get; set; }
+        public double? Minimum { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the minimum value is excluded. </summary>
         [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -67,11 +66,11 @@ namespace NJsonSchema.DraftV4
 
         /// <summary>Gets or sets the maximum length of the value string. </summary>
         [JsonProperty("maxLength", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int MaxLength { get; set; }
+        public int? MaxLength { get; set; }
 
         /// <summary>Gets or sets the minimum length of the value string. </summary>
         [JsonProperty("minLength", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public int MinLength { get; set; }
+        public int? MinLength { get; set; }
 
         /// <summary>Gets or sets the validation pattern as regular expression. </summary>
         [JsonProperty("pattern", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -119,6 +118,8 @@ namespace NJsonSchema.DraftV4
             }
         }
 
+        // TODO: Use all properties below for validation
+
         /// <summary>Gets the other schema definitions of this schema. </summary>
         [JsonIgnore]
         public IDictionary<string, JsonSchemaBase> Definitions { get; internal set; }
@@ -133,7 +134,7 @@ namespace NJsonSchema.DraftV4
         public ICollection<JsonSchemaBase> OneOf { get; internal set; }
 
         [JsonIgnore]
-        public SimpleType Type { get; internal set; }
+        public JsonObjectType Type { get; internal set; }
 
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchemaBase Not { get; internal set; }
@@ -147,8 +148,8 @@ namespace NJsonSchema.DraftV4
             {
                 var flags = Enum.GetValues(Type.GetType())
                     .Cast<Enum>().Where(v => Type.HasFlag(v))
-                    .OfType<SimpleType>()
-                    .Where(v => v != SimpleType.None)
+                    .OfType<JsonObjectType>()
+                    .Where(v => v != JsonObjectType.None)
                     .ToArray();
 
                 if (flags.Length > 1)
@@ -161,11 +162,11 @@ namespace NJsonSchema.DraftV4
             set
             {
                 if (value is JArray)
-                    Type = ((JArray)value).Aggregate(SimpleType.None, (type, token) => type | ConvertSimpleTypeFromString(token.ToString()));
+                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertSimpleTypeFromString(token.ToString()));
                 else if (value != null)
                     Type = ConvertSimpleTypeFromString(value.ToString());
                 else
-                    Type = SimpleType.None;
+                    Type = JsonObjectType.None;
             }
         }
 
@@ -223,7 +224,10 @@ namespace NJsonSchema.DraftV4
 
         #endregion
 
-        public List<ValidationError> Validate(JToken token)
+        /// <summary>Validates the given JSON token against this schema. </summary>
+        /// <param name="token">The token to validate. </param>
+        /// <returns>The collection of validation errors. </returns>
+        public ICollection<ValidationError> Validate(JToken token)
         {
             var validator = new JsonSchemaValidator(this);
             return validator.Validate(token, null, null);
@@ -270,9 +274,9 @@ namespace NJsonSchema.DraftV4
             }
         }
 
-        private static SimpleType ConvertSimpleTypeFromString(string value)
+        private static JsonObjectType ConvertSimpleTypeFromString(string value)
         {
-            return JsonConvert.DeserializeObject<SimpleType>("\"" + value + "\""); // TODO: Improve performance
+            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\""); // TODO: Improve performance
         }
     }
 }

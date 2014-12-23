@@ -18,7 +18,7 @@ namespace NJsonSchema.Collections
     /// <summary>An implementation of an observable dictionary. </summary>
     /// <typeparam name="TKey">The type of the key. </typeparam>
     /// <typeparam name="TValue">The type of the value. </typeparam>
-    public class ObservableDictionary<TKey, TValue> :
+    internal class ObservableDictionary<TKey, TValue> :
         IDictionary<TKey, TValue>, INotifyCollectionChanged,
         INotifyPropertyChanged, IDictionary
 #if !LEGACY

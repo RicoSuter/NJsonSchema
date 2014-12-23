@@ -13,10 +13,44 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_required_and_string_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.String;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
 
             var token = new JValue("test");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count());
+        }
+
+        [TestMethod]
+        public void When_format_date_time_incorrect_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("test");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.DateTimeExpected, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_format_date_time_correct_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("2014-12-01 11:00:01");
 
             //// Act
             var errors = schema.Validate(token);
@@ -29,8 +63,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_string_required_but_integer_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.String;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
 
             var token = new JValue(10);
 
@@ -45,8 +79,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_number_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Number;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Number;
 
             var token = new JValue(10);
 
@@ -61,8 +95,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_number_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Number;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Number;
 
             var token = new JValue("foo");
 
@@ -77,8 +111,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_integer_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Integer;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Integer;
 
             var token = new JValue(10);
 
@@ -93,8 +127,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_integer_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Integer;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Integer;
 
             var token = new JValue("foo");
 
@@ -109,8 +143,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_boolean_required_and_boolean_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Boolean;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Boolean;
 
             var token = new JValue(true);
 
@@ -125,8 +159,8 @@ namespace JsonSchema4.Tests.Validation
         public void When_boolean_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = SimpleType.Boolean;
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Boolean;
 
             var token = new JValue("foo");
 
@@ -135,6 +169,125 @@ namespace JsonSchema4.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.BooleanExpected, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_string_pattern_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Pattern = "aa(.*)aa";
+
+            var token = new JValue("aaccbb");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.PatternMismatch, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_string_min_length_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.MinLength = 2;
+
+            var token = new JValue("a");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.StringTooShort, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_string_max_length_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.MaxLength = 2;
+
+            var token = new JValue("aaa");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.StringTooLong, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_integer_minimum_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Integer;
+            schema.Minimum = 2;
+
+            var token = new JValue(1);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.IntegerTooSmall, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_integer_maximum_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Integer;
+            schema.Maximum = 2;
+
+            var token = new JValue(3);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.IntegerTooBig, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_number_minimum_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Number;
+            schema.Minimum = 1.5;
+
+            var token = new JValue(1.4);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.IntegerTooSmall, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_number_maximum_does_not_match_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new NJsonSchema.DraftV4.JsonSchema4();
+            schema.Type = JsonObjectType.Number;
+            schema.Maximum = 1.5;
+
+            var token = new JValue(1.6);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.IntegerTooBig, errors.First().Kind);
         }
     }
 }
