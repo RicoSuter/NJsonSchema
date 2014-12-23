@@ -41,23 +41,20 @@ namespace NJsonSchema
 
             var attributes = property.GetCustomAttributes().ToArray();
             
+            var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
-            if (propertyTypeDescription.IsAlwaysRequired ||
-                attributes.Any(a => a.GetType().FullName == "System.ComponentModel.DataAnnotations.RequiredAttribute"))
+            if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
                 parentSchema.RequiredProperties.Add(property.Name);
 
-            dynamic descriptionAttribute = attributes
-                .FirstOrDefault(a => a.GetType().FullName == "System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null)
                 jsonProperty.Description = descriptionAttribute.Description;
 
-            dynamic regexAttribute = attributes
-                .FirstOrDefault(a => a.GetType().FullName == "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
                 jsonProperty.Pattern = regexAttribute.Pattern;
 
-            dynamic rangeAttribute = attributes
-                .FirstOrDefault(a => a.GetType().FullName == "System.ComponentModel.DataAnnotations.RangeAttribute");
+            dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
             if (rangeAttribute != null)
             {
                 if (rangeAttribute.Minimum != null)
@@ -65,6 +62,11 @@ namespace NJsonSchema
                 if (rangeAttribute.Maximum != null)
                     jsonProperty.Maximum = rangeAttribute.Maximum;
             }
+        }
+
+        private Attribute TryGetAttribute(Attribute[] attributes, string attributeType)
+        {
+            return attributes.FirstOrDefault(a => a.GetType().FullName == attributeType);
         }
     }
 }

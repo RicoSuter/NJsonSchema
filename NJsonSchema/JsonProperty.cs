@@ -19,6 +19,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public string Key { get; internal set; }
 
+        /// <summary>Gets the parent schema of this property schema. </summary>
         public override JsonSchema4 Parent
         {
             get { return _parent; }
