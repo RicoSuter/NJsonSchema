@@ -14,6 +14,7 @@ The JsonSchema4 type can be used as follows:
     var schema = JsonSchema4.FromType<Person>();
     var schemaJsonData = schema.ToJson();
     var errors = schema.Validate("...");
+    var schema2 = JsonSchema4.FromJson(schemaJsonData);
 
 The schema class: 
 
