@@ -22,7 +22,7 @@ The JsonSchema4 type can be used as follows:
 
     schema = JsonSchema4.FromJson(schemaData);
 
-The schema class: 
+The `Person` class: 
 
     public class Person
     {
@@ -53,7 +53,7 @@ The schema class:
         Female
     }
   
-The generated JSON schema data (schemaData): 
+The generated JSON schema data stored in the `schemaData` variable: 
   
     {
       "$schema": "http://json-schema.org/draft-04/schema#",
