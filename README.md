@@ -9,7 +9,7 @@ This project is still in development, some features are not implemented yet.
 
 ## Usage
 
-The JsonSchema4 type can be used as follows: 
+The `JsonSchema4` type can be used as follows: 
 
     var schema = JsonSchema4.FromType<Person>();
     var schemaData = schema.ToJson();
@@ -63,6 +63,7 @@ The generated JSON schema data stored in the `schemaData` variable:
         "FirstName",
         "LastName",
         "Birthday",
+        "Sex",
         "Test"
       ],
       "properties": {
