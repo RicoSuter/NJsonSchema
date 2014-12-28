@@ -12,13 +12,15 @@ namespace NJsonSchema.Demo
             var schema = JsonSchema4.FromType<Person>();
             var schemaData = schema.ToJson();
 
-            var jsonToken = JToken.Parse("...");
+            var jsonToken = JToken.Parse("{}");
             var errors = schema.Validate(jsonToken);
 
             foreach (var error in errors)
                 Console.WriteLine(error.Path + ": " + error.Kind);
 
             schema = JsonSchema4.FromJson(schemaData);
+
+            Console.ReadLine();
         }
     }
 
