@@ -12,31 +12,48 @@ This project is still in development, some features are not implemented yet.
 The JsonSchema4 type can be used as follows: 
 
     var schema = JsonSchema4.FromType<Person>();
-    var schemaJsonData = schema.ToJson();
-    var errors = schema.Validate("...");
-    var schema2 = JsonSchema4.FromJson(schemaJsonData);
+    var schemaData = schema.ToJson();
 
-The schema class: 
+    var jsonToken = JToken.Parse("...");
+    var errors = schema.Validate(jsonToken);
+
+    foreach (var error in errors)
+        Console.WriteLine(error.Path + ": " + error.Kind);
+
+    schema = JsonSchema4.FromJson(schemaData);
+
+The `Person` class: 
 
     public class Person
     {
         [Required]
         public string FirstName { get; set; }
-  
+
         [Required]
         public string LastName { get; set; }
-  
+
+        public Sex Sex { get; set; }
+
         public DateTime Birthday { get; set; }
-  
+
         public Collection<Job> Jobs { get; set; }
+
+        [Range(2, 5)]
+        public int Test { get; set; }
     }
-  
+
     public class Job
     {
         public string Company { get; set; }
     }
+
+    public enum Sex
+    {
+        Male, 
+        Female
+    }
   
-The generated JSON data: 
+The generated JSON schema data stored in the `schemaData` variable: 
   
     {
       "$schema": "http://json-schema.org/draft-04/schema#",
@@ -45,7 +62,8 @@ The generated JSON data:
       "required": [
         "FirstName",
         "LastName",
-        "Birthday"
+        "Birthday",
+        "Test"
       ],
       "properties": {
         "FirstName": {
@@ -53,6 +71,13 @@ The generated JSON data:
         },
         "LastName": {
           "type": "string"
+        },
+        "Sex": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female"
+          ]
         },
         "Birthday": {
           "format": "date-time",
@@ -69,6 +94,11 @@ The generated JSON data:
             }
           },
           "type": "array"
+        },
+        "Test": {
+          "maximum": 5.0,
+          "minimum": 2.0,
+          "type": "integer"
         }
       }
     }
