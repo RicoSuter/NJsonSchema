@@ -155,6 +155,20 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
+        public void When_converting_enum_then_enum_array_must_be_set()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<MyType>();
+            var property = schema.Properties["Color"];
+
+            //// Assert
+            Assert.AreEqual(3, property.Enumerations.Count);
+            Assert.IsTrue(property.Enumerations.Contains("Red"));
+            Assert.IsTrue(property.Enumerations.Contains("Green"));
+            Assert.IsTrue(property.Enumerations.Contains("Blue"));
+        }
+
+        [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
             When_converting_array_then_items_must_correctly_be_loaded("Array");
@@ -215,10 +229,19 @@ namespace NJsonSchema.Tests.Conversion
         public MySubtype[] Array { get; set; }
         public Collection<MySubtype> Collection { get; set; }
         public List<MySubtype> List { get; set; }
+
+        public MyColor Color { get; set; }
     }
 
     public class MySubtype
     {
         public string Id { get; set; }
+    }
+
+    public enum MyColor
+    {
+        Red, 
+        Green, 
+        Blue
     }
 }

@@ -58,7 +58,7 @@ namespace NJsonSchema
 
                 return true;
             }
-            return false; 
+            return false;
         }
 
         private bool ValidateAllOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
@@ -93,7 +93,7 @@ namespace NJsonSchema
                     errors.Add(new ValidationError(ValidationErrorKind.ExcludedSchemaValidates, propertyName, propertyPath));
             }
         }
-        
+
         private void ValidateNull(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (_schema.Type.HasFlag(JsonObjectType.Null))
@@ -111,7 +111,7 @@ namespace NJsonSchema
                     errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
                 else
                 {
-                    var value = token.Value<string>(); 
+                    var value = token.Value<string>();
 
                     if (!string.IsNullOrEmpty(_schema.Pattern))
                     {
@@ -135,6 +135,10 @@ namespace NJsonSchema
                         //if (_schema.Format == JsonFormatStrings.Email && !DateTime.TryParse(value, out dateTimeResult))
                         //    errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath));
                     }
+
+                    // TODO: Support other enum types, not only string?
+                    if (_schema.Enumerations.Count > 0 && !_schema.Enumerations.Contains(value))
+                        errors.Add(new ValidationError(ValidationErrorKind.ValueNotInEnumeration, propertyName, propertyPath));
                 }
             }
         }
@@ -232,7 +236,7 @@ namespace NJsonSchema
 
                     if (_schema.MaxItems > 0 && array.Count > _schema.MaxItems)
                         errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath));
-                    
+
                     if (_schema.UniqueItems && array.Count != array.Distinct().Count())
                         errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath)); // TODO: Is this implementation correct?
 

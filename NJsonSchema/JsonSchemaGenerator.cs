@@ -28,7 +28,18 @@ namespace NJsonSchema
                 schema.Items = Generate<JsonSchema4>(itemType);
             }
 
+            TryLoadEnumerations(type, schema);
             return schema;
+        }
+
+        private static void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
+            where TSchemaType : JsonSchema4, new()
+        {
+            if (type.GetTypeInfo().IsEnum)
+            {
+                foreach (var enumValue in Enum.GetNames(type))
+                    schema.Enumerations.Add(enumValue);
+            }
         }
 
         private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema)

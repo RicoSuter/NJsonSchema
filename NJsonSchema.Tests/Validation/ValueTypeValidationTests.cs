@@ -288,5 +288,43 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
         }
+
+        [TestMethod]
+        public void When_value_not_in_enumeration_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Enumerations.Add("Red");
+            schema.Enumerations.Add("Green");
+            schema.Enumerations.Add("Blue");
+
+            var token = new JValue("Yellow");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.ValueNotInEnumeration, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_value_in_enumeration_then_it_should_succeed()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Enumerations.Add("Red");
+            schema.Enumerations.Add("Green");
+            schema.Enumerations.Add("Blue");
+
+            var token = new JValue("Red");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
+        }
     }
 }

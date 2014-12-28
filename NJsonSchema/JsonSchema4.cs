@@ -127,6 +127,10 @@ namespace NJsonSchema
         public int MinProperties { get; set; }
 
         /// <summary>Gets the collection of required properties. </summary>
+        [JsonIgnore]
+        public ICollection<string> Enumerations { get; internal set; }
+
+        /// <summary>Gets the collection of required properties. </summary>
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
@@ -294,6 +298,13 @@ namespace NJsonSchema
             set { Definitions = value ?? new ObservableDictionary<string, JsonSchema4>(); }
         }
 
+        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal ICollection<string> EnumerationsRaw
+        {
+            get { return Enumerations != null && Enumerations.Count > 0 ? Enumerations : null; }
+            set { Enumerations = value ?? new ObservableCollection<string>(); }
+        }
+
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema4> AllOfRaw
         {
@@ -379,6 +390,9 @@ namespace NJsonSchema
 
             if (OneOf == null)
                 OneOf = new ObservableCollection<JsonSchema4>();
+
+            if (Enumerations == null)
+                Enumerations = new ObservableCollection<string>();
         }
 
         private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)

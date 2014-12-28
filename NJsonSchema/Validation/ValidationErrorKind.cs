@@ -78,6 +78,9 @@
         NumberNotMultipleOf,
 
         /// <summary>The integer is not a multiple of the given integer. </summary>
-        IntegerNotMultipleOf
+        IntegerNotMultipleOf,
+
+        /// <summary>The value is not one of the allowed enumerations. </summary>
+        ValueNotInEnumeration
     }
 }
