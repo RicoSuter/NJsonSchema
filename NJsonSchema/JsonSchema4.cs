@@ -302,7 +302,7 @@ namespace NJsonSchema
         internal ICollection<string> EnumerationsRaw
         {
             get { return Enumerations != null && Enumerations.Count > 0 ? Enumerations : null; }
-            set { Enumerations = value ?? new ObservableCollection<string>(); }
+            set { Enumerations = value ?? new Collection<string>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -392,7 +392,7 @@ namespace NJsonSchema
                 OneOf = new ObservableCollection<JsonSchema4>();
 
             if (Enumerations == null)
-                Enumerations = new ObservableCollection<string>();
+                Enumerations = new Collection<string>();
         }
 
         private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
