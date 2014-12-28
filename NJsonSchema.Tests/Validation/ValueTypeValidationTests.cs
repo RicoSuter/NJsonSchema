@@ -295,9 +295,9 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.String;
-            schema.Enumerations.Add("Red");
-            schema.Enumerations.Add("Green");
-            schema.Enumerations.Add("Blue");
+            schema.Enumeration.Add("Red");
+            schema.Enumeration.Add("Green");
+            schema.Enumeration.Add("Blue");
 
             var token = new JValue("Yellow");
 
@@ -305,7 +305,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.ValueNotInEnumeration, errors.First().Kind);
+            Assert.AreEqual(ValidationErrorKind.NotInEnumeration, errors.First().Kind);
         }
 
         [TestMethod]
@@ -314,9 +314,9 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.String;
-            schema.Enumerations.Add("Red");
-            schema.Enumerations.Add("Green");
-            schema.Enumerations.Add("Blue");
+            schema.Enumeration.Add("Red");
+            schema.Enumeration.Add("Green");
+            schema.Enumeration.Add("Blue");
 
             var token = new JValue("Red");
 

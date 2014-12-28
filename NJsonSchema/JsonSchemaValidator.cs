@@ -137,8 +137,8 @@ namespace NJsonSchema
                     }
 
                     // TODO: Support other enum types, not only string?
-                    if (_schema.Enumerations.Count > 0 && !_schema.Enumerations.Contains(value))
-                        errors.Add(new ValidationError(ValidationErrorKind.ValueNotInEnumeration, propertyName, propertyPath));
+                    if (_schema.Enumeration.Count > 0 && !_schema.Enumeration.Contains(value))
+                        errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath));
                 }
             }
         }

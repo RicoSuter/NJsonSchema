@@ -38,7 +38,7 @@ namespace NJsonSchema
             if (type.GetTypeInfo().IsEnum)
             {
                 foreach (var enumValue in Enum.GetNames(type))
-                    schema.Enumerations.Add(enumValue);
+                    schema.Enumeration.Add(enumValue);
             }
         }
 

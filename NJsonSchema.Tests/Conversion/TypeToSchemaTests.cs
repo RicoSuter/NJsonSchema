@@ -162,10 +162,10 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Color"];
 
             //// Assert
-            Assert.AreEqual(3, property.Enumerations.Count);
-            Assert.IsTrue(property.Enumerations.Contains("Red"));
-            Assert.IsTrue(property.Enumerations.Contains("Green"));
-            Assert.IsTrue(property.Enumerations.Contains("Blue"));
+            Assert.AreEqual(3, property.Enumeration.Count);
+            Assert.IsTrue(property.Enumeration.Contains("Red"));
+            Assert.IsTrue(property.Enumeration.Contains("Green"));
+            Assert.IsTrue(property.Enumeration.Contains("Blue"));
         }
 
         [TestMethod]
