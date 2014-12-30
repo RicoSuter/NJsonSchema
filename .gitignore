@@ -6,6 +6,8 @@
 **.user
 **.DotSettings
 
+**.sln.ide/**
+
 MyToolkit/**
 NuGetReferenceSwitcher/**
 VisualJsonEditor/**

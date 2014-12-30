@@ -107,12 +107,15 @@ namespace NJsonSchema
         {
             if (_schema.Type.HasFlag(JsonObjectType.String))
             {
-                if (token.Type != JTokenType.String)
+                if (token.Type != JTokenType.String && token.Type != JTokenType.Date &&
+                    token.Type != JTokenType.Guid && token.Type != JTokenType.TimeSpan &&
+                    token.Type != JTokenType.Uri)
+                {
                     errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
+                }
                 else
                 {
                     var value = token.Value<string>();
-
                     if (!string.IsNullOrEmpty(_schema.Pattern))
                     {
                         if (!Regex.IsMatch(value, _schema.Pattern))
@@ -128,8 +131,11 @@ namespace NJsonSchema
                     if (!string.IsNullOrEmpty(_schema.Format))
                     {
                         DateTime dateTimeResult;
-                        if (_schema.Format == JsonFormatStrings.DateTime && !DateTime.TryParse(value, out dateTimeResult))
+                        if (_schema.Format == JsonFormatStrings.DateTime && token.Type != JTokenType.Date && 
+                            DateTime.TryParse(value, out dateTimeResult) == false)
+                        {
                             errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath));
+                        }
 
                         // TODO: Implement other format types
                         //if (_schema.Format == JsonFormatStrings.Email && !DateTime.TryParse(value, out dateTimeResult))
