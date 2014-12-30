@@ -59,6 +59,74 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
+        public void When_format_email_incorrect_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.Email;
+
+            var token = new JValue("test");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.EmailExpected, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_format_email_correct_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.Email;
+
+            var token = new JValue("mail@rsuter.com");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count());
+        }
+
+        [TestMethod]
+        public void When_format_uri_incorrect_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.Uri;
+
+            var token = new JValue("test");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(ValidationErrorKind.UriExpected, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_format_uri_correct_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.Uri;
+
+            var token = new JValue("http://rsuter.com");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count());
+        }
+
+        [TestMethod]
         public void When_string_required_but_integer_provided_then_validation_fails()
         {
             //// Arrange

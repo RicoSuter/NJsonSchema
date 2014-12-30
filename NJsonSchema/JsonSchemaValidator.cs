@@ -130,16 +130,29 @@ namespace NJsonSchema
 
                     if (!string.IsNullOrEmpty(_schema.Format))
                     {
-                        DateTime dateTimeResult;
-                        if (_schema.Format == JsonFormatStrings.DateTime && token.Type != JTokenType.Date && 
-                            DateTime.TryParse(value, out dateTimeResult) == false)
+                        if (_schema.Format == JsonFormatStrings.DateTime)
                         {
-                            errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath));
+                            DateTime dateTimeResult;
+                            if (token.Type != JTokenType.Date && DateTime.TryParse(value, out dateTimeResult) == false)
+                                errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath));
+                        }
+
+                        if (_schema.Format == JsonFormatStrings.Uri)
+                        {
+                            Uri uriResult;
+                            if (token.Type != JTokenType.Uri && Uri.TryCreate(value, UriKind.Absolute, out uriResult) == false)
+                                errors.Add(new ValidationError(ValidationErrorKind.UriExpected, propertyName, propertyPath));
+                        }
+
+                        if (_schema.Format == JsonFormatStrings.Email)
+                        {
+                            var isEmail = Regex.IsMatch(value, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
+                                @"@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+                            if (!isEmail)
+                                errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath));
                         }
 
                         // TODO: Implement other format types
-                        //if (_schema.Format == JsonFormatStrings.Email && !DateTime.TryParse(value, out dateTimeResult))
-                        //    errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath));
                     }
 
                     // TODO: Support other enum types, not only string?

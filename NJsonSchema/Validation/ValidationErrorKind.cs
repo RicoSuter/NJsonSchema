@@ -3,7 +3,7 @@
     /// <summary>Enumeration of the possible error kinds. </summary>
     public enum ValidationErrorKind
     {
-        Unknown, 
+        Unknown,
 
         /// <summary>A string is expected. </summary>
         StringExpected,
@@ -62,6 +62,9 @@
         /// <summary>A date time is expected. </summary>
         DateTimeExpected,
 
+        /// <summary>An URI is expected. </summary>
+        UriExpected,
+
         /// <summary>The object is not any of the given schemas. </summary>
         NotAnyOf,
 
@@ -81,6 +84,9 @@
         IntegerNotMultipleOf,
 
         /// <summary>The value is not one of the allowed enumerations. </summary>
-        NotInEnumeration
+        NotInEnumeration,
+
+        /// <summary>An Email is expected. </summary>
+        EmailExpected
     }
 }
