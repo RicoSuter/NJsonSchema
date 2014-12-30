@@ -152,7 +152,7 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath));
                         }
 
-                        // TODO: Implement other format types
+                        // TODO: Implement other format types (hostname, ipv4, ipv6)
                     }
 
                     // TODO: Support other enum types, not only string?
