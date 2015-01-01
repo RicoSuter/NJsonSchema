@@ -5,7 +5,7 @@ JSON Schema draft v4 reader, generator and validator for .NET
 
 NuGet package: https://www.nuget.org/packages/NJsonSchema
 
-The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. The project is still in development, some features are not implemented yet. 
+The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. The project is still in development: Some features are not implemented yet. 
 
 ## Usage
 
