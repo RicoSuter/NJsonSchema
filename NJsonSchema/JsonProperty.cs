@@ -1,4 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿//-----------------------------------------------------------------------
+// <copyright file="JsonProperty.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+using Newtonsoft.Json;
 
 namespace NJsonSchema
 {

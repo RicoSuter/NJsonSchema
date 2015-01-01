@@ -1,8 +1,17 @@
-﻿namespace NJsonSchema.Validation
+﻿//-----------------------------------------------------------------------
+// <copyright file="ValidationErrorKind.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+namespace NJsonSchema.Validation
 {
     /// <summary>Enumeration of the possible error kinds. </summary>
     public enum ValidationErrorKind
     {
+        /// <summary>An unknown error. </summary>
         Unknown,
 
         /// <summary>A string is expected. </summary>
