@@ -85,6 +85,7 @@ namespace NJsonSchema
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Default { get; set; }
 
+        /// <summary>Gets or sets the required multiple of for the number value. </summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public double? MultipleOf { get; set; } // TODO: Whats MultipleOf?
 
@@ -128,9 +129,11 @@ namespace NJsonSchema
         [JsonProperty("uniqueItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool UniqueItems { get; set; }
 
+        /// <summary>Gets or sets the maximal number of allowed properties in an object. </summary>
         [JsonProperty("maxProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MaxProperties { get; set; }
 
+        /// <summary>Gets or sets the minimal number of allowed properties in an object. </summary>
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
@@ -173,11 +176,12 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets or sets the schema which must not be valid. </summary>
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema4 Not
         {
             get { return _not; }
-            internal set
+            set
             {
                 _not = value;
                 if (_not != null)
