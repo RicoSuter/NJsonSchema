@@ -192,6 +192,7 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets the collection of schemas where each schema must be valid. </summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> AllOf
         {
@@ -206,6 +207,7 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets the collection of schemas where at least one must be valid. </summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> AnyOf
         {
@@ -220,6 +222,7 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets the collection of schemas where exactly one must be valid. </summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> OneOf
         {
@@ -348,6 +351,8 @@ namespace NJsonSchema
             return validator.Validate(token, null, null);
         }
 
+        /// <summary>Finds the root parent of this schema. </summary>
+        /// <returns>The parent schema or this when this is the root. </returns>
         public JsonSchema4 FindRootParent()
         {
             var parent = Parent;

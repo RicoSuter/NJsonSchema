@@ -63,9 +63,9 @@ namespace NJsonSchema
 
         private bool ValidateAllOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.AnyOf.Count > 0)
+            if (_schema.AllOf.Count > 0)
             {
-                if (_schema.AnyOf.Any(s => s.Validate(token).Count != 0))
+                if (_schema.AllOf.Any(s => s.Validate(token).Count != 0))
                     errors.Add(new ValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath));
 
                 return true;
@@ -75,9 +75,9 @@ namespace NJsonSchema
 
         private bool ValidateOneOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.AnyOf.Count > 0)
+            if (_schema.OneOf.Count > 0)
             {
-                if (_schema.AnyOf.Count(s => s.Validate(token).Count == 0) != 1)
+                if (_schema.OneOf.Count(s => s.Validate(token).Count == 0) != 1)
                     errors.Add(new ValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath));
 
                 return true;
