@@ -20,6 +20,7 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
+    [JsonObject(IsReference = true)]
     public class JsonSchema4
     {
         private IDictionary<string, JsonProperty> _properties;
@@ -50,7 +51,12 @@ namespace NJsonSchema
         /// <returns></returns>
         public static JsonSchema4 FromJson(string data)
         {
-            return JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings { ConstructorHandling = ConstructorHandling.Default });
+            return JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
+            {
+                ConstructorHandling = ConstructorHandling.Default, 
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize, 
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
         }
 
         /// <summary>Gets or sets the schema. </summary>
@@ -310,35 +316,35 @@ namespace NJsonSchema
         internal IDictionary<string, JsonSchema4> DefinitionsRaw
         {
             get { return Definitions != null && Definitions.Count > 0 ? Definitions : null; }
-            set { Definitions = value ?? new ObservableDictionary<string, JsonSchema4>(); }
+            set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema4>(value) : new ObservableDictionary<string, JsonSchema4>(); }
         }
 
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<string> EnumerationRaw
         {
             get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value ?? new Collection<string>(); }
+            set { Enumeration = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema4> AllOfRaw
         {
             get { return AllOf != null && AllOf.Count > 0 ? AllOf : null; }
-            set { AllOf = value ?? new ObservableCollection<JsonSchema4>(); }
+            set { AllOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
         }
 
         [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema4> AnyOfRaw
         {
             get { return AnyOf != null && AnyOf.Count > 0 ? AnyOf : null; }
-            set { AnyOf = value ?? new ObservableCollection<JsonSchema4>(); }
+            set { AnyOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
         }
 
         [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema4> OneOfRaw
         {
             get { return OneOf != null && OneOf.Count > 0 ? OneOf : null; }
-            set { OneOf = value ?? new ObservableCollection<JsonSchema4>(); }
+            set { OneOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
         }
 
         #endregion
@@ -385,7 +391,7 @@ namespace NJsonSchema
         private static JsonObjectType ConvertSimpleTypeFromString(string value)
         {
             // TODO: Improve performance
-            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\""); 
+            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\"");
         }
 
         private void Initialize()
@@ -416,7 +422,7 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
                 ((ObservableDictionary<string, JsonProperty>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-           
+
             if (newCollection != null)
             {
                 ((ObservableDictionary<string, JsonProperty>)newCollection).CollectionChanged += InitializeSchemaCollection;
@@ -428,7 +434,7 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
                 ((ObservableDictionary<string, JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-            
+
             if (newCollection != null)
             {
                 ((ObservableDictionary<string, JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
@@ -440,7 +446,7 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
                 ((ObservableCollection<JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-            
+
             if (newCollection != null)
             {
                 ((ObservableCollection<JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
@@ -452,7 +458,7 @@ namespace NJsonSchema
         {
             if (sender is ObservableDictionary<string, JsonProperty>)
             {
-                var properties = (ObservableDictionary<string, JsonProperty>) sender;
+                var properties = (ObservableDictionary<string, JsonProperty>)sender;
                 foreach (var property in properties)
                 {
                     property.Value.Key = property.Key;

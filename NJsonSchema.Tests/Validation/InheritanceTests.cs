@@ -46,14 +46,14 @@ namespace NJsonSchema.Tests.Validation
             });
 
             var token = new JValue(1.5);
-
+            
             //// Act
             var errors = schema.Validate(token);
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NotAnyOf, errors.First().Kind);
         }
-
+        
         [TestMethod]
         public void When_is_all_of_then_it_should_succeed()
         {
