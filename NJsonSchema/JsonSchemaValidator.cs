@@ -53,6 +53,7 @@ namespace NJsonSchema
             ValidateNull(token, propertyName, propertyPath, errors);
             ValidateObject(token, propertyName, propertyPath, errors);
             ValidateArray(token, propertyName, propertyPath, errors);
+            ValidateProperties(token, propertyName, propertyPath, errors);
 
             return errors;
         }
@@ -61,8 +62,9 @@ namespace NJsonSchema
         {
             if (_schema.AnyOf.Count > 0)
             {
-                if (_schema.AnyOf.All(s => s.Validate(token).Count != 0))
-                    errors.Add(new ValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath));
+                var propertyErrors = _schema.AnyOf.ToDictionary(s => s, s => s.Validate(token));
+                if (propertyErrors.All(s => s.Value.Count != 0))
+                    errors.Add(new SubschemaValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath, propertyErrors));
 
                 return true;
             }
@@ -73,8 +75,9 @@ namespace NJsonSchema
         {
             if (_schema.AllOf.Count > 0)
             {
-                if (_schema.AllOf.Any(s => s.Validate(token).Count != 0))
-                    errors.Add(new ValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath));
+                var propertyErrors = _schema.AllOf.ToDictionary(s => s, s => s.Validate(token));
+                if (propertyErrors.Any(s => s.Value.Count != 0))
+                    errors.Add(new SubschemaValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath, propertyErrors));
 
                 return true;
             }
@@ -85,8 +88,9 @@ namespace NJsonSchema
         {
             if (_schema.OneOf.Count > 0)
             {
-                if (_schema.OneOf.Count(s => s.Validate(token).Count == 0) != 1)
-                    errors.Add(new ValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath));
+                var propertyErrors = _schema.OneOf.ToDictionary(s => s, s => s.Validate(token));
+                if (propertyErrors.Count(s => s.Value.Count == 0) != 1)
+                    errors.Add(new SubschemaValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath, propertyErrors));
 
                 return true;
             }
@@ -228,26 +232,27 @@ namespace NJsonSchema
             if (_schema.Type.HasFlag(JsonObjectType.Object))
             {
                 var obj = token as JObject;
-                if (obj != null)
-                {
-                    foreach (var propertyInfo in _schema.Properties)
-                    {
-                        var newPropertyPath = propertyName != null ? propertyName + "." + propertyInfo.Key : propertyInfo.Key;
-
-                        var property = obj.Property(propertyInfo.Key);
-                        if (property != null)
-                        {
-                            var propertyValidator = new JsonSchemaValidator(propertyInfo.Value);
-                            var propertyErrors = propertyValidator.Validate(property.Value, propertyInfo.Key, newPropertyPath);
-                            errors.AddRange(propertyErrors);
-                        }
-                        else if (propertyInfo.Value.IsRequired)
-                            errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key,
-                                newPropertyPath));
-                    }
-                }
-                else
+                if (obj == null)
                     errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath));
+            }
+        }
+
+        private void ValidateProperties(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            var obj = token as JObject;
+            foreach (var propertyInfo in _schema.Properties)
+            {
+                var newPropertyPath = propertyName != null ? propertyName + "." + propertyInfo.Key : propertyInfo.Key;
+
+                var property = obj != null ? obj.Property(propertyInfo.Key) : null;
+                if (property != null)
+                {
+                    var propertyValidator = new JsonSchemaValidator(propertyInfo.Value);
+                    var propertyErrors = propertyValidator.Validate(property.Value, propertyInfo.Key, newPropertyPath);
+                    errors.AddRange(propertyErrors);
+                }
+                else if (propertyInfo.Value.IsRequired)
+                    errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath));
             }
         }
 

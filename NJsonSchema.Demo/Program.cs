@@ -13,6 +13,7 @@ namespace NJsonSchema.Demo
         static void Main(string[] args)
         {
             Console.BufferHeight = 2000;
+
             var passes = 0;
             var fails = 0;
             var exceptions = 0;
@@ -52,7 +53,7 @@ namespace NJsonSchema.Demo
                             catch (Exception ex)
                             {
                                 exceptions++;
-                                Console.WriteLine("      Exception");// + ex.Message);
+                                Console.WriteLine("      Exception: " + ex.GetType().FullName);
                             }
                         }
                     }
