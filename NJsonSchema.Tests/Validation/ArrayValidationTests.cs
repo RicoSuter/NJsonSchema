@@ -25,13 +25,55 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_array_items_are_valid_then_it_should_succeed()
+        public void When_tuple_correct_then_it_should_pass()
         {
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
-            schema.Items = new JsonSchema4();
-            schema.Items.Type = JsonObjectType.String;
+            schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.String });
+            schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.Integer });
+
+            var token = new JArray();
+            token.Add(new JValue("Foo"));
+            token.Add(new JValue(5));
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count());
+        }
+
+        [TestMethod]
+        public void When_tuple_too_large_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.Array;
+            schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.String });
+            schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.Integer });
+
+            var token = new JArray();
+            token.Add(new JValue("Foo"));
+            token.Add(new JValue(5));
+            token.Add(new JValue(5));
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(1, errors.Count());
+            Assert.AreEqual(ValidationErrorKind.TooManyItemsInTuple, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_array_item_are_valid_then_it_should_succeed()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.Array;
+            schema.Item = new JsonSchema4();
+            schema.Item.Type = JsonObjectType.String;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));
@@ -50,8 +92,8 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
-            schema.Items = new JsonSchema4();
-            schema.Items.Type = JsonObjectType.String;
+            schema.Item = new JsonSchema4();
+            schema.Item.Type = JsonObjectType.String;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));
@@ -62,20 +104,23 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(1, errors.Count());
-            Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
+            Assert.AreEqual(ValidationErrorKind.ArrayItemNotValid, errors.First().Kind);
+
+            var firstItemError = ((ChildSchemaValidationError) errors.First()).Errors.First().Value.First();
+            Assert.AreEqual(ValidationErrorKind.StringExpected, firstItemError.Kind);
             Assert.AreEqual("[1]", errors.First().Property);
             Assert.AreEqual("[1]", errors.First().Path);
         }
 
         [TestMethod]
-        public void When_max_items_does_not_match_then_it_should_fail()
+        public void When_max_item_does_not_match_then_it_should_fail()
         {
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.MaxItems = 1;
-            schema.Items = new JsonSchema4();
-            schema.Items.Type = JsonObjectType.String;
+            schema.Item = new JsonSchema4();
+            schema.Item.Type = JsonObjectType.String;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));
@@ -96,8 +141,8 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.MinItems = 2;
-            schema.Items = new JsonSchema4();
-            schema.Items.Type = JsonObjectType.String;
+            schema.Item = new JsonSchema4();
+            schema.Item.Type = JsonObjectType.String;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));
@@ -117,8 +162,8 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
             schema.UniqueItems = true;
-            schema.Items = new JsonSchema4();
-            schema.Items.Type = JsonObjectType.String;
+            schema.Item = new JsonSchema4();
+            schema.Item.Type = JsonObjectType.String;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));

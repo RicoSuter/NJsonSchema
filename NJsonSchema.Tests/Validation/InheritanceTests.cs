@@ -51,7 +51,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            var error = (SubschemaValidationError)errors.First();
+            var error = (ChildSchemaValidationError)errors.First();
             Assert.AreEqual(ValidationErrorKind.NotAnyOf, error.Kind);
             Assert.AreEqual(ValidationErrorKind.StringExpected, error.Errors.First().Value.First().Kind);
         }

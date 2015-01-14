@@ -53,9 +53,6 @@ namespace NJsonSchema.Validation
         /// <summary>The number is too big. </summary>
         NumberTooBig,
 
-        /// <summary>The integer is too small. </summary>
-        IntegerTooSmall,
-
         /// <summary>The integer is too big. </summary>
         IntegerTooBig,
 
@@ -96,6 +93,12 @@ namespace NJsonSchema.Validation
         NotInEnumeration,
 
         /// <summary>An Email is expected. </summary>
-        EmailExpected
+        EmailExpected,
+
+        /// <summary>The array tuple contains too many items. </summary>
+        TooManyItemsInTuple,
+
+        /// <summary>An array item is not valid. </summary>
+        ArrayItemNotValid
     }
 }

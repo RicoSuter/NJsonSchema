@@ -73,7 +73,7 @@
     <Compile Include="JsonSchemaGenerator.cs" />
     <Compile Include="JsonObjectType.cs" />
     <Compile Include="JsonObjectTypeDescription.cs" />
-    <Compile Include="Validation\SubschemaValidationError.cs" />
+    <Compile Include="Validation\ChildSchemaValidationError.cs" />
     <Compile Include="Validation\ValidationError.cs" />
     <Compile Include="Validation\ValidationErrorKind.cs" />
   </ItemGroup>

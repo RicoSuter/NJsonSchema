@@ -195,9 +195,9 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties[propertyName];
 
             Assert.AreEqual(JsonObjectType.Array, property.Type);
-            Assert.AreEqual(JsonObjectType.Object, property.Items.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.Items.Title);
-            Assert.AreEqual(JsonObjectType.String, property.Items.Properties["Id"].Type);
+            Assert.AreEqual(JsonObjectType.Object, property.Item.Type);
+            Assert.AreEqual(typeof(MySubtype).Name, property.Item.Title);
+            Assert.AreEqual(JsonObjectType.String, property.Item.Properties["Id"].Type);
         }
     }
 

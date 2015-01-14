@@ -33,7 +33,7 @@ namespace NJsonSchema
             {
                 schema.Type = JsonObjectType.Array;
                 var itemType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
-                schema.Items = Generate<JsonSchema4>(itemType);
+                schema.Item = Generate<JsonSchema4>(itemType);
             }
 
             TryLoadEnumerations(type, schema);

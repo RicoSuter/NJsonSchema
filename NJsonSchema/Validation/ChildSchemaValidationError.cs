@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="SubschemaValidationError.cs" company="NJsonSchema">
+// <copyright file="ChildSchemaValidationError.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -11,13 +11,13 @@ using System.Collections.Generic;
 namespace NJsonSchema.Validation
 {
     /// <summary>A subschema validation error. </summary>
-    public class SubschemaValidationError : ValidationError
+    public class ChildSchemaValidationError : ValidationError
     {
         /// <summary>Initializes a new instance of the <see cref="ValidationError"/> class. </summary>
         /// <param name="kind">The error kind. </param>
         /// <param name="property">The property name. </param>
         /// <param name="path">The property path. </param>
-        public SubschemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors)
             : base(kind, property, path)
         {
             Errors = errors;

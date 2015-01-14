@@ -303,7 +303,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.IntegerTooSmall, errors.First().Kind);
+            Assert.AreEqual(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
         }
 
         [TestMethod]
@@ -320,7 +320,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.IntegerTooBig, errors.First().Kind);
+            Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
         }
 
         [TestMethod]

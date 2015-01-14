@@ -28,7 +28,8 @@ namespace NJsonSchema
         private ICollection<JsonSchema4> _allOf;
         private ICollection<JsonSchema4> _anyOf;
         private ICollection<JsonSchema4> _oneOf;
-        private JsonSchema4 _items;
+        private JsonSchema4 _item;
+        private ICollection<JsonSchema4> _items;
         private JsonSchema4 _not;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
@@ -58,7 +59,7 @@ namespace NJsonSchema
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
         }
-
+        
         /// <summary>Gets or sets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Schema { get; set; }
@@ -170,15 +171,61 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the schema of an array item. </summary>
-        [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonSchema4 Items
+        [JsonIgnore]
+        public JsonSchema4 Item
         {
-            get { return _items; }
+            get { return _item; }
             set
             {
-                _items = value;
-                if (_items != null)
-                    _items.Parent = this;
+                if (_item != value)
+                {
+                    _item = value;
+                    if (_item != null)
+                    {
+                        _item.Parent = this;
+                        Items.Clear();
+                    }
+                }
+            }
+        }
+
+        /// <summary>Gets or sets the schema of an array item. </summary>
+        [JsonIgnore]
+        public ICollection<JsonSchema4> Items
+        {
+            get { return _items; }
+            internal set
+            {
+                if (_items != value)
+                {
+                    RegisterSchemaCollection(_items, value);
+                    _items = value;
+
+                    if (_items != null)
+                        Item = null;
+                }
+            }
+        }
+
+        [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal object ItemsRaw
+        {
+            get
+            {
+                if (Item != null)
+                    return Item;
+
+                if (Items.Count > 0)
+                    return Items;
+
+                return null; 
+            }
+            set
+            {
+                if (value is JArray)
+                    Items = new ObservableCollection<JsonSchema4>(((JArray) value).Select(t => FromJson(t.ToString())));
+                else if (value != null)
+                    Item = FromJson(value.ToString());
             }
         }
 
@@ -396,6 +443,9 @@ namespace NJsonSchema
 
         private void Initialize()
         {
+            if (Items == null)
+                Items = new ObservableCollection<JsonSchema4>();
+            
             if (Properties == null)
                 Properties = new ObservableDictionary<string, JsonProperty>();
 
