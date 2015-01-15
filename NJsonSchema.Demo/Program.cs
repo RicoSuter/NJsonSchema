@@ -35,12 +35,7 @@ namespace NJsonSchema.Demo
                         Console.WriteLine("    Test: " + testDescription);
                         Console.WriteLine("      Valid: " + valid);
 
-                        if (test["data"] is JArray)
-                        {
-                            foreach (var value in test["data"])
-                                RunTest(suite, value, valid, ref fails, ref passes, ref exceptions);
-                        }
-                        else
+                        //if (testDescription == "both anyOf invalid")
                             RunTest(suite, test["data"], valid, ref fails, ref passes, ref exceptions);
                     }
                 }

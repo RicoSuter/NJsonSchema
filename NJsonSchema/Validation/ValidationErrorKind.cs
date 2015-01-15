@@ -99,6 +99,9 @@ namespace NJsonSchema.Validation
         TooManyItemsInTuple,
 
         /// <summary>An array item is not valid. </summary>
-        ArrayItemNotValid
+        ArrayItemNotValid,
+
+        /// <summary>The item is not valid with the AdditionalItems schema. </summary>
+        AdditionalItemNotValid
     }
 }

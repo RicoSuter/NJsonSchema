@@ -25,12 +25,17 @@ namespace NJsonSchema
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _definitions;
+
         private ICollection<JsonSchema4> _allOf;
         private ICollection<JsonSchema4> _anyOf;
         private ICollection<JsonSchema4> _oneOf;
+        private JsonSchema4 _not;
+
         private JsonSchema4 _item;
         private ICollection<JsonSchema4> _items;
-        private JsonSchema4 _not;
+
+        private bool _areAdditionalItemsAllowed = true;
+        private JsonSchema4 _additionalItemsSchema = null;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
         public JsonSchema4()
@@ -207,28 +212,6 @@ namespace NJsonSchema
             }
         }
 
-        [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object ItemsRaw
-        {
-            get
-            {
-                if (Item != null)
-                    return Item;
-
-                if (Items.Count > 0)
-                    return Items;
-
-                return null; 
-            }
-            set
-            {
-                if (value is JArray)
-                    Items = new ObservableCollection<JsonSchema4>(((JArray) value).Select(t => FromJson(t.ToString())));
-                else if (value != null)
-                    Item = FromJson(value.ToString());
-            }
-        }
-
         /// <summary>Gets or sets the schema which must not be valid. </summary>
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema4 Not
@@ -302,9 +285,83 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating whether additional items are allowed (default: true). 
+        /// If this property is set to <c>false</c>, then <see cref="AdditionalItemsSchema"/> is set to <c>null</c>. </summary>
+        [JsonIgnore]
+        public bool AreAdditionalItemsAllowed
+        {
+            get { return _areAdditionalItemsAllowed; }
+            private set
+            {
+                if (_areAdditionalItemsAllowed != value)
+                {
+                    _areAdditionalItemsAllowed = value;
+                    if (!_areAdditionalItemsAllowed)
+                        AdditionalItemsSchema = null;
+                }
+            }
+        }
+
+        /// <summary>Gets the schema for the additional items. 
+        /// If this property has a schema, then <see cref="AreAdditionalItemsAllowed"/> is set to <c>true</c>. </summary>
+        [JsonIgnore]
+        public JsonSchema4 AdditionalItemsSchema
+        {
+            get { return _additionalItemsSchema; }
+            private set
+            {
+                if (_additionalItemsSchema != value)
+                {
+                    _additionalItemsSchema = value;
+                    if (_additionalItemsSchema != null)
+                        AreAdditionalItemsAllowed = true;
+                }
+            }
+        }
+
         #endregion
 
         #region Raw properties
+
+        [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal object AdditionalItemsRaw
+        {
+            get
+            {
+                if (AdditionalItemsSchema != null)
+                    return AdditionalItemsSchema;
+                if (!AreAdditionalItemsAllowed)
+                    return false;
+                return null;
+            }
+            set
+            {
+                if (value is bool)
+                    AreAdditionalItemsAllowed = (bool)value;
+                else if (value != null)
+                    AdditionalItemsSchema = FromJson(value.ToString());
+            }
+        }
+
+        [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal object ItemsRaw
+        {
+            get
+            {
+                if (Item != null)
+                    return Item;
+                if (Items.Count > 0)
+                    return Items;
+                return null;
+            }
+            set
+            {
+                if (value is JArray)
+                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJson(t.ToString())));
+                else if (value != null)
+                    Item = FromJson(value.ToString());
+            }
+        }
 
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object TypeRaw
@@ -348,8 +405,7 @@ namespace NJsonSchema
             get
             {
                 return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) :
-                    null;
+                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
             }
             set
             {

@@ -36,8 +36,6 @@ namespace NJsonSchema
         {
             var errors = new List<ValidationError>();
 
-            // TODO: If multiple flags check whether it is either one of them...
-
             ValidateAnyOf(token, propertyName, propertyPath, errors);
             ValidateAllOf(token, propertyName, propertyPath, errors);
             ValidateOneOf(token, propertyName, propertyPath, errors);
@@ -56,43 +54,34 @@ namespace NJsonSchema
             return errors;
         }
 
-        private bool ValidateAnyOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        private void ValidateAnyOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (_schema.AnyOf.Count > 0)
             {
                 var propertyErrors = _schema.AnyOf.ToDictionary(s => s, s => s.Validate(token));
                 if (propertyErrors.All(s => s.Value.Count != 0))
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath, propertyErrors));
-
-                return true;
             }
-            return false;
         }
 
-        private bool ValidateAllOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        private void ValidateAllOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (_schema.AllOf.Count > 0)
             {
                 var propertyErrors = _schema.AllOf.ToDictionary(s => s, s => s.Validate(token));
                 if (propertyErrors.Any(s => s.Value.Count != 0))
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath, propertyErrors));
-
-                return true;
             }
-            return false;
         }
 
-        private bool ValidateOneOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        private void ValidateOneOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (_schema.OneOf.Count > 0)
             {
                 var propertyErrors = _schema.OneOf.ToDictionary(s => s, s => s.Validate(token));
                 if (propertyErrors.Count(s => s.Value.Count == 0) != 1)
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath, propertyErrors));
-
-                return true;
             }
-            return false;
         }
 
         private void ValidateNot(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
@@ -115,7 +104,6 @@ namespace NJsonSchema
 
         private void ValidateEnum(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            // TODO: Support other enum types, not only string?
             if (_schema.Enumeration.Count > 0 && !_schema.Enumeration.Contains(token.ToString()))
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath));
         }
@@ -130,9 +118,13 @@ namespace NJsonSchema
                 {
                     errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
                 }
-                else
+            }
+
+            if (token.Type == JTokenType.String)
+            {
+                var value = token.Value<string>();
+                if (value != null)
                 {
-                    var value = token.Value<string>();
                     if (!string.IsNullOrEmpty(_schema.Pattern))
                     {
                         if (!Regex.IsMatch(value, _schema.Pattern))
@@ -247,57 +239,78 @@ namespace NJsonSchema
 
         private void ValidateArray(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.Array))
+            var array = token as JArray;
+            if (array != null)
             {
-                var array = token as JArray;
-                if (array != null)
+                if (_schema.MinItems > 0 && array.Count < _schema.MinItems)
+                    errors.Add(new ValidationError(ValidationErrorKind.TooFewItems, propertyName, propertyPath));
+
+                if (_schema.MaxItems > 0 && array.Count > _schema.MaxItems)
+                    errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath));
+
+                if (_schema.UniqueItems && array.Count != array.Distinct().Count())
+                    errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath)); 
+
+                var itemValidator = _schema.Item != null ? new JsonSchemaValidator(_schema.Item) : null;
+                for (var i = 0; i < array.Count; i++)
                 {
-                    if (_schema.MinItems > 0 && array.Count < _schema.MinItems)
-                        errors.Add(new ValidationError(ValidationErrorKind.TooFewItems, propertyName, propertyPath));
+                    var item = array[i];
 
-                    if (_schema.MaxItems > 0 && array.Count > _schema.MaxItems)
-                        errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath));
+                    var propertyIndex = string.Format("[{0}]", i);
+                    var itemPath = propertyName != null ? propertyName + "." + propertyIndex : propertyIndex;
 
-                    if (_schema.UniqueItems && array.Count != array.Distinct().Count())
-                        errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath)); // TODO: Is this implementation correct?
-
-                    var itemValidator = _schema.Item != null ? new JsonSchemaValidator(_schema.Item) : null;
-                    for (var i = 0; i < array.Count; i++)
+                    if (_schema.Item != null && itemValidator != null)
                     {
-                        var item = array[i];
+                        var error = TryCreateChildSchemaError(itemValidator, _schema.Item, item, ValidationErrorKind.ArrayItemNotValid, propertyIndex, itemPath);
+                        if (error != null)
+                            errors.Add(error);
+                    }
 
-                        var propertyIndex = string.Format("[{0}]", i);
-                        var itemPath = propertyName != null ? propertyName + "." + propertyIndex : propertyIndex;
-
-                        if (_schema.Item != null && itemValidator != null)
+                    if (_schema.Items.Count > 0)
+                    {
+                        if (_schema.Items.Count > i)
                         {
-                            var itemErrors = itemValidator.Validate(item, propertyIndex, itemPath);
-                            if (itemErrors.Any())
-                            {
-                                var errorDictionary = new Dictionary<JsonSchema4, ICollection<ValidationError>>();
-                                errorDictionary.Add(_schema.Item, itemErrors);
-
-                                errors.Add(new ChildSchemaValidationError(ValidationErrorKind.ArrayItemNotValid, 
-                                    propertyIndex, itemPath, errorDictionary));
-                            }
+                            var error = TryCreateChildSchemaError(_schema.Items.ElementAt(i), item, ValidationErrorKind.ArrayItemNotValid, propertyIndex, itemPath);
+                            if (error != null)
+                                errors.Add(error);
                         }
-
-                        if (_schema.Items != null && _schema.Items.Count > 0)
+                        else
                         {
-                            if (_schema.Items.Count > i)
+                            if (_schema.AdditionalItemsSchema != null)
                             {
-                                var tupleItemValidator = new JsonSchemaValidator(_schema.Items.ElementAt(i));
-                                var itemErrors = tupleItemValidator.Validate(item, propertyIndex, itemPath);
-                                errors.AddRange(itemErrors);
+                                var error = TryCreateChildSchemaError(_schema.AdditionalItemsSchema, item, ValidationErrorKind.AdditionalItemNotValid, propertyIndex, itemPath);
+                                if (error != null)
+                                    errors.Add(error);
                             }
                             else
-                                errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple, propertyIndex, itemPath));
+                            {
+                                if (!_schema.AreAdditionalItemsAllowed)
+                                    errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple, propertyIndex, itemPath));
+                            }
                         }
                     }
                 }
-                else
-                    errors.Add(new ValidationError(ValidationErrorKind.ArrayExpected, propertyName, propertyPath));
             }
+            else if (_schema.Type.HasFlag(JsonObjectType.Array))
+                errors.Add(new ValidationError(ValidationErrorKind.ArrayExpected, propertyName, propertyPath));
+        }
+
+        private ChildSchemaValidationError TryCreateChildSchemaError(JsonSchema4 schema, JToken token, ValidationErrorKind errorKind, string property, string path)
+        {
+            var validator = new JsonSchemaValidator(schema);
+            return TryCreateChildSchemaError(validator, schema, token, errorKind, property, path);
+        }
+
+        private ChildSchemaValidationError TryCreateChildSchemaError(JsonSchemaValidator validator, JsonSchema4 schema, JToken token, ValidationErrorKind errorKind, string property, string path)
+        {
+            var errors = validator.Validate(token, null, null);
+            if (errors.Count == 0)
+                return null;
+
+            var errorDictionary = new Dictionary<JsonSchema4, ICollection<ValidationError>>();
+            errorDictionary.Add(schema, errors);
+
+            return new ChildSchemaValidationError(errorKind, property, path, errorDictionary);
         }
     }
 }
