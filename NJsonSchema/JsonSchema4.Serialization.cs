@@ -138,6 +138,22 @@ namespace NJsonSchema
             }
         }
 
+        [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal IDictionary<string, JsonSchema4> PatternPropertiesRaw
+        {
+            get
+            {
+                return PatternProperties != null && PatternProperties.Count > 0 ?
+                    PatternProperties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
+            }
+            set
+            {
+                PatternProperties = value != null ?
+                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) :
+                    new ObservableDictionary<string, JsonProperty>();
+            }
+        }
+
         [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchema4> DefinitionsRaw
         {

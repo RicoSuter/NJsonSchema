@@ -238,22 +238,48 @@ namespace NJsonSchema
 
             if (obj != null)
             {
-                var additionalProperties = obj.Properties().Where(p => !_schema.Properties.ContainsKey(p.Name));
-                if (_schema.AdditionalPropertiesSchema != null)
+                var additionalProperties = obj.Properties().Where(p => !_schema.Properties.ContainsKey(p.Name)).ToList();
+
+                ValidatePatternProperties(additionalProperties, errors);
+                ValidateAdditionalProperties(additionalProperties, propertyName, propertyPath, errors);
+            }
+        }
+
+        private void ValidatePatternProperties(List<JProperty> additionalProperties, List<ValidationError> errors)
+        {
+            foreach (var property in additionalProperties.ToArray())
+            {
+                var patternPropertySchema = _schema.PatternProperties.FirstOrDefault(p => Regex.IsMatch(property.Name, p.Key));
+                if (patternPropertySchema.Value != null)
                 {
-                    foreach (var property in additionalProperties)
-                    {
-                        var error = TryCreateChildSchemaError(_schema.AdditionalPropertiesSchema, property.Value,
-                            ValidationErrorKind.AdditionalPropertiesNotValid, propertyName, propertyPath);
-                        if (error != null)
-                            errors.Add(error);
-                    }
+                    var error = TryCreateChildSchemaError(patternPropertySchema.Value, property,
+                        ValidationErrorKind.AdditionalPropertiesNotValid, property.Name, property.Path);
+
+                    if (error != null)
+                        errors.Add(error);
+
+                    additionalProperties.Remove(property);
                 }
-                else
+            }
+        }
+
+        private void ValidateAdditionalProperties(List<JProperty> additionalProperties,
+            string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.AdditionalPropertiesSchema != null)
+            {
+                foreach (var property in additionalProperties)
                 {
-                    if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
-                        errors.Add(new ValidationError(ValidationErrorKind.TooManyPropertiesInTuple, propertyName, propertyPath));
+                    var error = TryCreateChildSchemaError(_schema.AdditionalPropertiesSchema, property.Value,
+                        ValidationErrorKind.AdditionalPropertiesNotValid, property.Name, property.Path);
+                    if (error != null)
+                        errors.Add(error);
                 }
+            }
+            else
+            {
+                if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
+                    errors.Add(new ValidationError(ValidationErrorKind.TooManyPropertiesInTuple, propertyName, propertyPath));
             }
         }
 
@@ -269,14 +295,14 @@ namespace NJsonSchema
                     errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath));
 
                 if (_schema.UniqueItems && array.Count != array.Distinct().Count())
-                    errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath)); 
+                    errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath));
 
                 var itemValidator = _schema.Item != null ? new JsonSchemaValidator(_schema.Item) : null;
-                for (var i = 0; i < array.Count; i++)
+                for (var index = 0; index < array.Count; index++)
                 {
-                    var item = array[i];
+                    var item = array[index];
 
-                    var propertyIndex = string.Format("[{0}]", i);
+                    var propertyIndex = string.Format("[{0}]", index);
                     var itemPath = propertyName != null ? propertyName + "." + propertyIndex : propertyIndex;
 
                     if (_schema.Item != null && itemValidator != null)
@@ -286,33 +312,44 @@ namespace NJsonSchema
                             errors.Add(error);
                     }
 
-                    if (_schema.Items.Count > 0)
-                    {
-                        if (_schema.Items.Count > i)
-                        {
-                            var error = TryCreateChildSchemaError(_schema.Items.ElementAt(i), item, ValidationErrorKind.ArrayItemNotValid, propertyIndex, itemPath);
-                            if (error != null)
-                                errors.Add(error);
-                        }
-                        else
-                        {
-                            if (_schema.AdditionalItemsSchema != null)
-                            {
-                                var error = TryCreateChildSchemaError(_schema.AdditionalItemsSchema, item, ValidationErrorKind.AdditionalItemNotValid, propertyIndex, itemPath);
-                                if (error != null)
-                                    errors.Add(error);
-                            }
-                            else
-                            {
-                                if (!_schema.AllowAdditionalItems)
-                                    errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple, propertyIndex, itemPath));
-                            }
-                        }
-                    }
+                    ValidateAdditionalItems(item, index, propertyPath, errors);
                 }
             }
             else if (_schema.Type.HasFlag(JsonObjectType.Array))
                 errors.Add(new ValidationError(ValidationErrorKind.ArrayExpected, propertyName, propertyPath));
+        }
+
+        private void ValidateAdditionalItems(JToken item, int index, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.Items.Count > 0)
+            {
+                var propertyIndex = string.Format("[{0}]", index);
+                if (_schema.Items.Count > index)
+                {
+                    var error = TryCreateChildSchemaError(_schema.Items.ElementAt(index), item,
+                        ValidationErrorKind.ArrayItemNotValid, propertyIndex, propertyPath + propertyIndex);
+                    if (error != null)
+                        errors.Add(error);
+                }
+                else
+                {
+                    if (_schema.AdditionalItemsSchema != null)
+                    {
+                        var error = TryCreateChildSchemaError(_schema.AdditionalItemsSchema, item,
+                            ValidationErrorKind.AdditionalItemNotValid, propertyIndex, propertyPath + propertyIndex);
+                        if (error != null)
+                            errors.Add(error);
+                    }
+                    else
+                    {
+                        if (!_schema.AllowAdditionalItems)
+                        {
+                            errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple,
+                                propertyIndex, propertyPath + propertyIndex));
+                        }
+                    }
+                }
+            }
         }
 
         private ChildSchemaValidationError TryCreateChildSchemaError(JsonSchema4 schema, JToken token, ValidationErrorKind errorKind, string property, string path)

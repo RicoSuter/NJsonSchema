@@ -21,6 +21,7 @@ namespace NJsonSchema
     public partial class JsonSchema4
     {
         private IDictionary<string, JsonProperty> _properties;
+        private IDictionary<string, JsonProperty> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
 
         private ICollection<JsonSchema4> _allOf;
@@ -171,6 +172,21 @@ namespace NJsonSchema
                 {
                     RegisterProperties(_properties, value);
                     _properties = value;
+                }
+            }
+        }
+
+        /// <summary>Gets the pattern properties of the type. </summary>
+        [JsonIgnore]
+        public IDictionary<string, JsonProperty> PatternProperties
+        {
+            get { return _patternProperties; }
+            internal set
+            {
+                if (_patternProperties != value)
+                {
+                    RegisterProperties(_patternProperties, value);
+                    _patternProperties = value;
                 }
             }
         }
@@ -401,6 +417,9 @@ namespace NJsonSchema
             
             if (Properties == null)
                 Properties = new ObservableDictionary<string, JsonProperty>();
+
+            if (PatternProperties == null)
+                PatternProperties = new ObservableDictionary<string, JsonProperty>();
 
             if (Definitions == null)
                 Definitions = new ObservableDictionary<string, JsonSchema4>();
