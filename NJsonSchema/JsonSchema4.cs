@@ -6,11 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,7 +18,7 @@ namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
     [JsonObject(IsReference = true)]
-    public class JsonSchema4
+    public partial class JsonSchema4
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _definitions;
@@ -34,8 +31,11 @@ namespace NJsonSchema
         private JsonSchema4 _item;
         private ICollection<JsonSchema4> _items;
 
-        private bool _areAdditionalItemsAllowed = true;
+        private bool _allowAdditionalItems = true;
         private JsonSchema4 _additionalItemsSchema = null;
+
+        private bool _allowAdditionalProperties = true;
+        private JsonSchema4 _additionalPropertiesSchema = null;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
         public JsonSchema4()
@@ -87,7 +87,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
-        public virtual JsonSchema4 Parent { get; internal set; }
+        public virtual JsonSchema4 ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -151,7 +151,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
-        public ICollection<string> Enumeration { get; internal set; }
+        public ICollection<object> Enumeration { get; internal set; }
 
         /// <summary>Gets the collection of required properties. </summary>
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
@@ -187,7 +187,7 @@ namespace NJsonSchema
                     _item = value;
                     if (_item != null)
                     {
-                        _item.Parent = this;
+                        _item.ParentSchema = this;
                         Items.Clear();
                     }
                 }
@@ -221,7 +221,7 @@ namespace NJsonSchema
             {
                 _not = value;
                 if (_not != null)
-                    _not.Parent = this;
+                    _not.ParentSchema = this;
             }
         }
 
@@ -285,169 +285,72 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets a value indicating whether additional items are allowed (default: true). 
-        /// If this property is set to <c>false</c>, then <see cref="AdditionalItemsSchema"/> is set to <c>null</c>. </summary>
+        /// <summary>Gets or sets a value indicating whether additional items are allowed (default: true). </summary>
+        /// <remarks>If this property is set to <c>false</c>, then <see cref="AdditionalItemsSchema"/> is set to <c>null</c>. </remarks>
         [JsonIgnore]
-        public bool AreAdditionalItemsAllowed
+        public bool AllowAdditionalItems
         {
-            get { return _areAdditionalItemsAllowed; }
-            private set
+            get { return _allowAdditionalItems; }
+            set
             {
-                if (_areAdditionalItemsAllowed != value)
+                if (_allowAdditionalItems != value)
                 {
-                    _areAdditionalItemsAllowed = value;
-                    if (!_areAdditionalItemsAllowed)
+                    _allowAdditionalItems = value;
+                    if (!_allowAdditionalItems)
                         AdditionalItemsSchema = null;
                 }
             }
         }
 
-        /// <summary>Gets the schema for the additional items. 
-        /// If this property has a schema, then <see cref="AreAdditionalItemsAllowed"/> is set to <c>true</c>. </summary>
+        /// <summary>Gets or sets the schema for the additional items. </summary>
+        /// <remarks>If this property has a schema, then <see cref="AllowAdditionalItems"/> is set to <c>true</c>. </remarks>
         [JsonIgnore]
         public JsonSchema4 AdditionalItemsSchema
         {
             get { return _additionalItemsSchema; }
-            private set
+            set
             {
                 if (_additionalItemsSchema != value)
                 {
                     _additionalItemsSchema = value;
                     if (_additionalItemsSchema != null)
-                        AreAdditionalItemsAllowed = true;
+                        AllowAdditionalItems = true;
                 }
             }
         }
 
-        #endregion
-
-        #region Raw properties
-
-        [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object AdditionalItemsRaw
+        /// <summary>Gets or sets a value indicating whether additional properties are allowed (default: true). </summary>
+        /// <remarks>If this property is set to <c>false</c>, then <see cref="AdditionalPropertiesSchema"/> is set to <c>null</c>. </remarks>
+        [JsonIgnore]
+        public bool AllowAdditionalProperties
         {
-            get
-            {
-                if (AdditionalItemsSchema != null)
-                    return AdditionalItemsSchema;
-                if (!AreAdditionalItemsAllowed)
-                    return false;
-                return null;
-            }
+            get { return _allowAdditionalProperties; }
             set
             {
-                if (value is bool)
-                    AreAdditionalItemsAllowed = (bool)value;
-                else if (value != null)
-                    AdditionalItemsSchema = FromJson(value.ToString());
+                if (_allowAdditionalProperties != value)
+                {
+                    _allowAdditionalProperties = value;
+                    if (!_allowAdditionalProperties)
+                        AdditionalPropertiesSchema = null;
+                }
             }
         }
 
-        [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object ItemsRaw
+        /// <summary>Gets or sets the schema for the additional properties. </summary>
+        /// <remarks>If this property has a schema, then <see cref="AllowAdditionalProperties"/> is set to <c>true</c>. </remarks>
+        [JsonIgnore]
+        public JsonSchema4 AdditionalPropertiesSchema
         {
-            get
-            {
-                if (Item != null)
-                    return Item;
-                if (Items.Count > 0)
-                    return Items;
-                return null;
-            }
+            get { return _additionalPropertiesSchema; }
             set
             {
-                if (value is JArray)
-                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJson(t.ToString())));
-                else if (value != null)
-                    Item = FromJson(value.ToString());
+                if (_additionalPropertiesSchema != value)
+                {
+                    _additionalPropertiesSchema = value;
+                    if (_additionalPropertiesSchema != null)
+                        AllowAdditionalProperties = true;
+                }
             }
-        }
-
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object TypeRaw
-        {
-            get
-            {
-                var flags = Enum.GetValues(Type.GetType())
-                    .Cast<Enum>().Where(v => Type.HasFlag(v))
-                    .OfType<JsonObjectType>()
-                    .Where(v => v != JsonObjectType.None)
-                    .ToArray();
-
-                if (flags.Length > 1)
-                    return new JArray(flags.Select(f => new JValue(f.ToString().ToLower())));
-                if (flags.Length == 1)
-                    return new JValue(flags[0].ToString().ToLower());
-
-                return null;
-            }
-            set
-            {
-                if (value is JArray)
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertSimpleTypeFromString(token.ToString()));
-                else if (value != null)
-                    Type = ConvertSimpleTypeFromString(value.ToString());
-                else
-                    Type = JsonObjectType.None;
-            }
-        }
-
-        [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<string> RequiredPropertiesRaw
-        {
-            get { return RequiredProperties != null && RequiredProperties.Count > 0 ? RequiredProperties : null; }
-            set { RequiredProperties = value; }
-        }
-
-        [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> PropertiesRaw
-        {
-            get
-            {
-                return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
-            }
-            set
-            {
-                Properties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) :
-                    new ObservableDictionary<string, JsonProperty>();
-            }
-        }
-
-        [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> DefinitionsRaw
-        {
-            get { return Definitions != null && Definitions.Count > 0 ? Definitions : null; }
-            set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema4>(value) : new ObservableDictionary<string, JsonSchema4>(); }
-        }
-
-        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<string> EnumerationRaw
-        {
-            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
-        }
-
-        [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema4> AllOfRaw
-        {
-            get { return AllOf != null && AllOf.Count > 0 ? AllOf : null; }
-            set { AllOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
-        }
-
-        [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema4> AnyOfRaw
-        {
-            get { return AnyOf != null && AnyOf.Count > 0 ? AnyOf : null; }
-            set { AnyOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
-        }
-
-        [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema4> OneOfRaw
-        {
-            get { return OneOf != null && OneOf.Count > 0 ? OneOf : null; }
-            set { OneOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
         }
 
         #endregion
@@ -476,19 +379,13 @@ namespace NJsonSchema
         /// <returns>The parent schema or this when this is the root. </returns>
         public JsonSchema4 FindRootParent()
         {
-            var parent = Parent;
+            var parent = ParentSchema;
             if (parent == null)
                 return this;
 
-            while (parent.Parent != null)
-                parent = parent.Parent;
+            while (parent.ParentSchema != null)
+                parent = parent.ParentSchema;
             return parent;
-        }
-
-        [OnDeserialized]
-        internal void OnDeserialized(StreamingContext ctx)
-        {
-            Initialize();
         }
 
         private static JsonObjectType ConvertSimpleTypeFromString(string value)
@@ -521,68 +418,7 @@ namespace NJsonSchema
                 OneOf = new ObservableCollection<JsonSchema4>();
 
             if (Enumeration == null)
-                Enumeration = new Collection<string>();
-        }
-
-        private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
-        {
-            if (oldCollection != null)
-                ((ObservableDictionary<string, JsonProperty>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-
-            if (newCollection != null)
-            {
-                ((ObservableDictionary<string, JsonProperty>)newCollection).CollectionChanged += InitializeSchemaCollection;
-                InitializeSchemaCollection(newCollection, null);
-            }
-        }
-
-        private void RegisterSchemaDictionary(IDictionary<string, JsonSchema4> oldCollection, IDictionary<string, JsonSchema4> newCollection)
-        {
-            if (oldCollection != null)
-                ((ObservableDictionary<string, JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-
-            if (newCollection != null)
-            {
-                ((ObservableDictionary<string, JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
-                InitializeSchemaCollection(newCollection, null);
-            }
-        }
-
-        private void RegisterSchemaCollection(ICollection<JsonSchema4> oldCollection, ICollection<JsonSchema4> newCollection)
-        {
-            if (oldCollection != null)
-                ((ObservableCollection<JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
-
-            if (newCollection != null)
-            {
-                ((ObservableCollection<JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
-                InitializeSchemaCollection(newCollection, null);
-            }
-        }
-
-        private void InitializeSchemaCollection(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (sender is ObservableDictionary<string, JsonProperty>)
-            {
-                var properties = (ObservableDictionary<string, JsonProperty>)sender;
-                foreach (var property in properties)
-                {
-                    property.Value.Key = property.Key;
-                    property.Value.Parent = this;
-                }
-            }
-            else if (sender is ObservableCollection<JsonSchema4>)
-            {
-                var collection = (ObservableCollection<JsonSchema4>)sender;
-                foreach (var item in collection)
-                    item.Parent = this;
-            }
-            else if (sender is ObservableDictionary<string, JsonSchema4>)
-            {
-                var collection = (ObservableDictionary<string, JsonSchema4>)sender;
-                foreach (var item in collection.Values)
-                    item.Parent = this;
-            }
+                Enumeration = new Collection<object>();
         }
     }
 }

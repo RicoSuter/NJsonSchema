@@ -13,7 +13,7 @@ namespace NJsonSchema
     /// <summary>A description of a JSON property of a JSON object. </summary>
     public class JsonProperty : JsonSchema4
     {
-        private JsonSchema4 _parent;
+        private JsonSchema4 _parentSchema;
 
         internal static JsonProperty FromJsonSchema(string key, JsonSchema4 type)
         {
@@ -28,13 +28,13 @@ namespace NJsonSchema
         public string Key { get; internal set; }
 
         /// <summary>Gets the parent schema of this property schema. </summary>
-        public override JsonSchema4 Parent
+        public override JsonSchema4 ParentSchema
         {
-            get { return _parent; }
+            get { return _parentSchema; }
             internal set
             {
-                var initialize = _parent == null;
-                _parent = value;
+                var initialize = _parentSchema == null;
+                _parentSchema = value;
 
                 if (initialize && InitialIsRequired)
                     IsRequired = InitialIsRequired;
@@ -45,22 +45,22 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsRequired
         {
-            get { return Parent.RequiredProperties.Contains(Key); }
+            get { return ParentSchema.RequiredProperties.Contains(Key); }
             set
             {
-                if (Parent == null)
+                if (ParentSchema == null)
                     InitialIsRequired = value;
                 else
                 {
                     if (value)
                     {
-                        if (!Parent.RequiredProperties.Contains(Key))
-                            Parent.RequiredProperties.Add(Key);
+                        if (!ParentSchema.RequiredProperties.Contains(Key))
+                            ParentSchema.RequiredProperties.Add(Key);
                     }
                     else
                     {
-                        if (Parent.RequiredProperties.Contains(Key))
-                            Parent.RequiredProperties.Remove(Key);
+                        if (ParentSchema.RequiredProperties.Contains(Key))
+                            ParentSchema.RequiredProperties.Remove(Key);
                     }
                 }
             }

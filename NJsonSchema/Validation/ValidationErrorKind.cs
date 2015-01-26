@@ -102,6 +102,8 @@ namespace NJsonSchema.Validation
         ArrayItemNotValid,
 
         /// <summary>The item is not valid with the AdditionalItems schema. </summary>
-        AdditionalItemNotValid
+        AdditionalItemNotValid,
+        AdditionalPropertiesNotValid,
+        TooManyPropertiesInTuple
     }
 }

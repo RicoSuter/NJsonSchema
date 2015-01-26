@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
 
@@ -104,23 +105,17 @@ namespace NJsonSchema
 
         private void ValidateEnum(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Enumeration.Count > 0 && !_schema.Enumeration.Contains(token.ToString()))
+            if (_schema.Enumeration.Count > 0 && _schema.Enumeration.All(v => v.ToString() != token.ToString()))
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath));
         }
 
         private void ValidateString(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.String))
-            {
-                if (token.Type != JTokenType.String && token.Type != JTokenType.Date &&
-                    token.Type != JTokenType.Guid && token.Type != JTokenType.TimeSpan &&
-                    token.Type != JTokenType.Uri)
-                {
-                    errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
-                }
-            }
+            var isString = token.Type == JTokenType.String || token.Type == JTokenType.Date ||
+                           token.Type == JTokenType.Guid || token.Type == JTokenType.TimeSpan ||
+                           token.Type == JTokenType.Uri;
 
-            if (token.Type == JTokenType.String)
+            if (isString)
             {
                 var value = token.Value<string>();
                 if (value != null)
@@ -164,6 +159,11 @@ namespace NJsonSchema
                         // TODO: Implement other format types (hostname, ipv4, ipv6)
                     }
                 }
+            }
+            else
+            {
+                if (_schema.Type.HasFlag(JsonObjectType.String))
+                    errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
             }
         }
 
@@ -235,6 +235,26 @@ namespace NJsonSchema
                 else if (propertyInfo.Value.IsRequired)
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath));
             }
+
+            if (obj != null)
+            {
+                var additionalProperties = obj.Properties().Where(p => !_schema.Properties.ContainsKey(p.Name));
+                if (_schema.AdditionalPropertiesSchema != null)
+                {
+                    foreach (var property in additionalProperties)
+                    {
+                        var error = TryCreateChildSchemaError(_schema.AdditionalPropertiesSchema, property.Value,
+                            ValidationErrorKind.AdditionalPropertiesNotValid, propertyName, propertyPath);
+                        if (error != null)
+                            errors.Add(error);
+                    }
+                }
+                else
+                {
+                    if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
+                        errors.Add(new ValidationError(ValidationErrorKind.TooManyPropertiesInTuple, propertyName, propertyPath));
+                }
+            }
         }
 
         private void ValidateArray(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
@@ -284,7 +304,7 @@ namespace NJsonSchema
                             }
                             else
                             {
-                                if (!_schema.AreAdditionalItemsAllowed)
+                                if (!_schema.AllowAdditionalItems)
                                     errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple, propertyIndex, itemPath));
                             }
                         }

@@ -52,6 +52,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.Array;
             schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.String });
             schema.Items.Add(new JsonSchema4 { Type = JsonObjectType.Integer });
+            schema.AllowAdditionalItems = false;
 
             var token = new JArray();
             token.Add(new JValue("Foo"));

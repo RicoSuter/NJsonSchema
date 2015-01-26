@@ -169,7 +169,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("test"));
-            Assert.AreEqual(schema, schema.Properties["test"].Parent);
+            Assert.AreEqual(schema, schema.Properties["test"].ParentSchema);
         }
 
         [TestMethod]
