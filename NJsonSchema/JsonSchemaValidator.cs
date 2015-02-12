@@ -238,11 +238,28 @@ namespace NJsonSchema
 
             if (obj != null)
             {
-                var additionalProperties = obj.Properties().Where(p => !_schema.Properties.ContainsKey(p.Name)).ToList();
+                var properties = obj.Properties().ToList(); 
+
+                ValidateMaxProperties(properties, propertyName, propertyPath, errors);
+                ValidateMinProperties(properties, propertyName, propertyPath, errors);
+
+                var additionalProperties = properties.Where(p => !_schema.Properties.ContainsKey(p.Name)).ToList();
 
                 ValidatePatternProperties(additionalProperties, errors);
                 ValidateAdditionalProperties(additionalProperties, propertyName, propertyPath, errors);
             }
+        }
+
+        private void ValidateMaxProperties(IList<JProperty> properties, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.MaxProperties > 0 && properties.Count() > _schema.MaxProperties)
+                errors.Add(new ValidationError(ValidationErrorKind.TooManyProperties, propertyName, propertyPath));
+        }
+
+        private void ValidateMinProperties(IList<JProperty> properties, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.MinProperties > 0 && properties.Count() < _schema.MinProperties)
+                errors.Add(new ValidationError(ValidationErrorKind.TooFewProperties, propertyName, propertyPath));
         }
 
         private void ValidatePatternProperties(List<JProperty> additionalProperties, List<ValidationError> errors)
