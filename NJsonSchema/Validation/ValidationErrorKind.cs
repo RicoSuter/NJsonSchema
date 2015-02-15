@@ -108,6 +108,12 @@ namespace NJsonSchema.Validation
         AdditionalPropertiesNotValid,
 
         /// <summary>There are too many properties in the tuple. </summary>
-        TooManyPropertiesInTuple
+        TooManyPropertiesInTuple,
+
+        /// <summary>There are too many properties in the object. </summary>
+        TooManyProperties,
+
+        /// <summary>There are too few properties in the tuple. </summary>
+        TooFewProperties
     }
 }
