@@ -103,7 +103,11 @@ namespace NJsonSchema.Validation
 
         /// <summary>The item is not valid with the AdditionalItems schema. </summary>
         AdditionalItemNotValid,
+
+        /// <summary>The additional properties are not valid. </summary>
         AdditionalPropertiesNotValid,
+
+        /// <summary>There are too many properties in the tuple. </summary>
         TooManyPropertiesInTuple
     }
 }
