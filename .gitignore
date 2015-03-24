@@ -7,9 +7,11 @@
 **.DotSettings
 
 **.sln.ide/**
+**.vs/**
 
 MyToolkit/**
 NuGetReferenceSwitcher/**
 VisualJsonEditor/**
 ProjectDependencyBrowser/**
 Exceptional/**
+/NJsonSchema.sln.GhostDoc.xml
