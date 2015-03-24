@@ -17,6 +17,7 @@ namespace NJsonSchema.Validation
         /// <param name="kind">The error kind. </param>
         /// <param name="property">The property name. </param>
         /// <param name="path">The property path. </param>
+        /// <param name="errors">The error list. </param>
         public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors)
             : base(kind, property, path)
         {
