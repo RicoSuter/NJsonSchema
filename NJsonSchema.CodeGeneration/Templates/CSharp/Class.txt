@@ -1,0 +1,6 @@
+﻿public class <class>
+{
+    <properties:{property | 
+        public <property.Type> <property.Key> { get; set; \}
+    }>
+}
