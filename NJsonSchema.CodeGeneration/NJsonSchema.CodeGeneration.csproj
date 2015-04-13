@@ -36,6 +36,10 @@
     <Reference Include="Antlr4.StringTemplate">
       <HintPath>..\packages\Antlr4.StringTemplate.4.0.6.9004\lib\net35\Antlr4.StringTemplate.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,6 +51,11 @@
   <ItemGroup>
     <Compile Include="Generators\CSharpClassGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
+    <Compile Include="Jsdl\JsdlOperation.cs" />
+    <Compile Include="Jsdl\JsdlParameterType.cs" />
+    <Compile Include="Jsdl\JsdlOperationMethod.cs" />
+    <Compile Include="Jsdl\JsdlService.cs" />
+    <Compile Include="Jsdl\JsdlParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -55,6 +55,8 @@ namespace NJsonSchema.Demo
         }
 
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string ToJson() 
     	{
     		return JsonConvert.SerializeObject(this);
@@ -64,8 +66,6 @@ namespace NJsonSchema.Demo
     	{
     		return JsonConvert.DeserializeObject<Person2>(data);
     	}
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
