@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace NJsonSchema
 {
@@ -54,12 +55,17 @@ namespace NJsonSchema
             where TSchemaType : JsonSchema4, new()
         {
             var propertyType = property.PropertyType;
+            var attributes = property.GetCustomAttributes().ToArray();
 
             var jsonProperty = Generate<JsonProperty>(propertyType);
-            parentSchema.Properties.Add(property.Name, jsonProperty);
-
-            var attributes = property.GetCustomAttributes().ToArray();
             
+            var propertyName = property.Name;
+            var jsonPropertyAttribute = attributes.FirstOrDefault(a => a is JsonPropertyAttribute) as JsonPropertyAttribute;
+            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
+                propertyName = jsonPropertyAttribute.PropertyName; 
+
+            parentSchema.Properties.Add(propertyName, jsonProperty);
+
             var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
             if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)

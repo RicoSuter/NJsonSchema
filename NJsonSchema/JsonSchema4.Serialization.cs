@@ -232,7 +232,7 @@ namespace NJsonSchema
                 var properties = (ObservableDictionary<string, JsonProperty>)sender;
                 foreach (var property in properties)
                 {
-                    property.Value.Key = property.Key;
+                    property.Value.Name = property.Key;
                     property.Value.ParentSchema = this;
                 }
             }

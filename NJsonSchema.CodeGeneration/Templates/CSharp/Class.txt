@@ -1,6 +1,41 @@
-﻿public class <class>
+﻿public partial class <class> : INotifyPropertyChanged
 {
-    <properties:{property | 
-        public <property.Type> <property.Key> { get; set; \}
-    }>
+<properties:{property | 
+    private <property.Type> _<property.FieldName>;
+}>
+
+<properties:{property | 
+    [JsonProperty("<property.Name>", Required = <property.Required>)]
+    public <property.Type> <property.PropertyName>
+    {
+        get { return _<property.FieldName>; \}
+        set 
+        {
+            if (_<property.FieldName> != value)
+            {
+                _<property.FieldName> = value; 
+                RaisePropertyChanged();
+            \}
+        \}
+    \}
+
+}>
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public string ToJson() 
+	{
+		return JsonConvert.SerializeObject(this);
+	}
+	
+	public static <class> FromJson(string data)
+	{
+		return JsonConvert.DeserializeObject\<<class>>(data);
+	}
+
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) 
+            handler(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

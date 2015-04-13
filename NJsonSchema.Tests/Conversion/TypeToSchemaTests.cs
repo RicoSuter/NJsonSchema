@@ -133,6 +133,17 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
+        public void When_property_is_renamed_then_the_name_must_be_correct()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<MyType>();
+
+            //// Assert
+            Assert.IsTrue(schema.Properties.ContainsKey("abc"));
+            Assert.IsFalse(schema.Properties.ContainsKey("ChangedName"));
+        }
+
+        [TestMethod]
         public void When_converting_object_then_it_should_be_correct()
         {
             //// Act
@@ -215,6 +226,9 @@ namespace NJsonSchema.Tests.Conversion
         public bool? NullableBoolean { get; set; }
 
         public string String { get; set; }
+
+        [JsonProperty("abc")]
+        public string ChangedName { get; set; }
 
         [Required]
         public MySubtype RequiredReference { get; set; }

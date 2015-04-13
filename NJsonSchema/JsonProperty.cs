@@ -15,17 +15,17 @@ namespace NJsonSchema
     {
         private JsonSchema4 _parentSchema;
 
-        internal static JsonProperty FromJsonSchema(string key, JsonSchema4 type)
+        internal static JsonProperty FromJsonSchema(string name, JsonSchema4 type)
         {
             var data = JsonConvert.SerializeObject(type);
             var property = JsonConvert.DeserializeObject<JsonProperty>(data);
-            property.Key = key;
+            property.Name = name;
             return property;
         }
         
-        /// <summary>Gets or sets the key of the property. </summary>
+        /// <summary>Gets or sets the name of the property. </summary>
         [JsonIgnore]
-        public string Key { get; internal set; }
+        public string Name { get; internal set; }
 
         /// <summary>Gets the parent schema of this property schema. </summary>
         public override JsonSchema4 ParentSchema
@@ -45,7 +45,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsRequired
         {
-            get { return ParentSchema.RequiredProperties.Contains(Key); }
+            get { return ParentSchema.RequiredProperties.Contains(Name); }
             set
             {
                 if (ParentSchema == null)
@@ -54,13 +54,13 @@ namespace NJsonSchema
                 {
                     if (value)
                     {
-                        if (!ParentSchema.RequiredProperties.Contains(Key))
-                            ParentSchema.RequiredProperties.Add(Key);
+                        if (!ParentSchema.RequiredProperties.Contains(Name))
+                            ParentSchema.RequiredProperties.Add(Name);
                     }
                     else
                     {
-                        if (ParentSchema.RequiredProperties.Contains(Key))
-                            ParentSchema.RequiredProperties.Remove(Key);
+                        if (ParentSchema.RequiredProperties.Contains(Name))
+                            ParentSchema.RequiredProperties.Remove(Name);
                     }
                 }
             }

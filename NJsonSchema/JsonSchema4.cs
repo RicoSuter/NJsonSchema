@@ -84,7 +84,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the object type. </summary>
         [JsonIgnore]
-        public JsonObjectType Type { get; internal set; }
+        public JsonObjectType Type { get; set; }
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]

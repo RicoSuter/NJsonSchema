@@ -1,4 +1,9 @@
-﻿namespace <namespace>
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
+
+namespace <namespace>
 {
     <classes>
 }

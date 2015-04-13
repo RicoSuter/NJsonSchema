@@ -35,7 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -58,10 +63,6 @@
       <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
       <Name>NJsonSchema.CodeGeneration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NJsonSchema.Tests\NJsonSchema.Tests.csproj">
-      <Project>{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}</Project>
-      <Name>NJsonSchema.Tests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7b7a2e32-e808-4a19-98b1-37e766580f8c}</Project>
       <Name>NJsonSchema</Name>
@@ -71,6 +72,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

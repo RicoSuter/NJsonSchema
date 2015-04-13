@@ -45,8 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CSharpGenerator.cs" />
-    <Compile Include="GeneratorBase.cs" />
+    <Compile Include="Generators\CSharpClassGenerator.cs" />
+    <Compile Include="Generators\GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
