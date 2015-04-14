@@ -13,8 +13,13 @@ using Newtonsoft.Json;
 
 namespace NJsonSchema
 {
-    internal class JsonSchemaGenerator
+    /// <summary>Generates a <see cref="JsonSchema4"/> object for a given type. </summary>
+    public class JsonSchemaGenerator
     {
+        /// <summary>Generates a <see cref="JsonSchema4"/> object for the given type type.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
+        /// <param name="type">The type.</param>
+        /// <returns>The schema. </returns>
         public TSchemaType Generate<TSchemaType>(Type type)
             where TSchemaType : JsonSchema4, new()
         {

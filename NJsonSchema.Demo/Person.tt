@@ -14,11 +14,9 @@
     schema.Properties.Add("FirstName", new JsonProperty { Type = JsonObjectType.String });
     schema.Properties.Add("LastName", new JsonProperty { Type = JsonObjectType.String });
     schema.Properties.Add("Birthday", new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, IsRequired = true });
-    var generator = new CSharpClassGenerator(schema);
 
-    var provider = new CSharpCodeProvider();
-    //generator.Class = provider.CreateEscapedIdentifier(Path.GetFileNameWithoutExtension(Host.TemplateFile));
+    var generator = new CSharpClassGenerator(schema);
 	generator.Namespace = Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint");
-    var code = generator.Generate();
+    var code = generator.GenerateFile();
 #>
 <#= code #>

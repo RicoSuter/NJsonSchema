@@ -59,10 +59,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Jsdl.CodeGeneration\Jsdl.CodeGeneration.csproj">
-      <Project>{75B3F91D-687E-4FB3-AD45-CCFA3C406DB4}</Project>
-      <Name>Jsdl.CodeGeneration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
       <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
       <Name>NJsonSchema.CodeGeneration</Name>

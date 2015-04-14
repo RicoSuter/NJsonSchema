@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -51,6 +52,15 @@ namespace NJsonSchema
         {
             var generator = new JsonSchemaGenerator();
             return generator.Generate<JsonSchema4>(typeof(TType));
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema4"/> from a given type. </summary>
+        /// <param name="type">The type to create the schema for. </param>
+        /// <returns>The <see cref="JsonSchema4"/>. </returns>
+        public static JsonSchema4 FromType(Type type)
+        {
+            var generator = new JsonSchemaGenerator();
+            return generator.Generate<JsonSchema4>(type);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>

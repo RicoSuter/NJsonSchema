@@ -12,7 +12,8 @@ using System.Reflection;
 
 namespace NJsonSchema
 {
-    internal class JsonObjectTypeDescription
+    /// <summary>Gets JSON information about a .NET type. </summary>
+    public class JsonObjectTypeDescription
     {
         /// <summary>Creates a <see cref="JsonObjectTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="type">The type. </param>
@@ -72,7 +73,7 @@ namespace NJsonSchema
 
         private static bool IsArrayType(Type type)
         {
-            return typeof(ICollection).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
         }
     }
 }

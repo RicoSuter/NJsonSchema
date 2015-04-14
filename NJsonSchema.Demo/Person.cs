@@ -58,14 +58,14 @@ namespace NJsonSchema.Demo
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string ToJson() 
-    	{
-    		return JsonConvert.SerializeObject(this);
-    	}
+        {
+            return JsonConvert.SerializeObject(this);
+        }
 
-    	public static Person2 FromJson(string data)
-    	{
-    		return JsonConvert.DeserializeObject<Person2>(data);
-    	}
+        public static Person2 FromJson(string data)
+        {
+            return JsonConvert.DeserializeObject<Person2>(data);
+        }
 
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {

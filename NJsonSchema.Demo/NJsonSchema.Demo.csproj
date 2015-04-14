@@ -48,11 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataService.cs">
-      <DependentUpon>DataService.tt</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="Person.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -159,10 +154,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Jsdl.CodeGeneration\Jsdl.CodeGeneration.csproj">
-      <Project>{75B3F91D-687E-4FB3-AD45-CCFA3C406DB4}</Project>
-      <Name>Jsdl.CodeGeneration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
       <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
       <Name>NJsonSchema.CodeGeneration</Name>
@@ -177,10 +168,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataService.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DataService.cs</LastGenOutput>
-    </Content>
     <Content Include="Person.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Person.cs</LastGenOutput>
