@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
-namespace NJsonSchema.Demo
+namespace NJsonSchema.Demo.CodeGeneration
 {
-    public partial class Person2 : INotifyPropertyChanged
+    public partial class Person : INotifyPropertyChanged
     {
         private string _firstName;
         private string _lastName;
@@ -62,9 +62,9 @@ namespace NJsonSchema.Demo
             return JsonConvert.SerializeObject(this);
         }
 
-        public static Person2 FromJson(string data)
+        public static Person FromJson(string data)
         {
-            return JsonConvert.DeserializeObject<Person2>(data);
+            return JsonConvert.DeserializeObject<Person>(data);
         }
 
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)

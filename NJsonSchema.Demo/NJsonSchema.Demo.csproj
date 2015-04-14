@@ -48,10 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Person.cs">
+    <Compile Include="CodeGeneration\PersonCSharp.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Person.tt</DependentUpon>
+      <DependentUpon>PersonCSharp.tt</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -168,9 +168,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Person.tt">
+    <Content Include="CodeGeneration\PersonCSharp.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Person.cs</LastGenOutput>
+      <LastGenOutput>PersonCSharp.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

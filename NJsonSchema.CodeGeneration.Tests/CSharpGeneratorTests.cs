@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.Generators;
 using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.CSharp;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {

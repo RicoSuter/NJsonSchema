@@ -10,7 +10,7 @@
 <#@ output extension=".cs" #>
 <#
     var schema = new JsonSchema4();
-    schema.Title = "Person2";
+    schema.Title = "Person";
     schema.Properties.Add("FirstName", new JsonProperty { Type = JsonObjectType.String });
     schema.Properties.Add("LastName", new JsonProperty { Type = JsonObjectType.String });
     schema.Properties.Add("Birthday", new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, IsRequired = true });
