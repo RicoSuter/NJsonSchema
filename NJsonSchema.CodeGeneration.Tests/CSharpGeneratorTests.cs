@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             generator.Namespace = "MyNamespace";
             
             //// Act
-            var output = generator.Generate();
+            var output = generator.GenerateFile();
             
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
@@ -31,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             generator.Namespace = "MyNamespace";
 
             //// Act
-            var output = generator.Generate();
+            var output = generator.GenerateFile();
 
             //// Assert
             Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));

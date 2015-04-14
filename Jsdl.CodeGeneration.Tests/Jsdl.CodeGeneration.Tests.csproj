@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}</ProjectGuid>
+    <ProjectGuid>{37650571-163A-4BE7-86BF-DC1B02ADACBB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NJsonSchema.Tests</RootNamespace>
-    <AssemblyName>NJsonSchema.Tests</AssemblyName>
+    <RootNamespace>Jsdl.CodeGeneration.Tests</RootNamespace>
+    <AssemblyName>Jsdl.CodeGeneration.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -33,12 +33,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -56,20 +55,21 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Samples\SampleTests.cs" />
-    <Compile Include="Schema\JsonSchemaTests.cs" />
+    <Compile Include="JsdlTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Conversion\TypeToSchemaTests.cs" />
-    <Compile Include="Suite\TestSuiteTests.cs" />
-    <Compile Include="Validation\ArrayValidationTests.cs" />
-    <Compile Include="Validation\InheritanceTests.cs" />
-    <Compile Include="Validation\ObjectValidationTests.cs" />
-    <Compile Include="Validation\ValueTypeValidationTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Jsdl.CodeGeneration\Jsdl.CodeGeneration.csproj">
+      <Project>{75B3F91D-687E-4FB3-AD45-CCFA3C406DB4}</Project>
+      <Name>Jsdl.CodeGeneration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
+      <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
+      <Name>NJsonSchema.CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7b7a2e32-e808-4a19-98b1-37e766580f8c}</Project>
-      <Name>JsonSchema4</Name>
+      <Name>NJsonSchema</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

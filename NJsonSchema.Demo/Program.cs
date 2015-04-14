@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using Jsdl.CodeGeneration;
+using Jsdl.CodeGeneration.Generators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,6 +16,45 @@ namespace NJsonSchema.Demo
         static void Main(string[] args)
         {
             Console.BufferHeight = 2000;
+
+            var service = new JsdlService();
+            service.Name = "DataService";
+            service.Operations.Add(new JsdlOperation
+            {
+                Name = "Foo", 
+                Target = "api/Sum/{0}/{1}",
+                Method = JsdlOperationMethod.Delete,
+                Parameters = new List<JsdlParameter>
+                {
+                    new JsdlParameter
+                    {
+                        Name = "a", 
+                        ParameterType = JsdlParameterType.segment,
+                        SegmentPosition = 0, 
+                        Type = JsonObjectType.Integer
+                    }, 
+                    new JsdlParameter
+                    {
+                        Name = "b", 
+                        ParameterType = JsdlParameterType.segment,
+                        SegmentPosition = 1, 
+                        Type = JsonObjectType.Integer
+                    }, 
+                },
+                Returns = new JsonSchema4
+                {
+                    Type = JsonObjectType.Integer,
+                }
+            });
+
+            var generator = new CSharpJsdlServiceGenerator(service);
+            generator.Namespace = "Test";
+            var code = generator.GenerateFile();
+
+            Console.WriteLine(code);
+            Console.ReadLine();
+
+
 
             var passes = 0;
             var fails = 0;

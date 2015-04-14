@@ -51,11 +51,6 @@
   <ItemGroup>
     <Compile Include="Generators\CSharpClassGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
-    <Compile Include="Jsdl\JsdlOperation.cs" />
-    <Compile Include="Jsdl\JsdlParameterType.cs" />
-    <Compile Include="Jsdl\JsdlOperationMethod.cs" />
-    <Compile Include="Jsdl\JsdlService.cs" />
-    <Compile Include="Jsdl\JsdlParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

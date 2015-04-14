@@ -4,11 +4,12 @@ using Antlr4.StringTemplate;
 
 namespace NJsonSchema.CodeGeneration.Generators
 {
-    public class GeneratorBase
+    public abstract class GeneratorBase
     {
         protected Template LoadTemplate(string language, string file)
         {
-            var resourceName = string.Format("NJsonSchema.CodeGeneration.Templates.{0}.{1}.txt", language, file);
+            var assembly = GetType().Assembly;
+            var resourceName = string.Format("{0}.Templates.{1}.{2}.txt", assembly.GetName().Name, language, file);
             using (var stream = GetType().Assembly.GetManifestResourceStream(resourceName))
             {
                 using (var reader = new StreamReader(stream))

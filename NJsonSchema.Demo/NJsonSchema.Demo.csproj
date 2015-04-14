@@ -35,11 +35,12 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.7\lib\portable-net45+wp80+win8+wpa81+aspnetcore50\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataService.cs">
+      <DependentUpon>DataService.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Person.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -57,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
     <None Include="Tests\additionalItems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -152,6 +159,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Jsdl.CodeGeneration\Jsdl.CodeGeneration.csproj">
+      <Project>{75B3F91D-687E-4FB3-AD45-CCFA3C406DB4}</Project>
+      <Name>Jsdl.CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
       <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
       <Name>NJsonSchema.CodeGeneration</Name>
@@ -166,6 +177,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DataService.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DataService.cs</LastGenOutput>
+    </Content>
     <Content Include="Person.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Person.cs</LastGenOutput>

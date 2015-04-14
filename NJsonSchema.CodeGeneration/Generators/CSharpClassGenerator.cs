@@ -7,31 +7,24 @@ namespace NJsonSchema.CodeGeneration.Generators
     public class CSharpClassGenerator : GeneratorBase
     {
         private readonly JsonSchema4 _schema;
-        private readonly Dictionary<string, CSharpClassGenerator> _classes;
+        private readonly Dictionary<string, CSharpClassGenerator> _types;
 
         public CSharpClassGenerator(JsonSchema4 schema)
             : this(schema, new Dictionary<string, CSharpClassGenerator>())
         {
         }
 
-        private CSharpClassGenerator(JsonSchema4 schema, Dictionary<string, CSharpClassGenerator> classes)
+        private CSharpClassGenerator(JsonSchema4 schema, Dictionary<string, CSharpClassGenerator> types)
         {
             _schema = schema;
-            _classes = classes;
+            _types = types;
         }
 
         public string Namespace { get; set; }
 
-        public string Generate()
+        public string GenerateFile()
         {
-            return GenerateFile();
-        }
-
-        private string GenerateFile()
-        {
-            var classes = GenerateClass();
-            foreach (var childClass in _classes.Values)
-                classes += "\n\n" + childClass.GenerateClass();
+            var classes = GenerateClasses();
 
             var template = LoadTemplate("CSharp", "File");
             template.Add("namespace", Namespace);
@@ -39,7 +32,15 @@ namespace NJsonSchema.CodeGeneration.Generators
             return template.Render();
         }
 
-        private string GenerateClass()
+        public string GenerateClasses()
+        {
+            var classes = GenerateMainClass();
+            foreach (var type in _types.Values)
+                classes += "\n\n" + type.GenerateMainClass();
+            return classes;
+        }
+
+        private string GenerateMainClass()
         {
             var properties = _schema.Properties.Values.Select(p => new
             {
@@ -57,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.Generators
             return template.Render();
         }
 
-        private string GetType(JsonSchema4 schema, bool isRequired)
+        protected string GetType(JsonSchema4 schema, bool isRequired)
         {
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
@@ -91,11 +92,11 @@ namespace NJsonSchema.CodeGeneration.Generators
                 {
                     if (!string.IsNullOrEmpty(schema.Title))
                     {
-                        if (!_classes.ContainsKey(schema.Title))
+                        if (!_types.ContainsKey(schema.Title))
                         {
-                            var generator = new CSharpClassGenerator(schema, _classes);
+                            var generator = new CSharpClassGenerator(schema, _types);
                             generator.Namespace = Namespace;
-                            _classes[schema.Title] = generator;
+                            _types[schema.Title] = generator;
                         }
 
                         return schema.Title;

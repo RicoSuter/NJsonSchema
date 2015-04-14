@@ -1,0 +1,90 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace <namespace>
+{
+    public partial class <class>
+    {
+        public <class>() { }
+
+        public <class>(string baseUrl)
+        {
+	        BaseUrl = baseUrl; 
+        }
+
+        partial void PrepareRequest(HttpClient request);
+
+        partial void ProcessResponse(HttpClient request, HttpResponseMessage response);
+
+        public string BaseUrl { get; set; }
+        
+<operations:{operation | 
+        public async Task\<<operation.resultType>> <operation.MethodName>Async(<operation.Parameters:{parameter | <parameter.Type> <parameter.Name><if(!parameter.isLast)>,<endif> }>)
+        {
+            var url = string.Format("{0\}/{1\}?", BaseUrl, "<operation.Target>");
+
+<operation.SegmentParameters:{parameter | 
+            url = url.Replace("{<parameter.SegmentPosition>\}", <parameter.Name>.ToString());
+}>
+
+<operation.QueryParameters:{parameter | 
+            url += string.Format("{0\}<parameter.Name>={1\}&", url, Url.Encode(<parameter.Name>.ToString()));
+}>
+			
+            var client = new HttpClient();
+            PrepareRequest(client);
+
+<if(operation.HasContent)>
+            var content = new StringContent(JsonConvert.SerializeObject(<operation.ContentParameter.Name>));
+
+            var response = await client.<operation.Method>Async(url, content);
+            ProcessResponse(client, response);
+<else>
+            var response = await client.<operation.Method>Async(url);
+            ProcessResponse(client, response);
+<endif>
+
+            var data = await response.Content.ReadAsStringAsync(); 
+            var httpStatusCode = response.StatusCode;
+            
+            var isError = (int)httpStatusCode >= 400; 
+			if (isError)
+            {
+                if (!string.IsNullOrEmpty(data))
+                {
+                    try
+                    {
+                        var exception = (JContainer)JsonConvert.DeserializeObject(data);
+                        throw new JsdlException(
+                            exception["code"] != null ? exception["code"].ToString() : null, 
+                            exception["message"] != null ? exception["message"].ToString() : "", 
+                            exception["stackTrace"] != null ? exception["stackTrace"].ToString() : null);
+                    \} catch { \}
+                \}
+                throw new JsdlException("http_" + (int)httpStatusCode, "HTTP error: " + httpStatusCode, null);
+            \}
+
+            return JsonConvert.DeserializeObject\<<operation.resultType>>(data);		
+        \}
+}>
+
+        public class JsdlException : Exception
+        {
+            public JsdlException(string code, string message, string serverStackTrace) : base(message)
+            { 
+                Code = code; 
+                ServerStackTrace = serverStackTrace; 
+            }
+			
+            public string Code { get; private set; }
+
+            public string ServerStackTrace { get; private set; }
+        }
+    }
+
+    <classes>
+}

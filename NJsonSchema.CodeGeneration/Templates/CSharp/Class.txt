@@ -23,14 +23,14 @@
     public event PropertyChangedEventHandler PropertyChanged;
 
     public string ToJson() 
-	{
-		return JsonConvert.SerializeObject(this);
-	}
+    {
+        return JsonConvert.SerializeObject(this);
+    }
 	
-	public static <class> FromJson(string data)
-	{
-		return JsonConvert.DeserializeObject\<<class>>(data);
-	}
+    public static <class> FromJson(string data)
+    {
+        return JsonConvert.DeserializeObject\<<class>>(data);
+    }
 
     protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
     {
