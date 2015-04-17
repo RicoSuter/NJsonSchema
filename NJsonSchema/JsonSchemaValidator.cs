@@ -41,18 +41,50 @@ namespace NJsonSchema
             ValidateAllOf(token, propertyName, propertyPath, errors);
             ValidateOneOf(token, propertyName, propertyPath, errors);
             ValidateNot(token, propertyName, propertyPath, errors);
-
+            ValidateType(token, propertyName, propertyPath, errors);
             ValidateEnum(token, propertyName, propertyPath, errors);
-            ValidateString(token, propertyName, propertyPath, errors);
-            ValidateNumber(token, propertyName, propertyPath, errors);
-            ValidateInteger(token, propertyName, propertyPath, errors);
-            ValidateBoolean(token, propertyName, propertyPath, errors);
-            ValidateNull(token, propertyName, propertyPath, errors);
-            ValidateObject(token, propertyName, propertyPath, errors);
             ValidateArray(token, propertyName, propertyPath, errors);
             ValidateProperties(token, propertyName, propertyPath, errors);
 
             return errors;
+        }
+
+        private void ValidateType(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            var types = GetTypes().ToDictionary(t => t, t => new List<ValidationError>());
+            if (types.Count > 0)
+            {
+                foreach (var type in types)
+                {
+                    ValidateString(token, propertyName, propertyPath, type.Value);
+                    ValidateNumber(token, propertyName, propertyPath, type.Value);
+                    ValidateInteger(token, propertyName, propertyPath, type.Value);
+                    ValidateBoolean(token, propertyName, propertyPath, type.Value);
+                    ValidateNull(token, propertyName, propertyPath, type.Value);
+                    ValidateObject(token, propertyName, propertyPath, type.Value);
+                }
+
+                // just one has to validate when multiple types are defined
+                if (types.All(t => t.Value.Count > 0))
+                    errors.AddRange(types.SelectMany(t => t.Value));
+            }
+            else
+            {
+                ValidateString(token, propertyName, propertyPath, errors);
+                ValidateNumber(token, propertyName, propertyPath, errors);
+                ValidateInteger(token, propertyName, propertyPath, errors);
+                ValidateBoolean(token, propertyName, propertyPath, errors);
+                ValidateNull(token, propertyName, propertyPath, errors);
+                ValidateObject(token, propertyName, propertyPath, errors);
+            }
+        }
+
+        private IEnumerable<JsonObjectType> GetTypes()
+        {
+            return Enum
+                .GetValues(typeof(JsonObjectType))
+                .Cast<JsonObjectType>()
+                .Where(t => t != JsonObjectType.None && _schema.Type.HasFlag(t));
         }
 
         private void ValidateAnyOf(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
