@@ -65,7 +65,7 @@ The generated JSON schema data stored in the `schemaData` variable:
         "FirstName",
         "LastName",
         "Birthday",
-        "Sex",
+        "Gender",
         "Test"
       ],
       "properties": {
