@@ -34,7 +34,7 @@ The `Person` class:
         [Required]
         public string LastName { get; set; }
 
-        public Sex Sex { get; set; }
+        public Gender Gender { get; set; }
 
         public DateTime Birthday { get; set; }
 
@@ -49,7 +49,7 @@ The `Person` class:
         public string Company { get; set; }
     }
 
-    public enum Sex
+    public enum Gender
     {
         Male, 
         Female
@@ -65,7 +65,7 @@ The generated JSON schema data stored in the `schemaData` variable:
         "FirstName",
         "LastName",
         "Birthday",
-        "Sex",
+        "Gender",
         "Test"
       ],
       "properties": {
@@ -75,7 +75,7 @@ The generated JSON schema data stored in the `schemaData` variable:
         "LastName": {
           "type": "string"
         },
-        "Sex": {
+        "Gender": {
           "type": "string",
           "enum": [
             "Male",
