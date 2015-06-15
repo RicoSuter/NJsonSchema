@@ -9,9 +9,4 @@
 **.sln.ide/**
 **.vs/**
 
-MyToolkit/**
-NuGetReferenceSwitcher/**
-VisualJsonEditor/**
-ProjectDependencyBrowser/**
-Exceptional/**
-/NJsonSchema.sln.GhostDoc.xml
+/src/NJsonSchema.sln.GhostDoc.xml
