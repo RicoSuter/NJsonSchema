@@ -35,49 +35,47 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
             {
-                var property = (JsonProperty)schema;
+                var property = schema;
                 if (property.Item != null)
                     return string.Format("ObservableCollection<{0}>", Resolve(property.Item, true));
-                else
-                    throw new NotImplementedException("Items not supported");
+
+                throw new NotImplementedException("Items not supported");
             }
-            else
+
+            if (type.HasFlag(JsonObjectType.Number))
+                return isRequired ? "decimal" : "decimal?";
+
+            if (type.HasFlag(JsonObjectType.Integer))
+                return isRequired ? "long" : "long?";
+
+            if (type.HasFlag(JsonObjectType.Boolean))
+                return isRequired ? "bool" : "bool?";
+
+            if (type.HasFlag(JsonObjectType.String))
             {
-                if (type.HasFlag(JsonObjectType.Number))
-                    return isRequired ? "decimal" : "decimal?";
-
-                if (type.HasFlag(JsonObjectType.Integer))
-                    return isRequired ? "long" : "long?";
-
-                if (type.HasFlag(JsonObjectType.Boolean))
-                    return isRequired ? "bool" : "bool?";
-
-                if (type.HasFlag(JsonObjectType.String))
-                {
-                    if (schema.Format == JsonFormatStrings.DateTime)
-                        return isRequired ? "DateTime" : "DateTime?";
-                    else
-                        return "string";
-                }
-
-                if (type.HasFlag(JsonObjectType.Object))
-                {
-                    if (!string.IsNullOrEmpty(schema.Title))
-                    {
-                        if (!_types.ContainsKey(schema.Title))
-                        {
-                            var generator = new CSharpClassGenerator(schema, this);
-                            generator.Namespace = Namespace;
-                            _types[schema.Title] = generator;
-                        }
-
-                        return schema.Title;
-                    }
-                    return "object";
-                }
-
-                throw new NotImplementedException("Type not supported");
+                if (schema.Format == JsonFormatStrings.DateTime)
+                    return isRequired ? "DateTime" : "DateTime?";
+                else
+                    return "string";
             }
+
+            if (type.HasFlag(JsonObjectType.Object))
+            {
+                if (!string.IsNullOrEmpty(schema.Title))
+                {
+                    if (!_types.ContainsKey(schema.Title))
+                    {
+                        var generator = new CSharpClassGenerator(schema, this);
+                        generator.Namespace = Namespace;
+                        _types[schema.Title] = generator;
+                    }
+
+                    return schema.Title;
+                }
+                return "object";
+            }
+
+            throw new NotImplementedException("Type not supported");
         }
     }
 }
