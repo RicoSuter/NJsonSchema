@@ -100,6 +100,11 @@ namespace NJsonSchema
         [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string TypeName { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether this is a type reference to the type in <see cref="TypeName"/> 
+        /// and does not describe the full object and does not contain any properties. </summary>
+        [JsonProperty("isTypeReference", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool IsTypeReference { get; set; }
+
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
         public virtual JsonSchema4 ParentSchema { get; internal set; }

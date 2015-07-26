@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.TypeName))
+                    if (!_types.ContainsKey(schema.TypeName) && !schema.IsTypeReference)
                     {
                         var generator = new TypeScriptInterfaceGenerator(schema, this);
                         _types[schema.TypeName] = generator;

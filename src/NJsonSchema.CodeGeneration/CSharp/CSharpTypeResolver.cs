@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.TypeName))
+                    if (!_types.ContainsKey(schema.TypeName) && !schema.IsTypeReference)
                     {
                         var generator = new CSharpClassGenerator(schema, this);
                         generator.Namespace = Namespace;
