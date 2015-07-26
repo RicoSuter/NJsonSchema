@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }).ToList();
 
             var template = LoadTemplate("Interface");
-            template.Add("class", _schema.Title);
+            template.Add("class", _schema.TypeName);
             template.Add("properties", properties);
             return template.Render();
         }

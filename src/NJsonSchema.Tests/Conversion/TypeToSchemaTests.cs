@@ -16,7 +16,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.AreEqual(typeof(MyType).Name, schema.Title);
+            Assert.AreEqual(typeof(MyType).Name, schema.TypeName);
         }
 
         [TestMethod]
@@ -152,7 +152,7 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             var subSchema = schema.Properties["Reference"];
             Assert.AreEqual(JsonObjectType.Object, subSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, subSchema.Title);
+            Assert.AreEqual(typeof(MySubtype).Name, subSchema.TypeName);
         }
 
         [TestMethod]
@@ -162,7 +162,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.IsNull(schema.Properties["Integer"].Title);
+            Assert.IsNull(schema.Properties["Integer"].TypeName);
         }
 
         [TestMethod]
@@ -207,7 +207,7 @@ namespace NJsonSchema.Tests.Conversion
 
             Assert.AreEqual(JsonObjectType.Array, property.Type);
             Assert.AreEqual(JsonObjectType.Object, property.Item.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.Item.Title);
+            Assert.AreEqual(typeof(MySubtype).Name, property.Item.TypeName);
             Assert.AreEqual(JsonObjectType.String, property.Item.Properties["Id"].Type);
         }
     }

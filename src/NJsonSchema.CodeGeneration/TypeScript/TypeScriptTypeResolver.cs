@@ -51,19 +51,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return "boolean";
 
             if (type.HasFlag(JsonObjectType.String))
-                return "string";
+            {
+                if (schema.Format == JsonFormatStrings.DateTime)
+                    return "Date";
+                else
+                    return "string";
+            }
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (!string.IsNullOrEmpty(schema.Title))
+                if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.Title))
+                    if (!_types.ContainsKey(schema.TypeName))
                     {
                         var generator = new TypeScriptInterfaceGenerator(schema, this);
-                        _types[schema.Title] = generator;
+                        _types[schema.TypeName] = generator;
                     }
 
-                    return schema.Title;
+                    return schema.TypeName;
                 }
                 return "object";
             }

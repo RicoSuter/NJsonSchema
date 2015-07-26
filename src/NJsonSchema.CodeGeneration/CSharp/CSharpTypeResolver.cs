@@ -61,16 +61,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (!string.IsNullOrEmpty(schema.Title))
+                if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.Title))
+                    if (!_types.ContainsKey(schema.TypeName))
                     {
                         var generator = new CSharpClassGenerator(schema, this);
                         generator.Namespace = Namespace;
-                        _types[schema.Title] = generator;
+                        _types[schema.TypeName] = generator;
                     }
 
-                    return schema.Title;
+                    return schema.TypeName;
                 }
                 return "object";
             }

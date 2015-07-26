@@ -31,9 +31,8 @@ namespace NJsonSchema
 
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
-                schema.Title = type.Name;
-                foreach (var property in type.GetRuntimeProperties())
-                    LoadProperty(property, schema);
+                schema.TypeName = type.Name;
+                GenerateObjectProperties(type, schema);
             }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
             {
@@ -44,6 +43,16 @@ namespace NJsonSchema
 
             TryLoadEnumerations(type, schema);
             return schema;
+        }
+
+        /// <summary>Generates the properties for the given type and schema.</summary>
+        /// <param name="type">The types.</param>
+        /// <param name="schema">The properties</param>
+        protected virtual void GenerateObjectProperties<TSchemaType>(Type type, TSchemaType schema)
+            where TSchemaType : JsonSchema4, new()
+        {
+            foreach (var property in type.GetRuntimeProperties())
+                LoadProperty(property, schema);
         }
 
         private static void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
@@ -60,6 +69,8 @@ namespace NJsonSchema
             where TSchemaType : JsonSchema4, new()
         {
             var propertyType = property.PropertyType;
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
+
             var attributes = property.GetCustomAttributes().ToArray();
 
             var jsonProperty = Generate<JsonProperty>(propertyType);
@@ -72,7 +83,6 @@ namespace NJsonSchema
             parentSchema.Properties.Add(propertyName, jsonProperty);
 
             var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
             if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
                 parentSchema.RequiredProperties.Add(property.Name);
 

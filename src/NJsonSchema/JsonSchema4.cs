@@ -96,6 +96,10 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
 
+        /// <summary>Gets or sets the type name (class name of the object). </summary>
+        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string TypeName { get; set; }
+
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
         public virtual JsonSchema4 ParentSchema { get; internal set; }

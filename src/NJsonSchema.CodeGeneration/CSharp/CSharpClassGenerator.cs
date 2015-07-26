@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             var template = LoadTemplate("Class");
             template.Add("namespace", Namespace);
-            template.Add("class", _schema.Title);
+            template.Add("class", _schema.TypeName);
             template.Add("properties", properties);
             return template.Render();
         }
