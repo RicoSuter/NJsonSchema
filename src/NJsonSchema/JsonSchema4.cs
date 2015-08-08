@@ -75,7 +75,20 @@ namespace NJsonSchema
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
         }
-        
+
+        /// <summary>Creates the type reference.</summary>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The type reference.</returns>
+        public static JsonSchema4 CreateTypeReference(string typeName)
+        {
+            return new JsonSchema4
+            {
+                Type = JsonObjectType.Object,
+                TypeName = typeName,
+                IsTypeReference = true
+            };
+        }
+
         /// <summary>Gets or sets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Schema { get; set; }

@@ -24,8 +24,9 @@ namespace NJsonSchema.CodeGeneration
         protected Template LoadTemplate(string file)
         {
             var assembly = GetType().Assembly;
-            var resourceName = string.Format("{0}.{1}.Templates.{2}.txt", assembly.GetName().Name, Language, file);
-            using (var stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+            var prefix = assembly.GetName().Name == "NJsonSchema.CodeGeneration" ? assembly.GetName().Name : assembly.GetName().Name + ".ClientGenerators";
+            var resourceName = string.Format("{0}.{1}.Templates.{2}.txt", prefix, Language, file);
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
             {
                 using (var reader = new StreamReader(stream))
                 {

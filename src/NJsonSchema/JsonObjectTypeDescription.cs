@@ -42,6 +42,9 @@ namespace NJsonSchema
             if (type == typeof(Uri))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, JsonFormatStrings.Uri);
 
+            if (IsDictionaryType(type))
+                return new JsonObjectTypeDescription(JsonObjectType.Object, false);
+
             if (IsArrayType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Array, false);
 
@@ -74,6 +77,11 @@ namespace NJsonSchema
         private static bool IsArrayType(Type type)
         {
             return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+        }
+
+        private static bool IsDictionaryType(Type type)
+        {
+            return typeof(IDictionary).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
         }
     }
 }
