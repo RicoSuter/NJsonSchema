@@ -1,6 +1,8 @@
 NJsonSchema for .NET
 ====================
 
+[![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
+
 JSON Schema draft v4 reader, generator and validator for .NET
 
 NuGet packages: 
