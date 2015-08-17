@@ -9,7 +9,8 @@
         <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
     </metadata>
     <files>
-        <!--<file src="bin\Release\NJsonSchema.CodeGeneration.dll" target="lib\net45" />
-        <file src="bin\Release\NJsonSchema.CodeGeneration.xml" target="lib\net45" />-->
+        <file src="bin\Release\NJsonSchema.CodeGeneration.dll" target="lib\net45" />
+        <file src="bin\Release\NJsonSchema.CodeGeneration.pdb" target="lib\net45" />
+        <file src="bin\Release\NJsonSchema.CodeGeneration.xml" target="lib\net45" />
     </files>
 </package>
