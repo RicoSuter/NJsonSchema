@@ -5,7 +5,7 @@ NJsonSchema for .NET
 
 JSON Schema draft v4 reader, generator and validator for .NET
 
-NuGet packages: 
+**NuGet packages:** 
 -   https://www.nuget.org/packages/NJsonSchema
 -   https://www.nuget.org/packages/NJsonSchema.CodeGeneration
 
