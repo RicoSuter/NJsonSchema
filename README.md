@@ -12,7 +12,7 @@ JSON Schema draft v4 reader, generator and validator for .NET
 
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. The project is still in development: Some features are not implemented yet. 
 
-## Usage
+## NJsonSchema usage
 
 The `JsonSchema4` type can be used as follows: 
 
@@ -108,3 +108,12 @@ The generated JSON schema data stored in the `schemaData` variable:
         }
       }
     }
+
+## NJsonSchema.CodeGeneration usage
+
+The `NJsonSchema.CodeGeneration` can be used to generate code from a JSON schema.
+
+    var generator new CSharpClassGenerator(schema);
+    var file = generator.GenerateFile();
+    
+The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
