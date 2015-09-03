@@ -17,6 +17,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     {
         private readonly Dictionary<string, TypeScriptInterfaceGenerator> _types = new Dictionary<string, TypeScriptInterfaceGenerator>();
 
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
+        public TypeScriptTypeResolver()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
+        /// <param name="knownSchemes">The known schemes.</param>
+        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
+        {
+            foreach (var type in knownSchemes)
+                _types[type.TypeName] = new TypeScriptInterfaceGenerator(type, this);
+        }
+
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
         public string Namespace { get; set; }
 
@@ -60,9 +73,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
+                if (schema.IsTypeReference)
+                    return Resolve(schema.TypeReference);
+
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.TypeName) && !schema.IsTypeReference)
+                    if (!_types.ContainsKey(schema.TypeName))
                     {
                         var generator = new TypeScriptInterfaceGenerator(schema, this);
                         _types[schema.TypeName] = generator;
@@ -70,6 +86,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                     return schema.TypeName;
                 }
+
                 return "object";
             }
 

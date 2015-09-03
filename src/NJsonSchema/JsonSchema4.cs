@@ -68,30 +68,34 @@ namespace NJsonSchema
         /// <returns></returns>
         public static JsonSchema4 FromJson(string data)
         {
-            return JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
+            data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
+            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
             {
                 ConstructorHandling = ConstructorHandling.Default, 
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize, 
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
+
+            JsonSchemaReferenceUtilities.UpdateAllTypeReferences(schema);
+            return schema; 
         }
 
         /// <summary>Creates the type reference.</summary>
-        /// <param name="typeName">The type name.</param>
+        /// <param name="schema">The referenced schema.</param>
         /// <returns>The type reference.</returns>
-        public static JsonSchema4 CreateTypeReference(string typeName)
+        public static JsonSchema4 CreateTypeReference(JsonSchema4 schema)
         {
             return new JsonSchema4
             {
                 Type = JsonObjectType.Object,
-                TypeName = typeName,
-                IsTypeReference = true
+                TypeName = schema.TypeName,
+                TypeReference = schema
             };
         }
 
         /// <summary>Gets or sets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Schema { get; set; }
+        public string SchemaReference { get; set; }
 
         /// <summary>Gets or sets the id. </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -113,11 +117,21 @@ namespace NJsonSchema
         [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string TypeName { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether this is a type reference to the type in <see cref="TypeName"/> 
-        /// and does not describe the full object and does not contain any properties. </summary>
-        [JsonProperty("isTypeReference", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public bool IsTypeReference { get; set; }
+        /// <summary>Gets or sets the type reference path ($ref). </summary>
+        [JsonProperty("typeReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string TypeReferencePath { get; set; }
 
+        /// <summary>Gets or sets the type reference.</summary>
+        [JsonIgnore]
+        public JsonSchema4 TypeReference { get; set; }
+
+        /// <summary>Gets a value indicating whether this is a type reference.</summary>
+        [JsonIgnore]
+        public bool IsTypeReference
+        {
+            get { return TypeReference != null || TypeReferencePath != null; }
+        }
+        
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
         public virtual JsonSchema4 ParentSchema { get; internal set; }
@@ -407,11 +421,15 @@ namespace NJsonSchema
         /// <returns>The JSON string. </returns>
         public string ToJson()
         {
-            var oldSchema = Schema;
-            Schema = "http://json-schema.org/draft-04/schema#";
+            var oldSchema = SchemaReference;
+            SchemaReference = "http://json-schema.org/draft-04/schema#";
+
+            JsonSchemaReferenceUtilities.UpdateAllTypeReferences(this);
+
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
-            Schema = oldSchema;
-            return data;
+            SchemaReference = oldSchema;
+
+            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
 
         /// <summary>Validates the given JSON token against this schema. </summary>

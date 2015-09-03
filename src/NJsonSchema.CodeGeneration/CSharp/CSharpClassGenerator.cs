@@ -45,7 +45,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public string GenerateFile()
         {
-            var classes = GenerateClasses();
+            var classes = GenerateClass();
+            classes += "\n\n" + _resolver.GenerateClasses();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Namespace);
@@ -53,17 +54,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return template.Render();
         }
 
-        /// <summary>Generates the classes.</summary>
-        /// <returns>The code of the generated classes. </returns>
-        public string GenerateClasses()
-        {
-            var classes = GenerateMainClass();
-            foreach (var type in _resolver.Types)
-                classes += "\n\n" + type.GenerateMainClass();
-            return classes;
-        }
-
-        private string GenerateMainClass()
+        /// <summary>Generates the main class.</summary>
+        /// <returns></returns>
+        public string GenerateClass()
         {
             var properties = _schema.Properties.Values.Select(property => new
             {

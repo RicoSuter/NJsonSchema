@@ -69,7 +69,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7b7a2e32-e808-4a19-98b1-37e766580f8c}</Project>
-      <Name>JsonSchema4</Name>
+      <Name>NJsonSchema</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

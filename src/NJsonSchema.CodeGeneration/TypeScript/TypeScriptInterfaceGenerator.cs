@@ -55,7 +55,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return classes;
         }
 
-        private string GenerateInterface()
+        /// <summary>Generates the interface.</summary>
+        /// <returns>The interface.</returns>
+        public string GenerateInterface()
         {
             var properties = _schema.Properties.Values.Select(property => new
             {

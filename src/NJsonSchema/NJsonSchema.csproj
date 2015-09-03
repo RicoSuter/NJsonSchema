@@ -68,7 +68,9 @@
   <ItemGroup>
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="JsonFormatStrings.cs" />
+    <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
+    <Compile Include="JsonSchemaReferenceUtilities.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
     <Compile Include="JsonSchema4.cs" />
     <Compile Include="JsonSchemaValidator.cs" />

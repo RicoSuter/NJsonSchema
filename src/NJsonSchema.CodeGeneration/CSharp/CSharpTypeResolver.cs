@@ -17,6 +17,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
     {
         private readonly Dictionary<string, CSharpClassGenerator> _types = new Dictionary<string, CSharpClassGenerator>();
 
+        /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
+        public CSharpTypeResolver()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
+        /// <param name="knownSchemes">The known schemes.</param>
+        public CSharpTypeResolver(JsonSchema4[] knownSchemes)
+        {
+            foreach (var type in knownSchemes)
+                _types[type.TypeName] = new CSharpClassGenerator(type, this);
+        }
+
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
         public string Namespace { get; set; }
 
@@ -61,9 +74,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (type.HasFlag(JsonObjectType.Object))
             {
+                if (schema.IsTypeReference)
+                    return Resolve(schema.TypeReference, isRequired);
+
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
-                    if (!_types.ContainsKey(schema.TypeName) && !schema.IsTypeReference)
+                    if (!_types.ContainsKey(schema.TypeName))
                     {
                         var generator = new CSharpClassGenerator(schema, this);
                         generator.Namespace = Namespace;
@@ -72,10 +88,21 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                     return schema.TypeName;
                 }
+
                 return "object";
             }
 
             throw new NotImplementedException("Type not supported");
+        }
+
+        /// <summary>Generates the classes.</summary>
+        /// <returns>The code of the generated classes. </returns>
+        public string GenerateClasses()
+        {
+            var classes = "";
+            foreach (var type in Types)
+                classes += type.GenerateClass() + "\n\n";
+            return classes;
         }
     }
 }
