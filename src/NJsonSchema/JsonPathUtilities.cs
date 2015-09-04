@@ -36,6 +36,7 @@ namespace NJsonSchema
         /// <param name="path">The JSON path.</param>
         /// <returns>The object or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the path.</exception>
+        /// <exception cref="NotSupportedException">Could not resolve the path.</exception>
         public static JsonSchema4 GetObjectFromJsonPath(object obj, string path)
         {
             if (path == "#")
@@ -48,13 +49,13 @@ namespace NJsonSchema
             {
                 var schema = GetObjectFromJsonPath(obj, path.Split('/').Skip(1).ToList(), new List<object>());
                 if (schema == null)
-                    throw new InvalidOperationException("Could not resolve the path.");
+                    throw new InvalidOperationException("Could not resolve the path '" + path +  "'.");
                 return schema; 
             }
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
-                throw new NotSupportedException("JSON web references are not supported.");
+                throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON web references are not supported.");
             else
-                throw new NotSupportedException("JSON file references are not supported.");
+                throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported.");
         }
 
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, List<object> checkedObjects)
@@ -81,7 +82,7 @@ namespace NJsonSchema
                 var i = 0;
                 foreach (var item in (IEnumerable)obj)
                 {
-                    var path = GetJsonPath(item, objectToSearch, basePath + "[" + i + "]", checkedObjects);
+                    var path = GetJsonPath(item, objectToSearch, basePath + "/" + i, checkedObjects);
                     if (path != null)
                         return path;
                 }
@@ -90,9 +91,7 @@ namespace NJsonSchema
             {
                 foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
-                    var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-                    var pathSegment = attribute != null && !string.IsNullOrEmpty(attribute.PropertyName) ? attribute.PropertyName : property.Name;
-
+                    var pathSegment = GetPathSegmentName(property);
                     var value = property.GetValue(obj);
                     if (value != null)
                     {
@@ -121,20 +120,37 @@ namespace NJsonSchema
                 if (((IDictionary)obj).Contains(segments.First()))
                     return GetObjectFromJsonPath(((IDictionary)obj)[segments.First()], segments.Skip(1).ToList(), checkedObjects);
             }
+            else if (obj is IEnumerable)
+            {
+                int index;
+                if (int.TryParse(segments.First(), out index))
+                {
+                    var enumerable = ((IEnumerable) obj).Cast<object>().ToArray(); 
+                    if (enumerable.Length > index)
+                        return GetObjectFromJsonPath(enumerable[index], segments.Skip(1).ToList(), checkedObjects);
+                }
+            }
             else
             {
                 foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
+                    var pathSegment = GetPathSegmentName(property);
                     var value = property.GetValue(obj);
-                    var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-
-                    var segment = attribute != null && !string.IsNullOrEmpty(attribute.PropertyName) ? attribute.PropertyName : property.Name;
-                    if (segment == segments.First())
+                    if (pathSegment == segments.First())
                         return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects);
                 }
             }
 
             return null;
+        }
+
+        private static string GetPathSegmentName(PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+            var pathSegment = attribute != null && !string.IsNullOrEmpty(attribute.PropertyName)
+                ? attribute.PropertyName
+                : property.Name;
+            return pathSegment;
         }
     }
 }

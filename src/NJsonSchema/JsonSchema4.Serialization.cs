@@ -42,7 +42,7 @@ namespace NJsonSchema
                 if (value is bool)
                     AllowAdditionalItems = (bool)value;
                 else if (value != null)
-                    AdditionalItemsSchema = FromJson(value.ToString());
+                    AdditionalItemsSchema = FromJsonWithoutReferenceHandling(value.ToString());
             }
         }
 
@@ -62,7 +62,7 @@ namespace NJsonSchema
                 if (value is bool)
                     AllowAdditionalProperties = (bool)value;
                 else if (value != null)
-                    AdditionalPropertiesSchema = FromJson(value.ToString());
+                    AdditionalPropertiesSchema = FromJsonWithoutReferenceHandling(value.ToString());
             }
         }
 
@@ -80,9 +80,9 @@ namespace NJsonSchema
             set
             {
                 if (value is JArray)
-                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJson(t.ToString())));
+                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJsonWithoutReferenceHandling(t.ToString())));
                 else if (value != null)
-                    Item = FromJson(value.ToString());
+                    Item = FromJsonWithoutReferenceHandling(value.ToString());
             }
         }
 

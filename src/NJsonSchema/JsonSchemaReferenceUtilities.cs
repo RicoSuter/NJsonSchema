@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace NJsonSchema
 {
@@ -29,7 +30,7 @@ namespace NJsonSchema
         /// <returns>The data.</returns>
         public static string ConvertJsonReferences(string data)
         {
-            return data.Replace("$ref", "typeReferencePath");
+            return data.Replace("$ref", "schemaReferencePath");
         }
 
         /// <summary>Converts property references to JSON references ($ref).</summary>
@@ -37,13 +38,20 @@ namespace NJsonSchema
         /// <returns></returns>
         public static string ConvertPropertyReferences(string data)
         {
-            return data.Replace("typeReferencePath", "$ref");
+            return data.Replace("schemaReferencePath", "$ref");
         }
 
         private static void UpdateTypeReferencePaths(object root, object obj, List<object> checkedObjects)
         {
             if (obj == null || obj is string)
                 return;
+
+            var schema = obj as JsonSchema4;
+            if (schema != null)
+            {
+                if (schema.SchemaReference != null)
+                    schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(root, schema.SchemaReference);
+            }
 
             if (obj is IDictionary)
             {
@@ -57,7 +65,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead))
+                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var value = property.GetValue(obj);
                     if (value != null)
@@ -65,13 +73,6 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-
-                            var schema = value as JsonSchema4;
-                            if (schema != null)
-                            {
-                                if (schema.TypeReference != null)
-                                    schema.TypeReferencePath = JsonPathUtilities.GetJsonPath(root, schema.TypeReference);
-                            }
 
                             UpdateTypeReferencePaths(root, value, checkedObjects);
                         }
@@ -85,6 +86,10 @@ namespace NJsonSchema
             if (obj == null || obj is string)
                 return;
 
+            var schema = obj as JsonSchema4;
+            if (schema != null && schema.SchemaReferencePath != null)
+                schema.SchemaReference = JsonPathUtilities.GetObjectFromJsonPath(root, schema.SchemaReferencePath);
+            
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values)
@@ -97,7 +102,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead))
+                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var value = property.GetValue(obj);
                     if (value != null)
@@ -105,11 +110,6 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-
-                            var schema = value as JsonSchema4;
-                            if (schema != null && schema.TypeReferencePath != null)
-                                schema.TypeReference = JsonPathUtilities.GetObjectFromJsonPath(root, schema.TypeReferencePath);
-
                             UpdateTypeReferences(root, value, checkedObjects);
                         }
                     }

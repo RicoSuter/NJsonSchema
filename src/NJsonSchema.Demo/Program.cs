@@ -86,7 +86,7 @@ namespace NJsonSchema.Demo
                 exceptions++;
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("      Exception: " + ex.GetType().FullName);
+                Console.WriteLine("      Exception: " + ex.GetType().FullName + " => " + ex.Message);
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
         }

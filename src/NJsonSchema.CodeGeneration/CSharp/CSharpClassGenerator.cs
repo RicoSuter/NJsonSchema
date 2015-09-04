@@ -45,8 +45,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public string GenerateFile()
         {
-            var classes = GenerateClass();
-            classes += "\n\n" + _resolver.GenerateClasses();
+            var classes = GenerateClass() + "\n\n" + _resolver.GenerateClasses();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Namespace);

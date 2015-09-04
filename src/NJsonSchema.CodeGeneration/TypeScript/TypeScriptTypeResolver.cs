@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                _types[type.TypeName] = new TypeScriptInterfaceGenerator(type, this);
+                _types[type.TypeName] = new TypeScriptInterfaceGenerator(type.ActualSchema, this);
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
@@ -44,6 +44,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The CSharp type name. </returns>
         public string Resolve(JsonSchema4 schema)
         {
+            schema = schema.ActualSchema;
+
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
             {
@@ -73,8 +75,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (schema.IsTypeReference)
-                    return Resolve(schema.TypeReference);
+                if (schema.IsSchemaReference)
+                    return Resolve(schema.SchemaReference);
 
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
@@ -91,6 +93,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
 
             throw new NotImplementedException("Type not supported");
+        }
+
+        /// <summary>Generates the interfaces.</summary>
+        /// <returns>The interfaces.</returns>
+        public string GenerateInterfaces()
+        {
+            var classes = "";
+            var runGenerators = new List<TypeScriptInterfaceGenerator>();
+            while (Types.Any(t => !runGenerators.Contains(t)))
+                classes += GenerateInterfaces(runGenerators);
+            return classes;
+        }
+
+        private string GenerateInterfaces(List<TypeScriptInterfaceGenerator> runGenerators)
+        {
+            var classes = "";
+            foreach (var type in Types.Where(t => !runGenerators.Contains(t)))
+            {
+                classes += type.GenerateInterface() + "\n\n";
+                runGenerators.Add(type);
+            }
+            return classes;
         }
     }
 }

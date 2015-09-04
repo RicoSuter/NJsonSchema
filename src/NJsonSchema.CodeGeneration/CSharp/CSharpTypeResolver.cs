@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public CSharpTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                _types[type.TypeName] = new CSharpClassGenerator(type, this);
+                _types[type.TypeName] = new CSharpClassGenerator(type.ActualSchema, this);
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
@@ -45,6 +45,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The CSharp type name. </returns>
         public string Resolve(JsonSchema4 schema, bool isRequired)
         {
+            schema = schema.ActualSchema;
+
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
             {
@@ -74,8 +76,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (schema.IsTypeReference)
-                    return Resolve(schema.TypeReference, isRequired);
+                if (schema.IsSchemaReference)
+                    return Resolve(schema.SchemaReference, isRequired);
 
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
@@ -100,8 +102,20 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string GenerateClasses()
         {
             var classes = "";
-            foreach (var type in Types)
+            var runGenerators = new List<CSharpClassGenerator>();
+            while (Types.Any(t => !runGenerators.Contains(t)))
+                classes += GenerateClasses(runGenerators);
+            return classes;
+        }
+
+        private string GenerateClasses(List<CSharpClassGenerator> runGenerators)
+        {
+            var classes = "";
+            foreach (var type in Types.Where(t => !runGenerators.Contains(t)))
+            {
                 classes += type.GenerateClass() + "\n\n";
+                runGenerators.Add(type);
+            }
             return classes;
         }
     }

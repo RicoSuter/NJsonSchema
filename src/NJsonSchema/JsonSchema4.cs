@@ -71,13 +71,24 @@ namespace NJsonSchema
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
             {
-                ConstructorHandling = ConstructorHandling.Default, 
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize, 
+                ConstructorHandling = ConstructorHandling.Default,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
 
             JsonSchemaReferenceUtilities.UpdateAllTypeReferences(schema);
-            return schema; 
+            return schema;
+        }
+
+        internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
+        {
+            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
+            {
+                ConstructorHandling = ConstructorHandling.Default,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            });
+            return schema;
         }
 
         /// <summary>Creates the type reference.</summary>
@@ -89,13 +100,13 @@ namespace NJsonSchema
             {
                 Type = JsonObjectType.Object,
                 TypeName = schema.TypeName,
-                TypeReference = schema
+                SchemaReference = schema
             };
         }
 
         /// <summary>Gets or sets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string SchemaReference { get; set; }
+        public string SchemaVersion { get; set; }
 
         /// <summary>Gets or sets the id. </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -113,25 +124,43 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
 
+
+
         /// <summary>Gets or sets the type name (class name of the object). </summary>
         [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string TypeName { get; set; }
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty("typeReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string TypeReferencePath { get; set; }
+        [JsonProperty("schemaReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string SchemaReferencePath { get; internal set; }
 
         /// <summary>Gets or sets the type reference.</summary>
         [JsonIgnore]
-        public JsonSchema4 TypeReference { get; set; }
+        public JsonSchema4 SchemaReference { get; set; }
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
-        public bool IsTypeReference
+        public bool IsSchemaReference
         {
-            get { return TypeReference != null || TypeReferencePath != null; }
+            get { return SchemaReference != null || SchemaReferencePath != null; }
         }
-        
+
+        /// <summary>Gets the actual schema, either this or the reference schema.</summary>
+        /// <exception cref="InvalidOperationException" accessor="get">The schema reference path is not resolved.</exception>
+        [JsonIgnore]
+        public virtual JsonSchema4 ActualSchema
+        {
+            get
+            {
+                if (IsSchemaReference && SchemaReference == null)
+                    throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' is not resolved.");
+
+                return IsSchemaReference ? SchemaReference.ActualSchema : this;
+            }
+        }
+
+
+
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
         public virtual JsonSchema4 ParentSchema { get; internal set; }
@@ -421,13 +450,13 @@ namespace NJsonSchema
         /// <returns>The JSON string. </returns>
         public string ToJson()
         {
-            var oldSchema = SchemaReference;
-            SchemaReference = "http://json-schema.org/draft-04/schema#";
+            var oldSchema = SchemaVersion;
+            SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
             JsonSchemaReferenceUtilities.UpdateAllTypeReferences(this);
 
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
-            SchemaReference = oldSchema;
+            SchemaVersion = oldSchema;
 
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
@@ -437,7 +466,7 @@ namespace NJsonSchema
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(JToken token)
         {
-            var validator = new JsonSchemaValidator(this);
+            var validator = new JsonSchemaValidator(ActualSchema);
             return validator.Validate(token, null, null);
         }
 
@@ -464,7 +493,7 @@ namespace NJsonSchema
         {
             if (Items == null)
                 Items = new ObservableCollection<JsonSchema4>();
-            
+
             if (Properties == null)
                 Properties = new ObservableDictionary<string, JsonProperty>();
 

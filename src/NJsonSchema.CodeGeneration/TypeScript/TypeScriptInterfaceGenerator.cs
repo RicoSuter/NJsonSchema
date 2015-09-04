@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -42,17 +43,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public string GenerateFile()
         {
-            return GenerateInterfaces();
-        }
-
-        /// <summary>Generates the interfaces.</summary>
-        /// <returns>The interfaces.</returns>
-        public string GenerateInterfaces()
-        {
-            var classes = GenerateInterface();
-            foreach (var type in _resolver.Types)
-                classes += "\n\n" + type.GenerateInterface();
-            return classes;
+            return GenerateInterface() + "\n\n" + _resolver.GenerateInterfaces();
         }
 
         /// <summary>Generates the interface.</summary>
