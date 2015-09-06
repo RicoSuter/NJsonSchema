@@ -26,6 +26,11 @@ namespace NJsonSchema
             Initialize();
         }
 
+        /// <summary>Gets or sets the type name (class name of the object). </summary>
+        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public string TypeName { get; set; }
+
+
         [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object AdditionalItemsRaw
         {
