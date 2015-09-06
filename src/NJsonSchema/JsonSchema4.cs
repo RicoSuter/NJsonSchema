@@ -18,7 +18,6 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    [JsonObject(IsReference = true)]
     public partial class JsonSchema4
     {
         private IDictionary<string, JsonProperty> _properties;
@@ -38,6 +37,7 @@ namespace NJsonSchema
 
         private bool _allowAdditionalProperties = true;
         private JsonSchema4 _additionalPropertiesSchema = null;
+        private JsonSchema4 _schemaReference;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
         public JsonSchema4()
@@ -132,30 +132,41 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
         [JsonProperty("schemaReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string SchemaReferencePath { get; internal set; }
+        internal string SchemaReferencePath { get; set; }
 
         /// <summary>Gets or sets the type reference.</summary>
         [JsonIgnore]
-        public JsonSchema4 SchemaReference { get; set; }
+        public JsonSchema4 SchemaReference
+        {
+            get { return _schemaReference; }
+            set
+            {
+                if (_schemaReference != value)
+                {
+                    _schemaReference = value;
+                    SchemaReferencePath = null; 
+                }
+            }
+        }
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
-        public bool IsSchemaReference
+        public bool HasSchemaReference
         {
-            get { return SchemaReference != null || SchemaReferencePath != null; }
+            get { return SchemaReference != null; }
         }
 
         /// <summary>Gets the actual schema, either this or the reference schema.</summary>
-        /// <exception cref="InvalidOperationException" accessor="get">The schema reference path is not resolved.</exception>
+        /// <exception cref="InvalidOperationException" accessor="get">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
         public virtual JsonSchema4 ActualSchema
         {
             get
             {
-                if (IsSchemaReference && SchemaReference == null)
-                    throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' is not resolved.");
+                if (SchemaReferencePath != null && SchemaReference == null)
+                    throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
 
-                return IsSchemaReference ? SchemaReference.ActualSchema : this;
+                return HasSchemaReference ? SchemaReference.ActualSchema : this;
             }
         }
 

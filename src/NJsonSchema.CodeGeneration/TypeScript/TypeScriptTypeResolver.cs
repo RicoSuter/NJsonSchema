@@ -75,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (schema.IsSchemaReference)
+                if (schema.HasSchemaReference)
                     return Resolve(schema.SchemaReference);
 
                 if (!string.IsNullOrEmpty(schema.TypeName))
