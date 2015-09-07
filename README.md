@@ -117,3 +117,10 @@ The `NJsonSchema.CodeGeneration` can be used to generate code from a JSON schema
     var file = generator.GenerateFile();
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
+
+## Final notes
+
+Applications which use the library: 
+
+- [VisualJsonEditor](http://visualjsoneditor.org), a JSON schema based file editor for Windows. 
+- [NSwag](http://nswag.org): The Swagger API toolchain for .NET
