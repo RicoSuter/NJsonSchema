@@ -51,7 +51,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType<TType>()
         {
             var generator = new JsonSchemaGenerator();
-            return generator.Generate<JsonSchema4>(typeof(TType));
+            return generator.Generate<JsonSchema4>(typeof(TType), new SchemaResolver());
         }
 
         /// <summary>Creates a <see cref="JsonSchema4"/> from a given type. </summary>
@@ -60,7 +60,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType(Type type)
         {
             var generator = new JsonSchemaGenerator();
-            return generator.Generate<JsonSchema4>(type);
+            return generator.Generate<JsonSchema4>(type, new SchemaResolver());
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>

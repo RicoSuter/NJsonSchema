@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="ISchemaResolver.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="JsonSchemaGenerator.cs" />
     <Compile Include="JsonObjectType.cs" />
     <Compile Include="JsonObjectTypeDescription.cs" />
+    <Compile Include="SchemaResolver.cs" />
     <Compile Include="Validation\ChildSchemaValidationError.cs" />
     <Compile Include="Validation\ValidationError.cs" />
     <Compile Include="Validation\ValidationErrorKind.cs" />

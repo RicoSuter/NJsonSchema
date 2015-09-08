@@ -16,11 +16,12 @@ namespace NJsonSchema
     /// <summary>Generates a <see cref="JsonSchema4"/> object for a given type. </summary>
     public class JsonSchemaGenerator
     {
-        /// <summary>Generates a <see cref="JsonSchema4"/> object for the given type type.</summary>
+        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The type.</param>
-        /// <returns>The schema. </returns>
-        public TSchemaType Generate<TSchemaType>(Type type)
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <returns>The schema.</returns>
+        public TSchemaType Generate<TSchemaType>(Type type, ISchemaResolver schemaResolver) 
             where TSchemaType : JsonSchema4, new()
         {
             var schema = new TSchemaType();
@@ -32,27 +33,37 @@ namespace NJsonSchema
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
                 schema.TypeName = type.Name;
-                GenerateObjectProperties(type, schema);
+
+                if (schemaResolver.HasSchema(type))
+                {
+                    schema.SchemaReference = schemaResolver.GetSchema(type);
+                    return schema;
+                }
+
+                GenerateObject(type, schema, schemaResolver);
             }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
             {
                 schema.Type = JsonObjectType.Array;
                 var itemType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
-                schema.Item = Generate<JsonSchema4>(itemType);
+                schema.Item = Generate<JsonSchema4>(itemType, schemaResolver);
             }
 
             TryLoadEnumerations(type, schema);
             return schema;
         }
-
+        
         /// <summary>Generates the properties for the given type and schema.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
         /// <param name="schema">The properties</param>
-        protected virtual void GenerateObjectProperties<TSchemaType>(Type type, TSchemaType schema)
+        /// <param name="schemaResolver">The schema resolver.</param>
+        protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+            schemaResolver.AddSchema(type, schema);
             foreach (var property in type.GetRuntimeProperties())
-                LoadProperty(property, schema);
+                LoadProperty(property, schema, schemaResolver);
         }
 
         private static void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
@@ -65,7 +76,7 @@ namespace NJsonSchema
             }
         }
 
-        private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema)
+        private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var propertyType = property.PropertyType;
@@ -73,7 +84,7 @@ namespace NJsonSchema
 
             var attributes = property.GetCustomAttributes().ToArray();
 
-            var jsonProperty = Generate<JsonProperty>(propertyType);
+            var jsonProperty = Generate<JsonProperty>(propertyType, schemaResolver);
             
             var propertyName = property.Name;
             var jsonPropertyAttribute = attributes.FirstOrDefault(a => a is JsonPropertyAttribute) as JsonPropertyAttribute;
