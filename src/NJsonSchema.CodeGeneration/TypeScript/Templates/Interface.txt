@@ -1,5 +1,4 @@
 ﻿export interface <class> {
 <properties:{property | 
     <property.Name><if(property.IsOptional)>?<endif>: <property.Type>;
-}>
-}
+}>}

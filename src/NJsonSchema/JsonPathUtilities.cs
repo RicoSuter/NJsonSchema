@@ -85,6 +85,7 @@ namespace NJsonSchema
                     var path = GetJsonPath(item, objectToSearch, basePath + "/" + i, checkedObjects);
                     if (path != null)
                         return path;
+                    i++; 
                 }
             }
             else
