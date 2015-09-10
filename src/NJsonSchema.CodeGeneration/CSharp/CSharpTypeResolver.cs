@@ -91,6 +91,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     return schema.TypeName;
                 }
 
+                if (schema.IsDictionary)
+                    return string.Format("Dictionary<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true));
+
                 return "object";
             }
 

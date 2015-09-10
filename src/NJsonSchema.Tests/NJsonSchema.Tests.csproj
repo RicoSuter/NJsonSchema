@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Conversion\SchemaReferenceTests.cs" />
+    <Compile Include="Generation\SchemaGenerationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="Schema\JsonPathUtilitiesGetJsonPathTests.cs" />
     <Compile Include="Schema\JsonPathUtilitiesGetObjectFromJsonPathTests.cs" />

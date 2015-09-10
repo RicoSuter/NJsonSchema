@@ -21,6 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(output.Contains(@"lastName?: string;"));
+            Assert.IsTrue(output.Contains(@"Dictionary?: { [key: string] : string; };"));
         }
 
         [TestMethod]
@@ -39,6 +40,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         private static TypeScriptInterfaceGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Person>();
+            var schemaData = schema.ToJson();
             var generator = new TypeScriptInterfaceGenerator(schema);
             return generator;
         }

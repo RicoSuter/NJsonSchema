@@ -32,15 +32,20 @@ namespace NJsonSchema
 
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
-                schema.TypeName = type.Name;
-
-                if (schemaResolver.HasSchema(type))
+                if (typeDescription.IsDictionary)
+                    GenerateDictionary(type, schema, schemaResolver);
+                else
                 {
-                    schema.SchemaReference = schemaResolver.GetSchema(type);
-                    return schema;
-                }
+                    schema.TypeName = type.Name;
 
-                GenerateObject(type, schema, schemaResolver);
+                    if (schemaResolver.HasSchema(type))
+                    {
+                        schema.SchemaReference = schemaResolver.GetSchema(type);
+                        return schema;
+                    }
+
+                    GenerateObject(type, schema, schemaResolver);
+                }
             }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
             {
@@ -52,7 +57,15 @@ namespace NJsonSchema
             TryLoadEnumerations(type, schema);
             return schema;
         }
-        
+
+        private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
+            where TSchemaType : JsonSchema4, new()
+        {
+            var valueType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
+            schema.AdditionalPropertiesSchema = Generate<JsonProperty>(valueType, schemaResolver);
+            schema.AllowAdditionalProperties = true;
+        }
+
         /// <summary>Generates the properties for the given type and schema.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
@@ -62,6 +75,9 @@ namespace NJsonSchema
             where TSchemaType : JsonSchema4, new()
         {
             schemaResolver.AddSchema(type, schema);
+
+            schema.TypeName = type.Name;
+            schema.AllowAdditionalProperties = false;
             foreach (var property in type.GetRuntimeProperties())
                 LoadProperty(property, schema, schemaResolver);
         }

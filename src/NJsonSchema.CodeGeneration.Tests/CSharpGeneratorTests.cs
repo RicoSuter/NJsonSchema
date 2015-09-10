@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
+            Assert.IsTrue(output.Contains("Dictionary<string, string>"));
         }
 
         [TestMethod]
@@ -41,6 +43,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         private static CSharpClassGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Person>();
+            var schemaData = schema.ToJson();
             var generator = new CSharpClassGenerator(schema);
             return generator;
         }
@@ -59,6 +62,10 @@ namespace NJsonSchema.CodeGeneration.Tests
         public Sex Sex { get; set; }
         
         public Address Address { get; set; }
+
+        public List<string> Array { get; set; } 
+
+        public Dictionary<string, string> Dictionary { get; set; } 
     }
 
     public class Address

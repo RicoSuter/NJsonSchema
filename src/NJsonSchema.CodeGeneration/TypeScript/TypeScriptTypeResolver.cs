@@ -75,9 +75,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (schema.HasSchemaReference)
-                    return Resolve(schema.SchemaReference);
-
                 if (!string.IsNullOrEmpty(schema.TypeName))
                 {
                     if (!_types.ContainsKey(schema.TypeName))
@@ -89,7 +86,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return schema.TypeName;
                 }
 
-                return "object";
+                if (schema.IsDictionary)
+                    return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema)); 
+
+                return "any";
             }
 
             throw new NotImplementedException("Type not supported");

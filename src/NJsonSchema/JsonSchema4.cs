@@ -449,6 +449,13 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
+        [JsonIgnore]
+        public bool IsDictionary
+        {
+            get { return Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;}
+        }
+
         #endregion
 
         /// <summary>Serializes the <see cref="JsonSchema4"/> to a JSON string. </summary>

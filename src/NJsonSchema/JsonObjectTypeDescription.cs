@@ -37,13 +37,13 @@ namespace NJsonSchema
                 return new JsonObjectTypeDescription(JsonObjectType.String, false);
 
             if (type == typeof(DateTime))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, JsonFormatStrings.DateTime);
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, JsonFormatStrings.Uri);
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Uri);
 
             if (IsDictionaryType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.Object, false);
+                return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
 
             if (IsArrayType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Array, false);
@@ -58,11 +58,12 @@ namespace NJsonSchema
             return new JsonObjectTypeDescription(JsonObjectType.Object, false);
         }
 
-        private JsonObjectTypeDescription(JsonObjectType type, bool isAlwaysRequired, string format = null)
+        private JsonObjectTypeDescription(JsonObjectType type, bool isAlwaysRequired, bool isDictionary = false, string format = null)
         {
             Type = type;
             IsAlwaysRequired = isAlwaysRequired;
             Format = format;
+            IsDictionary = isDictionary; 
         }
 
         /// <summary>Gets the type. </summary>
@@ -70,6 +71,9 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the type must always required. </summary>
         public bool IsAlwaysRequired { get; private set; }
+
+        /// <summary>Gets a value indicating whether the object is a generic dictionary.</summary>
+        public bool IsDictionary { get; private set; }
 
         /// <summary>Gets the format string. </summary>
         public string Format { get; private set; }
