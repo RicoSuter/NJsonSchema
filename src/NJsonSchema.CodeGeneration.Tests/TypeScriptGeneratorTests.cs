@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(output.Contains(@"lastName?: string;"));
-            Assert.IsTrue(output.Contains(@"Dictionary?: { [key: string] : string; };"));
+            Assert.IsTrue(output.Contains(@"Dictionary?: { [key: string] : number; };"));
         }
 
         [TestMethod]

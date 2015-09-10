@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
-            Assert.IsTrue(output.Contains("Dictionary<string, string>"));
+            Assert.IsTrue(output.Contains("Dictionary<string, long>"));
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         [JsonProperty("lastName")]
         public string LastName { get; set; }
-
+        
         public DateTime Birthday { get; set; }
 
         public Sex Sex { get; set; }
@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         public List<string> Array { get; set; } 
 
-        public Dictionary<string, string> Dictionary { get; set; } 
+        public Dictionary<string, int> Dictionary { get; set; } 
     }
 
     public class Address

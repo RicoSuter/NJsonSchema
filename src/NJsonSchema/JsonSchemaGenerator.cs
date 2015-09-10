@@ -21,7 +21,9 @@ namespace NJsonSchema
         /// <param name="type">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
-        public TSchemaType Generate<TSchemaType>(Type type, ISchemaResolver schemaResolver) 
+        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find item type of enumeration type.</exception>
+        public TSchemaType Generate<TSchemaType>(Type type, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var schema = new TSchemaType();
@@ -50,7 +52,11 @@ namespace NJsonSchema
             else if (schema.Type.HasFlag(JsonObjectType.Array))
             {
                 schema.Type = JsonObjectType.Array;
+
                 var itemType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
+                if (itemType == null)
+                    throw new InvalidOperationException("Could not find item type of enumeration type '" + type.FullName + "'.");
+
                 schema.Item = Generate<JsonSchema4>(itemType, schemaResolver);
             }
 
@@ -58,10 +64,15 @@ namespace NJsonSchema
             return schema;
         }
 
+        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            var valueType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
+            if (type.GenericTypeArguments.Length != 2)
+                throw new InvalidOperationException("Could not find value type of dictionary type '" + type.FullName + "'.");
+
+            var valueType = type.GenericTypeArguments[1];
+
             schema.AdditionalPropertiesSchema = Generate<JsonProperty>(valueType, schemaResolver);
             schema.AllowAdditionalProperties = true;
         }
@@ -101,11 +112,11 @@ namespace NJsonSchema
             var attributes = property.GetCustomAttributes().ToArray();
 
             var jsonProperty = Generate<JsonProperty>(propertyType, schemaResolver);
-            
+
             var propertyName = property.Name;
             var jsonPropertyAttribute = attributes.FirstOrDefault(a => a is JsonPropertyAttribute) as JsonPropertyAttribute;
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
-                propertyName = jsonPropertyAttribute.PropertyName; 
+                propertyName = jsonPropertyAttribute.PropertyName;
 
             parentSchema.Properties.Add(propertyName, jsonProperty);
 
