@@ -13,10 +13,8 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
-    public class TypeScriptTypeResolver
+    public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptInterfaceGenerator>
     {
-        private readonly Dictionary<string, TypeScriptInterfaceGenerator> _types = new Dictionary<string, TypeScriptInterfaceGenerator>();
-
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         public TypeScriptTypeResolver()
         {
@@ -27,22 +25,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                _types[type.TypeName] = new TypeScriptInterfaceGenerator(type.ActualSchema, this);
+                AddTypeGenerator(type.TypeName, new TypeScriptInterfaceGenerator(type.ActualSchema, this));
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
         public string Namespace { get; set; }
 
-        /// <summary>Gets the available types.</summary>
-        public IReadOnlyCollection<TypeScriptInterfaceGenerator> Types
-        {
-            get { return _types.Values.ToList().AsReadOnly(); }
-        }
-
-        /// <summary>Resolves the specified schema.</summary>
+        /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>
-        /// <returns>The CSharp type name. </returns>
-        public string Resolve(JsonSchema4 schema)
+        /// <param name="isRequired">Specifies whether the given type usage is required.</param>
+        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
+        /// <returns>The type name.</returns>
+        public override string Resolve(JsonSchema4 schema, bool isRequired, string typeNameHint)
         {
             schema = schema.ActualSchema;
 
@@ -51,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var property = schema;
                 if (property.Item != null)
-                    return string.Format("{0}[]", Resolve(property.Item));
+                    return string.Format("{0}[]", Resolve(property.Item, true, null));
 
                 throw new NotImplementedException("Items not supported");
             }
@@ -75,21 +69,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
-                if (!string.IsNullOrEmpty(schema.TypeName))
-                {
-                    if (!_types.ContainsKey(schema.TypeName))
-                    {
-                        var generator = new TypeScriptInterfaceGenerator(schema, this);
-                        _types[schema.TypeName] = generator;
-                    }
-
-                    return schema.TypeName;
-                }
-
                 if (schema.IsDictionary)
-                    return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema)); 
+                    return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
 
-                return "any";
+                var typeName = GetOrGenerateTypeName(schema, typeNameHint);
+                if (!HasTypeGenerator(typeName))
+                {
+                    var generator = new TypeScriptInterfaceGenerator(schema, this);
+                    AddTypeGenerator(typeName, generator);
+                }
+                return typeName;
             }
 
             throw new NotImplementedException("Type not supported");

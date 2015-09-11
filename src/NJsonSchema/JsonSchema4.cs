@@ -76,7 +76,7 @@ namespace NJsonSchema
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
 
-            JsonSchemaReferenceUtilities.UpdateAllTypeReferences(schema);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema);
             return schema;
         }
 
@@ -465,11 +465,12 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateAllTypeReferences(this);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
 
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
-            SchemaVersion = oldSchema;
 
+            SchemaVersion = oldSchema;
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
 

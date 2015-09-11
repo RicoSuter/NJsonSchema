@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 PropertyName = ConvertToUpperStart(property.Name),
                 FieldName = ConvertToLowerStart(property.Name),
                 Required = property.IsRequired ? "Required.Always" : "Required.Default",
-                Type = _resolver.Resolve(property, property.IsRequired)
+                Type = _resolver.Resolve(property, property.IsRequired, property.Name)
             });
 
             var template = LoadTemplate("Class");

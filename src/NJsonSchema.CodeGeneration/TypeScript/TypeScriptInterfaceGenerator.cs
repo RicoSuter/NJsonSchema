@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var properties = _schema.Properties.Values.Select(property => new
             {
                 Name = property.Name,
-                Type = _resolver.Resolve(property),
+                Type = _resolver.Resolve(property, property.IsRequired, property.Name),
                 IsOptional = !property.IsRequired
             }).ToList();
 
