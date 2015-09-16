@@ -69,6 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var template = LoadTemplate("Class");
             template.Add("namespace", Namespace);
             template.Add("class", _schema.TypeName);
+            template.Add("inheritance", _schema.AllOf.Count == 1 ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + ", " : string.Empty);
             template.Add("properties", properties);
             return template.Render();
         }

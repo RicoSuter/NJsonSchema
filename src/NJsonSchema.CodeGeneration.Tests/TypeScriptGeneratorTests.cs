@@ -37,9 +37,22 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"FirstName: string;"));
         }
 
+        [TestMethod]
+        public void When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
+        {
+            //// Arrange
+            var generator = CreateGenerator();
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"interface Teacher extends Person"));
+        }
+
         private static TypeScriptInterfaceGenerator CreateGenerator()
         {
-            var schema = JsonSchema4.FromType<Person>();
+            var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var generator = new TypeScriptInterfaceGenerator(schema);
             return generator;

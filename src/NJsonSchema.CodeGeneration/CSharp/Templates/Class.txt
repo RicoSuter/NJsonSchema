@@ -1,4 +1,4 @@
-﻿public partial class <class> : INotifyPropertyChanged
+﻿public partial class <class> : <inheritance>INotifyPropertyChanged
 {
 <properties:{property | 
     private <property.Type> _<property.FieldName>;

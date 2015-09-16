@@ -1,4 +1,4 @@
-﻿export interface <class> {
+﻿export interface <class><inheritance> {
 <properties:{property | 
     <property.Name><if(property.IsOptional)>?<endif>: <property.Type>;
 }>}

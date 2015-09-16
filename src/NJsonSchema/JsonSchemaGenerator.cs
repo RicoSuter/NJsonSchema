@@ -47,6 +47,7 @@ namespace NJsonSchema
                     }
 
                     GenerateObject(type, schema, schemaResolver);
+                    GenerateInheritance(type, schema, schemaResolver);
                 }
             }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
@@ -61,6 +62,7 @@ namespace NJsonSchema
             }
 
             TryLoadEnumerations(type, schema);
+
             return schema;
         }
 
@@ -100,6 +102,16 @@ namespace NJsonSchema
             {
                 foreach (var enumValue in Enum.GetNames(type))
                     schema.Enumeration.Add(enumValue);
+            }
+        }
+
+        private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver)
+        {
+            var baseType = type.GetTypeInfo().BaseType;
+            if (baseType != typeof(object))
+            {
+                var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
+                schema.AllOf.Add(baseSchema);
             }
         }
 

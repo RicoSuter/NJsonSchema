@@ -40,9 +40,23 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"public string LastName"));
         }
 
+        [TestMethod]
+        public void When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
+        {
+            //// Arrange
+            var generator = CreateGenerator();
+            generator.Namespace = "MyNamespace";
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"class Teacher : Person, "));
+        }
+
         private static CSharpClassGenerator CreateGenerator()
         {
-            var schema = JsonSchema4.FromType<Person>();
+            var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var generator = new CSharpClassGenerator(schema);
             return generator;
@@ -66,6 +80,11 @@ namespace NJsonSchema.CodeGeneration.Tests
         public List<string> Array { get; set; } 
 
         public Dictionary<string, int> Dictionary { get; set; } 
+    }
+
+    public class Teacher : Person
+    {
+        public string Class { get; set; }
     }
 
     public class Address

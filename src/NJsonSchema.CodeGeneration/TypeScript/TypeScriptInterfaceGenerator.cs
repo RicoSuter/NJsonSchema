@@ -59,6 +59,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             var template = LoadTemplate("Interface");
             template.Add("class", _schema.TypeName);
+            template.Add("inheritance", _schema.AllOf.Count == 1 ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
             template.Add("properties", properties);
             return template.Render();
         }
