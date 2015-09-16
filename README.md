@@ -39,75 +39,98 @@ The `Person` class:
 
         public Gender Gender { get; set; }
 
+        [Range(2, 5)]
+        public int NumberWithRange { get; set; }
+
         public DateTime Birthday { get; set; }
 
-        public Collection<Job> Jobs { get; set; }
+        public Company Company { get; set; }
 
-        [Range(2, 5)]
-        public int Test { get; set; }
-    }
-
-    public class Job
-    {
-        public string Company { get; set; }
+        public Collection<Car> Cars { get; set; }
     }
 
     public enum Gender
     {
-        Male, 
+        Male,
         Female
+    }
+
+    public class Car
+    {
+        public string Name { get; set; }
+
+        public Company Manufacturer { get; set; }
+    }
+
+    public class Company
+    {
+        public string Name { get; set; }
     }
   
 The generated JSON schema data stored in the `schemaData` variable: 
   
-    {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "title": "Person",
-      "type": "object",
-      "required": [
-        "FirstName",
-        "LastName",
-        "Birthday",
-        "Gender",
-        "Test"
-      ],
-      "properties": {
-        "FirstName": {
-          "type": "string"
-        },
-        "LastName": {
-          "type": "string"
-        },
-        "Gender": {
-          "type": "string",
-          "enum": [
-            "Male",
-            "Female"
-          ]
-        },
-        "Birthday": {
-          "format": "date-time",
-          "type": "string"
-        },
-        "Jobs": {
-          "items": {
-            "title": "Job",
-            "type": "object",
-            "properties": {
-              "Company": {
-                "type": "string"
-              }
-            }
-          },
-          "type": "array"
-        },
-        "Test": {
-          "maximum": 5.0,
-          "minimum": 2.0,
-          "type": "integer"
-        }
-      }
-    }
+	{
+	  "$schema": "http://json-schema.org/draft-04/schema#",
+	  "typeName": "Person",
+	  "type": "object",
+	  "required": [
+		"FirstName",
+		"LastName",
+		"Gender",
+		"NumberWithRange",
+		"Birthday"
+	  ],
+	  "properties": {
+		"FirstName": {
+		  "type": "string"
+		},
+		"LastName": {
+		  "type": "string"
+		},
+		"Gender": {
+		  "type": "string",
+		  "enum": [
+			"Male",
+			"Female"
+		  ]
+		},
+		"NumberWithRange": {
+		  "type": "integer",
+		  "maximum": 5.0,
+		  "minimum": 2.0
+		},
+		"Birthday": {
+		  "type": "string",
+		  "format": "date-time"
+		},
+		"Company": {
+		  "typeName": "Company",
+		  "type": "object",
+		  "properties": {
+			"Name": {
+			  "type": "string"
+			}
+		  }
+		},
+		"Cars": {
+		  "items": {
+			"typeName": "Car",
+			"type": "object",
+			"properties": {
+			  "Name": {
+				"type": "string"
+			  },
+			  "Manufacturer": {
+				"typeName": "Company",
+				"type": "object",
+				"$ref": "#/properties/Company"
+			  }
+			}
+		  },
+		  "type": "array"
+		}
+	  }
+	}
 
 ## NJsonSchema.CodeGeneration usage
 
