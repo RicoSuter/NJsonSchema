@@ -188,7 +188,7 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath));
                         }
 
-                        // TODO: Implement other format types (hostname, ipv4, ipv6)
+                        // TODO: Implement other format types (hostname, ipv4, ipv6, guid)
                     }
                 }
             }
