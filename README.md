@@ -134,7 +134,7 @@ The generated JSON schema data stored in the `schemaData` variable:
 
 ## NJsonSchema.CodeGeneration usage
 
-The `NJsonSchema.CodeGeneration` can be used to generate code from a JSON schema.
+The `NJsonSchema.CodeGeneration` can be used to generate C# or TypeScript code from a JSON schema:
 
     var generator new CSharpClassGenerator(schema);
     var file = generator.GenerateFile();
