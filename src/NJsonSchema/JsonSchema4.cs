@@ -467,6 +467,8 @@ namespace NJsonSchema
                     AnyOf.Count == 0 && 
                     AllOf.Count == 0 && 
                     OneOf.Count == 0 &&
+                    AllowAdditionalProperties == false && 
+                    AdditionalPropertiesSchema == null && 
                     MultipleOf == null;
             }
         }
