@@ -38,7 +38,10 @@ namespace NJsonSchema
                     GenerateDictionary(type, schema, schemaResolver);
                 else
                 {
-                    schema.TypeName = type.Name;
+                    if (type == typeof(object))
+                        return new TSchemaType { Type = JsonObjectType.Object };
+
+                    schema.TypeName = GetTypeName(type);
 
                     if (schemaResolver.HasSchema(type))
                     {
@@ -66,6 +69,14 @@ namespace NJsonSchema
             return schema;
         }
 
+        private static string GetTypeName(Type type)
+        {
+            if (type.IsConstructedGenericType)
+                return type.Name.Split('`').First() + type.GenericTypeArguments[0].Name;
+
+            return type.Name;
+        }
+
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
@@ -89,7 +100,6 @@ namespace NJsonSchema
         {
             schemaResolver.AddSchema(type, schema);
 
-            schema.TypeName = type.Name;
             schema.AllowAdditionalProperties = false;
             foreach (var property in type.GetRuntimeProperties())
                 LoadProperty(property, schema, schemaResolver);
@@ -108,7 +118,7 @@ namespace NJsonSchema
         private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver)
         {
             var baseType = type.GetTypeInfo().BaseType;
-            if (baseType != typeof(object))
+            if (baseType != null && baseType != typeof(object))
             {
                 var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
                 schema.AllOf.Add(baseSchema);

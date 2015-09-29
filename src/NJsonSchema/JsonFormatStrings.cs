@@ -19,5 +19,8 @@ namespace NJsonSchema
 
         /// <summary>Format for an URI. </summary>
         public const string Uri = "uri";
+
+        /// <summary>Format for an GUID. </summary>
+        public const string Guid = "guid";
     }
 }

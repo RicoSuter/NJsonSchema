@@ -64,12 +64,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 if (schema.Format == JsonFormatStrings.DateTime)
                     return isRequired ? "DateTime" : "DateTime?";
-                else
-                    return "string";
+
+                if (schema.Format == JsonFormatStrings.Guid)
+                    return isRequired ? "Guid" : "Guid?";
+
+                return "string";
             }
 
             if (type.HasFlag(JsonObjectType.Object))
             {
+                if (schema.IsAnyType)
+                    return "object";
+
                 if (schema.IsDictionary)
                     return string.Format("Dictionary<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true, null));
                 

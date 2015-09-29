@@ -456,6 +456,21 @@ namespace NJsonSchema
             get { return Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;}
         }
 
+        /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
+        [JsonIgnore]
+        public bool IsAnyType
+        {
+            get
+            {
+                return Type == JsonObjectType.Object && 
+                    Properties.Count == 0 && 
+                    AnyOf.Count == 0 && 
+                    AllOf.Count == 0 && 
+                    OneOf.Count == 0 &&
+                    MultipleOf == null;
+            }
+        }
+
         #endregion
 
         /// <summary>Serializes the <see cref="JsonSchema4"/> to a JSON string. </summary>

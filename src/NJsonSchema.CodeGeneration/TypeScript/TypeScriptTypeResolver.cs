@@ -38,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The type name.</returns>
         public override string Resolve(JsonSchema4 schema, bool isRequired, string typeNameHint)
         {
-            schema = schema.ActualSchema;
+            schema = schema.ActualSchema; 
 
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
@@ -69,6 +69,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.Object))
             {
+                if (schema.IsAnyType)
+                    return "any";
+
                 if (schema.IsDictionary)
                     return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
 
