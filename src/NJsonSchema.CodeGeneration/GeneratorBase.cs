@@ -39,17 +39,17 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Converts the first letter to lower case.</summary>
         /// <param name="name">The name.</param>
         /// <returns>The converted name. </returns>
-        public static string ConvertToLowerStart(string name)
+        public static string ConvertToLowerStartIdentifier(string name)
         {
-            return name[0].ToString(CultureInfo.InvariantCulture).ToLower() + name.Substring(1);
+            return (name[0].ToString(CultureInfo.InvariantCulture).ToLower() + name.Substring(1)).Replace(" ", "_");
         }
 
         /// <summary>Converts the first letter to upper case.</summary>
         /// <param name="name">The name.</param>
         /// <returns>The converted name. </returns>
-        public static string ConvertToUpperStart(string name)
+        public static string ConvertToUpperStartIdentifier(string name)
         {
-            return name[0].ToString(CultureInfo.InvariantCulture).ToUpper() + name.Substring(1);
+            return (name[0].ToString(CultureInfo.InvariantCulture).ToUpper() + name.Substring(1)).Replace(" ", "_");
         }
     }
 }

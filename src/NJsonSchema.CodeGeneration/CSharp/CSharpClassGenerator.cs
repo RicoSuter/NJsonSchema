@@ -60,8 +60,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var properties = _schema.Properties.Values.Select(property => new
             {
                 Name = property.Name,
-                PropertyName = ConvertToUpperStart(property.Name),
-                FieldName = ConvertToLowerStart(property.Name),
+                PropertyName = ConvertToUpperStartIdentifier(property.Name),
+                FieldName = ConvertToLowerStartIdentifier(property.Name),
                 Required = property.IsRequired ? "Required.Always" : "Required.Default",
                 Type = _resolver.Resolve(property, property.IsRequired, property.Name)
             });
