@@ -38,8 +38,14 @@ namespace NJsonSchema
                     GenerateDictionary(type, schema, schemaResolver);
                 else
                 {
-                    if (type == typeof(object))
-                        return new TSchemaType { Type = JsonObjectType.Object };
+                    if (type == typeof (object))
+                    {
+                        return new TSchemaType
+                        {
+                            Type = JsonObjectType.Object,
+                            AllowAdditionalProperties = false
+                        };
+                    }
 
                     schema.TypeName = GetTypeName(type);
 

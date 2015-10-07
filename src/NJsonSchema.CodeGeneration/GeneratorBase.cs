@@ -41,6 +41,9 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The converted name. </returns>
         public static string ConvertToLowerStartIdentifier(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return string.Empty;
+
             return (name[0].ToString(CultureInfo.InvariantCulture).ToLower() + name.Substring(1)).Replace(" ", "_");
         }
 
@@ -49,6 +52,9 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The converted name. </returns>
         public static string ConvertToUpperStartIdentifier(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return string.Empty;
+
             return (name[0].ToString(CultureInfo.InvariantCulture).ToUpper() + name.Substring(1)).Replace(" ", "_");
         }
     }
