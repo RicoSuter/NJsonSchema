@@ -54,11 +54,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"class Teacher : Person, "));
         }
 
-        private static CSharpClassGenerator CreateGenerator()
+        private static CSharpGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new CSharpClassGenerator(schema);
+            var generator = new CSharpGenerator(schema);
             return generator;
         }
     }

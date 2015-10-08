@@ -53,12 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CSharp\CSharpClassGenerator.cs" />
+    <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
     <Compile Include="TypeResolverBase.cs" />
     <Compile Include="GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeScript\TypeScriptInterfaceGenerator.cs" />
+    <Compile Include="TypeScript\TypeScriptGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptTypeResolver.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +83,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TypeScript\Templates\Interface.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CSharp\Templates\Enum.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TypeScript\Templates\Enum.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

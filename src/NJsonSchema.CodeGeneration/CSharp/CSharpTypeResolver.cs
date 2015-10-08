@@ -7,13 +7,11 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
-    public class CSharpTypeResolver : TypeResolverBase<CSharpClassGenerator>
+    public class CSharpTypeResolver : TypeResolverBase<CSharpGenerator>
     {
 
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
@@ -26,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public CSharpTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                AddTypeGenerator(type.TypeName, new CSharpClassGenerator(type.ActualSchema, this));
+                AddTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, this));
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
@@ -47,8 +45,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 var property = schema;
                 if (property.Item != null)
                     return string.Format("ObservableCollection<{0}>", Resolve(property.Item, true, null));
-
-                throw new NotImplementedException("Items not supported");
+                
+                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
             }
 
             if (type.HasFlag(JsonObjectType.Number))
@@ -68,6 +66,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.Guid)
                     return isRequired ? "Guid" : "Guid?";
 
+                if (schema.Enumeration.Count > 0)
+                    return AddGenerator(schema, typeNameHint);
+
                 return "string";
             }
 
@@ -79,39 +80,20 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.IsDictionary)
                     return string.Format("Dictionary<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true, null));
                 
-                var typeName = GetOrGenerateTypeName(schema, typeNameHint);
-                if (!HasTypeGenerator(typeName))
-                {
-                    var generator = new CSharpClassGenerator(schema, this);
-                    generator.Namespace = Namespace;
-                    AddTypeGenerator(typeName, generator);
-                }
-                return typeName;
+                return AddGenerator(schema, typeNameHint);
             }
 
             throw new NotImplementedException("Type not supported");
         }
 
-        /// <summary>Generates the classes.</summary>
-        /// <returns>The code of the generated classes. </returns>
-        public string GenerateClasses()
+        /// <summary>Creates a type generator.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The generator.</returns>
+        protected override CSharpGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            var classes = "";
-            var runGenerators = new List<CSharpClassGenerator>();
-            while (Types.Any(t => !runGenerators.Contains(t)))
-                classes += GenerateClasses(runGenerators);
-            return classes;
-        }
-
-        private string GenerateClasses(List<CSharpClassGenerator> runGenerators)
-        {
-            var classes = "";
-            foreach (var type in Types.Where(t => !runGenerators.Contains(t)))
-            {
-                classes += type.GenerateClass() + "\n\n";
-                runGenerators.Add(type);
-            }
-            return classes;
+            var generator = new CSharpGenerator(schema, this);
+            generator.Namespace = Namespace;
+            return generator;
         }
     }
 }

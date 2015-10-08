@@ -18,12 +18,6 @@ namespace NJsonSchema.CodeGeneration
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
         private int _anonymousClassCount = 0;
 
-        /// <summary>Gets the available types.</summary>
-        public IReadOnlyCollection<TGenerator> Types
-        {
-            get { return _types.Values.ToList().AsReadOnly(); }
-        }
-
         /// <summary>Determines whether the generator for a given type name is registered.</summary>
         /// <param name="typeName">Name of the type.</param>
         /// <returns></returns>
@@ -47,15 +41,42 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public abstract string Resolve(JsonSchema4 schema, bool isRequired, string typeNameHint);
 
-        /// <summary>Gets the name of the type of the given schema.</summary>
+        /// <summary>Generates the types (e.g. interfaces, classes, enums, etc).</summary>
+        /// <returns>The code.</returns>
+        public string GenerateTypes()
+        {
+            var classes = "";
+            var runGenerators = new List<TGenerator>();
+            while (_types.ToList().Any(pair => !runGenerators.Contains(pair.Value)))
+                classes += GenerateTypes(runGenerators);
+            return classes;
+        }
+
+        /// <summary>Creates a type generator.</summary>
         /// <param name="schema">The schema.</param>
-        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
-        /// <returns>The type name.</returns>
-        protected string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        /// <returns>The generator.</returns>
+        protected abstract TGenerator CreateTypeGenerator(JsonSchema4 schema);
+
+        /// <summary>Adds a generator for the given schema if necessary.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns></returns>
+        protected string AddGenerator(JsonSchema4 schema, string typeNameHint)
+        {
+            var typeName = GetOrGenerateTypeName(schema, typeNameHint);
+            if (!HasTypeGenerator(typeName))
+            {
+                var generator = CreateTypeGenerator(schema);
+                AddTypeGenerator(typeName, generator);
+            }
+            return typeName;
+        }
+
+        private string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
             if (string.IsNullOrEmpty(schema.TypeName))
                 return GenerateTypeName(typeNameHint);
-            return schema.TypeName; 
+            return schema.TypeName;
         }
 
         private string GenerateTypeName(string typeNameHint)
@@ -74,6 +95,17 @@ namespace NJsonSchema.CodeGeneration
             }
             else
                 return GenerateTypeName("Anonymous");
+        }
+
+        private string GenerateTypes(List<TGenerator> runGenerators)
+        {
+            var classes = "";
+            foreach (var pair in _types.ToList().Where(pair => !runGenerators.Contains(pair.Value)))
+            {
+                classes += pair.Value.GenerateType(pair.Key) + "\n\n";
+                runGenerators.Add(pair.Value);
+            }
+            return classes;
         }
     }
 }

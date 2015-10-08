@@ -7,13 +7,11 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
-    public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptInterfaceGenerator>
+    public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptGenerator>
     {
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         public TypeScriptTypeResolver()
@@ -25,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                AddTypeGenerator(type.TypeName, new TypeScriptInterfaceGenerator(type.ActualSchema, this));
+                AddTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, this));
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
@@ -47,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (property.Item != null)
                     return string.Format("{0}[]", Resolve(property.Item, true, null));
 
-                throw new NotImplementedException("Items not supported");
+                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
             }
 
             if (type.HasFlag(JsonObjectType.Number))
@@ -63,8 +61,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 if (schema.Format == JsonFormatStrings.DateTime)
                     return "Date";
-                else
-                    return "string";
+
+                if (schema.Enumeration.Count > 0)
+                    return AddGenerator(schema, typeNameHint);
+                
+                return "string";
             }
 
             if (type.HasFlag(JsonObjectType.Object))
@@ -75,38 +76,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (schema.IsDictionary)
                     return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
 
-                var typeName = GetOrGenerateTypeName(schema, typeNameHint);
-                if (!HasTypeGenerator(typeName))
-                {
-                    var generator = new TypeScriptInterfaceGenerator(schema, this);
-                    AddTypeGenerator(typeName, generator);
-                }
-                return typeName;
+                return AddGenerator(schema, typeNameHint);
             }
 
             throw new NotImplementedException("Type not supported");
         }
 
-        /// <summary>Generates the interfaces.</summary>
-        /// <returns>The interfaces.</returns>
-        public string GenerateInterfaces()
+        /// <summary>Creates a type generator.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The generator.</returns>
+        protected override TypeScriptGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            var classes = "";
-            var runGenerators = new List<TypeScriptInterfaceGenerator>();
-            while (Types.Any(t => !runGenerators.Contains(t)))
-                classes += GenerateInterfaces(runGenerators);
-            return classes;
-        }
-
-        private string GenerateInterfaces(List<TypeScriptInterfaceGenerator> runGenerators)
-        {
-            var classes = "";
-            foreach (var type in Types.Where(t => !runGenerators.Contains(t)))
-            {
-                classes += type.GenerateInterface() + "\n\n";
-                runGenerators.Add(type);
-            }
-            return classes;
+            return new TypeScriptGenerator(schema, this);
         }
     }
 }

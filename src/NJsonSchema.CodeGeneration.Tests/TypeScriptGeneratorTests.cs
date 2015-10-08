@@ -50,11 +50,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"interface Teacher extends Person"));
         }
 
-        private static TypeScriptInterfaceGenerator CreateGenerator()
+        private static TypeScriptGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new TypeScriptInterfaceGenerator(schema);
+            var generator = new TypeScriptGenerator(schema);
             return generator;
         }
     }

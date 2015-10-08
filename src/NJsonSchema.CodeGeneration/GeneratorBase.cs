@@ -18,6 +18,15 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the language.</summary>
         protected abstract string Language { get; }
 
+        /// <summary>Generates the the whole file containing all needed types.</summary>
+        /// <returns>The code</returns>
+        public abstract string GenerateFile();
+
+        /// <summary>Generates the type.</summary>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The code.</returns>
+        public abstract string GenerateType(string typeNameHint);
+
         /// <summary>Loads the template from an embedded resource.</summary>
         /// <param name="file">The file name.</param>
         /// <returns>The template. </returns>

@@ -1,0 +1,5 @@
+﻿public enum <name>
+{
+<enums:{enum | 
+    <enum>, }>
+}
