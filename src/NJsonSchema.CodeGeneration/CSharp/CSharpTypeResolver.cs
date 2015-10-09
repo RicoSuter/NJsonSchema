@@ -13,7 +13,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
     public class CSharpTypeResolver : TypeResolverBase<CSharpGenerator>
     {
-
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         public CSharpTypeResolver()
         {

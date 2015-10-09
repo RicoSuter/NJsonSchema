@@ -11,7 +11,7 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>The TypeScript interface and enum code generator. </summary>
-    public class TypeScriptGenerator : GeneratorBase
+    public class TypeScriptGenerator : TypeGeneratorBase
     {
         private readonly JsonSchema4 _schema;
         private readonly TypeScriptTypeResolver _resolver;

@@ -11,7 +11,7 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The CSharp code generator. </summary>
-    public class CSharpGenerator : GeneratorBase
+    public class CSharpGenerator : TypeGeneratorBase
     {
         private readonly JsonSchema4 _schema;
         private readonly CSharpTypeResolver _resolver;

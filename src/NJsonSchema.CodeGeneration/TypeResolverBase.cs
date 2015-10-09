@@ -13,7 +13,7 @@ namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The type resolver base.</summary>
     public abstract class TypeResolverBase<TGenerator> 
-        where TGenerator : GeneratorBase
+        where TGenerator : TypeGeneratorBase
     {
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
         private int _anonymousClassCount = 0;
