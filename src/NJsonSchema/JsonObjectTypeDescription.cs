@@ -36,6 +36,9 @@ namespace NJsonSchema
             if (type == typeof(string))
                 return new JsonObjectTypeDescription(JsonObjectType.String, false);
 
+            if (type == typeof(char))
+                return new JsonObjectTypeDescription(JsonObjectType.String, true);
+
             if (type == typeof(Guid))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Guid);
 
