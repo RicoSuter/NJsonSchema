@@ -67,10 +67,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="EnumHandling.cs" />
     <Compile Include="ISchemaResolver.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
+    <Compile Include="JsonSchemaGeneratorSettings.cs" />
     <Compile Include="JsonSchemaReferenceUtilities.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
     <Compile Include="JsonSchema4.cs" />
@@ -99,7 +101,9 @@
   <ItemGroup>
     <None Include="Diagram.cd" />
     <None Include="NJsonSchema.nuspec" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

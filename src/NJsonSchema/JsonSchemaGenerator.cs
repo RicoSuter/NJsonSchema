@@ -16,6 +16,16 @@ namespace NJsonSchema
     /// <summary>Generates a <see cref="JsonSchema4"/> object for a given type. </summary>
     public class JsonSchemaGenerator
     {
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
+        /// <param name="settings">The settings.</param>
+        public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
+        {
+            Settings = settings;
+        }
+
+        /// <summary>Gets the settings.</summary>
+        public JsonSchemaGeneratorSettings Settings { get; private set; }
+
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The type.</param>
@@ -71,7 +81,6 @@ namespace NJsonSchema
             }
 
             TryLoadEnumerations(type, schema);
-
             return schema;
         }
 
@@ -111,14 +120,32 @@ namespace NJsonSchema
                 LoadProperty(property, schema, schemaResolver);
         }
 
-        private static void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
+        private void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
             where TSchemaType : JsonSchema4, new()
         {
             if (type.GetTypeInfo().IsEnum)
-            {
-                foreach (var enumValue in Enum.GetNames(type))
-                    schema.Enumeration.Add(enumValue);
+            {              
+                dynamic jsonConverterAttribute = type.GetTypeInfo().GetCustomAttributes()
+                    .SingleOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+
+                if (jsonConverterAttribute != null)
+                {
+                    var converterType = (Type)jsonConverterAttribute.ConverterType;
+                    if (converterType.Name == "StringEnumConverter")
+                        LoadEnumerations(type, schema);
+                    else if (Settings.DefaultEnumHandling == EnumHandling.String)
+                        LoadEnumerations(type, schema);
+                }
+                else if (Settings.DefaultEnumHandling == EnumHandling.String)
+                    LoadEnumerations(type, schema);
             }
+        }
+
+        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema) where TSchemaType : JsonSchema4, new()
+        {
+            schema.Type = JsonObjectType.String;
+            foreach (var enumValue in Enum.GetNames(type))
+                schema.Enumeration.Add(enumValue);
         }
 
         private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver)

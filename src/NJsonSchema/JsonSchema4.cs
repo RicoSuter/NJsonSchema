@@ -45,21 +45,39 @@ namespace NJsonSchema
             Initialize();
         }
 
-        /// <summary>Creates a <see cref="JsonSchema4"/> from a given type. </summary>
-        /// <typeparam name="TType">The type to create the schema for. </typeparam>
-        /// <returns>The <see cref="JsonSchema4"/>. </returns>
+        /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <returns>The <see cref="JsonSchema4" />.</returns>
         public static JsonSchema4 FromType<TType>()
         {
-            var generator = new JsonSchemaGenerator();
+            return FromType<TType>(new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <returns>The <see cref="JsonSchema4" />.</returns>
+        public static JsonSchema4 FromType(Type type)
+        {
+            return FromType(type, new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema4" />.</returns>
+        public static JsonSchema4 FromType<TType>(JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
             return generator.Generate<JsonSchema4>(typeof(TType), new SchemaResolver());
         }
 
-        /// <summary>Creates a <see cref="JsonSchema4"/> from a given type. </summary>
-        /// <param name="type">The type to create the schema for. </param>
-        /// <returns>The <see cref="JsonSchema4"/>. </returns>
-        public static JsonSchema4 FromType(Type type)
+        /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema4" />.</returns>
+        public static JsonSchema4 FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
-            var generator = new JsonSchemaGenerator();
+            var generator = new JsonSchemaGenerator(settings);
             return generator.Generate<JsonSchema4>(type, new SchemaResolver());
         }
 
