@@ -22,5 +22,9 @@ namespace NJsonSchema
 
         /// <summary>Format for an GUID. </summary>
         public const string Guid = "guid";
+
+        /// <summary>Format for an IP v4 address. </summary>
+        public const string IpV4 = "ipv4";
+
     }
 }

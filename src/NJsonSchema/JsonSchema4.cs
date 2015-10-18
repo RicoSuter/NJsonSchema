@@ -528,6 +528,7 @@ namespace NJsonSchema
 
             while (parent.ParentSchema != null)
                 parent = parent.ParentSchema;
+
             return parent;
         }
 

@@ -71,6 +71,9 @@ namespace NJsonSchema.Validation
         /// <summary>An URI is expected. </summary>
         UriExpected,
 
+        /// <summary>An IP v4 address is expected. </summary>
+        IpV4Expected, 
+
         /// <summary>The object is not any of the given schemas. </summary>
         NotAnyOf,
 

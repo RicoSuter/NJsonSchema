@@ -181,13 +181,24 @@ namespace NJsonSchema
 
                         if (_schema.Format == JsonFormatStrings.Email)
                         {
-                            var isEmail = Regex.IsMatch(value, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
-                                @"@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+                            var isEmail = Regex.IsMatch(value,
+                                @"^\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
+                                @"@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z$", RegexOptions.IgnoreCase);
                             if (!isEmail)
                                 errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath));
                         }
 
-                        // TODO: Implement other format types (hostname, ipv4, ipv6, guid)
+                        if (_schema.Format == JsonFormatStrings.IpV4)
+                        {
+                            var isIpV4 = Regex.IsMatch(value,
+                                @"^(0[0-7]{10,11}|0(x|X)[0-9a-fA-F]{8}|(\b4\d{8}[0-5]\b|\b[1-3]?\d{8}\d?\b)|((2[0-5][0-5]|1\d{2}|[1-9]\d?)" +
+                                @"|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))(\.((2[0-5][0-5]|1\d{2}|\d\d?)|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))){3})$", RegexOptions.IgnoreCase);
+
+                            if (!isIpV4)
+                                errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath));
+                        }
+
+                        // TODO: Implement other format types (hostname, ipv6, guid)
                     }
                 }
             }
@@ -269,7 +280,7 @@ namespace NJsonSchema
 
             if (obj != null)
             {
-                var properties = obj.Properties().ToList(); 
+                var properties = obj.Properties().ToList();
 
                 ValidateMaxProperties(properties, propertyName, propertyPath, errors);
                 ValidateMinProperties(properties, propertyName, propertyPath, errors);
