@@ -116,7 +116,7 @@ namespace NJsonSchema
             schemaResolver.AddSchema(type, schema);
 
             schema.AllowAdditionalProperties = false;
-            foreach (var property in type.GetRuntimeProperties())
+            foreach (var property in type.GetTypeInfo().DeclaredProperties)
                 LoadProperty(property, schema, schemaResolver);
         }
 

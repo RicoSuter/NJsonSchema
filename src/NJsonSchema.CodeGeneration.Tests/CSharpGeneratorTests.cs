@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -54,6 +55,51 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"class Teacher : Person, "));
         }
 
+        [TestMethod]
+        public void When_enum_has_description_then_csharp_has_xml_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.AllOf.First().Properties["Gender"].Description = "EnumDesc.";
+            var generator = new CSharpGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/// <summary>EnumDesc.</summary>"));
+        }
+
+        [TestMethod]
+        public void When_class_has_description_then_csharp_has_xml_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.Description = "ClassDesc.";
+            var generator = new CSharpGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/// <summary>ClassDesc.</summary>"));
+        }
+
+        [TestMethod]
+        public void When_property_has_description_then_csharp_has_xml_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.Properties["Class"].Description = "PropertyDesc.";
+            var generator = new CSharpGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
+        }
+
         private static CSharpGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();
@@ -73,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         
         public DateTime Birthday { get; set; }
 
-        public Sex Sex { get; set; }
+        public Gender Gender { get; set; }
         
         public Address Address { get; set; }
 
@@ -94,7 +140,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public string City { get; set; }
     }
 
-    public enum Sex
+    public enum Gender
     {
         Male, 
         Female

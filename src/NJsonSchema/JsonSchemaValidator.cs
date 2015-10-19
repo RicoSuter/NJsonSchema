@@ -198,7 +198,14 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath));
                         }
 
-                        // TODO: Implement other format types (hostname, ipv6, guid)
+                        if (_schema.Format == JsonFormatStrings.Guid)
+                        {
+                            Guid guid;
+                            if (Guid.TryParse(value, out guid) == false)
+                                errors.Add(new ValidationError(ValidationErrorKind.GuidExpected, propertyName, propertyPath));
+                        }
+
+                        // TODO: Implement other format types (hostname, ipv6)
                     }
                 }
             }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.CodeGeneration.Tests
@@ -48,6 +45,51 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(output.Contains(@"interface Teacher extends Person"));
+        }
+
+        [TestMethod]
+        public void When_enum_has_description_then_typescript_has_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.AllOf.First().Properties["Gender"].Description = "EnumDesc.";
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/** EnumDesc. *"));
+        }
+        
+        [TestMethod]
+        public void When_class_has_description_then_typescript_has_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.Description = "ClassDesc.";
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/** ClassDesc. *"));
+        }
+
+        [TestMethod]
+        public void When_property_has_description_then_csharp_has_xml_comment()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            schema.Properties["Class"].Description = "PropertyDesc.";
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"/** PropertyDesc. *"));
         }
 
         private static TypeScriptGenerator CreateGenerator()

@@ -67,6 +67,11 @@
     <Compile Include="Conversion\TypeToSchemaTests.cs" />
     <Compile Include="Suite\TestSuiteTests.cs" />
     <Compile Include="Validation\ArrayValidationTests.cs" />
+    <Compile Include="Validation\FormatDateTimeTests.cs" />
+    <Compile Include="Validation\FormatEmailTests.cs" />
+    <Compile Include="Validation\FormatGuidTests.cs" />
+    <Compile Include="Validation\FormatIpV4Tests.cs" />
+    <Compile Include="Validation\FormatUriTests.cs" />
     <Compile Include="Validation\InheritanceTests.cs" />
     <Compile Include="Validation\ObjectValidationTests.cs" />
     <Compile Include="Validation\ValueTypeValidationTests.cs" />

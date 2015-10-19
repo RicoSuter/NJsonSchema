@@ -1,4 +1,5 @@
-﻿export enum <name>
+﻿<if(hasDescription)>/** <description> */
+<endif>export enum <name>
 {
 <enums:{enum | 
     <enum> = \<any>"<enum>", }>

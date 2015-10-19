@@ -1,11 +1,13 @@
-﻿public partial class <class> : <inheritance>INotifyPropertyChanged
+﻿<if(hasDescription)>/// \<summary><description>\</summary>
+<endif>public partial class <class> : <inheritance>INotifyPropertyChanged
 {
 <properties:{property | 
     private <property.Type> _<property.FieldName>;
 }>
 
 <properties:{property | 
-    [JsonProperty("<property.Name>", Required = <property.Required>)]
+<if(property.HasDescription)>    /// \<summary><property.Description>\</summary>
+<endif>    [JsonProperty("<property.Name>", Required = <property.Required>)]
     public <property.Type> <property.PropertyName>
     {
         get { return _<property.FieldName>; \}
@@ -26,7 +28,7 @@
     {
         return JsonConvert.SerializeObject(this);
     }
-	
+    
     public static <class> FromJson(string data)
     {
         return JsonConvert.DeserializeObject\<<class>>(data);

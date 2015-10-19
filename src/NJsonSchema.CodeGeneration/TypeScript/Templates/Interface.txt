@@ -1,4 +1,6 @@
-﻿export interface <class><inheritance> {
+﻿<if(hasDescription)>/** <description> */
+<endif>export interface <class><inheritance> {
 <properties:{property | 
-    <property.Name><if(property.IsOptional)>?<endif>: <property.Type>;
+<if(property.HasDescription)>    /** <property.Description> */
+<endif>    <property.Name><if(property.IsOptional)>?<endif>: <property.Type>;
 }>}
