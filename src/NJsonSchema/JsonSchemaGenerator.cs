@@ -7,9 +7,11 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -65,6 +67,8 @@ namespace NJsonSchema
                         return schema;
                     }
 
+                    schema.Description = GetDescription(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes());
+                    
                     GenerateObject(type, schema, schemaResolver);
                     GenerateInheritance(type, schema, schemaResolver);
                 }
@@ -179,9 +183,7 @@ namespace NJsonSchema
             if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
                 parentSchema.RequiredProperties.Add(property.Name);
 
-            dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null)
-                jsonProperty.Description = descriptionAttribute.Description;
+            jsonProperty.Description = GetDescription(property, attributes);
 
             dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
@@ -197,7 +199,22 @@ namespace NJsonSchema
             }
         }
 
-        private Attribute TryGetAttribute(Attribute[] attributes, string attributeType)
+        private string GetDescription(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
+        {
+            dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
+            if (descriptionAttribute != null)
+                return descriptionAttribute.Description;
+            else
+            {
+                var summary = memberInfo.GetXmlDocumentation();
+                if (summary != string.Empty)
+                    return summary;
+            }
+
+            return null; 
+        }
+
+        private Attribute TryGetAttribute(IEnumerable<Attribute> attributes, string attributeType)
         {
             return attributes.FirstOrDefault(a => a.GetType().FullName == attributeType);
         }

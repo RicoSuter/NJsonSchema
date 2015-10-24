@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="EnumHandling.cs" />
+    <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
     <Compile Include="ISchemaResolver.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />

@@ -25,7 +25,7 @@ namespace NJsonSchema.Demo
                 {
                     var description = suite["description"].Value<string>();
                     Console.WriteLine("  Suite: " + description);
-                    
+
                     foreach (var test in suite["tests"].OfType<JObject>())
                     {
                         var testDescription = test["description"].Value<string>();
@@ -35,7 +35,7 @@ namespace NJsonSchema.Demo
                         Console.WriteLine("      Valid: " + valid);
 
                         //if (testDescription == "both anyOf invalid")
-                            RunTest(suite, test["data"], valid, ref fails, ref passes, ref exceptions);
+                        RunTest(suite, test["data"], valid, ref fails, ref passes, ref exceptions);
                     }
                 }
             }
@@ -100,24 +100,33 @@ namespace NJsonSchema.Demo
         [Required]
         public string LastName { get; set; }
 
-        public Sex Sex { get; set; }
+        public Gender Gender { get; set; }
+
+        [Range(2, 5)]
+        public int NumberWithRange { get; set; }
 
         public DateTime Birthday { get; set; }
 
-        public Collection<Job> Jobs { get; set; }
+        public Company Company { get; set; }
 
-        [Range(2, 5)]
-        public int Test { get; set; }
+        public Collection<Car> Cars { get; set; }
     }
 
-    public class Job
-    {
-        public string Company { get; set; }
-    }
-
-    public enum Sex
+    public enum Gender
     {
         Male,
         Female
+    }
+
+    public class Car
+    {
+        public string Name { get; set; }
+
+        public Company Manufacturer { get; set; }
+    }
+
+    public class Company
+    {
+        public string Name { get; set; }
     }
 }
