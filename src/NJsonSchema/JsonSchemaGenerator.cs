@@ -118,10 +118,25 @@ namespace NJsonSchema
             where TSchemaType : JsonSchema4, new()
         {
             schemaResolver.AddSchema(type, schema);
-
             schema.AllowAdditionalProperties = false;
-            foreach (var property in type.GetTypeInfo().DeclaredProperties)
+
+            var properties = GetTypeProperties(type);
+            foreach (var property in type.GetTypeInfo().DeclaredProperties
+                .Where(p => properties == null || properties.Contains(p.Name)))
+            {
                 LoadProperty(property, schema, schemaResolver);
+            }
+        }
+
+        /// <summary>Gets the properties of the given type or null to take all properties.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The property names or null for all.</returns>
+        protected virtual string[] GetTypeProperties(Type type)
+        {
+            if (type == typeof(Exception))
+                return new[] { "InnerException", "Message", "Source", "StackTrace" };
+
+            return null; 
         }
 
         private void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
