@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("enums", _schema.Enumeration);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", _schema.Description);
+                template.Add("description", RemoveLineBreaks(_schema.Description));
 
                 return template.Render();
             }
@@ -78,7 +78,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("class", _schema.TypeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", _schema.Description);
+                template.Add("description", RemoveLineBreaks(_schema.Description));
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
                 template.Add("properties", properties);

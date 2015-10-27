@@ -83,8 +83,32 @@ namespace NJsonSchema
 
                 schema.Item = Generate<JsonSchema4>(itemType, schemaResolver);
             }
+            else if (type.GetTypeInfo().IsEnum)
+            {
+                if (schemaResolver.HasSchema(type))
+                {
+                    schema.SchemaReference = schemaResolver.GetSchema(type);
+                    return schema;
+                }
 
-            TryLoadEnumerations(type, schema);
+                dynamic jsonConverterAttribute = type.GetTypeInfo().GetCustomAttributes()
+                        .SingleOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+
+                if (jsonConverterAttribute != null)
+                {
+                    var converterType = (Type)jsonConverterAttribute.ConverterType;
+                    if (converterType.Name == "StringEnumConverter")
+                        LoadEnumerations(type, schema);
+                    else if (Settings.DefaultEnumHandling == EnumHandling.String)
+                        LoadEnumerations(type, schema);
+                }
+                else if (Settings.DefaultEnumHandling == EnumHandling.String)
+                    LoadEnumerations(type, schema);
+
+                schema.TypeName = type.Name; 
+                schemaResolver.AddSchema(type, schema);
+            }
+
             return schema;
         }
 
@@ -138,28 +162,7 @@ namespace NJsonSchema
 
             return null; 
         }
-
-        private void TryLoadEnumerations<TSchemaType>(Type type, TSchemaType schema)
-            where TSchemaType : JsonSchema4, new()
-        {
-            if (type.GetTypeInfo().IsEnum)
-            {              
-                dynamic jsonConverterAttribute = type.GetTypeInfo().GetCustomAttributes()
-                    .SingleOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
-
-                if (jsonConverterAttribute != null)
-                {
-                    var converterType = (Type)jsonConverterAttribute.ConverterType;
-                    if (converterType.Name == "StringEnumConverter")
-                        LoadEnumerations(type, schema);
-                    else if (Settings.DefaultEnumHandling == EnumHandling.String)
-                        LoadEnumerations(type, schema);
-                }
-                else if (Settings.DefaultEnumHandling == EnumHandling.String)
-                    LoadEnumerations(type, schema);
-            }
-        }
-
+        
         private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema) where TSchemaType : JsonSchema4, new()
         {
             schema.Type = JsonObjectType.String;

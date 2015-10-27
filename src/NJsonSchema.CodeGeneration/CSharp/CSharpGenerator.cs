@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("enums", _schema.Enumeration);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", _schema.Description);
+                template.Add("description", RemoveLineBreaks(_schema.Description));
 
                 return template.Render();
             }
@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     Name = property.Name,
 
                     HasDescription = !string.IsNullOrEmpty(property.Description), 
-                    Description = property.Description, 
+                    Description = RemoveLineBreaks(property.Description), 
 
                     PropertyName = ConvertToUpperStartIdentifier(property.Name),
                     FieldName = ConvertToLowerStartIdentifier(property.Name),
@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("class", _schema.TypeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", _schema.Description);
+                template.Add("description", RemoveLineBreaks(_schema.Description));
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + ", " : string.Empty);
                 template.Add("properties", properties);

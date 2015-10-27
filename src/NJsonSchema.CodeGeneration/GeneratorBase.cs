@@ -61,5 +61,22 @@ namespace NJsonSchema.CodeGeneration
 
             return (name[0].ToString(CultureInfo.InvariantCulture).ToUpper() + name.Substring(1)).Replace(" ", "_");
         }
+
+        /// <summary>Removes the line breaks from the .</summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The updated text.</returns>
+        public static string RemoveLineBreaks(string text)
+        {
+            if (text == null)
+                return null; 
+
+            return text
+                .Replace("\r", "")
+                .Replace("\n", " \n")
+                .Replace("\n ", "\n")
+                .Replace("  \n", " \n")
+                .Replace("\n", "")
+                .Trim('\n', '\t', ' ');
+        }
     }
 }
