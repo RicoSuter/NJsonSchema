@@ -189,12 +189,7 @@ namespace NJsonSchema
             var attributes = property.GetCustomAttributes().ToArray();
 
             var jsonProperty = Generate<JsonProperty>(propertyType, schemaResolver);
-
-            var propertyName = property.Name;
-            var jsonPropertyAttribute = attributes.FirstOrDefault(a => a is JsonPropertyAttribute) as JsonPropertyAttribute;
-            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
-                propertyName = jsonPropertyAttribute.PropertyName;
-
+            var propertyName = JsonPathUtilities.GetPropertyName(property);
             parentSchema.Properties.Add(propertyName, jsonProperty);
 
             var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");

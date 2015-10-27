@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace NJsonSchema
@@ -58,6 +59,25 @@ namespace NJsonSchema
                 throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported.");
         }
 
+        /// <summary>Gets the name of the property for JSON serialization.</summary>
+        /// <param name="property">The property.</param>
+        /// <returns>The name.</returns>
+        public static string GetPropertyName(PropertyInfo property)
+        {
+            var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
+                return jsonPropertyAttribute.PropertyName;
+
+            if (property.DeclaringType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null)
+            {
+                var dataMemberAttribute = property.GetCustomAttribute<DataMemberAttribute>();
+                if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
+                    return dataMemberAttribute.Name;
+            }
+
+            return property.Name;
+        }
+
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, List<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
@@ -92,7 +112,7 @@ namespace NJsonSchema
             {
                 foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
-                    var pathSegment = GetPathSegmentName(property);
+                    var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
                     if (value != null)
                     {
@@ -135,7 +155,7 @@ namespace NJsonSchema
             {
                 foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
-                    var pathSegment = GetPathSegmentName(property);
+                    var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
                     if (pathSegment == segments.First())
                         return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects);
@@ -143,15 +163,6 @@ namespace NJsonSchema
             }
 
             return null;
-        }
-
-        private static string GetPathSegmentName(PropertyInfo property)
-        {
-            var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-            var pathSegment = attribute != null && !string.IsNullOrEmpty(attribute.PropertyName)
-                ? attribute.PropertyName
-                : property.Name;
-            return pathSegment;
         }
     }
 }
