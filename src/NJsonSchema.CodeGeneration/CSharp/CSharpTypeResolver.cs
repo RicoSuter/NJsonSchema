@@ -52,7 +52,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isRequired ? "decimal" : "decimal?";
 
             if (type.HasFlag(JsonObjectType.Integer))
+            {
+                if (schema.Format == JsonFormatStrings.Byte)
+                    return isRequired ? "byte" : "byte?";
+
                 return isRequired ? "long" : "long?";
+            }
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return isRequired ? "bool" : "bool?";
@@ -64,6 +69,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 if (schema.Format == JsonFormatStrings.Guid)
                     return isRequired ? "Guid" : "Guid?";
+
+                if (schema.Format == JsonFormatStrings.Base64)
+                    return "byte[]";
 
                 if (schema.Enumeration.Count > 0)
                     return AddGenerator(schema, typeNameHint);

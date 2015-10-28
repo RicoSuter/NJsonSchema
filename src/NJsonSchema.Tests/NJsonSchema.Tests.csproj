@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Conversion\SchemaReferenceTests.cs" />
     <Compile Include="Generation\InheritanceTests.cs" />
+    <Compile Include="Generation\PrimitiveTypeGenerationTests.cs" />
     <Compile Include="Generation\SchemaGenerationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="Schema\JsonPathUtilitiesGetJsonPathTests.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Validation\FormatDateTimeTests.cs" />
     <Compile Include="Validation\FormatEmailTests.cs" />
     <Compile Include="Validation\FormatGuidTests.cs" />
+    <Compile Include="Validation\FormatHostnameTests.cs" />
     <Compile Include="Validation\FormatIpV4Tests.cs" />
     <Compile Include="Validation\FormatUriTests.cs" />
     <Compile Include="Validation\InheritanceTests.cs" />

@@ -9,10 +9,25 @@ using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Demo
 {
+    public class Test
+    {
+        public byte[] Bar { get; set; }
+
+        public byte Foo { get; set; }
+    }
+
     public class Program
     {
         static void Main(string[] args)
         {
+            var t = new Test
+            {
+                Bar = new byte[] { 1, 2, 3 }, 
+                Foo = 123
+            };
+            var json = JsonConvert.SerializeObject(t);
+            var foo = Convert.FromBase64String("AQID");
+
             Console.BufferHeight = 2000;
 
             var passes = 0;

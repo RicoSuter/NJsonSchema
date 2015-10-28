@@ -48,6 +48,12 @@ namespace NJsonSchema
             if (type == typeof(Uri))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Uri);
 
+            if (type == typeof(byte))
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Byte);
+
+            if (type == typeof(byte[]))
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Base64);
+
             if (IsDictionaryType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
 

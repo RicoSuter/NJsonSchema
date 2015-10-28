@@ -101,6 +101,9 @@ namespace NJsonSchema.Validation
         /// <summary>An Email is expected. </summary>
         EmailExpected,
 
+        /// <summary>An hostname is expected. </summary>
+        HostnameExpected,
+
         /// <summary>The array tuple contains too many items. </summary>
         TooManyItemsInTuple,
 

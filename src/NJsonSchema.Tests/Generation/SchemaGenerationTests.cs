@@ -6,6 +6,19 @@ namespace NJsonSchema.Tests.Generation
     [TestClass]
     public class SchemaGenerationTests
     {
+        public class Foo
+        {
+            public Dictionary<string, string> Dictionary { get; set; }
+
+            public Bar Bar { get; set; }
+        }
+
+        public class Bar
+        {
+            public string Name { get; set; }
+        }
+
+
         [TestMethod]
         public void When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
         {
@@ -32,17 +45,5 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(true, schema.Properties["Dictionary"].AllowAdditionalProperties);
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].AdditionalPropertiesSchema.Type);
         }
-    }
-
-    public class Foo
-    {
-        public Dictionary<string, string> Dictionary { get; set; }
-        
-        public Bar Bar { get; set; } 
-    }
-
-    public class Bar
-    {
-        public string Name { get; set; }
     }
 }

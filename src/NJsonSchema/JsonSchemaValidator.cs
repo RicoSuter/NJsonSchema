@@ -205,6 +205,14 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.GuidExpected, propertyName, propertyPath));
                         }
 
+                        if (_schema.Format == JsonFormatStrings.Hostname)
+                        {
+                            var isHostname = Regex.IsMatch(value, "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*" +
+                                                                  "([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$", RegexOptions.IgnoreCase);
+                            if (!isHostname)
+                                errors.Add(new ValidationError(ValidationErrorKind.HostnameExpected, propertyName, propertyPath));
+                        }
+
                         // TODO: Implement other format types (hostname, ipv6)
                     }
                 }
