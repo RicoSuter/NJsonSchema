@@ -4,13 +4,20 @@ NJsonSchema for .NET
 [![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
 [![NuGet Version](http://img.shields.io/nuget/v/NJsonSchema.svg?style=flat)](https://www.nuget.org/packages?q=NJsonSchema)
 
-JSON Schema draft v4 reader, generator and validator for .NET
+JSON Schema draft v4 reader, generator and validator for .NET. 
 
 **NuGet packages:** 
 -   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema): JSON Schema 4 validation and parsing classes
 -   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration): Classes to generate code from a JSON Schema 4 (C# and TypeScript)
 
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
+
+Features: 
+
+- Read existing JSON Schemas and validate JSON data
+- Generate JSON Schema from .NET type via reflection
+- Support for schema references ($ref)
+- Generate C# and TypeScript code from JSON Schema
 
 ## NJsonSchema usage
 
