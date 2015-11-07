@@ -29,6 +29,17 @@ namespace NJsonSchema
         public JsonSchemaGeneratorSettings Settings { get; private set; }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <returns>The schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find item type of enumeration type.</exception>
+        public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
+        {
+            return Generate<JsonSchema4>(type, schemaResolver);
+        }
+
+        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
