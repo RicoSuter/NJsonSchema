@@ -19,21 +19,31 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
         public CSharpGenerator(JsonSchema4 schema)
-            : this(schema, new CSharpTypeResolver())
+            : this(schema, new CSharpGeneratorSettings())
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="settings">The generator settings.</param>
+        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings)
+            : this(schema, settings, new CSharpTypeResolver(settings))
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpTypeResolver resolver)
+        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver)
         {
             _schema = schema;
             _resolver = resolver;
+            Settings = settings; 
         }
 
-        /// <summary>Gets or sets the namespace.</summary>
-        public string Namespace { get; set; }
+        /// <summary>Gets the generator settings.</summary>
+        public CSharpGeneratorSettings Settings { get; private set; }
 
         /// <summary>Gets the language.</summary>
         protected override string Language
@@ -48,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var classes = GenerateType(string.Empty) + "\n\n" + _resolver.GenerateTypes();
 
             var template = LoadTemplate("File");
-            template.Add("namespace", Namespace);
+            template.Add("namespace", Settings.Namespace);
             template.Add("classes", classes);
             return template.Render();
         }
@@ -80,12 +90,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                     PropertyName = ConvertToUpperStartIdentifier(property.Name),
                     FieldName = ConvertToLowerStartIdentifier(property.Name),
-                    Required = property.IsRequired ? "Required.Always" : "Required.Default",
+                    Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
                     Type = _resolver.Resolve(property, property.IsRequired, property.Name)
                 }).ToList();
 
                 var template = LoadTemplate("Class");
-                template.Add("namespace", Namespace);
+                template.Add("namespace", Settings.Namespace);
                 template.Add("class", _schema.TypeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));

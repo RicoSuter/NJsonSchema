@@ -14,20 +14,24 @@ namespace NJsonSchema.CodeGeneration.CSharp
     public class CSharpTypeResolver : TypeResolverBase<CSharpGenerator>
     {
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
-        public CSharpTypeResolver()
+        /// <param name="settings">The generator settings.</param>
+        public CSharpTypeResolver(CSharpGeneratorSettings settings)
         {
+            Settings = settings; 
         }
 
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
+        /// <param name="settings">The generator settings.</param>
         /// <param name="knownSchemes">The known schemes.</param>
-        public CSharpTypeResolver(JsonSchema4[] knownSchemes)
+        public CSharpTypeResolver(CSharpGeneratorSettings settings, JsonSchema4[] knownSchemes) 
+            : this(settings)
         {
             foreach (var type in knownSchemes)
-                AddTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, this));
+                AddTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, Settings, this));
         }
 
-        /// <summary>Gets or sets the namespace of the generated classes.</summary>
-        public string Namespace { get; set; }
+        /// <summary>Gets the generator settings.</summary>
+        public CSharpGeneratorSettings Settings { get; private set; }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>
@@ -98,9 +102,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The generator.</returns>
         protected override CSharpGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            var generator = new CSharpGenerator(schema, this);
-            generator.Namespace = Namespace;
-            return generator;
+            return new CSharpGenerator(schema, Settings, this);
         }
     }
 }

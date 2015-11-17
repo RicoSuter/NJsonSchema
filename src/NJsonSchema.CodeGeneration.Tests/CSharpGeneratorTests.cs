@@ -16,7 +16,6 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var generator = CreateGenerator();
-            generator.Namespace = "MyNamespace";
             
             //// Act
             var output = generator.GenerateFile();
@@ -31,7 +30,6 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var generator = CreateGenerator();
-            generator.Namespace = "MyNamespace";
 
             //// Act
             var output = generator.GenerateFile();
@@ -46,7 +44,6 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var generator = CreateGenerator();
-            generator.Namespace = "MyNamespace";
 
             //// Act
             var output = generator.GenerateFile();
@@ -104,7 +101,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new CSharpGenerator(schema);
+            var settings = new CSharpGeneratorSettings();
+            settings.Namespace = "MyNamespace";
+            var generator = new CSharpGenerator(schema, settings);
             return generator;
         }
     }

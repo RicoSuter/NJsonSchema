@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSharp\CSharpGenerator.cs" />
+    <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
     <Compile Include="TypeGeneratorBase.cs" />
     <Compile Include="TypeResolverBase.cs" />
