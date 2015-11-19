@@ -15,6 +15,7 @@ using System.Xml.Linq;
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
+    /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
         private static readonly object _lock = new object();
@@ -165,6 +166,7 @@ namespace NJsonSchema.Infrastructure
                 return DynamicXPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
         }
 
+        /// <exception cref="ArgumentException">Unknown member type.</exception>
         private static string GetMemberElementName(dynamic member)
         {
             char prefixCode;
@@ -204,7 +206,7 @@ namespace NJsonSchema.Infrastructure
                     break;
 
                 default:
-                    throw new ArgumentException("Unknown member type", "member");
+                    throw new ArgumentException("Unknown member type.", "member");
             }
             return string.Format("{0}:{1}", prefixCode, memberName);
         }
