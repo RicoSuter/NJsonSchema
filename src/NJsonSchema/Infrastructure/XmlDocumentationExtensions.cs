@@ -217,7 +217,11 @@ namespace NJsonSchema.Infrastructure
                 return path;
 
             dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-            return DynamicPathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
+            path = DynamicPathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
+            if (DynamicFileExists(path))
+                return path;
+
+            return DynamicPathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
         }
 
         private static bool DynamicFileExists(string filePath)
