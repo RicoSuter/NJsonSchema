@@ -154,11 +154,15 @@ namespace NJsonSchema
             schemaResolver.AddSchema(type, schema);
             schema.AllowAdditionalProperties = false;
 
+            GeneratePropertiesAndInheritance(type, schema, schemaResolver);
+        }
+
+        private void GeneratePropertiesAndInheritance<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
+            where TSchemaType : JsonSchema4, new()
+        {
             var properties = GetTypeProperties(type);
             foreach (var property in type.GetTypeInfo().DeclaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-            {
                 LoadProperty(property, schema, schemaResolver);
-            }
 
             GenerateInheritance(type, schema, schemaResolver);
         }
@@ -168,8 +172,13 @@ namespace NJsonSchema
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object))
             {
-                var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
-                schema.AllOf.Add(baseSchema);
+                if (Settings.FlattenInheritanceHierarchy)
+                    GeneratePropertiesAndInheritance(baseType, schema, schemaResolver);
+                else
+                {
+                    var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
+                    schema.AllOf.Add(baseSchema);
+                }
             }
         }
 

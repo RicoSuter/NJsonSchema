@@ -19,5 +19,8 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the default enum handling (default: String).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
+        public bool FlattenInheritanceHierarchy { get; set; }
     }
 }

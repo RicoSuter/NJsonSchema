@@ -32,5 +32,37 @@ namespace NJsonSchema.Tests.Generation
         {
             public string Name { get; set; }
         }
+
+        [TestMethod]
+        public void When_generating_type_with_inheritance_and_flattening_then_schema_has_all_properties_of_inherited_classes()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<CC>(new JsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true
+            });
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(3, schema.Properties.Count);
+        }
+
+        public class AA
+        {
+            public string FirstName { get; set; }
+        }
+
+        public class BB : AA
+        {
+            public string LastName { get; set; }
+        }
+
+        public class CC : BB
+        {
+            public string Address { get; set; }
+        }
+
     }
 }
