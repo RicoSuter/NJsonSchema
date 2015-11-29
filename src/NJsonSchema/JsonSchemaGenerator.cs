@@ -81,7 +81,6 @@ namespace NJsonSchema
                     schema.Description = GetDescription(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes());
                     
                     GenerateObject(type, schema, schemaResolver);
-                    GenerateInheritance(type, schema, schemaResolver);
                 }
             }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
@@ -156,10 +155,21 @@ namespace NJsonSchema
             schema.AllowAdditionalProperties = false;
 
             var properties = GetTypeProperties(type);
-            foreach (var property in type.GetTypeInfo().DeclaredProperties
-                .Where(p => properties == null || properties.Contains(p.Name)))
+            foreach (var property in type.GetTypeInfo().DeclaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
             {
                 LoadProperty(property, schema, schemaResolver);
+            }
+
+            GenerateInheritance(type, schema, schemaResolver);
+        }
+
+        private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver)
+        {
+            var baseType = type.GetTypeInfo().BaseType;
+            if (baseType != null && baseType != typeof(object))
+            {
+                var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
+                schema.AllOf.Add(baseSchema);
             }
         }
 
@@ -179,16 +189,6 @@ namespace NJsonSchema
             schema.Type = JsonObjectType.String;
             foreach (var enumValue in Enum.GetNames(type))
                 schema.Enumeration.Add(enumValue);
-        }
-
-        private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver)
-        {
-            var baseType = type.GetTypeInfo().BaseType;
-            if (baseType != null && baseType != typeof(object))
-            {
-                var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
-                schema.AllOf.Add(baseSchema);
-            }
         }
 
         private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema, ISchemaResolver schemaResolver)
