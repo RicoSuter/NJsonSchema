@@ -480,7 +480,9 @@ namespace NJsonSchema
         {
             get
             {
-                return Type == JsonObjectType.Object && 
+                return 
+                    string.IsNullOrEmpty(TypeName) && 
+                    Type == JsonObjectType.Object && 
                     Properties.Count == 0 && 
                     AnyOf.Count == 0 && 
                     AllOf.Count == 0 && 
