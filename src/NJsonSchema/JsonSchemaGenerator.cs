@@ -115,7 +115,7 @@ namespace NJsonSchema
                 else if (Settings.DefaultEnumHandling == EnumHandling.String)
                     LoadEnumerations(type, schema);
 
-                schema.TypeName = type.Name; 
+                schema.TypeName = GetTypeName(type); 
                 schemaResolver.AddSchema(type, schema);
             }
 
@@ -125,8 +125,7 @@ namespace NJsonSchema
         private static string GetTypeName(Type type)
         {
             if (type.IsConstructedGenericType)
-                return type.Name.Split('`').First() + type.GenericTypeArguments[0].Name;
-
+                return type.Name.Split('`').First() + GetTypeName(type.GenericTypeArguments[0]);
             return type.Name;
         }
 
