@@ -292,5 +292,24 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(0, errors.Count);
         }
+
+        [TestMethod]
+        public void When_value_is_wrong_type_in_enumeration_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Enumeration.Add("1");
+            schema.Enumeration.Add("2");
+            schema.Enumeration.Add("3");
+
+            var token = new JValue(3);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(1, errors.Count);
+        }
     }
 }
