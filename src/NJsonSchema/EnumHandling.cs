@@ -8,7 +8,7 @@
 
 namespace NJsonSchema
 {
-    /// <summary>De</summary>
+    /// <summary>Defines the enum handling.</summary>
     public enum EnumHandling
     {
         /// <summary>Generates a string field with JSON Schema enumeration.</summary>

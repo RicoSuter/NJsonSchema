@@ -206,28 +206,30 @@ namespace NJsonSchema
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
 
             var attributes = property.GetCustomAttributes().ToArray();
-
-            var jsonProperty = Generate<JsonProperty>(propertyType, schemaResolver);
-            var propertyName = JsonPathUtilities.GetPropertyName(property);
-            parentSchema.Properties.Add(propertyName, jsonProperty);
-
-            var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
-            if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
-                parentSchema.RequiredProperties.Add(property.Name);
-
-            jsonProperty.Description = GetDescription(property, attributes);
-
-            dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
-            if (regexAttribute != null)
-                jsonProperty.Pattern = regexAttribute.Pattern;
-
-            dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
-            if (rangeAttribute != null)
+            if (attributes.All(a => !(a is JsonIgnoreAttribute)))
             {
-                if (rangeAttribute.Minimum != null)
-                    jsonProperty.Minimum = rangeAttribute.Minimum;
-                if (rangeAttribute.Maximum != null)
-                    jsonProperty.Maximum = rangeAttribute.Maximum;
+                var jsonProperty = Generate<JsonProperty>(propertyType, schemaResolver);
+                var propertyName = JsonPathUtilities.GetPropertyName(property);
+                parentSchema.Properties.Add(propertyName, jsonProperty);
+
+                var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
+                if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
+                    parentSchema.RequiredProperties.Add(propertyName);
+
+                jsonProperty.Description = GetDescription(property, attributes);
+
+                dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+                if (regexAttribute != null)
+                    jsonProperty.Pattern = regexAttribute.Pattern;
+
+                dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
+                if (rangeAttribute != null)
+                {
+                    if (rangeAttribute.Minimum != null)
+                        jsonProperty.Minimum = rangeAttribute.Minimum;
+                    if (rangeAttribute.Maximum != null)
+                        jsonProperty.Maximum = rangeAttribute.Maximum;
+                }
             }
         }
 
