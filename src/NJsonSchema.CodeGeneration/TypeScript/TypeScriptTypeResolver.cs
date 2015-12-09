@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                AddTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, this));
+                AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, this));
         }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
@@ -52,7 +52,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return "number";
 
             if (type.HasFlag(JsonObjectType.Integer))
+            {
+                if (schema.IsEnumeration)
+                    return AddGenerator(schema, typeNameHint);
+
                 return "number";
+            }
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return "boolean";
@@ -62,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (schema.Format == JsonFormatStrings.DateTime)
                     return "Date";
 
-                if (schema.Enumeration.Count > 0)
+                if (schema.IsEnumeration)
                     return AddGenerator(schema, typeNameHint);
                 
                 return "string";
@@ -88,6 +93,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         protected override TypeScriptGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
             return new TypeScriptGenerator(schema, this);
+        }
+
+        /// <summary>Gets or generates the type name for the given schema.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name.</returns>
+        protected override string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        {
+            if (string.IsNullOrEmpty(schema.TypeName))
+                return GenerateTypeName(typeNameHint);
+
+            if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
+                return schema.TypeName + "AsInteger";
+
+            return schema.TypeName;
         }
     }
 }

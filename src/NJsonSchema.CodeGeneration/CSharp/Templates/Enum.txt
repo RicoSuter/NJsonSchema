@@ -2,5 +2,5 @@
 <endif>public enum <name>
 {
 <enums:{enum | 
-    <enum>, }>
+    <enum.Name> = <enum.Value>, }>
 }

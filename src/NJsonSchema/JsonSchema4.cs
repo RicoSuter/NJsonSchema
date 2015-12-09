@@ -252,6 +252,13 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<object> Enumeration { get; internal set; }
 
+        /// <summary>Gets a value indicating whether this is enumeration.</summary>
+        [JsonIgnore]
+        public bool IsEnumeration
+        {
+            get { return Enumeration.Count > 0; }
+        }
+
         /// <summary>Gets the collection of required properties. </summary>
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
         [JsonIgnore]
@@ -568,6 +575,9 @@ namespace NJsonSchema
 
             if (Enumeration == null)
                 Enumeration = new Collection<object>();
+
+            if (EnumerationNames == null)
+                EnumerationNames = new Collection<string>();
         }
     }
 }

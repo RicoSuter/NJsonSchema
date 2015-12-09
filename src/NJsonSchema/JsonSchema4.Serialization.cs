@@ -30,6 +30,9 @@ namespace NJsonSchema
         [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string TypeName { get; set; }
 
+        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        [JsonIgnore]
+        public Collection<string> EnumerationNames { get; set; }
 
         [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object AdditionalItemsRaw
@@ -171,6 +174,14 @@ namespace NJsonSchema
         {
             get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
             set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
+        }
+
+        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        [JsonProperty("enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public Collection<string> EnumerationNamesRaw
+        {
+            get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
+            set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

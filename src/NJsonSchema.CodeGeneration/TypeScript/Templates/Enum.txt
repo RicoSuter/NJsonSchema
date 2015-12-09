@@ -2,5 +2,5 @@
 <endif>export enum <name>
 {
 <enums:{enum | 
-    <enum> = \<any>"<enum>", }>
+    <enum.Name> = <enum.Value>, }>
 }

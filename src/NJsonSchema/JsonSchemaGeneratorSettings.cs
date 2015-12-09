@@ -14,10 +14,10 @@ namespace NJsonSchema
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
-            DefaultEnumHandling = EnumHandling.String;
+            DefaultEnumHandling = EnumHandling.Integer;
         }
 
-        /// <summary>Gets or sets the default enum handling (default: String).</summary>
+        /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>

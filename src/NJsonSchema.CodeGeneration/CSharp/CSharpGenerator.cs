@@ -6,7 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -68,11 +70,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public override string GenerateType(string typeNameHint)
         {
-            if (_schema.Type == JsonObjectType.String && _schema.Enumeration.Count > 0)
+            if (_schema.IsEnumeration)
             {
                 var template = LoadTemplate("Enum");
                 template.Add("name", !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint);
-                template.Add("enums", _schema.Enumeration);
+                template.Add("enums", GetEnumeration());
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));
@@ -91,6 +93,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     PropertyName = ConvertToUpperStartIdentifier(property.Name),
                     FieldName = ConvertToLowerStartIdentifier(property.Name),
                     Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
+                    IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String, 
                     Type = _resolver.Resolve(property, property.IsRequired, property.Name)
                 }).ToList();
 
@@ -105,6 +108,25 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("properties", properties);
                 return template.Render();
             }
+        }
+
+        private List<EnumerationEntry> GetEnumeration()
+        {
+            var entries = new List<EnumerationEntry>();
+            for (int i = 0; i < _schema.Enumeration.Count; i++)
+            {
+                var value = _schema.Enumeration.ElementAt(i);
+                var name = _schema.EnumerationNames.Count > i ?
+                    _schema.EnumerationNames.ElementAt(i) :
+                    _schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
+
+                entries.Add(new EnumerationEntry
+                {
+                    Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
+                    Name = ConvertToUpperStartIdentifier(name)
+                });
+            }
+            return entries;
         }
     }
 }

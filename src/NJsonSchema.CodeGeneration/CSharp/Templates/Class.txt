@@ -8,6 +8,8 @@
 <properties:{property | 
 <if(property.HasDescription)>    /// \<summary><property.Description>\</summary>
 <endif>    [JsonProperty("<property.Name>", Required = <property.Required>)]
+<if(property.IsStringEnum)>    [JsonConverter(typeof(StringEnumConverter))]
+<endif>
     public <property.Type> <property.PropertyName>
     {
         get { return _<property.FieldName>; \}

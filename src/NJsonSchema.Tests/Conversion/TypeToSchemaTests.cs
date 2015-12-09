@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.Tests.Conversion
 {
@@ -169,11 +170,14 @@ namespace NJsonSchema.Tests.Conversion
         public void When_converting_enum_then_enum_array_must_be_set()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = JsonSchema4.FromType<MyType>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.Integer
+            });
             var property = schema.Properties["Color"];
 
             //// Assert
-            Assert.AreEqual(3, property.Enumeration.Count);
+            Assert.AreEqual(3, property.Enumeration.Count); // Color property has StringEnumConverter
             Assert.IsTrue(property.Enumeration.Contains("Red"));
             Assert.IsTrue(property.Enumeration.Contains("Green"));
             Assert.IsTrue(property.Enumeration.Contains("Blue"));
@@ -244,6 +248,7 @@ namespace NJsonSchema.Tests.Conversion
         public Collection<MySubtype> Collection { get; set; }
         public List<MySubtype> List { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public MyColor Color { get; set; }
     }
 

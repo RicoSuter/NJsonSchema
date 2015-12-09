@@ -15,17 +15,20 @@ namespace NJsonSchema
     {
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="enumType">The enum type or Object.</param>
         /// <returns><c>true</c> when the mapping exists.</returns>
-        bool HasSchema(Type type);
+        bool HasSchema(Type type, JsonObjectType enumType);
 
         /// <summary>Gets the schema for a given type.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="enumType">The enum type or Object.</param>
         /// <returns>The schema.</returns>
-        JsonSchema4 GetSchema(Type type);
+        JsonSchema4 GetSchema(Type type, JsonObjectType enumType);
 
         /// <summary>Adds a schema to type mapping.</summary>
         /// <param name="type">The type.</param>
+        /// <param name="enumType">The enum type or Object.</param>
         /// <param name="schema">The schema.</param>
-        void AddSchema(Type type, JsonSchema4 schema);
+        void AddSchema(Type type, JsonObjectType enumType, JsonSchema4 schema);
     }
 }

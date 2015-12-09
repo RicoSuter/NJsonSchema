@@ -29,9 +29,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Adds the type generator for a given type name.</summary>
         /// <param name="typeName">Name of the type.</param>
         /// <param name="generator">The generator.</param>
-        public void AddTypeGenerator(string typeName, TGenerator generator)
+        public void AddOrReplaceTypeGenerator(string typeName, TGenerator generator)
         {
-            _types.Add(typeName, generator);
+            _types[typeName] = generator;
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
@@ -61,25 +61,33 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns></returns>
-        protected string AddGenerator(JsonSchema4 schema, string typeNameHint)
+        protected virtual string AddGenerator(JsonSchema4 schema, string typeNameHint)
         {
             var typeName = GetOrGenerateTypeName(schema, typeNameHint);
             if (!HasTypeGenerator(typeName))
             {
                 var generator = CreateTypeGenerator(schema);
-                AddTypeGenerator(typeName, generator);
+                AddOrReplaceTypeGenerator(typeName, generator);
             }
             return typeName;
         }
 
-        private string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        /// <summary>Gets or generates the type name for the given schema.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name.</returns>
+        protected virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
             if (string.IsNullOrEmpty(schema.TypeName))
                 return GenerateTypeName(typeNameHint);
+
             return schema.TypeName;
         }
 
-        private string GenerateTypeName(string typeNameHint)
+        /// <summary>Generates a unique type name with the given hint.</summary>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name.</returns>
+        protected string GenerateTypeName(string typeNameHint)
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {

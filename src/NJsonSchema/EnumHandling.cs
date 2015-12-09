@@ -11,10 +11,10 @@ namespace NJsonSchema
     /// <summary>Defines the enum handling.</summary>
     public enum EnumHandling
     {
-        /// <summary>Generates a string field with JSON Schema enumeration.</summary>
-        String,
-
         /// <summary>Generates an integer field without enumeration (except when using StringEnumConverter).</summary>
         Integer,
+
+        /// <summary>Generates a string field with JSON Schema enumeration.</summary>
+        String,
     }
 }

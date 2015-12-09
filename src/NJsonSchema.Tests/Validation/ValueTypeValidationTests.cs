@@ -309,7 +309,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual(1, errors.Count); // wrong type
         }
     }
 }

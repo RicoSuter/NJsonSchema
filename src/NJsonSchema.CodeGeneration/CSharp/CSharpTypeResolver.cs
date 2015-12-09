@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             : this(settings)
         {
             foreach (var type in knownSchemes)
-                AddTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, Settings, this));
+                AddOrReplaceTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, Settings, this));
         }
 
         /// <summary>Gets the generator settings.</summary>
@@ -57,6 +57,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (type.HasFlag(JsonObjectType.Integer))
             {
+                if (schema.IsEnumeration)
+                    return AddGenerator(schema, typeNameHint);
+
                 if (schema.Format == JsonFormatStrings.Byte)
                     return isRequired ? "byte" : "byte?";
 
@@ -77,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.Base64)
                     return "byte[]";
 
-                if (schema.Enumeration.Count > 0)
+                if (schema.IsEnumeration)
                     return AddGenerator(schema, typeNameHint);
 
                 return "string";
@@ -95,6 +98,23 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             throw new NotImplementedException("Type not supported");
+        }
+
+        /// <summary>Adds a generator for the given schema if necessary.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns></returns>
+        protected override string AddGenerator(JsonSchema4 schema, string typeNameHint)
+        {
+            if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
+            {
+                // Recreate generator because it be better (defined enum values) than the current one
+                var typeName = GetOrGenerateTypeName(schema, typeNameHint);
+                var generator = CreateTypeGenerator(schema);
+                AddOrReplaceTypeGenerator(typeName, generator);
+            }
+
+            return base.AddGenerator(schema, typeNameHint);
         }
 
         /// <summary>Creates a type generator.</summary>
