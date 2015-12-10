@@ -21,7 +21,7 @@ namespace NJsonSchema
         public static JsonObjectTypeDescription FromType(Type type)
         {
             if (type.GetTypeInfo().IsEnum)
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, true); // TODO: This may be wrong (may be string or integer)!
 
             if ((type == typeof(int) || type == typeof(long) || type == typeof(short)) ||
                 (type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort)))

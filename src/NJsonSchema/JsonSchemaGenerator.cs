@@ -78,9 +78,9 @@ namespace NJsonSchema
 
                     schema.TypeName = GetTypeName(type);
 
-                    if (schemaResolver.HasSchema(type, JsonObjectType.Object))
+                    if (schemaResolver.HasSchema(type, false))
                     {
-                        schema.SchemaReference = schemaResolver.GetSchema(type, JsonObjectType.Object);
+                        schema.SchemaReference = schemaResolver.GetSchema(type, false);
                         return schema;
                     }
 
@@ -101,28 +101,28 @@ namespace NJsonSchema
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var enumType = GetEnumerationType(propertyInfo);
+                var isIntegerEnumeration = IsIntegerEnumeration(propertyInfo);
 
-                if (schemaResolver.HasSchema(type, enumType))
+                if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
-                    schema.Type = enumType;
-                    schema.SchemaReference = schemaResolver.GetSchema(type, enumType);
+                    schema.Type = isIntegerEnumeration ? JsonObjectType.Integer : JsonObjectType.String;
+                    schema.SchemaReference = schemaResolver.GetSchema(type, isIntegerEnumeration);
                     return schema;
                 }
 
-                LoadEnumerations(type, schema, enumType);
+                LoadEnumerations(type, schema, isIntegerEnumeration);
 
                 schema.TypeName = GetTypeName(type); 
-                schemaResolver.AddSchema(type, enumType, schema);
+                schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
 
             return schema;
         }
 
-        /// <summary>Gets the type of the enumeration.</summary>
+        /// <summary>Checks whether the property is an integer enumeration.</summary>
         /// <param name="propertyInfo">The property information.</param>
-        /// <returns>The type.</returns>
-        protected JsonObjectType GetEnumerationType(PropertyInfo propertyInfo)
+        /// <returns>true if the property is an integer enumeration.</returns>
+        protected bool IsIntegerEnumeration(PropertyInfo propertyInfo)
         {
             var enumType = Settings.DefaultEnumHandling == EnumHandling.String ? JsonObjectType.String : JsonObjectType.Integer;
 
@@ -137,7 +137,8 @@ namespace NJsonSchema
                     enumType = JsonObjectType.String;
                 }
             }
-            return enumType;
+
+            return enumType == JsonObjectType.Integer;
         }
 
         private string GetTypeName(Type type)
@@ -169,7 +170,7 @@ namespace NJsonSchema
         protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            schemaResolver.AddSchema(type, JsonObjectType.Object, schema);
+            schemaResolver.AddSchema(type, false, schema);
             schema.AllowAdditionalProperties = false;
 
             GeneratePropertiesAndInheritance(type, schema, schemaResolver);
@@ -211,10 +212,23 @@ namespace NJsonSchema
             return null; 
         }
         
-        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, JsonObjectType enumHandling) 
+        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration) 
             where TSchemaType : JsonSchema4, new()
         {
-            if (enumHandling == JsonObjectType.String)
+            if (isIntegerEnumeration)
+            {
+                schema.Type = JsonObjectType.Integer;
+                schema.Enumeration.Clear();
+                schema.EnumerationNames.Clear();
+
+                foreach (var enumName in Enum.GetNames(type))
+                {
+                    var value = (int) Enum.Parse(type, enumName);
+                    schema.Enumeration.Add(value);
+                    schema.EnumerationNames.Add(enumName);
+                }
+            }
+            else
             {
                 schema.Type = JsonObjectType.String;
                 schema.Enumeration.Clear();
@@ -226,21 +240,6 @@ namespace NJsonSchema
                     schema.EnumerationNames.Add(enumName);
                 }
             }
-            else if (enumHandling == JsonObjectType.Integer)
-            {
-                schema.Type = JsonObjectType.Integer;
-                schema.Enumeration.Clear();
-                schema.EnumerationNames.Clear();
-
-                foreach (var enumName in Enum.GetNames(type))
-                {
-                    var value = (int)Enum.Parse(type, enumName);
-                    schema.Enumeration.Add(value);
-                    schema.EnumerationNames.Add(enumName);
-                }
-            }
-            else
-                throw new NotImplementedException("The enum handling " + enumHandling + " is not supported.");
         }
 
         private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema, ISchemaResolver schemaResolver)
