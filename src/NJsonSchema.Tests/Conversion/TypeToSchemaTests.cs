@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Tests.Conversion
 {
@@ -45,7 +46,6 @@ namespace NJsonSchema.Tests.Conversion
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Decimal"].Type);
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Double"].Type);
             Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["Boolean"].Type);
-
             Assert.AreEqual(JsonObjectType.String, schema.Properties["String"].Type);
             Assert.AreEqual(JsonObjectType.Array, schema.Properties["Array"].Type);
         }
@@ -180,6 +180,29 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
+        public void When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<DictionarySubType>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.Object, schema.Type);
+            Assert.AreEqual(typeof(DictionarySubType).Name, schema.TypeName);
+        }
+
+        [TestMethod]
+        public void When_converting_non_generic_collection_then_items_must_correctly_be_loaded()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<JObject>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.Object, schema.Type);
+            Assert.AreEqual(typeof(JObject).Name, schema.TypeName);
+        }
+
+
+        [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
             When_converting_array_then_items_must_correctly_be_loaded("Array");
@@ -250,6 +273,15 @@ namespace NJsonSchema.Tests.Conversion
     public class MySubtype
     {
         public string Id { get; set; }
+    }
+
+    public class DictionarySubType : DictionaryType
+    {
+    }
+
+    public class DictionaryType : Dictionary<string, IList<string>>
+    {
+        public string foo { get; set; }
     }
 
     public enum MyColor

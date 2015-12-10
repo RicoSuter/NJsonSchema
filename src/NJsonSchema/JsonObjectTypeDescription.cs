@@ -63,7 +63,7 @@ namespace NJsonSchema
             if (type.Name == "Nullable`1")
             {
                 var typeDescription = FromType(type.GenericTypeArguments[0]);
-                typeDescription.IsAlwaysRequired = false; 
+                typeDescription.IsAlwaysRequired = false;
                 return typeDescription;
             }
 
@@ -75,7 +75,7 @@ namespace NJsonSchema
             Type = type;
             IsAlwaysRequired = isAlwaysRequired;
             Format = format;
-            IsDictionary = isDictionary; 
+            IsDictionary = isDictionary;
         }
 
         /// <summary>Gets the type. </summary>
@@ -92,12 +92,14 @@ namespace NJsonSchema
 
         private static bool IsArrayType(Type type)
         {
-            return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
+                && (type.GetTypeInfo().IsGenericType || type.GetTypeInfo().IsArray);
         }
 
         private static bool IsDictionaryType(Type type)
         {
-            return typeof(IDictionary).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            return typeof(IDictionary).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
+                && type.GetTypeInfo().IsGenericType;
         }
     }
 }
