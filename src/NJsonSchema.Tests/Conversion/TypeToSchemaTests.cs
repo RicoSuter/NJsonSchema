@@ -191,18 +191,6 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_non_generic_collection_then_items_must_correctly_be_loaded()
-        {
-            //// Act
-            var schema = JsonSchema4.FromType<JObject>();
-
-            //// Assert
-            Assert.AreEqual(JsonObjectType.Object, schema.Type);
-            Assert.AreEqual(typeof(JObject).Name, schema.TypeName);
-        }
-
-
-        [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
             When_converting_array_then_items_must_correctly_be_loaded("Array");
