@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -55,6 +56,15 @@ namespace NJsonSchema
         private TSchemaType Generate<TSchemaType>(Type type, PropertyInfo propertyInfo, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+            if (type == typeof(object) || type == typeof(JObject))
+            {
+                return new TSchemaType
+                {
+                    Type = JsonObjectType.Object,
+                    AllowAdditionalProperties = true
+                };
+            }
+
             var schema = new TSchemaType();
 
             var typeDescription = JsonObjectTypeDescription.FromType(type);
@@ -67,15 +77,6 @@ namespace NJsonSchema
                     GenerateDictionary(type, schema, schemaResolver);
                 else
                 {
-                    if (type == typeof (object))
-                    {
-                        return new TSchemaType
-                        {
-                            Type = JsonObjectType.Object,
-                            AllowAdditionalProperties = false
-                        };
-                    }
-
                     schema.TypeName = GetTypeName(type);
 
                     if (schemaResolver.HasSchema(type, false))
@@ -93,7 +94,8 @@ namespace NJsonSchema
             {
                 schema.Type = JsonObjectType.Array;
 
-                var itemType = type.GenericTypeArguments.Length == 0 ? type.GetElementType() : type.GenericTypeArguments[0];
+                var genericTypeArguments = GetGenericTypeArguments(type);
+                var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
                 if (itemType == null)
                     throw new InvalidOperationException("Could not find item type of enumeration type '" + type.FullName + "'.");
 
@@ -153,13 +155,29 @@ namespace NJsonSchema
         private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (type.GenericTypeArguments.Length != 2)
+            var genericTypeArguments = GetGenericTypeArguments(type);
+            if (genericTypeArguments.Length != 2)
                 throw new InvalidOperationException("Could not find value type of dictionary type '" + type.FullName + "'.");
 
-            var valueType = type.GenericTypeArguments[1];
+            var valueType = genericTypeArguments[1];
 
             schema.AdditionalPropertiesSchema = Generate<JsonProperty>(valueType, schemaResolver);
             schema.AllowAdditionalProperties = true;
+        }
+
+        /// <summary>Gets the generic type arguments of a type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The type arguments.</returns>
+        public static Type[] GetGenericTypeArguments(Type type)
+        {
+            var genericTypeArguments = type.GenericTypeArguments;
+            while (type != null && type != typeof (object) && genericTypeArguments.Length == 0)
+            {
+                type = type.GetTypeInfo().BaseType;
+                if (type != null)
+                    genericTypeArguments = type.GenericTypeArguments;
+            }
+            return genericTypeArguments;
         }
 
         /// <summary>Generates the properties for the given type and schema.</summary>

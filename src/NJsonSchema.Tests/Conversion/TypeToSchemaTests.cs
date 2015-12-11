@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Tests.Conversion
 {
@@ -46,7 +47,6 @@ namespace NJsonSchema.Tests.Conversion
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Decimal"].Type);
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Double"].Type);
             Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["Boolean"].Type);
-
             Assert.AreEqual(JsonObjectType.String, schema.Properties["String"].Type);
             Assert.AreEqual(JsonObjectType.Array, schema.Properties["Array"].Type);
         }
@@ -182,7 +182,21 @@ namespace NJsonSchema.Tests.Conversion
             Assert.IsTrue(property.Enumeration.Contains("Green"));
             Assert.IsTrue(property.Enumeration.Contains("Blue"));
         }
+        
+        [TestMethod]
+        public void When_type_is_JObject_then_generated_type_is_any()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<ClassWithJObjectProperty>();
+            var property = schema.Properties["Property"];
 
+            //// Assert
+            Assert.IsTrue(property.IsAnyType);
+            Assert.AreEqual(JsonObjectType.Object, property.Type);
+            Assert.IsTrue(property.AllowAdditionalItems);
+            Assert.AreEqual(0, property.Properties.Count);
+        }
+        
         [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
@@ -214,53 +228,58 @@ namespace NJsonSchema.Tests.Conversion
             Assert.AreEqual(typeof(MySubtype).Name, property.Item.ActualSchema.TypeName);
             Assert.AreEqual(JsonObjectType.String, property.Item.ActualSchema.Properties["Id"].Type);
         }
-    }
-
-    public class MyType
-    {
-        [System.ComponentModel.Description("Test")]
-        public int Integer { get; set; }
-        public decimal Decimal { get; set; }
-        public double Double { get; set; }
-        public bool Boolean  { get; set; }
-
-        public int? NullableInteger { get; set; }
-        public decimal? NullableDecimal { get; set; }
-        public double? NullableDouble { get; set; }
-        public bool? NullableBoolean { get; set; }
-
-        public string String { get; set; }
-
-        [JsonProperty("abc")]
-        public string ChangedName { get; set; }
-
-        [Required]
-        public MySubtype RequiredReference { get; set; }
-
-        [RegularExpression("regex")]
-        public string RegexString { get; set; }
-
-        [Range(5, 10)]
-        public int RangeInteger { get; set; }
         
-        public MySubtype Reference { get; set; }
-        public MySubtype[] Array { get; set; }
-        public Collection<MySubtype> Collection { get; set; }
-        public List<MySubtype> List { get; set; }
+        public class MyType
+        {
+            [System.ComponentModel.Description("Test")]
+            public int Integer { get; set; }
+            public decimal Decimal { get; set; }
+            public double Double { get; set; }
+            public bool Boolean { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public MyColor Color { get; set; }
-    }
+            public int? NullableInteger { get; set; }
+            public decimal? NullableDecimal { get; set; }
+            public double? NullableDouble { get; set; }
+            public bool? NullableBoolean { get; set; }
 
-    public class MySubtype
-    {
-        public string Id { get; set; }
-    }
+            public string String { get; set; }
 
-    public enum MyColor
-    {
-        Red, 
-        Green, 
-        Blue
+            [JsonProperty("abc")]
+            public string ChangedName { get; set; }
+
+            [Required]
+            public MySubtype RequiredReference { get; set; }
+
+            [RegularExpression("regex")]
+            public string RegexString { get; set; }
+
+            [Range(5, 10)]
+            public int RangeInteger { get; set; }
+
+            public MySubtype Reference { get; set; }
+            public MySubtype[] Array { get; set; }
+            public Collection<MySubtype> Collection { get; set; }
+            public List<MySubtype> List { get; set; }
+
+            [JsonConverter(typeof(StringEnumConverter))]
+            public MyColor Color { get; set; }
+        }
+
+        public class MySubtype
+        {
+            public string Id { get; set; }
+        }
+
+        public class ClassWithJObjectProperty
+        {
+            public JObject Property { get; set; }
+        }
+
+        public enum MyColor
+        {
+            Red,
+            Green,
+            Blue
+        }
     }
 }
