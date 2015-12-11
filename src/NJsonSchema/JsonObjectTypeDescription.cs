@@ -92,10 +92,11 @@ namespace NJsonSchema
 
         private static bool IsArrayType(Type type)
         {
-            //if (IsDictionaryType(type))
-            //    return false;
+            if (IsDictionaryType(type))
+                return false;
 
-            //if (!type.FullName.StartsWith("System."))
+            // See ArrayTypeToSchemaTests.When_converting_type_inheriting_from_dictionary_then_it_should_be_correct
+            //if (!type.IsArray && !type.FullName.StartsWith("System."))
             //    return false;
 
             return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
@@ -103,7 +104,9 @@ namespace NJsonSchema
 
         private static bool IsDictionaryType(Type type)
         {
-            //if (!type.FullName.StartsWith("System."))
+
+            // See ArrayTypeToSchemaTests.When_converting_type_inheriting_from_dictionary_then_it_should_be_correct
+            //if (!type.IsArray && !type.FullName.StartsWith("System.")) // Only System.* dictionary implementations are
             //    return false;
 
             return typeof(IDictionary).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
