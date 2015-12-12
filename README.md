@@ -12,7 +12,7 @@ JSON Schema draft v4 reader, generator and validator for .NET.
 
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
 
-Features: 
+**Features:**
 
 - Read existing JSON Schemas and validate JSON data
 - Generate JSON Schema from .NET type via reflection
