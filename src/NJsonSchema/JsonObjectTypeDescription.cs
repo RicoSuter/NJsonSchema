@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
 
 namespace NJsonSchema
@@ -94,22 +95,17 @@ namespace NJsonSchema
         {
             if (IsDictionaryType(type))
                 return false;
-
-            // See ArrayTypeToSchemaTests.When_converting_type_inheriting_from_dictionary_then_it_should_be_correct
-            //if (!type.FullName.StartsWith("System.") && !type.IsArray)
-            //    return false;
-
-            return typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            
+            return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) && 
+                (type.GetTypeInfo().BaseType == null || 
+                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
         }
 
         private static bool IsDictionaryType(Type type)
         {
-
-            // See ArrayTypeToSchemaTests.When_converting_type_inheriting_from_dictionary_then_it_should_be_correct
-            //if (!type.FullName.StartsWith("System.") && !type.IsArray) // Only System.* dictionary implementations are
-            //    return false;
-
-            return typeof(IDictionary).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
+                (type.GetTypeInfo().BaseType == null ||
+                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
     }
 }

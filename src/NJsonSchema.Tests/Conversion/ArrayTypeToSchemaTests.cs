@@ -8,19 +8,19 @@ namespace NJsonSchema.Tests.Conversion
     [TestClass]
     public class ArrayTypeToSchemaTests
     {
-        //[TestMethod]
-        //public void When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
-        //{
-        //    //// Act
-        //    var schema = JsonSchema4.FromType<DictionarySubType>();
-        //    var data = schema.ToJson();
+        [TestMethod]
+        public void When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<DictionarySubType>();
+            var data = schema.ToJson();
 
-        //    //// Assert
-        //    Assert.AreEqual(JsonObjectType.Object, schema.Type);
-        //    Assert.IsNotNull(schema.AllOf.First().Properties["Foo"]);
-        //    Assert.AreEqual(typeof(DictionarySubType).Name, schema.TypeName);
-        //}
-        
+            //// Assert
+            Assert.AreEqual(JsonObjectType.Object, schema.Type);
+            Assert.IsNotNull(schema.AllOf.First().Properties["Foo"]);
+            Assert.AreEqual(typeof(DictionarySubType).Name, schema.TypeName);
+        }
+
         [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
@@ -37,6 +37,19 @@ namespace NJsonSchema.Tests.Conversion
         public void When_converting_list_then_items_must_correctly_be_loaded()
         {
             When_converting_array_then_items_must_correctly_be_loaded("List");
+        }
+
+
+        [TestMethod]
+        public void When_converting_interface_list_then_items_must_correctly_be_loaded()
+        {
+            When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
+        }
+
+        [TestMethod]
+        public void When_converting_enumerable_list_then_items_must_correctly_be_loaded()
+        {
+            When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
         }
 
         public void When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
@@ -72,6 +85,10 @@ namespace NJsonSchema.Tests.Conversion
             public Collection<MySubtype> Collection { get; set; }
 
             public List<MySubtype> List { get; set; }
+
+            public IList<MySubtype> InterfaceList { get; set; }
+
+            public IEnumerable<MySubtype> Enumerable { get; set; }
         }
 
         public class MySubtype

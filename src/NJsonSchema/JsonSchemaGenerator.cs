@@ -168,7 +168,7 @@ namespace NJsonSchema
         /// <summary>Gets the generic type arguments of a type.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The type arguments.</returns>
-        public static Type[] GetGenericTypeArguments(Type type)
+        public Type[] GetGenericTypeArguments(Type type)
         {
             var genericTypeArguments = type.GenericTypeArguments;
             while (type != null && type != typeof (object) && genericTypeArguments.Length == 0)
