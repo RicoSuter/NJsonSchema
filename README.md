@@ -19,6 +19,8 @@ Features:
 - Support for schema references ($ref)
 - Generate C# and TypeScript code from JSON Schema
 
+NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET
+
 ## NJsonSchema usage
 
 The `JsonSchema4` type can be used as follows: 
