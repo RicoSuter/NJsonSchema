@@ -42,7 +42,7 @@ namespace NJsonSchema
             if (type == typeof(Guid))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime))
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(Uri))
