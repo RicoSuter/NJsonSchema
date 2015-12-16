@@ -51,11 +51,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The code.</returns>
         public override string GenerateType(string typeNameHint)
         {
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
+
             if (_schema.IsEnumeration)
             {
                 var template = LoadTemplate("Enum");
 
-                var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
                 if (_schema.Type == JsonObjectType.Integer)
                     typeName = typeName + "AsInteger";
 
@@ -81,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }).ToList();
 
                 var template = LoadTemplate("Interface");
-                template.Add("class", _schema.TypeName);
+                template.Add("class", typeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));

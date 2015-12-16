@@ -70,10 +70,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public override string GenerateType(string typeNameHint)
         {
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
+
             if (_schema.IsEnumeration)
             {
                 var template = LoadTemplate("Enum");
-                template.Add("name", !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint);
+                template.Add("name", typeName);
                 template.Add("enums", GetEnumeration());
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
@@ -99,7 +101,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 var template = LoadTemplate("Class");
                 template.Add("namespace", Settings.Namespace);
-                template.Add("class", _schema.TypeName);
+                template.Add("class", typeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));

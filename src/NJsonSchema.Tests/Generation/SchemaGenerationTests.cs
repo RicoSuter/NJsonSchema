@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -11,6 +12,8 @@ namespace NJsonSchema.Tests.Generation
             public Dictionary<string, string> Dictionary { get; set; }
 
             public Bar Bar { get; set; }
+
+            public DateTimeOffset Time { get; set; }
         }
 
         public class Bar
@@ -30,6 +33,20 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(false, schema.Properties["Bar"].AllowAdditionalProperties);
+        }
+
+        [TestMethod]
+        public void When_generating_DateTimeOffset_property_then_format_datetime_must_be_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<Foo>();
+            var schemaData = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Time"].Type);
+            Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["Time"].Format);
         }
 
         [TestMethod]
