@@ -287,22 +287,35 @@ namespace NJsonSchema
                 if (regexAttribute != null)
                     jsonProperty.Pattern = regexAttribute.Pattern;
 
-                dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
-                if (rangeAttribute != null)
+                if (propertyTypeDescription.Type == JsonObjectType.Number || propertyTypeDescription.Type == JsonObjectType.Integer)
                 {
-                    if (rangeAttribute.Minimum != null)
-                        jsonProperty.Minimum = rangeAttribute.Minimum;
-                    if (rangeAttribute.Maximum != null)
-                        jsonProperty.Maximum = rangeAttribute.Maximum;
+                    dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
+                    if (rangeAttribute != null)
+                    {
+                        if (rangeAttribute.Minimum != null)
+                            jsonProperty.Minimum = rangeAttribute.Minimum;
+                        if (rangeAttribute.Maximum != null)
+                            jsonProperty.Maximum = rangeAttribute.Maximum;
+                    }
                 }
 
                 dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
                 if (minLengthAttribute != null && minLengthAttribute.Length != null)
-                    jsonProperty.MinLength = minLengthAttribute.Length;
+                {
+                    if (propertyTypeDescription.Type == JsonObjectType.String)
+                        jsonProperty.MinLength = minLengthAttribute.Length;
+                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                        jsonProperty.MinItems = minLengthAttribute.Length;
+                }
 
                 dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
                 if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
-                    jsonProperty.MaxLength = maxLengthAttribute.Length;
+                {
+                    if (propertyTypeDescription.Type == JsonObjectType.String)
+                        jsonProperty.MaxLength = maxLengthAttribute.Length;
+                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                        jsonProperty.MaxItems = maxLengthAttribute.Length;
+                }
             }
         }
 

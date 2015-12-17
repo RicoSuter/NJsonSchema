@@ -7,13 +7,27 @@ namespace NJsonSchema.Tests.Generation
     public class AttributeGenerationTests
     {
         [TestMethod]
-        public void When_minLength_and_maxLength_attribute_are_available_then_minLength_and_maxLenght_are_set()
+        public void When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
             //// Arrange
 
             //// Act
             var schema = JsonSchema4.FromType<AttributeTestClass>();
             var property = schema.Properties["Items"];
+
+            //// Assert
+            Assert.AreEqual(3, property.MinItems);
+            Assert.AreEqual(5, property.MaxItems);
+        }
+
+        [TestMethod]
+        public void When_minLength_and_maxLength_attribute_are_set_on_string_then_minLength_and_maxLenght_are_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var property = schema.Properties["String"];
 
             //// Assert
             Assert.AreEqual(3, property.MinLength);
@@ -54,6 +68,10 @@ namespace NJsonSchema.Tests.Generation
             [MinLength(3)]
             [MaxLength(5)]
             public string[] Items { get; set; }
+
+            [MinLength(3)]
+            [MaxLength(5)]
+            public string String { get; set; }
 
             [Display(Name = "Foo", Description = "Bar")]
             public string Display { get; set; }
