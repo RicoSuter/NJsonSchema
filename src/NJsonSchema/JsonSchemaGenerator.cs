@@ -277,6 +277,10 @@ namespace NJsonSchema
                 if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
                     parentSchema.RequiredProperties.Add(propertyName);
 
+                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+                if (displayAttribute != null && displayAttribute.Name != null)
+                    jsonProperty.Title = displayAttribute.Name;
+
                 jsonProperty.Description = GetDescription(property, attributes);
 
                 dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
@@ -291,19 +295,33 @@ namespace NJsonSchema
                     if (rangeAttribute.Maximum != null)
                         jsonProperty.Maximum = rangeAttribute.Maximum;
                 }
+
+                dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
+                if (minLengthAttribute != null && minLengthAttribute.Length != null)
+                    jsonProperty.MinLength = minLengthAttribute.Length;
+
+                dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+                if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+                    jsonProperty.MaxLength = maxLengthAttribute.Length;
             }
         }
 
         private string GetDescription(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
         {
             dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null)
+            if (descriptionAttribute != null && descriptionAttribute.Description != null)
                 return descriptionAttribute.Description;
             else
             {
-                var summary = memberInfo.GetXmlDocumentation();
-                if (summary != string.Empty)
-                    return summary;
+                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+                if (displayAttribute != null && displayAttribute.Description != null)
+                    return displayAttribute.Description;
+                else
+                {
+                    var summary = memberInfo.GetXmlDocumentation();
+                    if (summary != string.Empty)
+                        return summary;
+                }
             }
 
             return null; 

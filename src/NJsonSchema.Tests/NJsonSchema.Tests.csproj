@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Conversion\SchemaReferenceTests.cs" />
     <Compile Include="Conversion\ArrayTypeToSchemaTests.cs" />
+    <Compile Include="Generation\AttributeGenerationTests.cs" />
     <Compile Include="Generation\EnumGenerationTests.cs" />
     <Compile Include="Generation\InheritanceTests.cs" />
     <Compile Include="Generation\PrimitiveTypeGenerationTests.cs" />
