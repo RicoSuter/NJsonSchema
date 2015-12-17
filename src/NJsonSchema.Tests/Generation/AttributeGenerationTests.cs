@@ -49,6 +49,20 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
+        public void When_Range_attribute_is_set_on_integer_then_minimum_and_maximum_are_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var property = schema.Properties["Integer"];
+
+            //// Assert
+            Assert.AreEqual(5, property.Minimum);
+            Assert.AreEqual(10, property.Maximum);
+        }
+
+        [TestMethod]
         public void When_display_attribute_is_available_then_name_and_description_are_read()
         {
             //// Arrange
@@ -89,6 +103,9 @@ namespace NJsonSchema.Tests.Generation
 
             [Range(5, 10)]
             public double Double { get; set; }
+
+            [Range(5, 10)]
+            public int Integer { get; set; }
 
             [Display(Name = "Foo", Description = "Bar")]
             public string Display { get; set; }
