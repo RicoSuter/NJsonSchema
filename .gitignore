@@ -10,3 +10,6 @@ src/packages/**
 **.vs/**
 
 /src/NJsonSchema.sln.GhostDoc.xml
+
+[Bb]in/
+[Oo]bj/

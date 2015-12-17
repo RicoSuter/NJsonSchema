@@ -277,19 +277,44 @@ namespace NJsonSchema
                 if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
                     parentSchema.RequiredProperties.Add(propertyName);
 
+                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+                if (displayAttribute != null && displayAttribute.Name != null)
+                    jsonProperty.Title = displayAttribute.Name;
+
                 jsonProperty.Description = GetDescription(property, attributes);
 
                 dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
                 if (regexAttribute != null)
                     jsonProperty.Pattern = regexAttribute.Pattern;
 
-                dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
-                if (rangeAttribute != null)
+                if (propertyTypeDescription.Type == JsonObjectType.Number || propertyTypeDescription.Type == JsonObjectType.Integer)
                 {
-                    if (rangeAttribute.Minimum != null)
-                        jsonProperty.Minimum = rangeAttribute.Minimum;
-                    if (rangeAttribute.Maximum != null)
-                        jsonProperty.Maximum = rangeAttribute.Maximum;
+                    dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
+                    if (rangeAttribute != null)
+                    {
+                        if (rangeAttribute.Minimum != null)
+                            jsonProperty.Minimum = rangeAttribute.Minimum;
+                        if (rangeAttribute.Maximum != null)
+                            jsonProperty.Maximum = rangeAttribute.Maximum;
+                    }
+                }
+
+                dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
+                if (minLengthAttribute != null && minLengthAttribute.Length != null)
+                {
+                    if (propertyTypeDescription.Type == JsonObjectType.String)
+                        jsonProperty.MinLength = minLengthAttribute.Length;
+                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                        jsonProperty.MinItems = minLengthAttribute.Length;
+                }
+
+                dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+                if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+                {
+                    if (propertyTypeDescription.Type == JsonObjectType.String)
+                        jsonProperty.MaxLength = maxLengthAttribute.Length;
+                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                        jsonProperty.MaxItems = maxLengthAttribute.Length;
                 }
             }
         }
@@ -297,13 +322,19 @@ namespace NJsonSchema
         private string GetDescription(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
         {
             dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null)
+            if (descriptionAttribute != null && descriptionAttribute.Description != null)
                 return descriptionAttribute.Description;
             else
             {
-                var summary = memberInfo.GetXmlDocumentation();
-                if (summary != string.Empty)
-                    return summary;
+                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+                if (displayAttribute != null && displayAttribute.Description != null)
+                    return displayAttribute.Description;
+                else
+                {
+                    var summary = memberInfo.GetXmlDocumentation();
+                    if (summary != string.Empty)
+                        return summary;
+                }
             }
 
             return null; 
