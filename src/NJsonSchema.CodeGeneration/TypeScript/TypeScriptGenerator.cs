@@ -43,13 +43,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            return GenerateType(string.Empty) + "\n\n" + _resolver.GenerateTypes();
+            return GenerateType(string.Empty).Code + "\n\n" + _resolver.GenerateTypes();
         }
 
         /// <summary>Generates the type.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override string GenerateType(string typeNameHint)
+        public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
             var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
 
@@ -66,7 +66,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));
 
-                return template.Render();
+                return new TypeGeneratorResult
+                {
+                    TypeName = typeName,
+                    Code = template.Render()
+                };
             }
             else
             {
@@ -89,7 +93,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
                 template.Add("properties", properties);
-                return template.Render();
+
+                return new TypeGeneratorResult
+                {
+                    TypeName = typeName,
+                    Code = template.Render()
+                };
             }
         }
 
