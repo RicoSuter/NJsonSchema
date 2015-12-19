@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (type.HasFlag(JsonObjectType.String))
             {
                 if (schema.Format == JsonFormatStrings.DateTime)
-                    return isRequired ? "DateTime" : "DateTime?";
+                    return isRequired ? Settings.DateTimeType.ToString() : Settings.DateTimeType + "?";
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
                     return isRequired ? "TimeSpan" : "TimeSpan?";
