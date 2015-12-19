@@ -45,6 +45,10 @@ namespace NJsonSchema
 
         /// <summary>A string. </summary>
         [JsonProperty("string")]
-        String = 64, 
+        String = 64,
+
+        /// <summary>A file (used in Swagger specifications). </summary>
+        [JsonProperty("file")]
+        File = 128,
     }
 }

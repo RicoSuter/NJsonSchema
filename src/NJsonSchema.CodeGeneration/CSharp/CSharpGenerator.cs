@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -41,7 +40,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             _schema = schema;
             _resolver = resolver;
-            Settings = settings; 
+            Settings = settings;
         }
 
         /// <summary>Gets the generator settings.</summary>
@@ -57,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType(string.Empty) + "\n\n" + _resolver.GenerateTypes();
+            var classes = GenerateType(string.Empty).Code + "\n\n" + _resolver.GenerateTypes();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Settings.Namespace);
@@ -68,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Generates the type.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override string GenerateType(string typeNameHint)
+        public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
             var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
 
@@ -81,7 +80,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));
 
-                return template.Render();
+                return new TypeGeneratorResult
+                {
+                    TypeName = typeName,
+                    Code = template.Render()
+                };
             }
             else
             {
@@ -89,13 +92,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 {
                     Name = property.Name,
 
-                    HasDescription = !string.IsNullOrEmpty(property.Description), 
-                    Description = RemoveLineBreaks(property.Description), 
+                    HasDescription = !string.IsNullOrEmpty(property.Description),
+                    Description = RemoveLineBreaks(property.Description),
 
                     PropertyName = ConvertToUpperStartIdentifier(property.Name),
                     FieldName = ConvertToLowerStartIdentifier(property.Name),
                     Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
-                    IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String, 
+                    IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String,
                     Type = _resolver.Resolve(property, property.IsRequired, property.Name)
                 }).ToList();
 
@@ -108,7 +111,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + ", " : string.Empty);
                 template.Add("properties", properties);
-                return template.Render();
+
+                return new TypeGeneratorResult
+                {
+                    TypeName = typeName,
+                    Code = template.Render()
+                };
             }
         }
 

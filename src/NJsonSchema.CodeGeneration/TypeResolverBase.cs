@@ -34,23 +34,30 @@ namespace NJsonSchema.CodeGeneration
             _types[typeName] = generator;
         }
 
+        /// <summary>Generates the types (e.g. interfaces, classes, enums, etc).</summary>
+        /// <returns>The code.</returns>
+        public string GenerateTypes()
+        {
+            var processedTypes = new List<string>();
+            var classes = new Dictionary<string, string>();
+            while (_types.Any(t => !processedTypes.Contains(t.Key)))
+            {
+                foreach (var pair in _types.ToList())
+                {
+                    processedTypes.Add(pair.Key);
+                    var result = pair.Value.GenerateType(pair.Key); 
+                    classes[result.TypeName] = result.Code;
+                }
+            }
+            return string.Join("\n\n", classes.Select(p => p.Value));
+        }
+
         /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="isRequired">Specifies whether the given type usage is required.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         public abstract string Resolve(JsonSchema4 schema, bool isRequired, string typeNameHint);
-
-        /// <summary>Generates the types (e.g. interfaces, classes, enums, etc).</summary>
-        /// <returns>The code.</returns>
-        public string GenerateTypes()
-        {
-            var classes = "";
-            var runGenerators = new List<TGenerator>();
-            while (_types.ToList().Any(pair => !runGenerators.Contains(pair.Value)))
-                classes += GenerateTypes(runGenerators);
-            return classes;
-        }
 
         /// <summary>Creates a type generator.</summary>
         /// <param name="schema">The schema.</param>
@@ -103,17 +110,6 @@ namespace NJsonSchema.CodeGeneration
             }
             else
                 return GenerateTypeName("Anonymous");
-        }
-
-        private string GenerateTypes(List<TGenerator> runGenerators)
-        {
-            var classes = "";
-            foreach (var pair in _types.ToList().Where(pair => !runGenerators.Contains(pair.Value)))
-            {
-                classes += pair.Value.GenerateType(pair.Key) + "\n\n";
-                runGenerators.Add(pair.Value);
-            }
-            return classes;
         }
     }
 }
