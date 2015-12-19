@@ -74,6 +74,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.DateTime)
                     return isRequired ? "DateTime" : "DateTime?";
 
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                    return isRequired ? "TimeSpan" : "TimeSpan?";
+
                 if (schema.Format == JsonFormatStrings.Guid)
                     return isRequired ? "Guid" : "Guid?";
 

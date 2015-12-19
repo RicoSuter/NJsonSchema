@@ -34,7 +34,7 @@ namespace NJsonSchema
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of enumeration type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
         {
             return Generate<JsonSchema4>(type, schemaResolver);
@@ -46,7 +46,7 @@ namespace NJsonSchema
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of enumeration type.</exception>
+        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public TSchemaType Generate<TSchemaType>(Type type, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
@@ -97,7 +97,7 @@ namespace NJsonSchema
                 var genericTypeArguments = GetGenericTypeArguments(type);
                 var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
                 if (itemType == null)
-                    throw new InvalidOperationException("Could not find item type of enumeration type '" + type.FullName + "'.");
+                    throw new InvalidOperationException("Could not find item type of array type '" + type.FullName + "'.");
 
                 schema.Item = Generate<JsonSchema4>(itemType, schemaResolver);
             }

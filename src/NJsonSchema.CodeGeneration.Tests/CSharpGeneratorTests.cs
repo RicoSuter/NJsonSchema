@@ -40,6 +40,20 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
+        public void When_property_is_timespan_than_csharp_timespan_is_used()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Person>();
+            var generator = new CSharpGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"public TimeSpan TimeSpan"));
+        }
+        
+        [TestMethod]
         public void When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
             //// Arrange
@@ -117,6 +131,8 @@ namespace NJsonSchema.CodeGeneration.Tests
         public string LastName { get; set; }
         
         public DateTime Birthday { get; set; }
+
+        public TimeSpan TimeSpan { get; set; }
 
         public Gender Gender { get; set; }
         

@@ -46,6 +46,9 @@ namespace NJsonSchema
             if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.DateTime);
 
+            if (type == typeof(TimeSpan))
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.TimeSpan);
+
             if (type == typeof(Uri))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Uri);
 

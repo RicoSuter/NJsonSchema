@@ -6,13 +6,18 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace NJsonSchema
 {
     /// <summary>Class containing the constants available as format string. </summary>
     public static class JsonFormatStrings
     {
-        /// <summary>Format for a <see cref="DateTime"/>. </summary>
+        /// <summary>Format for a <see cref="System.DateTime"/>. </summary>
         public const string DateTime = "date-time";
+
+        /// <summary>Format for a <see cref="TimeSpan"/>. </summary>
+        public const string TimeSpan = "time-span";
 
         /// <summary>Format for an email. </summary>
         public const string Email = "email";
