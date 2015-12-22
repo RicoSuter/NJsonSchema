@@ -53,6 +53,7 @@ namespace NJsonSchema
             return Generate<TSchemaType>(type, null, schemaResolver);
         }
 
+        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         private TSchemaType Generate<TSchemaType>(Type type, PropertyInfo propertyInfo, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
@@ -273,8 +274,11 @@ namespace NJsonSchema
                 var propertyName = JsonPathUtilities.GetPropertyName(property);
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
+                var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+                var isJsonPropertyRequired = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.Always;
+
                 var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
-                if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null)
+                if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null || isJsonPropertyRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
 
                 dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");

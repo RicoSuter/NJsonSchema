@@ -91,6 +91,35 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual("Abc", property.Description);
         }
 
+        [TestMethod]
+        public void When_required_attribute_is_available_then_property_is_required()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var property = schema.Properties["Required"];
+
+            //// Assert
+            Assert.IsTrue(property.IsRequired);
+        }
+
+        [TestMethod]
+        public void When_required_attribute_is_not_available_then_property_is_not_required()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var property = schema.Properties["Description"];
+
+            //// Assert
+            Assert.IsFalse(property.IsRequired);
+        }
+
+
         public class AttributeTestClass
         {
             [MinLength(3)]
@@ -112,6 +141,9 @@ namespace NJsonSchema.Tests.Generation
 
             [System.ComponentModel.Description("Abc")]
             public string Description { get; set; }
+
+            [Required]
+            public bool Required { get; set; }
         }
     }
 }
