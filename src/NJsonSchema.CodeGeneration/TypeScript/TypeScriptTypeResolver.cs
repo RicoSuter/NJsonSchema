@@ -101,13 +101,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The type name.</returns>
         protected override string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
-            if (string.IsNullOrEmpty(schema.TypeName))
-                return GenerateTypeName(typeNameHint);
+            var typeName = base.GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
-                return schema.TypeName + "AsInteger";
+                return typeName + "AsInteger";
 
-            return schema.TypeName;
+            return typeName;
         }
     }
 }
