@@ -24,7 +24,7 @@ namespace NJsonSchema
         /// <param name="schema">The schema. </param>
         public JsonSchemaValidator(JsonSchema4 schema)
         {
-            _schema = schema;
+            _schema = schema.ActualSchema;
         }
 
         /// <summary>Validates the given JSON token. </summary>

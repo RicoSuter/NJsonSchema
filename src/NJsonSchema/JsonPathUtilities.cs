@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -23,12 +24,12 @@ namespace NJsonSchema
         /// <param name="obj">The object.</param>
         /// <param name="objectToSearch">The object to search.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
-        /// <exception cref="InvalidOperationException">Could not resolve the path.</exception>
+        /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         public static string GetJsonPath(object obj, object objectToSearch)
         {
             var path = GetJsonPath(obj, objectToSearch, "#", new List<object>());
             if (path == null)
-                throw new InvalidOperationException("Could not resolve the path.");
+                throw new InvalidOperationException("Could not find the JSON path of a child object.");
             return path;
         }
 
@@ -44,7 +45,8 @@ namespace NJsonSchema
             {
                 if (obj is JsonSchema4)
                     return (JsonSchema4)obj;
-                throw new InvalidOperationException("Could not resolve the path.");
+
+                throw new InvalidOperationException("Could not resolve the path '#' because the root object is not a JsonSchema4.");
             }
             else if (path.StartsWith("#/"))
             {
@@ -56,7 +58,18 @@ namespace NJsonSchema
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
                 throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON web references are not supported.");
             else
-                throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported.");
+            {
+                if (FullDotNetMethods.SupportsFullDotNetMethods)
+                {
+                    var schema = obj as JsonSchema4;
+                    if (schema != null && schema.RootDirectory != null)
+                        return JsonSchema4.FromJson(FullDotNetMethods.FileReadAllText(FullDotNetMethods.PathCombine(schema.RootDirectory, path)));
+                    else
+                        throw new NotSupportedException("Could not resolve the path '" + path + "' because no root path is available.");
+                }
+                else 
+                   throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported on this platform.");
+            }
         }
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>

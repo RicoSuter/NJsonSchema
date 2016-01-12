@@ -9,10 +9,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
+using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema
@@ -81,10 +81,21 @@ namespace NJsonSchema
             return generator.Generate<JsonSchema4>(type, new SchemaResolver());
         }
 
+        /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
+        /// <param name="filePath">The file path.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromFile(string filePath)
+        {
+            var data = FullDotNetMethods.FileReadAllText(filePath);
+            var rootDirectory = FullDotNetMethods.PathGetDirectoryName(filePath);
+            return FromJson(data, rootDirectory);
+        }
+
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
         /// <param name="data">The JSON string. </param>
-        /// <returns></returns>
-        public static JsonSchema4 FromJson(string data)
+        /// <param name="rootDirectory">The document root directory for resolving relative document references.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromJson(string data, string rootDirectory = null)
         {
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -93,7 +104,7 @@ namespace NJsonSchema
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
-
+            schema.RootDirectory = rootDirectory;
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema);
             return schema;
         }
@@ -160,6 +171,10 @@ namespace NJsonSchema
                 }
             }
         }
+
+        /// <summary>Gets or sets the document root directory for resolving relative document references.</summary>
+        [JsonIgnore]
+        internal string RootDirectory { get; set; }
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
