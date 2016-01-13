@@ -25,128 +25,136 @@ NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchai
 
 The `JsonSchema4` type can be used as follows: 
 
-    var schema = JsonSchema4.FromType<Person>();
-    var schemaData = schema.ToJson();
+```cs
+var schema = JsonSchema4.FromType<Person>();
+var schemaData = schema.ToJson();
 
-    var jsonToken = JToken.Parse("...");
-    var errors = schema.Validate(jsonToken);
+var jsonToken = JToken.Parse("...");
+var errors = schema.Validate(jsonToken);
 
-    foreach (var error in errors)
-        Console.WriteLine(error.Path + ": " + error.Kind);
+foreach (var error in errors)
+    Console.WriteLine(error.Path + ": " + error.Kind);
 
-    schema = JsonSchema4.FromJson(schemaData);
+schema = JsonSchema4.FromJson(schemaData);
+```
 
 The `Person` class: 
 
-    public class Person
-    {
-        [Required]
-        public string FirstName { get; set; }
+```cs
+public class Person
+{
+    [Required]
+    public string FirstName { get; set; }
 
-        [Required]
-        public string LastName { get; set; }
+    [Required]
+    public string LastName { get; set; }
 
-        public Gender Gender { get; set; }
+    public Gender Gender { get; set; }
 
-        [Range(2, 5)]
-        public int NumberWithRange { get; set; }
+    [Range(2, 5)]
+    public int NumberWithRange { get; set; }
 
-        public DateTime Birthday { get; set; }
+    public DateTime Birthday { get; set; }
 
-        public Company Company { get; set; }
+    public Company Company { get; set; }
 
-        public Collection<Car> Cars { get; set; }
-    }
+    public Collection<Car> Cars { get; set; }
+}
 
-    public enum Gender
-    {
-        Male,
-        Female
-    }
+public enum Gender
+{
+    Male,
+    Female
+}
 
-    public class Car
-    {
-        public string Name { get; set; }
+public class Car
+{
+    public string Name { get; set; }
 
-        public Company Manufacturer { get; set; }
-    }
+    public Company Manufacturer { get; set; }
+}
 
-    public class Company
-    {
-        public string Name { get; set; }
-    }
+public class Company
+{
+    public string Name { get; set; }
+}
+```
   
 The generated JSON schema data stored in the `schemaData` variable: 
-  
-	{
-	  "$schema": "http://json-schema.org/draft-04/schema#",
-	  "typeName": "Person",
-	  "type": "object",
-	  "required": [
-		"FirstName",
-		"LastName",
-		"Gender",
-		"NumberWithRange",
-		"Birthday"
-	  ],
-	  "properties": {
-		"FirstName": {
-		  "type": "string"
-		},
-		"LastName": {
-		  "type": "string"
-		},
-		"Gender": {
-		  "type": "string",
-		  "enum": [
-			"Male",
-			"Female"
-		  ]
-		},
-		"NumberWithRange": {
-		  "type": "integer",
-		  "maximum": 5.0,
-		  "minimum": 2.0
-		},
-		"Birthday": {
-		  "type": "string",
-		  "format": "date-time"
-		},
-		"Company": {
-		  "typeName": "Company",
-		  "type": "object",
-		  "properties": {
-			"Name": {
-			  "type": "string"
-			}
-		  }
-		},
-		"Cars": {
-		  "items": {
-			"typeName": "Car",
-			"type": "object",
-			"properties": {
-			  "Name": {
-				"type": "string"
-			  },
-			  "Manufacturer": {
-				"typeName": "Company",
-				"type": "object",
-				"$ref": "#/properties/Company"
-			  }
-			}
-		  },
-		  "type": "array"
-		}
-	  }
-	}
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "typeName": "Person",
+  "type": "object",
+  "required": [
+    "FirstName",
+    "LastName",
+    "Gender",
+    "NumberWithRange",
+    "Birthday"
+  ],
+  "properties": {
+    "FirstName": {
+      "type": "string"
+    },
+    "LastName": {
+      "type": "string"
+    },
+    "Gender": {
+      "type": "string",
+      "enum": [
+        "Male",
+        "Female"
+      ]
+    },
+    "NumberWithRange": {
+      "type": "integer",
+      "maximum": 5.0,
+      "minimum": 2.0
+    },
+    "Birthday": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Company": {
+      "typeName": "Company",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        }
+      }
+    },
+    "Cars": {
+      "items": {
+        "typeName": "Car",
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "Manufacturer": {
+            "typeName": "Company",
+            "type": "object",
+            "$ref": "#/properties/Company"
+          }
+        }
+      },
+      "type": "array"
+    }
+  }
+}
+```
 
 ## NJsonSchema.CodeGeneration usage
 
 The `NJsonSchema.CodeGeneration` can be used to generate C# or TypeScript code from a JSON schema:
 
-    var generator new CSharpClassGenerator(schema);
-    var file = generator.GenerateFile();
+```cs
+var generator new CSharpClassGenerator(schema);
+var file = generator.GenerateFile();
+```
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
 

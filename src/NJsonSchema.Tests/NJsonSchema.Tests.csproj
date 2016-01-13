@@ -62,6 +62,7 @@
     <Compile Include="Generation\AttributeGenerationTests.cs" />
     <Compile Include="Generation\EnumGenerationTests.cs" />
     <Compile Include="Generation\InheritanceTests.cs" />
+    <Compile Include="Generation\JsonPropertyAttributeTests.cs" />
     <Compile Include="Generation\PrimitiveTypeGenerationTests.cs" />
     <Compile Include="Generation\SchemaGenerationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />

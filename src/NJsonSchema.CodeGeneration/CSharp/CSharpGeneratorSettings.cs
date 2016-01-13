@@ -14,6 +14,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            DateTimeType = CSharpDateTimeType.DateTime;
             RequiredPropertiesMustBeDefined = true; 
         }
 
@@ -23,5 +24,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
+
+        /// <summary>Gets or sets the date time .NET type.</summary>
+        public CSharpDateTimeType DateTimeType { get; set; }
     }
 }

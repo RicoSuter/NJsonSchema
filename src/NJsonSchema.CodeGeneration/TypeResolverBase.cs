@@ -16,6 +16,8 @@ namespace NJsonSchema.CodeGeneration
         where TGenerator : TypeGeneratorBase
     {
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
+        private readonly Dictionary<JsonSchema4, string> _generatedTypeNames = new Dictionary<JsonSchema4, string>();
+
         private int _anonymousClassCount = 0;
 
         /// <summary>Determines whether the generator for a given type name is registered.</summary>
@@ -86,7 +88,12 @@ namespace NJsonSchema.CodeGeneration
         protected virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
             if (string.IsNullOrEmpty(schema.TypeName))
-                return GenerateTypeName(typeNameHint);
+            {
+                if (!_generatedTypeNames.ContainsKey(schema))
+                    _generatedTypeNames[schema] = GenerateTypeName(typeNameHint);
+
+                return _generatedTypeNames[schema];
+            }
 
             return schema.TypeName;
         }
