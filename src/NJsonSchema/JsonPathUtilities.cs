@@ -23,13 +23,30 @@ namespace NJsonSchema
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="obj">The object.</param>
         /// <param name="objectToSearch">The object to search.</param>
+        /// <param name="appendToDefinitions">Appends the <paramref name="objectToSearch"/> to the 'definitions' if it could not be found.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        public static string GetJsonPath(object obj, object objectToSearch)
+        public static string GetJsonPath(object obj, object objectToSearch, bool appendToDefinitions = true)
         {
             var path = GetJsonPath(obj, objectToSearch, "#", new List<object>());
             if (path == null)
-                throw new InvalidOperationException("Could not find the JSON path of a child object.");
+            {
+                if (appendToDefinitions)
+                {
+                    var schema = obj as JsonSchema4;
+                    var searchedSchema = objectToSearch as JsonSchema4;
+                    if (schema != null && searchedSchema != null)
+                    {
+                        schema.Definitions["ref_" + Guid.NewGuid()] = searchedSchema;
+                        return GetJsonPath(obj, objectToSearch, false);
+                    }
+                    else
+                        throw new InvalidOperationException("Could not find the JSON path of a child object.");
+                }
+                else
+                    throw new InvalidOperationException("Could not find the JSON path of a child object.");
+
+            }
             return path;
         }
 
@@ -52,8 +69,9 @@ namespace NJsonSchema
             {
                 var schema = GetObjectFromJsonPath(obj, path.Split('/').Skip(1).ToList(), new List<object>());
                 if (schema == null)
-                    throw new InvalidOperationException("Could not resolve the path '" + path +  "'.");
-                return schema; 
+                    throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
+
+                return schema;
             }
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
                 throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON web references are not supported.");
@@ -67,8 +85,8 @@ namespace NJsonSchema
                     else
                         throw new NotSupportedException("Could not resolve the path '" + path + "' because no root path is available.");
                 }
-                else 
-                   throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported on this platform.");
+                else
+                    throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported on this platform.");
             }
         }
 
@@ -118,7 +136,7 @@ namespace NJsonSchema
                     var path = GetJsonPath(item, objectToSearch, basePath + "/" + i, checkedObjects);
                     if (path != null)
                         return path;
-                    i++; 
+                    i++;
                 }
             }
             else
@@ -159,7 +177,7 @@ namespace NJsonSchema
                 int index;
                 if (int.TryParse(segments.First(), out index))
                 {
-                    var enumerable = ((IEnumerable) obj).Cast<object>().ToArray(); 
+                    var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
                         return GetObjectFromJsonPath(enumerable[index], segments.Skip(1).ToList(), checkedObjects);
                 }

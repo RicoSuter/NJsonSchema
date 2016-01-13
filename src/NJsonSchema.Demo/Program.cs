@@ -20,9 +20,10 @@ namespace NJsonSchema.Demo
     {
         static void Main(string[] args)
         {
-            //var schema = JsonSchema4.FromJson(File.ReadAllText(@"c:\data\person.json"), @"c:\data");
-            //var x = JToken.Parse(File.ReadAllText(@"c:\data\data.json"));
-            //var errors = schema.Validate(x);
+            var schema = JsonSchema4.FromJson(File.ReadAllText(@"c:\data\person.json"), @"c:\data");
+            var x = JToken.Parse(File.ReadAllText(@"c:\data\data.json"));
+            var errors = schema.Validate(x);
+            var u = schema.ToJson(); 
 
             var t = new Test
             {
