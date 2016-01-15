@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var property = schema;
                 if (property.Item != null)
-                    return string.Format("ObservableCollection<{0}>", Resolve(property.Item, true, null));
+                    return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, true, null));
                 
                 throw new NotImplementedException("Array with multiple Items schemes are not supported.");
             }
@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (type.HasFlag(JsonObjectType.String))
             {
                 if (schema.Format == JsonFormatStrings.DateTime)
-                    return isRequired ? Settings.DateTimeType.ToString() : Settings.DateTimeType + "?";
+                    return isRequired ? Settings.DateTimeType : Settings.DateTimeType + "?";
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
                     return isRequired ? "TimeSpan" : "TimeSpan?";
@@ -95,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     return "object";
 
                 if (schema.IsDictionary)
-                    return string.Format("Dictionary<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true, null));
+                    return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true, null));
                 
                 return AddGenerator(schema, typeNameHint);
             }

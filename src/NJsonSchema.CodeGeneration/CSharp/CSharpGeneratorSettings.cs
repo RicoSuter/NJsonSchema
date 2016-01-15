@@ -14,7 +14,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
-            DateTimeType = CSharpDateTimeType.DateTime;
+            DateTimeType = "DateTime";
+            ArrayType = "ObservableCollection";
+            DictionaryType = "Dictionary"; 
             RequiredPropertiesMustBeDefined = true; 
         }
 
@@ -26,6 +28,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
         /// <summary>Gets or sets the date time .NET type.</summary>
-        public CSharpDateTimeType DateTimeType { get; set; }
+        public string DateTimeType { get; set; }
+
+        /// <summary>Gets or sets the generic array .NET type.</summary>
+        public string ArrayType { get; set; }
+
+        /// <summary>Gets or sets the generic dictionary .NET type.</summary>
+        public string DictionaryType { get; set; }
     }
 }
