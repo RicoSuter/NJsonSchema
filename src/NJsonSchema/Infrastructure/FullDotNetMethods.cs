@@ -24,6 +24,14 @@ namespace NJsonSchema.Infrastructure
             get { return XPathExtensionsType != null; }
         }
 
+        public static string HttpGet(string url)
+        {
+            var type = Type.GetType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", true);
+            dynamic client = (IDisposable)Activator.CreateInstance(type);
+            using (client)
+                return client.DownloadString(url); 
+        }
+
         public static bool FileExists(string filePath)
         {
             var type = Type.GetType("System.IO.File", true);

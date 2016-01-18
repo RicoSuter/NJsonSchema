@@ -74,7 +74,13 @@ namespace NJsonSchema
                 return schema;
             }
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
-                throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON web references are not supported.");
+            {
+                if (FullDotNetMethods.SupportsFullDotNetMethods)
+                    return JsonSchema4.FromJson(FullDotNetMethods.HttpGet(path));
+                else
+                    throw new NotSupportedException("Could not resolve the path '" + path + 
+                        "' because JSON web references are not supported on this platform.");
+            }
             else
             {
                 if (FullDotNetMethods.SupportsFullDotNetMethods)
@@ -83,10 +89,12 @@ namespace NJsonSchema
                     if (schema != null && schema.RootDirectory != null)
                         return JsonSchema4.FromJson(FullDotNetMethods.FileReadAllText(FullDotNetMethods.PathCombine(schema.RootDirectory, path)));
                     else
-                        throw new NotSupportedException("Could not resolve the path '" + path + "' because no root path is available.");
+                        throw new NotSupportedException("Could not resolve the path '" + path + 
+                            "' because no root path is available.");
                 }
                 else
-                    throw new NotSupportedException("Could not resolve the path '" + path + "' because JSON file references are not supported on this platform.");
+                    throw new NotSupportedException("Could not resolve the path '" + path + 
+                        "' because JSON file references are not supported on this platform.");
             }
         }
 

@@ -53,8 +53,15 @@ namespace NJsonSchema
             return Generate<TSchemaType>(type, null, schemaResolver);
         }
 
+        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
+        /// <param name="type">The type.</param>
+        /// <param name="attributes">The property or parameter attributes.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <returns>The schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
-        private TSchemaType Generate<TSchemaType>(Type type, PropertyInfo propertyInfo, ISchemaResolver schemaResolver)
+        public TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> attributes, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             if (type == typeof(object) || type == typeof(JObject))
@@ -104,7 +111,7 @@ namespace NJsonSchema
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var isIntegerEnumeration = IsIntegerEnumeration(propertyInfo);
+                var isIntegerEnumeration = IsIntegerEnumeration(attributes);
 
                 if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
@@ -123,22 +130,18 @@ namespace NJsonSchema
         }
 
         /// <summary>Checks whether the property is an integer enumeration.</summary>
-        /// <param name="propertyInfo">The property information.</param>
+        /// <param name="attributes">The property or parameter attributes.</param>
         /// <returns>true if the property is an integer enumeration.</returns>
-        protected bool IsIntegerEnumeration(PropertyInfo propertyInfo)
+        protected bool IsIntegerEnumeration(IEnumerable<Attribute> attributes)
         {
             var enumType = Settings.DefaultEnumHandling == EnumHandling.String ? JsonObjectType.String : JsonObjectType.Integer;
 
-            dynamic jsonConverterAttribute = propertyInfo != null ? 
-                propertyInfo.GetCustomAttributes().SingleOrDefault(a => a.GetType().Name == "JsonConverterAttribute") : null;
-
+            dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type) jsonConverterAttribute.ConverterType;
                 if (converterType.Name == "StringEnumConverter")
-                {
                     enumType = JsonObjectType.String;
-                }
             }
 
             return enumType == JsonObjectType.Integer;
@@ -270,7 +273,7 @@ namespace NJsonSchema
             var attributes = property.GetCustomAttributes().ToArray();
             if (attributes.All(a => !(a is JsonIgnoreAttribute)))
             {
-                var jsonProperty = Generate<JsonProperty>(propertyType, property, schemaResolver);
+                var jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver);
                 var propertyName = JsonPathUtilities.GetPropertyName(property);
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 

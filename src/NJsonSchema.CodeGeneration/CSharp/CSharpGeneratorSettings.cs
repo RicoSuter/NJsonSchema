@@ -27,13 +27,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
-        /// <summary>Gets or sets the date time .NET type.</summary>
+        /// <summary>Gets or sets the date time .NET type (default: 'DateTime').</summary>
         public string DateTimeType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type.</summary>
+        /// <summary>Gets or sets the generic array .NET type (default: 'ObservableCollection').</summary>
         public string ArrayType { get; set; }
 
-        /// <summary>Gets or sets the generic dictionary .NET type.</summary>
+        /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
         public string DictionaryType { get; set; }
     }
 }
