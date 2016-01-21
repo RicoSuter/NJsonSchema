@@ -245,7 +245,7 @@ namespace NJsonSchema
 
                 foreach (var enumName in Enum.GetNames(type))
                 {
-                    var value = (int) Enum.Parse(type, enumName);
+                    var value = Convert.ChangeType(Enum.Parse(type, enumName), Enum.GetUnderlyingType(type));
                     schema.Enumeration.Add(value);
                     schema.EnumerationNames.Add(enumName);
                 }

@@ -14,10 +14,21 @@ namespace NJsonSchema.Infrastructure
 {
     internal static class FullDotNetMethods
     {
-        private static readonly Type XPathExtensionsType = Type.GetType(
-            "System.Xml.XPath.Extensions, " +
-            "System.Xml.Linq, Version=4.0.0.0, " +
-            "Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        private static readonly Type XPathExtensionsType;
+
+        static FullDotNetMethods()
+        {
+            try
+            {
+                XPathExtensionsType = Type.GetType(
+                    "System.Xml.XPath.Extensions, " +
+                    "System.Xml.Linq, Version=4.0.0.0, " +
+                    "Culture=neutral, PublicKeyToken=b77a5c561934e089");
+            }
+            catch
+            {
+            }
+        }
 
         public static bool SupportsFullDotNetMethods
         {
@@ -29,7 +40,7 @@ namespace NJsonSchema.Infrastructure
             var type = Type.GetType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", true);
             dynamic client = (IDisposable)Activator.CreateInstance(type);
             using (client)
-                return client.DownloadString(url); 
+                return client.DownloadString(url);
         }
 
         public static bool FileExists(string filePath)
