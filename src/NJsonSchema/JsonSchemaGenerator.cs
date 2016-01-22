@@ -64,16 +64,11 @@ namespace NJsonSchema
         public TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> attributes, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (type == typeof(object) || type == typeof(JObject))
-            {
-                return new TSchemaType
-                {
-                    Type = JsonObjectType.Object,
-                    AllowAdditionalProperties = true
-                };
-            }
+            var schema = HandleSpecialTypes<TSchemaType>(type);
+            if (schema != null)
+                return schema;
 
-            var schema = new TSchemaType();
+            schema = new TSchemaType();
 
             var typeDescription = JsonObjectTypeDescription.FromType(type);
             schema.Type = typeDescription.Type;
@@ -145,6 +140,24 @@ namespace NJsonSchema
             }
 
             return enumType == JsonObjectType.Integer;
+        }
+
+        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type) 
+            where TSchemaType : JsonSchema4, new()
+        {
+            if (type == typeof(object) || type == typeof(JObject))
+            {
+                return new TSchemaType
+                {
+                    Type = JsonObjectType.Object,
+                    AllowAdditionalProperties = true
+                };
+            }
+
+            if (type == typeof(Type))
+                return new TSchemaType { Type = JsonObjectType.String };
+
+            return null;
         }
 
         private string GetTypeName(Type type)
