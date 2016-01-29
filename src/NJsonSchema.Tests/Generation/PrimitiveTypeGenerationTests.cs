@@ -1,5 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -13,6 +14,8 @@ namespace NJsonSchema.Tests.Generation
             public byte Byte { get; set; }
 
             public TimeSpan TimeSpan { get; set; }
+
+            public Type Type { get; set; }
         }
 
         [TestMethod]
@@ -55,6 +58,20 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["TimeSpan"].Type);
             Assert.AreEqual(JsonFormatStrings.TimeSpan, schema.Properties["TimeSpan"].Format);
+        }
+
+        [TestMethod]
+        public void When_property_is_type_then_schema_type_is_string()
+        {
+            //// Arrange
+            var data = JsonConvert.SerializeObject(new Foo { Type = typeof(Foo) }); // Type property is serialized as string
+
+            //// Act
+            var schema = JsonSchema4.FromType<Foo>();
+            var json = schema.ToJson(); 
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Type"].Type);
         }
     }
 }
