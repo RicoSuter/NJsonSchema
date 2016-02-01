@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));
-                template.Add("inpc", Settings.Style == CSharpStyle.Inpc);
+                template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + ", " : string.Empty);
                 template.Add("properties", properties);

@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var generator = CreateGenerator();
-            generator.Settings.Style = CSharpStyle.Poco;
+            generator.Settings.ClassStyle = CSharpClassStyle.Poco;
 
             //// Act
             var output = generator.GenerateFile();

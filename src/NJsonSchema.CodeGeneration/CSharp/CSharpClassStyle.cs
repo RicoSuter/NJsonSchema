@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="CSharpStyle.cs" company="NJsonSchema">
+// <copyright file="CSharpClassStyle.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -11,7 +11,7 @@ using System.ComponentModel;
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The CSharp styles.</summary>
-    public enum CSharpStyle
+    public enum CSharpClassStyle
     {
         /// <summary>Generates POCOs (Plain Old C# Objects).</summary>
         Poco,

@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ArrayType = "ObservableCollection";
             DictionaryType = "Dictionary"; 
             RequiredPropertiesMustBeDefined = true; 
-            Style = CSharpStyle.Inpc;
+            ClassStyle = CSharpClassStyle.Inpc;
         }
 
         /// <summary>Gets or sets the namespace.</summary>
@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
         public string DictionaryType { get; set; }
 
-        /// <summary>Gets or sets the CSharp style.</summary>
-        public CSharpStyle Style { get; set; }
+        /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
+        public CSharpClassStyle ClassStyle { get; set; }
     }
 }
