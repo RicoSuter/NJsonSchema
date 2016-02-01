@@ -1,9 +1,9 @@
 ﻿<if(hasDescription)>/// \<summary><description>\</summary>
-<endif>public partial class <class> : <inheritance><if(inpc)>INotifyPropertyChanged<endif>
+<endif>public partial class <class> <inheritance>
 {
-<properties:{property | 
+<if(inpc)><properties:{property | 
     private <property.Type> _<property.FieldName>;
-}>
+}><endif>
 <properties:{property | 
 <if(property.HasDescription)>    /// \<summary><property.Description>\</summary>
 <endif>    [JsonProperty("<property.Name>", Required = <property.Required>)]
@@ -23,8 +23,8 @@
     \}<endif>
 
 
-}>    public event PropertyChangedEventHandler PropertyChanged;
-
+}><if(inpc)>    public event PropertyChangedEventHandler PropertyChanged;
+<endif>
     public string ToJson() 
     {
         return JsonConvert.SerializeObject(this);

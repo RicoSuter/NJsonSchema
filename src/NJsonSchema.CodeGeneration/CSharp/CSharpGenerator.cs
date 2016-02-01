@@ -110,7 +110,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("description", RemoveLineBreaks(_schema.Description));
                 template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
 
-                template.Add("inheritance", _schema.AllOf.Count == 1 ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + ", " : string.Empty);
+                template.Add("inheritance", _schema.AllOf.Count == 1 ? 
+                    ": " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + 
+                    (Settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
+                    (Settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "") );
                 template.Add("properties", properties);
 
                 return new TypeGeneratorResult
