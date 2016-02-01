@@ -24,6 +24,7 @@
 
 
 }><if(inpc)>    public event PropertyChangedEventHandler PropertyChanged;
+
 <endif>
     public string ToJson() 
     {
