@@ -55,11 +55,12 @@ namespace NJsonSchema.Tests.Samples
             }";
             var schema = JsonSchema4.FromJson(schemaJson);
 
-            var dataJson = @"{
-                 ""SimpleDate"":""2012-05-18T00:00:00Z"",
-                 ""PatternDate"":""2012-11-07T00:00:00.4021600Z""
-            }";
-            var data = JObject.Parse(dataJson);
+            var data = JObject.Parse(@"{
+                ""SimpleDate"":""2012-05-18T00:00:00Z"",
+                ""PatternDate"":""2012-11-07T00:00:00Z""
+            }");
+
+            var value = data["SimpleDate"].Value<string>(); // not original format
 
             //// Act
             var errors = schema.Validate(data);
