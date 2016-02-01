@@ -26,6 +26,20 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
+        public void When_POCO_is_set_then_auto_properties_is_available()
+        {
+            //// Arrange
+            var generator = CreateGenerator();
+            generator.Settings.Style = CSharpStyle.Poco;
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("{ get; set; }"));
+        }
+
+        [TestMethod]
         public void When_property_name_does_not_match_property_name_then_attribute_is_correct()
         {
             //// Arrange

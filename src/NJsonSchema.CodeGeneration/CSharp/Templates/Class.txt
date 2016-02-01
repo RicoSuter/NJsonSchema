@@ -1,16 +1,15 @@
 ﻿<if(hasDescription)>/// \<summary><description>\</summary>
-<endif>public partial class <class> : <inheritance>INotifyPropertyChanged
+<endif>public partial class <class> : <inheritance><if(inpc)>INotifyPropertyChanged<endif>
 {
 <properties:{property | 
     private <property.Type> _<property.FieldName>;
 }>
-
 <properties:{property | 
 <if(property.HasDescription)>    /// \<summary><property.Description>\</summary>
 <endif>    [JsonProperty("<property.Name>", Required = <property.Required>)]
 <if(property.IsStringEnum)>    [JsonConverter(typeof(StringEnumConverter))]
 <endif>
-    public <property.Type> <property.PropertyName>
+    public <property.Type> <property.PropertyName><if(!inpc)> { get; set; \}<else>
     {
         get { return _<property.FieldName>; \}
         set 
@@ -21,10 +20,10 @@
                 RaisePropertyChanged();
             \}
         \}
-    \}
+    \}<endif>
 
-}>
-    public event PropertyChangedEventHandler PropertyChanged;
+
+}>    public event PropertyChangedEventHandler PropertyChanged;
 
     public string ToJson() 
     {
@@ -35,11 +34,13 @@
     {
         return JsonConvert.DeserializeObject\<<class>>(data);
     }
-
+<if(inpc)>
+    
     protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
     {
         var handler = PropertyChanged;
         if (handler != null) 
             handler(this, new PropertyChangedEventArgs(propertyName));
-    }
+    \}
+<endif>
 }
