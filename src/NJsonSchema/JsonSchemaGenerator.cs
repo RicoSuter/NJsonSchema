@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
@@ -56,12 +57,12 @@ namespace NJsonSchema
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The type.</param>
-        /// <param name="attributes">The property or parameter attributes.</param>
+        /// <param name="parentAttributes">The parent property or parameter attributes.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
-        public TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> attributes, ISchemaResolver schemaResolver)
+        public TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var schema = HandleSpecialTypes<TSchemaType>(type);
@@ -106,7 +107,7 @@ namespace NJsonSchema
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var isIntegerEnumeration = IsIntegerEnumeration(attributes);
+                var isIntegerEnumeration = IsIntegerEnumeration(parentAttributes) || HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
 
                 if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
@@ -115,7 +116,7 @@ namespace NJsonSchema
                     return schema;
                 }
 
-                LoadEnumerations(type, schema, isIntegerEnumeration);
+                LoadEnumerations(type, schema, isIntegerEnumeration, parentAttributes);
 
                 schema.TypeName = GetTypeName(type); 
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
@@ -130,16 +131,24 @@ namespace NJsonSchema
         protected bool IsIntegerEnumeration(IEnumerable<Attribute> attributes)
         {
             var enumType = Settings.DefaultEnumHandling == EnumHandling.String ? JsonObjectType.String : JsonObjectType.Integer;
+            if (HasStringEnumConverter(attributes))
+                enumType = JsonObjectType.String;
+            return enumType == JsonObjectType.Integer;
+        }
+
+        private static bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
+        {
+            if (attributes == null)
+                return false; 
 
             dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type) jsonConverterAttribute.ConverterType;
                 if (converterType.Name == "StringEnumConverter")
-                    enumType = JsonObjectType.String;
+                    return true;
             }
-
-            return enumType == JsonObjectType.Integer;
+            return false;
         }
 
         private TSchemaType HandleSpecialTypes<TSchemaType>(Type type) 
@@ -247,7 +256,7 @@ namespace NJsonSchema
             return null; 
         }
         
-        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration) 
+        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration, IEnumerable<Attribute> parentAttributes) 
             where TSchemaType : JsonSchema4, new()
         {
             if (isIntegerEnumeration)
@@ -256,7 +265,7 @@ namespace NJsonSchema
                 schema.Enumeration.Clear();
                 schema.EnumerationNames.Clear();
 
-                foreach (var enumName in Enum.GetNames(type))
+                foreach (var enumName in GetEnumNames(type, parentAttributes))
                 {
                     var value = Convert.ChangeType(Enum.Parse(type, enumName), Enum.GetUnderlyingType(type));
                     schema.Enumeration.Add(value);
@@ -269,12 +278,29 @@ namespace NJsonSchema
                 schema.Enumeration.Clear();
                 schema.EnumerationNames.Clear();
 
-                foreach (var enumName in Enum.GetNames(type))
+                foreach (var enumName in GetEnumNames(type, parentAttributes))
                 {
                     schema.Enumeration.Add(enumName);
                     schema.EnumerationNames.Add(enumName);
                 }
             }
+        }
+
+        private string[] GetEnumNames(Type type, IEnumerable<Attribute> parentAttributes)
+        {
+            if (HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) || (parentAttributes != null && HasStringEnumConverter(parentAttributes)))
+            {
+                return Enum.GetNames(type).Select(name =>
+                {
+                    var attributes = type.GetTypeInfo().GetDeclaredField(name).GetCustomAttributes();
+                    dynamic enumMemberAttribute = TryGetAttribute(attributes, "System.Runtime.Serialization.EnumMemberAttribute");
+                    if (enumMemberAttribute != null)
+                        return (string)enumMemberAttribute.Value;
+                    return name; 
+                }).ToArray();
+            }
+
+            return Enum.GetNames(type);
         }
 
         private void LoadProperty<TSchemaType>(PropertyInfo property, TSchemaType parentSchema, ISchemaResolver schemaResolver)

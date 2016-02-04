@@ -27,7 +27,6 @@ namespace NJsonSchema.Tests.Samples
             public string Company { get; set; }
         }
 
-        [TestMethod]
         public void Demo()
         {
             var schema = JsonSchema4.FromType<Person>();
@@ -35,8 +34,40 @@ namespace NJsonSchema.Tests.Samples
             var errors = schema.Validate("...");
         }
 
-        //[TestMethod]
-        public void When_DateTime_is_available_then_validator_works()
+        [TestMethod]
+        public void When_JSON_contains_DateTime_is_available_then_string_validator_validates_correctly()
+        {
+            //// Arrange
+            var schemaJson = @"{
+            ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+            ""type"": ""object"",
+            ""properties"": {
+                ""SimpleDate"": {
+                    ""type"": ""string"",
+                    ""format"": ""date-time""
+                },
+                ""PatternDate"": {
+                    ""type"": ""string"",
+                    ""pattern"" : ""(^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}T[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}Z$|^$)""
+                    }
+                }
+            }";
+            var schema = JsonSchema4.FromJson(schemaJson);
+
+            var dataJson = @"{
+                ""SimpleDate"":""2012-05-18T00:00:00Z"",
+                ""PatternDate"":""2012-11-07T00:00:00Z""
+            }"; 
+
+            //// Act
+            var errors = schema.Validate(dataJson);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
+        }
+
+        [TestMethod]
+        public void When_JSON_contains_DateTime_is_available_then_JObject_validator_validates_correctly()
         {
             //// Arrange
             var schemaJson = @"{

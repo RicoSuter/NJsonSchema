@@ -148,8 +148,7 @@ namespace NJsonSchema
 
             if (isString)
             {
-                var value = token.Value<string>();
-                //var value = token.Type == JTokenType.Date ? token.Value<DateTime>().ToString("yyyy-MM-ddTHH:mm:ssK") : token.Value<string>();
+                var value = token.Type == JTokenType.Date ? token.Value<DateTime>().ToString("yyyy-MM-ddTHH:mm:ssK") : token.Value<string>();
                 if (value != null)
                 {
                     if (!string.IsNullOrEmpty(_schema.Pattern))

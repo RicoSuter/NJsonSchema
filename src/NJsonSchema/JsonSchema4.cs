@@ -533,6 +533,16 @@ namespace NJsonSchema
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
 
+        /// <summary>Validates the given JSON data against this schema. </summary>
+        /// <param name="jsonData">The JSON data to validate. </param>
+        /// <returns>The collection of validation errors. </returns>
+        public ICollection<ValidationError> Validate(string jsonData)
+        {
+            var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None };
+            var jsonObject = JsonConvert.DeserializeObject<JObject>(jsonData, settings);
+            return Validate(jsonObject);
+        }
+
         /// <summary>Validates the given JSON token against this schema. </summary>
         /// <param name="token">The token to validate. </param>
         /// <returns>The collection of validation errors. </returns>
