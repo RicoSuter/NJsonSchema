@@ -327,6 +327,10 @@ namespace NJsonSchema
                 if (displayAttribute != null && displayAttribute.Name != null)
                     jsonProperty.Title = displayAttribute.Name;
 
+                dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
+                if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
+                    jsonProperty.Default = defaultValueAttribute.Value;
+
                 jsonProperty.Description = GetDescription(property, attributes);
 
                 dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
