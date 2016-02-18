@@ -16,21 +16,19 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 
 - Read existing JSON Schemas and validate JSON data
 - Generate JSON Schema from .NET type via reflection
-- Support for schema references ($ref)
+- Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services.
 
 ## NJsonSchema usage
 
-The `JsonSchema4` type can be used as follows: 
+The `JsonSchema4` class can be used as follows: 
 
 ```cs
 var schema = JsonSchema4.FromType<Person>();
 var schemaData = schema.ToJson();
-
-var jsonToken = JToken.Parse("...");
-var errors = schema.Validate(jsonToken);
+var errors = schema.Validate("{...}");
 
 foreach (var error in errors)
     Console.WriteLine(error.Path + ": " + error.Kind);
