@@ -31,6 +31,9 @@ namespace NJsonSchema
         /// <summary>Format for an IP v4 address. </summary>
         public const string IpV4 = "ipv4";
 
+        /// <summary>Format for an IP v6 address. </summary>
+        public const string IpV6 = "ipv6";
+
         /// <summary>Format for binary data encoded with Base64.</summary>
         public const string Base64 = "base64";
 
