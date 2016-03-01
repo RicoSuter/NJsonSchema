@@ -220,8 +220,6 @@ namespace NJsonSchema
                             if (!isHostname)
                                 errors.Add(new ValidationError(ValidationErrorKind.HostnameExpected, propertyName, propertyPath));
                         }
-
-                        // TODO: Implement other format types (hostname, ipv6)
                     }
                 }
             }
