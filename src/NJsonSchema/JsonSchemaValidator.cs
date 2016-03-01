@@ -198,6 +198,14 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath));
                         }
 
+                        if (_schema.Format == JsonFormatStrings.IpV6)
+                        {
+                            var isIpV6 = Uri.CheckHostName(value) == UriHostNameType.IPv6;
+
+                            if (!isIpV6)
+                                errors.Add(new ValidationError(ValidationErrorKind.IpV6Expected, propertyName, propertyPath));
+                        }
+
                         if (_schema.Format == JsonFormatStrings.Guid)
                         {
                             Guid guid;
