@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -20,8 +21,7 @@ namespace NJsonSchema.Tests.Generation
         {
             public string Name { get; set; }
         }
-
-
+        
         [TestMethod]
         public void When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
         {
@@ -61,6 +61,25 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.AreEqual(true, schema.Properties["Dictionary"].AllowAdditionalProperties);
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].AdditionalPropertiesSchema.Type);
+        }
+
+        public class DefaultTests
+        {
+            [DefaultValue(10)]
+            public int Number { get; set; }
+        }
+        
+        [TestMethod]
+        public void When_default_value_is_set_on_property_then_default_is_set_in_schema()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<DefaultTests>();
+
+            //// Act
+            var property = schema.Properties["Number"];
+
+            //// Assert
+            Assert.AreEqual(10, property.Default);
         }
     }
 }

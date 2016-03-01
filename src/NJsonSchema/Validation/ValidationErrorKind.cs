@@ -74,6 +74,9 @@ namespace NJsonSchema.Validation
         /// <summary>An IP v4 address is expected. </summary>
         IpV4Expected,
 
+        /// <summary>An IP v6 address is expected. </summary>
+        IpV6Expected,
+
         /// <summary>A valid GUID is expected. </summary>
         GuidExpected,
 
