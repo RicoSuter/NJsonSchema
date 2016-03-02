@@ -49,6 +49,27 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
+        public void When_property_matches_one_of_the_types_then_it_should_succeed()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.Object;
+            schema.Properties["Foo"] = new JsonProperty
+            {
+                Type = JsonObjectType.Number | JsonObjectType.Null
+            };
+
+            var token = new JObject();
+            token["Foo"] = new JValue(5);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count());
+        }
+
+        [TestMethod]
         public void When_optional_property_is_missing_then_it_should_succeed()
         {
             //// Arrange
