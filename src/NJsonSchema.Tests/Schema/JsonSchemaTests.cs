@@ -9,7 +9,7 @@ namespace NJsonSchema.Tests.Schema
     [TestClass]
     public class JsonSchemaTests
     {
-        //[TestMethod]
+        [TestMethod]
         public void When_schema_contains_refs_then_they_should_be_resolved()
         {
             //// Arrange
@@ -199,6 +199,24 @@ namespace NJsonSchema.Tests.Schema
 
             //// Assert
             Assert.IsFalse(schema.RequiredProperties.Contains("test"));
+        }
+
+        [TestMethod]
+        public void When_property_is_null_and_not_required_then_it_is_valid()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Properties["test"] = new JsonProperty
+            {
+                Type = JsonObjectType.String,
+                IsRequired = false
+            };
+
+            //// Act
+            var errors = schema.Validate("{ test: null }");
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
         }
     }
 }
