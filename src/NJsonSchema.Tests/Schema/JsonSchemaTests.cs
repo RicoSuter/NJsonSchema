@@ -202,13 +202,13 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_property_is_null_and_not_required_then_it_is_valid()
+        public void When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
             //// Arrange
             var schema = new JsonSchema4();
             schema.Properties["test"] = new JsonProperty
             {
-                Type = JsonObjectType.String,
+                Type = JsonObjectType.Number,
                 IsRequired = false
             };
 
@@ -216,7 +216,7 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate("{ test: null }");
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.AreEqual(1, errors.Count);
         }
     }
 }

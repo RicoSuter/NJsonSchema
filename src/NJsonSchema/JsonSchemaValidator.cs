@@ -291,13 +291,13 @@ namespace NJsonSchema
                 var property = obj?.Property(propertyInfo.Key);
                 if (property != null)
                 {
-                    var hasValueOrIsRequired = property.Value.Type != JTokenType.Null || propertyInfo.Value.IsRequired; 
-                    if (hasValueOrIsRequired)
-                    {
+                    //var hasValueOrIsRequired = property.Value.Type != JTokenType.Null || propertyInfo.Value.IsRequired; 
+                    //if (hasValueOrIsRequired)
+                    //{
                         var propertyValidator = new JsonSchemaValidator(propertyInfo.Value);
                         var propertyErrors = propertyValidator.Validate(property.Value, propertyInfo.Key, newPropertyPath);
                         errors.AddRange(propertyErrors);
-                    }
+                    //}
                 }
                 else if (propertyInfo.Value.IsRequired)
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath));
