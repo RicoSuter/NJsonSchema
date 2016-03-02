@@ -149,7 +149,7 @@ namespace NJsonSchema
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Description { get; set; }
 
-        /// <summary>Gets the object type. </summary>
+        /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
 
@@ -504,7 +504,7 @@ namespace NJsonSchema
             {
                 return 
                     string.IsNullOrEmpty(TypeName) && 
-                    Type == JsonObjectType.Object && 
+                    (Type == JsonObjectType.Object || Type == (JsonObjectType.Object | JsonObjectType.Null)) && 
                     Properties.Count == 0 && 
                     AnyOf.Count == 0 && 
                     AllOf.Count == 0 && 

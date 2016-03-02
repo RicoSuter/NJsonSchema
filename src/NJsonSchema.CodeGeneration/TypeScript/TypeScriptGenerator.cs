@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var properties = _schema.Properties.Values.Select(property => new
                 {
                     Name = property.Name,
-                    Type = _resolver.Resolve(property, property.IsRequired, property.Name),
+                    Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name),
 
                     HasDescription = !string.IsNullOrEmpty(property.Description),
                     Description = property.Description,

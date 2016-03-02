@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_required_attribute_is_not_available_then_property_is_not_required()
+        public void When_required_attribute_is_not_available_then_property_is_can_be_null()
         {
             //// Arrange
 
@@ -117,6 +117,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.IsFalse(property.IsRequired);
+            Assert.IsTrue(property.Type.HasFlag(JsonObjectType.Null));
         }
 
 

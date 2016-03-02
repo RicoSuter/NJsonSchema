@@ -24,7 +24,13 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            // TODO: Add test
+            Assert.IsFalse(schema.Properties["Id"].IsRequired);
+            Assert.IsFalse(schema.Properties["Name"].IsRequired);
+            Assert.IsFalse(schema.Properties["Size"].IsRequired);
+
+            Assert.IsFalse(schema.Properties["Id"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["Name"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["Size"].Type.HasFlag(JsonObjectType.Null));
         }
     }
 }

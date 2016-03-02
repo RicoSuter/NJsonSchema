@@ -90,7 +90,7 @@ namespace NJsonSchema
                     }
 
                     schema.Description = GetDescription(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes());
-                    
+
                     GenerateObject(type, schema, schemaResolver);
                 }
             }
@@ -118,7 +118,7 @@ namespace NJsonSchema
 
                 LoadEnumerations(type, schema, isIntegerEnumeration, parentAttributes);
 
-                schema.TypeName = GetTypeName(type); 
+                schema.TypeName = GetTypeName(type);
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
 
@@ -139,19 +139,19 @@ namespace NJsonSchema
         private static bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
         {
             if (attributes == null)
-                return false; 
+                return false;
 
             dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
             if (jsonConverterAttribute != null)
             {
-                var converterType = (Type) jsonConverterAttribute.ConverterType;
+                var converterType = (Type)jsonConverterAttribute.ConverterType;
                 if (converterType.Name == "StringEnumConverter")
                     return true;
             }
             return false;
         }
 
-        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type) 
+        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
             where TSchemaType : JsonSchema4, new()
         {
             if (type == typeof(object) || type == typeof(JObject))
@@ -197,7 +197,7 @@ namespace NJsonSchema
         public Type[] GetGenericTypeArguments(Type type)
         {
             var genericTypeArguments = type.GenericTypeArguments;
-            while (type != null && type != typeof (object) && genericTypeArguments.Length == 0)
+            while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
             {
                 type = type.GetTypeInfo().BaseType;
                 if (type != null)
@@ -253,10 +253,10 @@ namespace NJsonSchema
             if (type == typeof(Exception))
                 return new[] { "InnerException", "Message", "Source", "StackTrace" };
 
-            return null; 
+            return null;
         }
-        
-        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration, IEnumerable<Attribute> parentAttributes) 
+
+        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
             if (isIntegerEnumeration)
@@ -296,7 +296,7 @@ namespace NJsonSchema
                     dynamic enumMemberAttribute = TryGetAttribute(attributes, "System.Runtime.Serialization.EnumMemberAttribute");
                     if (enumMemberAttribute != null)
                         return (string)enumMemberAttribute.Value;
-                    return name; 
+                    return name;
                 }).ToArray();
             }
 
@@ -314,14 +314,25 @@ namespace NJsonSchema
             {
                 var jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver);
                 var propertyName = JsonPathUtilities.GetPropertyName(property);
+
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
-                var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-                var isJsonPropertyRequired = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.Always;
-
                 var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
-                if (propertyTypeDescription.IsAlwaysRequired || requiredAttribute != null || isJsonPropertyRequired)
+                var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+
+                var hasJsonNetAttributeRequired = jsonPropertyAttribute != null && (
+                    jsonPropertyAttribute.Required == Required.Always ||
+                    jsonPropertyAttribute.Required == Required.AllowNull);
+
+                var hasRequiredAttribute = requiredAttribute != null;
+                if (hasRequiredAttribute || hasJsonNetAttributeRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
+
+                var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
+
+                var isNullable = propertyTypeDescription.IsAlwaysRequired == false;
+                if (!hasRequiredAttribute && (isNullable || isJsonNetAttributeNullable))
+                    jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
 
                 dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && displayAttribute.Name != null)
@@ -387,7 +398,7 @@ namespace NJsonSchema
                 }
             }
 
-            return null; 
+            return null;
         }
 
         private Attribute TryGetAttribute(IEnumerable<Attribute> attributes, string attributeType)

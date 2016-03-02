@@ -94,6 +94,9 @@ namespace NJsonSchema
         /// <summary>Gets the format string. </summary>
         public string Format { get; private set; }
 
+        /// <summary>Gets or sets a value indicating whether this is a complex type (i.e. object, dictionary or array).</summary>
+        public bool IsComplexType => Type.HasFlag(JsonObjectType.Object) || Type.HasFlag(JsonObjectType.Array);
+
         private static bool IsArrayType(Type type)
         {
             if (IsDictionaryType(type))

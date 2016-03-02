@@ -35,10 +35,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>
-        /// <param name="isRequired">Specifies whether the given type usage is required.</param>
+        /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public override string Resolve(JsonSchema4 schema, bool isRequired, string typeNameHint)
+        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             schema = schema.ActualSchema;
 
@@ -47,13 +47,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var property = schema;
                 if (property.Item != null)
-                    return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, true, null));
+                    return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
                 
                 throw new NotImplementedException("Array with multiple Items schemes are not supported.");
             }
 
             if (type.HasFlag(JsonObjectType.Number))
-                return isRequired ? "decimal" : "decimal?";
+                return isNullable ? "decimal?" : "decimal";
 
             if (type.HasFlag(JsonObjectType.Integer))
             {
@@ -61,24 +61,24 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     return AddGenerator(schema, typeNameHint);
 
                 if (schema.Format == JsonFormatStrings.Byte)
-                    return isRequired ? "byte" : "byte?";
+                    return isNullable ? "byte?" : "byte";
 
-                return isRequired ? "long" : "long?";
+                return isNullable ? "long?" : "long";
             }
 
             if (type.HasFlag(JsonObjectType.Boolean))
-                return isRequired ? "bool" : "bool?";
+                return isNullable ? "bool?" : "bool";
 
             if (type.HasFlag(JsonObjectType.String))
             {
                 if (schema.Format == JsonFormatStrings.DateTime)
-                    return isRequired ? Settings.DateTimeType : Settings.DateTimeType + "?";
+                    return isNullable ? Settings.DateTimeType + "?" : Settings.DateTimeType;
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
-                    return isRequired ? "TimeSpan" : "TimeSpan?";
+                    return isNullable ? "TimeSpan?" : "TimeSpan";
 
                 if (schema.Format == JsonFormatStrings.Guid)
-                    return isRequired ? "Guid" : "Guid?";
+                    return isNullable ? "Guid?" : "Guid";
 
                 if (schema.Format == JsonFormatStrings.Base64)
                     return "byte[]";
@@ -95,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     return "object";
 
                 if (schema.IsDictionary)
-                    return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, true, null));
+                    return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
                 
                 return AddGenerator(schema, typeNameHint);
             }

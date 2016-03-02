@@ -60,10 +60,10 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             var property = schema.Properties[propertyName];
 
-            Assert.AreEqual(JsonObjectType.Array, property.Type);
-            Assert.AreEqual(JsonObjectType.Object, property.Item.ActualSchema.Type);
+            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
+            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, property.Item.ActualSchema.Type);
             Assert.AreEqual(typeof(MySubtype).Name, property.Item.ActualSchema.TypeName);
-            Assert.AreEqual(JsonObjectType.String, property.Item.ActualSchema.Properties["Id"].Type);
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.Item.ActualSchema.Properties["Id"].Type);
         }
 
         public class DictionarySubType : DictionaryType

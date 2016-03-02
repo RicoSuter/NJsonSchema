@@ -58,6 +58,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = JsonSchema4.FromType<Person>();
+            var data = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 
             //// Act

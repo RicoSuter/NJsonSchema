@@ -41,14 +41,15 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = JsonSchema4.FromType<MyType>();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Integer"].Type);
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Decimal"].Type);
             Assert.AreEqual(JsonObjectType.Number, schema.Properties["Double"].Type);
             Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["Boolean"].Type);
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["String"].Type);
-            Assert.AreEqual(JsonObjectType.Array, schema.Properties["Array"].Type);
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["String"].Type);
+            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, schema.Properties["Array"].Type);
         }
 
         [TestMethod]
@@ -58,10 +59,10 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["NullableInteger"].Type);
-            Assert.AreEqual(JsonObjectType.Number, schema.Properties["NullableDecimal"].Type);
-            Assert.AreEqual(JsonObjectType.Number, schema.Properties["NullableDouble"].Type);
-            Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["NullableBoolean"].Type);
+            Assert.AreEqual(JsonObjectType.Integer | JsonObjectType.Null, schema.Properties["NullableInteger"].Type);
+            Assert.AreEqual(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDecimal"].Type);
+            Assert.AreEqual(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDouble"].Type);
+            Assert.AreEqual(JsonObjectType.Boolean | JsonObjectType.Null, schema.Properties["NullableBoolean"].Type);
         }
 
         [TestMethod]
@@ -106,31 +107,36 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_not_nullable_properties_then_they_should_be_required()
+        public void When_converting_not_nullable_properties_then_they_should_have_null_type()
         {
             //// Act
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["Integer"].IsRequired);
-            Assert.IsTrue(schema.Properties["Decimal"].IsRequired);
-            Assert.IsTrue(schema.Properties["Double"].IsRequired);
-            Assert.IsTrue(schema.Properties["Boolean"].IsRequired);
-
+            Assert.IsFalse(schema.Properties["Integer"].IsRequired);
+            Assert.IsFalse(schema.Properties["Decimal"].IsRequired);
+            Assert.IsFalse(schema.Properties["Double"].IsRequired);
+            Assert.IsFalse(schema.Properties["Boolean"].IsRequired);
             Assert.IsFalse(schema.Properties["String"].IsRequired);
+
+            Assert.IsFalse(schema.Properties["Integer"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsFalse(schema.Properties["Decimal"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsFalse(schema.Properties["Double"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsFalse(schema.Properties["Boolean"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["String"].Type.HasFlag(JsonObjectType.Null));
         }
 
         [TestMethod]
-        public void When_converting_nullable_simple_properties_then_they_should_not_be_required()
+        public void When_generating_nullable_primitive_properties_then_they_should_have_null_type()
         {
             //// Act
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.IsFalse(schema.Properties["NullableInteger"].IsRequired);
-            Assert.IsFalse(schema.Properties["NullableDecimal"].IsRequired);
-            Assert.IsFalse(schema.Properties["NullableDouble"].IsRequired);
-            Assert.IsFalse(schema.Properties["NullableBoolean"].IsRequired);
+            Assert.IsTrue(schema.Properties["NullableInteger"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["NullableDecimal"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["NullableDouble"].Type.HasFlag(JsonObjectType.Null));
+            Assert.IsTrue(schema.Properties["NullableBoolean"].Type.HasFlag(JsonObjectType.Null));
         }
 
         [TestMethod]
@@ -152,7 +158,7 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             var subSchema = schema.Properties["Reference"];
-            Assert.AreEqual(JsonObjectType.Object, subSchema.Type);
+            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, subSchema.Type);
             Assert.AreEqual(typeof(MySubtype).Name, subSchema.TypeName);
         }
 
@@ -192,7 +198,7 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             Assert.IsTrue(property.IsAnyType);
-            Assert.AreEqual(JsonObjectType.Object, property.Type);
+            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, property.Type);
             Assert.IsTrue(property.AllowAdditionalItems);
             Assert.AreEqual(0, property.Properties.Count);
         }
@@ -223,10 +229,10 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             var property = schema.Properties[propertyName];
 
-            Assert.AreEqual(JsonObjectType.Array, property.Type);
+            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
             Assert.AreEqual(JsonObjectType.Object, property.Item.ActualSchema.Type);
             Assert.AreEqual(typeof(MySubtype).Name, property.Item.ActualSchema.TypeName);
-            Assert.AreEqual(JsonObjectType.String, property.Item.ActualSchema.Properties["Id"].Type);
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.Item.ActualSchema.Properties["Id"].Type);
         }
         
         public class MyType

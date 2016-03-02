@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -9,12 +10,14 @@ namespace NJsonSchema.Tests.Generation
     {
         public class Foo
         {
+            [Required]
             public byte[] Bytes { get; set; }
 
             public byte Byte { get; set; }
 
             public TimeSpan TimeSpan { get; set; }
 
+            [Required]
             public Type Type { get; set; }
         }
 

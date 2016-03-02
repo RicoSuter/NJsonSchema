@@ -97,9 +97,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                     PropertyName = ConvertToUpperStartIdentifier(property.Name),
                     FieldName = ConvertToLowerStartIdentifier(property.Name),
+
                     Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
                     IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String,
-                    Type = _resolver.Resolve(property, property.IsRequired, property.Name)
+
+                    Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name)
                 }).ToList();
 
                 var template = LoadTemplate("Class");
@@ -111,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
 
                 template.Add("inheritance", _schema.AllOf.Count == 1 ? 
-                    ": " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) + 
+                    ": " + _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) + 
                     (Settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
                     (Settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "") );
                 template.Add("properties", properties);
