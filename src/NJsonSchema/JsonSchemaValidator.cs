@@ -50,32 +50,46 @@ namespace NJsonSchema
 
         private void ValidateType(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            var types = GetTypes().ToDictionary(t => t, t => new List<ValidationError>());
-            if (types.Count > 0)
-            {
-                foreach (var type in types)
-                {
-                    ValidateString(token, propertyName, propertyPath, type.Value);
-                    ValidateNumber(token, propertyName, propertyPath, type.Value);
-                    ValidateInteger(token, propertyName, propertyPath, type.Value);
-                    ValidateBoolean(token, propertyName, propertyPath, type.Value);
-                    ValidateNull(token, propertyName, propertyPath, type.Value);
-                    ValidateObject(token, propertyName, propertyPath, type.Value);
-                }
+            ValidateString(token, propertyName, propertyPath, errors);
+            ValidateNumber(token, propertyName, propertyPath, errors);
+            ValidateBoolean(token, propertyName, propertyPath, errors);
+            ValidateNull(token, propertyName, propertyPath, errors);
+            ValidateObject(token, propertyName, propertyPath, errors);
+        }
 
-                // just one has to validate when multiple types are defined
-                if (types.All(t => t.Value.Count > 0))
-                    errors.AddRange(types.SelectMany(t => t.Value));
-            }
-            else
-            {
-                ValidateString(token, propertyName, propertyPath, errors);
-                ValidateNumber(token, propertyName, propertyPath, errors);
-                ValidateInteger(token, propertyName, propertyPath, errors);
-                ValidateBoolean(token, propertyName, propertyPath, errors);
-                ValidateNull(token, propertyName, propertyPath, errors);
-                ValidateObject(token, propertyName, propertyPath, errors);
-            }
+        private static Dictionary<JsonObjectType, ValidationErrorKind> _typeExpected = new Dictionary<JsonObjectType, ValidationErrorKind>
+        {
+            { JsonObjectType.Array, ValidationErrorKind.ArrayExpected },
+            { JsonObjectType.Boolean, ValidationErrorKind.BooleanExpected },
+            { JsonObjectType.Integer, ValidationErrorKind.IntegerExpected },
+            { JsonObjectType.Number, ValidationErrorKind.NumberExpected },
+            { JsonObjectType.Null, ValidationErrorKind.NullExpected },
+            { JsonObjectType.Object, ValidationErrorKind.ObjectExpected },
+            { JsonObjectType.String, ValidationErrorKind.StringExpected }
+        };
+
+        private static Dictionary<JsonObjectType, ValidationErrorKind> _typeUnexpected = new Dictionary<JsonObjectType, ValidationErrorKind>
+        {
+            { JsonObjectType.Boolean, ValidationErrorKind.BooleanNotExpected },
+            { JsonObjectType.Integer, ValidationErrorKind.NumberNotExpected },
+            { JsonObjectType.Number, ValidationErrorKind.NonIntegralNumberNotExpected },
+            { JsonObjectType.Null, ValidationErrorKind.NullNotExpected },
+            { JsonObjectType.Object, ValidationErrorKind.ObjectNotExpected },
+            { JsonObjectType.String, ValidationErrorKind.StringNotExpected }
+        };
+
+        private void ValidatePrimitiveType(JsonObjectType instanceType, string propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (_schema.Type == JsonObjectType.None) return; // none means all.
+            var schemaType = _schema.Type;
+            if (schemaType.HasFlag(JsonObjectType.Number))
+                schemaType |= JsonObjectType.Integer;  // an integer is a number
+            if ((schemaType & instanceType) != JsonObjectType.None) return;
+
+            //If the type field specifies just one primitive type, report an XyzExpected error based on the schema, otherwise
+            //report an XyzNotExpected error based on what we actually got.
+            var errorKind = (GetTypes().Count() == 1) ? _typeExpected[_schema.Type] : _typeUnexpected[instanceType];
+            errors.Add(new ValidationError(errorKind, propertyName, propertyPath));
         }
 
         private IEnumerable<JsonObjectType> GetTypes()
@@ -127,11 +141,8 @@ namespace NJsonSchema
 
         private void ValidateNull(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.Null))
-            {
-                if (token != null && token.Type != JTokenType.Null)
-                    errors.Add(new ValidationError(ValidationErrorKind.NullExpected, propertyName, propertyPath));
-            }
+            if (token == null || token.Type == JTokenType.Null)
+                ValidatePrimitiveType(JsonObjectType.Null, propertyName, propertyPath, errors);
         }
 
         private void ValidateEnum(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
@@ -148,6 +159,9 @@ namespace NJsonSchema
 
             if (isString)
             {
+
+                ValidatePrimitiveType(JsonObjectType.String, propertyName, propertyPath, errors);
+
                 var value = token.Type == JTokenType.Date ? token.Value<DateTime>().ToString("yyyy-MM-ddTHH:mm:ssK") : token.Value<string>();
                 if (value != null)
                 {
@@ -223,23 +237,15 @@ namespace NJsonSchema
                     }
                 }
             }
-            else
-            {
-                if (_schema.Type.HasFlag(JsonObjectType.String))
-                    errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath));
-            }
         }
 
         private void ValidateNumber(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.Number))
-            {
-                if (token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath));
-            }
-
             if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
             {
+
+                ValidatePrimitiveType(token.Type == JTokenType.Float ? JsonObjectType.Number : JsonObjectType.Integer, propertyName, propertyPath, errors);
+
                 var value = token.Value<double>();
 
                 if (_schema.Minimum.HasValue && (_schema.IsExclusiveMinimum ? value <= _schema.Minimum : value < _schema.Minimum))
@@ -253,32 +259,16 @@ namespace NJsonSchema
             }
         }
 
-        private void ValidateInteger(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
-        {
-            if (_schema.Type.HasFlag(JsonObjectType.Integer))
-            {
-                if (token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.IntegerExpected, propertyName, propertyPath));
-            }
-        }
-
         private void ValidateBoolean(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.Boolean))
-            {
-                if (token.Type != JTokenType.Boolean)
-                    errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath));
-            }
+            if (token.Type == JTokenType.Boolean)
+                ValidatePrimitiveType(JsonObjectType.Boolean, propertyName, propertyPath, errors);
         }
 
         private void ValidateObject(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (_schema.Type.HasFlag(JsonObjectType.Object))
-            {
-                var obj = token as JObject;
-                if (obj == null)
-                    errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath));
-            }
+            if (token is JObject)
+                ValidatePrimitiveType(JsonObjectType.Object, propertyName, propertyPath, errors);
         }
 
         private void ValidateProperties(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)

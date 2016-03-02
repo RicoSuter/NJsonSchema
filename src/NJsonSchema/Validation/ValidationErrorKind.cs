@@ -126,6 +126,24 @@ namespace NJsonSchema.Validation
         TooManyProperties,
 
         /// <summary>There are too few properties in the tuple. </summary>
-        TooFewProperties
+        TooFewProperties,
+
+        /// <summary>A string is not expected according to the type. </summary>
+        StringNotExpected,
+
+        /// <summary>A boolean is not expected according to the type. </summary>
+        BooleanNotExpected,
+
+        /// <summary>An object is not expected according to the type. </summary>
+        ObjectNotExpected,
+
+        /// <summary>A null value is not expected according to the type. </summary>
+        NullNotExpected,
+
+        /// <summary>A number is not expected according to the type. </summary>
+        NumberNotExpected,
+
+        /// <summary>A non-integral number is not expected according to the type. </summary>
+        NonIntegralNumberNotExpected
     }
 }
