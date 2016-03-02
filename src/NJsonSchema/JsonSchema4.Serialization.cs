@@ -107,6 +107,7 @@ namespace NJsonSchema
 
                 if (flags.Length > 1)
                     return new JArray(flags.Select(f => new JValue(f.ToString().ToLower())));
+
                 if (flags.Length == 1)
                     return new JValue(flags[0].ToString().ToLower());
 
