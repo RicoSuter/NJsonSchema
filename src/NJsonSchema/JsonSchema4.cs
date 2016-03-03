@@ -330,7 +330,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets or sets the schema of an array item. </summary>
+        /// <summary>Gets or sets the schema of the array items (use <see cref="Item"/> if only a single schema defined).</summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> Items
         {
