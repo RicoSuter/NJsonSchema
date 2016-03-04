@@ -84,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return AddGenerator(schema, typeNameHint);
             }
 
-            throw new NotImplementedException("Type not supported");
+            return "any";
         }
 
         /// <summary>Creates a type generator.</summary>

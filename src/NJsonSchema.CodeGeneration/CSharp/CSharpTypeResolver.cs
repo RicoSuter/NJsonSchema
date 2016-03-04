@@ -100,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return AddGenerator(schema, typeNameHint);
             }
 
-            throw new NotImplementedException("Type not supported");
+            return "JObject"; 
         }
 
         /// <summary>Adds a generator for the given schema if necessary.</summary>
