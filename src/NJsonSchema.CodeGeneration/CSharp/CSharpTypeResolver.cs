@@ -89,18 +89,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return "string";
             }
 
-            if (type.HasFlag(JsonObjectType.Object))
-            {
-                if (schema.IsAnyType)
-                    return "object";
+            if (schema.IsAnyType)
+                return "object";
 
-                if (schema.IsDictionary)
-                    return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
-                
-                return AddGenerator(schema, typeNameHint);
-            }
+            if (schema.IsDictionary)
+                return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
 
-            return "JObject"; 
+            return AddGenerator(schema, typeNameHint);
         }
 
         /// <summary>Adds a generator for the given schema if necessary.</summary>

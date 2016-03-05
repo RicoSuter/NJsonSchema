@@ -73,18 +73,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return "string";
             }
 
-            if (type.HasFlag(JsonObjectType.Object))
-            {
-                if (schema.IsAnyType)
-                    return "any";
+            if (schema.IsAnyType)
+                return "any";
 
-                if (schema.IsDictionary)
-                    return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
+            if (schema.IsDictionary)
+                return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
 
-                return AddGenerator(schema, typeNameHint);
-            }
-
-            return "any";
+            return AddGenerator(schema, typeNameHint);
         }
 
         /// <summary>Creates a type generator.</summary>
