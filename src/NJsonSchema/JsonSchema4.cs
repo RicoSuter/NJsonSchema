@@ -574,6 +574,8 @@ namespace NJsonSchema
 
         private void Initialize()
         {
+            Type = JsonObjectType.Object;
+
             if (Items == null)
                 Items = new ObservableCollection<JsonSchema4>();
 
