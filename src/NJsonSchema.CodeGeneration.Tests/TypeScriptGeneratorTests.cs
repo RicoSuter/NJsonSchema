@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.CodeGeneration.Tests
@@ -90,6 +91,20 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(output.Contains(@"/** PropertyDesc. *"));
+        }
+
+        [TestMethod]
+        public void When_property_is_readonly_then_ts_property_is_also_readonly()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"readonly Birthday"));
         }
 
         private static TypeScriptGenerator CreateGenerator()

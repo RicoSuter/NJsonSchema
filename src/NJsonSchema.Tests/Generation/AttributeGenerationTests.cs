@@ -121,21 +121,19 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsTrue(property.Type.HasFlag(JsonObjectType.Null));
         }
 
-        // readonly has been removed in draft v4: http://json-schema.org/latest/json-schema-hypermedia.html#anchor43
-
-        //[TestMethod]
-        //public void When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
-        //{
-        //    //// Arrange
+        [TestMethod]
+        public void When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
+        {
+            //// Arrange
 
 
-        //    //// Act
-        //    var schema = JsonSchema4.FromType<AttributeTestClass>();
-        //    var property = schema.Properties["ReadOnly"];
+            //// Act
+            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var property = schema.Properties["ReadOnly"];
 
-        //    //// Assert
-        //    Assert.IsTrue(property.IsReadOnly);
-        //}
+            //// Assert
+            Assert.IsTrue(property.IsReadOnly);
+        }
 
         public class AttributeTestClass
         {
@@ -162,8 +160,8 @@ namespace NJsonSchema.Tests.Generation
             [Required]
             public bool Required { get; set; }
 
-            //[ReadOnly(true)]
-            //public bool ReadOnly { get; set; }
+            [ReadOnly(true)]
+            public bool ReadOnly { get; set; }
         }
     }
 }

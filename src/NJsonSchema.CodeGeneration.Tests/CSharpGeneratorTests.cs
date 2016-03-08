@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.Tests.Models;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
@@ -125,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Assert
             Assert.IsTrue(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
         }
-
+        
         private static CSharpGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();
@@ -135,44 +132,5 @@ namespace NJsonSchema.CodeGeneration.Tests
             var generator = new CSharpGenerator(schema, settings);
             return generator;
         }
-    }
-
-    public class Person
-    {
-        [Required]
-        public string FirstName { get; set; }
-
-        [JsonProperty("lastName")]
-        public string LastName { get; set; }
-        
-        public DateTime Birthday { get; set; }
-
-        public TimeSpan TimeSpan { get; set; }
-
-        public Gender Gender { get; set; }
-        
-        public Address Address { get; set; }
-
-        public List<string> Array { get; set; } 
-
-        public Dictionary<string, int> Dictionary { get; set; } 
-    }
-
-    public class Teacher : Person
-    {
-        public string Class { get; set; }
-    }
-
-    public class Address
-    {
-        public string Street { get; set; }
-
-        public string City { get; set; }
-    }
-
-    public enum Gender
-    {
-        Male, 
-        Female
     }
 }

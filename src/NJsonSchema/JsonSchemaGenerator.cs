@@ -339,6 +339,10 @@ namespace NJsonSchema
                 if (displayAttribute != null && displayAttribute.Name != null)
                     jsonProperty.Title = displayAttribute.Name;
 
+                dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");
+                if (readOnlyAttribute != null)
+                    jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
+
                 dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
                 if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
                     jsonProperty.Default = defaultValueAttribute.Value;

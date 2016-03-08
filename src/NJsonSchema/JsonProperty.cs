@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace NJsonSchema
@@ -69,5 +70,10 @@ namespace NJsonSchema
         /// <remarks>Value used to set <see cref="IsRequired"/> property even if parent is not set yet. </remarks>
         [JsonIgnore]
         internal bool InitialIsRequired { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the property is read only.</summary>
+        [DefaultValue(false)]
+        [JsonProperty("readonly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsReadOnly { get; set; }
     }
 }

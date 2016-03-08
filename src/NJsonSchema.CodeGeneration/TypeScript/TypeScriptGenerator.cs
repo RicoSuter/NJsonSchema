@@ -81,6 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                     HasDescription = !string.IsNullOrEmpty(property.Description),
                     Description = property.Description,
+                    IsReadOnly = property.IsReadOnly,
 
                     IsOptional = !property.IsRequired
                 }).ToList();
