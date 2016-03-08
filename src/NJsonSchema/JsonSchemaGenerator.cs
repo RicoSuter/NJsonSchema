@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
@@ -107,7 +106,9 @@ namespace NJsonSchema
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var isIntegerEnumeration = IsIntegerEnumeration(parentAttributes) || HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
+                var isIntegerEnumeration = 
+                    IsIntegerEnumeration(parentAttributes) ||
+                    HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
 
                 if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
