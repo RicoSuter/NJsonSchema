@@ -221,6 +221,14 @@ namespace NJsonSchema
                             if (!isHostname)
                                 errors.Add(new ValidationError(ValidationErrorKind.HostnameExpected, propertyName, propertyPath));
                         }
+
+                        if (_schema.Format == JsonFormatStrings.Base64)
+                        {
+                            var isBase64 = (value.Length % 4 == 0) && Regex.IsMatch(value, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
+
+                            if (!isBase64)
+                                errors.Add(new ValidationError(ValidationErrorKind.Base64Expected, propertyName, propertyPath));
+                        }
                     }
                 }
             }

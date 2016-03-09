@@ -126,6 +126,9 @@ namespace NJsonSchema.Validation
         TooManyProperties,
 
         /// <summary>There are too few properties in the tuple. </summary>
-        TooFewProperties
+        TooFewProperties,
+
+        /// <summary>A Base64 string is expected. </summary>
+        Base64Expected
     }
 }
