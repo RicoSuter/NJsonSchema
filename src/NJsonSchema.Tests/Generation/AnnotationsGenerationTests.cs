@@ -12,6 +12,7 @@ namespace NJsonSchema.Tests.Generation
         {
             //// Arrange
             var schema = JsonSchema4.FromType<AnnotationClass>();
+            var schemaData = schema.ToJson();
 
             //// Act
             var property = schema.Properties["Point"];
