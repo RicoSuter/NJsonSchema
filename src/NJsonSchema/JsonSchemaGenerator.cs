@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -74,6 +75,8 @@ namespace NJsonSchema
             schema.Type = typeDescription.Type;
             schema.Format = typeDescription.Format;
 
+            ApplyJsonSchemaAttribute(type, schema);
+
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
@@ -106,7 +109,7 @@ namespace NJsonSchema
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var isIntegerEnumeration = 
+                var isIntegerEnumeration =
                     IsIntegerEnumeration(parentAttributes) ||
                     HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
 
@@ -137,7 +140,21 @@ namespace NJsonSchema
             return enumType == JsonObjectType.Integer;
         }
 
-        private static bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
+        private void ApplyJsonSchemaAttribute<TSchemaType>(Type type, TSchemaType schema)
+            where TSchemaType : JsonSchema4, new()
+        {
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            if (jsonSchemaAttribute != null)
+            {
+                if (jsonSchemaAttribute.Type != JsonObjectType.None)
+                    schema.Type = jsonSchemaAttribute.Type;
+
+                if (!string.IsNullOrEmpty(jsonSchemaAttribute.Format))
+                    schema.Format = jsonSchemaAttribute.Format;
+            }
+        }
+
+        private bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
         {
             if (attributes == null)
                 return false;

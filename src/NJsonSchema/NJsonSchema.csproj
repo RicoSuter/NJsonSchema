@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\FullDotNetMethods.cs" />
