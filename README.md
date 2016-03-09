@@ -15,7 +15,7 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 **Features:**
 
 - Read existing JSON Schemas and validate JSON data
-- Generate JSON Schema from .NET type via reflection
+- Generate JSON Schema from .NET type via reflection (with support for many attributes/annotations)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 
