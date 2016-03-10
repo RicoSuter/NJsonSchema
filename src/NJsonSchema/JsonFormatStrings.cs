@@ -35,9 +35,11 @@ namespace NJsonSchema
         public const string IpV6 = "ipv6";
 
         /// <summary>Format for binary data encoded with Base64.</summary>
+        /// <remarks>Should not be used. Prefer using Byte property of <see cref="JsonFormatStrings"/></remarks>
+        [Obsolete("Now made redundant. Use \"byte\" instead")]
         public const string Base64 = "base64";
 
-        /// <summary>Format for a byte.</summary>
+        /// <summary>Format for a byte if used with numeric type or for base64 encoded value otherwise.</summary>
         public const string Byte = "byte";
 
         /// <summary>Format for a hostname (DNS name).</summary>

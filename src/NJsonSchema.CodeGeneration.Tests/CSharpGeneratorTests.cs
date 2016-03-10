@@ -122,6 +122,35 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Assert
             Assert.IsTrue(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
         }
+
+        [TestMethod]
+        public void Can_generate_type_from_string_property_with_byte_format()
+        {
+            // Arrange
+            var schema = JsonSchema4.FromType<File>();
+            var generator = new CSharpGenerator(schema);
+
+            // Act
+            var output = generator.GenerateFile();
+
+            // Assert
+            Assert.IsTrue(output.Contains("public byte[] Content"));
+        }
+
+        [TestMethod]
+        public void Can_generate_type_from_string_property_with_base64_format()
+        {
+            // Arrange
+            var schema = JsonSchema4.FromType<File>();
+            schema.Properties["Content"].Format = "base64";
+            var generator = new CSharpGenerator(schema);
+
+            // Act
+            var output = generator.GenerateFile();
+
+            // Assert
+            Assert.IsTrue(output.Contains("public byte[] Content"));
+        }
         
         private static CSharpGenerator CreateGenerator()
         {

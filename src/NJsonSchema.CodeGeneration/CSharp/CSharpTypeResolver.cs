@@ -80,7 +80,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.Guid)
                     return isNullable ? "Guid?" : "Guid";
 
-                if (schema.Format == JsonFormatStrings.Base64)
+#pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
+                if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
+#pragma warning restore 618
                     return "byte[]";
 
                 if (schema.IsEnumeration)

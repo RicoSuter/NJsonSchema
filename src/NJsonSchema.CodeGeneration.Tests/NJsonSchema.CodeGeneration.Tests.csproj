@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="EnumGenerationTests.cs" />
+    <Compile Include="Models\File.cs" />
     <Compile Include="Models\Gender.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Teacher.cs" />
