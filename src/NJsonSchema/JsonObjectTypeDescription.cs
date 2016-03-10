@@ -56,7 +56,7 @@ namespace NJsonSchema
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Byte);
 
             if (type == typeof(byte[]))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Base64);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Byte);
 
             if (IsDictionaryType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);

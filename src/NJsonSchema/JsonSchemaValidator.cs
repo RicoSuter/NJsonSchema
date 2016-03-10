@@ -222,7 +222,9 @@ namespace NJsonSchema
                                 errors.Add(new ValidationError(ValidationErrorKind.HostnameExpected, propertyName, propertyPath));
                         }
 
-                        if (_schema.Format == JsonFormatStrings.Base64)
+#pragma warning disable 618 //Base64 check is used for backward compatibility
+                        if (_schema.Format == JsonFormatStrings.Byte || _schema.Format == JsonFormatStrings.Base64)
+#pragma warning restore 618
                         {
                             var isBase64 = (value.Length % 4 == 0) && Regex.IsMatch(value, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
 

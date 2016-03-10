@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Bytes"].Type);
-            Assert.AreEqual(JsonFormatStrings.Base64, schema.Properties["Bytes"].Format);
+            Assert.AreEqual(JsonFormatStrings.Byte, schema.Properties["Bytes"].Format);
         }
 
         [TestMethod]
