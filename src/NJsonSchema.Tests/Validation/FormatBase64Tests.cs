@@ -16,7 +16,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema4
                          {
                              Type = JsonObjectType.String,
-                             Format = JsonFormatStrings.Base64
+                             Format = "base64"
                          };
 
             var token = new JValue("invalid");
@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema4
                          {
                              Type = JsonObjectType.String,
-                             Format = JsonFormatStrings.Base64
+                             Format = "base64"
                          };
 
             var value = Convert.ToBase64String(new byte[] { 101, 22, 87, 25 });
@@ -96,7 +96,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema4
                          {
                              Type = JsonObjectType.String,
-                             Format = JsonFormatStrings.Base64
+                             Format = "base64"
                          };
 
             var value = Convert.ToBase64String(new byte[] { 1, 2, 3 });
