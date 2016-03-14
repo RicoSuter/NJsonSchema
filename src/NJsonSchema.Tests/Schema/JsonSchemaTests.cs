@@ -258,5 +258,28 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.AreEqual(0, errors.Count());
         }
+
+        [TestMethod]
+        public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Type = JsonObjectType.String
+            };
+
+            var token = new JValue(System.DateTimeOffset.Now);
+
+            try
+            {
+                //// Act
+                schema.Validate(token);
+            }
+            catch
+            {
+                //// Assert
+                Assert.Fail("Validating JToken with a DateTimeOffset value threw an exception.");
+            }
+        }
     }
 }
