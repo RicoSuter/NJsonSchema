@@ -8,6 +8,7 @@
 
 using System.Globalization;
 using System.IO;
+using System.Text;
 using Antlr4.StringTemplate;
 
 namespace NJsonSchema.CodeGeneration
@@ -40,26 +41,37 @@ namespace NJsonSchema.CodeGeneration
             }
         }
 
-        /// <summary>Converts the first letter to lower case.</summary>
-        /// <param name="name">The name.</param>
-        /// <returns>The converted name. </returns>
-        public static string ConvertToLowerStartIdentifier(string name)
+        /// <summary>Converts the first letter to lower case and dashes to camel case.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToLowerCamelCase(string input)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return (name[0].ToString(CultureInfo.InvariantCulture).ToLower() + name.Substring(1)).Replace(" ", "_");
+            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
         }
 
-        /// <summary>Converts the first letter to upper case.</summary>
-        /// <param name="name">The name.</param>
-        /// <returns>The converted name. </returns>
-        public static string ConvertToUpperStartIdentifier(string name)
+        /// <summary>Converts the first letter to upper case and dashes to camel case.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToUpperCamelCase(string input)
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return (name[0].ToString(CultureInfo.InvariantCulture).ToUpper() + name.Substring(1)).Replace(" ", "_");
+            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
+        }
+
+        /// <summary>Converts the input to a camel case identifier.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToCamelCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            return ConvertDashesToCamelCase(input.Replace(" ", "_"));
         }
 
         /// <summary>Removes the line breaks from the .</summary>
@@ -67,16 +79,31 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The updated text.</returns>
         public static string RemoveLineBreaks(string text)
         {
-            if (text == null)
-                return null; 
-
-            return text
-                .Replace("\r", "")
+            return text?.Replace("\r", "")
                 .Replace("\n", " \n")
                 .Replace("\n ", "\n")
                 .Replace("  \n", " \n")
                 .Replace("\n", "")
                 .Trim('\n', '\t', ' ');
+        }
+
+        private static string ConvertDashesToCamelCase(string input)
+        {
+            var sb = new StringBuilder();
+            var caseFlag = false;
+            foreach (char c in input)
+            {
+                if (c == '-')
+                    caseFlag = true;
+                else if (caseFlag)
+                {
+                    sb.Append(char.ToUpper(c));
+                    caseFlag = false;
+                }
+                else
+                    sb.Append(c);
+            }
+            return sb.ToString();
         }
     }
 }

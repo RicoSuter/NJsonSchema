@@ -107,6 +107,41 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(output.Contains(@"readonly Birthday"));
         }
 
+        [TestMethod]
+        public void When_name_contains_dash_then_it_is_converted_to_upper_case()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.TypeName = "MyClass";
+            schema.Properties["foo-bar"] = new JsonProperty
+            {
+                Type = JsonObjectType.String
+            };
+
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"""foo-bar""?: string;"));
+        }
+
+        [TestMethod]
+        public void When_type_name_is_missing_then_anonymous_name_is_generated()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+
+            var generator = new TypeScriptGenerator(schema);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsFalse(output.Contains(@"interface  {"));
+        }
+
         private static TypeScriptGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();

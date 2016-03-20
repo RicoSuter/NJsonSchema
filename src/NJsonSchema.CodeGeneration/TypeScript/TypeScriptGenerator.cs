@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The code.</returns>
         public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : _resolver.GenerateTypeName(typeNameHint);
 
             if (_schema.IsEnumeration)
             {
@@ -77,6 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var properties = _schema.Properties.Values.Select(property => new
                 {
                     Name = property.Name,
+                    PropertyName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
                     Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name),
 
                     HasDescription = !string.IsNullOrEmpty(property.Description),
@@ -109,14 +110,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             for (int i = 0; i < _schema.Enumeration.Count; i++)
             {
                 var value = _schema.Enumeration.ElementAt(i);
-                var name = _schema.EnumerationNames.Count > i ? 
+                var name = _schema.EnumerationNames.Count > i ?
                     _schema.EnumerationNames.ElementAt(i) :
                     _schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
 
                 entries.Add(new EnumerationEntry
                 {
-                    Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"", 
-                    Name = ConvertToUpperStartIdentifier(name)
+                    Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
+                    Name = ConvertToUpperCamelCase(name)
                 });
             }
             return entries;

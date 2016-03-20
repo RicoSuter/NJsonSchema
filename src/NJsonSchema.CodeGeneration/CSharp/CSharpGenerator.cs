@@ -69,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : typeNameHint;
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : _resolver.GenerateTypeName(typeNameHint);
 
             if (_schema.IsEnumeration)
             {
@@ -95,8 +95,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     HasDescription = !string.IsNullOrEmpty(property.Description),
                     Description = RemoveLineBreaks(property.Description),
 
-                    PropertyName = ConvertToUpperStartIdentifier(property.Name),
-                    FieldName = ConvertToLowerStartIdentifier(property.Name),
+                    PropertyName = ConvertToUpperCamelCase(property.Name),
+                    FieldName = ConvertToLowerCamelCase(property.Name),
 
                     Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
                     IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String,
@@ -139,7 +139,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 entries.Add(new EnumerationEntry
                 {
                     Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
-                    Name = ConvertToUpperStartIdentifier(name)
+                    Name = ConvertToUpperCamelCase(name)
                 });
             }
             return entries;

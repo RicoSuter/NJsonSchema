@@ -101,7 +101,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Generates a unique type name with the given hint.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        protected string GenerateTypeName(string typeNameHint)
+        public string GenerateTypeName(string typeNameHint)
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {

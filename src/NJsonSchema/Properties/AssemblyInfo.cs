@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("JSON Schema draft v4 reader, generator and validator for .NET")]
 [assembly: AssemblyCompany("Rico Suter")]
 [assembly: AssemblyProduct("NJsonSchema")]
-[assembly: AssemblyCopyright("Copyright © Rico Suter, 2015")]
-[assembly: AssemblyVersion("1.38.*")]
+[assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
+[assembly: AssemblyVersion("1.39.*")]
 
 [assembly: InternalsVisibleTo("NJsonSchema.Tests")]

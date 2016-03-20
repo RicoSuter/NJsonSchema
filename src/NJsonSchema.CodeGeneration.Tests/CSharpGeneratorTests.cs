@@ -151,7 +151,42 @@ namespace NJsonSchema.CodeGeneration.Tests
             // Assert
             Assert.IsTrue(output.Contains("public byte[] Content"));
         }
-        
+
+        [TestMethod]
+        public void When_name_contains_dash_then_it_is_converted_to_upper_case()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.TypeName = "MyClass";
+            schema.Properties["foo-bar"] = new JsonProperty
+            {
+                Type = JsonObjectType.String
+            };
+
+            var generator = new CSharpGenerator(schema);
+
+            // Act
+            var output = generator.GenerateFile();
+
+            // Assert
+            Assert.IsTrue(output.Contains(@"[JsonProperty(""foo-bar"", "));
+            Assert.IsTrue(output.Contains(@"public string FooBar"));
+        }
+
+        [TestMethod]
+        public void When_type_name_is_missing_then_anonymous_name_is_generated()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            var generator = new CSharpGenerator(schema);
+
+            // Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsFalse(output.Contains(@"class  :"));
+        }
+
         private static CSharpGenerator CreateGenerator()
         {
             var schema = JsonSchema4.FromType<Teacher>();
