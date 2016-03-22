@@ -38,44 +38,26 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
         {
-            return Generate<JsonSchema4>(type, schemaResolver);
+            return Generate(type, null, schemaResolver);
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
-        /// <param name="type">The type.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        /// <returns>The schema.</returns>
-        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
-        public TSchemaType Generate<TSchemaType>(Type type, ISchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
-        {
-            return Generate<TSchemaType>(type, null, schemaResolver);
-        }
-
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent property or parameter attributes.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
-        public TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, ISchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+        public JsonSchema4 Generate(Type type, IEnumerable<Attribute> parentAttributes, ISchemaResolver schemaResolver)
         {
-            var schema = HandleSpecialTypes<TSchemaType>(type);
+            var schema = HandleSpecialTypes(type);
             if (schema != null)
                 return schema;
 
-            schema = new TSchemaType();
+            schema = new JsonSchema4();
 
-            var typeDescription = JsonObjectTypeDescription.FromType(type);
-            schema.Type = typeDescription.Type;
-            schema.Format = typeDescription.Format;
-
-            ApplyJsonSchemaAttribute(type, schema);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+            typeDescription.ApplyType(schema);
 
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
@@ -105,14 +87,11 @@ namespace NJsonSchema
                 if (itemType == null)
                     throw new InvalidOperationException("Could not find item type of array type '" + type.FullName + "'.");
 
-                schema.Item = Generate<JsonSchema4>(itemType, schemaResolver);
+                schema.Item = Generate(itemType, schemaResolver);
             }
             else if (type.GetTypeInfo().IsEnum)
             {
-                var isIntegerEnumeration =
-                    IsIntegerEnumeration(parentAttributes) ||
-                    HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
-
+                var isIntegerEnumeration = typeDescription.Type == JsonObjectType.Integer;
                 if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
                     schema.Type = isIntegerEnumeration ? JsonObjectType.Integer : JsonObjectType.String;
@@ -120,7 +99,7 @@ namespace NJsonSchema
                     return schema;
                 }
 
-                LoadEnumerations(type, schema, isIntegerEnumeration, parentAttributes);
+                LoadEnumerations(type, schema, typeDescription);
 
                 schema.TypeName = GetTypeName(type);
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
@@ -129,60 +108,16 @@ namespace NJsonSchema
             return schema;
         }
 
-        /// <summary>Checks whether the property is an integer enumeration.</summary>
-        /// <param name="attributes">The property or parameter attributes.</param>
-        /// <returns>true if the property is an integer enumeration.</returns>
-        protected bool IsIntegerEnumeration(IEnumerable<Attribute> attributes)
-        {
-            var enumType = Settings.DefaultEnumHandling == EnumHandling.String ? JsonObjectType.String : JsonObjectType.Integer;
-            if (HasStringEnumConverter(attributes))
-                enumType = JsonObjectType.String;
-            return enumType == JsonObjectType.Integer;
-        }
-
-        private void ApplyJsonSchemaAttribute<TSchemaType>(Type type, TSchemaType schema)
-            where TSchemaType : JsonSchema4, new()
-        {
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
-            if (jsonSchemaAttribute != null)
-            {
-                if (jsonSchemaAttribute.Type != JsonObjectType.None)
-                    schema.Type = jsonSchemaAttribute.Type;
-
-                if (!string.IsNullOrEmpty(jsonSchemaAttribute.Format))
-                    schema.Format = jsonSchemaAttribute.Format;
-            }
-        }
-
-        private bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
-        {
-            if (attributes == null)
-                return false;
-
-            dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
-            if (jsonConverterAttribute != null)
-            {
-                var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "StringEnumConverter")
-                    return true;
-            }
-            return false;
-        }
-
-        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
-            where TSchemaType : JsonSchema4, new()
+        private JsonSchema4 HandleSpecialTypes(Type type)
         {
             if (type == typeof(object) || type == typeof(JObject))
             {
-                return new TSchemaType
+                return new JsonSchema4
                 {
                     Type = JsonObjectType.Object,
                     AllowAdditionalProperties = true
                 };
             }
-
-            if (type == typeof(Type))
-                return new TSchemaType { Type = JsonObjectType.String };
 
             return null;
         }
@@ -205,7 +140,7 @@ namespace NJsonSchema
 
             var valueType = genericTypeArguments[1];
 
-            schema.AdditionalPropertiesSchema = Generate<JsonProperty>(valueType, schemaResolver);
+            schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver);
             schema.AllowAdditionalProperties = true;
         }
 
@@ -257,7 +192,7 @@ namespace NJsonSchema
                     GeneratePropertiesAndInheritance(baseType, schema, schemaResolver);
                 else
                 {
-                    var baseSchema = Generate<JsonProperty>(baseType, schemaResolver);
+                    var baseSchema = Generate(baseType, schemaResolver);
                     schema.AllOf.Add(baseSchema);
                 }
             }
@@ -274,39 +209,28 @@ namespace NJsonSchema
             return null;
         }
 
-        private void LoadEnumerations<TSchemaType>(Type type, TSchemaType schema, bool isIntegerEnumeration, IEnumerable<Attribute> parentAttributes)
-            where TSchemaType : JsonSchema4, new()
+        private void LoadEnumerations(Type type, JsonSchema4 schema, JsonObjectTypeDescription typeDescription)
         {
-            if (isIntegerEnumeration)
-            {
-                schema.Type = JsonObjectType.Integer;
-                schema.Enumeration.Clear();
-                schema.EnumerationNames.Clear();
+            schema.Type = typeDescription.Type;
+            schema.Enumeration.Clear();
+            schema.EnumerationNames.Clear();
 
-                foreach (var enumName in GetEnumNames(type, parentAttributes))
+            foreach (var enumName in GetEnumNames(type, typeDescription))
+            {
+                if (typeDescription.Type == JsonObjectType.Integer)
                 {
                     var value = Convert.ChangeType(Enum.Parse(type, enumName), Enum.GetUnderlyingType(type));
                     schema.Enumeration.Add(value);
-                    schema.EnumerationNames.Add(enumName);
                 }
-            }
-            else
-            {
-                schema.Type = JsonObjectType.String;
-                schema.Enumeration.Clear();
-                schema.EnumerationNames.Clear();
-
-                foreach (var enumName in GetEnumNames(type, parentAttributes))
-                {
+                else
                     schema.Enumeration.Add(enumName);
-                    schema.EnumerationNames.Add(enumName);
-                }
+                schema.EnumerationNames.Add(enumName);
             }
         }
 
-        private string[] GetEnumNames(Type type, IEnumerable<Attribute> parentAttributes)
+        private string[] GetEnumNames(Type type, JsonObjectTypeDescription typeDescription)
         {
-            if (HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) || (parentAttributes != null && HasStringEnumConverter(parentAttributes)))
+            if (typeDescription.Type == JsonObjectType.String)
             {
                 return Enum.GetNames(type).Select(name =>
                 {
@@ -325,14 +249,23 @@ namespace NJsonSchema
             where TSchemaType : JsonSchema4, new()
         {
             var propertyType = property.PropertyType;
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType);
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, property.GetCustomAttributes(), Settings.DefaultEnumHandling);
 
             var attributes = property.GetCustomAttributes().ToArray();
             if (attributes.All(a => !(a is JsonIgnoreAttribute)))
             {
-                var jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver);
-                var propertyName = JsonPathUtilities.GetPropertyName(property);
+                var jsonProperty = new JsonProperty();
+                propertyTypeDescription.ApplyType(jsonProperty);
+                
+                if (propertyTypeDescription.IsComplexType || propertyTypeDescription.IsEnum)
+                {
+                    var jsonPropertySchema = Generate(propertyType, property.GetCustomAttributes(), schemaResolver);
+                    jsonProperty.SchemaReference = jsonPropertySchema;
 
+                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+                }
+
+                var propertyName = JsonPathUtilities.GetPropertyName(property);
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
                 var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
@@ -352,53 +285,62 @@ namespace NJsonSchema
                 if (!hasRequiredAttribute && (isNullable || isJsonNetAttributeNullable))
                     jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
 
-                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
-                if (displayAttribute != null && displayAttribute.Name != null)
-                    jsonProperty.Title = displayAttribute.Name;
-
                 dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");
                 if (readOnlyAttribute != null)
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
-                dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
-                if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
-                    jsonProperty.Default = defaultValueAttribute.Value;
-
                 jsonProperty.Description = GetDescription(property, attributes);
 
-                dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
-                if (regexAttribute != null)
-                    jsonProperty.Pattern = regexAttribute.Pattern;
+                ApplyPropertyAnnotations(jsonProperty, attributes, propertyTypeDescription);
+            }
+        }
 
-                if (propertyTypeDescription.Type == JsonObjectType.Number || propertyTypeDescription.Type == JsonObjectType.Integer)
-                {
-                    dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
-                    if (rangeAttribute != null)
-                    {
-                        if (rangeAttribute.Minimum != null)
-                            jsonProperty.Minimum = rangeAttribute.Minimum;
-                        if (rangeAttribute.Maximum != null)
-                            jsonProperty.Maximum = rangeAttribute.Maximum;
-                    }
-                }
+        /// <summary></summary>
+        /// <param name="jsonProperty"></param>
+        /// <param name="attributes"></param>
+        /// <param name="propertyTypeDescription"></param>
+        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, IEnumerable<Attribute> attributes, JsonObjectTypeDescription propertyTypeDescription)
+        {
+            dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+            if (displayAttribute != null && displayAttribute.Name != null)
+                jsonProperty.Title = displayAttribute.Name;
 
-                dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
-                if (minLengthAttribute != null && minLengthAttribute.Length != null)
-                {
-                    if (propertyTypeDescription.Type == JsonObjectType.String)
-                        jsonProperty.MinLength = minLengthAttribute.Length;
-                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
-                        jsonProperty.MinItems = minLengthAttribute.Length;
-                }
+            dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
+            if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
+                jsonProperty.Default = defaultValueAttribute.Value;
 
-                dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
-                if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+            dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            if (regexAttribute != null)
+                jsonProperty.Pattern = regexAttribute.Pattern;
+
+            if (propertyTypeDescription.Type == JsonObjectType.Number || propertyTypeDescription.Type == JsonObjectType.Integer)
+            {
+                dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
+                if (rangeAttribute != null)
                 {
-                    if (propertyTypeDescription.Type == JsonObjectType.String)
-                        jsonProperty.MaxLength = maxLengthAttribute.Length;
-                    else if (propertyTypeDescription.Type == JsonObjectType.Array)
-                        jsonProperty.MaxItems = maxLengthAttribute.Length;
+                    if (rangeAttribute.Minimum != null)
+                        jsonProperty.Minimum = rangeAttribute.Minimum;
+                    if (rangeAttribute.Maximum != null)
+                        jsonProperty.Maximum = rangeAttribute.Maximum;
                 }
+            }
+
+            dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
+            if (minLengthAttribute != null && minLengthAttribute.Length != null)
+            {
+                if (propertyTypeDescription.Type == JsonObjectType.String)
+                    jsonProperty.MinLength = minLengthAttribute.Length;
+                else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                    jsonProperty.MinItems = minLengthAttribute.Length;
+            }
+
+            dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+            if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+            {
+                if (propertyTypeDescription.Type == JsonObjectType.String)
+                    jsonProperty.MaxLength = maxLengthAttribute.Length;
+                else if (propertyTypeDescription.Type == JsonObjectType.Array)
+                    jsonProperty.MaxItems = maxLengthAttribute.Length;
             }
         }
 

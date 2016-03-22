@@ -44,10 +44,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets all the schemas.</summary>
-        public IEnumerable<JsonSchema4> Schemes
-        {
-            get { return _mappings.Values; }
-        }
+        public IEnumerable<JsonSchema4> Schemes => _mappings.Values;
 
         private string GetKey(Type type, bool isIntegerEnum)
         {

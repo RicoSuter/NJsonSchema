@@ -61,9 +61,9 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties[propertyName];
 
             Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
-            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, property.Item.ActualSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.Item.ActualSchema.TypeName);
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.Item.ActualSchema.Properties["Id"].Type);
+            Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
+            Assert.AreEqual(typeof(MySubtype).Name, property.ActualSchema.Item.ActualSchema.TypeName);
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
 
         public class DictionarySubType : DictionaryType

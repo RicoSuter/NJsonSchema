@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(false, schema.Properties["Bar"].AllowAdditionalProperties);
+            Assert.AreEqual(false, schema.Properties["Bar"].ActualSchema.AllowAdditionalProperties);
         }
 
         [TestMethod]
@@ -59,8 +59,8 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(true, schema.Properties["Dictionary"].AllowAdditionalProperties);
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].AdditionalPropertiesSchema.Type);
+            Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.Type);
         }
 
         public class DefaultTests

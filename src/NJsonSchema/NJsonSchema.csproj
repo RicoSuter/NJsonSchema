@@ -72,10 +72,12 @@
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\FullDotNetMethods.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
+    <Compile Include="ISchemaDefinitionAppender.cs" />
     <Compile Include="ISchemaResolver.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
+    <Compile Include="JsonSchemaDefinitionAppender.cs" />
     <Compile Include="JsonSchemaGeneratorSettings.cs" />
     <Compile Include="JsonSchemaReferenceUtilities.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
