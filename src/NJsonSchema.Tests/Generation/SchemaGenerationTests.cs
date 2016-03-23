@@ -61,6 +61,20 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.Type);
+            // "#/definitions/ref_7de8187d_d860_41fa_a17b_3f395c053cae"
+        }
+
+        [TestMethod]
+        public void When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<Foo>();
+            var schemaData = schema.ToJson();
+
+            //// Assert
+            Assert.IsTrue(schemaData.Contains("#/definitions/Bar"));
         }
 
         public class DefaultTests

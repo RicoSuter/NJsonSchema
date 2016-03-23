@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_a_referencing_type_then_deep_path_is_in_json()
+        public void When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
             //// Arrange
             var schema = JsonSchema4.FromType<House>();
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(json.Contains(@"""$ref"": ""#/definitions/ref_"));
+            Assert.IsTrue(json.Contains(@"""$ref"": ""#/definitions/Person"));
         }
     }
 
