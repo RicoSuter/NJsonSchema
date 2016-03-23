@@ -233,7 +233,7 @@ namespace NJsonSchema
                 if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
                 {
                     var knownSchema = Generate(knownTypeAttribute.Type, rootSchema, null, schemaDefinitionAppender, schemaResolver);
-                    schemaDefinitionAppender.Append(rootSchema, knownSchema);
+                    schemaDefinitionAppender.Append(rootSchema, knownSchema.ActualSchema);
                 }
             }
         }
