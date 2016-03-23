@@ -68,7 +68,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType), new JsonSchemaDefinitionAppender(), new SchemaResolver());
+            return generator.Generate(typeof(TType), null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
         }
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
@@ -78,7 +78,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type, new JsonSchemaDefinitionAppender(), new SchemaResolver());
+            return generator.Generate(type, null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
