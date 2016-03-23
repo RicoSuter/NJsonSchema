@@ -38,8 +38,12 @@ namespace NJsonSchema
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
         /// <param name="schema">The schema.</param>
+        /// <exception cref="InvalidOperationException">Added schema is not a JsonSchema4 instance.</exception>
         public void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema4 schema)
         {
+            if (schema.GetType() != typeof(JsonSchema4))
+                throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
+
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }
 
