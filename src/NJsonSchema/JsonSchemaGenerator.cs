@@ -210,7 +210,8 @@ namespace NJsonSchema
             schema.AllowAdditionalProperties = false;
 
             GeneratePropertiesAndInheritance(type, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
-            GenerateKnownTypes(type, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
+            if (Settings.GenerateKnownTypes)
+                GenerateKnownTypes(type, rootSchema, schemaDefinitionAppender, schemaResolver);
         }
 
         private void GeneratePropertiesAndInheritance(Type type, JsonSchema4 schema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
@@ -222,7 +223,7 @@ namespace NJsonSchema
             GenerateInheritance(type, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
         }
 
-        private void GenerateKnownTypes(Type type, JsonSchema4 schema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
+        private void GenerateKnownTypes(Type type, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
             foreach (var knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes<KnownTypeAttribute>())
             {
