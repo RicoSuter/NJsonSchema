@@ -21,7 +21,7 @@ namespace NJsonSchema
         {
             var rootSchema = root as JsonSchema4;
             if (rootSchema != null && objectToAppend != null)
-                rootSchema.Definitions["ref_" + Guid.NewGuid()] = objectToAppend;
+                rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = objectToAppend;
             else
                 throw new InvalidOperationException("Could not find the JSON path of a child object.");
         }
