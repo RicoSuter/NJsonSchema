@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NJsonSchema
 {
@@ -43,6 +44,11 @@ namespace NJsonSchema
         {
             if (schema.GetType() != typeof(JsonSchema4))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
+
+#if DEBUG
+            if (Schemes.Any(s => s.TypeName == schema.TypeName))
+                throw new InvalidOperationException("TypeName already exists.");
+#endif
 
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }

@@ -11,9 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Validation;
 
-namespace NJsonSchema
+namespace NJsonSchema.Validation
 {
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
     internal class JsonSchemaValidator

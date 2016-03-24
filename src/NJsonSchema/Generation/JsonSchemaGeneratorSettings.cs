@@ -8,7 +8,7 @@
 
 using System.Runtime.Serialization;
 
-namespace NJsonSchema
+namespace NJsonSchema.Generation
 {
     /// <summary>The JSON Schema generator settings.</summary>
     public class JsonSchemaGeneratorSettings
