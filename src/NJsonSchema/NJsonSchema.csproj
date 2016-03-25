@@ -106,7 +106,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Diagram.cd" />
     <None Include="NJsonSchema.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

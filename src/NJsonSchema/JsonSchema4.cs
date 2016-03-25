@@ -179,10 +179,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
-        public bool HasSchemaReference
-        {
-            get { return SchemaReference != null; }
-        }
+        public bool HasSchemaReference => SchemaReference != null;
 
         /// <summary>Gets the actual schema, either this or the reference schema.</summary>
         /// <exception cref="InvalidOperationException" accessor="get">The schema reference path has not been resolved.</exception>
@@ -270,10 +267,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is enumeration.</summary>
         [JsonIgnore]
-        public bool IsEnumeration
-        {
-            get { return Enumeration.Count > 0; }
-        }
+        public bool IsEnumeration => Enumeration.Count > 0;
 
         /// <summary>Gets the collection of required properties. </summary>
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>

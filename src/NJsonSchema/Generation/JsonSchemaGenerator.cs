@@ -29,7 +29,7 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>Gets the settings.</summary>
-        public JsonSchemaGeneratorSettings Settings { get; private set; }
+        public JsonSchemaGeneratorSettings Settings { get; }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
