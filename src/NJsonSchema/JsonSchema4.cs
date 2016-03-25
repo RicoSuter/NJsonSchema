@@ -135,11 +135,11 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the schema. </summary>
-        [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
         public string SchemaVersion { get; set; }
 
         /// <summary>Gets or sets the id. </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 2)]
         public string Id { get; set; }
 
         /// <summary>Gets or sets the title. </summary>
