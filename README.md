@@ -2,8 +2,8 @@ NJsonSchema for .NET
 ====================
 
 [![NuGet Version](https://badge.fury.io/nu/njsonschema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
- [![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
-[![Build status](https://ci.appveyor.com/api/projects/status/0n9hi0o61al5g2uu?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
+[![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
+CI: [![Build status](https://ci.appveyor.com/api/projects/status/0n9hi0o61al5g2uu?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
 
 JSON Schema draft v4 reader, generator and validator for .NET
 
@@ -84,14 +84,12 @@ The generated JSON schema data stored in the `schemaData` variable:
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "typeName": "Person",
   "type": "object",
+  "typeName": "Person",
+  "additionalProperties": false,
   "required": [
     "FirstName",
-    "LastName",
-    "Gender",
-    "NumberWithRange",
-    "Birthday"
+    "LastName"
   ],
   "properties": {
     "FirstName": {
@@ -101,11 +99,8 @@ The generated JSON schema data stored in the `schemaData` variable:
       "type": "string"
     },
     "Gender": {
-      "type": "string",
-      "enum": [
-        "Male",
-        "Female"
-      ]
+      "type": "integer",
+      "$ref": "#/definitions/Gender"
     },
     "NumberWithRange": {
       "type": "integer",
@@ -117,30 +112,64 @@ The generated JSON schema data stored in the `schemaData` variable:
       "format": "date-time"
     },
     "Company": {
-      "typeName": "Company",
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        }
-      }
+      "type": [
+        "null",
+        "object"
+      ],
+      "$ref": "#/definitions/Company"
     },
     "Cars": {
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
-        "typeName": "Car",
         "type": "object",
+        "typeName": "Car",
+        "additionalProperties": false,
         "properties": {
           "Name": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "Manufacturer": {
-            "typeName": "Company",
-            "type": "object",
-            "$ref": "#/properties/Company"
+            "type": [
+              "null",
+              "object"
+            ],
+            "$ref": "#/definitions/Company"
           }
         }
-      },
-      "type": "array"
+      }
+    }
+  },
+  "definitions": {
+    "Gender": {
+      "type": "integer",
+      "typeName": "Gender",
+      "enum": [
+        0,
+        1
+      ],
+      "enumNames": [
+        "Male",
+        "Female"
+      ]
+    },
+    "Company": {
+      "type": "object",
+      "typeName": "Company",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
     }
   }
 }
