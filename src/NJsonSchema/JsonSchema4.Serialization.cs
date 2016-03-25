@@ -170,19 +170,19 @@ namespace NJsonSchema
             set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema4>(value) : new ObservableDictionary<string, JsonSchema4>(); }
         }
 
-        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<object> EnumerationRaw
-        {
-            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
-        }
-
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Collection<string> EnumerationNamesRaw
         {
             get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
             set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
+        }
+
+        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal ICollection<object> EnumerationRaw
+        {
+            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
+            set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
