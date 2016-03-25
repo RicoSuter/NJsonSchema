@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
@@ -76,7 +77,7 @@ namespace NJsonSchema.Generation
             if (rootSchema == null)
                 rootSchema = schema;
 
-             var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
             typeDescription.ApplyType(schema);
 
             if (schema.Type.HasFlag(JsonObjectType.Object))
@@ -379,6 +380,10 @@ namespace NJsonSchema.Generation
                     if (rangeAttribute.Maximum != null)
                         jsonProperty.Maximum = rangeAttribute.Maximum;
                 }
+
+                var multipleOfAttribute = attributes.OfType<MultipleOfAttribute>().SingleOrDefault();
+                if (multipleOfAttribute != null)
+                    jsonProperty.MultipleOf = multipleOfAttribute.MultipleOf;
             }
 
             dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");

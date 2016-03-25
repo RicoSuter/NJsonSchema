@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {

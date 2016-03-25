@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
