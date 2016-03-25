@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
 
@@ -68,7 +69,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate<JsonSchema4>(typeof(TType), new SchemaResolver());
+            return generator.Generate(typeof(TType), null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
         }
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
@@ -78,7 +79,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate<JsonSchema4>(type, new SchemaResolver());
+            return generator.Generate(type, null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -178,10 +179,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
-        public bool HasSchemaReference
-        {
-            get { return SchemaReference != null; }
-        }
+        public bool HasSchemaReference => SchemaReference != null;
 
         /// <summary>Gets the actual schema, either this or the reference schema.</summary>
         /// <exception cref="InvalidOperationException" accessor="get">The schema reference path has not been resolved.</exception>
@@ -269,10 +267,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is enumeration.</summary>
         [JsonIgnore]
-        public bool IsEnumeration
-        {
-            get { return Enumeration.Count > 0; }
-        }
+        public bool IsEnumeration => Enumeration.Count > 0;
 
         /// <summary>Gets the collection of required properties. </summary>
         /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
@@ -524,10 +519,9 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this);
-            JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
-
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender());
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
 
             SchemaVersion = oldSchema;
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);

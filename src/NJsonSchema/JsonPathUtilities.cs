@@ -21,27 +21,20 @@ namespace NJsonSchema
     public static class JsonPathUtilities
     {
         /// <summary>Gets the JSON path of the given object.</summary>
-        /// <param name="obj">The object.</param>
+        /// <param name="root">The root object.</param>
         /// <param name="objectToSearch">The object to search.</param>
-        /// <param name="appendToDefinitions">Appends the <paramref name="objectToSearch"/> to the 'definitions' if it could not be found.</param>
+        /// <param name="schemaDefinitionAppender">Appends the <paramref name="objectToSearch"/> to the 'definitions' if it could not be found.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        public static string GetJsonPath(object obj, object objectToSearch, bool appendToDefinitions = true)
+        public static string GetJsonPath(object root, object objectToSearch, ISchemaDefinitionAppender schemaDefinitionAppender = null)
         {
-            var path = GetJsonPath(obj, objectToSearch, "#", new List<object>());
+            var path = GetJsonPath(root, objectToSearch, "#", new List<object>());
             if (path == null)
             {
-                if (appendToDefinitions)
+                if (schemaDefinitionAppender != null && objectToSearch is JsonSchema4)
                 {
-                    var schema = obj as JsonSchema4;
-                    var searchedSchema = objectToSearch as JsonSchema4;
-                    if (schema != null && searchedSchema != null)
-                    {
-                        schema.Definitions["ref_" + Guid.NewGuid()] = searchedSchema;
-                        return GetJsonPath(obj, objectToSearch, false);
-                    }
-                    else
-                        throw new InvalidOperationException("Could not find the JSON path of a child object.");
+                    schemaDefinitionAppender.Append(root, (JsonSchema4)objectToSearch);
+                    return GetJsonPath(root, objectToSearch, schemaDefinitionAppender);
                 }
                 else
                     throw new InvalidOperationException("Could not find the JSON path of a child object.");
@@ -51,23 +44,23 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
-        /// <param name="obj">The object.</param>
+        /// <param name="root">The root object.</param>
         /// <param name="path">The JSON path.</param>
         /// <returns>The object or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the path.</exception>
-        public static JsonSchema4 GetObjectFromJsonPath(object obj, string path)
+        public static JsonSchema4 GetObjectFromJsonPath(object root, string path)
         {
             if (path == "#")
             {
-                if (obj is JsonSchema4)
-                    return (JsonSchema4)obj;
+                if (root is JsonSchema4)
+                    return (JsonSchema4)root;
 
                 throw new InvalidOperationException("Could not resolve the path '#' because the root object is not a JsonSchema4.");
             }
             else if (path.StartsWith("#/"))
             {
-                var schema = GetObjectFromJsonPath(obj, path.Split('/').Skip(1).ToList(), new List<object>());
+                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new List<object>());
                 if (schema == null)
                     throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
 
@@ -78,22 +71,22 @@ namespace NJsonSchema
                 if (FullDotNetMethods.SupportsFullDotNetMethods)
                     return JsonSchema4.FromJson(FullDotNetMethods.HttpGet(path));
                 else
-                    throw new NotSupportedException("Could not resolve the path '" + path + 
+                    throw new NotSupportedException("Could not resolve the path '" + path +
                         "' because JSON web references are not supported on this platform.");
             }
             else
             {
                 if (FullDotNetMethods.SupportsFullDotNetMethods)
                 {
-                    var schema = obj as JsonSchema4;
+                    var schema = root as JsonSchema4;
                     if (schema != null && schema.RootDirectory != null)
                         return JsonSchema4.FromJson(FullDotNetMethods.FileReadAllText(FullDotNetMethods.PathCombine(schema.RootDirectory, path)));
                     else
-                        throw new NotSupportedException("Could not resolve the path '" + path + 
+                        throw new NotSupportedException("Could not resolve the path '" + path +
                             "' because no root path is available.");
                 }
                 else
-                    throw new NotSupportedException("Could not resolve the path '" + path + 
+                    throw new NotSupportedException("Could not resolve the path '" + path +
                         "' because JSON file references are not supported on this platform.");
             }
         }

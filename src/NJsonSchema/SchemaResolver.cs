@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NJsonSchema
 {
@@ -38,16 +39,23 @@ namespace NJsonSchema
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
         /// <param name="schema">The schema.</param>
+        /// <exception cref="InvalidOperationException">Added schema is not a JsonSchema4 instance.</exception>
         public void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema4 schema)
         {
+            if (schema.GetType() != typeof(JsonSchema4))
+                throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
+
+            // TODO: Check this
+//#if DEBUG
+//            if (Schemes.Any(s => s.TypeName == schema.TypeName))
+//                throw new InvalidOperationException("TypeName already exists.");
+//#endif
+
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }
 
         /// <summary>Gets all the schemas.</summary>
-        public IEnumerable<JsonSchema4> Schemes
-        {
-            get { return _mappings.Values; }
-        }
+        public IEnumerable<JsonSchema4> Schemes => _mappings.Values;
 
         private string GetKey(Type type, bool isIntegerEnum)
         {

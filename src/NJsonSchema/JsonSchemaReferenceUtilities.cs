@@ -28,9 +28,10 @@ namespace NJsonSchema
         /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
         /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
         /// <param name="root">The root.</param>
-        public static void UpdateSchemaReferencePaths(object root)
+        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
+        public static void UpdateSchemaReferencePaths(object root, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
-            UpdateSchemaReferencePaths(root, root, new List<object>());
+            UpdateSchemaReferencePaths(root, root, new List<object>(), schemaDefinitionAppender);
         }
 
         /// <summary>Converts JSON references ($ref) to property references.</summary>
@@ -49,24 +50,24 @@ namespace NJsonSchema
             return data.Replace("schemaReferencePath", "$ref");
         }
 
-        private static void UpdateSchemaReferencePaths(object root, object obj, List<object> checkedObjects)
+        private static void UpdateSchemaReferencePaths(object root, object obj, List<object> checkedObjects, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
             if (obj == null || obj is string)
                 return;
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReference != null)
-                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(root, schema.SchemaReference);
+                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(root, schema.SchemaReference.ActualSchema, schemaDefinitionAppender);
 
             if (obj is IDictionary)
             {
-                foreach (var item in ((IDictionary)obj).Values)
-                    UpdateSchemaReferencePaths(root, item, checkedObjects);
+                foreach (var item in ((IDictionary)obj).Values.OfType<object>().ToList())
+                    UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
             }
             else if (obj is IEnumerable)
             {
                 foreach (var item in (IEnumerable)obj)
-                    UpdateSchemaReferencePaths(root, item, checkedObjects);
+                    UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
             }
             else
             {
@@ -78,8 +79,7 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-
-                            UpdateSchemaReferencePaths(root, value, checkedObjects);
+                            UpdateSchemaReferencePaths(root, value, checkedObjects, schemaDefinitionAppender);
                         }
                     }
                 }

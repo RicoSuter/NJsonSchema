@@ -7,6 +7,19 @@ namespace NJsonSchema.Tests.Generation
     [TestClass]
     public class AnnotationsGenerationTests
     {
+        public class AnnotationClass
+        {
+            public Point Point { get; set; }
+        }
+
+        [JsonSchema(JsonObjectType.String, Format = "point")]
+        public class Point
+        {
+            public decimal X { get; set; }
+
+            public decimal Y { get; set; }
+        }
+
         [TestMethod]
         public void When_annotations_are_available_then_type_and_format_can_be_customized()
         {
@@ -22,17 +35,23 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual("point", property.Format);
         }
 
-        public class AnnotationClass
+        public class MultipleOfClass
         {
-            public Point Point { get; set; }
+            [MultipleOf(4.5)]
+            public double Number { get; set; }
         }
 
-        [JsonSchema(JsonObjectType.String, Format = "point")]
-        public class Point
+        [TestMethod]
+        public void When_multipleOf_attribute_is_available_then_value_is_set_in_schema()
         {
-            public decimal X { get; set; }
+            //// Arrange
 
-            public decimal Y { get; set; }
+            //// Act
+            var schema = JsonSchema4.FromType<MultipleOfClass>();
+            var property = schema.Properties["Number"];
+
+            //// Assert
+            Assert.AreEqual(4.5, property.MultipleOf.Value);
         }
     }
 }

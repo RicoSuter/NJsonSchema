@@ -14,7 +14,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<Person>();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Car"].Properties["Person"].ActualSchema);
+            Assert.AreEqual(schema, schema.Properties["Car"].ActualSchema.Properties["Person"].ActualSchema);
         }
 
         [TestMethod]
@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<Car>();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Person"].Properties["Car"].ActualSchema);
+            Assert.AreEqual(schema, schema.Properties["Person"].ActualSchema.Properties["Car"].ActualSchema);
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_a_referencing_type_then_deep_path_is_in_json()
+        public void When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
             //// Arrange
             var schema = JsonSchema4.FromType<House>();
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(json.Contains(@"""$ref"": ""#/properties/Person"""));
+            Assert.IsTrue(json.Contains(@"""$ref"": ""#/definitions/Person"));
         }
     }
 

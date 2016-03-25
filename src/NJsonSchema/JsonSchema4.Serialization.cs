@@ -27,7 +27,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the type name (class name of the object). </summary>
-        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 2)]
         public string TypeName { get; set; }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
@@ -94,7 +94,7 @@ namespace NJsonSchema
             }
         }
 
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
         internal object TypeRaw
         {
             get

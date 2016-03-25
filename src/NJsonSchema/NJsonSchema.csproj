@@ -68,21 +68,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
+    <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\FullDotNetMethods.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
+    <Compile Include="ISchemaDefinitionAppender.cs" />
     <Compile Include="ISchemaResolver.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
-    <Compile Include="JsonSchemaGeneratorSettings.cs" />
+    <Compile Include="JsonSchemaDefinitionAppender.cs" />
+    <Compile Include="Generation\JsonSchemaGeneratorSettings.cs" />
     <Compile Include="JsonSchemaReferenceUtilities.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
     <Compile Include="JsonSchema4.cs" />
-    <Compile Include="JsonSchemaValidator.cs" />
+    <Compile Include="Validation\JsonSchemaValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="JsonSchemaGenerator.cs" />
+    <Compile Include="Generation\JsonSchemaGenerator.cs" />
     <Compile Include="JsonObjectType.cs" />
     <Compile Include="JsonObjectTypeDescription.cs" />
     <Compile Include="SchemaResolver.cs" />
@@ -103,7 +106,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Diagram.cd" />
     <None Include="NJsonSchema.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
