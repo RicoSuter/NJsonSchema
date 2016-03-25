@@ -3,7 +3,7 @@ NJsonSchema for .NET
 
 [![NuGet Version](https://badge.fury.io/nu/njsonschema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
  [![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
-[![Build status](https://ci.appveyor.com/api/projects/status/0n9hi0o61al5g2uu?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)  (CI)
+[![Build status](https://ci.appveyor.com/api/projects/status/0n9hi0o61al5g2uu?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
 
 JSON Schema draft v4 reader, generator and validator for .NET
 
