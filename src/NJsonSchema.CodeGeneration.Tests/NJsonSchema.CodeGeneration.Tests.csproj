@@ -56,6 +56,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="TypeScriptDictionaryTests.cs" />
     <Compile Include="EnumGenerationTests.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\Gender.cs" />

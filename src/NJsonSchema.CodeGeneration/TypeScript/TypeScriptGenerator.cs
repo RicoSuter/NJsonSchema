@@ -34,10 +34,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         }
 
         /// <summary>Gets the language.</summary>
-        protected override string Language
-        {
-            get { return "TypeScript"; }
-        }
+        protected override string Language => "TypeScript";
 
         /// <summary>Generates the file.</summary>
         /// <returns>The file contents.</returns>
