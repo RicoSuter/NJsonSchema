@@ -150,7 +150,7 @@ namespace NJsonSchema
 
         private static bool IsDictionaryType(Type type)
         {
-            if (type.Name == "IDictionary`2")
+            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
                 return true; 
 
             return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&

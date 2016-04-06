@@ -307,6 +307,9 @@ namespace NJsonSchema.Generation
             var attributes = property.GetCustomAttributes().ToArray();
             if (attributes.All(a => !(a is JsonIgnoreAttribute)))
             {
+                if (propertyType.Name == "Nullable`1")
+                    propertyType = propertyType.GenericTypeArguments[0];
+
                 JsonProperty jsonProperty;
                 if (!propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum))
                 {
