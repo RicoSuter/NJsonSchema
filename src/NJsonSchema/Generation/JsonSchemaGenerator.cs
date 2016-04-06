@@ -311,11 +311,15 @@ namespace NJsonSchema.Generation
                 if (!propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum))
                 {
                     var jsonPropertySchema = Generate<JsonSchema4>(propertyType, rootSchema, property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
+                    if (jsonPropertySchema.ActualSchema.IsAnyType)
+                        jsonProperty = JsonProperty.FromJsonSchema(string.Empty, jsonPropertySchema.ActualSchema);
+                    else
+                    {
+                        jsonProperty = new JsonProperty();
+                        jsonProperty.SchemaReference = jsonPropertySchema.ActualSchema;
 
-                    jsonProperty = new JsonProperty();
-                    jsonProperty.SchemaReference = jsonPropertySchema.ActualSchema;
-
-                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+                        // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+                    }
                 }
                 else
                     jsonProperty = Generate<JsonProperty>(propertyType, rootSchema, property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
