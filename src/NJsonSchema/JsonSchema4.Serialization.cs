@@ -27,7 +27,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the type name (class name of the object). </summary>
-        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 2)]
+        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 4)]
         public string TypeName { get; set; }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
@@ -94,7 +94,7 @@ namespace NJsonSchema
             }
         }
 
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         internal object TypeRaw
         {
             get
@@ -170,19 +170,19 @@ namespace NJsonSchema
             set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema4>(value) : new ObservableDictionary<string, JsonSchema4>(); }
         }
 
-        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<object> EnumerationRaw
-        {
-            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
-        }
-
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Collection<string> EnumerationNamesRaw
         {
             get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
             set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
+        }
+
+        [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal ICollection<object> EnumerationRaw
+        {
+            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
+            set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

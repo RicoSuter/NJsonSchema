@@ -135,11 +135,11 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the schema. </summary>
-        [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
         public string SchemaVersion { get; set; }
 
         /// <summary>Gets or sets the id. </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 2)]
         public string Id { get; set; }
 
         /// <summary>Gets or sets the title. </summary>
@@ -486,10 +486,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary
-        {
-            get { return Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;}
-        }
+        public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]

@@ -17,16 +17,37 @@ namespace NJsonSchema.Tests.Samples
             [Required]
             public string LastName { get; set; }
 
+            public Gender Gender { get; set; }
+
+            [Range(2, 5)]
+            public int NumberWithRange { get; set; }
+
             public DateTime Birthday { get; set; }
 
-            public Collection<Job> Jobs { get; set; }
+            public Company Company { get; set; }
+
+            public Collection<Car> Cars { get; set; }
         }
 
-        public class Job
+        public enum Gender
         {
-            public string Company { get; set; }
+            Male,
+            Female
         }
 
+        public class Car
+        {
+            public string Name { get; set; }
+
+            public Company Manufacturer { get; set; }
+        }
+
+        public class Company
+        {
+            public string Name { get; set; }
+        }
+
+        //[TestMethod]
         public void Demo()
         {
             var schema = JsonSchema4.FromType<Person>();
