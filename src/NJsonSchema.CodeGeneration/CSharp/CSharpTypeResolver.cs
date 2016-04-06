@@ -53,7 +53,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             if (type.HasFlag(JsonObjectType.Number))
+            {
+                if (schema.Format == JsonFormatStrings.Double)
+                    return isNullable ? "double?" : "double";
+
                 return isNullable ? "decimal?" : "decimal";
+            }
 
             if (type.HasFlag(JsonObjectType.Integer))
             {
@@ -63,7 +68,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.Byte)
                     return isNullable ? "byte?" : "byte";
 
-                return isNullable ? "long?" : "long";
+                if (schema.Format == JsonFormatStrings.Long)
+                    return isNullable ? "long?" : "long";
+
+                return isNullable ? "int?" : "int";
             }
 
             if (type.HasFlag(JsonObjectType.Boolean))

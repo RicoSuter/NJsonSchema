@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
-            Assert.IsTrue(output.Contains("Dictionary<string, long>"));
+            Assert.IsTrue(output.Contains("Dictionary<string, int>"));
         }
 
         [TestMethod]

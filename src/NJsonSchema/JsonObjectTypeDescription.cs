@@ -39,12 +39,17 @@ namespace NJsonSchema
                 };
             }
 
-            if ((type == typeof(int) || type == typeof(long) || type == typeof(short)) ||
-                (type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort)))
+            if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, true);
 
-            if (type == typeof(double) || type == typeof(decimal) || type == typeof(float))
-                return new JsonObjectTypeDescription(JsonObjectType.Number, true);
+            if ((type == typeof(long)) ||(type == typeof(ulong)))
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Long);
+
+            if (type == typeof(double) || type == typeof(float))
+                return new JsonObjectTypeDescription(JsonObjectType.Number, true, false, JsonFormatStrings.Double);
+
+            if (type == typeof(decimal))
+                return new JsonObjectTypeDescription(JsonObjectType.Number, true, false, JsonFormatStrings.Decimal);
 
             if (type == typeof(bool))
                 return new JsonObjectTypeDescription(JsonObjectType.Boolean, true);
