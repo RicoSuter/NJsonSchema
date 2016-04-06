@@ -17,13 +17,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="settings">The generator settings.</param>
         public CSharpTypeResolver(CSharpGeneratorSettings settings)
         {
-            Settings = settings; 
+            Settings = settings;
         }
 
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
         /// <param name="knownSchemes">The known schemes.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings, JsonSchema4[] knownSchemes) 
+        public CSharpTypeResolver(CSharpGeneratorSettings settings, JsonSchema4[] knownSchemes)
             : this(settings)
         {
             foreach (var type in knownSchemes)
@@ -48,12 +48,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 var property = schema;
                 if (property.Item != null)
                     return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
-                
+
                 throw new NotImplementedException("Array with multiple Items schemes are not supported.");
             }
 
             if (type.HasFlag(JsonObjectType.Number))
-                return isNullable ? "decimal?" : "decimal";
+            {
+                if (schema.Format == JsonFormatStrings.Decimal)
+                    return isNullable ? "decimal?" : "decimal";
+
+                return isNullable ? "double?" : "double";
+            }
 
             if (type.HasFlag(JsonObjectType.Integer))
             {
@@ -63,7 +68,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (schema.Format == JsonFormatStrings.Byte)
                     return isNullable ? "byte?" : "byte";
 
-                return isNullable ? "long?" : "long";
+                if (schema.Format == JsonFormatStrings.Long)
+                    return isNullable ? "long?" : "long";
+
+                return isNullable ? "int?" : "int";
             }
 
             if (type.HasFlag(JsonObjectType.Boolean))

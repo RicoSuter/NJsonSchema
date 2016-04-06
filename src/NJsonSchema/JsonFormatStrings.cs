@@ -28,6 +28,15 @@ namespace NJsonSchema
         /// <summary>Format for an GUID. </summary>
         public const string Guid = "guid";
 
+        /// <summary>Format for a long integer. </summary>
+        public const string Long = "long";
+
+        /// <summary>Format for a double number. </summary>
+        public const string Double = "double";
+
+        /// <summary>Format for a decimal number. </summary>
+        public const string Decimal = "decimal";
+
         /// <summary>Format for an IP v4 address. </summary>
         public const string IpV4 = "ipv4";
 
