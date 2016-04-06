@@ -17,7 +17,9 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         public class EnumKeyDictionaryTest
         {
-            public Dictionary<PropertyName, string> Mapping { get; set; } 
+            public Dictionary<PropertyName, string> Mapping { get; set; }
+
+            public IDictionary<PropertyName, string> Mapping2 { get; set; } 
         }
 
         [TestMethod]
@@ -33,6 +35,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(code.Contains("Mapping?: { [key: string] : string; };"));
+            Assert.IsTrue(code.Contains("Mapping2?: { [key: string] : string; };"));
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -45,6 +48,8 @@ namespace NJsonSchema.CodeGeneration.Tests
         public class EnumValueDictionaryTest
         {
             public Dictionary<string, Gender> Mapping { get; set; }
+
+            public IDictionary<string, Gender> Mapping2 { get; set; }
         }
 
         [TestMethod]
@@ -60,6 +65,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(code.Contains("Mapping?: { [key: string] : Gender; };"));
+            Assert.IsTrue(code.Contains("Mapping2?: { [key: string] : Gender; };"));
         }
     }
 }
