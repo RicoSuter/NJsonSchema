@@ -11,6 +11,7 @@ using System;
 namespace NJsonSchema.Annotations
 {
     /// <summary>Attribute to set the multipleOf parameter of a JSON Schema.</summary>
+    [AttributeUsage(AttributeTargets.Property)]
     public class MultipleOfAttribute : Attribute 
     {
         /// <summary>Initializes a new instance of the <see cref="MultipleOfAttribute"/> class.</summary>
