@@ -80,6 +80,8 @@ namespace NJsonSchema.Generation
             var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
             typeDescription.ApplyType(schema);
 
+            ApplyExtensionDataAttributes(schema, type, parentAttributes);
+
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
@@ -141,6 +143,25 @@ namespace NJsonSchema.Generation
             }
 
             return schema;
+        }
+
+        private static void ApplyExtensionDataAttributes<TSchemaType>(TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes)
+            where TSchemaType : JsonSchema4, new()
+        {
+            if (parentAttributes == null)
+            {
+                // class
+                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>();
+                if (extensionDataAttributes.Any())
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+            }
+            else
+            {
+                // property or parameter
+                var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>();
+                if (extensionDataAttributes.Any())
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+            }
         }
 
         private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
