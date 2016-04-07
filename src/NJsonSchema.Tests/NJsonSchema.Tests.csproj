@@ -63,6 +63,7 @@
     <Compile Include="Conversion\ArrayTypeToSchemaTests.cs" />
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
+    <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\FormatBase64Tests.cs" />
     <Compile Include="Validation\FormatIpV6Tests.cs" />
     <Compile Include="Generation\AttributeGenerationTests.cs" />

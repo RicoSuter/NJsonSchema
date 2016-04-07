@@ -206,6 +206,10 @@ namespace NJsonSchema
             set { OneOf = value != null ? new ObservableCollection<JsonSchema4>(value) : new ObservableCollection<JsonSchema4>(); }
         }
 
+        /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
+        [JsonExtensionData]
+        public IDictionary<string, object> ExtensionData { get; set; } 
+
         private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
         {
             if (oldCollection != null)
