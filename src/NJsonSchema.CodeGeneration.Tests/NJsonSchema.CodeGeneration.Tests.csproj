@@ -56,15 +56,16 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Address.cs" />
-    <Compile Include="TypeScriptObjectTests.cs" />
-    <Compile Include="TypeScriptDictionaryTests.cs" />
+    <Compile Include="DefaultGenerationTests.cs" />
+    <Compile Include="TypeScript\TypeScriptObjectTests.cs" />
+    <Compile Include="TypeScript\TypeScriptDictionaryTests.cs" />
     <Compile Include="EnumGenerationTests.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\Gender.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Teacher.cs" />
-    <Compile Include="TypeScriptGeneratorTests.cs" />
-    <Compile Include="CSharpGeneratorTests.cs" />
+    <Compile Include="TypeScript\TypeScriptGeneratorTests.cs" />
+    <Compile Include="CSharp\CSharpGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
