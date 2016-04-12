@@ -137,9 +137,10 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             schema.Type = JsonObjectType.Integer;
+            var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual("integer", schema.TypeRaw.ToString());
+            Assert.IsTrue(data.Contains(@"""type"": ""integer"""));
         }
 
         [TestMethod]
@@ -150,12 +151,14 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
+            var data = schema.ToJson();
 
             //// Assert
-            var types = (JArray)schema.TypeRaw;
-            Assert.AreEqual(2, types.Count);
-            Assert.IsTrue(types.OfType<JValue>().Any(v => v.ToString(CultureInfo.InvariantCulture) == "integer"));
-            Assert.IsTrue(types.OfType<JValue>().Any(v => v.ToString(CultureInfo.InvariantCulture) == "object"));
+            Assert.IsTrue(data.Contains(
+@"  ""type"": [
+    ""integer"",
+    ""object""
+  ]"));
         }
 
         [TestMethod]
