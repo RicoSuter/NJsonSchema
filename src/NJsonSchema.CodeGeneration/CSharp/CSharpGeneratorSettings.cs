@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ClassStyle = CSharpClassStyle.Inpc;
         }
 
-        /// <summary>Gets or sets the namespace.</summary>
+        /// <summary>Gets or sets the .NET namespace of the generated types.</summary>
         public string Namespace { get; set; }
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 

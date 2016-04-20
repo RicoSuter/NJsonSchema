@@ -238,7 +238,7 @@ namespace NJsonSchema.Generation
         {
             var properties = GetTypeProperties(type);
             foreach (var property in type.GetTypeInfo().DeclaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-                LoadProperty(property, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
+                LoadProperty(type, property, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
 
             GenerateInheritance(type, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
         }
@@ -320,13 +320,13 @@ namespace NJsonSchema.Generation
             return Enum.GetNames(type);
         }
 
-        private void LoadProperty(PropertyInfo property, JsonSchema4 parentSchema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
+        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
             var propertyType = property.PropertyType;
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, property.GetCustomAttributes(), Settings.DefaultEnumHandling);
 
             var attributes = property.GetCustomAttributes().ToArray();
-            if (attributes.All(a => !(a is JsonIgnoreAttribute)))
+            if (IsPropertyIgnored(parentType, attributes) == false)
             {
                 if (propertyType.Name == "Nullable`1")
                     propertyType = propertyType.GenericTypeArguments[0];
@@ -378,6 +378,18 @@ namespace NJsonSchema.Generation
 
                 ApplyPropertyAnnotations(jsonProperty, attributes, propertyTypeDescription);
             }
+        }
+
+        private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
+        {
+            if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
+                return true;
+
+            var hasDataContractAttribute = parentType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null;
+            if (hasDataContractAttribute && !propertyAttributes.Any(a => a is DataMemberAttribute) && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+                return true;
+
+            return false;
         }
 
         /// <summary></summary>
