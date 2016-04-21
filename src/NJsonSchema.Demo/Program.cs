@@ -66,6 +66,15 @@ namespace NJsonSchema.Demo
             Console.WriteLine("Fails: " + fails);
             Console.WriteLine("Exceptions: " + exceptions);
 
+            var expectedFails = 16;
+            var expectedExceptions = 11;
+            if (fails != expectedFails || exceptions != expectedExceptions)
+                Console.WriteLine("========================\n" +
+                                  "Unexpected result => Some commits changed the outcome! Please check. \n" +
+                                  "Expected fails: " + expectedFails + "\n" +
+                                  "Expected exceptions: " + expectedExceptions);
+
+
             Console.ReadLine();
 
             //var schema = JsonSchema4.FromType<Person>();
