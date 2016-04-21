@@ -346,7 +346,7 @@ namespace NJsonSchema.Validation
                 var patternPropertySchema = _schema.PatternProperties.FirstOrDefault(p => Regex.IsMatch(property.Name, p.Key));
                 if (patternPropertySchema.Value != null)
                 {
-                    var error = TryCreateChildSchemaError(patternPropertySchema.Value, property,
+                    var error = TryCreateChildSchemaError(patternPropertySchema.Value, property.Value,
                         ValidationErrorKind.AdditionalPropertiesNotValid, property.Name, property.Path);
 
                     if (error != null)
