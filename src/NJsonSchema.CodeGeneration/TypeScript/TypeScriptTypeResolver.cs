@@ -14,8 +14,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptGenerator>
     {
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
-        public TypeScriptTypeResolver()
+        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
         {
+            Settings = settings; 
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
@@ -23,8 +24,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
         {
             foreach (var type in knownSchemes)
-                AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, this));
+                AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, Settings, this));
         }
+
+        /// <summary>Gets the generator settings.</summary>
+        public TypeScriptGeneratorSettings Settings { get; private set; }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
         public string Namespace { get; set; }
@@ -87,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The generator.</returns>
         protected override TypeScriptGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            return new TypeScriptGenerator(schema, this);
+            return new TypeScriptGenerator(schema, Settings, this);
         }
 
         /// <summary>Gets or generates the type name for the given schema.</summary>

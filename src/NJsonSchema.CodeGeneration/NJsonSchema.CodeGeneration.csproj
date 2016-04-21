@@ -64,8 +64,10 @@
     <Compile Include="GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnumerationEntry.cs" />
+    <Compile Include="TypeScript\TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScript\TypeScriptGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptTypeResolver.cs" />
+    <Compile Include="TypeScript\TypeScriptTypeStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
@@ -99,6 +101,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TypeScript\Templates\Enum.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TypeScript\Templates\Class.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
