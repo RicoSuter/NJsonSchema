@@ -92,24 +92,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                     Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name),
 
-                    IsObject = HasLocalClass(property),
+                    IsNewableObject = IsNewableObject(property),
                     IsDate = property.ActualSchema.Format == JsonFormatStrings.DateTime,
 
                     IsDictionary = property.ActualSchema.IsDictionary,
-                    IsDictionaryItemObject = property.ActualSchema.AdditionalPropertiesSchema != null && HasLocalClass(property.ActualSchema.AdditionalPropertiesSchema),
-                    IsDictionaryItemDate = property.ActualSchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
-                    DictionaryItemType = property.ActualSchema.AdditionalPropertiesSchema != null ? _resolver.Resolve(property.ActualSchema.AdditionalPropertiesSchema, false, property.Name) : string.Empty,
+                    DictionaryValueType = TryResolve(property.ActualSchema.AdditionalPropertiesSchema, property.Name),
+                    IsDictionaryValueNewableObject = property.ActualSchema.AdditionalPropertiesSchema != null && IsNewableObject(property.ActualSchema.AdditionalPropertiesSchema),
+                    IsDictionaryValueDate = property.ActualSchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                     IsArray = property.ActualSchema.Type.HasFlag(JsonObjectType.Array),
-                    IsArrayItemObject = property.ActualSchema.Item != null && HasLocalClass(property.ActualSchema.Item), 
+                    ArrayItemType = TryResolve(property.ActualSchema.Item, property.Name),
+                    IsArrayItemNewableObject = property.ActualSchema.Item != null && IsNewableObject(property.ActualSchema.Item), 
                     IsArrayItemDate = property.ActualSchema.Item?.Format == JsonFormatStrings.DateTime, 
-                    ArrayItemType = property.ActualSchema.Item != null ? _resolver.Resolve(property.ActualSchema.Item, false, property.Name) : string.Empty, 
 
-                    HasDescription = !string.IsNullOrEmpty(property.Description),
                     Description = property.Description,
+                    HasDescription = !string.IsNullOrEmpty(property.Description),
 
                     IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
-
                     IsOptional = !property.IsRequired
                 }).ToList();
 
@@ -130,7 +129,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
         }
 
-        private static bool HasLocalClass(JsonSchema4 schema)
+        private string TryResolve(JsonSchema4 schema, string typeNameHint)
+        {
+            return schema != null ? _resolver.Resolve(schema, false, typeNameHint) : string.Empty;
+        }
+
+        private static bool IsNewableObject(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
             return schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAnyType && !schema.IsDictionary;
