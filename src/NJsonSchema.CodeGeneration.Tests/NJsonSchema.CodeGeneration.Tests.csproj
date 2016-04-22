@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
+    <Compile Include="TypeScript\ClassGenerationTests.cs" />
     <Compile Include="TypeScript\TypeScriptObjectTests.cs" />
     <Compile Include="TypeScript\TypeScriptDictionaryTests.cs" />
     <Compile Include="EnumGenerationTests.cs" />

@@ -20,18 +20,31 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
         public TypeScriptGenerator(JsonSchema4 schema)
-            : this(schema, new TypeScriptTypeResolver())
+            : this(schema, new TypeScriptGeneratorSettings())
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
+        /// <param name="settings">The generator settings.</param>
+        /// <param name="schema">The schema.</param>
+        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings)
+            : this(schema, settings, new TypeScriptTypeResolver(settings))
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptTypeResolver resolver)
+        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver)
         {
             _schema = schema;
             _resolver = resolver;
+            Settings = settings;
         }
+
+        /// <summary>Gets the generator settings.</summary>
+        public TypeScriptGeneratorSettings Settings { get; set; }
 
         /// <summary>Gets the language.</summary>
         protected override string Language => "TypeScript";
@@ -74,17 +87,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var properties = _schema.Properties.Values.Select(property => new
                 {
                     Name = property.Name,
-                    PropertyName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
+                    InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
+                    PropertyName = ConvertToLowerCamelCase(property.Name).Replace("-", "_"),
+
                     Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name),
 
-                    HasDescription = !string.IsNullOrEmpty(property.Description),
-                    Description = property.Description,
-                    IsReadOnly = property.IsReadOnly,
+                    IsNewableObject = IsNewableObject(property),
+                    IsDate = property.ActualSchema.Format == JsonFormatStrings.DateTime,
 
+                    IsDictionary = property.ActualSchema.IsDictionary,
+                    DictionaryValueType = TryResolve(property.ActualSchema.AdditionalPropertiesSchema, property.Name),
+                    IsDictionaryValueNewableObject = property.ActualSchema.AdditionalPropertiesSchema != null && IsNewableObject(property.ActualSchema.AdditionalPropertiesSchema),
+                    IsDictionaryValueDate = property.ActualSchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
+
+                    IsArray = property.ActualSchema.Type.HasFlag(JsonObjectType.Array),
+                    ArrayItemType = TryResolve(property.ActualSchema.Item, property.Name),
+                    IsArrayItemNewableObject = property.ActualSchema.Item != null && IsNewableObject(property.ActualSchema.Item), 
+                    IsArrayItemDate = property.ActualSchema.Item?.Format == JsonFormatStrings.DateTime, 
+
+                    Description = property.Description,
+                    HasDescription = !string.IsNullOrEmpty(property.Description),
+
+                    IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
                     IsOptional = !property.IsRequired
                 }).ToList();
 
-                var template = LoadTemplate("Interface");
+                var template = LoadTemplate(Settings.TypeStyle == TypeScriptTypeStyle.Interface ? "Interface" : "Class");
                 template.Add("class", typeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
@@ -99,6 +127,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     Code = template.Render()
                 };
             }
+        }
+
+        private string TryResolve(JsonSchema4 schema, string typeNameHint)
+        {
+            return schema != null ? _resolver.Resolve(schema, false, typeNameHint) : string.Empty;
+        }
+
+        private static bool IsNewableObject(JsonSchema4 schema)
+        {
+            schema = schema.ActualSchema;
+            return schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAnyType && !schema.IsDictionary;
         }
 
         private List<EnumerationEntry> GetEnumeration()
