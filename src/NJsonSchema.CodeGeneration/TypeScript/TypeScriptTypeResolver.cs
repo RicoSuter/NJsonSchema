@@ -21,7 +21,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         /// <param name="knownSchemes">The known schemes.</param>
-        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
+        /// <param name="settings">The generator settings.</param>
+        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings) 
+            : this(settings)
         {
             foreach (var type in knownSchemes)
                 AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, Settings, this));
