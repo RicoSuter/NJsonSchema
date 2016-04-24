@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     IsOptional = !property.IsRequired
                 }).ToList();
 
-                var template = LoadTemplate(Settings.TypeStyle == TypeScriptTypeStyle.Interface ? "Interface" : "Class");
+                var template = LoadTemplate(Settings.TypeStyle.ToString());
                 template.Add("class", typeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));

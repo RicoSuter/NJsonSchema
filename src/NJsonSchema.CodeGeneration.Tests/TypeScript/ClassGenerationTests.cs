@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var data = schema.ToJson();
             var settings = new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Class
+                TypeStyle = TypeScriptTypeStyle.KoObservableClass
             };
 
             //// Act

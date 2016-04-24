@@ -15,6 +15,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         Interface,
 
         /// <summary>Generates classes which can be constructed from JSON.</summary>
-        Class
+        Class,
+
+        /// <summary>Generates classes with KnockoutJS observable properties.</summary>
+        KoObservableClass
     }
 }
