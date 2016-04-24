@@ -5,6 +5,9 @@
 <endif>    <if(property.IsReadOnly)>readonly <endif><property.PropertyName>: <property.Type>;
 }>
     constructor(data?: any) {
+    <if(hasInheritance)>
+        super(data);
+    <endif>
         if (data !== undefined) {
 <properties:{property | 
     <if(property.IsNewableObject)>

@@ -22,14 +22,19 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             public Dictionary<string, DateTime> DateDictionary { get; set; }
 
-            public MyItemClass Reference { get; set; }
+            public Student Reference { get; set; }
 
-            public MyItemClass[] Array { get; set; }
+            public Student[] Array { get; set; }
 
-            public Dictionary<string, MyItemClass> Dictionary { get; set; }
+            public Dictionary<string, Student> Dictionary { get; set; }
         }
 
-        public class MyItemClass
+        public class Student : Person
+        {
+            public string Study { get; set; }
+        }
+
+        public class Person
         {
             public string FirstName { get; set; }
 

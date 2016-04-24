@@ -118,7 +118,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
                 template.Add("description", RemoveLineBreaks(_schema.Description));
 
-                template.Add("inheritance", _schema.AllOf.Count == 1 ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
+                var hasInheritance = _schema.AllOf.Count == 1;
+                template.Add("hasInheritance", hasInheritance);
+                template.Add("inheritance", hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
                 template.Add("properties", properties);
 
                 return new TypeGeneratorResult
