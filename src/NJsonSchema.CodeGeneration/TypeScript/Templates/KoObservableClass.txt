@@ -2,7 +2,7 @@
 <endif>export class <class><inheritance> {
 <properties:{property | 
 <if(property.HasDescription)>    /** <property.Description> */
-<endif>    <if(property.IsReadOnly)>readonly <endif><property.PropertyName>: <property.Type>;
+<endif>    <if(property.IsReadOnly)>readonly <endif><property.PropertyName> = <if(property.IsArray)>ko.observableArray\<<property.ArrayItemType>>()<else>ko.observable\<<property.Type>>()<endif>;
 }>
     constructor(data?: any) {
     <if(hasInheritance)>
@@ -11,11 +11,11 @@
         if (data !== undefined) {
 <properties:{property | 
     <if(property.IsNewableObject)>
-            this.<property.PropertyName> = new <property.Type>(data["<property.Name>"]);
+            this.<property.PropertyName>(new <property.Type>(data["<property.Name>"]));
     <else>
     <if(property.IsArray)>
             if (data["<property.Name>"] && data["<property.Name>"].constructor === Array) {
-                this.<property.PropertyName> = [];
+                this.<property.PropertyName>([]);
                 for (var item of data["<property.Name>"])
         <if(property.IsArrayItemNewableObject)>
                     this.<property.PropertyName>.push(new <property.ArrayItemType>(item));
@@ -30,25 +30,25 @@
     <else>
     <if(property.IsDictionary)>
             if (data["<property.Name>"]) {
-                this.<property.PropertyName> = {\};
+                this.<property.PropertyName>({\});
                 for (var key in data["<property.Name>"]) {
                     if (data["<property.Name>"].hasOwnProperty(key))
         <if(property.IsDictionaryValueNewableObject)>
-                        this.<property.PropertyName>[key] = new <property.DictionaryValueType>(data["<property.Name>"][key]);
+                        this.<property.PropertyName>()[key] = new <property.DictionaryValueType>(data["<property.Name>"][key]);
         <else>
         <if(property.IsDictionaryValueDate)>
-                        this.<property.PropertyName>[key] = new Date(data["<property.Name>"][key]);
+                        this.<property.PropertyName>()[key] = new Date(data["<property.Name>"][key]);
         <else>
-                        this.<property.PropertyName>[key] = data["<property.Name>"][key];
+                        this.<property.PropertyName>()[key] = data["<property.Name>"][key];
         <endif>
         <endif>
                 \}
             \}
     <else>
         <if(property.IsDate)>
-            this.<property.PropertyName> = new Date(data["<property.Name>"]);
+            this.<property.PropertyName>(new Date(data["<property.Name>"]));
         <else>
-            this.<property.PropertyName> = data["<property.Name>"];
+            this.<property.PropertyName>(data["<property.Name>"]);
         <endif>
     <endif>
     <endif>
