@@ -53,7 +53,7 @@ namespace NJsonSchema.Validation
             {
                 foreach (var type in types)
                 {
-                    ValidateArray(token, type.Key, propertyName, propertyPath, errors);
+                    ValidateArray(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateString(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateNumber(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateInteger(token, type.Key, propertyName, propertyPath, type.Value);

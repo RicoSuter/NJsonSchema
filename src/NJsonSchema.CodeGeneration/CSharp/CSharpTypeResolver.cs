@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -42,6 +43,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             schema = schema.ActualSchema;
 
+            if (schema.IsAnyType)
+                return "object";
+
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
             {
@@ -49,7 +53,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (property.Item != null)
                     return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
 
-                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
+                if (property.Items != null && property.Items.Count > 0)
+                    return string.Format("Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
+
+                return string.Format(Settings.ArrayType + "<object>", Resolve(property.Item, true, null));
             }
 
             if (type.HasFlag(JsonObjectType.Number))
@@ -98,9 +105,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 return "string";
             }
-
-            if (schema.IsAnyType)
-                return "object";
 
             if (schema.IsDictionary)
                 return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));

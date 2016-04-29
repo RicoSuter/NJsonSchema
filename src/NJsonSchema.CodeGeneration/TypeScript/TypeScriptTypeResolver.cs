@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -16,13 +16,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
         {
-            Settings = settings; 
+            Settings = settings;
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         /// <param name="knownSchemes">The known schemes.</param>
         /// <param name="settings">The generator settings.</param>
-        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings) 
+        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings)
             : this(settings)
         {
             foreach (var type in knownSchemes)
@@ -42,7 +42,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The type name.</returns>
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
-            schema = schema.ActualSchema; 
+            schema = schema.ActualSchema;
+
+            if (schema.IsAnyType)
+                return "any";
 
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
@@ -51,7 +54,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (property.Item != null)
                     return string.Format("{0}[]", Resolve(property.Item, true, null));
 
-                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
+                if (property.Items != null && property.Items.Count > 0)
+                    return string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
+
+                return "any[]";
             }
 
             if (type.HasFlag(JsonObjectType.Number))
@@ -75,12 +81,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 if (schema.IsEnumeration)
                     return AddGenerator(schema, typeNameHint);
-                
+
                 return "string";
             }
-
-            if (schema.IsAnyType)
-                return "any";
 
             if (schema.IsDictionary)
                 return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
