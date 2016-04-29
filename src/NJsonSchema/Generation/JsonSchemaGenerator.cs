@@ -196,8 +196,24 @@ namespace NJsonSchema.Generation
                 throw new InvalidOperationException("Could not find value type of dictionary type '" + type.FullName + "'.");
 
             var valueType = genericTypeArguments[1];
+            if (valueType == typeof(object))
+            {
+                schema.AdditionalPropertiesSchema = new JsonSchema4
+                {
+                    Type =
+                        JsonObjectType.Null |
+                        JsonObjectType.Object |
+                        JsonObjectType.Array |
+                        JsonObjectType.String |
+                        JsonObjectType.Boolean |
+                        JsonObjectType.Integer |
+                        JsonObjectType.Number
+                };
+            }
+            else
+                schema.AdditionalPropertiesSchema = Generate(valueType, rootSchema, null, schemaDefinitionAppender,
+                    schemaResolver);
 
-            schema.AdditionalPropertiesSchema = Generate(valueType, rootSchema, null, schemaDefinitionAppender, schemaResolver);
             schema.AllowAdditionalProperties = true;
         }
 

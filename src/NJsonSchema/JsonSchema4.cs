@@ -486,7 +486,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;
+        public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties;
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
@@ -496,12 +496,12 @@ namespace NJsonSchema
             {
                 return 
                     string.IsNullOrEmpty(TypeName) && 
-                    (Type == JsonObjectType.Object || Type == (JsonObjectType.Object | JsonObjectType.Null)) && 
+                    Type.HasFlag(JsonObjectType.Object) && 
                     Properties.Count == 0 && 
                     AnyOf.Count == 0 && 
                     AllOf.Count == 0 && 
                     OneOf.Count == 0 &&
-                    AllowAdditionalProperties == true && 
+                    AllowAdditionalProperties && 
                     AdditionalPropertiesSchema == null && 
                     MultipleOf == null;
             }
