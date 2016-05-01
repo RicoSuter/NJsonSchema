@@ -12,13 +12,6 @@ namespace NJsonSchema.CodeGeneration
     public abstract class TypeGeneratorBase : GeneratorBase
     {
         /// <summary>Generates the type.</summary>
-        /// <returns>The code.</returns>
-        public TypeGeneratorResult GenerateType()
-        {
-            return GenerateType(null);
-        }
-
-        /// <summary>Generates the type.</summary>
         /// <param name="fallbackTypeName">The type name hint.</param>
         /// <returns>The code.</returns>
         public abstract TypeGeneratorResult GenerateType(string fallbackTypeName);

@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType().Code + "\n\n" + _resolver.GenerateTypes();
+            var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Settings.Namespace);

@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            return GenerateType().Code + "\n\n" + _resolver.GenerateTypes();
+            return GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
         }
 
         /// <summary>Generates the type.</summary>
