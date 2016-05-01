@@ -12,7 +12,7 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The type resolver base.</summary>
-    public abstract class TypeResolverBase<TGenerator> 
+    public abstract class TypeResolverBase<TGenerator>
         where TGenerator : TypeGeneratorBase
     {
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration
                 foreach (var pair in _types.ToList())
                 {
                     processedTypes.Add(pair.Key);
-                    var result = pair.Value.GenerateType(pair.Key); 
+                    var result = pair.Value.GenerateType(pair.Key);
                     classes[result.TypeName] = result.Code;
                 }
             }
@@ -96,6 +96,13 @@ namespace NJsonSchema.CodeGeneration
             }
 
             return schema.TypeName;
+        }
+
+        /// <summary>Generates a unique type name.</summary>
+        /// <returns>The type name.</returns>
+        public string GenerateTypeName()
+        {
+            return GenerateTypeName(string.Empty);
         }
 
         /// <summary>Generates a unique type name with the given hint.</summary>

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
@@ -194,8 +195,6 @@ namespace NJsonSchema
                 return HasSchemaReference ? SchemaReference.ActualSchema : this;
             }
         }
-
-
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
@@ -488,24 +487,22 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties;
 
+        /// <summary>Gets a value indicating whether the validated data can be null.</summary>
+        [JsonIgnore]
+        public bool IsNullable => (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0) ||
+            ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable));
+
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType
-        {
-            get
-            {
-                return 
-                    string.IsNullOrEmpty(TypeName) && 
-                    Type.HasFlag(JsonObjectType.Object) && 
-                    Properties.Count == 0 && 
-                    AnyOf.Count == 0 && 
-                    AllOf.Count == 0 && 
-                    OneOf.Count == 0 &&
-                    AllowAdditionalProperties && 
-                    AdditionalPropertiesSchema == null && 
-                    MultipleOf == null;
-            }
-        }
+        public bool IsAnyType => string.IsNullOrEmpty(TypeName) && 
+                                 Type.HasFlag(JsonObjectType.Object) && 
+                                 Properties.Count == 0 && 
+                                 AnyOf.Count == 0 && 
+                                 AllOf.Count == 0 && 
+                                 OneOf.Count == 0 &&
+                                 AllowAdditionalProperties && 
+                                 AdditionalPropertiesSchema == null && 
+                                 MultipleOf == null;
 
         #endregion
 

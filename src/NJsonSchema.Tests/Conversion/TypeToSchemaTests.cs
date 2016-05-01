@@ -158,9 +158,9 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            var subSchema = schema.Properties["Reference"];
-            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, subSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, subSchema.ActualSchema.TypeName);
+            var property = schema.Properties["Reference"];
+            Assert.IsTrue(property.IsNullable);
+            Assert.AreEqual(typeof(MySubtype).Name, property.ActualPropertySchema.TypeName);
         }
 
         [TestMethod]
@@ -184,23 +184,29 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Color"];
 
             //// Assert
-            Assert.AreEqual(3, property.ActualSchema.Enumeration.Count); // Color property has StringEnumConverter
-            Assert.IsTrue(property.ActualSchema.Enumeration.Contains("Red"));
-            Assert.IsTrue(property.ActualSchema.Enumeration.Contains("Green"));
-            Assert.IsTrue(property.ActualSchema.Enumeration.Contains("Blue"));
+            Assert.AreEqual(3, property.ActualPropertySchema.Enumeration.Count); // Color property has StringEnumConverter
+            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Red"));
+            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Green"));
+            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Blue"));
         }
-        
+
+        public class ClassWithJObjectProperty
+        {
+            public JObject Property { get; set; }
+        }
+
         [TestMethod]
         public void When_type_is_JObject_then_generated_type_is_any()
         {
             //// Act
             var schema = JsonSchema4.FromType<ClassWithJObjectProperty>();
+            var schemaData = schema.ToJson();
             var property = schema.Properties["Property"];
 
             //// Assert
-            Assert.IsTrue(property.IsAnyType);
-            Assert.AreEqual(JsonObjectType.Object | JsonObjectType.Null, property.Type);
-            Assert.IsTrue(property.AllowAdditionalItems);
+            Assert.IsTrue(property.IsNullable);
+            Assert.IsTrue(property.ActualPropertySchema.IsAnyType);
+            Assert.IsTrue(property.ActualPropertySchema.AllowAdditionalItems);
             Assert.AreEqual(0, property.Properties.Count);
         }
         
@@ -275,11 +281,6 @@ namespace NJsonSchema.Tests.Conversion
         public class MySubtype
         {
             public string Id { get; set; }
-        }
-
-        public class ClassWithJObjectProperty
-        {
-            public JObject Property { get; set; }
         }
 
         public enum MyColor

@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType(string.Empty).Code + "\n\n" + _resolver.GenerateTypes();
+            var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Settings.Namespace);
@@ -65,11 +65,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Generates the type.</summary>
-        /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="fallbackTypeName">The fallback type name when TypeName is not available on schema.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string typeNameHint)
+        public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : _resolver.GenerateTypeName(typeNameHint);
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
 
             if (_schema.IsEnumeration)
             {
@@ -99,9 +99,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     FieldName = ConvertToLowerCamelCase(property.Name),
 
                     Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
-                    IsStringEnum = property.ActualSchema.IsEnumeration && property.ActualSchema.Type == JsonObjectType.String,
+                    IsStringEnum = property.ActualPropertySchema.IsEnumeration && property.ActualPropertySchema.Type == JsonObjectType.String,
 
-                    Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name)
+                    Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name)
                 }).ToList();
 
                 var template = LoadTemplate("Class");
