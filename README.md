@@ -45,6 +45,8 @@ public class Person
     [Required]
     public string FirstName { get; set; }
 
+    public string MiddleName { get; set; }
+
     [Required]
     public string LastName { get; set; }
 
@@ -95,12 +97,21 @@ The generated JSON schema data stored in the `schemaData` variable:
     "FirstName": {
       "type": "string"
     },
+    "MiddleName": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "LastName": {
       "type": "string"
     },
     "Gender": {
-      "type": "integer",
-      "$ref": "#/definitions/Gender"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Gender"
+        }
+      ]
     },
     "NumberWithRange": {
       "type": "integer",
@@ -112,11 +123,14 @@ The generated JSON schema data stored in the `schemaData` variable:
       "format": "date-time"
     },
     "Company": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "$ref": "#/definitions/Company"
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Company"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "Cars": {
       "type": [
@@ -135,11 +149,14 @@ The generated JSON schema data stored in the `schemaData` variable:
             ]
           },
           "Manufacturer": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "$ref": "#/definitions/Company"
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Company"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       }
@@ -149,13 +166,13 @@ The generated JSON schema data stored in the `schemaData` variable:
     "Gender": {
       "type": "integer",
       "typeName": "Gender",
-      "enum": [
-        0,
-        1
-      ],
       "enumNames": [
         "Male",
         "Female"
+      ],
+      "enum": [
+        0,
+        1
       ]
     },
     "Company": {
@@ -185,6 +202,36 @@ var file = generator.GenerateFile();
 ```
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
+
+The previously generated JSON Schema would generate the following TypeScript code: 
+
+```typescript
+export interface Person {
+    FirstName: string;
+    MiddleName?: string;
+    LastName: string;
+    Gender?: GenderAsInteger;
+    NumberWithRange?: number;
+    Birthday?: Date;
+    Company?: Company;
+    Cars?: Car[];
+}
+
+export enum GenderAsInteger
+{
+    Male = 0, 
+    Female = 1, 
+}
+
+export interface Company {
+    Name?: string;
+}
+
+export interface Car {
+    Name?: string;
+    Manufacturer?: Company;
+}
+```
 
 ## Final notes
 
