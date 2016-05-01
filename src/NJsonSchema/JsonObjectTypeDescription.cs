@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 
 namespace NJsonSchema
@@ -28,8 +29,8 @@ namespace NJsonSchema
         {
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = 
-                    HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) || 
+                var isStringEnum =
+                    HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) ||
                     (parentAttributes != null && HasStringEnumConverter(parentAttributes)) ||
                     defaultEnumHandling == EnumHandling.String;
 
@@ -42,7 +43,7 @@ namespace NJsonSchema
             if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, true);
 
-            if ((type == typeof(long)) ||(type == typeof(ulong)))
+            if ((type == typeof(long)) || (type == typeof(ulong)))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Long);
 
             if (type == typeof(double) || type == typeof(float))
@@ -78,6 +79,9 @@ namespace NJsonSchema
             if (type == typeof(byte[]))
                 return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Byte);
 
+            if (type == typeof(JObject) || type == typeof(object))
+                return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
+
             if (IsDictionaryType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
 
@@ -95,7 +99,7 @@ namespace NJsonSchema
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
-                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null; 
+                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
                 return new JsonObjectTypeDescription(classType, false, false, format);
             }
 
@@ -156,7 +160,7 @@ namespace NJsonSchema
         private static bool IsDictionaryType(Type type)
         {
             if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
-                return true; 
+                return true;
 
             return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
                 (type.GetTypeInfo().BaseType == null ||

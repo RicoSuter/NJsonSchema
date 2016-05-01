@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace NJsonSchema
@@ -23,7 +24,7 @@ namespace NJsonSchema
             property.Name = name;
             return property;
         }
-        
+
         /// <summary>Gets or sets the name of the property. </summary>
         [JsonIgnore]
         public string Name { get; internal set; }
@@ -75,5 +76,9 @@ namespace NJsonSchema
         [DefaultValue(false)]
         [JsonProperty("readonly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsReadOnly { get; set; }
+
+        /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
+        [JsonIgnore]
+        public JsonSchema4 ActualPropertySchema => OneOf.FirstOrDefault(o => !o.IsNullable)?.ActualSchema ?? ActualSchema;
     }
 }

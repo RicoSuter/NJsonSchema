@@ -90,20 +90,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
                     PropertyName = ConvertToLowerCamelCase(property.Name).Replace("-", "_"),
 
-                    Type = _resolver.Resolve(property, property.Type.HasFlag(JsonObjectType.Null), property.Name),
+                    Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
 
-                    IsNewableObject = IsNewableObject(property),
-                    IsDate = property.ActualSchema.Format == JsonFormatStrings.DateTime,
+                    IsNewableObject = IsNewableObject(property.ActualPropertySchema),
+                    IsDate = property.ActualPropertySchema.Format == JsonFormatStrings.DateTime,
 
-                    IsDictionary = property.ActualSchema.IsDictionary,
-                    DictionaryValueType = TryResolve(property.ActualSchema.AdditionalPropertiesSchema, property.Name),
-                    IsDictionaryValueNewableObject = property.ActualSchema.AdditionalPropertiesSchema != null && IsNewableObject(property.ActualSchema.AdditionalPropertiesSchema),
-                    IsDictionaryValueDate = property.ActualSchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
+                    IsDictionary = property.ActualPropertySchema.IsDictionary,
+                    DictionaryValueType = TryResolve(property.ActualPropertySchema.AdditionalPropertiesSchema, property.Name),
+                    IsDictionaryValueNewableObject = property.ActualPropertySchema.AdditionalPropertiesSchema != null && IsNewableObject(property.ActualPropertySchema.AdditionalPropertiesSchema),
+                    IsDictionaryValueDate = property.ActualPropertySchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
-                    IsArray = property.ActualSchema.Type.HasFlag(JsonObjectType.Array),
-                    ArrayItemType = TryResolve(property.ActualSchema.Item, property.Name),
-                    IsArrayItemNewableObject = property.ActualSchema.Item != null && IsNewableObject(property.ActualSchema.Item), 
-                    IsArrayItemDate = property.ActualSchema.Item?.Format == JsonFormatStrings.DateTime, 
+                    IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array),
+                    ArrayItemType = TryResolve(property.ActualPropertySchema.Item, property.Name),
+                    IsArrayItemNewableObject = property.ActualPropertySchema.Item != null && IsNewableObject(property.ActualPropertySchema.Item), 
+                    IsArrayItemDate = property.ActualPropertySchema.Item?.Format == JsonFormatStrings.DateTime, 
 
                     Description = property.Description,
                     HasDescription = !string.IsNullOrEmpty(property.Description),

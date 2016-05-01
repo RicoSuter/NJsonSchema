@@ -56,6 +56,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = JsonSchema4.FromType<MyType>();
+            var schemaData = schema.ToJson();
 
             //// Assert
             var property = schema.Properties[propertyName];

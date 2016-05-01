@@ -64,6 +64,7 @@
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
+    <Compile Include="Validation\NullPropertyTests.cs" />
     <Compile Include="Validation\PatternPropertyValidationTests.cs" />
     <Compile Include="Validation\FormatBase64Tests.cs" />
     <Compile Include="Validation\FormatIpV6Tests.cs" />
@@ -94,6 +95,10 @@
     <Compile Include="Validation\ValueTypeValidationTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
+      <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
+      <Name>NJsonSchema.CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7b7a2e32-e808-4a19-98b1-37e766580f8c}</Project>
       <Name>NJsonSchema</Name>
