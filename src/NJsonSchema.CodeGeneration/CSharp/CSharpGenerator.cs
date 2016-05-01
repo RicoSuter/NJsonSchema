@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType(string.Empty).Code + "\n\n" + _resolver.GenerateTypes();
+            var classes = GenerateType().Code + "\n\n" + _resolver.GenerateTypes();
 
             var template = LoadTemplate("File");
             template.Add("namespace", Settings.Namespace);
@@ -65,11 +65,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Generates the type.</summary>
-        /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="fallbackTypeName">The fallback type name when TypeName is not available on schema.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string typeNameHint)
+        public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : _resolver.GenerateTypeName(typeNameHint);
+            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
 
             if (_schema.IsEnumeration)
             {
