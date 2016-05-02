@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -84,32 +85,29 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property => new
+                var properties = _schema.Properties.Values.Select(property =>
                 {
-                    Name = property.Name,
-                    InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
-                    PropertyName = ConvertToLowerCamelCase(property.Name).Replace("-", "_"),
+                    var propertyName = ConvertToLowerCamelCase(property.Name).Replace("-", "_");
+                    return new
+                    {
+                        Name = property.Name,
+                        InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
+                        PropertyName = propertyName,
 
-                    Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
+                        Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
+                        DataConversionCode = GenerateDataConversion(
+                            "this." + propertyName,
+                            "data[\"" + property.Name + "\"]",
+                            property.ActualPropertySchema,
+                            property.IsNullable,
+                            property.Name),
 
-                    IsNewableObject = IsNewableObject(property.ActualPropertySchema),
-                    IsDate = property.ActualPropertySchema.Format == JsonFormatStrings.DateTime,
+                        Description = property.Description,
+                        HasDescription = !string.IsNullOrEmpty(property.Description),
 
-                    IsDictionary = property.ActualPropertySchema.IsDictionary,
-                    DictionaryValueType = TryResolve(property.ActualPropertySchema.AdditionalPropertiesSchema, property.Name),
-                    IsDictionaryValueNewableObject = property.ActualPropertySchema.AdditionalPropertiesSchema != null && IsNewableObject(property.ActualPropertySchema.AdditionalPropertiesSchema),
-                    IsDictionaryValueDate = property.ActualPropertySchema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
-
-                    IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array),
-                    ArrayItemType = TryResolve(property.ActualPropertySchema.Item, property.Name),
-                    IsArrayItemNewableObject = property.ActualPropertySchema.Item != null && IsNewableObject(property.ActualPropertySchema.Item), 
-                    IsArrayItemDate = property.ActualPropertySchema.Item?.Format == JsonFormatStrings.DateTime, 
-
-                    Description = property.Description,
-                    HasDescription = !string.IsNullOrEmpty(property.Description),
-
-                    IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
-                    IsOptional = !property.IsRequired
+                        IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
+                        IsOptional = !property.IsRequired
+                    };
                 }).ToList();
 
                 var template = LoadTemplate(Settings.TypeStyle.ToString());
@@ -129,6 +127,44 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     Code = template.Render()
                 };
             }
+        }
+
+        /// <summary>Generates the code to convert a data object to the target class instances.</summary>
+        /// <param name="variable">The variable to assign the converted value to.</param>
+        /// <param name="value">The variable containing the original value.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="isPropertyNullable">Value indicating whether the value is nullable.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The generated code.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
+        public string GenerateDataConversion(string variable, string value, JsonSchema4 schema, bool isPropertyNullable, string typeNameHint)
+        {
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            var template = LoadTemplate("DataConversion");
+            template.Add("variable", variable);
+            template.Add("value", value);
+            template.Add("property", new
+            {
+                Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
+
+                IsNewableObject = IsNewableObject(schema),
+                IsDate = schema.Format == JsonFormatStrings.DateTime,
+
+                IsDictionary = schema.IsDictionary,
+                DictionaryValueType = TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
+                IsDictionaryValueNewableObject = schema.AdditionalPropertiesSchema != null && IsNewableObject(schema.AdditionalPropertiesSchema),
+                IsDictionaryValueDate = schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
+
+                IsArray = schema.Type.HasFlag(JsonObjectType.Array),
+                ArrayItemType = TryResolve(schema.Item, typeNameHint),
+                IsArrayItemNewableObject = schema.Item != null && IsNewableObject(schema.Item),
+                IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
+            });
+
+            var output = template.Render();
+            return output.Trim('\n', '\r');
         }
 
         private string TryResolve(JsonSchema4 schema, string typeNameHint)

@@ -106,6 +106,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return "string";
             }
 
+            if (type.HasFlag(JsonObjectType.File))
+                return "byte[]";
+
             if (schema.IsDictionary)
                 return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
 

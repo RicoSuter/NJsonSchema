@@ -485,7 +485,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties;
+        public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) && Properties.Count == 0 && AllowAdditionalProperties;
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
         [JsonIgnore]

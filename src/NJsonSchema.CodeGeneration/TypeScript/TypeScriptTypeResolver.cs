@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -40,8 +41,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
             schema = schema.ActualSchema;
 
             if (schema.IsAnyType)
@@ -85,6 +90,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return "string";
             }
 
+            if (type.HasFlag(JsonObjectType.File))
+                return "any";
+            
             if (schema.IsDictionary)
                 return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
 
