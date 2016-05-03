@@ -95,8 +95,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         PropertyName = propertyName,
 
                         Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
-                        DataConversionCode = GenerateDataConversion(
-                            "this." + propertyName,
+
+                        DataConversionCode = Settings.TypeStyle == TypeScriptTypeStyle.Interface ? string.Empty : GenerateDataConversion(
+                            Settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + propertyName : propertyName,
                             "data[\"" + property.Name + "\"]",
                             property.ActualPropertySchema,
                             property.IsNullable,
