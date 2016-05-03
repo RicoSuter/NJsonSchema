@@ -75,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("enums", GetEnumeration());
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", RemoveLineBreaks(_schema.Description));
+                template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
 
                 return new TypeGeneratorResult
                 {
@@ -87,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var properties = _schema.Properties.Values.Select(property =>
                 {
-                    var propertyName = ConvertToLowerCamelCase(property.Name).Replace("-", "_");
+                    var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
                     return new
                     {
                         Name = property.Name,
@@ -115,7 +115,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 template.Add("class", typeName);
 
                 template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", RemoveLineBreaks(_schema.Description));
+                template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
 
                 var hasInheritance = _schema.AllOf.Count == 1;
                 template.Add("hasInheritance", hasInheritance);
@@ -192,7 +192,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 entries.Add(new EnumerationEntry
                 {
                     Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
-                    Name = ConvertToUpperCamelCase(name)
+                    Name = ConversionUtilities.ConvertToUpperCamelCase(name)
                 });
             }
             return entries;

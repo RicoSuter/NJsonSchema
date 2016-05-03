@@ -554,7 +554,7 @@ namespace NJsonSchema
             return parent;
         }
 
-        private static JsonObjectType ConvertSimpleTypeFromString(string value)
+        private static JsonObjectType ConvertStringToObjectType(string value)
         {
             // TODO: Improve performance
             return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\"");

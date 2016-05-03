@@ -54,41 +54,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
-            {
-                var property = schema;
-                if (property.Item != null)
-                    return string.Format("{0}[]", Resolve(property.Item, true, null));
-
-                if (property.Items != null && property.Items.Count > 0)
-                    return string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
-
-                return "any[]";
-            }
+                return ResolveArray(schema);
 
             if (type.HasFlag(JsonObjectType.Number))
                 return "number";
 
             if (type.HasFlag(JsonObjectType.Integer))
-            {
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-
-                return "number";
-            }
+                return ResolveInteger(schema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return "boolean";
 
             if (type.HasFlag(JsonObjectType.String))
-            {
-                if (schema.Format == JsonFormatStrings.DateTime)
-                    return "Date";
-
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-
-                return "string";
-            }
+                return ResolveString(schema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
                 return "any";
@@ -119,6 +97,39 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return typeName + "AsInteger";
 
             return typeName;
+        }
+
+        private string ResolveString(JsonSchema4 schema, string typeNameHint)
+        {
+            if (schema.Format == JsonFormatStrings.DateTime)
+                return "Date";
+
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            return "string";
+        }
+
+        private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
+        {
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            return "number";
+        }
+
+        private string ResolveArray(JsonSchema4 schema)
+        {
+            var property = schema;
+            if (property.Item != null)
+                return string.Format("{0}[]", Resolve(property.Item, true, null));
+
+            if (property.Items != null && property.Items.Count > 0)
+                return
+                    string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) +
+                                  "]");
+
+            return "any[]";
         }
     }
 }

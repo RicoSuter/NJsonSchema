@@ -57,7 +57,7 @@ namespace NJsonSchema.Demo
                         Console.WriteLine("      Valid: " + valid);
 
                         //if (testDescription == "both anyOf invalid")
-                        RunTest(suite, test["data"], valid, ref fails, ref passes, ref exceptions);
+                        RunTest(file, suite, test["data"], valid, ref fails, ref passes, ref exceptions);
                     }
                 }
             }
@@ -67,7 +67,7 @@ namespace NJsonSchema.Demo
             Console.WriteLine("Exceptions: " + exceptions);
 
             var expectedFails = 16;
-            var expectedExceptions = 11;
+            var expectedExceptions = 14;
             if (fails != expectedFails || exceptions != expectedExceptions)
                 Console.WriteLine("========================\n" +
                                   "Unexpected result => Some commits changed the outcome! Please check. \n" +
@@ -91,11 +91,11 @@ namespace NJsonSchema.Demo
             //Console.ReadLine();
         }
 
-        private static void RunTest(JObject suite, JToken value, bool expectedResult, ref int fails, ref int passes, ref int exceptions)
+        private static void RunTest(string file, JObject suite, JToken value, bool expectedResult, ref int fails, ref int passes, ref int exceptions)
         {
             try
             {
-                var schema = JsonSchema4.FromJson(suite["schema"].ToString());
+                var schema = JsonSchema4.FromJson(suite["schema"].ToString(), Path.GetDirectoryName(file));
                 var errors = schema.Validate(value);
                 var success = expectedResult ? errors.Count == 0 : errors.Count > 0;
 

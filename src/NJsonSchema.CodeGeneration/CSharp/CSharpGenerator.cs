@@ -47,10 +47,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public CSharpGeneratorSettings Settings { get; private set; }
 
         /// <summary>Gets the language.</summary>
-        protected override string Language
-        {
-            get { return "CSharp"; }
-        }
+        protected override string Language => "CSharp";
 
         /// <summary>Generates the file.</summary>
         /// <returns>The file contents.</returns>
@@ -72,59 +69,57 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
 
             if (_schema.IsEnumeration)
-            {
-                var template = LoadTemplate("Enum");
-                template.Add("name", typeName);
-                template.Add("enums", GetEnumeration());
-
-                template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", RemoveLineBreaks(_schema.Description));
-
-                return new TypeGeneratorResult
-                {
-                    TypeName = typeName,
-                    Code = template.Render()
-                };
-            }
+                return GenerateEnum(typeName);
             else
+                return GenerateClass(typeName);
+        }
+
+        private TypeGeneratorResult GenerateClass(string typeName)
+        {
+            var properties = _schema.Properties.Values.Select(property => new CSharpPropertyModel(property, _resolver, Settings)).ToList();
+
+            var template = LoadTemplate("Class");
+            template.Add("namespace", Settings.Namespace);
+            template.Add("class", typeName);
+
+            template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
+            template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
+            template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
+
+            var hasInheritance = _schema.AllOf.Count == 1;
+
+            template.Add("hasInheritance", hasInheritance);
+            template.Add("inheritance", GenerateInheritanceCode(hasInheritance));
+            template.Add("properties", properties);
+
+            return new TypeGeneratorResult
             {
-                var properties = _schema.Properties.Values.Select(property => new
-                {
-                    Name = property.Name,
+                TypeName = typeName,
+                Code = template.Render()
+            };
+        }
 
-                    HasDescription = !string.IsNullOrEmpty(property.Description),
-                    Description = RemoveLineBreaks(property.Description),
+        private string GenerateInheritanceCode(bool hasInheritance)
+        {
+            return hasInheritance ? ": " + _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) +
+                  (Settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
+                  (Settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "");
+        }
 
-                    PropertyName = ConvertToUpperCamelCase(property.Name),
-                    FieldName = ConvertToLowerCamelCase(property.Name),
+        private TypeGeneratorResult GenerateEnum(string typeName)
+        {
+            var template = LoadTemplate("Enum");
+            template.Add("name", typeName);
+            template.Add("enums", GetEnumeration());
 
-                    Required = property.IsRequired && Settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default",
-                    IsStringEnum = property.ActualPropertySchema.IsEnumeration && property.ActualPropertySchema.Type == JsonObjectType.String,
+            template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
+            template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
 
-                    Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name)
-                }).ToList();
-
-                var template = LoadTemplate("Class");
-                template.Add("namespace", Settings.Namespace);
-                template.Add("class", typeName);
-
-                template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", RemoveLineBreaks(_schema.Description));
-                template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
-
-                var hasInheritance = _schema.AllOf.Count == 1;
-                template.Add("hasInheritance", hasInheritance);
-                template.Add("inheritance", hasInheritance ? ": " + _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) +
-                    (Settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
-                    (Settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : ""));
-                template.Add("properties", properties);
-
-                return new TypeGeneratorResult
-                {
-                    TypeName = typeName,
-                    Code = template.Render()
-                };
-            }
+            return new TypeGeneratorResult
+            {
+                TypeName = typeName,
+                Code = template.Render()
+            };
         }
 
         private List<EnumerationEntry> GetEnumeration()
@@ -140,7 +135,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 entries.Add(new EnumerationEntry
                 {
                     Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
-                    Name = ConvertToUpperCamelCase(name)
+                    Name = ConversionUtilities.ConvertToUpperCamelCase(name)
                 });
             }
             return entries;
