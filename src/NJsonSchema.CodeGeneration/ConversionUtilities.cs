@@ -1,0 +1,82 @@
+//-----------------------------------------------------------------------
+// <copyright file="ConversionUtilities.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+using System.Globalization;
+using System.Text;
+
+namespace NJsonSchema.CodeGeneration
+{
+    /// <summary>Provides name conversion utility methods.</summary>
+    public static class ConversionUtilities
+    {
+        /// <summary>Converts the first letter to lower case and dashes to camel case.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToLowerCamelCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
+        }
+
+        /// <summary>Converts the first letter to upper case and dashes to camel case.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToUpperCamelCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
+        }
+
+        /// <summary>Converts the input to a camel case identifier.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToCamelCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            return ConvertDashesToCamelCase(input.Replace(" ", "_"));
+        }
+
+        /// <summary>Removes the line breaks from the .</summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The updated text.</returns>
+        public static string RemoveWhiteSpaces(string text)
+        {
+            return text?.Replace("\r", "")
+                .Replace("\n", " \n")
+                .Replace("\n ", "\n")
+                .Replace("  \n", " \n")
+                .Replace("\n", "")
+                .Trim('\n', '\t', ' ');
+        }
+
+        private static string ConvertDashesToCamelCase(string input)
+        {
+            var sb = new StringBuilder();
+            var caseFlag = false;
+            foreach (char c in input)
+            {
+                if (c == '-')
+                    caseFlag = true;
+                else if (caseFlag)
+                {
+                    sb.Append(char.ToUpper(c));
+                    caseFlag = false;
+                }
+                else
+                    sb.Append(c);
+            }
+            return sb.ToString();
+        }
+    }
+}

@@ -116,9 +116,9 @@ namespace NJsonSchema
             set
             {
                 if (value is JArray)
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertSimpleTypeFromString(token.ToString()));
+                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToObjectType(token.ToString()));
                 else if (value != null)
-                    Type = ConvertSimpleTypeFromString(value.ToString());
+                    Type = ConvertStringToObjectType(value.ToString());
                 else
                     Type = JsonObjectType.None;
             }

@@ -57,7 +57,9 @@
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpClassStyle.cs" />
+    <Compile Include="CSharp\CSharpPropertyModel.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
+    <Compile Include="ConversionUtilities.cs" />
     <Compile Include="TypeGeneratorBase.cs" />
     <Compile Include="TypeGeneratorResult.cs" />
     <Compile Include="TypeResolverBase.cs" />
