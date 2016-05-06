@@ -66,7 +66,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return "byte[]";
 
             if (schema.IsDictionary)
-                return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
+            {
+                var valueType = schema.AdditionalPropertiesSchema != null ? Resolve(schema.AdditionalPropertiesSchema, false, null) : "object";
+                return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+            }
 
             return AddGenerator(schema, typeNameHint);
         }

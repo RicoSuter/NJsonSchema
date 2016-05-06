@@ -70,9 +70,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.HasFlag(JsonObjectType.File))
                 return "any";
-            
+
             if (schema.IsDictionary)
-                return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
+            {
+                var valueType = schema.AdditionalPropertiesSchema != null ? Resolve(schema.AdditionalPropertiesSchema, true, null) : "any";
+                return $"{{ [key: string] : {valueType}; }}";
+            }
 
             return AddGenerator(schema, typeNameHint);
         }
