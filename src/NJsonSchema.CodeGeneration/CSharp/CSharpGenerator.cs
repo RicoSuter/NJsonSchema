@@ -6,8 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.CSharp.Models;
+using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -54,11 +55,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public override string GenerateFile()
         {
             var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
-
-            var template = LoadTemplate("File");
-            template.Add("namespace", Settings.Namespace);
-            template.Add("classes", classes);
-            return template.Render();
+            var template = new FileTemplate(new FileTemplateModel
+            {
+                Namespace = Settings.Namespace ?? string.Empty, 
+                Classes = classes
+            });
+            return template.TransformText();
         }
 
         /// <summary>Generates the type.</summary>
@@ -76,69 +78,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
-            var properties = _schema.Properties.Values.Select(property => new CSharpPropertyModel(property, _resolver, Settings)).ToList();
+            var properties = _schema.Properties.Values
+                .Select(property => new PropertyModel(property, _resolver, Settings))
+                .ToList();
 
-            var template = LoadTemplate("Class");
-            template.Add("namespace", Settings.Namespace);
-            template.Add("class", typeName);
-
-            template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-            template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
-            template.Add("inpc", Settings.ClassStyle == CSharpClassStyle.Inpc);
-
-            var hasInheritance = _schema.AllOf.Count == 1;
-
-            template.Add("hasInheritance", hasInheritance);
-            template.Add("inheritance", GenerateInheritanceCode(hasInheritance));
-            template.Add("properties", properties);
-
+            var template = new ClassTemplate(new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties));
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                Code = template.Render()
+                Code = template.TransformText()
             };
-        }
-
-        private string GenerateInheritanceCode(bool hasInheritance)
-        {
-            return hasInheritance ? ": " + _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) +
-                  (Settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
-                  (Settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "");
         }
 
         private TypeGeneratorResult GenerateEnum(string typeName)
         {
-            var template = LoadTemplate("Enum");
-            template.Add("name", typeName);
-            template.Add("enums", GetEnumeration());
-
-            template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-            template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
-
+            var template = new EnumTemplate(new EnumTemplateModel(typeName, _schema));
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                Code = template.Render()
+                Code = template.TransformText()
             };
-        }
-
-        private List<EnumerationEntry> GetEnumeration()
-        {
-            var entries = new List<EnumerationEntry>();
-            for (int i = 0; i < _schema.Enumeration.Count; i++)
-            {
-                var value = _schema.Enumeration.ElementAt(i);
-                var name = _schema.EnumerationNames.Count > i ?
-                    _schema.EnumerationNames.ElementAt(i) :
-                    _schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
-
-                entries.Add(new EnumerationEntry
-                {
-                    Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
-                    Name = ConversionUtilities.ConvertToUpperCamelCase(name)
-                });
-            }
-            return entries;
         }
     }
 }

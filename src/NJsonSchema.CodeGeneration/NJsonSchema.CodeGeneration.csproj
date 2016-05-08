@@ -54,18 +54,69 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\Models\ClassTemplateModel.cs" />
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpClassStyle.cs" />
-    <Compile Include="CSharp\CSharpPropertyModel.cs" />
+    <Compile Include="CSharp\Models\PropertyModel.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
     <Compile Include="ConversionUtilities.cs" />
+    <Compile Include="CSharp\Models\EnumTemplateModel.cs" />
+    <Compile Include="CSharp\Templates\ClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\ClassTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Templates\EnumTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\EnumTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Templates\FileTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\FileTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Models\FileTemplateModel.cs" />
     <Compile Include="TypeGeneratorBase.cs" />
     <Compile Include="TypeGeneratorResult.cs" />
     <Compile Include="TypeResolverBase.cs" />
     <Compile Include="GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnumerationEntry.cs" />
+    <Compile Include="TypeScript\Models\EnumTemplateModel.cs" />
+    <Compile Include="TypeScript\Templates\ClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\ClassTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\DataConversionTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataConversionTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\EnumTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\EnumTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\InterfaceTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InterfaceTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\InterfaceTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\KnockoutClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KnockoutClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\KnockoutClassTemplate.Extensions.cs" />
     <Compile Include="TypeScript\TypeScriptDerivedTypeMapping.cs" />
     <Compile Include="TypeScript\TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScript\TypeScriptGenerator.cs" />
@@ -79,46 +130,46 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\Class.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="NJsonSchema.CodeGeneration.nuspec" />
     <None Include="packages.config" />
+    <Compile Include="TypeScript\Templates\DataConversionTemplate.Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\File.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <Content Include="CSharp\Templates\ClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="CSharp\Templates\EnumTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="CSharp\Templates\FileTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>FileTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="TypeScript\Templates\ClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="TypeScript\Templates\DataConversionTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DataConversionTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="TypeScript\Templates\EnumTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="TypeScript\Templates\InterfaceTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>InterfaceTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="TypeScript\Templates\KnockoutClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>KnockoutClassTemplate.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Interface.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\Enum.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Enum.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Class.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\KoObservableClass.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\DataConversion.txt" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

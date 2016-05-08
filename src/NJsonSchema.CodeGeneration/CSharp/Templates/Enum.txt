@@ -1,6 +1,0 @@
-﻿<if(hasDescription)>/// \<summary><description>\</summary>
-<endif>public enum <name>
-{
-<enums:{enum | 
-    <enum.Name> = <enum.Value>, }>
-}

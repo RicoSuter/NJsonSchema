@@ -8,7 +8,7 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
-    /// <summary>Desribes a mapping from a type to a derived to so that generated classes can be extended.</summary>
+    /// <summary>Describes a mapping from a type to a derived to so that generated classes can be extended.</summary>
     public class TypeScriptDerivedTypeMapping
     {
         /// <summary>Gets or sets the original type name.</summary>

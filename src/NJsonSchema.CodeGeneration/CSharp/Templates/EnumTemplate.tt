@@ -1,0 +1,8 @@
+﻿<#@ assembly name="System.Core" #>
+<# if(Model.HasDescription){ #>/// <summary><#=Model.Description#></summary>
+<# } #>public enum <#=Model.Name#>
+{
+<# foreach(var pair in Model.Enums){ #>
+    <#=pair.Name#> = <#=pair.Value#>,
+<# } #>
+}
