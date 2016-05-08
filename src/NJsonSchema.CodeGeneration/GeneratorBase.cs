@@ -6,7 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.IO;
+using System.Reflection;
 using Antlr4.StringTemplate;
 
 namespace NJsonSchema.CodeGeneration
@@ -24,9 +26,12 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Loads the template from an embedded resource.</summary>
         /// <param name="file">The file name.</param>
         /// <returns>The template. </returns>
+        //[Obsolete]
         protected Template LoadTemplate(string file)
         {
-            var assembly = GetType().Assembly;
+            // TODO: Remove LoadTemplate method
+
+            var assembly = GetType().GetTypeInfo().Assembly;
             var prefix = assembly.GetName().Name == "NJsonSchema.CodeGeneration" ? assembly.GetName().Name : assembly.GetName().Name + ".CodeGenerators";
             var resourceName = string.Format("{0}.{1}.Templates.{2}.txt", prefix, Language, file);
             using (var stream = assembly.GetManifestResourceStream(resourceName))

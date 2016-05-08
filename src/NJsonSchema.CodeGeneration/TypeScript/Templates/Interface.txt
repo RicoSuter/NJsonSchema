@@ -1,6 +1,0 @@
-﻿<if(hasDescription)>/** <description> */
-<endif>export interface <class><inheritance> {
-<properties:{property | 
-<if(property.HasDescription)>    /** <property.Description> */
-<endif>    <if(property.IsReadOnly)>readonly <endif><property.InterfaceName><if(property.IsOptional)>?<endif>: <property.Type>;
-}>}

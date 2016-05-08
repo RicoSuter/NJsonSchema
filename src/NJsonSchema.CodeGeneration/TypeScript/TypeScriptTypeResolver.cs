@@ -128,9 +128,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return string.Format("{0}[]", Resolve(property.Item, true, null));
 
             if (property.Items != null && property.Items.Count > 0)
-                return
-                    string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) +
-                                  "]");
+                return string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
 
             return "any[]";
         }
