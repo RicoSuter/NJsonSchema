@@ -74,9 +74,9 @@ foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
-            this.Write(", ");
+            this.Write(", \r\n");
             
-            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default

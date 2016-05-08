@@ -148,14 +148,14 @@ if(property.IsArray){
             
             #line default
             #line hidden
-            this.Write("\r\n    constructor(data?: any) {\r\n    ");
+            this.Write("\r\n    constructor(data?: any) {\r\n");
             
             #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.HasInheritance){
             
             #line default
             #line hidden
-            this.Write("        super(data);\r\n    ");
+            this.Write("        super(data);\r\n");
             
             #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }

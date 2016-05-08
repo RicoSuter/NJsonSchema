@@ -4,5 +4,6 @@
 <#}#>export enum <#=Model.Name#>
 {
 <#foreach(var enumeration in Model.Enums){#>
-    <#=enumeration.Name#> = <#=enumeration.Value#>, <#}#>
+    <#=enumeration.Name#> = <#=enumeration.Value#>, 
+<#}#>
 }

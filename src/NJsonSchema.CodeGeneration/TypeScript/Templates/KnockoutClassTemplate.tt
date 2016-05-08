@@ -8,9 +8,9 @@
 <#}#>
 
     constructor(data?: any) {
-    <#if(Model.HasInheritance){#>
+<#if(Model.HasInheritance){#>
         super(data);
-    <#}#>
+<#}#>
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>: <#=property.Type#> = null; 
