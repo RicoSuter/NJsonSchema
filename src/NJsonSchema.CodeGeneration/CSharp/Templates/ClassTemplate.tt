@@ -10,7 +10,7 @@
 <#}#>    [JsonProperty("<#=property.Name#>", Required = <property.Required>)]
 <#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>
-    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<else>
+    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#}else{#>
     {
         get { return _<#=property.FieldName#>; }
         set 

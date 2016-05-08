@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="CSharp\Templates\FileTemplate.Extensions.cs" />
     <Compile Include="CSharp\Models\FileTemplateModel.cs" />
+    <Compile Include="ITemplate.cs" />
     <Compile Include="TypeGeneratorBase.cs" />
     <Compile Include="TypeGeneratorResult.cs" />
     <Compile Include="TypeResolverBase.cs" />

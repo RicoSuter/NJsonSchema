@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NJsonSchema.CodeGeneration.TypeScript.Templates
+﻿namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
     public partial class DataConversionTemplate
     {
+        internal DataConversionTemplate(dynamic model)
+        {
+            Model = model;
+        }
+
+        internal dynamic Model { get; set; }
     }
 }

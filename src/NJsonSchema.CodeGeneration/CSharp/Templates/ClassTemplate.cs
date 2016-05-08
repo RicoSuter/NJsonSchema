@@ -160,7 +160,14 @@ if(!Model.Inpc){
             
             #line default
             #line hidden
-            this.Write(" { get; set; }<else>\r\n    {\r\n        get { return _");
+            this.Write(" { get; set; }");
+            
+            #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("    {\r\n        get { return _");
             
             #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));

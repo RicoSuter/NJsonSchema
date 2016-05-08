@@ -100,21 +100,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         Description = property.Description,
                         HasDescription = !string.IsNullOrEmpty(property.Description),
 
+                        IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array),
+                        ArrayItemType = TryResolve(property.ActualPropertySchema.Item, property.Name),
+
                         IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
                         IsOptional = !property.IsRequired
                     };
                 }).ToList();
 
-                var template = LoadTemplate(Settings.TypeStyle.ToString());
-                template.Add("class", typeName);
-
-                template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
-
                 var hasInheritance = _schema.AllOf.Count == 1;
-                template.Add("hasInheritance", hasInheritance);
-                template.Add("inheritance", hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
-                template.Add("properties", properties);
+
+                var template = Settings.CreateTemplate();
+                template.Initialize(new
+                {
+                    Class = typeName,
+
+                    HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
+                    Description = ConversionUtilities.RemoveWhiteSpaces(_schema.Description),
+
+                    HasInheritance = hasInheritance,
+                    Inheritance = hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty,
+                    Properties = properties
+                });
 
                 return new TypeGeneratorResult
                 {
@@ -137,11 +144,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
 
-            var template = LoadTemplate("DataConversion");
-            template.Add("variable", variable);
-            template.Add("value", value);
-            template.Add("property", new
+            var template = new DataConversionTemplate(new
             {
+                Variable = variable,
+                Value = value,
+
                 Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
 
                 IsNewableObject = IsNewableObject(schema),
@@ -158,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
             });
 
-            var output = template.Render();
+            var output = template.TransformText();
             return output.Trim('\n', '\r');
         }
 

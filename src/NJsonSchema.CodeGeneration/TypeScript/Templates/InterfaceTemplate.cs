@@ -9,9 +9,6 @@
 // ------------------------------------------------------------------------------
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
-    using System.Linq;
-    using System.Text;
-    using System.Collections.Generic;
     using System;
     
     /// <summary>
@@ -28,12 +25,114 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"<if(hasDescription)>/** <description> */
-<endif>export interface <class><inheritance> {
-<properties:{property | 
-<if(property.HasDescription)>    /** <property.Description> */
-<endif>    <if(property.IsReadOnly)>readonly <endif><property.InterfaceName><if(property.IsOptional)>?<endif>: <property.Type>;
-}>}");
+            
+            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(Model.HasDescription){
+            
+            #line default
+            #line hidden
+            this.Write("/** ");
+            
+            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Description));
+            
+            #line default
+            #line hidden
+            this.Write(" */\r\n");
+            
+            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("export interface ");
+            
+            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            
+            #line default
+            #line hidden
+            
+            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Inheritance));
+            
+            #line default
+            #line hidden
+            this.Write(" {\r\n");
+            
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+foreach(var property in Model.Properties){
+            
+            #line default
+            #line hidden
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(property.HasDescription){
+            
+            #line default
+            #line hidden
+            this.Write("    /** ");
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Description));
+            
+            #line default
+            #line hidden
+            this.Write(" */\r\n");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("    ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(property.IsReadOnly){
+            
+            #line default
+            #line hidden
+            this.Write("readonly ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.InterfaceName));
+            
+            #line default
+            #line hidden
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(property.IsOptional){
+            
+            #line default
+            #line hidden
+            this.Write("?");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(": ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
+            
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

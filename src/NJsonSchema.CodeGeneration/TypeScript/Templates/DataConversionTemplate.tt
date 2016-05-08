@@ -1,48 +1,44 @@
-﻿<#@ template language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<if(property.IsNewableObject)>
-<variable> = new <property.Type>(<value>);
-<else>
-<if(property.IsArray)>
-if (<value> && <value>.constructor === Array) {
-    <variable> = [];
-    for (var item of <value>)
-    <if(property.IsArrayItemNewableObject)>
-        <variable>.push(new <property.ArrayItemType>(item));
-    <else>
-    <if(property.IsArrayItemDate)>
-    <variable>.push(new Date(item));
-    <else>
-    <variable>.push(item);
-    <endif>
-    <endif>
-\}
-<else>
-<if(property.IsDictionary)>
-if (<value>) {
-    <variable> = {\};
-    for (var key in <value>) {
-        if (<value>.hasOwnProperty(key))
-    <if(property.IsDictionaryValueNewableObject)>
-            <variable>[key] = new <property.DictionaryValueType>(<value>[key]);
-    <else>
-    <if(property.IsDictionaryValueDate)>
-            <variable>[key] = new Date(<value>[key]);
-    <else>
-            <variable>[key] = <value>[key];
-    <endif>
-    <endif>
-    \}
-\}
-<else>
-    <if(property.IsDate)>
-<variable> = new Date(<value>);
-    <else>
-<variable> = <value>;
-    <endif>
-<endif>
-<endif>
-<endif>
+﻿<#@ assembly name="System.Core" #>
+<#if(Model.IsNewableObject){#>
+<#=Model.Variable#> = new <#=Model.Type#>(<#=Model.Value#>);
+<#}else{#>
+<#if(Model.IsArray){#>
+if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
+    <#=Model.Variable#> = [];
+    for (var item of <#=Model.Value#>)
+    <#if(Model.IsArrayItemNewableObject){#>
+        <#=Model.Variable#>.push(new <#=Model.ArrayItemType#>(item));
+    <#}else{#>
+    <#if(Model.IsArrayItemDate){#>
+    <#=Model.Variable#>.push(new Date(item));
+    <#}else{#>
+    <#=Model.Variable#>.push(item);
+    <#}#>
+    <#}#>
+}
+<#}else{#>
+<#if(Model.IsDictionary){#>
+if (<#=Model.Value#>) {
+    <#=Model.Variable#> = {};
+    for (var key in <#=Model.Value#>) {
+        if (<#=Model.Value#>.hasOwnProperty(key))
+    <#if(Model.IsDictionaryValueNewableObject){#>
+            <#=Model.Variable#>[key] = new <#=Model.DictionaryValueType#>(<#=Model.Value#>[key]);
+    <#}else{#>
+    <#if(Model.IsDictionaryValueDate){#>
+            <#=Model.Variable#>[key] = new Date(<#=Model.Value#>[key]);
+    <#}else{#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key];
+    <#}#>
+    <#}#>
+    }
+}
+<#}else{#>
+    <#if(Model.IsDate){#>
+<#=Model.Variable#> = new Date(<#=Model.Value#>);
+    <#}else{#>
+<#=Model.Variable#> = <#=Model.Value#>;
+    <#}#>
+<#}#>
+<#}#>
+<#}#>

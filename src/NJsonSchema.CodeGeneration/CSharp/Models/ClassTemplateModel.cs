@@ -40,9 +40,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         private static string GenerateInheritanceCode(CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, bool hasInheritance)
         {
-            return hasInheritance ?
-                ": " + resolver.Resolve(schema.AllOf.First(), false, string.Empty) + (settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "") :
-                (settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "");
+            if (hasInheritance)
+                return ": " + resolver.Resolve(schema.AllOf.First(), false, string.Empty) + 
+                    (settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "");
+            else
+                return settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "";
         }
     }
 }

@@ -1,24 +1,20 @@
-﻿<#@ template language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<if(hasDescription)>/** <description> */
-<endif>export class <class><inheritance> {
-<properties:{property | 
-<if(property.HasDescription)>    /** <property.Description> */
-<endif>    <if(property.IsReadOnly)>readonly <endif><property.PropertyName> = <if(property.IsArray)>ko.observableArray\<<property.ArrayItemType>>()<else>ko.observable\<<property.Type>>()<endif>;
-}>
+﻿<#@ assembly name="System.Core" #>
+<#if(Model.HasDescription){#>/** <#=Model.Description#> */
+<#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
+<#foreach (var property in Model.Properties){#>
+<#if(property.HasDescription){#>    /** <#=property.Description#> */
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>()<#}else{#>ko.observable<<#=property.Type#>>()<#}#>;
+<#}#>
     constructor(data?: any) {
-    <if(hasInheritance)>
+    <#if(Model.HasInheritance){#>
         super(data);
-    <endif>
+    <#}#>
         if (data !== undefined) {
-<properties:{property | 
-            var <property.PropertyName>: <property.Type> = null; 
-            <property.DataConversionCode>
-            this.<property.PropertyName>(<property.PropertyName>);
+<#foreach(var property in Model.Properties){#>
+            var <#=property.PropertyName#>: <#=property.Type#> = null; 
+            <#=property.DataConversionCode#>
+            this.<#=property.PropertyName#>(<#=property.PropertyName#>);
 
-}>        }
+<#}#>        }
     }
 }
