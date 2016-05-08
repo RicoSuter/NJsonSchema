@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (TypeStyle == TypeScriptTypeStyle.Class)
                 return new ClassTemplate();
 
-            if (TypeStyle == TypeScriptTypeStyle.KoObservableClass)
+            if (TypeStyle == TypeScriptTypeStyle.KnockoutClass)
                 return new KnockoutClassTemplate();
 
             throw new NotImplementedException();

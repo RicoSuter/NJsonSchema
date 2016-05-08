@@ -18,6 +18,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         Class,
 
         /// <summary>Generates classes with KnockoutJS observable properties.</summary>
-        KoObservableClass
+        KnockoutClass
     }
 }

@@ -1,10 +1,12 @@
 ﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach (var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
 <#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>()<#}else{#>ko.observable<<#=property.Type#>>()<#}#>;
 <#}#>
+
     constructor(data?: any) {
     <#if(Model.HasInheritance){#>
         super(data);
@@ -12,7 +14,7 @@
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>: <#=property.Type#> = null; 
-            <#=property.DataConversionCode#>
+            <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
             this.<#=property.PropertyName#>(<#=property.PropertyName#>);
 
 <#}#>        }

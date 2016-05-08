@@ -1,4 +1,5 @@
 ﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export interface <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>

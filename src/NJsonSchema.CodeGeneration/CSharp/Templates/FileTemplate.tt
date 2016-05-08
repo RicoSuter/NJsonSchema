@@ -1,4 +1,5 @@
 ﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,5 +12,5 @@ using Newtonsoft.Json.Converters;
 
 namespace <#=Model.Namespace#>
 {
-    <#=Model.Classes#>
+    <#=ConversionUtilities.Tab(Model.Classes, 1)#>
 }

@@ -1,3 +1,11 @@
+//-----------------------------------------------------------------------
+// <copyright file="EnumTemplateModel.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             Enums = GetEnumeration(schema);
 
             HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = ConversionUtilities.RemoveWhiteSpaces(schema.Description);
+            Description = ConversionUtilities.RemoveLineBreaks(schema.Description);
         }
 
         public string Name { get; }

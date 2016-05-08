@@ -1,4 +1,5 @@
 ﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
 <# if(Model.HasDescription){ #>/// <summary><#=Model.Description#></summary>
 <# } #>public enum <#=Model.Name#>
 {

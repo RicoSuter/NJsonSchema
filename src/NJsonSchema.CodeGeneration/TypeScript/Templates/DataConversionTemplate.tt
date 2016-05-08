@@ -1,4 +1,5 @@
 ﻿<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.IsNewableObject){#>
 <#=Model.Variable#> = new <#=Model.Type#>(<#=Model.Value#>);
 <#}else{#>
@@ -6,15 +7,14 @@
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
     <#=Model.Variable#> = [];
     for (var item of <#=Model.Value#>)
-    <#if(Model.IsArrayItemNewableObject){#>
+<#if(Model.IsArrayItemNewableObject){#>
         <#=Model.Variable#>.push(new <#=Model.ArrayItemType#>(item));
-    <#}else{#>
-    <#if(Model.IsArrayItemDate){#>
+<#}else{#>
+<#if(Model.IsArrayItemDate){#>
     <#=Model.Variable#>.push(new Date(item));
-    <#}else{#>
+<#}else{#>
     <#=Model.Variable#>.push(item);
-    <#}#>
-    <#}#>
+<#}}#>
 }
 <#}else{#>
 <#if(Model.IsDictionary){#>
@@ -22,15 +22,14 @@ if (<#=Model.Value#>) {
     <#=Model.Variable#> = {};
     for (var key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
-    <#if(Model.IsDictionaryValueNewableObject){#>
+<#if(Model.IsDictionaryValueNewableObject){#>
             <#=Model.Variable#>[key] = new <#=Model.DictionaryValueType#>(<#=Model.Value#>[key]);
-    <#}else{#>
-    <#if(Model.IsDictionaryValueDate){#>
+<#}else{#>
+<#if(Model.IsDictionaryValueDate){#>
             <#=Model.Variable#>[key] = new Date(<#=Model.Value#>[key]);
-    <#}else{#>
+<#}else{#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key];
-    <#}#>
-    <#}#>
+<#}}#>
     }
 }
 <#}else{#>

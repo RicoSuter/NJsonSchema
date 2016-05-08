@@ -2,13 +2,22 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    public partial class ClassTemplate
+    public partial class ClassTemplate : ITemplate
     {
-        internal ClassTemplate(ClassTemplateModel model)
+        internal ClassTemplateModel Model { get; private set; }
+
+        /// <summary>Initializes the template with a model.</summary>
+        /// <param name="model">The model.</param>
+        public void Initialize(object model)
         {
-            Model = model; 
+            Model = (ClassTemplateModel) model;
         }
 
-        internal ClassTemplateModel Model { get; }
+        /// <summary>Renders the template.</summary>
+        /// <returns>The output.</returns>
+        public string Render()
+        {
+            return ConversionUtilities.TrimWhiteSpaces(TransformText());
+        }
     }
 }

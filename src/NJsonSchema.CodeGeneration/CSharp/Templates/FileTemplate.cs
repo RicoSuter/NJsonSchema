@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
+    using NJsonSchema.CodeGeneration;
     using System;
     
     /// <summary>
@@ -37,19 +38,19 @@ using Newtonsoft.Json.Converters;
 
 namespace ");
             
-            #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
+            #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    ");
             
-            #line 14 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Classes));
+            #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(Model.Classes, 1)));
             
             #line default
             #line hidden
-            this.Write("\r\n}\r\n");
+            this.Write("\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

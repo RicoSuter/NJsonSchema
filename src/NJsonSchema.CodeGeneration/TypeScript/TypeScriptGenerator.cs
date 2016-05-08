@@ -55,7 +55,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            return GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            var output = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            return ConversionUtilities.TrimWhiteSpaces(output);
         }
 
         /// <summary>Generates the type.</summary>
@@ -70,11 +71,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (_schema.Type == JsonObjectType.Integer)
                     typeName = typeName + "AsInteger";
 
-                var template = new EnumTemplate(new EnumTemplateModel(typeName, _schema));
+                var template = new EnumTemplate() as ITemplate;
+                template.Initialize(new EnumTemplateModel(typeName, _schema));
                 return new TypeGeneratorResult
                 {
                     TypeName = typeName,
-                    Code = template.TransformText()
+                    Code = template.Render()
                 };
             }
             else
@@ -82,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var properties = _schema.Properties.Values.Select(property =>
                 {
                     var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
-                    return new
+                    return new // TODO: Create model class
                     {
                         Name = property.Name,
                         InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
@@ -111,12 +113,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var hasInheritance = _schema.AllOf.Count == 1;
 
                 var template = Settings.CreateTemplate();
-                template.Initialize(new
+                template.Initialize(new // TODO: Create model class
                 {
                     Class = typeName,
 
                     HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
-                    Description = ConversionUtilities.RemoveWhiteSpaces(_schema.Description),
+                    Description = ConversionUtilities.RemoveLineBreaks(_schema.Description),
 
                     HasInheritance = hasInheritance,
                     Inheritance = hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty,
@@ -144,7 +146,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
 
-            var template = new DataConversionTemplate(new
+            var template = new DataConversionTemplate() as ITemplate;
+            template.Initialize(new // TODO: Create model class
             {
                 Variable = variable,
                 Value = value,
@@ -164,9 +167,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemNewableObject = schema.Item != null && IsNewableObject(schema.Item),
                 IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
             });
-
-            var output = template.TransformText();
-            return output.Trim('\n', '\r');
+            return template.Render();
         }
 
         private string TryResolve(JsonSchema4 schema, string typeNameHint)

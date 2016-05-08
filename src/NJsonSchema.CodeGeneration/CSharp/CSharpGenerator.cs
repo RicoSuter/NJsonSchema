@@ -55,12 +55,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public override string GenerateFile()
         {
             var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
-            var template = new FileTemplate(new FileTemplateModel
+            var template = new FileTemplate() as ITemplate;
+            template.Initialize(new FileTemplateModel
             {
-                Namespace = Settings.Namespace ?? string.Empty, 
-                Classes = classes
+                Namespace = Settings.Namespace ?? string.Empty,
+                Classes = ConversionUtilities.TrimWhiteSpaces(classes)
             });
-            return template.TransformText();
+            return template.Render();
         }
 
         /// <summary>Generates the type.</summary>
@@ -82,21 +83,23 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 
-            var template = new ClassTemplate(new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties));
+            var template = new ClassTemplate() as ITemplate;
+            template.Initialize(new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties));
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                Code = template.TransformText()
+                Code = template.Render()
             };
         }
 
         private TypeGeneratorResult GenerateEnum(string typeName)
         {
-            var template = new EnumTemplate(new EnumTemplateModel(typeName, _schema));
+            var template = new EnumTemplate() as ITemplate;
+            template.Initialize(new EnumTemplateModel(typeName, _schema));
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                Code = template.TransformText()
+                Code = template.Render()
             };
         }
     }

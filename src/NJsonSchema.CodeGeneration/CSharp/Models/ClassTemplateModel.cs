@@ -1,17 +1,25 @@
-﻿using System.Collections.Generic;
+﻿//-----------------------------------------------------------------------
+// <copyright file="ClassTemplateModel.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     internal class ClassTemplateModel
     {
-        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, List<PropertyModel> properties)
+        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, IEnumerable<PropertyModel> properties)
         {
             Class = typeName;
             Namespace = settings.Namespace;
 
             HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = ConversionUtilities.RemoveWhiteSpaces(schema.Description);
+            Description = ConversionUtilities.RemoveLineBreaks(schema.Description);
 
             Inpc = settings.ClassStyle == CSharpClassStyle.Inpc;
 
@@ -36,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public bool HasInheritance { get; set; }
 
-        public List<PropertyModel> Properties { get; set; }
+        public IEnumerable<PropertyModel> Properties { get; set; }
 
         private static string GenerateInheritanceCode(CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, bool hasInheritance)
         {

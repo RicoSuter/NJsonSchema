@@ -1,14 +1,31 @@
-﻿using NJsonSchema.CodeGeneration.TypeScript.Models;
+﻿//-----------------------------------------------------------------------
+// <copyright file="EnumTemplate.Extensions.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+using NJsonSchema.CodeGeneration.TypeScript.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
-    public partial class EnumTemplate
+    public partial class EnumTemplate : ITemplate
     {
-        internal EnumTemplate(EnumTemplateModel model)
+        internal EnumTemplateModel Model { get; set; }
+
+        /// <summary>Initializes the template with a model.</summary>
+        /// <param name="model">The model.</param>
+        public void Initialize(object model)
         {
-            Model = model;
+            Model = (EnumTemplateModel)model;
         }
 
-        internal EnumTemplateModel Model { get; set; }
+        /// <summary>Renders the template.</summary>
+        /// <returns>The output.</returns>
+        public string Render()
+        {
+            return ConversionUtilities.TrimWhiteSpaces(TransformText());
+        }
     }
 }

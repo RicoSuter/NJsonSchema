@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace NJsonSchema.CodeGeneration
@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
+            return ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
         }
 
         /// <summary>Converts the first letter to upper case and dashes to camel case.</summary>
@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return ConvertDashesToCamelCase((input[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
+            return ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
         }
 
         /// <summary>Converts the input to a camel case identifier.</summary>
@@ -47,10 +47,19 @@ namespace NJsonSchema.CodeGeneration
             return ConvertDashesToCamelCase(input.Replace(" ", "_"));
         }
 
-        /// <summary>Removes the line breaks from the .</summary>
+
+        /// <summary>Trims white spaces from the text.</summary>
         /// <param name="text">The text.</param>
         /// <returns>The updated text.</returns>
-        public static string RemoveWhiteSpaces(string text)
+        public static string TrimWhiteSpaces(string text)
+        {
+            return text?.Trim('\n', '\r', '\t', ' ');
+        }
+
+        /// <summary>Removes the line breaks from the text.</summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The updated text.</returns>
+        public static string RemoveLineBreaks(string text)
         {
             return text?.Replace("\r", "")
                 .Replace("\n", " \n")
@@ -58,6 +67,15 @@ namespace NJsonSchema.CodeGeneration
                 .Replace("  \n", " \n")
                 .Replace("\n", "")
                 .Trim('\n', '\t', ' ');
+        }
+
+        /// <summary>Add tabs to the given string.</summary>
+        /// <param name="input">The input.</param>
+        /// <param name="count">The tab count.</param>
+        /// <returns>The output.</returns>
+        public static string Tab(string input, int count)
+        {
+            return input.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", count)));
         }
 
         private static string ConvertDashesToCamelCase(string input)
