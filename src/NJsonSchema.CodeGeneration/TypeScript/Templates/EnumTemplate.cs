@@ -53,30 +53,30 @@ if(Model.HasDescription){
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n");
+            this.Write(" {\r\n");
             
-            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Value));
             
             #line default
             #line hidden
             this.Write(", \r\n");
             
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default
