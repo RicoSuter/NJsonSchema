@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
     
     #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
-    public partial class EnumTemplate : EnumTemplateBase
+    internal partial class EnumTemplate : EnumTemplateBase
     {
 #line hidden
         /// <summary>
@@ -27,56 +27,56 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         public virtual string TransformText()
         {
             
-            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 if(Model.HasDescription){
             
             #line default
             #line hidden
             this.Write("/** ");
             
-            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Description));
             
             #line default
             #line hidden
             this.Write(" */\r\n");
             
-            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("export enum ");
             
-            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Name));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Value));
             
             #line default
             #line hidden
             this.Write(", \r\n");
             
-            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default
@@ -93,7 +93,7 @@ foreach(var enumeration in Model.Enums){
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
-    public class EnumTemplateBase
+    internal class EnumTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

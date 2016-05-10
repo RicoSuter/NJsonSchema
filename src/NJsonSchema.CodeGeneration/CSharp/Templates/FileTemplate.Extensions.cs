@@ -2,15 +2,15 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    public partial class FileTemplate : ITemplate
+    internal partial class FileTemplate : ITemplate
     {
-        internal FileTemplateModel Model { get; private set; }
+        public dynamic Model { get; private set; }
 
         /// <summary>Initializes the template with a model.</summary>
         /// <param name="model">The model.</param>
         public void Initialize(object model)
         {
-            Model = (FileTemplateModel)model;
+            Model = model;
         }
 
         /// <summary>Renders the template.</summary>

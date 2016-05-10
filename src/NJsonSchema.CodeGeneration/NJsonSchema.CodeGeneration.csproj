@@ -114,7 +114,6 @@
       <DependentUpon>ClassTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeScript\Templates\ClassTemplate.Extensions.cs" />
-    <Compile Include="Infrastructure\CompilerErrorCollection.cs" />
     <Compile Include="TypeScript\Templates\DataConversionTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -138,7 +137,7 @@
       <DependentUpon>KnockoutClassTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeScript\Templates\KnockoutClassTemplate.Extensions.cs" />
-    <Compile Include="Infrastructure\CodeGenerationExtensions.cs" />
+    <Compile Include="Infrastructure\T4Extensions.cs" />
     <Compile Include="TypeScript\TypeScriptDerivedTypeMapping.cs" />
     <Compile Include="TypeScript\TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScript\TypeScriptGenerator.cs" />

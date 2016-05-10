@@ -8,9 +8,9 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
-    public partial class KnockoutClassTemplate : ITemplate
+    internal partial class KnockoutClassTemplate : ITemplate
     {
-        internal dynamic Model { get; set; }
+        public dynamic Model { get; set; }
 
         /// <summary>Initializes the template with a model.</summary>
         /// <param name="model">The model.</param>

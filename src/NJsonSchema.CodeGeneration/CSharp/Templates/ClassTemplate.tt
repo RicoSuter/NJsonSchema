@@ -1,18 +1,19 @@
-﻿<#@ assembly name="System.Core" #>
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.HasDescription){#>/// <summary><#=Model.Description#></summary>
 <#}#>public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
-    private <#=property.Type#> _<#=property.FieldName#>;
-<#}}#>
+    private <#=property.Type#> _<#=property.FieldName#>;<#}}#>
+
 
 <#foreach(var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /// <summary><#=property.Description#></summary>
 <#}#>    [JsonProperty("<#=property.Name#>", Required = <property.Required>)]
 <#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>
-    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#}else{#>
-
+    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }
+    <#}else{#>
     {
         get { return _<#=property.FieldName#>; }
         set 
@@ -34,7 +35,7 @@
         return JsonConvert.SerializeObject(this);
     }
     
-    public static <class> FromJson(string data)
+    public static <#=Model.Class#> FromJson(string data)
     {
         return JsonConvert.DeserializeObject<<#=Model.Class#>>(data);
     }

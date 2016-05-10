@@ -2,9 +2,9 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    public partial class EnumTemplate : ITemplate
+    internal partial class EnumTemplate : ITemplate
     {
-        internal EnumTemplateModel Model { get; set; }
+        public EnumTemplateModel Model { get; set; }
         
         /// <summary>Initializes the template with a model.</summary>
         /// <param name="model">The model.</param>

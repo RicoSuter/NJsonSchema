@@ -2,9 +2,9 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    public partial class ClassTemplate : ITemplate
+    internal partial class ClassTemplate : ITemplate
     {
-        internal ClassTemplateModel Model { get; private set; }
+        public ClassTemplateModel Model { get; private set; }
 
         /// <summary>Initializes the template with a model.</summary>
         /// <param name="model">The model.</param>

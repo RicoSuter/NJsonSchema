@@ -1,31 +1,40 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="CompilerErrorCollection.cs" company="NJsonSchema">
+// <copyright file="T4Extensions.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
-// ReSharper disable once CheckNamespace
-namespace System.CodeDom.Compiler
+namespace NJsonSchema.CodeGeneration
 {
     // Needed for T4 in PCL libraries
 
-    /// <summary>Internal.</summary>
-    public class CompilerErrorCollection : List<CompilerError>
+    internal static class T4Extensions
     {
-        
+        public static MethodInfo GetMethod(this Type type, string method, params Type[] parameters)
+        {
+            return type.GetRuntimeMethod(method, parameters);
+        }
     }
 
-    /// <summary>Internal.</summary>
-    public class CompilerError
+}
+
+namespace System.CodeDom.Compiler
+{
+    internal class CompilerErrorCollection : List<CompilerError>
     {
-        /// <summary>Gets or sets the error text.</summary>
+
+    }
+
+    internal class CompilerError
+    {
         public string ErrorText { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether this error is a warning.</summary>
         public bool IsWarning { get; set; }
     }
 }
