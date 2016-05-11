@@ -344,14 +344,14 @@ if(Model.IsDate){
             this.Write(") : ");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\DataConversionTemplate.tt"
-if(property.HasDefaultValue){
+if(Model.HasDefaultValue){
             
             #line default
             #line hidden
             this.Write("new Date(");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\DataConversionTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
             
             #line default
             #line hidden
@@ -399,13 +399,13 @@ if(property.HasDefaultValue){
             this.Write(" : ");
             
             #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\DataConversionTemplate.tt"
-if(property.HasDefaultValue){
+if(Model.HasDefaultValue){
             
             #line default
             #line hidden
             
             #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\DataConversionTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
             
             #line default
             #line hidden

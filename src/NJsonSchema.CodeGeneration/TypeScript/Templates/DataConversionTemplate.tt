@@ -35,9 +35,9 @@ if (<#=Model.Value#>) {
 }
 <#}else{#>
     <#if(Model.IsDate){#>
-<#=Model.Variable#> = <#=Model.Value#> !== undefined ? new Date(<#=Model.Value#>) : <#if(property.HasDefaultValue){#>new Date(<#=property.DefaultValue#>)<#}else{#>null<#}#>;
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? new Date(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#>new Date(<#=Model.DefaultValue#>)<#}else{#>null<#}#>;
     <#}else{#>
-<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}else{#>null<#}#>;
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
     <#}#>
 <#}#>
 <#}#>
