@@ -202,30 +202,29 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("    ");
             
             #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
-}else{
+  }else{
             
             #line default
             #line hidden
-            this.Write("    {\r\n        get { return _");
+            this.Write("\r\n    {\r\n        get { return _");
             
-            #line 18 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 19 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
             
             #line default
             #line hidden
             this.Write("; }\r\n        set \r\n        {\r\n            if (_");
             
-            #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 22 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
             
             #line default
             #line hidden
             this.Write(" != value)\r\n            {\r\n                _");
             
-            #line 23 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 24 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
             
             #line default
@@ -233,27 +232,27 @@ if(property.HasDefaultValue){
             this.Write(" = value; \r\n                RaisePropertyChanged();\r\n            }\r\n        }\r\n  " +
                     "  }");
             
-            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 }
             
             #line default
             #line hidden
             
-            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 if(Model.Inpc){
             
             #line default
             #line hidden
             this.Write("    public event PropertyChangedEventHandler PropertyChanged;\r\n\r\n");
             
-            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 }
             
             #line default
@@ -261,21 +260,21 @@ if(Model.Inpc){
             this.Write("    public string ToJson() \r\n    {\r\n        return JsonConvert.SerializeObject(th" +
                     "is);\r\n    }\r\n    \r\n    public static ");
             
-            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 39 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
             this.Write(" FromJson(string data)\r\n    {\r\n        return JsonConvert.DeserializeObject<");
             
-            #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 41 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
             this.Write(">(data);\r\n    }\r\n");
             
-            #line 42 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 if(Model.Inpc){
             
             #line default
@@ -289,7 +288,7 @@ if(Model.Inpc){
     }
 ");
             
-            #line 50 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            #line 51 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 }
             
             #line default

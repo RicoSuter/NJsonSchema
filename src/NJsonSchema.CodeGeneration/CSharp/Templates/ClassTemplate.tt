@@ -13,7 +13,8 @@
 <#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>
     public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
-    <#}else{#>
+<#  }else{#>
+
     {
         get { return _<#=property.FieldName#>; }
         set 
