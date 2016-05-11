@@ -67,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = Prepare(TypeScriptTypeStyle.KnockoutClass);
 
             //// Assert
-            Assert.IsTrue(code.Contains("name = ko.observable<string>();"));
+            Assert.IsTrue(code.Contains("dateOfBirth = ko.observable<Date>();"));
         }
 
         private static string Prepare(TypeScriptTypeStyle style)
