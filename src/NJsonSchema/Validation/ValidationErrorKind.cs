@@ -119,8 +119,8 @@ namespace NJsonSchema.Validation
         /// <summary>The additional properties are not valid. </summary>
         AdditionalPropertiesNotValid,
 
-        /// <summary>There are too many properties in the tuple. </summary>
-        TooManyPropertiesInTuple,
+        /// <summary>Additional/unspecified properties are not allowed. </summary>
+        NoAdditionalPropertiesAllowed,
 
         /// <summary>There are too many properties in the object. </summary>
         TooManyProperties,

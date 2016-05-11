@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(1, errors.Count());
-            Assert.AreEqual(ValidationErrorKind.TooManyPropertiesInTuple, errors.First().Kind);
+            Assert.AreEqual(ValidationErrorKind.NoAdditionalPropertiesAllowed, errors.First().Kind);
         }
 
         [TestMethod]
