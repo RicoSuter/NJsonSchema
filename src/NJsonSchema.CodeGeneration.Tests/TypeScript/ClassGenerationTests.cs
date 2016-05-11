@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 
@@ -10,6 +11,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     {
         public class MyClassTest
         {
+            [DefaultValue("foo")]
             public string Name { get; set; }
 
             public DateTime DateOfBirth { get; set; }
@@ -42,22 +44,45 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void Todo()
+        public void When_generating_TypeScript_classes_then_output_is_correct()
         {
-            //// Arrange
+            var code = Prepare(TypeScriptTypeStyle.Class);
+
+            //// Assert
+            Assert.IsTrue(code.Contains("constructor(data?: any) {"));
+        }
+
+        [TestMethod]
+        public void When_default_value_is_available_then_variable_is_initialized()
+        {
+            var code = Prepare(TypeScriptTypeStyle.Class);
+
+            //// Assert
+            Assert.IsTrue(code.Contains("name: string = \"foo\"; "));
+        }
+
+        [TestMethod]
+        public void When_generating_TypeScript_knockout_classes_then_output_is_correct()
+        {
+            var code = Prepare(TypeScriptTypeStyle.KnockoutClass);
+
+            //// Assert
+            Assert.IsTrue(code.Contains("dateOfBirth = ko.observable<Date>();"));
+        }
+
+        private static string Prepare(TypeScriptTypeStyle style)
+        {
             var schema = JsonSchema4.FromType<MyClassTest>();
             var data = schema.ToJson();
             var settings = new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.KoObservableClass
+                TypeStyle = style
             };
 
             //// Act
             var generator = new TypeScriptGenerator(schema, settings);
             var code = generator.GenerateFile();
-
-            //// Assert
-            //Assert.IsTrue(code.Contains("Test?: { [key: string] : any; };"));
+            return code;
         }
     }
 }

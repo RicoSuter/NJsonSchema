@@ -19,7 +19,7 @@ namespace NJsonSchema.Validation
         {
             Kind = kind; 
             Property = property;
-            Path = path;
+            Path = path != null ? "#/" + path : "#";
         }
 
         /// <summary>Gets the error kind. </summary>

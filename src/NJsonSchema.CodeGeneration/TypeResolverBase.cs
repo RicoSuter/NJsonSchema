@@ -36,6 +36,15 @@ namespace NJsonSchema.CodeGeneration
             _types[typeName] = generator;
         }
 
+        /// <summary>Tries the resolve the schema and returns null there was a problem.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name.</returns>
+        public string TryResolve(JsonSchema4 schema, string typeNameHint)
+        {
+            return schema != null ? Resolve(schema, false, typeNameHint) : string.Empty;
+        }
+
         /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
         public string GenerateTypes()

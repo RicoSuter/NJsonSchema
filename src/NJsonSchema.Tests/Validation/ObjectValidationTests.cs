@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual("Foo", errors.First().Property);
-            Assert.AreEqual("Foo", errors.First().Path);
+            Assert.AreEqual("#/Foo", errors.First().Path);
             Assert.AreEqual(ValidationErrorKind.PropertyRequired, errors.First().Kind);
         }
 
@@ -132,7 +132,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
             Assert.AreEqual("Foo", errors.First().Property);
-            Assert.AreEqual("Foo", errors.First().Path);
+            Assert.AreEqual("#/Foo", errors.First().Path);
         }
     }
 }

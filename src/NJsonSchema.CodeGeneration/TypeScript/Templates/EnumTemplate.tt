@@ -1,0 +1,9 @@
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#if(Model.HasDescription){#>/** <#=Model.Description#> */
+<#}#>export enum <#=Model.Name#> {
+<#foreach(var enumeration in Model.Enums){#>
+    <#=enumeration.Name#> = <#=enumeration.Value#>, 
+<#}#>
+}

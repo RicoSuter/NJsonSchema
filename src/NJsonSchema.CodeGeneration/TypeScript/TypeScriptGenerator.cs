@@ -7,8 +7,10 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
+using NJsonSchema.CodeGeneration.TypeScript.Models;
+using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -54,7 +56,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            return GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            var output = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            return ConversionUtilities.TrimWhiteSpaces(output);
         }
 
         /// <summary>Generates the type.</summary>
@@ -66,17 +69,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (_schema.IsEnumeration)
             {
-                var template = LoadTemplate("Enum");
-
                 if (_schema.Type == JsonObjectType.Integer)
                     typeName = typeName + "AsInteger";
 
-                template.Add("name", typeName);
-                template.Add("enums", GetEnumeration());
-
-                template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
-
+                var template = new EnumTemplate() as ITemplate;
+                template.Initialize(new EnumTemplateModel(typeName, _schema));
                 return new TypeGeneratorResult
                 {
                     TypeName = typeName,
@@ -85,42 +82,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property =>
-                {
-                    var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
-                    return new
-                    {
-                        Name = property.Name,
-                        InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
-                        PropertyName = propertyName,
-
-                        Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
-
-                        DataConversionCode = Settings.TypeStyle == TypeScriptTypeStyle.Interface ? string.Empty : GenerateDataConversion(
-                            Settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + propertyName : propertyName,
-                            "data[\"" + property.Name + "\"]",
-                            property.ActualPropertySchema,
-                            property.IsNullable,
-                            property.Name),
-
-                        Description = property.Description,
-                        HasDescription = !string.IsNullOrEmpty(property.Description),
-
-                        IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
-                        IsOptional = !property.IsRequired
-                    };
-                }).ToList();
-
-                var template = LoadTemplate(Settings.TypeStyle.ToString());
-                template.Add("class", typeName);
-
-                template.Add("hasDescription", !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description));
-                template.Add("description", ConversionUtilities.RemoveWhiteSpaces(_schema.Description));
-
+                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings, this)).ToList();
                 var hasInheritance = _schema.AllOf.Count == 1;
-                template.Add("hasInheritance", hasInheritance);
-                template.Add("inheritance", hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty);
-                template.Add("properties", properties);
+
+                var template = Settings.CreateTemplate();
+                template.Initialize(new // TODO: Create model class
+                {
+                    Class = typeName,
+
+                    HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
+                    Description = ConversionUtilities.RemoveLineBreaks(_schema.Description),
+
+                    HasInheritance = hasInheritance,
+                    Inheritance = hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty,
+                    Properties = properties
+                });
 
                 return new TypeGeneratorResult
                 {
@@ -143,59 +119,37 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
 
-            var template = LoadTemplate("DataConversion");
-            template.Add("variable", variable);
-            template.Add("value", value);
-            template.Add("property", new
+            var template = new DataConversionTemplate() as ITemplate;
+            template.Initialize(new // TODO: Create model class
             {
+                Variable = variable,
+                Value = value,
+
+                HasDefaultValue = PropertyModelBase.GetDefaultValue(schema) != null, 
+                DefaultValue = PropertyModelBase.GetDefaultValue(schema), 
+
                 Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
 
                 IsNewableObject = IsNewableObject(schema),
                 IsDate = schema.Format == JsonFormatStrings.DateTime,
 
                 IsDictionary = schema.IsDictionary,
-                DictionaryValueType = TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
+                DictionaryValueType = _resolver.TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
                 IsDictionaryValueNewableObject = schema.AdditionalPropertiesSchema != null && IsNewableObject(schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                 IsArray = schema.Type.HasFlag(JsonObjectType.Array),
-                ArrayItemType = TryResolve(schema.Item, typeNameHint),
+                ArrayItemType = _resolver.TryResolve(schema.Item, typeNameHint),
                 IsArrayItemNewableObject = schema.Item != null && IsNewableObject(schema.Item),
                 IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
             });
-
-            var output = template.Render();
-            return output.Trim('\n', '\r');
-        }
-
-        private string TryResolve(JsonSchema4 schema, string typeNameHint)
-        {
-            return schema != null ? _resolver.Resolve(schema, false, typeNameHint) : string.Empty;
+            return template.Render();
         }
 
         private static bool IsNewableObject(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
             return schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAnyType && !schema.IsDictionary;
-        }
-
-        private List<EnumerationEntry> GetEnumeration()
-        {
-            var entries = new List<EnumerationEntry>();
-            for (int i = 0; i < _schema.Enumeration.Count; i++)
-            {
-                var value = _schema.Enumeration.ElementAt(i);
-                var name = _schema.EnumerationNames.Count > i ?
-                    _schema.EnumerationNames.ElementAt(i) :
-                    _schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
-
-                entries.Add(new EnumerationEntry
-                {
-                    Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
-                    Name = ConversionUtilities.ConvertToUpperCamelCase(name)
-                });
-            }
-            return entries;
         }
     }
 }

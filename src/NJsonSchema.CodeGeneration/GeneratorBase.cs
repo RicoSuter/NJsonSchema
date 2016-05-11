@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.IO;
-using Antlr4.StringTemplate;
+using System.Reflection;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -20,23 +20,5 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <returns>The code</returns>
         public abstract string GenerateFile();
-
-        /// <summary>Loads the template from an embedded resource.</summary>
-        /// <param name="file">The file name.</param>
-        /// <returns>The template. </returns>
-        protected Template LoadTemplate(string file)
-        {
-            var assembly = GetType().Assembly;
-            var prefix = assembly.GetName().Name == "NJsonSchema.CodeGeneration" ? assembly.GetName().Name : assembly.GetName().Name + ".CodeGenerators";
-            var resourceName = string.Format("{0}.{1}.Templates.{2}.txt", prefix, Language, file);
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    var text = reader.ReadToEnd();
-                    return new Template(text);
-                }
-            }
-        }
     }
 }

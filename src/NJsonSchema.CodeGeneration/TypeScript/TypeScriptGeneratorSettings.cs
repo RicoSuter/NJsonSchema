@@ -6,8 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -47,6 +49,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             var modules = DerivedTypeMappings.GroupBy(m => m.Module).Select(g => g.Key).ToList();
             return "m" + modules.IndexOf(mapping.Module);
+        }
+
+        internal ITemplate CreateTemplate()
+        {
+            if (TypeStyle == TypeScriptTypeStyle.Interface)
+                return new InterfaceTemplate();
+
+            if (TypeStyle == TypeScriptTypeStyle.Class)
+                return new ClassTemplate();
+
+            if (TypeStyle == TypeScriptTypeStyle.KnockoutClass)
+                return new KnockoutClassTemplate();
+
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,0 +1,44 @@
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#if(Model.IsNewableObject){#>
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? new <#=Model.Type#>(<#=Model.Value#>) : null;
+<#}else{#>
+<#if(Model.IsArray){#>
+if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
+    <#=Model.Variable#> = [];
+    for (var item of <#=Model.Value#>)
+<#if(Model.IsArrayItemNewableObject){#>
+        <#=Model.Variable#>.push(new <#=Model.ArrayItemType#>(item));
+<#}else{#>
+<#if(Model.IsArrayItemDate){#>
+    <#=Model.Variable#>.push(new Date(item));
+<#}else{#>
+    <#=Model.Variable#>.push(item);
+<#}}#>
+}
+<#}else{#>
+<#if(Model.IsDictionary){#>
+if (<#=Model.Value#>) {
+    <#=Model.Variable#> = {};
+    for (var key in <#=Model.Value#>) {
+        if (<#=Model.Value#>.hasOwnProperty(key))
+<#if(Model.IsDictionaryValueNewableObject){#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? new <#=Model.DictionaryValueType#>(<#=Model.Value#>[key]) : null;
+<#}else{#>
+<#if(Model.IsDictionaryValueDate){#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? new Date(<#=Model.Value#>[key]) : null;
+<#}else{#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : null;
+<#}}#>
+    }
+}
+<#}else{#>
+    <#if(Model.IsDate){#>
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? new Date(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#>new Date(<#=Model.DefaultValue#>)<#}else{#>null<#}#>;
+    <#}else{#>
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
+    <#}#>
+<#}#>
+<#}#>
+<#}#>

@@ -1,20 +1,22 @@
 //-----------------------------------------------------------------------
-// <copyright file="CSharpPropertyModel.cs" company="NJsonSchema">
+// <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-namespace NJsonSchema.CodeGeneration.CSharp
+using NJsonSchema.CodeGeneration.Models;
+
+namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    internal class CSharpPropertyModel
+    internal class PropertyModel : PropertyModelBase
     {
-        public CSharpPropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
+        internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings) : base(property)
         {
             Name = property.Name;
             HasDescription = !string.IsNullOrEmpty(property.Description);
-            Description = ConversionUtilities.RemoveWhiteSpaces(property.Description);
+            Description = ConversionUtilities.RemoveLineBreaks(property.Description);
             PropertyName = ConversionUtilities.ConvertToUpperCamelCase(property.Name);
             FieldName = ConversionUtilities.ConvertToLowerCamelCase(property.Name);
             Required = property.IsRequired && settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default";

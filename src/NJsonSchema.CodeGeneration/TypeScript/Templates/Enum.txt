@@ -1,6 +1,0 @@
-﻿<if(hasDescription)>/** <description> */
-<endif>export enum <name>
-{
-<enums:{enum | 
-    <enum.Name> = <enum.Value>, }>
-}

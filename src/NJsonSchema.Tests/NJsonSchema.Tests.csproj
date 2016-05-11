@@ -92,6 +92,7 @@
     <Compile Include="Validation\FormatUriTests.cs" />
     <Compile Include="Validation\InheritanceTests.cs" />
     <Compile Include="Validation\ObjectValidationTests.cs" />
+    <Compile Include="Validation\SchemaTests.cs" />
     <Compile Include="Validation\ValueTypeValidationTests.cs" />
   </ItemGroup>
   <ItemGroup>
