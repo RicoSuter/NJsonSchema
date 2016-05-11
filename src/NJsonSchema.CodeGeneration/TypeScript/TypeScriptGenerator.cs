@@ -81,35 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property =>
-                {
-                    var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
-                    return new // TODO: Create model class
-                    {
-                        Name = property.Name,
-                        InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name,
-                        PropertyName = propertyName,
-
-                        Type = _resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name),
-
-                        DataConversionCode = Settings.TypeStyle == TypeScriptTypeStyle.Interface ? string.Empty : GenerateDataConversion(
-                            Settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + propertyName : propertyName,
-                            "data[\"" + property.Name + "\"]",
-                            property.ActualPropertySchema,
-                            property.IsNullable,
-                            property.Name),
-
-                        Description = property.Description,
-                        HasDescription = !string.IsNullOrEmpty(property.Description),
-
-                        IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array),
-                        ArrayItemType = TryResolve(property.ActualPropertySchema.Item, property.Name),
-
-                        IsReadOnly = property.IsReadOnly && Settings.GenerateReadOnlyKeywords,
-                        IsOptional = !property.IsRequired
-                    };
-                }).ToList();
-
+                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings, this)).ToList();
                 var hasInheritance = _schema.AllOf.Count == 1;
 
                 var template = Settings.CreateTemplate();
@@ -158,21 +130,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDate = schema.Format == JsonFormatStrings.DateTime,
 
                 IsDictionary = schema.IsDictionary,
-                DictionaryValueType = TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
+                DictionaryValueType = _resolver.TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
                 IsDictionaryValueNewableObject = schema.AdditionalPropertiesSchema != null && IsNewableObject(schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                 IsArray = schema.Type.HasFlag(JsonObjectType.Array),
-                ArrayItemType = TryResolve(schema.Item, typeNameHint),
+                ArrayItemType = _resolver.TryResolve(schema.Item, typeNameHint),
                 IsArrayItemNewableObject = schema.Item != null && IsNewableObject(schema.Item),
                 IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
             });
             return template.Render();
-        }
-
-        private string TryResolve(JsonSchema4 schema, string typeNameHint)
-        {
-            return schema != null ? _resolver.Resolve(schema, false, typeNameHint) : string.Empty;
         }
 
         private static bool IsNewableObject(JsonSchema4 schema)

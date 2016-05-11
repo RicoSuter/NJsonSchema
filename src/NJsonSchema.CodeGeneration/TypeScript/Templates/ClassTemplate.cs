@@ -114,6 +114,25 @@ if(property.IsReadOnly){
             
             #line default
             #line hidden
+            
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+if(property.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            this.Write(" = ");
+            
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
             this.Write(";");
             
             #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"

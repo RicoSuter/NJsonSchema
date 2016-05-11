@@ -4,7 +4,7 @@
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {<#foreach(var property in Model.Properties){#> 
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#>;<#}#>
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
 
 
     constructor(data?: any) {

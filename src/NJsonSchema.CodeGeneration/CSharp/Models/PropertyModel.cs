@@ -6,11 +6,13 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.CodeGeneration.Models;
+
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    internal class PropertyModel
+    internal class PropertyModel : PropertyModelBase
     {
-        internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
+        internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings) : base(property)
         {
             Name = property.Name;
             HasDescription = !string.IsNullOrEmpty(property.Description);

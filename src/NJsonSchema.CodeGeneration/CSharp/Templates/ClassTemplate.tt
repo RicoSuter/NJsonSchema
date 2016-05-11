@@ -4,7 +4,7 @@
 <#if(Model.HasDescription){#>/// <summary><#=Model.Description#></summary>
 <#}#>public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
-    private <#=property.Type#> _<#=property.FieldName#>;<#}}#>
+    private <#=property.Type#> _<#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
 
 
 <#foreach(var property in Model.Properties){#>
@@ -12,7 +12,7 @@
 <#}#>    [JsonProperty("<#=property.Name#>", Required = <property.Required>)]
 <#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>
-    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }
+    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
     <#}else{#>
     {
         get { return _<#=property.FieldName#>; }

@@ -134,7 +134,26 @@ if(property.IsArray){
             
             #line default
             #line hidden
-            this.Write(">()");
+            this.Write(">(");
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+if(property.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(")");
             
             #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
