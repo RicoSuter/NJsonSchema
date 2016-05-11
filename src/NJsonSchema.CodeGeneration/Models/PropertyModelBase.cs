@@ -4,21 +4,22 @@ namespace NJsonSchema.CodeGeneration.Models
     {
         public PropertyModelBase(JsonProperty property)
         {
-            ProcessDefaultValue(property);
+            DefaultValue = GetDefaultValue(property);
         }
 
-        private void ProcessDefaultValue(JsonProperty property)
+        internal static string GetDefaultValue(JsonSchema4 property)
         {
-            if (property.Default != null)
-            {
-                if (property.Type.HasFlag(JsonObjectType.String))
-                    DefaultValue = "\"" + property.Default + "\"";
-                else if (property.Type.HasFlag(JsonObjectType.Integer) ||
-                         property.Type.HasFlag(JsonObjectType.Number) ||
-                         property.Type.HasFlag(JsonObjectType.Boolean) ||
-                         property.Type.HasFlag(JsonObjectType.Integer))
-                    DefaultValue = property.Default.ToString();
-            }
+            if (property.Default == null)
+                return null;
+
+            if (property.Type.HasFlag(JsonObjectType.String))
+                return "\"" + property.Default + "\"";
+            else if (property.Type.HasFlag(JsonObjectType.Integer) ||
+                     property.Type.HasFlag(JsonObjectType.Number) ||
+                     property.Type.HasFlag(JsonObjectType.Boolean) ||
+                     property.Type.HasFlag(JsonObjectType.Integer))
+                return property.Default.ToString();
+            return null;
         }
 
         public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);

@@ -8,6 +8,7 @@
 
 using System;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
@@ -123,6 +124,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 Variable = variable,
                 Value = value,
+
+                HasDefaultValue = PropertyModelBase.GetDefaultValue(schema) != null, 
+                DefaultValue = PropertyModelBase.GetDefaultValue(schema), 
 
                 Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
 
