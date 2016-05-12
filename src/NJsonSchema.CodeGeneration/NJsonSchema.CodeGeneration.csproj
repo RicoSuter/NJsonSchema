@@ -158,38 +158,38 @@
     <Compile Include="TypeScript\Templates\DataConversionTemplate.Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CSharp\Templates\ClassTemplate.tt">
+    <None Include="CSharp\Templates\ClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClassTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="CSharp\Templates\EnumTemplate.tt">
+    </None>
+    <None Include="CSharp\Templates\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="CSharp\Templates\FileTemplate.tt">
+    </None>
+    <None Include="CSharp\Templates\FileTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>FileTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="TypeScript\Templates\ClassTemplate.tt">
+    </None>
+    <None Include="TypeScript\Templates\ClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClassTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="TypeScript\Templates\DataConversionTemplate.tt">
+    </None>
+    <None Include="TypeScript\Templates\DataConversionTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>DataConversionTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="TypeScript\Templates\EnumTemplate.tt">
+    </None>
+    <None Include="TypeScript\Templates\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="TypeScript\Templates\InterfaceTemplate.tt">
+    </None>
+    <None Include="TypeScript\Templates\InterfaceTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>InterfaceTemplate.cs</LastGenOutput>
-    </Content>
-    <Content Include="TypeScript\Templates\KnockoutClassTemplate.tt">
+    </None>
+    <None Include="TypeScript\Templates\KnockoutClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>KnockoutClassTemplate.cs</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
