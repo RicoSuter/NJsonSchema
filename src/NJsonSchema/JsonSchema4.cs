@@ -556,8 +556,29 @@ namespace NJsonSchema
 
         private static JsonObjectType ConvertStringToObjectType(string value)
         {
-            // TODO: Improve performance
-            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\"");
+            // Section 3.5:
+            // http://json-schema.org/latest/json-schema-core.html#anchor8
+            // The string must be one of the 7 primitive types
+
+            switch( value )
+            {
+                case "array":
+                    return JsonObjectType.Array;
+                case "boolean"  :
+                    return JsonObjectType.Boolean;
+                case "integer"  :
+                    return JsonObjectType.Integer;
+                case "number"   :
+                    return JsonObjectType.Number;
+                case "null"     :
+                    return JsonObjectType.Null;
+                case "object"   :
+                    return JsonObjectType.Object;
+                case "string"   :
+                    return JsonObjectType.String;
+                default:
+                    return JsonObjectType.None;
+            }
         }
 
         private void Initialize()
