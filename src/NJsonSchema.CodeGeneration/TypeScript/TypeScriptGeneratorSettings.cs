@@ -7,8 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -21,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Interface;
-            DerivedTypeMappings = new List<TypeScriptDerivedTypeMapping>();
+            AdditionalCode = string.Empty;
         }
 
         /// <summary>Gets or sets a value indicating whether to generate the readonly keywords (only available in TS 2.0+, default: true).</summary>
@@ -30,25 +29,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
-        /// <summary>Gets or sets the derived type mappings (experimental).</summary>
-        public IList<TypeScriptDerivedTypeMapping> DerivedTypeMappings { get; private set; }
+        /// <summary>Gets or sets the class mappings (the classes must be implemented in the <see cref="AdditionalCode"/>).</summary>
+        public TypeScriptClassMapping[] ClassMappings { get; set; }
 
-        /// <summary>Maps a type to the new type or returns the original type if no mapping is available.</summary>
-        /// <param name="type">The type name.</param>
-        /// <returns>The new type name.</returns>
-        public string GetMappedDerivedType(string type)
+        /// <summary>Gets or sets the additional code to append to the generated code.</summary>
+        public string AdditionalCode { get; set; }
+
+        /// <summary>Gets the transformed additional code.</summary>
+        public string TransformedAdditionalCode
         {
-            var mapping = DerivedTypeMappings.SingleOrDefault(m => m.Type == type);
-            if (mapping != null)
-                return $"{GetModuleAlias(mapping)}.{mapping.NewType}";
-
-            return type; 
-        }
-
-        private string GetModuleAlias(TypeScriptDerivedTypeMapping mapping)
-        {
-            var modules = DerivedTypeMappings.GroupBy(m => m.Module).Select(g => g.Key).ToList();
-            return "m" + modules.IndexOf(mapping.Module);
+            get
+            {
+                var additionalCode = Regex.Replace(AdditionalCode ?? "", "import generated = (.*?)\n", "", RegexOptions.Multiline);
+                return additionalCode.Replace("generated.", "");
+            }
         }
 
         internal ITemplate CreateTemplate()

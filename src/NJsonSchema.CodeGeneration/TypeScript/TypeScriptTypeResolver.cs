@@ -20,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             Settings = settings;
         }
 
-        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="knownSchemes">The known schemes.</param>
         /// <param name="settings">The generator settings.</param>
         public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings)
@@ -77,9 +77,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            return AddGenerator(schema, typeNameHint);
+            var typeName = AddGenerator(schema, typeNameHint);
+            if (Settings.TypeStyle != TypeScriptTypeStyle.Interface)
+            {
+                var mapping = Settings.ClassMappings?.FirstOrDefault(m => m.Class == typeName);
+                if (mapping != null)
+                    return mapping.TargetClass;
+            }
+            return typeName;
         }
-
+        
         /// <summary>Creates a type generator.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The generator.</returns>
