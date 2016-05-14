@@ -117,10 +117,15 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                     Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToObjectType(token.ToString()));
-                else if (value != null)
-                    Type = ConvertStringToObjectType(value.ToString());
                 else
-                    Type = JsonObjectType.None;
+                {
+                    // Section 5.5.2:
+                    // http://json-schema.org/latest/json-schema-validation.html#anchor79
+                    // "type" must be either string or array.
+                    // At this point we expect a valid string
+                    // with one of the 7 primitive names, anything else is invalid.
+                    Type = ConvertStringToObjectType( value as string );
+                }
             }
         }
 
