@@ -169,7 +169,7 @@ namespace NJsonSchema
                 if (_schemaReference != value)
                 {
                     _schemaReference = value;
-                    SchemaReferencePath = null; 
+                    SchemaReferencePath = null;
                 }
             }
         }
@@ -494,14 +494,14 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType => string.IsNullOrEmpty(TypeName) && 
-                                 Type.HasFlag(JsonObjectType.Object) && 
-                                 Properties.Count == 0 && 
-                                 AnyOf.Count == 0 && 
-                                 AllOf.Count == 0 && 
+        public bool IsAnyType => string.IsNullOrEmpty(TypeName) &&
+                                 Type.HasFlag(JsonObjectType.Object) &&
+                                 Properties.Count == 0 &&
+                                 AnyOf.Count == 0 &&
+                                 AllOf.Count == 0 &&
                                  OneOf.Count == 0 &&
-                                 AllowAdditionalProperties && 
-                                 AdditionalPropertiesSchema == null && 
+                                 AllowAdditionalProperties &&
+                                 AdditionalPropertiesSchema == null &&
                                  MultipleOf == null;
 
         #endregion
@@ -556,8 +556,29 @@ namespace NJsonSchema
 
         private static JsonObjectType ConvertStringToObjectType(string value)
         {
-            // TODO: Improve performance
-            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\"");
+            // Section 3.5:
+            // http://json-schema.org/latest/json-schema-core.html#anchor8
+            // The string must be one of the 7 primitive types
+
+            switch (value)
+            {
+                case "array":
+                    return JsonObjectType.Array;
+                case "boolean":
+                    return JsonObjectType.Boolean;
+                case "integer":
+                    return JsonObjectType.Integer;
+                case "number":
+                    return JsonObjectType.Number;
+                case "null":
+                    return JsonObjectType.Null;
+                case "object":
+                    return JsonObjectType.Object;
+                case "string":
+                    return JsonObjectType.String;
+                default:
+                    return JsonObjectType.None;
+            }
         }
 
         private void Initialize()

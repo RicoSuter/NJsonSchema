@@ -56,7 +56,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var output = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            var output =
+                GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" +
+                _resolver.GenerateTypes() + "\n\n" +
+                Settings.TransformedAdditionalCode + "\n\n";
+
             return ConversionUtilities.TrimWhiteSpaces(output);
         }
 
@@ -125,8 +129,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = variable,
                 Value = value,
 
-                HasDefaultValue = PropertyModelBase.GetDefaultValue(schema) != null, 
-                DefaultValue = PropertyModelBase.GetDefaultValue(schema), 
+                HasDefaultValue = PropertyModelBase.GetDefaultValue(schema) != null,
+                DefaultValue = PropertyModelBase.GetDefaultValue(schema),
 
                 Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
 

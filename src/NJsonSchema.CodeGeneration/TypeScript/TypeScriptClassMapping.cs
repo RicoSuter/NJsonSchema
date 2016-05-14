@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="TypeScriptDerivedTypeMapping.cs" company="NJsonSchema">
+// <copyright file="TypeScriptClassMapping.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -8,16 +8,13 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
-    /// <summary>Describes a mapping from a type to a derived to so that generated classes can be extended.</summary>
-    public class TypeScriptDerivedTypeMapping
+    /// <summary>Describes a type mapping.</summary>
+    public class TypeScriptClassMapping
     {
         /// <summary>Gets or sets the original type name.</summary>
-        public string Type { get; set; }
+        public string Class { get; set; }
 
-        /// <summary>Gets or sets the new type name.</summary>
-        public string NewType { get; set; }
-
-        /// <summary>The module</summary>
-        public string Module { get; set; }
+        /// <summary>Gets or sets the name of the target class.</summary>
+        public string TargetClass { get; set; }
     }
 }

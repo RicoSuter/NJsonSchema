@@ -140,7 +140,7 @@
     </Compile>
     <Compile Include="TypeScript\Templates\KnockoutClassTemplate.Extensions.cs" />
     <Compile Include="Infrastructure\T4Extensions.cs" />
-    <Compile Include="TypeScript\TypeScriptDerivedTypeMapping.cs" />
+    <Compile Include="TypeScript\TypeScriptClassMapping.cs" />
     <Compile Include="TypeScript\TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScript\TypeScriptGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptTypeResolver.cs" />

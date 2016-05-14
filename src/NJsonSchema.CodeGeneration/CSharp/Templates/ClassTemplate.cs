@@ -147,7 +147,14 @@ if(property.HasDescription){
             
             #line default
             #line hidden
-            this.Write("\", Required = <property.Required>)]\r\n");
+            this.Write("\", Required = ");
+            
+            #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Required));
+            
+            #line default
+            #line hidden
+            this.Write(")]\r\n");
             
             #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
 if(property.IsStringEnum){
