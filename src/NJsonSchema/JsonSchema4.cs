@@ -576,6 +576,8 @@ namespace NJsonSchema
                     return JsonObjectType.Object;
                 case "string":
                     return JsonObjectType.String;
+                case "file": // used for NSwag (special Swagger type)
+                    return JsonObjectType.File;
                 default:
                     return JsonObjectType.None;
             }

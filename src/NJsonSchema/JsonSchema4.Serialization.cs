@@ -124,7 +124,7 @@ namespace NJsonSchema
                     // "type" must be either string or array.
                     // At this point we expect a valid string
                     // with one of the 7 primitive names, anything else is invalid.
-                    Type = ConvertStringToObjectType( value as string );
+                    Type = ConvertStringToObjectType(value as string);
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
         [JsonExtensionData]
-        public IDictionary<string, object> ExtensionData { get; set; } 
+        public IDictionary<string, object> ExtensionData { get; set; }
 
         private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
         {
