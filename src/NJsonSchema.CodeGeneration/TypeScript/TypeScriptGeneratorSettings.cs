@@ -20,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Interface;
-            AdditionalCode = string.Empty;
+            ExtensionCode = string.Empty;
         }
 
         /// <summary>Gets or sets a value indicating whether to generate the readonly keywords (only available in TS 2.0+, default: true).</summary>
@@ -29,18 +29,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
-        /// <summary>Gets or sets the class mappings (the classes must be implemented in the <see cref="AdditionalCode"/>).</summary>
-        public TypeScriptClassMapping[] ClassMappings { get; set; }
+        /// <summary>Gets or sets the list of extended classes (the classes must be implemented in the <see cref="ExtensionCode"/>).</summary>
+        public string[] ExtendedClasses { get; set; }
 
-        /// <summary>Gets or sets the additional code to append to the generated code.</summary>
-        public string AdditionalCode { get; set; }
+        /// <summary>Gets or sets the extension code to append to the generated code.</summary>
+        public string ExtensionCode { get; set; }
 
         /// <summary>Gets the transformed additional code.</summary>
-        public string TransformedAdditionalCode
+        public string TransformedExtensionCode
         {
             get
             {
-                var additionalCode = Regex.Replace(AdditionalCode ?? "", "import generated = (.*?)\n", "", RegexOptions.Multiline);
+                var additionalCode = Regex.Replace(ExtensionCode ?? string.Empty, "import generated = (.*?)\n", "", RegexOptions.Multiline);
+                if (ExtendedClasses != null)
+                {
+                    foreach (var extendedClass in ExtendedClasses)
+                        additionalCode = additionalCode.Replace("\nclass " + extendedClass + " extends ", "\nexport class " + extendedClass + " extends ");
+                }
                 return additionalCode.Replace("generated.", "");
             }
         }

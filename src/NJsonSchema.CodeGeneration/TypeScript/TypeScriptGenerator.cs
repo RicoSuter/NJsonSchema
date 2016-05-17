@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var output =
                 GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" +
                 _resolver.GenerateTypes() + "\n\n" +
-                Settings.TransformedAdditionalCode + "\n\n";
+                Settings.TransformedExtensionCode + "\n\n";
 
             return ConversionUtilities.TrimWhiteSpaces(output);
         }
