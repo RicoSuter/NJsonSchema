@@ -77,14 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            var typeName = AddGenerator(schema, typeNameHint);
-            if (Settings.TypeStyle != TypeScriptTypeStyle.Interface)
-            {
-                var mapping = Settings.ClassMappings?.FirstOrDefault(m => m.Class == typeName);
-                if (mapping != null)
-                    return mapping.TargetClass;
-            }
-            return typeName;
+            return AddGenerator(schema, typeNameHint);
         }
         
         /// <summary>Creates a type generator.</summary>

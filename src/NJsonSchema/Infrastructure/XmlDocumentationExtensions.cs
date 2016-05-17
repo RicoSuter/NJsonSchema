@@ -208,17 +208,24 @@ namespace NJsonSchema.Infrastructure
 
         private static string GetXmlDocumentationPath(dynamic assembly)
         {
-            var assemblyName = assembly.GetName();
-            var path = FullDotNetMethods.PathCombine(FullDotNetMethods.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
-            if (FullDotNetMethods.FileExists(path))
-                return path;
+            try
+            {
+                var assemblyName = assembly.GetName();
+                var path = FullDotNetMethods.PathCombine(FullDotNetMethods.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
+                if (FullDotNetMethods.FileExists(path))
+                    return path;
 
-            dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-            path = FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
-            if (FullDotNetMethods.FileExists(path))
-                return path;
+                dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
+                path = FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
+                if (FullDotNetMethods.FileExists(path))
+                    return path;
 
-            return FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                return FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
