@@ -30,10 +30,7 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-        public static bool SupportsFullDotNetMethods
-        {
-            get { return XPathExtensionsType != null; }
-        }
+        public static bool SupportsFullDotNetMethods => XPathExtensionsType != null;
 
         public static string HttpGet(string url)
         {
@@ -45,6 +42,9 @@ namespace NJsonSchema.Infrastructure
 
         public static bool FileExists(string filePath)
         {
+            if (string.IsNullOrEmpty(filePath))
+                return false; 
+
             var type = Type.GetType("System.IO.File", true);
             return (bool)type.GetRuntimeMethod("Exists", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
         }

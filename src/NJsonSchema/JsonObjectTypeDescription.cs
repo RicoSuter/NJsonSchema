@@ -82,6 +82,9 @@ namespace NJsonSchema
             if (type == typeof(JObject) || type == typeof(object))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
 
+            if (IsFileType(type))
+                return new JsonObjectTypeDescription(JsonObjectType.File, false);
+
             if (IsDictionaryType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
 
@@ -155,6 +158,14 @@ namespace NJsonSchema
             return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
                 (type.GetTypeInfo().BaseType == null ||
                 !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
+        }
+
+        private static bool IsFileType(Type type)
+        {
+            var parameterTypeName = type.Name;
+            return parameterTypeName == "IFormFile" ||
+                   parameterTypeName == "HttpPostedFileBase" ||
+                   type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
         }
 
         private static bool IsDictionaryType(Type type)
