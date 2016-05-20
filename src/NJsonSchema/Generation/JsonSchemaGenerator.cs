@@ -329,7 +329,7 @@ namespace NJsonSchema.Generation
                 {
                     var attributes = type.GetTypeInfo().GetDeclaredField(name).GetCustomAttributes();
                     dynamic enumMemberAttribute = TryGetAttribute(attributes, "System.Runtime.Serialization.EnumMemberAttribute");
-                    if (enumMemberAttribute != null)
+                    if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
                         return (string)enumMemberAttribute.Value;
                     return name;
                 }).ToArray();
