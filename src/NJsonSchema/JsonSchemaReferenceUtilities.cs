@@ -9,8 +9,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Newtonsoft.Json;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -71,7 +70,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CanRead && ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
                     var value = property.GetValue(obj);
                     if (value != null)
@@ -107,7 +106,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CanRead && ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
                     var value = property.GetValue(obj);
                     if (value != null)

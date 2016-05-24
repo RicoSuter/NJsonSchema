@@ -11,8 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -20,10 +18,6 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
-        private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
-        private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
-        private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
-
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="root">The root object.</param>
         /// <param name="objectToSearch">The object to search.</param>
@@ -32,6 +26,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         public static string GetJsonPath(object root, object objectToSearch, ISchemaDefinitionAppender schemaDefinitionAppender = null)
         {
+
             var path = GetJsonPath(root, objectToSearch, "#", new HashSet<object>());
             if (path == null)
             {
@@ -100,7 +95,7 @@ namespace NJsonSchema
         /// <returns>The name.</returns>
         public static string GetPropertyName(PropertyInfo property)
         {
-            var customAttributes = GetCustomAttributes(property);
+            var customAttributes = ReflectionCache.GetCustomAttributes(property);
 
             if (customAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(customAttributes.JsonPropertyAttribute.PropertyName))
                 return customAttributes.JsonPropertyAttribute.PropertyName;
@@ -146,12 +141,12 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttributes(p).JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
-                    var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
                     if (value != null)
                     {
+                        var pathSegment = GetPropertyName(property);
                         var path = GetJsonPath(value, objectToSearch, basePath + "/" + pathSegment, checkedObjects);
                         if (path != null)
                             return path;
@@ -171,16 +166,17 @@ namespace NJsonSchema
                 return (JsonSchema4)obj;
 
             checkedObjects.Add(obj);
+            var firstSegment = segments[0];
 
             if (obj is IDictionary)
             {
-                if (((IDictionary)obj).Contains(segments.First()))
-                    return GetObjectFromJsonPath(((IDictionary)obj)[segments.First()], segments.Skip(1).ToList(), checkedObjects);
+                if (((IDictionary)obj).Contains(firstSegment))
+                    return GetObjectFromJsonPath(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
             }
             else if (obj is IEnumerable)
             {
                 int index;
-                if (int.TryParse(segments.First(), out index))
+                if (int.TryParse(firstSegment, out index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
@@ -189,74 +185,19 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttributes(p).JsonIgnoreAttribute == null))
+
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
                     var pathSegment = GetPropertyName(property);
-                    var value = property.GetValue(obj);
-                    if (pathSegment == segments.First())
+                    if (pathSegment == firstSegment)
+                    {
+                        var value = property.GetValue(obj);
                         return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects);
+                    }
                 }
             }
 
             return null;
-        }
-
-        private static IEnumerable<PropertyInfo> GetProperties(Type type)
-        {
-            IList<PropertyInfo> properties;
-
-            if (PropertyCacheByType.ContainsKey(type))
-                properties = PropertyCacheByType[type];
-            else
-            {
-                properties = type.GetRuntimeProperties().ToList();
-                PropertyCacheByType[type] = properties;
-            }
-
-            return properties;
-        }
-
-        private static CustomAttributes GetCustomAttributes(PropertyInfo property)
-        {
-            if (AttributeCacheByProperty.ContainsKey(property))
-                return AttributeCacheByProperty[property];
-
-            CustomAttributes customAttributes = new CustomAttributes();
-
-            foreach(var attribute in property.GetCustomAttributes())
-            {
-                if (attribute is JsonIgnoreAttribute)
-                    customAttributes.JsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
-                else if (attribute is JsonPropertyAttribute)
-                    customAttributes.JsonPropertyAttribute = attribute as JsonPropertyAttribute;
-                else if (attribute is DataMemberAttribute)
-                    customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
-            }
-
-            customAttributes.DataContractAttribute = GetDataContractAttribute(property.DeclaringType);
-
-            AttributeCacheByProperty[property] = customAttributes;
-
-            return customAttributes;
-        }
-
-        private static DataContractAttribute GetDataContractAttribute(Type type)
-        {
-            if (DataContractAttributeCacheByType.ContainsKey(type))
-                return DataContractAttributeCacheByType[type];
-
-            var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
-            DataContractAttributeCacheByType[type] = attribute;
-
-            return attribute;
-        }
-
-        private class CustomAttributes
-        {
-            public JsonIgnoreAttribute JsonIgnoreAttribute { get; set; }
-            public JsonPropertyAttribute JsonPropertyAttribute { get; set; }
-            public DataContractAttribute DataContractAttribute { get; set; }
-            public DataMemberAttribute DataMemberAttribute { get; set; }
         }
     }
 }
