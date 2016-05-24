@@ -20,6 +20,9 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
+        private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
+        private static readonly Dictionary<PropertyInfo, IList<Attribute>> AttributeCacheByProperty = new Dictionary<PropertyInfo, IList<Attribute>>();
+
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="root">The root object.</param>
         /// <param name="objectToSearch">The object to search.</param>
@@ -96,13 +99,13 @@ namespace NJsonSchema
         /// <returns>The name.</returns>
         public static string GetPropertyName(PropertyInfo property)
         {
-            var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = GetCustomAttribute<JsonPropertyAttribute>(property);
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
                 return jsonPropertyAttribute.PropertyName;
 
             if (property.DeclaringType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null)
             {
-                var dataMemberAttribute = property.GetCustomAttribute<DataMemberAttribute>();
+                var dataMemberAttribute = GetCustomAttribute<DataMemberAttribute>(property);
                 if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
                     return dataMemberAttribute.Name;
             }
@@ -142,7 +145,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttribute<JsonIgnoreAttribute>(p) == null))
                 {
                     var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
@@ -185,7 +188,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttribute<JsonIgnoreAttribute>(p) == null))
                 {
                     var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
@@ -195,6 +198,37 @@ namespace NJsonSchema
             }
 
             return null;
+        }
+
+        private static IEnumerable<PropertyInfo> GetProperties(Type type)
+        {
+            IList<PropertyInfo> properties;
+
+            if (PropertyCacheByType.ContainsKey(type))
+                properties = PropertyCacheByType[type];
+            else
+            {
+                properties = type.GetRuntimeProperties().ToList();
+                PropertyCacheByType[type] = properties;
+            }
+
+            return properties;
+        }
+
+        private static T GetCustomAttribute<T>(PropertyInfo property)
+            where T : Attribute
+        {
+            IList<Attribute> attributes;
+
+            if (AttributeCacheByProperty.ContainsKey(property))
+                attributes = AttributeCacheByProperty[property];
+            else
+            {
+                attributes = property.GetCustomAttributes().ToList();
+                AttributeCacheByProperty[property] = attributes;
+            }
+
+            return attributes.OfType<T>().FirstOrDefault();
         }
     }
 }
