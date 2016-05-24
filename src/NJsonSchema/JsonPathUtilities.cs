@@ -22,6 +22,7 @@ namespace NJsonSchema
     {
         private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
         private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
+        private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
 
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="root">The root object.</param>
@@ -104,7 +105,7 @@ namespace NJsonSchema
             if (customAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(customAttributes.JsonPropertyAttribute.PropertyName))
                 return customAttributes.JsonPropertyAttribute.PropertyName;
 
-            if (property.DeclaringType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null)
+            if (customAttributes.DataContractAttribute != null)
             {
                 if (customAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(customAttributes.DataMemberAttribute.Name))
                     return customAttributes.DataMemberAttribute.Name;
@@ -232,15 +233,29 @@ namespace NJsonSchema
                     customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
             }
 
+            customAttributes.DataContractAttribute = GetDataContractAttribute(property.DeclaringType);
+
             AttributeCacheByProperty[property] = customAttributes;
 
             return customAttributes;
+        }
+
+        private static DataContractAttribute GetDataContractAttribute(Type type)
+        {
+            if (DataContractAttributeCacheByType.ContainsKey(type))
+                return DataContractAttributeCacheByType[type];
+
+            var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
+            DataContractAttributeCacheByType[type] = attribute;
+
+            return attribute;
         }
 
         private class CustomAttributes
         {
             public JsonIgnoreAttribute JsonIgnoreAttribute { get; set; }
             public JsonPropertyAttribute JsonPropertyAttribute { get; set; }
+            public DataContractAttribute DataContractAttribute { get; set; }
             public DataMemberAttribute DataMemberAttribute { get; set; }
         }
     }
