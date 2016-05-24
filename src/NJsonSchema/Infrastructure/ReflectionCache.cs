@@ -17,7 +17,7 @@ namespace NJsonSchema.Infrastructure
 {
     internal static class ReflectionCache
     {
-        // TODO: Make thread-safe
+        private static readonly object Lock = new object();
 
         private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
         private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
@@ -25,59 +25,66 @@ namespace NJsonSchema.Infrastructure
 
         public static IEnumerable<PropertyInfo> GetProperties(Type type)
         {
-            IList<PropertyInfo> properties;
-
-            if (PropertyCacheByType.ContainsKey(type))
-                properties = PropertyCacheByType[type];
-            else
+            lock (Lock)
             {
-                properties = type.GetRuntimeProperties().ToList();
-                PropertyCacheByType[type] = properties;
-            }
+                if (!PropertyCacheByType.ContainsKey(type))
+                {
+                    var properties = type.GetRuntimeProperties().ToList();
+                    PropertyCacheByType[type] = properties;
+                }
 
-            return properties;
+                return PropertyCacheByType[type];
+            }
         }
 
         public static CustomAttributes GetCustomAttributes(PropertyInfo property)
         {
-            if (AttributeCacheByProperty.ContainsKey(property))
-                return AttributeCacheByProperty[property];
-
-            CustomAttributes customAttributes = new CustomAttributes();
-
-            foreach (var attribute in property.GetCustomAttributes())
+            lock (Lock)
             {
-                if (attribute is JsonIgnoreAttribute)
-                    customAttributes.JsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
-                else if (attribute is JsonPropertyAttribute)
-                    customAttributes.JsonPropertyAttribute = attribute as JsonPropertyAttribute;
-                else if (attribute is DataMemberAttribute)
-                    customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
+                if (!AttributeCacheByProperty.ContainsKey(property))
+                {
+                    var customAttributes = new CustomAttributes();
+
+                    foreach (var attribute in property.GetCustomAttributes())
+                    {
+                        if (attribute is JsonIgnoreAttribute)
+                            customAttributes.JsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
+                        else if (attribute is JsonPropertyAttribute)
+                            customAttributes.JsonPropertyAttribute = attribute as JsonPropertyAttribute;
+                        else if (attribute is DataMemberAttribute)
+                            customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
+                    }
+
+                    customAttributes.DataContractAttribute = GetDataContractAttribute(property.DeclaringType);
+                    AttributeCacheByProperty[property] = customAttributes;
+                }
+
+                return AttributeCacheByProperty[property];
             }
-
-            customAttributes.DataContractAttribute = GetDataContractAttribute(property.DeclaringType);
-
-            AttributeCacheByProperty[property] = customAttributes;
-
-            return customAttributes;
         }
 
         public static DataContractAttribute GetDataContractAttribute(Type type)
         {
-            if (DataContractAttributeCacheByType.ContainsKey(type))
+            lock (Lock)
+            {
+                if (!DataContractAttributeCacheByType.ContainsKey(type))
+                {
+                    var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
+                    DataContractAttributeCacheByType[type] = attribute;
+                }
+
                 return DataContractAttributeCacheByType[type];
-
-            var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
-            DataContractAttributeCacheByType[type] = attribute;
-
-            return attribute;
+            }
         }
 
         public class CustomAttributes
         {
             public JsonIgnoreAttribute JsonIgnoreAttribute { get; set; }
+
             public JsonPropertyAttribute JsonPropertyAttribute { get; set; }
+
             public DataContractAttribute DataContractAttribute { get; set; }
+
             public DataMemberAttribute DataMemberAttribute { get; set; }
         }
     }

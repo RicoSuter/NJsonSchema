@@ -202,7 +202,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Format { get; set; } // TODO: This is missing in JSON Schema schema
+        public string Format { get; set; }
 
         /// <summary>Gets or sets the default value. </summary>
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -210,7 +210,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the required multiple of for the number value. </summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public double? MultipleOf { get; set; } // TODO: Whats MultipleOf?
+        public double? MultipleOf { get; set; }
 
         /// <summary>Gets or sets the maximum allowed value. </summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

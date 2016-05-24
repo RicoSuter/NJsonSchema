@@ -26,7 +26,6 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         public static string GetJsonPath(object root, object objectToSearch, ISchemaDefinitionAppender schemaDefinitionAppender = null)
         {
-
             var path = GetJsonPath(root, objectToSearch, "#", new HashSet<object>());
             if (path == null)
             {

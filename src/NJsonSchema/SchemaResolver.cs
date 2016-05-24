@@ -46,7 +46,7 @@ namespace NJsonSchema
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
 //#if DEBUG
-//            // TODO: Check this
+//            // TODO: (low-prio) Check code so that type names are unique
 //            if (Schemes.Any(s => s.TypeName == schema.TypeName))
 //                throw new InvalidOperationException("The type name '"+ schema.TypeName + "' is already registered in the schema resolver.");
 //#endif
