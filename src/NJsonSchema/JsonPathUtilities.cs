@@ -31,7 +31,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         public static string GetJsonPath(object root, object objectToSearch, ISchemaDefinitionAppender schemaDefinitionAppender = null)
         {
-            var path = GetJsonPath(root, objectToSearch, "#", new List<object>());
+            var path = GetJsonPath(root, objectToSearch, "#", new HashSet<object>());
             if (path == null)
             {
                 if (schemaDefinitionAppender != null && objectToSearch is JsonSchema4)
@@ -63,7 +63,7 @@ namespace NJsonSchema
             }
             else if (path.StartsWith("#/"))
             {
-                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new List<object>());
+                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new HashSet<object>());
                 if (schema == null)
                     throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
 
@@ -113,7 +113,7 @@ namespace NJsonSchema
             return property.Name;
         }
 
-        private static string GetJsonPath(object obj, object objectToSearch, string basePath, List<object> checkedObjects)
+        private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -161,7 +161,7 @@ namespace NJsonSchema
             return null;
         }
 
-        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, List<object> checkedObjects)
+        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
