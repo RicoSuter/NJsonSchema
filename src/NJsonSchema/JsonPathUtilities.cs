@@ -21,7 +21,7 @@ namespace NJsonSchema
     public static class JsonPathUtilities
     {
         private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
-        private static readonly Dictionary<PropertyInfo, IList<Attribute>> AttributeCacheByProperty = new Dictionary<PropertyInfo, IList<Attribute>>();
+        private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
 
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="root">The root object.</param>
@@ -99,15 +99,15 @@ namespace NJsonSchema
         /// <returns>The name.</returns>
         public static string GetPropertyName(PropertyInfo property)
         {
-            var jsonPropertyAttribute = GetCustomAttribute<JsonPropertyAttribute>(property);
-            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
-                return jsonPropertyAttribute.PropertyName;
+            var customAttributes = GetCustomAttributes(property);
+
+            if (customAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(customAttributes.JsonPropertyAttribute.PropertyName))
+                return customAttributes.JsonPropertyAttribute.PropertyName;
 
             if (property.DeclaringType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null)
             {
-                var dataMemberAttribute = GetCustomAttribute<DataMemberAttribute>(property);
-                if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
-                    return dataMemberAttribute.Name;
+                if (customAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(customAttributes.DataMemberAttribute.Name))
+                    return customAttributes.DataMemberAttribute.Name;
             }
 
             return property.Name;
@@ -145,7 +145,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttribute<JsonIgnoreAttribute>(p) == null))
+                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
                     var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
@@ -188,7 +188,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttribute<JsonIgnoreAttribute>(p) == null))
+                foreach (var property in GetProperties(obj.GetType()).Where(p => GetCustomAttributes(p).JsonIgnoreAttribute == null))
                 {
                     var pathSegment = GetPropertyName(property);
                     var value = property.GetValue(obj);
@@ -215,20 +215,33 @@ namespace NJsonSchema
             return properties;
         }
 
-        private static T GetCustomAttribute<T>(PropertyInfo property)
-            where T : Attribute
+        private static CustomAttributes GetCustomAttributes(PropertyInfo property)
         {
-            IList<Attribute> attributes;
-
             if (AttributeCacheByProperty.ContainsKey(property))
-                attributes = AttributeCacheByProperty[property];
-            else
+                return AttributeCacheByProperty[property];
+
+            CustomAttributes customAttributes = new CustomAttributes();
+
+            foreach(var attribute in property.GetCustomAttributes())
             {
-                attributes = property.GetCustomAttributes().ToList();
-                AttributeCacheByProperty[property] = attributes;
+                if (attribute is JsonIgnoreAttribute)
+                    customAttributes.JsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
+                else if (attribute is JsonPropertyAttribute)
+                    customAttributes.JsonPropertyAttribute = attribute as JsonPropertyAttribute;
+                else if (attribute is DataMemberAttribute)
+                    customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
             }
 
-            return attributes.OfType<T>().FirstOrDefault();
+            AttributeCacheByProperty[property] = customAttributes;
+
+            return customAttributes;
+        }
+
+        private class CustomAttributes
+        {
+            public JsonIgnoreAttribute JsonIgnoreAttribute { get; set; }
+            public JsonPropertyAttribute JsonPropertyAttribute { get; set; }
+            public DataMemberAttribute DataMemberAttribute { get; set; }
         }
     }
 }
