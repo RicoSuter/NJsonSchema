@@ -89,6 +89,13 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets the name of the property for JSON serialization.</summary>
+        /// <returns>The name.</returns>
+        public static string GetPropertyName(PropertyInfo property)
+        {
+            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+        }
+
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
@@ -178,13 +185,6 @@ namespace NJsonSchema
             }
 
             return null;
-        }
-
-        /// <summary>Gets the name of the property for JSON serialization.</summary>
-        /// <returns>The name.</returns>
-        public static string GetPropertyName(PropertyInfo property)
-        {
-            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
         }
     }
 }
