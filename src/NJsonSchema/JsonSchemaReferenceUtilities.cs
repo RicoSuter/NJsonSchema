@@ -70,9 +70,9 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CanRead && ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.PropertyInfo.CanRead && p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
                     {
                         if (!checkedObjects.Contains(value))
@@ -106,9 +106,9 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CanRead && ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.PropertyInfo.CanRead && p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
                     {
                         if (!checkedObjects.Contains(value))

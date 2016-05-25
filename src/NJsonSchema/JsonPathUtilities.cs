@@ -89,25 +89,6 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets the name of the property for JSON serialization.</summary>
-        /// <param name="property">The property.</param>
-        /// <returns>The name.</returns>
-        public static string GetPropertyName(PropertyInfo property)
-        {
-            var customAttributes = ReflectionCache.GetCustomAttributes(property);
-
-            if (customAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(customAttributes.JsonPropertyAttribute.PropertyName))
-                return customAttributes.JsonPropertyAttribute.PropertyName;
-
-            if (customAttributes.DataContractAttribute != null)
-            {
-                if (customAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(customAttributes.DataMemberAttribute.Name))
-                    return customAttributes.DataMemberAttribute.Name;
-            }
-
-            return property.Name;
-        }
-
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
@@ -140,12 +121,12 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
                     {
-                        var pathSegment = GetPropertyName(property);
+                        var pathSegment = property.GetName();
                         var path = GetJsonPath(value, objectToSearch, basePath + "/" + pathSegment, checkedObjects);
                         if (path != null)
                             return path;
@@ -185,18 +166,25 @@ namespace NJsonSchema
             else
             {
 
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => ReflectionCache.GetCustomAttributes(p).JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var pathSegment = GetPropertyName(property);
+                    var pathSegment = property.GetName();
                     if (pathSegment == firstSegment)
                     {
-                        var value = property.GetValue(obj);
+                        var value = property.PropertyInfo.GetValue(obj);
                         return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects);
                     }
                 }
             }
 
             return null;
+        }
+
+        /// <summary>Gets the name of the property for JSON serialization.</summary>
+        /// <returns>The name.</returns>
+        public static string GetPropertyName(PropertyInfo property)
+        {
+            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
         }
     }
 }
