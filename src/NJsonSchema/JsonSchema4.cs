@@ -554,7 +554,7 @@ namespace NJsonSchema
             return parent;
         }
 
-        private static JsonObjectType ConvertStringToObjectType(string value)
+        private static JsonObjectType ConvertStringToJsonObjectType(string value)
         {
             // Section 3.5:
             // http://json-schema.org/latest/json-schema-core.html#anchor8
