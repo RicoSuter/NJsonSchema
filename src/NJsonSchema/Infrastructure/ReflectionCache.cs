@@ -22,20 +22,17 @@ namespace NJsonSchema.Infrastructure
 
         public static IEnumerable<Property> GetProperties(Type type)
         {
-            if (!PropertyCacheByType.ContainsKey(type))
+            lock (PropertyCacheByType)
             {
-                lock (PropertyCacheByType)
+                if (!PropertyCacheByType.ContainsKey(type))
                 {
-                    if (!PropertyCacheByType.ContainsKey(type))
-                    {
-                        var properties = type.GetRuntimeProperties().Select(p => new Property(p, GetCustomAttributes(p))).ToList();
+                    var properties = type.GetRuntimeProperties().Select(p => new Property(p, GetCustomAttributes(p))).ToList();
 
-                        PropertyCacheByType[type] = properties;
-                    }
+                    PropertyCacheByType[type] = properties;
                 }
-            }
 
-            return PropertyCacheByType[type];
+                return PropertyCacheByType[type];
+            }
         }
 
         private static CustomAttributes GetCustomAttributes(PropertyInfo property)
@@ -59,25 +56,23 @@ namespace NJsonSchema.Infrastructure
 
         public static DataContractAttribute GetDataContractAttribute(Type type)
         {
-            if (!DataContractAttributeCacheByType.ContainsKey(type))
+            lock (DataContractAttributeCacheByType)
             {
-                lock (DataContractAttributeCacheByType)
+                if (!DataContractAttributeCacheByType.ContainsKey(type))
                 {
-                    if (!DataContractAttributeCacheByType.ContainsKey(type))
-                    {
-                        var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
-                        DataContractAttributeCacheByType[type] = attribute;
-                    }
+                    var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
+                    DataContractAttributeCacheByType[type] = attribute;
                 }
-            }
 
-            return DataContractAttributeCacheByType[type];
+                return DataContractAttributeCacheByType[type];
+            }
         }
 
         public class Property
         {
             public PropertyInfo PropertyInfo { get; private set; }
             public CustomAttributes CustomAttributes { get; private set; }
+
 
             public Property(PropertyInfo propertyInfo, CustomAttributes customAttributes)
             {
