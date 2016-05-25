@@ -17,15 +17,13 @@ namespace NJsonSchema.Infrastructure
 {
     internal static class ReflectionCache
     {
-        private static readonly object Lock = new object();
-
         private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
         private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
         private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
 
         public static IEnumerable<PropertyInfo> GetProperties(Type type)
         {
-            lock (Lock)
+            lock (PropertyCacheByType)
             {
                 if (!PropertyCacheByType.ContainsKey(type))
                 {
@@ -39,7 +37,7 @@ namespace NJsonSchema.Infrastructure
 
         public static CustomAttributes GetCustomAttributes(PropertyInfo property)
         {
-            lock (Lock)
+            lock (AttributeCacheByProperty)
             {
                 if (!AttributeCacheByProperty.ContainsKey(property))
                 {
@@ -65,7 +63,7 @@ namespace NJsonSchema.Infrastructure
 
         public static DataContractAttribute GetDataContractAttribute(Type type)
         {
-            lock (Lock)
+            lock (DataContractAttributeCacheByType)
             {
                 if (!DataContractAttributeCacheByType.ContainsKey(type))
                 {
