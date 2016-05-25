@@ -94,10 +94,11 @@ namespace NJsonSchema
             }
         }
 
-        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
-        internal object TypeRaw
+        private Lazy<object> typeRaw;
+
+        private void ResetTypeRaw()
         {
-            get
+            this.typeRaw = new Lazy<object>(() => 
             {
                 var flags = Enum.GetValues(Type.GetType())
                     .Cast<Enum>().Where(v => Type.HasFlag(v))
@@ -112,6 +113,18 @@ namespace NJsonSchema
                     return new JValue(flags[0].ToString().ToLower());
 
                 return null;
+            });
+        }
+
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
+        internal object TypeRaw
+        {
+            get
+            {
+                if(this.typeRaw == null)
+                    this.ResetTypeRaw();
+
+                return this.typeRaw.Value;
             }
             set
             {
@@ -126,6 +139,8 @@ namespace NJsonSchema
                     // with one of the 7 primitive names, anything else is invalid.
                     Type = ConvertStringToObjectType(value as string);
                 }
+
+                this.ResetTypeRaw();
             }
         }
 
