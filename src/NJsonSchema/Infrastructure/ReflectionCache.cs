@@ -18,6 +18,7 @@ namespace NJsonSchema.Infrastructure
     internal static class ReflectionCache
     {
         private static readonly Dictionary<Type, IList<Property>> PropertyCacheByType = new Dictionary<Type, IList<Property>>();
+
         private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
 
         public static IEnumerable<Property> GetProperties(Type type)
@@ -70,51 +71,54 @@ namespace NJsonSchema.Infrastructure
 
         public class Property
         {
-            public PropertyInfo PropertyInfo { get; private set; }
-            public CustomAttributes CustomAttributes { get; private set; }
-
-
             public Property(PropertyInfo propertyInfo, CustomAttributes customAttributes)
             {
-                this.PropertyInfo = propertyInfo;
-                this.CustomAttributes = customAttributes;
+                PropertyInfo = propertyInfo;
+                CustomAttributes = customAttributes;
             }
+
+            public PropertyInfo PropertyInfo { get; }
+
+            public CustomAttributes CustomAttributes { get; }
 
             /// <summary>Gets the name of the property for JSON serialization.</summary>
             /// <returns>The name.</returns>
             public string GetName()
             {
-                if (this.CustomAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(this.CustomAttributes.JsonPropertyAttribute.PropertyName))
-                    return this.CustomAttributes.JsonPropertyAttribute.PropertyName;
+                if (CustomAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(CustomAttributes.JsonPropertyAttribute.PropertyName))
+                    return CustomAttributes.JsonPropertyAttribute.PropertyName;
 
-                if (this.CustomAttributes.DataContractAttribute != null)
+                if (CustomAttributes.DataContractAttribute != null)
                 {
-                    if (this.CustomAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(this.CustomAttributes.DataMemberAttribute.Name))
-                        return this.CustomAttributes.DataMemberAttribute.Name;
+                    if (CustomAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(CustomAttributes.DataMemberAttribute.Name))
+                        return CustomAttributes.DataMemberAttribute.Name;
                 }
 
-                return this.PropertyInfo.Name;
+                return PropertyInfo.Name;
             }
         }
 
         public class CustomAttributes
         {
-            public JsonIgnoreAttribute JsonIgnoreAttribute { get; private set; }
-            public JsonPropertyAttribute JsonPropertyAttribute { get; private set; }
-            public DataContractAttribute DataContractAttribute { get; private set; }
-            public DataMemberAttribute DataMemberAttribute { get; private set; }
-
             public CustomAttributes(
                 JsonIgnoreAttribute jsonIgnoreAttribute,
                 JsonPropertyAttribute jsonPropertyAttribute,
                 DataContractAttribute dataContractAttribute,
                 DataMemberAttribute dataMemberAttribute)
             {
-                this.JsonIgnoreAttribute = jsonIgnoreAttribute;
-                this.JsonPropertyAttribute = jsonPropertyAttribute;
-                this.DataContractAttribute = dataContractAttribute;
-                this.DataMemberAttribute = dataMemberAttribute;
+                JsonIgnoreAttribute = jsonIgnoreAttribute;
+                JsonPropertyAttribute = jsonPropertyAttribute;
+                DataContractAttribute = dataContractAttribute;
+                DataMemberAttribute = dataMemberAttribute;
             }
+
+            public JsonIgnoreAttribute JsonIgnoreAttribute { get; }
+
+            public JsonPropertyAttribute JsonPropertyAttribute { get; }
+
+            public DataContractAttribute DataContractAttribute { get; }
+
+            public DataMemberAttribute DataMemberAttribute { get; }
         }
     }
 }
