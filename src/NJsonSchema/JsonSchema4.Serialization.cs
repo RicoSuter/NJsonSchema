@@ -94,10 +94,32 @@ namespace NJsonSchema
             }
         }
 
+        private Lazy<object> _typeRaw;
+
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         internal object TypeRaw
         {
             get
+            {
+                if(_typeRaw == null)
+                    ResetTypeRaw();
+
+                return _typeRaw.Value;
+            }
+            set
+            {
+                if (value is JArray)
+                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
+                else
+                    Type = ConvertStringToJsonObjectType(value as string);
+
+                ResetTypeRaw();
+            }
+        }
+
+        private void ResetTypeRaw()
+        {
+            _typeRaw = new Lazy<object>(() =>
             {
                 var flags = Enum.GetValues(Type.GetType())
                     .Cast<Enum>().Where(v => Type.HasFlag(v))
@@ -112,21 +134,7 @@ namespace NJsonSchema
                     return new JValue(flags[0].ToString().ToLower());
 
                 return null;
-            }
-            set
-            {
-                if (value is JArray)
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToObjectType(token.ToString()));
-                else
-                {
-                    // Section 5.5.2:
-                    // http://json-schema.org/latest/json-schema-validation.html#anchor79
-                    // "type" must be either string or array.
-                    // At this point we expect a valid string
-                    // with one of the 7 primitive names, anything else is invalid.
-                    Type = ConvertStringToObjectType(value as string);
-                }
-            }
+            });
         }
 
         [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
