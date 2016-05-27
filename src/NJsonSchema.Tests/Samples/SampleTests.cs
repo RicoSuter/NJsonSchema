@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.Tests.Samples
 {
@@ -13,6 +14,8 @@ namespace NJsonSchema.Tests.Samples
         {
             [Required]
             public string FirstName { get; set; }
+
+            public string MiddleName { get; set; }
 
             [Required]
             public string LastName { get; set; }
@@ -47,12 +50,14 @@ namespace NJsonSchema.Tests.Samples
             public string Name { get; set; }
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void Demo()
         {
             var schema = JsonSchema4.FromType<Person>();
             var schemaJsonData = schema.ToJson();
-            var errors = schema.Validate("...");
+            var errors = schema.Validate("{}");
+            var generator = new TypeScriptGenerator(schema);
+            var code = generator.GenerateFile();
         }
 
         [TestMethod]

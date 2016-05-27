@@ -84,11 +84,11 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
+                if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
+                    return string.Empty;
+
                 lock (_lock)
                 {
-                    if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
-                        return string.Empty;
-
                     var assemblyName = member.Module.Assembly.GetName();
                     if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
                         return string.Empty;
@@ -119,11 +119,11 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
+                if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
+                    return string.Empty;
+
                 lock (_lock)
                 {
-                    if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
-                        return string.Empty;
-
                     var assemblyName = parameter.Member.Module.Assembly.GetName();
                     if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
                         return string.Empty;
@@ -208,17 +208,33 @@ namespace NJsonSchema.Infrastructure
 
         private static string GetXmlDocumentationPath(dynamic assembly)
         {
-            var assemblyName = assembly.GetName();
-            var path = FullDotNetMethods.PathCombine(FullDotNetMethods.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
-            if (FullDotNetMethods.FileExists(path))
-                return path;
+            try
+            {
+                if (assembly == null)
+                    return null; 
 
-            dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-            path = FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
-            if (FullDotNetMethods.FileExists(path))
-                return path;
+                if (string.IsNullOrEmpty(assembly.Location))
+                    return null; 
 
-            return FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                var assemblyName = assembly.GetName();
+                if (string.IsNullOrEmpty(assemblyName.Name))
+                    return null;
+
+                var path = FullDotNetMethods.PathCombine(FullDotNetMethods.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
+                if (FullDotNetMethods.FileExists(path))
+                    return path;
+
+                dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
+                path = FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
+                if (FullDotNetMethods.FileExists(path))
+                    return path;
+
+                return FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

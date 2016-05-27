@@ -1,0 +1,52 @@
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#if(Model.HasDescription){#>/// <summary><#=Model.Description#></summary>
+<#}#>public partial class <#=Model.Class#> <#=Model.Inheritance#>
+{<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
+    private <#=property.Type#> _<#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
+
+
+<#foreach(var property in Model.Properties){#>
+<#if(property.HasDescription){#>    /// <summary><#=property.Description#></summary>
+<#}#>    [JsonProperty("<#=property.Name#>", Required = <#=property.Required#>)]
+<#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
+<#}#>
+    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
+<#  }else{#>
+
+    {
+        get { return _<#=property.FieldName#>; }
+        set 
+        {
+            if (_<#=property.FieldName#> != value)
+            {
+                _<#=property.FieldName#> = value; 
+                RaisePropertyChanged();
+            }
+        }
+    }<#}#>
+
+
+<#}#><#if(Model.Inpc){#>    public event PropertyChangedEventHandler PropertyChanged;
+
+<#}#>
+    public string ToJson() 
+    {
+        return JsonConvert.SerializeObject(this);
+    }
+    
+    public static <#=Model.Class#> FromJson(string data)
+    {
+        return JsonConvert.DeserializeObject<<#=Model.Class#>>(data);
+    }
+<#if(Model.Inpc){#>
+    
+    protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) 
+            handler(this, new PropertyChangedEventArgs(propertyName));
+    }
+<#}#>
+}

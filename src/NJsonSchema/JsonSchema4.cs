@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
@@ -168,7 +169,7 @@ namespace NJsonSchema
                 if (_schemaReference != value)
                 {
                     _schemaReference = value;
-                    SchemaReferencePath = null; 
+                    SchemaReferencePath = null;
                 }
             }
         }
@@ -195,15 +196,13 @@ namespace NJsonSchema
             }
         }
 
-
-
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
         public virtual JsonSchema4 ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Format { get; set; } // TODO: This is missing in JSON Schema schema
+        public string Format { get; set; }
 
         /// <summary>Gets or sets the default value. </summary>
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -211,7 +210,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the required multiple of for the number value. </summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public double? MultipleOf { get; set; } // TODO: Whats MultipleOf?
+        public double? MultipleOf { get; set; }
 
         /// <summary>Gets or sets the maximum allowed value. </summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -486,26 +485,24 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary => Properties.Count == 0 && AllowAdditionalProperties && AdditionalPropertiesSchema != null;
+        public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) && Properties.Count == 0 && AllowAdditionalProperties;
+
+        /// <summary>Gets a value indicating whether the validated data can be null.</summary>
+        [JsonIgnore]
+        public bool IsNullable => (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0) ||
+            ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable));
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType
-        {
-            get
-            {
-                return 
-                    string.IsNullOrEmpty(TypeName) && 
-                    (Type == JsonObjectType.Object || Type == (JsonObjectType.Object | JsonObjectType.Null)) && 
-                    Properties.Count == 0 && 
-                    AnyOf.Count == 0 && 
-                    AllOf.Count == 0 && 
-                    OneOf.Count == 0 &&
-                    AllowAdditionalProperties == true && 
-                    AdditionalPropertiesSchema == null && 
-                    MultipleOf == null;
-            }
-        }
+        public bool IsAnyType => string.IsNullOrEmpty(TypeName) &&
+                                 Type.HasFlag(JsonObjectType.Object) &&
+                                 Properties.Count == 0 &&
+                                 AnyOf.Count == 0 &&
+                                 AllOf.Count == 0 &&
+                                 OneOf.Count == 0 &&
+                                 AllowAdditionalProperties &&
+                                 AdditionalPropertiesSchema == null &&
+                                 MultipleOf == null;
 
         #endregion
 
@@ -557,10 +554,33 @@ namespace NJsonSchema
             return parent;
         }
 
-        private static JsonObjectType ConvertSimpleTypeFromString(string value)
+        private static JsonObjectType ConvertStringToJsonObjectType(string value)
         {
-            // TODO: Improve performance
-            return JsonConvert.DeserializeObject<JsonObjectType>("\"" + value + "\"");
+            // Section 3.5:
+            // http://json-schema.org/latest/json-schema-core.html#anchor8
+            // The string must be one of the 7 primitive types
+
+            switch (value)
+            {
+                case "array":
+                    return JsonObjectType.Array;
+                case "boolean":
+                    return JsonObjectType.Boolean;
+                case "integer":
+                    return JsonObjectType.Integer;
+                case "number":
+                    return JsonObjectType.Number;
+                case "null":
+                    return JsonObjectType.Null;
+                case "object":
+                    return JsonObjectType.Object;
+                case "string":
+                    return JsonObjectType.String;
+                case "file": // used for NSwag (special Swagger type)
+                    return JsonObjectType.File;
+                default:
+                    return JsonObjectType.None;
+            }
         }
 
         private void Initialize()

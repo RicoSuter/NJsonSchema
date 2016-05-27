@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(false, schema.Properties["Bar"].ActualSchema.AllowAdditionalProperties);
+            Assert.AreEqual(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
         }
 
         [TestMethod]
@@ -94,6 +94,31 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(10, property.Default);
+        }
+
+        public class DictTest
+        {
+            public Dictionary<string, object> values { get; set; }
+        }
+
+        [TestMethod]
+        public void When_dictionary_value_is_null_then_string_values_are_allowed()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<DictTest>();
+            var schemaData = schema.ToJson();
+
+            var data = @"{
+                ""values"": { 
+                    ""key"": ""value"", 
+                }
+            }";
+
+            //// Act
+            var errors = schema.Validate(data);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
         }
     }
 }

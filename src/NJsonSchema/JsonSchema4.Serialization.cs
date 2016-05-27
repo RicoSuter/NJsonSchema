@@ -94,10 +94,32 @@ namespace NJsonSchema
             }
         }
 
+        private Lazy<object> _typeRaw;
+
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         internal object TypeRaw
         {
             get
+            {
+                if(_typeRaw == null)
+                    ResetTypeRaw();
+
+                return _typeRaw.Value;
+            }
+            set
+            {
+                if (value is JArray)
+                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
+                else
+                    Type = ConvertStringToJsonObjectType(value as string);
+
+                ResetTypeRaw();
+            }
+        }
+
+        private void ResetTypeRaw()
+        {
+            _typeRaw = new Lazy<object>(() =>
             {
                 var flags = Enum.GetValues(Type.GetType())
                     .Cast<Enum>().Where(v => Type.HasFlag(v))
@@ -112,16 +134,7 @@ namespace NJsonSchema
                     return new JValue(flags[0].ToString().ToLower());
 
                 return null;
-            }
-            set
-            {
-                if (value is JArray)
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertSimpleTypeFromString(token.ToString()));
-                else if (value != null)
-                    Type = ConvertSimpleTypeFromString(value.ToString());
-                else
-                    Type = JsonObjectType.None;
-            }
+            });
         }
 
         [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -208,7 +221,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
         [JsonExtensionData]
-        public IDictionary<string, object> ExtensionData { get; set; } 
+        public IDictionary<string, object> ExtensionData { get; set; }
 
         private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
         {

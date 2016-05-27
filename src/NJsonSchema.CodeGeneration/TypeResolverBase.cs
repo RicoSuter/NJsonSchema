@@ -12,13 +12,13 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The type resolver base.</summary>
-    public abstract class TypeResolverBase<TGenerator> 
+    public abstract class TypeResolverBase<TGenerator>
         where TGenerator : TypeGeneratorBase
     {
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
         private readonly Dictionary<JsonSchema4, string> _generatedTypeNames = new Dictionary<JsonSchema4, string>();
 
-        private int _anonymousClassCount = 0;
+        private int _anonymousTypeCount = 0;
 
         /// <summary>Determines whether the generator for a given type name is registered.</summary>
         /// <param name="typeName">Name of the type.</param>
@@ -36,22 +36,32 @@ namespace NJsonSchema.CodeGeneration
             _types[typeName] = generator;
         }
 
-        /// <summary>Generates the types (e.g. interfaces, classes, enums, etc).</summary>
+        /// <summary>Tries the resolve the schema and returns null there was a problem.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name.</returns>
+        public string TryResolve(JsonSchema4 schema, string typeNameHint)
+        {
+            return schema != null ? Resolve(schema, false, typeNameHint) : string.Empty;
+        }
+
+        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
         public string GenerateTypes()
         {
             var processedTypes = new List<string>();
-            var classes = new Dictionary<string, string>();
+            var types = new Dictionary<string, string>();
             while (_types.Any(t => !processedTypes.Contains(t.Key)))
             {
                 foreach (var pair in _types.ToList())
                 {
                     processedTypes.Add(pair.Key);
-                    var result = pair.Value.GenerateType(pair.Key); 
-                    classes[result.TypeName] = result.Code;
+                    var result = pair.Value.GenerateType(pair.Key);
+                    types[result.TypeName] = result.Code;
                 }
             }
-            return string.Join("\n\n", classes.Select(p => p.Value));
+
+            return string.Join("\n\n", types.Select(p => p.Value));
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
@@ -69,7 +79,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Adds a generator for the given schema if necessary.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns></returns>
+        /// <returns>The type name of the created generator.</returns>
         protected virtual string AddGenerator(JsonSchema4 schema, string typeNameHint)
         {
             var typeName = GetOrGenerateTypeName(schema, typeNameHint);
@@ -98,6 +108,13 @@ namespace NJsonSchema.CodeGeneration
             return schema.TypeName;
         }
 
+        /// <summary>Generates a unique type name.</summary>
+        /// <returns>The type name.</returns>
+        public string GenerateTypeName()
+        {
+            return GenerateTypeName(string.Empty);
+        }
+
         /// <summary>Generates a unique type name with the given hint.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
@@ -110,10 +127,10 @@ namespace NJsonSchema.CodeGeneration
 
                 do
                 {
-                    _anonymousClassCount++;
-                } while (HasTypeGenerator(typeNameHint + _anonymousClassCount));
+                    _anonymousTypeCount++;
+                } while (HasTypeGenerator(typeNameHint + _anonymousTypeCount));
 
-                return typeNameHint + _anonymousClassCount;
+                return typeNameHint + _anonymousTypeCount;
             }
             else
                 return GenerateTypeName("Anonymous");

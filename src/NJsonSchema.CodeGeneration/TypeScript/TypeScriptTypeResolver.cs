@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -16,12 +17,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
         public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
         {
-            Settings = settings; 
+            Settings = settings;
         }
 
-        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="knownSchemes">The known schemes.</param>
-        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes)
+        /// <param name="settings">The generator settings.</param>
+        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings)
+            : this(settings)
         {
             foreach (var type in knownSchemes)
                 AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, Settings, this));
@@ -38,54 +41,45 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
-            schema = schema.ActualSchema; 
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            schema = schema.ActualSchema;
+
+            if (schema.IsAnyType)
+                return "any";
 
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
-            {
-                var property = schema;
-                if (property.Item != null)
-                    return string.Format("{0}[]", Resolve(property.Item, true, null));
-
-                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
-            }
+                return ResolveArray(schema);
 
             if (type.HasFlag(JsonObjectType.Number))
                 return "number";
 
             if (type.HasFlag(JsonObjectType.Integer))
-            {
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-
-                return "number";
-            }
+                return ResolveInteger(schema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return "boolean";
 
             if (type.HasFlag(JsonObjectType.String))
-            {
-                if (schema.Format == JsonFormatStrings.DateTime)
-                    return "Date";
+                return ResolveString(schema, typeNameHint);
 
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-                
-                return "string";
-            }
-
-            if (schema.IsAnyType)
+            if (type.HasFlag(JsonObjectType.File))
                 return "any";
 
             if (schema.IsDictionary)
-                return string.Format("{{ [key: string] : {0}; }}", Resolve(schema.AdditionalPropertiesSchema, true, null));
+            {
+                var valueType = schema.AdditionalPropertiesSchema != null ? Resolve(schema.AdditionalPropertiesSchema, true, null) : "any";
+                return $"{{ [key: string] : {valueType}; }}";
+            }
 
             return AddGenerator(schema, typeNameHint);
         }
-
+        
         /// <summary>Creates a type generator.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The generator.</returns>
@@ -106,6 +100,37 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return typeName + "AsInteger";
 
             return typeName;
+        }
+
+        private string ResolveString(JsonSchema4 schema, string typeNameHint)
+        {
+            if (schema.Format == JsonFormatStrings.DateTime)
+                return "Date";
+
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            return "string";
+        }
+
+        private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
+        {
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            return "number";
+        }
+
+        private string ResolveArray(JsonSchema4 schema)
+        {
+            var property = schema;
+            if (property.Item != null)
+                return string.Format("{0}[]", Resolve(property.Item, true, null));
+
+            if (property.Items != null && property.Items.Count > 0)
+                return string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
+
+            return "any[]";
         }
     }
 }

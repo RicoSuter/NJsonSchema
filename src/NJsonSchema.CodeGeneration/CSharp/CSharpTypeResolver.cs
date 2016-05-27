@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -42,68 +43,33 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             schema = schema.ActualSchema;
 
-            var type = schema.Type;
-            if (type.HasFlag(JsonObjectType.Array))
-            {
-                var property = schema;
-                if (property.Item != null)
-                    return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
-
-                throw new NotImplementedException("Array with multiple Items schemes are not supported.");
-            }
-
-            if (type.HasFlag(JsonObjectType.Number))
-            {
-                if (schema.Format == JsonFormatStrings.Decimal)
-                    return isNullable ? "decimal?" : "decimal";
-
-                return isNullable ? "double?" : "double";
-            }
-
-            if (type.HasFlag(JsonObjectType.Integer))
-            {
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-
-                if (schema.Format == JsonFormatStrings.Byte)
-                    return isNullable ? "byte?" : "byte";
-
-                if (schema.Format == JsonFormatStrings.Long)
-                    return isNullable ? "long?" : "long";
-
-                return isNullable ? "int?" : "int";
-            }
-
-            if (type.HasFlag(JsonObjectType.Boolean))
-                return isNullable ? "bool?" : "bool";
-
-            if (type.HasFlag(JsonObjectType.String))
-            {
-                if (schema.Format == JsonFormatStrings.DateTime)
-                    return isNullable ? Settings.DateTimeType + "?" : Settings.DateTimeType;
-
-                if (schema.Format == JsonFormatStrings.TimeSpan)
-                    return isNullable ? "TimeSpan?" : "TimeSpan";
-
-                if (schema.Format == JsonFormatStrings.Guid)
-                    return isNullable ? "Guid?" : "Guid";
-
-#pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
-                if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
-#pragma warning restore 618
-                    return "byte[]";
-
-                if (schema.IsEnumeration)
-                    return AddGenerator(schema, typeNameHint);
-
-                return "string";
-            }
-
             if (schema.IsAnyType)
                 return "object";
 
+            var type = schema.Type;
+            if (type.HasFlag(JsonObjectType.Array))
+                return ResolveArray(schema);
+
+            if (type.HasFlag(JsonObjectType.Number))
+                return ResolveNumber(schema, isNullable);
+
+            if (type.HasFlag(JsonObjectType.Integer))
+                return ResolveInteger(schema, isNullable, typeNameHint);
+
+            if (type.HasFlag(JsonObjectType.Boolean))
+                return ResolveBoolean(isNullable);
+
+            if (type.HasFlag(JsonObjectType.String))
+                return ResolveString(schema, isNullable, typeNameHint);
+
+            if (type.HasFlag(JsonObjectType.File))
+                return "byte[]";
+
             if (schema.IsDictionary)
-                return string.Format(Settings.DictionaryType + "<string, {0}>", Resolve(schema.AdditionalPropertiesSchema, false, null));
+            {
+                var valueType = schema.AdditionalPropertiesSchema != null ? Resolve(schema.AdditionalPropertiesSchema, false, null) : "object";
+                return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+            }
 
             return AddGenerator(schema, typeNameHint);
         }
@@ -111,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Adds a generator for the given schema if necessary.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns></returns>
+        /// <returns>The type name of the created generator.</returns>
         protected override string AddGenerator(JsonSchema4 schema, string typeNameHint)
         {
             if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
@@ -131,6 +97,67 @@ namespace NJsonSchema.CodeGeneration.CSharp
         protected override CSharpGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
             return new CSharpGenerator(schema, Settings, this);
+        }
+
+        private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        {
+            if (schema.Format == JsonFormatStrings.DateTime)
+                return isNullable ? Settings.DateTimeType + "?" : Settings.DateTimeType;
+
+            if (schema.Format == JsonFormatStrings.TimeSpan)
+                return isNullable ? "TimeSpan?" : "TimeSpan";
+
+            if (schema.Format == JsonFormatStrings.Guid)
+                return isNullable ? "Guid?" : "Guid";
+
+#pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
+            if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
+#pragma warning restore 618
+                return "byte[]";
+
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            return "string";
+        }
+
+        private static string ResolveBoolean(bool isNullable)
+        {
+            return isNullable ? "bool?" : "bool";
+        }
+
+        private string ResolveInteger(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        {
+            if (schema.IsEnumeration)
+                return AddGenerator(schema, typeNameHint);
+
+            if (schema.Format == JsonFormatStrings.Byte)
+                return isNullable ? "byte?" : "byte";
+
+            if (schema.Format == JsonFormatStrings.Long)
+                return isNullable ? "long?" : "long";
+
+            return isNullable ? "int?" : "int";
+        }
+
+        private static string ResolveNumber(JsonSchema4 schema, bool isNullable)
+        {
+            if (schema.Format == JsonFormatStrings.Decimal)
+                return isNullable ? "decimal?" : "decimal";
+
+            return isNullable ? "double?" : "double";
+        }
+
+        private string ResolveArray(JsonSchema4 schema)
+        {
+            var property = schema;
+            if (property.Item != null)
+                return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
+
+            if (property.Items != null && property.Items.Count > 0)
+                return string.Format("Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
+
+            return string.Format(Settings.ArrayType + "<object>", Resolve(property.Item, true, null));
         }
     }
 }

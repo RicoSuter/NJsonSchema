@@ -11,7 +11,29 @@
     <AssemblyName>NJsonSchema.CodeGeneration</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>12.0</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,9 +59,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.StringTemplate">
-      <HintPath>..\packages\Antlr4.StringTemplate.4.0.6.9004\lib\net35\Antlr4.StringTemplate.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -54,16 +73,73 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\Models\ClassTemplateModel.cs" />
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpClassStyle.cs" />
+    <Compile Include="CSharp\Models\PropertyModel.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
+    <Compile Include="ConversionUtilities.cs" />
+    <Compile Include="CSharp\Models\EnumTemplateModel.cs" />
+    <Compile Include="Models\PropertyModelBase.cs" />
+    <Compile Include="CSharp\Templates\ClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\ClassTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Templates\EnumTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\EnumTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Templates\FileTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CSharp\Templates\FileTemplate.Extensions.cs" />
+    <Compile Include="CSharp\Models\FileTemplateModel.cs" />
+    <Compile Include="ITemplate.cs" />
     <Compile Include="TypeGeneratorBase.cs" />
     <Compile Include="TypeGeneratorResult.cs" />
     <Compile Include="TypeResolverBase.cs" />
     <Compile Include="GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnumerationEntry.cs" />
+    <Compile Include="TypeScript\Models\EnumTemplateModel.cs" />
+    <Compile Include="TypeScript\Models\PropertyModel.cs" />
+    <Compile Include="TypeScript\Templates\ClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\ClassTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\DataConversionTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataConversionTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\EnumTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\EnumTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\InterfaceTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InterfaceTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\InterfaceTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\KnockoutClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KnockoutClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\KnockoutClassTemplate.Extensions.cs" />
+    <Compile Include="Infrastructure\T4Extensions.cs" />
     <Compile Include="TypeScript\TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScript\TypeScriptGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptTypeResolver.cs" />
@@ -76,40 +152,48 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\Class.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="NJsonSchema.CodeGeneration.nuspec" />
     <None Include="packages.config" />
+    <Compile Include="TypeScript\Templates\DataConversionTemplate.Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\File.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <None Include="CSharp\Templates\ClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="CSharp\Templates\EnumTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="CSharp\Templates\FileTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>FileTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="TypeScript\Templates\ClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="TypeScript\Templates\DataConversionTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DataConversionTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="TypeScript\Templates\EnumTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="TypeScript\Templates\InterfaceTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>InterfaceTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="TypeScript\Templates\KnockoutClassTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>KnockoutClassTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Interface.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CSharp\Templates\Enum.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Enum.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TypeScript\Templates\Class.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

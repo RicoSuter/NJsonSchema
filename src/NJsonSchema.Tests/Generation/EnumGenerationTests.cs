@@ -38,11 +38,11 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson(); 
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].Type);
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualSchema.Enumeration.Count);
-            Assert.AreEqual(0, schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(0));
-            Assert.AreEqual(5, schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(1));
-            Assert.AreEqual(6, schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(2));
+            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].ActualPropertySchema.Type);
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.Enumeration.Count);
+            Assert.AreEqual(0, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(0));
+            Assert.AreEqual(5, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(1));
+            Assert.AreEqual(6, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(2));
         }
 
         [TestMethod]
@@ -59,9 +59,9 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(schema.Properties["Bar"].SchemaReference);
-            Assert.IsNotNull(schema.Properties["Bar2"].SchemaReference); // must not be a reference but second enum declaration
-            Assert.AreNotEqual(schema.Properties["Bar"].SchemaReference, schema.Properties["Bar2"].SchemaReference);
+            Assert.IsNotNull(schema.Properties["Bar"].OneOf.First(o => !o.IsNullable).SchemaReference);
+            Assert.IsNotNull(schema.Properties["Bar2"].OneOf.First(o => !o.IsNullable).SchemaReference); // must not be a reference but second enum declaration
+            Assert.AreNotEqual(schema.Properties["Bar"].OneOf.First(o => !o.IsNullable).SchemaReference, schema.Properties["Bar2"].OneOf.First(o => !o.IsNullable).SchemaReference);
         }
 
         [TestMethod]
@@ -77,11 +77,11 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Bar"].Type);
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualSchema.Enumeration.Count);
-            Assert.AreEqual("A", schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(0));
-            Assert.AreEqual("B", schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(1));
-            Assert.AreEqual("C", schema.Properties["Bar"].ActualSchema.Enumeration.ElementAt(2));
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Bar"].ActualPropertySchema.Type);
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.Enumeration.Count);
+            Assert.AreEqual("A", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(0));
+            Assert.AreEqual("B", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(1));
+            Assert.AreEqual("C", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(2));
         }
 
         [TestMethod]
@@ -97,10 +97,10 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualSchema.EnumerationNames.Count);
-            Assert.AreEqual("A", schema.Properties["Bar"].ActualSchema.EnumerationNames.ElementAt(0));
-            Assert.AreEqual("B", schema.Properties["Bar"].ActualSchema.EnumerationNames.ElementAt(1));
-            Assert.AreEqual("C", schema.Properties["Bar"].ActualSchema.EnumerationNames.ElementAt(2));
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.Count);
+            Assert.AreEqual("A", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(0));
+            Assert.AreEqual("B", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(1));
+            Assert.AreEqual("C", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(2));
         }
     }
 }

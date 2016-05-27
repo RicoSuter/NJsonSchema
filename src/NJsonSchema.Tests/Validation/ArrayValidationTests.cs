@@ -110,7 +110,7 @@ namespace NJsonSchema.Tests.Validation
             var firstItemError = ((ChildSchemaValidationError) errors.First()).Errors.First().Value.First();
             Assert.AreEqual(ValidationErrorKind.StringExpected, firstItemError.Kind);
             Assert.AreEqual("[1]", errors.First().Property);
-            Assert.AreEqual("[1]", errors.First().Path);
+            Assert.AreEqual("#/[1]", errors.First().Path);
         }
 
         [TestMethod]

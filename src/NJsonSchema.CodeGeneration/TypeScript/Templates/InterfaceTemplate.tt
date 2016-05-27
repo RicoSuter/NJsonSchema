@@ -1,0 +1,9 @@
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#if(Model.HasDescription){#>/** <#=Model.Description#> */
+<#}#>export interface <#=Model.Class#><#=Model.Inheritance#> {
+<#foreach(var property in Model.Properties){#>
+<#if(property.HasDescription){#>    /** <#=property.Description#> */
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#>;
+<#}#>}

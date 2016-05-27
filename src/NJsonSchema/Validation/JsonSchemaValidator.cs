@@ -53,7 +53,7 @@ namespace NJsonSchema.Validation
             {
                 foreach (var type in types)
                 {
-                    ValidateArray(token, type.Key, propertyName, propertyPath, errors);
+                    ValidateArray(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateString(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateNumber(token, type.Key, propertyName, propertyPath, type.Value);
                     ValidateInteger(token, type.Key, propertyName, propertyPath, type.Value);
@@ -301,13 +301,9 @@ namespace NJsonSchema.Validation
                 var property = obj?.Property(propertyInfo.Key);
                 if (property != null)
                 {
-                    //var hasValueOrIsRequired = property.Value.Type != JTokenType.Null || propertyInfo.Value.IsRequired; 
-                    //if (hasValueOrIsRequired)
-                    //{
                     var propertyValidator = new JsonSchemaValidator(propertyInfo.Value);
                     var propertyErrors = propertyValidator.Validate(property.Value, propertyInfo.Key, newPropertyPath);
                     errors.AddRange(propertyErrors);
-                    //}
                 }
                 else if (propertyInfo.Value.IsRequired)
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath));
@@ -373,7 +369,7 @@ namespace NJsonSchema.Validation
             else
             {
                 if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
-                    errors.Add(new ValidationError(ValidationErrorKind.TooManyPropertiesInTuple, propertyName, propertyPath));
+                    errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, propertyName, propertyPath));
             }
         }
 

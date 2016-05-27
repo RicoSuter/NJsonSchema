@@ -11,8 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -28,7 +26,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         public static string GetJsonPath(object root, object objectToSearch, ISchemaDefinitionAppender schemaDefinitionAppender = null)
         {
-            var path = GetJsonPath(root, objectToSearch, "#", new List<object>());
+            var path = GetJsonPath(root, objectToSearch, "#", new HashSet<object>());
             if (path == null)
             {
                 if (schemaDefinitionAppender != null && objectToSearch is JsonSchema4)
@@ -60,7 +58,7 @@ namespace NJsonSchema
             }
             else if (path.StartsWith("#/"))
             {
-                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new List<object>());
+                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new HashSet<object>());
                 if (schema == null)
                     throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
 
@@ -92,25 +90,13 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
-        /// <param name="property">The property.</param>
         /// <returns>The name.</returns>
         public static string GetPropertyName(PropertyInfo property)
         {
-            var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
-                return jsonPropertyAttribute.PropertyName;
-
-            if (property.DeclaringType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null)
-            {
-                var dataMemberAttribute = property.GetCustomAttribute<DataMemberAttribute>();
-                if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
-                    return dataMemberAttribute.Name;
-            }
-
-            return property.Name;
+            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
         }
 
-        private static string GetJsonPath(object obj, object objectToSearch, string basePath, List<object> checkedObjects)
+        private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -142,12 +128,12 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var pathSegment = GetPropertyName(property);
-                    var value = property.GetValue(obj);
+                    var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
                     {
+                        var pathSegment = property.GetName();
                         var path = GetJsonPath(value, objectToSearch, basePath + "/" + pathSegment, checkedObjects);
                         if (path != null)
                             return path;
@@ -158,7 +144,7 @@ namespace NJsonSchema
             return null;
         }
 
-        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, List<object> checkedObjects)
+        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -167,16 +153,17 @@ namespace NJsonSchema
                 return (JsonSchema4)obj;
 
             checkedObjects.Add(obj);
+            var firstSegment = segments[0];
 
             if (obj is IDictionary)
             {
-                if (((IDictionary)obj).Contains(segments.First()))
-                    return GetObjectFromJsonPath(((IDictionary)obj)[segments.First()], segments.Skip(1).ToList(), checkedObjects);
+                if (((IDictionary)obj).Contains(firstSegment))
+                    return GetObjectFromJsonPath(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
             }
             else if (obj is IEnumerable)
             {
                 int index;
-                if (int.TryParse(segments.First(), out index))
+                if (int.TryParse(firstSegment, out index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
@@ -185,12 +172,15 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var pathSegment = GetPropertyName(property);
-                    var value = property.GetValue(obj);
-                    if (pathSegment == segments.First())
+                    var pathSegment = property.GetName();
+                    if (pathSegment == firstSegment)
+                    {
+                        var value = property.PropertyInfo.GetValue(obj);
                         return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects);
+                    }
                 }
             }
 
