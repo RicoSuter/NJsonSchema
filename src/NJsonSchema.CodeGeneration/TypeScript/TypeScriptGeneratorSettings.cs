@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
@@ -35,6 +36,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the extension code to append to the generated code.</summary>
         public string ExtensionCode { get; set; }
 
+        /// <summary>Gets or sets the type names which always generate plain TypeScript classes.</summary>
+        public string[] ClassTypes { get; set; }
+
         /// <summary>Gets the transformed additional code.</summary>
         public string TransformedExtensionCode
         {
@@ -50,8 +54,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
         }
 
-        internal ITemplate CreateTemplate()
+        internal ITemplate CreateTemplate(string typeName)
         {
+            if (ClassTypes != null && ClassTypes.Contains(typeName))
+                return new ClassTemplate();
+
             if (TypeStyle == TypeScriptTypeStyle.Interface)
                 return new InterfaceTemplate();
 
@@ -62,6 +69,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return new KnockoutClassTemplate();
 
             throw new NotImplementedException();
+        }
+
+        internal TypeScriptTypeStyle GetTypeStyle(string typeName)
+        {
+            if (ClassTypes != null && ClassTypes.Contains(typeName))
+                return TypeScriptTypeStyle.Class;
+
+            return TypeStyle;
         }
     }
 }

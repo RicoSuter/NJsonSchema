@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace NJsonSchema.Infrastructure
@@ -149,16 +150,26 @@ namespace NJsonSchema.Infrastructure
         private static string GetXmlDocumentation(this MemberInfo member, XDocument xml)
         {
             var name = GetMemberElementName(member);
-            return FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/summary)", name)).ToString().Trim();
+            var documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/summary)", name)).ToString().Trim();
+            return RemoveLineBreakWhiteSpaces(documentation);
         }
 
         private static string GetXmlDocumentation(this ParameterInfo parameter, XDocument xml)
         {
+            string documentation;
+
             var name = GetMemberElementName(parameter.Member);
             if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
-                return FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/returns)", name)).ToString().Trim();
+                documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/returns)", name)).ToString().Trim();
             else
-                return FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
+                documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
+
+            return RemoveLineBreakWhiteSpaces(documentation);
+        }
+
+        private static string RemoveLineBreakWhiteSpaces(string documentation)
+        {
+            return Regex.Replace(documentation.Replace("\r", string.Empty), "\\n\\s+", "\n");
         }
 
         /// <exception cref="ArgumentException">Unknown member type.</exception>
@@ -211,10 +222,10 @@ namespace NJsonSchema.Infrastructure
             try
             {
                 if (assembly == null)
-                    return null; 
+                    return null;
 
                 if (string.IsNullOrEmpty(assembly.Location))
-                    return null; 
+                    return null;
 
                 var assemblyName = assembly.GetName();
                 if (string.IsNullOrEmpty(assemblyName.Name))

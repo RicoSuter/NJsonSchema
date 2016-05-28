@@ -1,14 +1,14 @@
 ﻿<#@ template visibility="internal" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
-<#if(Model.HasDescription){#>/// <summary><#=Model.Description#></summary>
+<#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#>public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
     private <#=property.Type#> _<#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
 
 
 <#foreach(var property in Model.Properties){#>
-<#if(property.HasDescription){#>    /// <summary><#=property.Description#></summary>
+<#if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#}#>    [JsonProperty("<#=property.Name#>", Required = <#=property.Required#>)]
 <#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>

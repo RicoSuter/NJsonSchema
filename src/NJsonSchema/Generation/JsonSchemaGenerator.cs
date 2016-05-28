@@ -123,6 +123,7 @@ namespace NJsonSchema.Generation
                     LoadEnumerations(type, schema, typeDescription);
 
                     schema.TypeName = GetTypeName(type);
+                    schema.Description = type.GetXmlDocumentation();
                     schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
                 }
                 else

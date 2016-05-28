@@ -86,10 +86,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings, this)).ToList();
+                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings, this, typeName)).ToList();
                 var hasInheritance = _schema.AllOf.Count == 1;
 
-                var template = Settings.CreateTemplate();
+                var template = Settings.CreateTemplate(typeName);
                 template.Initialize(new // TODO: Create model class
                 {
                     Class = typeName,

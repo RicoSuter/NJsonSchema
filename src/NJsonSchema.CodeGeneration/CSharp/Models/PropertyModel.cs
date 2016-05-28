@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             Name = property.Name;
             HasDescription = !string.IsNullOrEmpty(property.Description);
-            Description = ConversionUtilities.RemoveLineBreaks(property.Description);
+            Description = property.Description;
             PropertyName = ConversionUtilities.ConvertToUpperCamelCase(property.Name);
             FieldName = ConversionUtilities.ConvertToLowerCamelCase(property.Name);
             Required = property.IsRequired && settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default";

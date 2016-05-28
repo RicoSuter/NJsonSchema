@@ -71,11 +71,20 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Add tabs to the given string.</summary>
         /// <param name="input">The input.</param>
-        /// <param name="count">The tab count.</param>
+        /// <param name="tabCount">The tab count.</param>
         /// <returns>The output.</returns>
-        public static string Tab(string input, int count)
+        public static string Tab(string input, int tabCount)
         {
-            return input.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", count)));
+            return input.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)));
+        }
+
+        /// <summary>Converts all line breaks in a string into '\n' and removes white spaces.</summary>
+        /// <param name="input">The input.</param>
+        /// <param name="tabCount">The tab count.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertCSharpDocBreaks(string input, int tabCount)
+        {
+            return input.Replace("\r", string.Empty).Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ");
         }
 
         private static string ConvertDashesToCamelCase(string input)

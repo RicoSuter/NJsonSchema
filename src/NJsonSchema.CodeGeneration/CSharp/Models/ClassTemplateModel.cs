@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             Namespace = settings.Namespace;
 
             HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = ConversionUtilities.RemoveLineBreaks(schema.Description);
+            Description = schema.Description;
 
             Inpc = settings.ClassStyle == CSharpClassStyle.Inpc;
 

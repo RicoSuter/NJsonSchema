@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             Enums = GetEnumeration(schema);
 
             HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = ConversionUtilities.RemoveLineBreaks(schema.Description);
+            Description = schema.Description;
         }
 
         public string Name { get; }

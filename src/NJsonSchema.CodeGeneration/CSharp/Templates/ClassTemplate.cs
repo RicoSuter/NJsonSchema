@@ -35,7 +35,7 @@ if(Model.HasDescription){
             this.Write("/// <summary>");
             
             #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Description));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)));
             
             #line default
             #line hidden
@@ -129,7 +129,7 @@ if(property.HasDescription){
             this.Write("    /// <summary>");
             
             #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.Description));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)));
             
             #line default
             #line hidden
