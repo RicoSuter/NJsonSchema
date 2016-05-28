@@ -14,9 +14,9 @@
 <#}#>
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
-            var <#=property.PropertyName#>: <#=property.Type#> = null; 
+            var <#=property.PropertyName#>_: <#=property.Type#> = null; 
             <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
-            this.<#=property.PropertyName#>(<#=property.PropertyName#>);
+            this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
 <#}#>        }
     }
