@@ -17,68 +17,108 @@ namespace NJsonSchema.Infrastructure
 {
     internal static class ReflectionCache
     {
-        // TODO: Make thread-safe
+        private static readonly Dictionary<Type, IList<Property>> PropertyCacheByType = new Dictionary<Type, IList<Property>>();
 
-        private static readonly Dictionary<Type, IList<PropertyInfo>> PropertyCacheByType = new Dictionary<Type, IList<PropertyInfo>>();
-        private static readonly Dictionary<PropertyInfo, CustomAttributes> AttributeCacheByProperty = new Dictionary<PropertyInfo, CustomAttributes>();
         private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
 
-        public static IEnumerable<PropertyInfo> GetProperties(Type type)
+        public static IEnumerable<Property> GetProperties(Type type)
         {
-            IList<PropertyInfo> properties;
-
-            if (PropertyCacheByType.ContainsKey(type))
-                properties = PropertyCacheByType[type];
-            else
+            lock (PropertyCacheByType)
             {
-                properties = type.GetRuntimeProperties().ToList();
-                PropertyCacheByType[type] = properties;
-            }
+                if (!PropertyCacheByType.ContainsKey(type))
+                {
+                    var properties = type.GetRuntimeProperties().Select(p => new Property(p, GetCustomAttributes(p))).ToList();
 
-            return properties;
+                    PropertyCacheByType[type] = properties;
+                }
+
+                return PropertyCacheByType[type];
+            }
         }
 
-        public static CustomAttributes GetCustomAttributes(PropertyInfo property)
+        private static CustomAttributes GetCustomAttributes(PropertyInfo property)
         {
-            if (AttributeCacheByProperty.ContainsKey(property))
-                return AttributeCacheByProperty[property];
-
-            CustomAttributes customAttributes = new CustomAttributes();
+            JsonIgnoreAttribute jsonIgnoreAttribute = null;
+            JsonPropertyAttribute jsonPropertyAttribute = null;
+            DataMemberAttribute dataMemberAttribute = null;
 
             foreach (var attribute in property.GetCustomAttributes())
             {
                 if (attribute is JsonIgnoreAttribute)
-                    customAttributes.JsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
+                    jsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
                 else if (attribute is JsonPropertyAttribute)
-                    customAttributes.JsonPropertyAttribute = attribute as JsonPropertyAttribute;
+                    jsonPropertyAttribute = attribute as JsonPropertyAttribute;
                 else if (attribute is DataMemberAttribute)
-                    customAttributes.DataMemberAttribute = attribute as DataMemberAttribute;
+                    dataMemberAttribute = attribute as DataMemberAttribute;
             }
 
-            customAttributes.DataContractAttribute = GetDataContractAttribute(property.DeclaringType);
-
-            AttributeCacheByProperty[property] = customAttributes;
-
-            return customAttributes;
+            return new CustomAttributes(jsonIgnoreAttribute, jsonPropertyAttribute, GetDataContractAttribute(property.DeclaringType), dataMemberAttribute);
         }
 
         public static DataContractAttribute GetDataContractAttribute(Type type)
         {
-            if (DataContractAttributeCacheByType.ContainsKey(type))
+            lock (DataContractAttributeCacheByType)
+            {
+                if (!DataContractAttributeCacheByType.ContainsKey(type))
+                {
+                    var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
+                    DataContractAttributeCacheByType[type] = attribute;
+                }
+
                 return DataContractAttributeCacheByType[type];
+            }
+        }
 
-            var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
-            DataContractAttributeCacheByType[type] = attribute;
+        public class Property
+        {
+            public Property(PropertyInfo propertyInfo, CustomAttributes customAttributes)
+            {
+                PropertyInfo = propertyInfo;
+                CustomAttributes = customAttributes;
+            }
 
-            return attribute;
+            public PropertyInfo PropertyInfo { get; }
+
+            public CustomAttributes CustomAttributes { get; }
+
+            /// <summary>Gets the name of the property for JSON serialization.</summary>
+            /// <returns>The name.</returns>
+            public string GetName()
+            {
+                if (CustomAttributes.JsonPropertyAttribute != null && !string.IsNullOrEmpty(CustomAttributes.JsonPropertyAttribute.PropertyName))
+                    return CustomAttributes.JsonPropertyAttribute.PropertyName;
+
+                if (CustomAttributes.DataContractAttribute != null)
+                {
+                    if (CustomAttributes.DataMemberAttribute != null && !string.IsNullOrEmpty(CustomAttributes.DataMemberAttribute.Name))
+                        return CustomAttributes.DataMemberAttribute.Name;
+                }
+
+                return PropertyInfo.Name;
+            }
         }
 
         public class CustomAttributes
         {
-            public JsonIgnoreAttribute JsonIgnoreAttribute { get; set; }
-            public JsonPropertyAttribute JsonPropertyAttribute { get; set; }
-            public DataContractAttribute DataContractAttribute { get; set; }
-            public DataMemberAttribute DataMemberAttribute { get; set; }
+            public CustomAttributes(
+                JsonIgnoreAttribute jsonIgnoreAttribute,
+                JsonPropertyAttribute jsonPropertyAttribute,
+                DataContractAttribute dataContractAttribute,
+                DataMemberAttribute dataMemberAttribute)
+            {
+                JsonIgnoreAttribute = jsonIgnoreAttribute;
+                JsonPropertyAttribute = jsonPropertyAttribute;
+                DataContractAttribute = dataContractAttribute;
+                DataMemberAttribute = dataMemberAttribute;
+            }
+
+            public JsonIgnoreAttribute JsonIgnoreAttribute { get; }
+
+            public JsonPropertyAttribute JsonPropertyAttribute { get; }
+
+            public DataContractAttribute DataContractAttribute { get; }
+
+            public DataMemberAttribute DataMemberAttribute { get; }
         }
     }
 }

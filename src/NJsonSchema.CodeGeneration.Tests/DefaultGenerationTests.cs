@@ -34,43 +34,40 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.AreEqual("foo", schema.Properties["Test"].Default); 
         }
 
-        // TODO: Implement this
-        // Maybe we should use DefaultValue in output instead of default assignments: http://stackoverflow.com/questions/29611445/default-value-for-missing-properties-with-json-net
+        [TestMethod]
+        public void When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.Integer
+            });
 
-        //[TestMethod]
-        //public void When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
-        //{
-        //    //// Arrange
-        //    var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
-        //    {
-        //        DefaultEnumHandling = EnumHandling.Integer
-        //    });
+            //// Act
+            var generator = new CSharpGenerator(schema);
+            generator.Settings.ClassStyle = CSharpClassStyle.Inpc;
+            var code = generator.GenerateFile();
 
-        //    //// Act
-        //    var generator = new CSharpGenerator(schema);
-        //    generator.Settings.ClassStyle = CSharpClassStyle.Inpc;
-        //    var code = generator.GenerateFile();
+            //// Assert
+            Assert.IsTrue(code.Contains("private string _test = \"foo\";"));
+        }
 
-        //    //// Assert
-        //    Assert.IsTrue(code.Contains("private string _test = \"foo\";"));
-        //}
+        [TestMethod]
+        public void When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.Integer
+            });
 
-        //[TestMethod]
-        //public void When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
-        //{
-        //    //// Arrange
-        //    var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
-        //    {
-        //        DefaultEnumHandling = EnumHandling.Integer
-        //    });
+            //// Act
+            var generator = new CSharpGenerator(schema);
+            generator.Settings.ClassStyle = CSharpClassStyle.Poco;
+            var code = generator.GenerateFile();
 
-        //    //// Act
-        //    var generator = new CSharpGenerator(schema);
-        //    generator.Settings.ClassStyle = CSharpClassStyle.Poco;
-        //    var code = generator.GenerateFile();
-
-        //    //// Assert
-        //    Assert.IsTrue(code.Contains("public string Test { get; set; } = \"foo\";"));
-        //}
+            //// Assert
+            Assert.IsTrue(code.Contains("public string Test { get; set; } = \"foo\";"));
+        }
     }
 }
