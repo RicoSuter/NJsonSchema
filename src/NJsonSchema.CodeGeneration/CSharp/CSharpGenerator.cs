@@ -9,6 +9,7 @@
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
+using System;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -50,11 +51,30 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets the language.</summary>
         protected override string Language => "CSharp";
 
+
+        /// <summary>
+        ///  If schema id is in url format, parses a suggested type name for the top level object
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        public static string ParseTypeNameFromSchemaId(string schemaId)
+        {
+            if (schemaId == null) return null;
+            try {
+                var schemaUri = new Uri(schemaId);
+                var pathComponents = schemaUri.AbsolutePath.Split('/').Where((component) => component.Trim() != "");
+                return pathComponents.LastOrDefault()?.Split('.')?.FirstOrDefault();
+            } catch {
+                return null;
+            }
+        }
+
         /// <summary>Generates the file.</summary>
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            var fallbackTypeName = _resolver.GenerateTypeName(ParseTypeNameFromSchemaId(this._schema.Id));
+            var classes = GenerateType(_resolver.GenerateTypeName(fallbackTypeName)).Code + "\n\n" + _resolver.GenerateTypes();
             var template = new FileTemplate() as ITemplate;
             template.Initialize(new FileTemplateModel
             {
