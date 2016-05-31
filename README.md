@@ -1,6 +1,8 @@
 NJsonSchema for .NET
 ====================
 
+[![Join the chat at https://gitter.im/NJsonSchema/NJsonSchema](https://badges.gitter.im/NJsonSchema/NJsonSchema.svg)](https://gitter.im/NJsonSchema/NJsonSchema?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![NuGet Version](https://badge.fury.io/nu/njsonschema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
 [![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
