@@ -7,7 +7,7 @@
 <#if(Model.IsArray){#>
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
     <#=Model.Variable#> = [];
-    for (var item of <#=Model.Value#>)
+    for (let item of <#=Model.Value#>)
 <#if(Model.IsArrayItemNewableObject){#>
         <#=Model.Variable#>.push(new <#=Model.ArrayItemType#>(item));
 <#}else{#>
@@ -21,13 +21,13 @@ if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
 <#if(Model.IsDictionary){#>
 if (<#=Model.Value#>) {
     <#=Model.Variable#> = {};
-    for (var key in <#=Model.Value#>) {
+    for (let key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
 <#if(Model.IsDictionaryValueNewableObject){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? new <#=Model.DictionaryValueType#>(<#=Model.Value#>[key]) : null;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? new Date(<#=Model.Value#>[key]) : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? new Date(<#=Model.Value#>[key].toString()) : null;
 <#}else{#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : null;
 <#}}#>
@@ -35,7 +35,7 @@ if (<#=Model.Value#>) {
 }
 <#}else{#>
     <#if(Model.IsDate){#>
-<#=Model.Variable#> = <#=Model.Value#> ? new Date(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#>new Date(<#=Model.DefaultValue#>)<#}else{#>null<#}#>;
+<#=Model.Variable#> = <#=Model.Value#> ? new Date(<#=Model.Value#>.toString()) : <#if(Model.HasDefaultValue){#>new Date(<#=Model.DefaultValue#>)<#}else{#>null<#}#>;
     <#}else{#>
 <#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
     <#}#>
