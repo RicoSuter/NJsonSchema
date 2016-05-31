@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
-using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -47,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var output = generator.GenerateFile();
-            Console.WriteLine(output);
+
             //// Assert
             Assert.IsTrue(output.Contains("public partial class foo"));
         }
