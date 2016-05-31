@@ -20,4 +20,20 @@
 
 <#}#>        }
     }
+
+    toJS(data?: any) {
+        data = data === undefined ? {} : data;
+<#foreach (var property in Model.Properties){#>
+        var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
+        <#=ConversionUtilities.Tab(property.DataBackConversionCode, 2)#>
+
+<#} if(Model.HasInheritance){#>
+        super.toJS(data);
+<#}#>
+        return data; 
+    }
+
+    toJSON() {
+        return JSON.stringify(this.toJS());
+    }
 }

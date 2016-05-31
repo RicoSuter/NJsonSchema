@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings, this, typeName)).ToList();
+                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
                 var hasInheritance = _schema.AllOf.Count == 1;
 
                 var template = Settings.CreateTemplate(typeName);
@@ -108,52 +108,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     Code = template.Render()
                 };
             }
-        }
-
-        /// <summary>Generates the code to convert a data object to the target class instances.</summary>
-        /// <param name="variable">The variable to assign the converted value to.</param>
-        /// <param name="value">The variable containing the original value.</param>
-        /// <param name="schema">The schema.</param>
-        /// <param name="isPropertyNullable">Value indicating whether the value is nullable.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The generated code.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public string GenerateDataConversion(string variable, string value, JsonSchema4 schema, bool isPropertyNullable, string typeNameHint)
-        {
-            if (schema == null)
-                throw new ArgumentNullException(nameof(schema));
-
-            var template = new DataConversionTemplate() as ITemplate;
-            template.Initialize(new // TODO: Create model class
-            {
-                Variable = variable,
-                Value = value,
-
-                HasDefaultValue = PropertyModelBase.GetDefaultValue(schema) != null,
-                DefaultValue = PropertyModelBase.GetDefaultValue(schema),
-
-                Type = _resolver.Resolve(schema, isPropertyNullable, typeNameHint),
-
-                IsNewableObject = IsNewableObject(schema),
-                IsDate = schema.Format == JsonFormatStrings.DateTime,
-
-                IsDictionary = schema.IsDictionary,
-                DictionaryValueType = _resolver.TryResolve(schema.AdditionalPropertiesSchema, typeNameHint),
-                IsDictionaryValueNewableObject = schema.AdditionalPropertiesSchema != null && IsNewableObject(schema.AdditionalPropertiesSchema),
-                IsDictionaryValueDate = schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
-
-                IsArray = schema.Type.HasFlag(JsonObjectType.Array),
-                ArrayItemType = _resolver.TryResolve(schema.Item, typeNameHint),
-                IsArrayItemNewableObject = schema.Item != null && IsNewableObject(schema.Item),
-                IsArrayItemDate = schema.Item?.Format == JsonFormatStrings.DateTime
-            });
-            return template.Render();
-        }
-
-        private static bool IsNewableObject(JsonSchema4 schema)
-        {
-            schema = schema.ActualSchema;
-            return schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAnyType && !schema.IsDictionary;
         }
     }
 }

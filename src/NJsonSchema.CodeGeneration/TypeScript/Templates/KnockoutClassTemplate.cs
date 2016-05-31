@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+    #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
     internal partial class KnockoutClassTemplate : KnockoutClassTemplateBase
     {
@@ -27,210 +27,254 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         public virtual string TransformText()
         {
             
-            #line 4 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.HasDescription){
             
             #line default
             #line hidden
             this.Write("/** ");
             
-            #line 4 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Description));
             
             #line default
             #line hidden
             this.Write(" */\r\n");
             
-            #line 5 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("export class ");
             
-            #line 5 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
             
-            #line 5 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Inheritance));
             
             #line default
             #line hidden
             this.Write(" {\r\n");
             
-            #line 6 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 foreach (var property in Model.Properties){
             
             #line default
             #line hidden
             
-            #line 7 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(property.HasDescription){
             
             #line default
             #line hidden
             this.Write("    /** ");
             
-            #line 7 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Description));
             
             #line default
             #line hidden
             this.Write(" */\r\n");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(property.IsReadOnly){
             
             #line default
             #line hidden
             this.Write("readonly ");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(property.IsArray){
             
             #line default
             #line hidden
             this.Write("ko.observableArray<");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.ArrayItemType));
             
             #line default
             #line hidden
             this.Write(">()");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }else{
             
             #line default
             #line hidden
             this.Write("ko.observable<");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
             
             #line default
             #line hidden
             this.Write(">(");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(property.HasDefaultValue){
             
             #line default
             #line hidden
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.DefaultValue));
             
             #line default
             #line hidden
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write(")");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 9 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\r\n    constructor(data?: any) {\r\n");
             
-            #line 12 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.HasInheritance){
             
             #line default
             #line hidden
             this.Write("        super(data);\r\n");
             
-            #line 14 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 14 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("        if (data !== undefined) {\r\n");
             
-            #line 16 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 foreach(var property in Model.Properties){
             
             #line default
             #line hidden
             this.Write("            var ");
             
-            #line 17 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 17 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
             
             #line default
             #line hidden
             this.Write("_: ");
             
-            #line 17 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 17 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
             
             #line default
             #line hidden
             this.Write(" = null; \r\n            ");
             
-            #line 18 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 18 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataConversionCode, 3)));
             
             #line default
             #line hidden
             this.Write("\r\n            this.");
             
-            #line 19 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 19 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 19 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 19 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
             
             #line default
             #line hidden
             this.Write("_);\r\n\r\n");
             
-            #line 21 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
-            this.Write("        }\r\n    }\r\n}");
+            this.Write("        }\r\n    }\r\n\r\n    toJS(data?: any) {\r\n        data = data === undefined ? {" +
+                    "} : data;\r\n");
+            
+            #line 26 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+foreach (var property in Model.Properties){
+            
+            #line default
+            #line hidden
+            this.Write("        var ");
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
+            
+            #line default
+            #line hidden
+            this.Write("_ = this.");
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
+            
+            #line default
+            #line hidden
+            this.Write("(); \r\n        ");
+            
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataBackConversionCode, 2)));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+} if(Model.HasInheritance){
+            
+            #line default
+            #line hidden
+            this.Write("        super.toJS(data);\r\n");
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
+                    "s.toJS());\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

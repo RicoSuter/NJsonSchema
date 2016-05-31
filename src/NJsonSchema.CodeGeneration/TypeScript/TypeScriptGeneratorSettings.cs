@@ -71,7 +71,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             throw new NotImplementedException();
         }
 
-        internal TypeScriptTypeStyle GetTypeStyle(string typeName)
+        /// <summary>Gets the type style of the given type name.</summary>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The type style.</returns>
+        public TypeScriptTypeStyle GetTypeStyle(string typeName)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
                 return TypeScriptTypeStyle.Class;

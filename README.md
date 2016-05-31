@@ -20,7 +20,7 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 
-NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services.
+NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. The project is maintained and developed by [Rico Suter](http://rsuter.com) and other contributors. 
 
 ## NJsonSchema usage
 

@@ -1,60 +1,91 @@
+//-----------------------------------------------------------------------
+// <copyright file="PropertyModel.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     internal class PropertyModel : PropertyModelBase
     {
-        public PropertyModel(JsonProperty property, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings, TypeScriptGenerator generator, string parentTypeName) 
+        private readonly string _parentTypeName;
+        private readonly TypeScriptGeneratorSettings _settings;
+        private readonly JsonProperty _property;
+        private readonly TypeScriptTypeResolver _resolver;
+
+        public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
             : base(property)
         {
-            var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
-            var typeName = resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name); 
-
-            Name = property.Name;
-            InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name;
-            PropertyName = propertyName;
-            Type = typeName;
-            DataConversionCode = GenerateDataConversionCode(property, settings, generator, propertyName, parentTypeName);
-            Description = property.Description;
-            HasDescription = !string.IsNullOrEmpty(property.Description);
-            IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
-            ArrayItemType = resolver.TryResolve(property.ActualPropertySchema.Item, property.Name);
-            IsReadOnly = property.IsReadOnly && settings.GenerateReadOnlyKeywords;
-            IsOptional = !property.IsRequired;
+            _property = property;
+            _resolver = resolver;
+            _parentTypeName = parentTypeName;
+            _settings = settings;
         }
 
-        private static string GenerateDataConversionCode(JsonProperty property, TypeScriptGeneratorSettings settings, 
-            TypeScriptGenerator generator, string propertyName, string parentTypeName)
+        public string Name => _property.Name;
+
+        public string InterfaceName => _property.Name.Contains("-") ? '\"' + _property.Name + '\"' : _property.Name;
+
+        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(_property.Name).Replace("-", "_");
+
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable, _property.Name);
+
+        public string Description => _property.Description;
+
+        public bool HasDescription => !string.IsNullOrEmpty(Description);
+
+        public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, _property.Name);
+
+        public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
+
+        public bool IsOptional => !_property.IsRequired;
+
+        public string DataConversionCode
         {
-            var typeStyle = settings.GetTypeStyle(parentTypeName);
-            return typeStyle == TypeScriptTypeStyle.Interface ? string.Empty : generator.GenerateDataConversion(
-                typeStyle == TypeScriptTypeStyle.Class ? "this." + propertyName : propertyName + "_",
-                "data[\"" + property.Name + "\"]",
-                property.ActualPropertySchema,
-                property.IsNullable,
-                property.Name);
+            get
+            {
+                var typeStyle = _settings.GetTypeStyle(_parentTypeName);
+                if (typeStyle != TypeScriptTypeStyle.Interface)
+                {
+                    return DataConversionGenerator.Render(new DataConversionParameters
+                    {
+                        Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Value = "data[\"" + _property.Name + "\"]",
+                        Schema = _property.ActualPropertySchema,
+                        IsPropertyNullable = _property.IsNullable,
+                        TypeNameHint = _property.Name,
+                        Resolver = _resolver
+                    });
+                }
+                return string.Empty;
+            }
         }
 
-        public string Name { get; }
-
-        public string InterfaceName { get; }
-
-        public string PropertyName { get; }
-
-        public string Type { get; }
-
-        public string DataConversionCode { get; }
-
-        public string Description { get; }
-
-        public bool HasDescription { get; }
-
-        public bool IsArray { get; }
-
-        public string ArrayItemType { get; }
-
-        public bool IsReadOnly { get; }
-
-        public bool IsOptional { get; }
+        public string DataBackConversionCode
+        {
+            get
+            {
+                var typeStyle = _settings.GetTypeStyle(_parentTypeName);
+                if (typeStyle != TypeScriptTypeStyle.Interface)
+                {
+                    return DataConversionGenerator.Render(new DataConversionParameters
+                    {
+                        Variable = "data[\"" + _property.Name + "\"]",
+                        Value = _settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Schema = _property.ActualPropertySchema,
+                        IsPropertyNullable = _property.IsNullable,
+                        TypeNameHint = _property.Name,
+                        Resolver = _resolver
+                    });
+                }
+                return string.Empty;
+            }
+        }
     }
 }
