@@ -31,4 +31,9 @@
     toJSON() {
         return JSON.stringify(this.toJS());
     }
+
+    clone() {
+        var json = this.toJSON();
+        return new <#=Model.Class#>(JSON.parse(json));
+    }
 }

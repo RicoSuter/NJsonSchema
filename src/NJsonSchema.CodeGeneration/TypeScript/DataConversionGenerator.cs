@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using NJsonSchema.CodeGeneration.Models;
+using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -15,10 +16,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     {
         /// <summary>Generates the code to convert a data object to the target class instances.</summary>
         /// <returns>The generated code.</returns>
-        public static string Render(DataConversionParameters parameters)
+        public static string RenderConvertToJavaScriptCode(DataConversionParameters parameters)
         {
-            var template = new Templates.DataConversionTemplate() as ITemplate;
-            template.Initialize(new 
+            return Render(new ConvertToJavaScriptTemplate(), parameters);
+        }
+
+        /// <summary>Generates the code to convert a data object to the target class instances.</summary>
+        /// <returns>The generated code.</returns>
+        public static string RenderConvertToClassCode(DataConversionParameters parameters)
+        {
+            return Render(new ConvertToClassTemplate(), parameters);
+        }
+
+        private static string Render(ITemplate template, DataConversionParameters parameters)
+        {
+            template.Initialize(new
             {
                 Variable = parameters.Variable,
                 Value = parameters.Value,

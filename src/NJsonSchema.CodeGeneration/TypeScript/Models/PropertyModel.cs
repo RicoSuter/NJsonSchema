@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 var typeStyle = _settings.GetTypeStyle(_parentTypeName);
                 if (typeStyle != TypeScriptTypeStyle.Interface)
                 {
-                    return DataConversionGenerator.Render(new DataConversionParameters
+                    return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
                     {
                         Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
@@ -74,10 +74,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 var typeStyle = _settings.GetTypeStyle(_parentTypeName);
                 if (typeStyle != TypeScriptTypeStyle.Interface)
                 {
-                    return DataConversionGenerator.Render(new DataConversionParameters
+                    return DataConversionGenerator.RenderConvertToJavaScriptCode(new DataConversionParameters
                     {
                         Variable = "data[\"" + _property.Name + "\"]",
-                        Value = _settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable,
                         TypeNameHint = _property.Name,

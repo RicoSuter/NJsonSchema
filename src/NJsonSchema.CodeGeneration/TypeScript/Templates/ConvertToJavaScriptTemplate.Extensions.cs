@@ -8,7 +8,7 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
-    internal partial class DataConversionTemplate : ITemplate
+    internal partial class ConvertToJavaScriptTemplate : ITemplate
     {
         public dynamic Model { get; set; }
         
