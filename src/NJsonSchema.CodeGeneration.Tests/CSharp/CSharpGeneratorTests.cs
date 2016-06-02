@@ -8,6 +8,49 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     [TestClass]
     public class CSharpGeneratorTests
     {
+
+        [TestMethod]
+        public void When_schema_id_contains_valid_url_typename_is_parsed_correctly() {
+            /// Arrange
+            var schemaIds = new string[] {
+                "http://domain.name.com/foo.json#",
+                "http://domain.name.com/foo.json",
+                "http://domain.name.com/foo",
+            };
+
+            foreach (var schemaId in schemaIds) {
+                /// Act
+                var typeName = CSharpGenerator.ParseTypeNameFromSchemaId(schemaId);
+                /// Assert
+                Assert.AreEqual("foo", typeName);
+            }
+        }
+
+        [TestMethod]
+        public void When_schema_contains_id_field_top_level_type_name_can_be_derived_from_it()
+        {
+
+            /// Arrange
+            var schemaJson = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'id': 'http://domain.name.com/foo.json#',
+                'type': 'object',
+                'additionalProperties': false,
+                'properties': {
+                    'foo': {
+                        'type': 'integer'
+                     } 
+                }
+            }";
+            var generator = CreateGenerator(schemaJson);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("public partial class foo"));
+        }
+
         [TestMethod]
         public void When_namespace_is_set_then_it_should_appear_in_output()
         {
@@ -191,10 +234,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
+            return CreateGenerator(schemaData);
+        }
+
+        private static CSharpGenerator CreateGenerator(string schemaJson)
+        {
+            var schema = JsonSchema4.FromJson(schemaJson);
             var settings = new CSharpGeneratorSettings();
             settings.Namespace = "MyNamespace";
             var generator = new CSharpGenerator(schema, settings);
             return generator;
         }
+
     }
 }
