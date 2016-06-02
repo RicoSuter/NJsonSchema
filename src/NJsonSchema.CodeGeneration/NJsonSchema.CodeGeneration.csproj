@@ -117,12 +117,18 @@
       <DependentUpon>ClassTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeScript\Templates\ClassTemplate.Extensions.cs" />
-    <Compile Include="TypeScript\Templates\DataConversionTemplate.cs">
+    <Compile Include="TypeScript\Templates\ConvertToJavaScriptTemplate.cs">
+      <DependentUpon>ConvertToJavaScriptTemplate.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>DataConversionTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeScript\Templates\ConvertToClassTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConvertToClassTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeScript\DataConversionGenerator.cs" />
+    <Compile Include="TypeScript\Templates\ConvertToJavaScriptTemplate.Extensions.cs" />
     <Compile Include="TypeScript\Templates\EnumTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -156,7 +162,7 @@
   <ItemGroup>
     <None Include="NJsonSchema.CodeGeneration.nuspec" />
     <None Include="packages.config" />
-    <Compile Include="TypeScript\Templates\DataConversionTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\ConvertToClassTemplate.Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CSharp\Templates\ClassTemplate.tt">
@@ -175,9 +181,9 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClassTemplate.cs</LastGenOutput>
     </None>
-    <None Include="TypeScript\Templates\DataConversionTemplate.tt">
+    <None Include="TypeScript\Templates\ConvertToClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>DataConversionTemplate.cs</LastGenOutput>
+      <LastGenOutput>ConvertToClassTemplate.cs</LastGenOutput>
     </None>
     <None Include="TypeScript\Templates\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
@@ -194,6 +200,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TypeScript\Templates\ConvertToJavaScriptTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ConvertToJavaScriptTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
