@@ -31,10 +31,14 @@ class Foo extends generated.FooBase {
 
 }
 
+export class Test {
+
+}
+
 var x = 10;";
 
             //// Act
-            var ext = new TypeScriptExtensionCode(code);
+            var ext = new TypeScriptExtensionCode(code, new []{ "Foo", "Bar" });
 
             //// Assert
             Assert.IsTrue(ext.Classes.ContainsKey("Foo"));
@@ -47,6 +51,7 @@ var x = 10;";
 
             Assert.IsTrue(ext.CodeAfter.StartsWith("var clientClasses"));
             Assert.IsTrue(ext.CodeAfter.Contains("if (clientClasses.hasOwnProperty(clientClass))"));
+            Assert.IsTrue(ext.CodeAfter.Contains("export class Test"));
             Assert.IsTrue(ext.CodeAfter.EndsWith("var x = 10;"));
         }
     }
