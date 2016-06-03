@@ -278,7 +278,7 @@ foreach (var property in Model.Properties){
                     "eturn new ");
             
             #line 42 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
             
             #line default
             #line hidden

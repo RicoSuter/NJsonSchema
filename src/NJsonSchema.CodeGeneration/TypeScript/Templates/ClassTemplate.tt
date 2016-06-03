@@ -34,6 +34,6 @@
 
     clone() {
         var json = this.toJSON();
-        return new <#=Model.Class#>(JSON.parse(json));
+        return new <#=Model.RealClass#>(JSON.parse(json));
     }
 }

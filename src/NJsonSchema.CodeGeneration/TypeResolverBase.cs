@@ -50,18 +50,18 @@ namespace NJsonSchema.CodeGeneration
         public string GenerateTypes()
         {
             var processedTypes = new List<string>();
-            var types = new Dictionary<string, string>();
+            var types = new Dictionary<string, TypeGeneratorResult>();
             while (_types.Any(t => !processedTypes.Contains(t.Key)))
             {
                 foreach (var pair in _types.ToList())
                 {
                     processedTypes.Add(pair.Key);
                     var result = pair.Value.GenerateType(pair.Key);
-                    types[result.TypeName] = result.Code;
+                    types[result.TypeName] = result;
                 }
             }
 
-            return string.Join("\n\n", types.Select(p => p.Value));
+            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values).Select(p => p.Code));
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>

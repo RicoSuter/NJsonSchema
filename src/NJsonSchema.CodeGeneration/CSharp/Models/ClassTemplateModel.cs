@@ -13,46 +13,45 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     internal class ClassTemplateModel
     {
+        private readonly CSharpTypeResolver _resolver;
+        private readonly JsonSchema4 _schema;
+        private readonly CSharpGeneratorSettings _settings;
+
         public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, IEnumerable<PropertyModel> properties)
         {
+            _resolver = resolver;
+            _schema = schema;
+            _settings = settings; 
+
             Class = typeName;
-            Namespace = settings.Namespace;
-
-            HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = schema.Description;
-
-            Inpc = settings.ClassStyle == CSharpClassStyle.Inpc;
-
-            var hasInheritance = schema.AllOf.Count == 1;
-            HasInheritance = hasInheritance;
-            Inheritance = GenerateInheritanceCode(settings, resolver, schema, hasInheritance);
-
             Properties = properties;
         }
 
-        public string Namespace { get; set; }
-
         public string Class { get; set; }
 
-        public bool HasDescription { get; }
+        public string Namespace => _settings.Namespace;
 
-        public string Description { get; }
+        public IEnumerable<PropertyModel> Properties { get; }
 
-        public bool Inpc { get; set; }
+        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
-        public string Inheritance { get; set; }
+        public string Description => _schema.Description;
 
-        public bool HasInheritance { get; set; }
+        public bool Inpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
 
-        public IEnumerable<PropertyModel> Properties { get; set; }
+        public bool HasInheritance => _schema.AllOf.Count == 1;
 
-        private static string GenerateInheritanceCode(CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, bool hasInheritance)
+        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) : null;
+
+        public string Inheritance
         {
-            if (hasInheritance)
-                return ": " + resolver.Resolve(schema.AllOf.First(), false, string.Empty) + 
-                    (settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "");
-            else
-                return settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "";
+            get
+            {
+                if (HasInheritance)
+                    return ": " + BaseClass + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "");
+                else
+                    return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "";
+            }
         }
     }
 }

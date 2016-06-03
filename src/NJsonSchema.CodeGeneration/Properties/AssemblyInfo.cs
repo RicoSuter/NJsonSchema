@@ -7,3 +7,5 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyProduct("NJsonSchema.CodeGeneration")]
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
 [assembly: AssemblyVersion("2.29.*")]
+
+[assembly: InternalsVisibleTo("NJsonSchema.CodeGeneration.Tests")]
