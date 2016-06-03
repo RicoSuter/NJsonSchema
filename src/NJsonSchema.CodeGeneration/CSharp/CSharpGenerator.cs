@@ -56,14 +56,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var classes = _resolver.GenerateTypes();
             var template = new FileTemplate() as ITemplate;
             template.Initialize(new FileTemplateModel
             {
+                Toolchain = JsonSchema4.ToolchainVersion, 
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(classes)
+                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(null))
             });
-            return template.Render();
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>

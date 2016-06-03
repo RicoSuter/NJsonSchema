@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
-        public string GenerateTypes()
+        public string GenerateTypes(ExtensionCode extensionCode)
         {
             var processedTypes = new List<string>();
             var types = new Dictionary<string, TypeGeneratorResult>();
@@ -61,7 +61,13 @@ namespace NJsonSchema.CodeGeneration
                 }
             }
 
-            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values).Select(p => p.Code));
+            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values).Select(p =>
+            {
+                if (extensionCode?.Classes.ContainsKey(p.TypeName) == true)
+                    return p.Code + "\n\n" + extensionCode.Classes[p.TypeName];
+
+                return p.Code;
+            }));
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>

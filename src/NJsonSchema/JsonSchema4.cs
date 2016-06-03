@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
@@ -47,6 +48,9 @@ namespace NJsonSchema
             Initialize();
         }
 
+        /// <summary>Gets the NJsonSchema toolchain version.</summary>
+        public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
+        
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <returns>The <see cref="JsonSchema4" />.</returns>

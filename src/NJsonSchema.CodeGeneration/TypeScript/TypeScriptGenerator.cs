@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Linq;
-using NJsonSchema.CodeGeneration.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
@@ -58,11 +56,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var output =
-                _resolver.GenerateTypes() + "\n\n" +
-                Settings.TransformedExtensionCode + "\n\n";
+            var template = new FileTemplate() as ITemplate;
+            template.Initialize(new FileTemplateModel
+            {
+                Toolchain = JsonSchema4.ToolchainVersion,
+                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
 
-            return ConversionUtilities.TrimWhiteSpaces(output);
+                HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
+                ModuleName = Settings.ModuleName,
+
+                ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore, 
+                ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
+            });
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
