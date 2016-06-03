@@ -108,8 +108,12 @@
     <Compile Include="GeneratorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnumerationEntry.cs" />
+    <Compile Include="ClassOrderUtilities.cs" />
+    <Compile Include="TypeScript\TypeScriptExtensionCode.cs" />
     <Compile Include="TypeScript\DataConversionParameters.cs" />
+    <Compile Include="ExtensionCode.cs" />
     <Compile Include="TypeScript\Models\EnumTemplateModel.cs" />
+    <Compile Include="TypeScript\Models\FileTemplateModel.cs" />
     <Compile Include="TypeScript\Models\PropertyModel.cs" />
     <Compile Include="TypeScript\Templates\ClassTemplate.cs">
       <AutoGen>True</AutoGen>
@@ -135,6 +139,12 @@
       <DependentUpon>EnumTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeScript\Templates\EnumTemplate.Extensions.cs" />
+    <Compile Include="TypeScript\Templates\FileTemplate.cs">
+      <DependentUpon>FileTemplate.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="TypeScript\Templates\FileTemplate.Extensions.cs" />
     <Compile Include="TypeScript\Templates\InterfaceTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -205,6 +215,12 @@
     <None Include="TypeScript\Templates\ConvertToJavaScriptTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ConvertToJavaScriptTemplate.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TypeScript\Templates\FileTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>FileTemplate.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

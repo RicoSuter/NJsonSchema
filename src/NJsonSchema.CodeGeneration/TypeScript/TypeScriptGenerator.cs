@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Linq;
-using NJsonSchema.CodeGeneration.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
@@ -56,12 +54,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var output =
-                GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" +
-                _resolver.GenerateTypes() + "\n\n" +
-                Settings.TransformedExtensionCode + "\n\n";
+            _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            return ConversionUtilities.TrimWhiteSpaces(output);
+            var template = new FileTemplate() as ITemplate;
+            template.Initialize(new FileTemplateModel
+            {
+                Toolchain = JsonSchema4.ToolchainVersion,
+                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
+
+                HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
+                ModuleName = Settings.ModuleName,
+
+                ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore, 
+                ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
+            });
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
@@ -88,23 +95,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
                 var hasInheritance = _schema.AllOf.Count == 1;
+                var baseClass = hasInheritance ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : null;
 
                 var template = Settings.CreateTemplate(typeName);
                 template.Initialize(new // TODO: Create model class
                 {
-                    Class = typeName,
+                    Class = Settings.ExtendedClasses?.Contains(typeName) == true ? typeName + "Base" : typeName,
+                    RealClass = typeName,
 
                     HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
                     Description = ConversionUtilities.RemoveLineBreaks(_schema.Description),
 
                     HasInheritance = hasInheritance,
-                    Inheritance = hasInheritance ? " extends " + _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : string.Empty,
+                    Inheritance = hasInheritance ? " extends " + baseClass : string.Empty,
                     Properties = properties
                 });
 
                 return new TypeGeneratorResult
                 {
                     TypeName = typeName,
+                    BaseTypeName = baseClass,
                     Code = template.Render()
                 };
             }
