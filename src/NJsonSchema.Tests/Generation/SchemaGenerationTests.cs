@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -120,5 +121,29 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.AreEqual(0, errors.Count);
         }
+
+
+
+        // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
+
+        //public class TestClass
+        //{
+        //    [Required] // <= not nullable
+        //    public ReferencedClass RequiredProperty { get; set; }
+
+        //    public ReferencedClass NullableProperty { get; set; }
+        //}
+
+        //public class ReferencedClass
+        //{
+        //    public string Test { get; set; }
+        //}
+        
+        //[TestMethod]
+        //public void Demo()
+        //{
+        //    var schema = JsonSchema4.FromType<TestClass>();
+        //    var json = schema.ToJson();
+        //}
     }
 }
