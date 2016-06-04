@@ -8,6 +8,25 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     [TestClass]
     public class CSharpGeneratorTests
     {
+
+        [TestMethod]
+        public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
+        {
+            var schema = @"{'properties': {
+                                'boolWithDefault': {
+                                    'type': 'boolean',
+                                    'default': false
+                                 }
+                             }}";
+
+            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var gen = new CSharpGenerator(s, settings);
+            var output = gen.GenerateFile();
+
+            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false"));
+        }
+
         [TestMethod]
         public void When_namespace_is_set_then_it_should_appear_in_output()
         {
