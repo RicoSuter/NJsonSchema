@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
+using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -48,6 +49,49 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
         }
 
+
+        [TestMethod]
+        //[Ignore]
+        public void WhenSchemaContainsRefToDefinitionThatRefsAnotherDefinition_ThenResultShouldContainCorrectTargetRefType()
+        {
+            /// Arrange
+            var schemaJson = @"{
+                                 'x-typeName': 'foo',
+                                 'type': 'object',
+                                 'definitions': {
+                                    'pRef': {
+                                            'type': 'object',
+                                            'properties' : {
+                                                'pRef2': {
+                                                    '$ref': '#/definitions/pRef2'
+                                                },
+                                            }
+                                     },
+                                     'pRef2' : {
+                                            'type': 'string'  
+                                      } 
+                                 },
+                                 'properties': { 
+                                    'pRefs': {
+                                        'type': 'array',
+                                        'items': {
+                                            '$ref': '#/definitions/pRef'
+                                        }
+                                     } 
+                                }
+                               }";
+
+            var schema = NJsonSchema.JsonSchema4.FromJson(schemaJson);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco };
+            var gen = new CSharpGenerator(schema, settings);
+
+            /// Act
+            var output = gen.GenerateFile();
+
+            /// Assert
+            Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
+
+        }
 
         [TestMethod]
         public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
