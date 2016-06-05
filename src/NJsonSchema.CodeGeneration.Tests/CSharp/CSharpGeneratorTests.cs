@@ -30,6 +30,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [TestMethod]
         public void When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
         {
+            //// Arrange
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
@@ -49,48 +50,50 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
         }
 
-
         [TestMethod]
-        //[Ignore]
-        public void WhenSchemaContainsRefToDefinitionThatRefsAnotherDefinition_ThenResultShouldContainCorrectTargetRefType()
+        public void When_schema_contains_ref_to_definition_that_refs_another_definition_then_result_should_contain_correct_target_ref_type()
         {
-            /// Arrange
-            var schemaJson = @"{
-                                 'x-typeName': 'foo',
-                                 'type': 'object',
-                                 'definitions': {
-                                    'pRef': {
-                                            'type': 'object',
-                                            'properties' : {
-                                                'pRef2': {
-                                                    '$ref': '#/definitions/pRef2'
-                                                },
-                                            }
-                                     },
-                                     'pRef2' : {
-                                            'type': 'string'  
-                                      } 
-                                 },
-                                 'properties': { 
-                                    'pRefs': {
-                                        'type': 'array',
-                                        'items': {
-                                            '$ref': '#/definitions/pRef'
-                                        }
-                                     } 
-                                }
-                               }";
+            //// Arrange
+            var schemaJson =
+@"{
+	'x-typeName': 'foo',
+	'type': 'object',
+	'definitions': {
+		'pRef': {
+			'type': 'object',
+			'properties': {
+				'pRef2': {
+					'$ref': '#/definitions/pRef2'
+				},
+				
+			}
+		},
+		'pRef2': {
+			'type': 'string'
+		}
+	},
+	'properties': {
+		'pRefs': {
+			'type': 'array',
+			'items': {
+				'$ref': '#/definitions/pRef'
+			}
+		}
+	}
+}";
 
-            var schema = NJsonSchema.JsonSchema4.FromJson(schemaJson);
-            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco };
+            var schema = JsonSchema4.FromJson(schemaJson);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            };
             var gen = new CSharpGenerator(schema, settings);
 
-            /// Act
+            //// Act
             var output = gen.GenerateFile();
 
-            /// Assert
+            //// Assert
             Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
-
         }
 
         [TestMethod]

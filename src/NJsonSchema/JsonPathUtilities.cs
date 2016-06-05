@@ -58,9 +58,8 @@ namespace NJsonSchema
             }
             else if (path.StartsWith("#/"))
             {
-                var pathSegments = path.Split('/');
-                var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new HashSet<object>(), pathSegments.FirstOrDefault());
-                //var schema = GetObjectFromJsonPath(root, path.Split('/').Skip(1).ToList(), new HashSet<object>());
+                var allSegments = path.Split('/').Skip(1).ToList(); 
+                var schema = GetObjectFromJsonPath(root, allSegments, allSegments, new HashSet<object>());
                 if (schema == null)
                     throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
 
@@ -146,7 +145,7 @@ namespace NJsonSchema
             return null;
         }
 
-        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, HashSet<object> checkedObjects, string typeNameHint)
+        private static JsonSchema4 GetObjectFromJsonPath(object obj, List<string> segments, List<string> allSegments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -154,10 +153,13 @@ namespace NJsonSchema
             if (segments.Count == 0)
             {
                 var jsonSchema = obj as JsonSchema4;
-                if (jsonSchema != null && jsonSchema.TypeNameRaw == null && typeNameHint != null)
+                if (jsonSchema != null && jsonSchema.TypeNameRaw == null)
                 {
-                    jsonSchema.TypeNameRaw = typeNameHint;
+                    var referencesSchemaInDefinitionsList = allSegments.Count >= 2 && allSegments.ElementAt(allSegments.Count - 2) == "definitions";
+                    if (referencesSchemaInDefinitionsList)
+                        jsonSchema.TypeNameRaw = allSegments.Last();
                 }
+
                 return jsonSchema;
             } 
 
@@ -167,7 +169,7 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 if (((IDictionary)obj).Contains(firstSegment))
-                    return GetObjectFromJsonPath(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects, firstSegment);
+                    return GetObjectFromJsonPath(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), allSegments, checkedObjects);
             }
             else if (obj is IEnumerable)
             {
@@ -176,7 +178,7 @@ namespace NJsonSchema
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
-                        return GetObjectFromJsonPath(enumerable[index], segments.Skip(1).ToList(), checkedObjects, null);
+                        return GetObjectFromJsonPath(enumerable[index], segments.Skip(1).ToList(), allSegments, checkedObjects);
                 }
             }
             else
@@ -187,7 +189,7 @@ namespace NJsonSchema
                     if (pathSegment == firstSegment)
                     {
                         var value = property.PropertyInfo.GetValue(obj);
-                        return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), checkedObjects, null);
+                        return GetObjectFromJsonPath(value, segments.Skip(1).ToList(), allSegments, checkedObjects);
                     }
                 }
             }
