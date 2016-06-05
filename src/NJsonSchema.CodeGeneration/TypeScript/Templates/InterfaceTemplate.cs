@@ -106,7 +106,20 @@ if(property.IsReadOnly){
             
             #line default
             #line hidden
-            this.Write("?: ");
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(property.IsOptional){
+            
+            #line default
+            #line hidden
+            this.Write("?");
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(": ");
             
             #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
