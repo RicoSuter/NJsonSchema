@@ -25,18 +25,24 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Name => _property.Name;
 
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), _property.Name);
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetConvertedPropertyName());
 
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
 
         public string Description => _property.Description;
 
-        public string PropertyName => ConversionUtilities.ConvertToUpperCamelCase(_property.Name);
+        public string PropertyName => ConversionUtilities.ConvertToUpperCamelCase(GetConvertedPropertyName());
 
-        public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(_property.Name);
+        public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetConvertedPropertyName());
 
         public string Required => _property.IsRequired && _settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default";
 
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
+
+        private string GetConvertedPropertyName()
+        {
+            // TODO: Implement conversion, see https://github.com/NJsonSchema/NJsonSchema/issues/96
+            return _property.Name;
+        }
     }
 }
