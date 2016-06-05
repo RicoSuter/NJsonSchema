@@ -20,12 +20,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             _property = property;
             _settings = settings;
-            _resolver = resolver; 
+            _resolver = resolver;
         }
 
         public string Name => _property.Name;
 
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable, _property.Name);
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), _property.Name);
 
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
 

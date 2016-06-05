@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneratorSettingsBase.cs" />
     <Compile Include="CSharp\Models\ClassTemplateModel.cs" />
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />

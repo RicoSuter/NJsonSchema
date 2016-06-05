@@ -361,11 +361,21 @@ namespace NJsonSchema.Generation
                     var propertySchema = Generate(propertyType, rootSchema,
                         property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
 
-                    jsonProperty = new JsonProperty();
-                    jsonProperty.OneOf.Add(new JsonSchema4
+                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
                     {
-                        SchemaReference = propertySchema.ActualSchema
-                    });
+                        jsonProperty = new JsonProperty();
+                        jsonProperty.OneOf.Add(new JsonSchema4
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        });
+                    }
+                    else
+                    {
+                        jsonProperty = new JsonProperty
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        };
+                    }
                 }
                 else
                 {
@@ -392,10 +402,18 @@ namespace NJsonSchema.Generation
                 var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsAlwaysRequired == false || isJsonNetAttributeNullable);
                 if (isNullable)
                 {
-                    if (useSchemaReference)
-                        jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                    else
-                        jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
+                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
+                    {
+                        if (useSchemaReference)
+                            jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                        else
+                            jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
+                    }
+                }
+                else if (Settings.PropertyNullHandling == PropertyNullHandling.Required)
+                {
+                    if (!parentSchema.RequiredProperties.Contains(propertyName))
+                        parentSchema.RequiredProperties.Add(propertyName);
                 }
 
                 dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");

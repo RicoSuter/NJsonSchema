@@ -50,7 +50,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
         public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
-        
+
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <returns>The <see cref="JsonSchema4" />.</returns>
@@ -491,11 +491,6 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) && Properties.Count == 0 && AllowAdditionalProperties;
 
-        /// <summary>Gets a value indicating whether the validated data can be null.</summary>
-        [JsonIgnore]
-        public bool IsNullable => (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0) ||
-            ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable));
-
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => string.IsNullOrEmpty(TypeName) &&
@@ -509,6 +504,18 @@ namespace NJsonSchema
                                  MultipleOf == null;
 
         #endregion
+
+        /// <summary>Gets a value indicating whether the validated data can be null.</summary>
+        public bool IsNullable(PropertyNullHandling propertyNullHandling)
+        {
+            if (propertyNullHandling == PropertyNullHandling.Required && this is JsonProperty)
+                return ((JsonProperty)this).IsRequired == false;
+
+            if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
+                return true;
+
+            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(propertyNullHandling));
+        }
 
         /// <summary>Serializes the <see cref="JsonSchema4"/> to a JSON string. </summary>
         /// <returns>The JSON string. </returns>
