@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
+using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -10,12 +11,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     {
 
         [TestMethod]
-        [Ignore]
+        //[Ignore]
         public void WhenSchemaContainsRefToDefinitionThatRefsAnotherDefinition_ThenResultShouldContainCorrectTargetRefType()
         {
             /// Arrange
             var schemaJson = @"{
-                                 'typeName': 'foo',
+                                 'x-typeName': 'foo',
                                  'type': 'object',
                                  'definitions': {
                                     'pRef': {
@@ -48,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = gen.GenerateFile();
 
             /// Assert
-            Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
+            Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
 
         }
 
