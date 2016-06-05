@@ -399,7 +399,7 @@ namespace NJsonSchema.Generation
 
                 var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
 
-                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsAlwaysRequired == false || isJsonNetAttributeNullable);
+                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
                 if (isNullable)
                 {
                     if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
