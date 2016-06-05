@@ -6,6 +6,6 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("Rico Suter")]
 [assembly: AssemblyProduct("NJsonSchema.CodeGeneration")]
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
-[assembly: AssemblyVersion("2.32.*")]
+[assembly: AssemblyVersion("2.33.*")]
 
 [assembly: InternalsVisibleTo("NJsonSchema.CodeGeneration.Tests")]
