@@ -506,11 +506,8 @@ namespace NJsonSchema
         #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
-        public bool IsNullable(PropertyNullHandling propertyNullHandling)
+        public virtual bool IsNullable(PropertyNullHandling propertyNullHandling)
         {
-            if (propertyNullHandling == PropertyNullHandling.Required && this is JsonProperty)
-                return ((JsonProperty)this).IsRequired == false;
-
             if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
                 return true;
 
