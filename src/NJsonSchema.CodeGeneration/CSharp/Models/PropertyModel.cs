@@ -25,21 +25,21 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Name => _property.Name;
 
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetConvertedPropertyName());
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetGeneratedPropertyName());
 
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
 
         public string Description => _property.Description;
 
-        public string PropertyName => ConversionUtilities.ConvertToUpperCamelCase(GetConvertedPropertyName());
+        public string PropertyName => ConversionUtilities.ConvertToUpperCamelCase(GetGeneratedPropertyName());
 
-        public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetConvertedPropertyName());
+        public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName());
 
         public string Required => _property.IsRequired && _settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default";
 
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
 
-        private string GetConvertedPropertyName()
+        private string GetGeneratedPropertyName()
         {
             if (_settings.PropertyNameGenerator != null)
                 return _settings.PropertyNameGenerator.Convert(_property);
