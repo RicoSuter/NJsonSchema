@@ -16,7 +16,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
     {
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings)
+        public CSharpTypeResolver(CSharpGeneratorSettings settings) 
+            : base(settings.TypeNameGenerator)
         {
             Settings = settings;
         }
@@ -28,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             : this(settings)
         {
             foreach (var type in knownSchemes)
-                AddOrReplaceTypeGenerator(type.TypeName, new CSharpGenerator(type.ActualSchema, Settings, this));
+                AddOrReplaceTypeGenerator(type.GetTypeName(settings.TypeNameGenerator), new CSharpGenerator(type.ActualSchema, Settings, this));
         }
 
         /// <summary>Gets the generator settings.</summary>

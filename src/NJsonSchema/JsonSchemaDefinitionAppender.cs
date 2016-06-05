@@ -13,6 +13,14 @@ namespace NJsonSchema
     /// <summary>Appends a JSON Schema to the Definitions of another JSON Schema.</summary>
     public class JsonSchemaDefinitionAppender : ISchemaDefinitionAppender
     {
+        private readonly ITypeNameGenerator _typeNameGenerator;
+
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender"/> class.</summary>
+        public JsonSchemaDefinitionAppender(ITypeNameGenerator typeNameGenerator)
+        {
+            _typeNameGenerator = typeNameGenerator; 
+        }
+
         /// <summary>Appends the schema to the root object.</summary>
         /// <param name="root">The root object.</param>
         /// <param name="objectToAppend">The object to append.</param>
@@ -22,8 +30,10 @@ namespace NJsonSchema
             var rootSchema = root as JsonSchema4;
             if (rootSchema != null && objectToAppend != null)
             {
-                if (!rootSchema.Definitions.ContainsKey(objectToAppend.TypeName))
-                    rootSchema.Definitions[objectToAppend.TypeName] = objectToAppend;
+                var typeName = objectToAppend.GetTypeName(_typeNameGenerator); 
+
+                if (!rootSchema.Definitions.ContainsKey(typeName))
+                    rootSchema.Definitions[typeName] = objectToAppend;
                 else
                     rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = objectToAppend;
             }

@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptGenerator>
     {
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
-        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
+        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings) : base(settings.TypeNameGenerator)
         {
             Settings = settings;
         }
@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             : this(settings)
         {
             foreach (var type in knownSchemes)
-                AddOrReplaceTypeGenerator(type.TypeName, new TypeScriptGenerator(type.ActualSchema, Settings, this));
+                AddOrReplaceTypeGenerator(type.GetTypeName(Settings.TypeNameGenerator), new TypeScriptGenerator(type.ActualSchema, Settings, this));
         }
 
         /// <summary>Gets the generator settings.</summary>

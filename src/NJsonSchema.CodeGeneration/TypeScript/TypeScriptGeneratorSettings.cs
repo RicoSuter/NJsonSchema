@@ -13,7 +13,7 @@ using NJsonSchema.CodeGeneration.TypeScript.Templates;
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>The generator settings.</summary>
-    public class TypeScriptGeneratorSettings
+    public class TypeScriptGeneratorSettings : CodeGeneratorSettingsBase
     {
         private string _extensionCode;
         private string[] _extendedClasses;

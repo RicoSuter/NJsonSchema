@@ -39,7 +39,7 @@ namespace NJsonSchema.Generation
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
         {
-            return Generate<JsonSchema4>(type, null, null, new JsonSchemaDefinitionAppender(), schemaResolver);
+            return Generate<JsonSchema4>(type, null, null, new JsonSchemaDefinitionAppender(Settings.TypeNameGenerator), schemaResolver);
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
@@ -89,7 +89,7 @@ namespace NJsonSchema.Generation
                     GenerateDictionary(type, rootSchema, schema, schemaDefinitionAppender, schemaResolver);
                 else
                 {
-                    schema.TypeName = GetTypeName(type);
+                    schema.TypeNameRaw = GetTypeName(type);
                     if (schemaResolver.HasSchema(type, false))
                     {
                         schema.SchemaReference = schemaResolver.GetSchema(type, false);
@@ -122,7 +122,7 @@ namespace NJsonSchema.Generation
                 {
                     LoadEnumerations(type, schema, typeDescription);
 
-                    schema.TypeName = GetTypeName(type);
+                    schema.TypeNameRaw = GetTypeName(type);
                     schema.Description = type.GetXmlDocumentation();
                     schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
                 }
@@ -349,23 +349,33 @@ namespace NJsonSchema.Generation
             if (IsPropertyIgnored(parentType, attributes) == false)
             {
                 JsonProperty jsonProperty;
-                var useOneOf = !propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
 
                 if (propertyType.Name == "Nullable`1")
                     propertyType = propertyType.GenericTypeArguments[0];
 
-                if (useOneOf)
+                var useSchemaReference = !propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
+                if (useSchemaReference)
                 {
+                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+
                     var propertySchema = Generate(propertyType, rootSchema,
                         property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
 
-                    jsonProperty = new JsonProperty();
-                    jsonProperty.OneOf.Add(new JsonSchema4
+                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
                     {
-                        SchemaReference = propertySchema.ActualSchema
-                    });
-
-                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+                        jsonProperty = new JsonProperty();
+                        jsonProperty.OneOf.Add(new JsonSchema4
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        });
+                    }
+                    else
+                    {
+                        jsonProperty = new JsonProperty
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        };
+                    }
                 }
                 else
                 {
@@ -389,13 +399,21 @@ namespace NJsonSchema.Generation
 
                 var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
 
-                var isNullable = propertyTypeDescription.IsAlwaysRequired == false;
-                if (!hasRequiredAttribute && (isNullable || isJsonNetAttributeNullable))
+                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsAlwaysRequired == false || isJsonNetAttributeNullable);
+                if (isNullable)
                 {
-                    if (useOneOf)
-                        jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                    else
-                        jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
+                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
+                    {
+                        if (useSchemaReference)
+                            jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                        else
+                            jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
+                    }
+                }
+                else if (Settings.PropertyNullHandling == PropertyNullHandling.Required)
+                {
+                    if (!parentSchema.RequiredProperties.Contains(propertyName))
+                        parentSchema.RequiredProperties.Add(propertyName);
                 }
 
                 dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");

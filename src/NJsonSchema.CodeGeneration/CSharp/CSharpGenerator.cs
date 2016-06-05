@@ -71,7 +71,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
+            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
+
+            if (string.IsNullOrEmpty(typeName))
+                typeName = fallbackTypeName;
 
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);

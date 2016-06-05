@@ -79,6 +79,12 @@ namespace NJsonSchema
 
         /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
         [JsonIgnore]
-        public JsonSchema4 ActualPropertySchema => OneOf.FirstOrDefault(o => !o.IsNullable)?.ActualSchema ?? ActualSchema;
+        public JsonSchema4 ActualPropertySchema
+        {
+            get
+            {
+                return OneOf.FirstOrDefault(o => !o.IsNullable(PropertyNullHandling.OneOf))?.ActualSchema ?? ActualSchema;
+            }
+        }
     }
 }

@@ -25,14 +25,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _parentTypeName = parentTypeName;
             _settings = settings;
         }
+        
+        public string InterfaceName => _property.Name.Contains("-") ? $"\"{_property.Name}\"" : _property.Name;
 
-        public string Name => _property.Name;
+        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName()).Replace("-", "_");
 
-        public string InterfaceName => _property.Name.Contains("-") ? '\"' + _property.Name + '\"' : _property.Name;
-
-        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(_property.Name).Replace("-", "_");
-
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable, _property.Name);
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetGeneratedPropertyName());
 
         public string Description => _property.Description;
 
@@ -40,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
 
-        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, _property.Name);
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName());
 
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
@@ -58,8 +56,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable,
-                        TypeNameHint = _property.Name,
+                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        TypeNameHint = GetGeneratedPropertyName(),
                         Resolver = _resolver
                     });
                 }
@@ -79,13 +77,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable,
-                        TypeNameHint = _property.Name,
+                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        TypeNameHint = GetGeneratedPropertyName(),
                         Resolver = _resolver
                     });
                 }
                 return string.Empty;
             }
+        }
+
+        private string GetGeneratedPropertyName()
+        {
+            if (_settings.PropertyNameGenerator != null)
+                return _settings.PropertyNameGenerator.Generate(_property);
+
+            return _property.Name;
         }
     }
 }

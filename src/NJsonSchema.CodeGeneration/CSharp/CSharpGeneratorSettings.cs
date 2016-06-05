@@ -9,7 +9,7 @@
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The generator settings.</summary>
-    public class CSharpGeneratorSettings
+    public class CSharpGeneratorSettings : CodeGeneratorSettingsBase
     {
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
