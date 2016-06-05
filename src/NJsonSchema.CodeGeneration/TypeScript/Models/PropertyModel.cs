@@ -88,9 +88,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private string GetConvertedPropertyName()
         {
-            // TODO: Implement conversion, see https://github.com/NJsonSchema/NJsonSchema/issues/96
+            if (_settings.PropertyNameGenerator != null)
+                return _settings.PropertyNameGenerator.Convert(_property);
+
             return _property.Name;
         }
-
     }
 }
