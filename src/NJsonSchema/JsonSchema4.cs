@@ -74,7 +74,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType), null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
+            return generator.Generate(typeof(TType), null, null, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator), new SchemaResolver());
         }
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
@@ -84,7 +84,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type, null, null, new JsonSchemaDefinitionAppender(), new SchemaResolver());
+            return generator.Generate(type, null, null, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator), new SchemaResolver());
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -134,7 +134,7 @@ namespace NJsonSchema
             return new JsonSchema4
             {
                 Type = JsonObjectType.Object,
-                TypeName = schema.TypeName,
+                TypeNameRaw = schema.TypeNameRaw,
                 SchemaReference = schema
             };
         }
@@ -493,7 +493,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType => string.IsNullOrEmpty(TypeName) &&
+        public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
                                  Type.HasFlag(JsonObjectType.Object) &&
                                  Properties.Count == 0 &&
                                  AnyOf.Count == 0 &&
@@ -517,14 +517,22 @@ namespace NJsonSchema
             return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(propertyNullHandling));
         }
 
-        /// <summary>Serializes the <see cref="JsonSchema4"/> to a JSON string. </summary>
-        /// <returns>The JSON string. </returns>
+        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
+        /// <returns>The JSON string.</returns>
         public string ToJson()
+        {
+            return ToJson(null);
+        }
+
+        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
+        /// <param name="typeNameGenerator">The type name generator.</param>
+        /// <returns>The JSON string.</returns>
+        public string ToJson(ITypeNameGenerator typeNameGenerator)
         {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender());
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(typeNameGenerator));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
 

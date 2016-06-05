@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
                 ModuleName = Settings.ModuleName,
 
-                ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore, 
+                ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
                 ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
             });
             return ConversionUtilities.TrimWhiteSpaces(template.Render());
@@ -76,7 +76,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The code.</returns>
         public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
+            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
+
+            if (string.IsNullOrEmpty(typeName))
+                typeName = fallbackTypeName;
 
             if (_schema.IsEnumeration)
             {

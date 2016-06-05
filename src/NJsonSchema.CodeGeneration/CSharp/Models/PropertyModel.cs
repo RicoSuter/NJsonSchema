@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         private string GetGeneratedPropertyName()
         {
             if (_settings.PropertyNameGenerator != null)
-                return _settings.PropertyNameGenerator.Convert(_property);
+                return _settings.PropertyNameGenerator.Generate(_property);
 
             return _property.Name;
         }

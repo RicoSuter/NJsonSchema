@@ -16,5 +16,8 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets the property name generator.</summary>
         public IPropertyNameGenerator PropertyNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the type name generator.</summary>
+        public ITypeNameGenerator TypeNameGenerator { get; set; }
     }
 }

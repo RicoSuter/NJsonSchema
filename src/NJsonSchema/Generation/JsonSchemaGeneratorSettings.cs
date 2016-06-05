@@ -31,5 +31,8 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the property nullability handling.</summary>
         public PropertyNullHandling PropertyNullHandling { get; set; }
+
+        /// <summary>Gets or sets the type name generator.</summary>
+        public ITypeNameGenerator TypeNameGenerator { get; set; }
     }
 }

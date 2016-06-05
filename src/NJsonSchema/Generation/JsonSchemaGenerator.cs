@@ -39,7 +39,7 @@ namespace NJsonSchema.Generation
         /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
         {
-            return Generate<JsonSchema4>(type, null, null, new JsonSchemaDefinitionAppender(), schemaResolver);
+            return Generate<JsonSchema4>(type, null, null, new JsonSchemaDefinitionAppender(Settings.TypeNameGenerator), schemaResolver);
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
@@ -89,7 +89,7 @@ namespace NJsonSchema.Generation
                     GenerateDictionary(type, rootSchema, schema, schemaDefinitionAppender, schemaResolver);
                 else
                 {
-                    schema.TypeName = GetTypeName(type);
+                    schema.TypeNameRaw = GetTypeName(type);
                     if (schemaResolver.HasSchema(type, false))
                     {
                         schema.SchemaReference = schemaResolver.GetSchema(type, false);
@@ -122,7 +122,7 @@ namespace NJsonSchema.Generation
                 {
                     LoadEnumerations(type, schema, typeDescription);
 
-                    schema.TypeName = GetTypeName(type);
+                    schema.TypeNameRaw = GetTypeName(type);
                     schema.Description = type.GetXmlDocumentation();
                     schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
                 }

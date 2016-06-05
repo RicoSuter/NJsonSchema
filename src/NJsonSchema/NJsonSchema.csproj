@@ -82,6 +82,7 @@
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
     <Compile Include="ISchemaDefinitionAppender.cs" />
     <Compile Include="ISchemaResolver.cs" />
+    <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
