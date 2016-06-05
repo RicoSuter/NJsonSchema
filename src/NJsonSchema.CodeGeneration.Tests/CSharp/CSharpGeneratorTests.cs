@@ -10,6 +10,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     {
 
         [TestMethod]
+        [Ignore]
         public void WhenSchemaContainsRefToDefinitionThatRefsAnotherDefinition_ThenResultShouldContainCorrectTargetRefType()
         {
             /// Arrange
