@@ -135,7 +135,7 @@ namespace NJsonSchema
         /// <summary>Gets the type. </summary>
         public JsonObjectType Type { get; private set; }
 
-        /// <summary>Gets a value indicating whether the type must always required. </summary>
+        /// <summary>Gets a value indicating whether the type is always required (i.e. it is not nullable). </summary>
         public bool IsAlwaysRequired { get; private set; }
 
         /// <summary>Gets a value indicating whether the object is a generic dictionary.</summary>
