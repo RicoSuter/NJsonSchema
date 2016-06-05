@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
@@ -8,6 +9,45 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     [TestClass]
     public class CSharpGeneratorTests
     {
+
+        class CustomPropertyNameGenerator : IPropertyNameGenerator
+        {
+            public string Generate(JsonProperty property)
+            {
+                return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name);
+            }
+        }
+        class CustomTypeNameGenerator : ITypeNameGenerator
+        {
+            public string Generate(JsonSchema4 schema)
+            {
+                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw);
+            }
+
+        }
+
+        [TestMethod]
+        public void When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
+        {
+            var schema = JsonSchema4.FromType<Teacher>();
+            var schemaData = schema.ToJson();
+            var settings = new CSharpGeneratorSettings();
+
+            settings.TypeNameGenerator = new CustomTypeNameGenerator();
+            settings.PropertyNameGenerator = new CustomPropertyNameGenerator();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile();
+            Console.WriteLine(output);
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));
+            Assert.IsTrue(output.Contains(@"public string MyCustomLastName"));
+            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypeTeacher"));
+            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
+        }
+
 
         [TestMethod]
         public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
