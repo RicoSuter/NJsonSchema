@@ -5,5 +5,5 @@
 <#}#>export interface <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#>;
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#>?: <#=property.Type#>;
 <#}#>}
