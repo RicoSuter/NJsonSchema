@@ -14,9 +14,10 @@ namespace NJsonSchema.CodeGeneration.Models
 
             if (property.Type.HasFlag(JsonObjectType.String))
                 return "\"" + property.Default + "\"";
+            else if (property.Type.HasFlag(JsonObjectType.Boolean))
+                return property.Default.ToString().ToLower();
             else if (property.Type.HasFlag(JsonObjectType.Integer) ||
                      property.Type.HasFlag(JsonObjectType.Number) ||
-                     property.Type.HasFlag(JsonObjectType.Boolean) ||
                      property.Type.HasFlag(JsonObjectType.Integer))
                 return property.Default.ToString();
             return null;
