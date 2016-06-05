@@ -10,6 +10,48 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     {
 
         [TestMethod]
+        public void WhenSchemaContainsRefToDefinitionThatRefsAnotherDefinition_ThenResultShouldContainCorrectTargetRefType()
+        {
+            /// Arrange
+            var schemaJson = @"{
+                                 'typeName': 'foo',
+                                 'type': 'object',
+                                 'definitions': {
+                                    'pRef': {
+                                            'type': 'object',
+                                            'properties' : {
+                                                'pRef2': {
+                                                    '$ref': '#/definitions/pRef2'
+                                                },
+                                            }
+                                     },
+                                     'pRef2' : {
+                                            'type': 'string'  
+                                      } 
+                                 },
+                                 'properties': { 
+                                    'pRefs': {
+                                        'type': 'array',
+                                        'items': {
+                                            '$ref': '#/definitions/pRef'
+                                        }
+                                     } 
+                                }
+                               }";
+
+            var schema = NJsonSchema.JsonSchema4.FromJson(schemaJson);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco };
+            var gen = new CSharpGenerator(schema, settings);
+
+            /// Act
+            var output = gen.GenerateFile();
+
+            /// Assert
+            Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
+
+        }
+
+        [TestMethod]
         public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
         {
             var schema = @"{'properties': {
