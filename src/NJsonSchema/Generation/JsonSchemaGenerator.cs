@@ -349,13 +349,15 @@ namespace NJsonSchema.Generation
             if (IsPropertyIgnored(parentType, attributes) == false)
             {
                 JsonProperty jsonProperty;
-                var useOneOf = !propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
 
                 if (propertyType.Name == "Nullable`1")
                     propertyType = propertyType.GenericTypeArguments[0];
 
-                if (useOneOf)
+                var useSchemaReference = !propertyTypeDescription.IsDictionary && (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
+                if (useSchemaReference)
                 {
+                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+
                     var propertySchema = Generate(propertyType, rootSchema,
                         property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
 
@@ -364,8 +366,6 @@ namespace NJsonSchema.Generation
                     {
                         SchemaReference = propertySchema.ActualSchema
                     });
-
-                    // schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
                 }
                 else
                 {
@@ -389,10 +389,10 @@ namespace NJsonSchema.Generation
 
                 var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
 
-                var isNullable = propertyTypeDescription.IsAlwaysRequired == false;
-                if (!hasRequiredAttribute && (isNullable || isJsonNetAttributeNullable))
+                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsAlwaysRequired == false || isJsonNetAttributeNullable);
+                if (isNullable)
                 {
-                    if (useOneOf)
+                    if (useSchemaReference)
                         jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                     else
                         jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
