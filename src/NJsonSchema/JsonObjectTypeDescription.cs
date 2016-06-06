@@ -78,7 +78,7 @@ namespace NJsonSchema
             if (type == typeof(byte[]))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Byte);
 
-            if (type == typeof(JObject) || type == typeof(object))
+            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, true, true);
 
             if (IsFileType(type))

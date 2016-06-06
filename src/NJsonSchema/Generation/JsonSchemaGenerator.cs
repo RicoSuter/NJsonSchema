@@ -169,7 +169,7 @@ namespace NJsonSchema.Generation
         private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
             where TSchemaType : JsonSchema4, new()
         {
-            if (type == typeof(object) || type == typeof(JObject))
+            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
             {
                 return new TSchemaType
                 {
