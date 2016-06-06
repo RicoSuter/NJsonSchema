@@ -1,52 +1,97 @@
+//-----------------------------------------------------------------------
+// <copyright file="PropertyModel.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     internal class PropertyModel : PropertyModelBase
     {
-        public PropertyModel(JsonProperty property, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings, TypeScriptGenerator generator) 
+        private readonly string _parentTypeName;
+        private readonly TypeScriptGeneratorSettings _settings;
+        private readonly JsonProperty _property;
+        private readonly TypeScriptTypeResolver _resolver;
+
+        public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
             : base(property)
         {
-            var propertyName = ConversionUtilities.ConvertToLowerCamelCase(property.Name).Replace("-", "_");
+            _property = property;
+            _resolver = resolver;
+            _parentTypeName = parentTypeName;
+            _settings = settings;
+        }
+        
+        public string InterfaceName => _property.Name.Contains("-") ? $"\"{_property.Name}\"" : _property.Name;
 
-            Name = property.Name;
-            InterfaceName = property.Name.Contains("-") ? '\"' + property.Name + '\"' : property.Name;
-            PropertyName = propertyName;
-            Type = resolver.Resolve(property.ActualPropertySchema, property.IsNullable, property.Name);
-            DataConversionCode = settings.TypeStyle == TypeScriptTypeStyle.Interface ? string.Empty : generator.GenerateDataConversion(
-                settings.TypeStyle == TypeScriptTypeStyle.Class ? "this." + propertyName : propertyName,
-                "data[\"" + property.Name + "\"]",
-                property.ActualPropertySchema,
-                property.IsNullable,
-                property.Name);
-            Description = property.Description;
-            HasDescription = !string.IsNullOrEmpty(property.Description);
-            IsArray = property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
-            ArrayItemType = resolver.TryResolve(property.ActualPropertySchema.Item, property.Name);
-            IsReadOnly = property.IsReadOnly && settings.GenerateReadOnlyKeywords;
-            IsOptional = !property.IsRequired;
+        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName()).Replace("-", "_");
+
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetGeneratedPropertyName());
+
+        public string Description => _property.Description;
+
+        public bool HasDescription => !string.IsNullOrEmpty(Description);
+
+        public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName());
+
+        public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
+
+        public bool IsOptional => !_property.IsRequired;
+
+        public string DataConversionCode
+        {
+            get
+            {
+                var typeStyle = _settings.GetTypeStyle(_parentTypeName);
+                if (typeStyle != TypeScriptTypeStyle.Interface)
+                {
+                    return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
+                    {
+                        Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Value = "data[\"" + _property.Name + "\"]",
+                        Schema = _property.ActualPropertySchema,
+                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        TypeNameHint = GetGeneratedPropertyName(),
+                        Resolver = _resolver
+                    });
+                }
+                return string.Empty;
+            }
         }
 
-        public string Name { get; }
+        public string DataBackConversionCode
+        {
+            get
+            {
+                var typeStyle = _settings.GetTypeStyle(_parentTypeName);
+                if (typeStyle != TypeScriptTypeStyle.Interface)
+                {
+                    return DataConversionGenerator.RenderConvertToJavaScriptCode(new DataConversionParameters
+                    {
+                        Variable = "data[\"" + _property.Name + "\"]",
+                        Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Schema = _property.ActualPropertySchema,
+                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        TypeNameHint = GetGeneratedPropertyName(),
+                        Resolver = _resolver
+                    });
+                }
+                return string.Empty;
+            }
+        }
 
-        public string InterfaceName { get; }
+        private string GetGeneratedPropertyName()
+        {
+            if (_settings.PropertyNameGenerator != null)
+                return _settings.PropertyNameGenerator.Generate(_property);
 
-        public string PropertyName { get; }
-
-        public string Type { get; }
-
-        public string DataConversionCode { get; }
-
-        public string Description { get; }
-
-        public bool HasDescription { get; }
-
-        public bool IsArray { get; }
-
-        public string ArrayItemType { get; }
-
-        public bool IsReadOnly { get; }
-
-        public bool IsOptional { get; }
+            return _property.Name;
+        }
     }
 }

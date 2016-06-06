@@ -54,14 +54,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The file contents.</returns>
         public override string GenerateFile()
         {
-            var classes = GenerateType(_resolver.GenerateTypeName()).Code + "\n\n" + _resolver.GenerateTypes();
+            _resolver.Resolve(_schema, false, string.Empty); // register root type
+
             var template = new FileTemplate() as ITemplate;
             template.Initialize(new FileTemplateModel
             {
+                Toolchain = JsonSchema4.ToolchainVersion, 
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(classes)
+                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(null))
             });
-            return template.Render();
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
@@ -69,7 +71,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
-            var typeName = !string.IsNullOrEmpty(_schema.TypeName) ? _schema.TypeName : fallbackTypeName;
+            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
+
+            if (string.IsNullOrEmpty(typeName))
+                typeName = fallbackTypeName;
 
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);
@@ -83,11 +88,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 
+            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties); 
+
             var template = new ClassTemplate() as ITemplate;
-            template.Initialize(new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties));
+            template.Initialize(model);
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
+                BaseTypeName = model.BaseClass, 
                 Code = template.Render()
             };
         }

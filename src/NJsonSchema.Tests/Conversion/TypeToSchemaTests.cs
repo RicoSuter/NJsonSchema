@@ -19,7 +19,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.AreEqual(typeof(MyType).Name, schema.TypeName);
+            Assert.AreEqual(typeof(MyType).Name, schema.TypeNameRaw);
         }
 
         [TestMethod]
@@ -159,8 +159,8 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             var property = schema.Properties["Reference"];
-            Assert.IsTrue(property.IsNullable);
-            Assert.AreEqual(typeof(MySubtype).Name, property.ActualPropertySchema.TypeName);
+            Assert.IsTrue(property.IsNullable(PropertyNullHandling.OneOf));
+            Assert.AreEqual(typeof(MySubtype).Name, property.ActualPropertySchema.TypeNameRaw);
         }
 
         [TestMethod]
@@ -170,7 +170,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = JsonSchema4.FromType<MyType>();
 
             //// Assert
-            Assert.IsNull(schema.Properties["Integer"].TypeName);
+            Assert.IsNull(schema.Properties["Integer"].TypeNameRaw);
         }
 
         [TestMethod]
@@ -204,12 +204,12 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Property"];
 
             //// Assert
-            Assert.IsTrue(property.IsNullable);
+            Assert.IsTrue(property.IsNullable(PropertyNullHandling.OneOf));
             Assert.IsTrue(property.ActualPropertySchema.IsAnyType);
             Assert.IsTrue(property.ActualPropertySchema.AllowAdditionalItems);
             Assert.AreEqual(0, property.Properties.Count);
         }
-        
+
         [TestMethod]
         public void When_converting_array_then_items_must_correctly_be_loaded()
         {
@@ -238,10 +238,10 @@ namespace NJsonSchema.Tests.Conversion
 
             Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
             Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.ActualSchema.Item.ActualSchema.TypeName);
+            Assert.AreEqual(typeof(MySubtype).Name, property.ActualSchema.Item.ActualSchema.TypeNameRaw);
             Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
-        
+
         public class MyType
         {
             [System.ComponentModel.Description("Test")]

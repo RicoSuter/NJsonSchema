@@ -13,22 +13,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     internal class EnumTemplateModel
     {
+        private readonly JsonSchema4 _schema;
+
         public EnumTemplateModel(string typeName, JsonSchema4 schema)
         {
+            _schema = schema; 
             Name = typeName;
-            Enums = GetEnumeration(schema);
-
-            HasDescription = !(schema is JsonProperty) && !string.IsNullOrEmpty(schema.Description);
-            Description = ConversionUtilities.RemoveLineBreaks(schema.Description);
         }
 
         public string Name { get; }
 
-        public List<EnumerationEntry> Enums { get; }
+        public List<EnumerationEntry> Enums => GetEnumeration(_schema);
 
-        public bool HasDescription { get; }
+        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
-        public string Description { get; }
+        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
         private List<EnumerationEntry> GetEnumeration(JsonSchema4 schema)
         {

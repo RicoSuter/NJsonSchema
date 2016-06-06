@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeName = "MyClass";
+            schema.TypeNameRaw = "MyClass";
             schema.Properties["foo-bar"] = new JsonProperty
             {
                 Type = JsonObjectType.String

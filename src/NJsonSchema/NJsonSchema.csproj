@@ -82,6 +82,7 @@
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
     <Compile Include="ISchemaDefinitionAppender.cs" />
     <Compile Include="ISchemaResolver.cs" />
+    <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="JsonSchema4.Serialization.cs" />
     <Compile Include="JsonSchema4.cs" />
     <Compile Include="Infrastructure\ReflectionCache.cs" />
+    <Compile Include="PropertyNullHandling.cs" />
     <Compile Include="Validation\JsonSchemaValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generation\JsonSchemaGenerator.cs" />

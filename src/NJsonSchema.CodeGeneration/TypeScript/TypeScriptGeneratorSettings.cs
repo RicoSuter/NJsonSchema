@@ -7,17 +7,22 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Text.RegularExpressions;
+using System.Linq;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>The generator settings.</summary>
-    public class TypeScriptGeneratorSettings
+    public class TypeScriptGeneratorSettings : CodeGeneratorSettingsBase
     {
+        private string _extensionCode;
+        private string[] _extendedClasses;
+        private ExtensionCode _processedExtensionCode;
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGeneratorSettings"/> class.</summary>
         public TypeScriptGeneratorSettings()
         {
+            ModuleName = "";
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Interface;
             ExtensionCode = string.Empty;
@@ -29,29 +34,57 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
+        /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
+        public string ModuleName { get; set; }
+
         /// <summary>Gets or sets the list of extended classes (the classes must be implemented in the <see cref="ExtensionCode"/>).</summary>
-        public string[] ExtendedClasses { get; set; }
-
-        /// <summary>Gets or sets the extension code to append to the generated code.</summary>
-        public string ExtensionCode { get; set; }
-
-        /// <summary>Gets the transformed additional code.</summary>
-        public string TransformedExtensionCode
+        public string[] ExtendedClasses
         {
-            get
+            get { return _extendedClasses; }
+            set
             {
-                var additionalCode = Regex.Replace(ExtensionCode ?? string.Empty, "import generated = (.*?)\n", "", RegexOptions.Multiline);
-                if (ExtendedClasses != null)
+                if (value != _extendedClasses)
                 {
-                    foreach (var extendedClass in ExtendedClasses)
-                        additionalCode = additionalCode.Replace("\nclass " + extendedClass + " extends ", "\nexport class " + extendedClass + " extends ");
+                    _extendedClasses = value;
+                    _processedExtensionCode = null;
                 }
-                return additionalCode.Replace("generated.", "");
             }
         }
 
-        internal ITemplate CreateTemplate()
+        /// <summary>Gets or sets the extension code to append to the generated code.</summary>
+        public string ExtensionCode
         {
+            get { return _extensionCode; }
+            set
+            {
+                if (value != _extensionCode)
+                {
+                    _extensionCode = value;
+                    _processedExtensionCode = null; 
+                }
+            }
+        }
+
+        /// <summary>Gets or sets the type names which always generate plain TypeScript classes.</summary>
+        public string[] ClassTypes { get; set; }
+
+        /// <summary>Gets the transformed additional code.</summary>
+        public ExtensionCode ProcessedExtensionCode
+        {
+            get
+            {
+                if (_processedExtensionCode == null)
+                    _processedExtensionCode = new TypeScriptExtensionCode(ExtensionCode ?? string.Empty, ExtendedClasses); 
+
+                return _processedExtensionCode;
+            }
+        }
+
+        internal ITemplate CreateTemplate(string typeName)
+        {
+            if (ClassTypes != null && ClassTypes.Contains(typeName))
+                return new ClassTemplate();
+
             if (TypeStyle == TypeScriptTypeStyle.Interface)
                 return new InterfaceTemplate();
 
@@ -62,6 +95,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return new KnockoutClassTemplate();
 
             throw new NotImplementedException();
+        }
+
+        /// <summary>Gets the type style of the given type name.</summary>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The type style.</returns>
+        public TypeScriptTypeStyle GetTypeStyle(string typeName)
+        {
+            if (ClassTypes != null && ClassTypes.Contains(typeName))
+                return TypeScriptTypeStyle.Class;
+
+            return TypeStyle;
         }
     }
 }

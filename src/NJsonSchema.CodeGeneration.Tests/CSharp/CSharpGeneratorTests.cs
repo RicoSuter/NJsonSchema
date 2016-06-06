@@ -1,13 +1,119 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
+using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
     [TestClass]
     public class CSharpGeneratorTests
     {
+
+        class CustomPropertyNameGenerator : IPropertyNameGenerator
+        {
+            public string Generate(JsonProperty property)
+            {
+                return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name);
+            }
+        }
+        class CustomTypeNameGenerator : ITypeNameGenerator
+        {
+            public string Generate(JsonSchema4 schema)
+            {
+                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw);
+            }
+
+        }
+
+        [TestMethod]
+        public void When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Teacher>();
+            var schemaData = schema.ToJson();
+            var settings = new CSharpGeneratorSettings();
+
+            settings.TypeNameGenerator = new CustomTypeNameGenerator();
+            settings.PropertyNameGenerator = new CustomPropertyNameGenerator();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile();
+            Console.WriteLine(output);
+
+            //// Assert
+            Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));
+            Assert.IsTrue(output.Contains(@"public string MyCustomLastName"));
+            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypeTeacher"));
+            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
+        }
+
+        [TestMethod]
+        public void When_schema_contains_ref_to_definition_that_refs_another_definition_then_result_should_contain_correct_target_ref_type()
+        {
+            //// Arrange
+            var schemaJson =
+@"{
+	'x-typeName': 'foo',
+	'type': 'object',
+	'definitions': {
+		'pRef': {
+			'type': 'object',
+			'properties': {
+				'pRef2': {
+					'$ref': '#/definitions/pRef2'
+				},
+				
+			}
+		},
+		'pRef2': {
+			'type': 'string'
+		}
+	},
+	'properties': {
+		'pRefs': {
+			'type': 'array',
+			'items': {
+				'$ref': '#/definitions/pRef'
+			}
+		}
+	}
+}";
+
+            var schema = JsonSchema4.FromJson(schemaJson);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            };
+            var gen = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = gen.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
+        }
+
+        [TestMethod]
+        public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
+        {
+            var schema = @"{'properties': {
+                                'boolWithDefault': {
+                                    'type': 'boolean',
+                                    'default': false
+                                 }
+                             }}";
+
+            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var gen = new CSharpGenerator(s, settings);
+            var output = gen.GenerateFile();
+
+            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false"));
+        }
+
         [TestMethod]
         public void When_namespace_is_set_then_it_should_appear_in_output()
         {
@@ -157,7 +263,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeName = "MyClass";
+            schema.TypeNameRaw = "MyClass";
             schema.Properties["foo-bar"] = new JsonProperty
             {
                 Type = JsonObjectType.String

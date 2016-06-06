@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-namespace NJsonSchema.CodeGeneration.CSharp.Models
+namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     internal class FileTemplateModel
     {
@@ -14,6 +14,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Namespace { get; set; }
 
-        public string Classes { get; set; }
+        public string Types { get; set; }
+
+        public string ExtensionCodeBefore { get; set; }
+
+        public string ExtensionCodeAfter { get; set; }
+
+        public bool HasModuleName { get; set; }
+
+        public string ModuleName { get; set; }
     }
 }

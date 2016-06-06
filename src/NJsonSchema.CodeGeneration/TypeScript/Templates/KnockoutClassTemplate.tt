@@ -14,10 +14,31 @@
 <#}#>
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
-            var <#=property.PropertyName#>: <#=property.Type#> = null; 
+            var <#=property.PropertyName#>_: <#=property.Type#> = null; 
             <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
-            this.<#=property.PropertyName#>(<#=property.PropertyName#>);
+            this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
 <#}#>        }
+    }
+
+    toJS(data?: any) {
+        data = data === undefined ? {} : data;
+<#foreach (var property in Model.Properties){#>
+        var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
+        <#=ConversionUtilities.Tab(property.DataBackConversionCode, 2)#>
+
+<#} if(Model.HasInheritance){#>
+        super.toJS(data);
+<#}#>
+        return data; 
+    }
+
+    toJSON() {
+        return JSON.stringify(this.toJS());
+    }
+
+    clone() {
+        var json = this.toJSON();
+        return new <#=Model.RealClass#>(JSON.parse(json));
     }
 }
