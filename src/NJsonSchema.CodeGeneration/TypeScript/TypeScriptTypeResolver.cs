@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             var type = schema.Type;
             if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArray(schema);
+                return ResolveArray(schema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Number))
                 return "number";
@@ -121,14 +121,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "number";
         }
 
-        private string ResolveArray(JsonSchema4 schema)
+        private string ResolveArray(JsonSchema4 schema, string typeNameHint)
         {
-            var property = schema;
-            if (property.Item != null)
-                return string.Format("{0}[]", Resolve(property.Item, true, null));
+            if (schema.Item != null)
+                return string.Format("{0}[]", Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
 
-            if (property.Items != null && property.Items.Count > 0)
-                return string.Format("[" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
+            if (schema.Items != null && schema.Items.Count > 0)
+                return string.Format("[" + string.Join(", ", schema.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
 
             return "any[]";
         }
