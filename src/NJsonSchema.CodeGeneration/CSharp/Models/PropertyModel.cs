@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Name => _property.Name;
 
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetGeneratedPropertyName());
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
 
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
 

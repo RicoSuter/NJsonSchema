@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName()).Replace("-", "_");
 
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.PropertyNullHandling), GetGeneratedPropertyName());
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
 
         public string Description => _property.Description;
 
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = GetGeneratedPropertyName(),
                         Resolver = _resolver
                     });
@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable(_settings.PropertyNullHandling),
+                        IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = GetGeneratedPropertyName(),
                         Resolver = _resolver
                     });

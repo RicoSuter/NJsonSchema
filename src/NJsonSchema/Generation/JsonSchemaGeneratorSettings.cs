@@ -17,7 +17,7 @@ namespace NJsonSchema.Generation
         public JsonSchemaGeneratorSettings()
         {
             DefaultEnumHandling = EnumHandling.Integer;
-            PropertyNullHandling = PropertyNullHandling.OneOf;
+            NullHandling = NullHandling.JsonSchema;
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -30,7 +30,7 @@ namespace NJsonSchema.Generation
         public bool GenerateKnownTypes { get; set; } = true;
 
         /// <summary>Gets or sets the property nullability handling.</summary>
-        public PropertyNullHandling PropertyNullHandling { get; set; }
+        public NullHandling NullHandling { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }

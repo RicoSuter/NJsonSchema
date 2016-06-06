@@ -506,12 +506,12 @@ namespace NJsonSchema
         #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
-        public virtual bool IsNullable(PropertyNullHandling propertyNullHandling)
+        public virtual bool IsNullable(NullHandling nullHandling)
         {
             if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
                 return true;
 
-            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(propertyNullHandling));
+            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(nullHandling));
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>

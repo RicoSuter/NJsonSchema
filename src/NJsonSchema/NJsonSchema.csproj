@@ -92,7 +92,7 @@
     <Compile Include="JsonSchema4.Serialization.cs" />
     <Compile Include="JsonSchema4.cs" />
     <Compile Include="Infrastructure\ReflectionCache.cs" />
-    <Compile Include="PropertyNullHandling.cs" />
+    <Compile Include="NullHandling.cs" />
     <Compile Include="Validation\JsonSchemaValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generation\JsonSchemaGenerator.cs" />
