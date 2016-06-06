@@ -73,6 +73,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
 
+            // if schema is a allOf schema, expand properties to 
+
+
             if (string.IsNullOrEmpty(typeName))
                 typeName = fallbackTypeName;
 
@@ -84,9 +87,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
+
             var properties = _schema.Properties.Values
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
+
+            if (_schema.AllOf.Count > 1)
+            {
+                var allOfProperties = _schema.AllOf
+                    .SelectMany(s => s.ActualSchema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings)))
+                   .ToList();
+                properties.AddRange(allOfProperties);
+            }
 
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties); 
 
