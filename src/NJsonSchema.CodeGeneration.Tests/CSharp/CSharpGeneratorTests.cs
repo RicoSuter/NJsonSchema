@@ -14,6 +14,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'id': 'http://some.domain.com/foo.json',
+                'x-typeName': 'foo',
                 'type': 'object',
                 'additionalProperties': false,
                 'definitions': {
@@ -42,12 +43,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                         }
                     }
                 },
-                'tAgg': {
-                    'allOf': [
-                        {'$ref': '#/definitions/tRef1'},
-                        {'$ref': '#/definitions/tRef2'},
-                        {'$ref': '#/definitions/tRef3'}
-                    ]
+                'properties' : {
+                    'tAgg': {
+                        'allOf': [
+                            {'$ref': '#/definitions/tRef1'},
+                            {'$ref': '#/definitions/tRef2'},
+                            {'$ref': '#/definitions/tRef3'}
+                        ]
+                    }
                 }
             }";
             var s = NJsonSchema.JsonSchema4.FromJson(schema);
@@ -55,6 +58,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var gen = new CSharpGenerator(s, settings);
             var output = gen.GenerateFile();
             System.Console.WriteLine(output);
+
+            /// Assert
+            Assert.IsTrue(output.Contains("public partial class tAgg"));
+            Assert.IsTrue(output.Contains("public string Val1 { get; set; }"));
+            Assert.IsTrue(output.Contains("public string Val2 { get; set; }"));
+            Assert.IsTrue(output.Contains("public string Val3 { get; set; }"));
+
         } 
 
         [TestMethod]
