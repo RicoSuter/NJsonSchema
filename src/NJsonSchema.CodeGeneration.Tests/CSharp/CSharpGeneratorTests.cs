@@ -59,7 +59,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
             var gen = new CSharpGenerator(s, settings);
             var output = gen.GenerateFile();
-            System.Console.WriteLine(output);
 
             /// Assert
             Assert.IsTrue(output.Contains("public partial class tAgg"));
