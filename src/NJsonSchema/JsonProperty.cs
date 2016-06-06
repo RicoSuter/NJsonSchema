@@ -83,19 +83,19 @@ namespace NJsonSchema
         {
             get
             {
-                return OneOf.FirstOrDefault(o => !o.IsNullable(PropertyNullHandling.OneOf))?.ActualSchema ?? ActualSchema;
+                return OneOf.FirstOrDefault(o => !o.IsNullable(NullHandling.JsonSchema))?.ActualSchema ?? ActualSchema;
             }
         }
 
         /// <summary>Determines whether the specified property null handling is nullable.</summary>
-        /// <param name="propertyNullHandling">The property null handling.</param>
+        /// <param name="nullHandling">The property null handling.</param>
         /// <returns></returns>
-        public override bool IsNullable(PropertyNullHandling propertyNullHandling)
+        public override bool IsNullable(NullHandling nullHandling)
         {
-            if (propertyNullHandling == PropertyNullHandling.Required)
+            if (nullHandling == NullHandling.Swagger)
                 return IsRequired == false;
 
-            return base.IsNullable(propertyNullHandling);
+            return base.IsNullable(nullHandling);
         }
     }
 }

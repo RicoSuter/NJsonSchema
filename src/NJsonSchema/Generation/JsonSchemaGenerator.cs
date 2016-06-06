@@ -169,7 +169,7 @@ namespace NJsonSchema.Generation
         private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
             where TSchemaType : JsonSchema4, new()
         {
-            if (type == typeof(object) || type == typeof(JObject))
+            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
             {
                 return new TSchemaType
                 {
@@ -361,7 +361,7 @@ namespace NJsonSchema.Generation
                     var propertySchema = Generate(propertyType, rootSchema,
                         property.GetCustomAttributes(), schemaDefinitionAppender, schemaResolver);
 
-                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
+                    if (Settings.NullHandling == NullHandling.JsonSchema)
                     {
                         jsonProperty = new JsonProperty();
                         jsonProperty.OneOf.Add(new JsonSchema4
@@ -402,7 +402,7 @@ namespace NJsonSchema.Generation
                 var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
                 if (isNullable)
                 {
-                    if (Settings.PropertyNullHandling == PropertyNullHandling.OneOf)
+                    if (Settings.NullHandling == NullHandling.JsonSchema)
                     {
                         if (useSchemaReference)
                             jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
@@ -410,7 +410,7 @@ namespace NJsonSchema.Generation
                             jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
                     }
                 }
-                else if (Settings.PropertyNullHandling == PropertyNullHandling.Required)
+                else if (Settings.NullHandling == NullHandling.Swagger)
                 {
                     if (!parentSchema.RequiredProperties.Contains(propertyName))
                         parentSchema.RequiredProperties.Add(propertyName);
