@@ -38,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
 
-        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName());
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName()) ?? "any";
 
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
