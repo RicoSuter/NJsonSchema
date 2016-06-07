@@ -9,7 +9,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     public class CSharpGeneratorTests
     {
         [TestMethod]
-        public void multiple_refs_in_all_of_should_expand_to_single_def()
+        public void multiple_refs_in_all_of_should_expand_to_single_def_if_is_flatten_all_of_setting_is_set()
         {
             var schema = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 }
             }";
             var s = NJsonSchema.JsonSchema4.FromJson(schema);
-            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", IsFlattenAllOf=true};
             var gen = new CSharpGenerator(s, settings);
             var output = gen.GenerateFile();
 
