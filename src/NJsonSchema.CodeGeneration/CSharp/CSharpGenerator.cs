@@ -72,13 +72,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
             var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
-
-            // if schema is a allOf schema, expand properties to 
-
-
             if (string.IsNullOrEmpty(typeName))
                 typeName = fallbackTypeName;
-
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);
             else
@@ -92,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 
-            if (_schema.AllOf.Count > 2)
+            if (_resolver.Settings.IsFlattenAllOf && _schema.AllOf.Count > 1)
             {
                 var allOfProperties = _schema.AllOf
                     .SelectMany(s => s.ActualSchema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings)))
