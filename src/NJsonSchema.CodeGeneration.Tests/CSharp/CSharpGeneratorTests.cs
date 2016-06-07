@@ -3,13 +3,30 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
-using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
     [TestClass]
     public class CSharpGeneratorTests
     {
+
+        [TestMethod]
+        [Ignore]
+        public void array_with_no_items_present_should_be_considered_to_have_items_with_empty_schema_content()
+        {
+            var schema = @"{
+                                'properties': {
+                                    'emptySchema': { 'type': 'array' }
+                                }
+                            }";
+            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var gen = new CSharpGenerator(s, settings);
+            var output = gen.GenerateFile();
+
+            // assert once we know what kind of code is generated: List<dynamic>? 
+        }
+
         [TestMethod]
         public void multiple_refs_in_all_of_should_expand_to_single_def()
         {
