@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public string TryResolve(JsonSchema4 schema, string typeNameHint)
         {
-            return schema != null ? Resolve(schema, false, typeNameHint) : string.Empty;
+            return schema != null ? Resolve(schema, false, typeNameHint) : null;
         }
 
         /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>

@@ -44,12 +44,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDate = parameters.Schema.Format == JsonFormatStrings.DateTime,
 
                 IsDictionary = parameters.Schema.IsDictionary,
-                DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint),
+                DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any",
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = parameters.Schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                 IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
-                ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint),
+                ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
                 IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
                 IsArrayItemDate = parameters.Schema.Item?.Format == JsonFormatStrings.DateTime
             });

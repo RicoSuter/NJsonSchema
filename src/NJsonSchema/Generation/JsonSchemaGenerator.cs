@@ -36,7 +36,6 @@ namespace NJsonSchema.Generation
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver)
         {
             return Generate<JsonSchema4>(type, null, null, new JsonSchemaDefinitionAppender(Settings.TypeNameGenerator), schemaResolver);
@@ -50,8 +49,7 @@ namespace NJsonSchema.Generation
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
-        public JsonSchema4 Generate(Type type, JsonSchema4 rootSchema, IEnumerable<Attribute> parentAttributes, 
+        public JsonSchema4 Generate(Type type, JsonSchema4 rootSchema, IEnumerable<Attribute> parentAttributes,
             ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
             return Generate<JsonSchema4>(type, rootSchema, parentAttributes, schemaDefinitionAppender, schemaResolver);
@@ -65,7 +63,6 @@ namespace NJsonSchema.Generation
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        /// <exception cref="InvalidOperationException">Could not find item type of array type.</exception>
         public TSchemaType Generate<TSchemaType>(Type type, JsonSchema4 rootSchema, IEnumerable<Attribute> parentAttributes, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
@@ -139,9 +136,9 @@ namespace NJsonSchema.Generation
                 var genericTypeArguments = GetGenericTypeArguments(type);
                 var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
                 if (itemType == null)
-                    throw new InvalidOperationException("Could not find item type of array type '" + type.FullName + "'.");
-
-                schema.Item = Generate(itemType, rootSchema, null, schemaDefinitionAppender, schemaResolver);
+                    schema.Item = JsonSchema4.CreateAnySchema();
+                else
+                    schema.Item = Generate(itemType, rootSchema, null, schemaDefinitionAppender, schemaResolver);
             }
 
             return schema;
@@ -170,13 +167,7 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-            {
-                return new TSchemaType
-                {
-                    Type = JsonObjectType.Object,
-                    AllowAdditionalProperties = true
-                };
-            }
+                return new TSchemaType(); // any schema
 
             return null;
         }
@@ -199,19 +190,7 @@ namespace NJsonSchema.Generation
 
             var valueType = genericTypeArguments[1];
             if (valueType == typeof(object))
-            {
-                schema.AdditionalPropertiesSchema = new JsonSchema4
-                {
-                    Type =
-                        JsonObjectType.Null |
-                        JsonObjectType.Object |
-                        JsonObjectType.Array |
-                        JsonObjectType.String |
-                        JsonObjectType.Boolean |
-                        JsonObjectType.Integer |
-                        JsonObjectType.Number
-                };
-            }
+                schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else
                 schema.AdditionalPropertiesSchema = Generate(valueType, rootSchema, null, schemaDefinitionAppender,
                     schemaResolver);
@@ -241,7 +220,7 @@ namespace NJsonSchema.Generation
         /// <param name="rootSchema">The root schema.</param>
         /// <param name="schemaDefinitionAppender"></param>
         /// <param name="schemaResolver">The schema resolver.</param>
-        protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema, JsonSchema4 rootSchema, 
+        protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema, JsonSchema4 rootSchema,
             ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
@@ -339,7 +318,7 @@ namespace NJsonSchema.Generation
             return Enum.GetNames(type);
         }
 
-        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, JsonSchema4 rootSchema, 
+        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, JsonSchema4 rootSchema,
             ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
             var propertyType = property.PropertyType;

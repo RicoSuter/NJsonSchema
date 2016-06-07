@@ -48,6 +48,13 @@ namespace NJsonSchema
             Initialize();
         }
 
+        /// <summary>Creates a schema which matches any data.</summary>
+        /// <returns>The any schema.</returns>
+        public static JsonSchema4 CreateAnySchema()
+        {
+            return new JsonSchema4();
+        }
+
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
         public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
 
@@ -494,7 +501,7 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
-                                 Type.HasFlag(JsonObjectType.Object) &&
+                                 (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  AllOf.Count == 0 &&

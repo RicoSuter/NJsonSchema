@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -9,6 +10,23 @@ namespace NJsonSchema.Tests.Schema
     [TestClass]
     public class JsonSchemaTests
     {
+        [TestMethod]
+        public void When_creating_schema_without_setting_properties_then_it_is_empty()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(
+@"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#""
+}", json);
+            Assert.IsTrue(schema.IsAnyType);
+        }
+
         [TestMethod]
         public void When_schema_contains_refs_then_they_should_be_resolved()
         {
