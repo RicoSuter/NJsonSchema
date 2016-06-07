@@ -92,7 +92,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 
-            if (_schema.AllOf.Count > 1)
+            if (_schema.AllOf.Count > 2)
             {
                 var allOfProperties = _schema.AllOf
                     .SelectMany(s => s.ActualSchema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings)))
