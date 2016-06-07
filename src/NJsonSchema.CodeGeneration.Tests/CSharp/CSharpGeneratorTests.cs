@@ -11,6 +11,51 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     public class CSharpGeneratorTests
     {
 
+
+        [TestMethod]
+        [Ignore]
+        public void when_all_of_has_two_items_and_flattening_is_of_inheritance_structure_should_be_generated()
+        {
+            var schema = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'id': 'http://some.domain.com/foo.json',
+                'x-typeName': 'foo',
+                'type': 'object',
+                'additionalProperties': false,
+                'definitions': {
+                    'tRef1': {
+                        'type': 'object',
+                        'properties': {
+                            'val1': {
+                                'type': 'string',
+                            }
+                        }
+                    },
+                },
+                'properties' : {
+                    'tAgg': {
+                        'allOf': [
+                            {'$ref': '#/definitions/tRef1'},
+                            {
+                                'type': 'object',
+                                'properties': { 
+                                    'prop1' : { 'type' : 'string' } 
+                                }
+                            }
+                        ]
+                    }
+                }
+            }";
+            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco };
+            var gen = new CSharpGenerator(s, settings);
+            var output = gen.GenerateFile();
+
+            /// Assert
+            Assert.IsTrue(output.Contains("class tAgg : tRef1"));
+
+        }
+
         class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
             public string Generate(JsonProperty property)
