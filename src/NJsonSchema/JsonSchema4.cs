@@ -146,6 +146,28 @@ namespace NJsonSchema
             };
         }
 
+        /// <summary>Gets the list of inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+        public IReadOnlyCollection<JsonSchema4> InheritedSchemas
+        {
+            get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
+        }
+
+        /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+        public IReadOnlyDictionary<string, JsonProperty> AllProperties
+        {
+            get
+            {
+                return new ReadOnlyDictionary<string, JsonProperty>(Properties
+                    .Union(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.None)
+                    .SelectMany(s => s.ActualSchema.AllProperties))
+                    .ToDictionary(p => p.Key, p => p.Value));
+            }
+        }
+
         /// <summary>Gets or sets the schema. </summary>
         [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
         public string SchemaVersion { get; set; }
