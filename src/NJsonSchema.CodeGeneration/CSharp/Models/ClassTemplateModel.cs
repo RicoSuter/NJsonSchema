@@ -39,9 +39,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public bool Inpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
 
-        public bool HasInheritance => _schema.AllOf.Count == 1;
+        public bool HasInheritance => _schema.InheritedSchemas.Count >= 1;
 
-        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.AllOf.First(), false, string.Empty) : null;
+        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), false, string.Empty) : null;
 
         public string Inheritance
         {

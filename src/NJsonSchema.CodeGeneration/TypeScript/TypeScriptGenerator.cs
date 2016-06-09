@@ -96,9 +96,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.Properties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
-                var hasInheritance = _schema.AllOf.Count == 1;
-                var baseClass = hasInheritance ? _resolver.Resolve(_schema.AllOf.First(), true, string.Empty) : null;
+                var properties = _schema.AllProperties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
+                var hasInheritance = _schema.InheritedSchemas.Count >= 1;
+                var baseClass = hasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
 
                 var template = Settings.CreateTemplate(typeName);
                 template.Initialize(new // TODO: Create model class

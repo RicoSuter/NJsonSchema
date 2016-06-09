@@ -31,8 +31,7 @@ namespace NJsonSchema
             if (rootSchema != null && objectToAppend != null)
             {
                 var typeName = objectToAppend.GetTypeName(_typeNameGenerator); 
-
-                if (!rootSchema.Definitions.ContainsKey(typeName))
+                if (!string.IsNullOrEmpty(typeName) && !rootSchema.Definitions.ContainsKey(typeName))
                     rootSchema.Definitions[typeName] = objectToAppend;
                 else
                     rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = objectToAppend;

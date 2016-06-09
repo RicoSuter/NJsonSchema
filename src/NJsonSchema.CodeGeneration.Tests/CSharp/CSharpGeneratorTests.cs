@@ -3,13 +3,150 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
-using System;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
     [TestClass]
     public class CSharpGeneratorTests
     {
+        // TODO: Fix this / is this a valid json schema?, see https://github.com/NJsonSchema/NJsonSchema/pull/109
+        //[TestMethod]
+        //public void array_with_no_items_present_should_be_considered_to_have_items_with_empty_schema_content()
+        //{
+        //    var json = @"{
+        //        'properties': {
+        //            'emptySchema': { 'type': 'array' }
+        //        }
+        //    }";
+        //    var schema = JsonSchema4.FromJson(json);
+        //    var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+        //    var generator = new CSharpGenerator(schema, settings);
+        //    var output = generator.GenerateFile();
+
+        //    // assert once we know what kind of code is generated: List<dynamic>? 
+        //}
+
+        [TestMethod]
+        public void When_all_of_has_multiple_refs_then_the_properties_should_expand_to_single_class()
+        {
+            //// Arrange
+            var json = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'id': 'http://some.domain.com/foo.json',
+                'x-typeName': 'foo',
+                'type': 'object',
+                'additionalProperties': false,
+                'definitions': {
+                    'tRef1': {
+                        'properties': {
+                            'val1': {
+                                'type': 'string',
+                            }
+                        }
+                    },
+                    'tRef2': {
+                        'properties': {
+                            'val2': {
+                                'type': 'string',
+                            }
+                        }
+                    },
+                    'tRef3': {
+                        'properties': {
+                            'val3': {
+                                'type': 'string',
+                            }
+                        }
+                    }
+                },
+                'properties' : {
+                    'tAgg': {
+                        'allOf': [
+                            {'$ref': '#/definitions/tRef1'},
+                            {'$ref': '#/definitions/tRef2'},
+                            {'$ref': '#/definitions/tRef3'}
+                        ]
+                    }
+                }
+            }";
+
+            //// Act
+            var schema = JsonSchema4.FromJson(json);
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
+            var generator = new CSharpGenerator(schema, settings);
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("public partial class tAgg"));
+            Assert.IsTrue(output.Contains("public string Val1 { get; set; }"));
+            Assert.IsTrue(output.Contains("public string Val2 { get; set; }"));
+            Assert.IsTrue(output.Contains("public string Val3 { get; set; }"));
+        }
+
+        [TestMethod]
+        public void When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
+        {
+            //// Arrange
+            var json = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'type': 'object',
+                'x-typeName': 'Foo', 
+                'properties': { 
+                    'prop1' : { 'type' : 'string' } 
+                },
+                'allOf': [
+                    {
+                        'properties': { 
+                            'prop2' : { 'type' : 'string' } 
+                        }
+                    }
+                ]
+            }";
+
+            //// Act
+            var schema = JsonSchema4.FromJson(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("class Foo"));
+            Assert.IsTrue(code.Contains("public string Prop1 { get; set; }"));
+            Assert.IsTrue(code.Contains("public string Prop2 { get; set; }"));
+            Assert.IsFalse(code.Contains("class Anonymous")); // only one class is generated with both properties
+        }
+
+        [TestMethod]
+        public void When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
+        {
+            //// Arrange
+            var json = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'type': 'object',
+                'x-typeName': 'Foo', 
+                'properties': { 
+                    'prop1' : { 'type' : 'string' } 
+                },
+                'allOf': [
+                    {
+                        'type': 'object', 
+                        'x-typeName': 'Bar', 
+                        'properties': { 
+                            'prop2' : { 'type' : 'string' } 
+                        }
+                    }
+                ]
+            }";
+
+            //// Act
+            var schema = JsonSchema4.FromJson(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("class Foo : Bar"));
+            Assert.IsTrue(code.Contains("public string Prop1 { get; set; }"));
+            Assert.IsTrue(code.Contains("public string Prop2 { get; set; }"));
+        }
 
         class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
@@ -106,7 +243,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                                  }
                              }}";
 
-            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var s = JsonSchema4.FromJson(schema);
             var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
             var gen = new CSharpGenerator(s, settings);
             var output = gen.GenerateFile();
@@ -119,10 +256,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var generator = CreateGenerator();
-            
+
             //// Act
             var output = generator.GenerateFile();
-            
+
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
             Assert.IsTrue(output.Contains("Dictionary<string, int>"));
@@ -170,7 +307,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(output.Contains(@"public TimeSpan TimeSpan"));
         }
-        
+
         [TestMethod]
         public void When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
@@ -301,6 +438,41 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             settings.Namespace = "MyNamespace";
             var generator = new CSharpGenerator(schema, settings);
             return generator;
+        }
+
+
+        private class ObjectTestClass
+        {
+            public object Foo { get; set; }
+        }
+
+        [TestMethod]
+        public void When_property_is_object_then_any_type_is_generated()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<ObjectTestClass>();
+
+            //// Assert
+            Assert.AreEqual(
+@"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#""
+}", schema.Properties["Foo"].ActualPropertySchema.ToJson());
+        }
+
+        [TestMethod]
+        public void When_property_is_object_then_object_property_is_generated()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<ObjectTestClass>();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
         }
     }
 }

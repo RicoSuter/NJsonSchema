@@ -79,7 +79,7 @@ namespace NJsonSchema
                 return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Byte);
 
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return new JsonObjectTypeDescription(JsonObjectType.Object, true, true);
+                return new JsonObjectTypeDescription(JsonObjectType.None, true);
 
             if (IsFileType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.File, true);
@@ -148,6 +148,9 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the type is nullable.</summary>
         public bool IsNullable { get; private set; }
+
+        /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
+        public bool IsAny => Type == JsonObjectType.None;
 
         private static bool IsArrayType(Type type)
         {
