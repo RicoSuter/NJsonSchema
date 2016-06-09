@@ -39,5 +39,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
+
+        /// <summary>
+        ///  Flatten allOf entity properties into the parent type
+        /// </summary>
+        public bool IsFlattenAllOf { get; set; }
     }
 }

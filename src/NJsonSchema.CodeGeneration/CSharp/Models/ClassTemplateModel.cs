@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (HasInheritance)
+                if (HasInheritance && !_settings.IsFlattenAllOf)
                     return ": " + BaseClass + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "");
                 else
                     return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "";

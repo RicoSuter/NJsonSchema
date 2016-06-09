@@ -72,10 +72,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public override TypeGeneratorResult GenerateType(string fallbackTypeName)
         {
             var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
-
             if (string.IsNullOrEmpty(typeName))
                 typeName = fallbackTypeName;
-
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);
             else
@@ -84,9 +82,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
+
             var properties = _schema.Properties.Values
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
+
+            if (_resolver.Settings.IsFlattenAllOf && _schema.AllOf.Count > 1)
+            {
+                var allOfProperties = _schema.AllOf
+                    .SelectMany(s => s.ActualSchema.Properties.Values.Select(property => new PropertyModel(property, _resolver, Settings)))
+                   .ToList();
+                properties.AddRange(allOfProperties);
+            }
 
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties); 
 
