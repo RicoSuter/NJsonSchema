@@ -158,7 +158,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (property.Items != null && property.Items.Count > 0)
                 return string.Format("Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
 
-            return string.Format(Settings.ArrayType + "<object>", Resolve(property.Item, true, null));
+            return Settings.ArrayType + "<object>";
         }
     }
 }

@@ -12,6 +12,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var code =
 @"
+/// <reference path=""../../typings/angularjs/angular.d.ts"" />
+
 import generated = require(""foo/bar"");
 import foo = require(""foo/bar"");
 import bar = require(""foo/bar"");
@@ -47,7 +49,9 @@ var x = 10;";
             Assert.IsTrue(ext.Classes.ContainsKey("Bar"));
             Assert.IsTrue(ext.Classes["Bar"].StartsWith("export class Bar extends BarBase {"));
 
-            Assert.AreEqual("import foo = require(\"foo/bar\");\nimport bar = require(\"foo/bar\");", ext.CodeBefore);
+            Assert.IsTrue(ext.CodeBefore.Contains("<reference path"));
+            Assert.IsTrue(ext.CodeBefore.Contains("import foo = require(\"foo/bar\")"));
+            Assert.IsTrue(ext.CodeBefore.Contains("import bar = require(\"foo/bar\")"));
 
             Assert.IsTrue(ext.CodeAfter.StartsWith("var clientClasses"));
             Assert.IsTrue(ext.CodeAfter.Contains("if (clientClasses.hasOwnProperty(clientClass))"));

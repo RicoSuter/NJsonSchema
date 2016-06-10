@@ -9,22 +9,25 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     [TestClass]
     public class CSharpGeneratorTests
     {
-        // TODO: Fix this / is this a valid json schema?, see https://github.com/NJsonSchema/NJsonSchema/pull/109
-        //[TestMethod]
-        //public void array_with_no_items_present_should_be_considered_to_have_items_with_empty_schema_content()
-        //{
-        //    var json = @"{
-        //        'properties': {
-        //            'emptySchema': { 'type': 'array' }
-        //        }
-        //    }";
-        //    var schema = JsonSchema4.FromJson(json);
-        //    var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
-        //    var generator = new CSharpGenerator(schema, settings);
-        //    var output = generator.GenerateFile();
+        [TestMethod]
+        public void When_type_is_array_and_items_and_item_is_not_defined_then_any_array_is_generated()
+        {
+            //// Arrange
+            var json = @"{
+                'properties': {
+                    'emptySchema': { 'type': 'array' }
+                }
+            }";
+            var schema = JsonSchema4.FromJson(json);
 
-        //    // assert once we know what kind of code is generated: List<dynamic>? 
-        //}
+            //// Act
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var generator = new CSharpGenerator(schema, settings);
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("public ObservableCollection<object> EmptySchema { get; set; }"));
+        }
 
         [TestMethod]
         public void When_all_of_has_multiple_refs_then_the_properties_should_expand_to_single_class()
