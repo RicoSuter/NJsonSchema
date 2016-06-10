@@ -92,9 +92,19 @@ namespace NJsonSchema
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        public static string GetPropertyName(PropertyInfo property)
+        public static string GetPropertyName(PropertyInfo property, PropertyNameHandling propertyNameHandling)
         {
-            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+            switch (propertyNameHandling)
+            {
+                case PropertyNameHandling.Default:
+                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+
+                case PropertyNameHandling.CamelCase:
+                    return ToCamelCase(property.Name);
+
+                default:
+                    throw new NotSupportedException($"PropertyNameHandling '{propertyNameHandling}' is not supported.");
+            }
         }
 
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
@@ -195,6 +205,34 @@ namespace NJsonSchema
             }
 
             return null;
+        }
+
+        internal static string ToCamelCase(string s)
+        {
+            if (string.IsNullOrEmpty(s) || !char.IsUpper(s[0]))
+            {
+                return s;
+            }
+
+            char[] chars = s.ToCharArray();
+
+            for (int i = 0; i < chars.Length; i++)
+            {
+                if (i == 1 && !char.IsUpper(chars[i]))
+                {
+                    break;
+                }
+
+                bool hasNext = (i + 1 < chars.Length);
+                if (i > 0 && hasNext && !char.IsUpper(chars[i + 1]))
+                {
+                    break;
+                }
+
+                chars[i] = char.ToLowerInvariant(chars[i]);
+            }
+
+            return new string(chars);
         }
     }
 }
