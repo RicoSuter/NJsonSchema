@@ -151,6 +151,23 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(code.Contains("public string Prop2 { get; set; }"));
         }
 
+        [TestMethod]
+        [Ignore]
+        public void array_with_no_items_present_should_be_considered_to_have_items_with_empty_schema_content()
+        {
+            var schema = @"{
+                                'properties': {
+                                    'emptySchema': { 'type': 'array' }
+                                }
+                            }";
+            var s = NJsonSchema.JsonSchema4.FromJson(schema);
+            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var gen = new CSharpGenerator(s, settings);
+            var output = gen.GenerateFile();
+
+            // assert once we know what kind of code is generated: List<dynamic>? 
+        }
+
         class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
             public string Generate(JsonProperty property)
