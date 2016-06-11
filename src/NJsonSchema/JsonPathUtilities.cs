@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -90,11 +91,24 @@ namespace NJsonSchema
             }
         }
 
+        private static readonly Lazy<CamelCasePropertyNamesContractResolver> CamelCaseResolverLazy = new Lazy<CamelCasePropertyNamesContractResolver>();
+
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        public static string GetPropertyName(PropertyInfo property)
+        /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
+        public static string GetPropertyName(PropertyInfo property, PropertyNameHandling propertyNameHandling)
         {
-            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+            switch (propertyNameHandling)
+            {
+                case PropertyNameHandling.Default:
+                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+
+                case PropertyNameHandling.CamelCase:
+                    return CamelCaseResolverLazy.Value.GetResolvedPropertyName(property.Name);
+
+                default:
+                    throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");
+            }
         }
 
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)

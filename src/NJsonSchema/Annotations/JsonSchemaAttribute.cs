@@ -32,5 +32,8 @@ namespace NJsonSchema.Annotations
 
         /// <summary>Gets or sets the JSON format type (default: <c>null</c>, i.e. derived from <see cref="System.Type"/>).</summary>
         public string Format { get; set; }
+
+        /// <summary>Gets or sets the array item type.</summary>
+        public Type ArrayItem { get; set; }
     }
 }

@@ -136,7 +136,13 @@ namespace NJsonSchema.Generation
                 var genericTypeArguments = GetGenericTypeArguments(type);
                 var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
                 if (itemType == null)
-                    schema.Item = JsonSchema4.CreateAnySchema();
+                {
+                    var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+                    if (jsonSchemaAttribute?.ArrayItem != null)
+                        schema.Item = Generate(jsonSchemaAttribute?.ArrayItem, rootSchema, null, schemaDefinitionAppender, schemaResolver);
+                    else
+                        schema.Item = JsonSchema4.CreateAnySchema();
+                }
                 else
                     schema.Item = Generate(itemType, rootSchema, null, schemaDefinitionAppender, schemaResolver);
             }
@@ -365,7 +371,7 @@ namespace NJsonSchema.Generation
                     propertyTypeDescription.ApplyType(jsonProperty);
                 }
 
-                var propertyName = JsonPathUtilities.GetPropertyName(property);
+                var propertyName = JsonPathUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
                 parentSchema.Properties.Add(propertyName, jsonProperty);

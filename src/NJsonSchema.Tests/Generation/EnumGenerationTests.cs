@@ -25,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_integer_enum_then_schmea_has_enum()
+        public void When_property_is_integer_enum_then_schema_has_enum()
         {
             //// Arrange
 
