@@ -84,5 +84,29 @@ namespace NJsonSchema.Tests.Generation
   }
 }", json);
         }
+
+        [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
+        public class ArrayModel<T> : List<T>
+        {
+        }
+
+        [TestMethod]
+        public void When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<ArrayModel<string>>();
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(@"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""array"",
+  ""items"": {
+    ""type"": ""string""
+  }
+}", json);
+        }
     }
 }
