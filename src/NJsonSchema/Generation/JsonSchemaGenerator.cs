@@ -365,7 +365,7 @@ namespace NJsonSchema.Generation
                     propertyTypeDescription.ApplyType(jsonProperty);
                 }
 
-                var propertyName = JsonPathUtilities.GetPropertyName(property);
+                var propertyName = JsonPathUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
                 parentSchema.Properties.Add(propertyName, jsonProperty);
