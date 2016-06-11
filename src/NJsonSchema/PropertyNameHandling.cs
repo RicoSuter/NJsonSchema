@@ -14,7 +14,7 @@ namespace NJsonSchema
         /// <summary>Generates property name using reflection.</summary>
         Default,
 
-        /// <summary>Generates lower camel cased property name.</summary>
+        /// <summary>Generates lower camel cased property name using Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver.</summary>
         CamelCase,
     }
 }

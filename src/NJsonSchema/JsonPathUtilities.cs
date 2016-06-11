@@ -100,7 +100,7 @@ namespace NJsonSchema
                     return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
 
                 case PropertyNameHandling.CamelCase:
-                    return ToCamelCase(property.Name);
+                    return new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver().GetResolvedPropertyName(property.Name);
 
                 default:
                     throw new NotSupportedException($"PropertyNameHandling '{propertyNameHandling}' is not supported.");
@@ -205,34 +205,6 @@ namespace NJsonSchema
             }
 
             return null;
-        }
-
-        internal static string ToCamelCase(string s)
-        {
-            if (string.IsNullOrEmpty(s) || !char.IsUpper(s[0]))
-            {
-                return s;
-            }
-
-            char[] chars = s.ToCharArray();
-
-            for (int i = 0; i < chars.Length; i++)
-            {
-                if (i == 1 && !char.IsUpper(chars[i]))
-                {
-                    break;
-                }
-
-                bool hasNext = (i + 1 < chars.Length);
-                if (i > 0 && hasNext && !char.IsUpper(chars[i + 1]))
-                {
-                    break;
-                }
-
-                chars[i] = char.ToLowerInvariant(chars[i]);
-            }
-
-            return new string(chars);
         }
     }
 }
