@@ -42,8 +42,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
-        public bool IsOptional => !_property.IsRequired;
-
         public string DataConversionCode
         {
             get

@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("Test?: any;"));
+            Assert.IsTrue(code.Contains("Test: any;"));
         }
 
         public class DictionaryObjectTest
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("Test?: { [key: string] : any; };"));
+            Assert.IsTrue(code.Contains("Test: { [key: string] : any; };"));
         }
     }
 }

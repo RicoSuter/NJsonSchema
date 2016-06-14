@@ -34,8 +34,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("Mapping?: { [key: string] : string; };"));
-            Assert.IsTrue(code.Contains("Mapping2?: { [key: string] : string; };"));
+            Assert.IsTrue(code.Contains("Mapping: { [key: string] : string; };"));
+            Assert.IsTrue(code.Contains("Mapping2: { [key: string] : string; };"));
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -64,8 +64,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("Mapping?: { [key: string] : Gender; };"));
-            Assert.IsTrue(code.Contains("Mapping2?: { [key: string] : Gender; };"));
+            Assert.IsTrue(code.Contains("Mapping: { [key: string] : Gender; };"));
+            Assert.IsTrue(code.Contains("Mapping2: { [key: string] : Gender; };"));
         }
     }
 }
