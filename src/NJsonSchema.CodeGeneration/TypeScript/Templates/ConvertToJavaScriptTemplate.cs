@@ -127,7 +127,7 @@ if(Model.IsArrayItemDate){
             
             #line default
             #line hidden
-            this.Write(".push(item.toString());\r\n");
+            this.Write(".push(item.toISOString());\r\n");
             
             #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
 }else{
@@ -251,7 +251,7 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write("[key].toString() : null;\r\n");
+            this.Write("[key].toISOString() : null;\r\n");
             
             #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
 }else{
@@ -320,7 +320,7 @@ if(Model.IsDate){
             
             #line default
             #line hidden
-            this.Write(".toString() : ");
+            this.Write(".toISOString() : ");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
 if(Model.HasDefaultValue){

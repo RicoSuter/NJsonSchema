@@ -48,6 +48,13 @@ namespace NJsonSchema
             Initialize();
         }
 
+        /// <summary>Creates a schema which matches any data.</summary>
+        /// <returns>The any schema.</returns>
+        public static JsonSchema4 CreateAnySchema()
+        {
+            return new JsonSchema4();
+        }
+
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
         public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
 
@@ -137,6 +144,28 @@ namespace NJsonSchema
                 TypeNameRaw = schema.TypeNameRaw,
                 SchemaReference = schema
             };
+        }
+
+        /// <summary>Gets the list of inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+        public IReadOnlyCollection<JsonSchema4> InheritedSchemas
+        {
+            get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
+        }
+
+        /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+        public IReadOnlyDictionary<string, JsonProperty> AllProperties
+        {
+            get
+            {
+                return new ReadOnlyDictionary<string, JsonProperty>(Properties
+                    .Union(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.None)
+                    .SelectMany(s => s.ActualSchema.AllProperties))
+                    .ToDictionary(p => p.Key, p => p.Value));
+            }
         }
 
         /// <summary>Gets or sets the schema. </summary>
@@ -494,7 +523,7 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
-                                 Type.HasFlag(JsonObjectType.Object) &&
+                                 (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  AllOf.Count == 0 &&
@@ -506,12 +535,12 @@ namespace NJsonSchema
         #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
-        public virtual bool IsNullable(PropertyNullHandling propertyNullHandling)
+        public virtual bool IsNullable(NullHandling nullHandling)
         {
             if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
                 return true;
 
-            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(propertyNullHandling));
+            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(nullHandling));
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>

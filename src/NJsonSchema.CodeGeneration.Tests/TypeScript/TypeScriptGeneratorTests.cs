@@ -9,6 +9,69 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     public class TypeScriptGeneratorTests
     {
         [TestMethod]
+        public void When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
+        {
+            //// Arrange
+            var json = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'type': 'object',
+                'x-typeName': 'Foo', 
+                'properties': { 
+                    'prop1' : { 'type' : 'string' } 
+                },
+                'allOf': [
+                    {
+                        'properties': { 
+                            'prop2' : { 'type' : 'string' } 
+                        }
+                    }
+                ]
+            }";
+
+            //// Act
+            var schema = JsonSchema4.FromJson(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("class Foo"));
+            Assert.IsTrue(code.Contains("prop1: string;"));
+            Assert.IsTrue(code.Contains("prop2: string;"));
+            Assert.IsFalse(code.Contains("class Anonymous"));
+        }
+
+        [TestMethod]
+        public void When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
+        {
+            //// Arrange
+            var json = @"{
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'type': 'object',
+                'x-typeName': 'Foo', 
+                'properties': { 
+                    'prop1' : { 'type' : 'string' } 
+                },
+                'allOf': [
+                    {
+                        'type': 'object', 
+                        'x-typeName': 'Bar', 
+                        'properties': { 
+                            'prop2' : { 'type' : 'string' } 
+                        }
+                    }
+                ]
+            }";
+
+            //// Act
+            var schema = JsonSchema4.FromJson(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("class Foo extends Bar"));
+        }
+
+        [TestMethod]
         public void When_property_name_does_not_match_property_name_then_casing_is_correct_in_output()
         {
             //// Arrange
@@ -18,8 +81,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"lastName?: string;"));
-            Assert.IsTrue(output.Contains(@"Dictionary?: { [key: string] : number; };"));
+            Assert.IsTrue(output.Contains(@"lastName: string;"));
+            Assert.IsTrue(output.Contains(@"Dictionary: { [key: string] : number; };"));
         }
 
         [TestMethod]
@@ -62,7 +125,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
             Assert.IsTrue(output.Contains(@"/** EnumDesc. *"));
         }
-        
+
         [TestMethod]
         public void When_class_has_description_then_typescript_has_comment()
         {
@@ -124,7 +187,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"""foo-bar""?: string;"));
+            Assert.IsTrue(output.Contains(@"""foo-bar"": string;"));
         }
 
         [TestMethod]

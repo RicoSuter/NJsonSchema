@@ -84,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
-            var properties = _schema.Properties.Values
+            var properties = _schema.AllProperties.Values
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 

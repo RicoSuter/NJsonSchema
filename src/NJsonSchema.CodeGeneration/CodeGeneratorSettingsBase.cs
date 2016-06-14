@@ -12,7 +12,7 @@ namespace NJsonSchema.CodeGeneration
     public class CodeGeneratorSettingsBase
     {
         /// <summary>Gets or sets the property nullability handling.</summary>
-        public PropertyNullHandling PropertyNullHandling { get; set; } = PropertyNullHandling.OneOf;
+        public NullHandling NullHandling { get; set; } = NullHandling.JsonSchema;
 
         /// <summary>Gets or sets the property name generator.</summary>
         public IPropertyNameGenerator PropertyNameGenerator { get; set; }

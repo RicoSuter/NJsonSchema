@@ -17,11 +17,15 @@ namespace NJsonSchema.Generation
         public JsonSchemaGeneratorSettings()
         {
             DefaultEnumHandling = EnumHandling.Integer;
-            PropertyNullHandling = PropertyNullHandling.OneOf;
+            NullHandling = NullHandling.JsonSchema;
+            DefaultPropertyNameHandling = PropertyNameHandling.Default;
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
+        
+        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
+        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
@@ -30,7 +34,7 @@ namespace NJsonSchema.Generation
         public bool GenerateKnownTypes { get; set; } = true;
 
         /// <summary>Gets or sets the property nullability handling.</summary>
-        public PropertyNullHandling PropertyNullHandling { get; set; }
+        public NullHandling NullHandling { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }

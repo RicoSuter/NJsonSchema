@@ -9,6 +9,26 @@ namespace NJsonSchema.Tests.Validation
     public class ArrayValidationTests
     {
         [TestMethod]
+        public void When_type_is_array_and_items_and_item_is_not_defined_then_any_items_are_allowed()
+        {
+            //// Arrange
+            var json = @"{
+                'properties': {
+                    'emptySchema': { 'type': 'array' }
+                }
+            }";
+            var schema = JsonSchema4.FromJson(json);
+
+            //// Act
+            var errors1 = schema.Validate("{ 'emptySchema': [1, 2, 'abc'] }");
+            var errors2 = schema.Validate("{ 'emptySchema': 123 }");
+
+            //// Assert
+            Assert.AreEqual(0, errors1.Count);
+            Assert.AreEqual(1, errors2.Count);
+        }
+
+        [TestMethod]
         public void When_token_is_not_array_then_validation_should_fail()
         {
             //// Arrange
