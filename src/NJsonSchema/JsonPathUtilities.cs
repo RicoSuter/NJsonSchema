@@ -57,7 +57,7 @@ namespace NJsonSchema
 
                 throw new InvalidOperationException("Could not resolve the path '#' because the root object is not a JsonSchema4.");
             }
-            else if (path.StartsWith("#/"))
+            else if (path.StartsWith("#/", StringComparison.OrdinalIgnoreCase))
             {
                 var allSegments = path.Split('/').Skip(1).ToList(); 
                 var schema = GetObjectFromJsonPath(root, allSegments, allSegments, new HashSet<object>());
@@ -66,7 +66,7 @@ namespace NJsonSchema
 
                 return schema;
             }
-            else if (path.StartsWith("http://") || path.StartsWith("https://"))
+            else if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
                 if (FullDotNetMethods.SupportsFullDotNetMethods)
                     return JsonSchema4.FromJson(FullDotNetMethods.HttpGet(path));
@@ -92,6 +92,7 @@ namespace NJsonSchema
         }
 
         private static readonly Lazy<CamelCasePropertyNamesContractResolver> CamelCaseResolverLazy = new Lazy<CamelCasePropertyNamesContractResolver>();
+        private static readonly Lazy<DefaultContractResolver> DefaultResolverLazy = new Lazy<DefaultContractResolver>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
@@ -101,11 +102,20 @@ namespace NJsonSchema
             switch (propertyNameHandling)
             {
                 case PropertyNameHandling.Default:
-                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
-
+                    {
+                        var resolvedProperty = ReflectionCache.GetProperties(property.DeclaringType).FirstOrDefault(p => p.PropertyInfo == property);
+                        if (resolvedProperty != null)
+                        {
+                            return resolvedProperty.GetName();
+                        }
+                        else
+                        {
+                            // Workaround for .net portable issue: https://github.com/dotnet/corefx/issues/5884
+                            return DefaultResolverLazy.Value.GetResolvedPropertyName(property.Name);
+                        }                        
+                    }                
                 case PropertyNameHandling.CamelCase:
                     return CamelCaseResolverLazy.Value.GetResolvedPropertyName(property.Name);
-
                 default:
                     throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");
             }
