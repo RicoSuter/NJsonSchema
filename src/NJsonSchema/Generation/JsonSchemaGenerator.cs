@@ -338,7 +338,7 @@ namespace NJsonSchema.Generation
                 if (propertyType.Name == "Nullable`1")
                     propertyType = propertyType.GenericTypeArguments[0];
 
-                var useSchemaReference = 
+                var useSchemaReference =
                     !propertyTypeDescription.IsDictionary &&
                     (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
 
@@ -387,26 +387,28 @@ namespace NJsonSchema.Generation
                 if (hasRequiredAttribute || hasJsonNetAttributeRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
 
-                if (!propertyTypeDescription.IsAny)
-                {
-                    var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
+                var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
 
-                    var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
-                    if (isNullable)
+                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
+                if (isNullable)
+                {
+                    if (Settings.NullHandling == NullHandling.JsonSchema)
                     {
-                        if (Settings.NullHandling == NullHandling.JsonSchema)
+                        if (useSchemaReference)
+                            jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                        else if (jsonProperty.Type == JsonObjectType.None)
                         {
-                            if (useSchemaReference)
-                                jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                            else
-                                jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
+                            jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.None });
+                            jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                         }
+                        else
+                            jsonProperty.Type = jsonProperty.Type | JsonObjectType.Null;
                     }
-                    else if (Settings.NullHandling == NullHandling.Swagger)
-                    {
-                        if (!parentSchema.RequiredProperties.Contains(propertyName))
-                            parentSchema.RequiredProperties.Add(propertyName);
-                    }
+                }
+                else if (Settings.NullHandling == NullHandling.Swagger)
+                {
+                    if (!parentSchema.RequiredProperties.Contains(propertyName))
+                        parentSchema.RequiredProperties.Add(propertyName);
                 }
 
                 dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");

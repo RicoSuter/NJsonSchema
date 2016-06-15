@@ -35,7 +35,40 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName());
 
-        public string Required => _property.IsRequired && _settings.RequiredPropertiesMustBeDefined ? "Required.Always" : "Required.Default";
+        public string JsonPropertyRequired
+        {
+            get
+            {
+                if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
+                {
+                    if (!_property.IsNullable(_settings.NullHandling))
+                        return "Required.Always";
+                    else
+                        return "Required.AllowNull";
+                }
+                else
+                {
+                    if (!_property.IsNullable(_settings.NullHandling))
+                        return "Required.DisallowNull";
+                    else
+                        return "Required.Default";
+                }
+            }
+        }
+
+        public bool RenderRequiredAttribute
+        {
+            get
+            {
+                if (_property.IsNullable(_settings.NullHandling))
+                    return false;
+
+                return _property.ActualPropertySchema.IsAnyType ||
+                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Object) ||
+                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) ||
+                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+            }
+        }
 
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
 
