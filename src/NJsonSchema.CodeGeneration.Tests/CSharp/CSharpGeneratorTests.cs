@@ -468,9 +468,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public void When_property_is_object_then_object_property_is_generated()
         {
             //// Arrange
+            var schema = JsonSchema4.FromType<ObjectTestClass>();
 
             //// Act
-            var schema = JsonSchema4.FromType<ObjectTestClass>();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
 
