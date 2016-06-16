@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Infrastructure
@@ -19,7 +18,7 @@ namespace NJsonSchema.Infrastructure
     {
         private static readonly Dictionary<Type, IList<Property>> PropertyCacheByType = new Dictionary<Type, IList<Property>>();
 
-        private static readonly Dictionary<Type, DataContractAttribute> DataContractAttributeCacheByType = new Dictionary<Type, DataContractAttribute>();
+        private static readonly Dictionary<Type, Attribute> DataContractAttributeCacheByType = new Dictionary<Type, Attribute>();
 
         public static IEnumerable<Property> GetProperties(Type type)
         {
@@ -28,7 +27,6 @@ namespace NJsonSchema.Infrastructure
                 if (!PropertyCacheByType.ContainsKey(type))
                 {
                     var properties = type.GetRuntimeProperties().Select(p => new Property(p, GetCustomAttributes(p))).ToList();
-
                     PropertyCacheByType[type] = properties;
                 }
 
@@ -40,7 +38,7 @@ namespace NJsonSchema.Infrastructure
         {
             JsonIgnoreAttribute jsonIgnoreAttribute = null;
             JsonPropertyAttribute jsonPropertyAttribute = null;
-            DataMemberAttribute dataMemberAttribute = null;
+            Attribute dataMemberAttribute = null;
 
             foreach (var attribute in property.GetCustomAttributes())
             {
@@ -48,20 +46,20 @@ namespace NJsonSchema.Infrastructure
                     jsonIgnoreAttribute = attribute as JsonIgnoreAttribute;
                 else if (attribute is JsonPropertyAttribute)
                     jsonPropertyAttribute = attribute as JsonPropertyAttribute;
-                else if (attribute is DataMemberAttribute)
-                    dataMemberAttribute = attribute as DataMemberAttribute;
+                else if (attribute.GetType().Name == "DataMemberAttribute")
+                    dataMemberAttribute = attribute;
             }
 
             return new CustomAttributes(jsonIgnoreAttribute, jsonPropertyAttribute, GetDataContractAttribute(property.DeclaringType), dataMemberAttribute);
         }
 
-        public static DataContractAttribute GetDataContractAttribute(Type type)
+        public static Attribute GetDataContractAttribute(Type type)
         {
             lock (DataContractAttributeCacheByType)
             {
                 if (!DataContractAttributeCacheByType.ContainsKey(type))
                 {
-                    var attribute = type.GetTypeInfo().GetCustomAttribute<DataContractAttribute>();
+                    var attribute = type.GetTypeInfo().GetCustomAttributes().SingleOrDefault(a => a.GetType().Name == "DataContractAttribute");
                     DataContractAttributeCacheByType[type] = attribute;
                 }
 
@@ -103,8 +101,8 @@ namespace NJsonSchema.Infrastructure
             public CustomAttributes(
                 JsonIgnoreAttribute jsonIgnoreAttribute,
                 JsonPropertyAttribute jsonPropertyAttribute,
-                DataContractAttribute dataContractAttribute,
-                DataMemberAttribute dataMemberAttribute)
+                Attribute dataContractAttribute,
+                Attribute dataMemberAttribute)
             {
                 JsonIgnoreAttribute = jsonIgnoreAttribute;
                 JsonPropertyAttribute = jsonPropertyAttribute;
@@ -116,9 +114,9 @@ namespace NJsonSchema.Infrastructure
 
             public JsonPropertyAttribute JsonPropertyAttribute { get; }
 
-            public DataContractAttribute DataContractAttribute { get; }
+            public Attribute DataContractAttribute { get; }
 
-            public DataMemberAttribute DataMemberAttribute { get; }
+            public dynamic DataMemberAttribute { get; }
         }
     }
 }
