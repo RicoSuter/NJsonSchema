@@ -56,6 +56,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
+    <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
     <Compile Include="TypeScript\ClassGenerationTests.cs" />
     <Compile Include="TypeScript\ClassOrderTests.cs" />
