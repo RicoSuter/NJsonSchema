@@ -203,6 +203,13 @@ namespace NJsonSchema
                 {
                     _schemaReference = value;
                     SchemaReferencePath = null;
+
+                    if (value != null)
+                    {
+                        // only $ref property is allowed when schema is a reference
+                        Type = JsonObjectType.None;
+                        TypeNameRaw = null; 
+                    }
                 }
             }
         }
