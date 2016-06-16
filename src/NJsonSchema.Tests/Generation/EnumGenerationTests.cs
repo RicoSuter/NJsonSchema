@@ -25,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_integer_enum_then_schmea_has_enum()
+        public void When_property_is_integer_enum_then_schema_has_enum()
         {
             //// Arrange
 
@@ -59,9 +59,9 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(schema.Properties["Bar"].OneOf.First(o => !o.IsNullable).SchemaReference);
-            Assert.IsNotNull(schema.Properties["Bar2"].OneOf.First(o => !o.IsNullable).SchemaReference); // must not be a reference but second enum declaration
-            Assert.AreNotEqual(schema.Properties["Bar"].OneOf.First(o => !o.IsNullable).SchemaReference, schema.Properties["Bar2"].OneOf.First(o => !o.IsNullable).SchemaReference);
+            Assert.IsNotNull(schema.Properties["Bar"].ActualPropertySchema);
+            Assert.IsNotNull(schema.Properties["Bar2"].ActualPropertySchema); // must not be a reference but second enum declaration
+            Assert.AreNotEqual(schema.Properties["Bar"].ActualPropertySchema, schema.Properties["Bar2"].ActualPropertySchema);
         }
 
         [TestMethod]

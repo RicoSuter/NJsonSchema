@@ -8,17 +8,21 @@
 
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>The generator settings.</summary>
-    public class TypeScriptGeneratorSettings
+    public class TypeScriptGeneratorSettings : CodeGeneratorSettingsBase
     {
+        private string _extensionCode;
+        private string[] _extendedClasses;
+        private ExtensionCode _processedExtensionCode;
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGeneratorSettings"/> class.</summary>
         public TypeScriptGeneratorSettings()
         {
+            ModuleName = "";
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Interface;
             ExtensionCode = string.Empty;
@@ -30,27 +34,49 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
+        /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
+        public string ModuleName { get; set; }
+
         /// <summary>Gets or sets the list of extended classes (the classes must be implemented in the <see cref="ExtensionCode"/>).</summary>
-        public string[] ExtendedClasses { get; set; }
+        public string[] ExtendedClasses
+        {
+            get { return _extendedClasses; }
+            set
+            {
+                if (value != _extendedClasses)
+                {
+                    _extendedClasses = value;
+                    _processedExtensionCode = null;
+                }
+            }
+        }
 
         /// <summary>Gets or sets the extension code to append to the generated code.</summary>
-        public string ExtensionCode { get; set; }
+        public string ExtensionCode
+        {
+            get { return _extensionCode; }
+            set
+            {
+                if (value != _extensionCode)
+                {
+                    _extensionCode = value;
+                    _processedExtensionCode = null; 
+                }
+            }
+        }
 
         /// <summary>Gets or sets the type names which always generate plain TypeScript classes.</summary>
         public string[] ClassTypes { get; set; }
 
         /// <summary>Gets the transformed additional code.</summary>
-        public string TransformedExtensionCode
+        public ExtensionCode ProcessedExtensionCode
         {
             get
             {
-                var additionalCode = Regex.Replace(ExtensionCode ?? string.Empty, "import generated = (.*?)\n", "", RegexOptions.Multiline);
-                if (ExtendedClasses != null)
-                {
-                    foreach (var extendedClass in ExtendedClasses)
-                        additionalCode = additionalCode.Replace("\nclass " + extendedClass + " extends ", "\nexport class " + extendedClass + " extends ");
-                }
-                return additionalCode.Replace("generated.", "");
+                if (_processedExtensionCode == null)
+                    _processedExtensionCode = new TypeScriptExtensionCode(ExtensionCode ?? string.Empty, ExtendedClasses); 
+
+                return _processedExtensionCode;
             }
         }
 
@@ -71,7 +97,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             throw new NotImplementedException();
         }
 
-        internal TypeScriptTypeStyle GetTypeStyle(string typeName)
+        /// <summary>Gets the type style of the given type name.</summary>
+        /// <param name="typeName">The type name.</param>
+        /// <returns>The type style.</returns>
+        public TypeScriptTypeStyle GetTypeStyle(string typeName)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
                 return TypeScriptTypeStyle.Class;

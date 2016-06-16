@@ -11,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 
@@ -34,67 +33,67 @@ namespace NJsonSchema
                     (parentAttributes != null && HasStringEnumConverter(parentAttributes)) ||
                     defaultEnumHandling == EnumHandling.String;
 
-                return new JsonObjectTypeDescription(isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, true)
+                return new JsonObjectTypeDescription(isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false)
                 {
                     IsEnum = true
                 };
             }
 
             if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, false);
 
             if ((type == typeof(long)) || (type == typeof(ulong)))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Long);
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Long);
 
             if (type == typeof(double) || type == typeof(float))
-                return new JsonObjectTypeDescription(JsonObjectType.Number, true, false, JsonFormatStrings.Double);
+                return new JsonObjectTypeDescription(JsonObjectType.Number, false, false, JsonFormatStrings.Double);
 
             if (type == typeof(decimal))
-                return new JsonObjectTypeDescription(JsonObjectType.Number, true, false, JsonFormatStrings.Decimal);
+                return new JsonObjectTypeDescription(JsonObjectType.Number, false, false, JsonFormatStrings.Decimal);
 
             if (type == typeof(bool))
-                return new JsonObjectTypeDescription(JsonObjectType.Boolean, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Boolean, false);
 
             if (type == typeof(string) || type == typeof(Type))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false);
-
-            if (type == typeof(char))
                 return new JsonObjectTypeDescription(JsonObjectType.String, true);
 
+            if (type == typeof(char))
+                return new JsonObjectTypeDescription(JsonObjectType.String, false);
+
             if (type == typeof(Guid))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Guid);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Guid);
 
             if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.DateTime);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(TimeSpan))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.TimeSpan);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.TimeSpan);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Uri);
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Uri);
 
             if (type == typeof(byte))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, true, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
 
             if (type == typeof(byte[]))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Byte);
 
-            if (type == typeof(JObject) || type == typeof(object))
-                return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
+            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+                return new JsonObjectTypeDescription(JsonObjectType.None, true);
 
             if (IsFileType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.File, false);
+                return new JsonObjectTypeDescription(JsonObjectType.File, true);
 
             if (IsDictionaryType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.Object, false, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Object, true, true);
 
             if (IsArrayType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.Array, false);
+                return new JsonObjectTypeDescription(JsonObjectType.Array, true);
 
             if (type.Name == "Nullable`1")
             {
                 var typeDescription = FromType(type.GenericTypeArguments[0], parentAttributes, defaultEnumHandling);
-                typeDescription.IsAlwaysRequired = false;
+                typeDescription.IsNullable = true;
                 return typeDescription;
             }
 
@@ -103,16 +102,16 @@ namespace NJsonSchema
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return new JsonObjectTypeDescription(classType, false, false, format);
+                return new JsonObjectTypeDescription(classType, true, false, format);
             }
 
-            return new JsonObjectTypeDescription(JsonObjectType.Object, false);
+            return new JsonObjectTypeDescription(JsonObjectType.Object, true);
         }
 
-        private JsonObjectTypeDescription(JsonObjectType type, bool isAlwaysRequired, bool isDictionary = false, string format = null)
+        private JsonObjectTypeDescription(JsonObjectType type, bool isNullable, bool isDictionary = false, string format = null)
         {
             Type = type;
-            IsAlwaysRequired = isAlwaysRequired;
+            IsNullable = isNullable;
             Format = format;
             IsDictionary = isDictionary;
         }
@@ -135,9 +134,6 @@ namespace NJsonSchema
         /// <summary>Gets the type. </summary>
         public JsonObjectType Type { get; private set; }
 
-        /// <summary>Gets a value indicating whether the type must always required. </summary>
-        public bool IsAlwaysRequired { get; private set; }
-
         /// <summary>Gets a value indicating whether the object is a generic dictionary.</summary>
         public bool IsDictionary { get; private set; }
 
@@ -149,6 +145,12 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is a complex type (i.e. object, dictionary or array).</summary>
         public bool IsComplexType => Type.HasFlag(JsonObjectType.Object) || Type.HasFlag(JsonObjectType.Array);
+
+        /// <summary>Gets a value indicating whether the type is nullable.</summary>
+        public bool IsNullable { get; private set; }
+
+        /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
+        public bool IsAny => Type == JsonObjectType.None;
 
         private static bool IsArrayType(Type type)
         {

@@ -79,6 +79,23 @@ namespace NJsonSchema
 
         /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
         [JsonIgnore]
-        public JsonSchema4 ActualPropertySchema => OneOf.FirstOrDefault(o => !o.IsNullable)?.ActualSchema ?? ActualSchema;
+        public JsonSchema4 ActualPropertySchema
+        {
+            get
+            {
+                return OneOf.FirstOrDefault(o => !o.IsNullable(NullHandling.JsonSchema))?.ActualSchema ?? ActualSchema;
+            }
+        }
+
+        /// <summary>Determines whether the specified property null handling is nullable.</summary>
+        /// <param name="nullHandling">The property null handling.</param>
+        /// <returns></returns>
+        public override bool IsNullable(NullHandling nullHandling)
+        {
+            if (nullHandling == NullHandling.Swagger)
+                return IsRequired == false;
+
+            return base.IsNullable(nullHandling);
+        }
     }
 }

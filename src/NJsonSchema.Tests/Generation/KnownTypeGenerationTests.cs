@@ -35,7 +35,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson(); 
 
             //// Assert
-            Assert.IsTrue(schema.Definitions.Any(s => s.Value.TypeName == "Teacher"));
+            Assert.IsTrue(schema.Definitions.Any(s => s.Value.TypeNameRaw == "Teacher"));
         }
     }
 }

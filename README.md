@@ -1,11 +1,12 @@
 NJsonSchema for .NET
 ====================
 
+[![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![NuGet Version](https://badge.fury.io/nu/njsonschema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
 [![Build status](https://ci.appveyor.com/api/projects/status/pextintxxmn5xt46?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema)
 CI: [![Build status](https://ci.appveyor.com/api/projects/status/0n9hi0o61al5g2uu?svg=true)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
 
-NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v4 schemas. The library can read a schema from a file or string and validate JSON data against it. A schema can also be generated from an existing .NET class. With the code generation APIs we can generate C# and TypeScript classes or interfaces from a schema. 
+NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v4 schemas. The library can read a schema from a file or string and validate JSON data against it. A schema can also be generated from an existing .NET class. With the code generation APIs you can generate C# and TypeScript classes or interfaces from a schema. 
 
 **NuGet packages:** 
 -   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (PCL 259): JSON Schema 4 validation and parsing classes
@@ -20,7 +21,9 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 
-NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. The project is maintained and developed by [Rico Suter](http://rsuter.com) and other contributors. 
+NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
+
+The project is maintained and developed by [Rico Suter](http://rsuter.com) and other contributors. 
 
 ## NJsonSchema usage
 

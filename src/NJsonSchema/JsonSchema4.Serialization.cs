@@ -27,8 +27,19 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the type name (class name of the object). </summary>
-        [JsonProperty("typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 4)]
-        public string TypeName { get; set; }
+        [JsonProperty("x-typeName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 4)]
+        public string TypeNameRaw { get; set; }
+
+        /// <summary>Gets the type name of the schema.</summary>
+        /// <param name="typeNameGenerator">The type name generator.</param>
+        /// <returns>The type name.</returns>
+        public string GetTypeName(ITypeNameGenerator typeNameGenerator)
+        {
+            if (typeNameGenerator != null)
+                return typeNameGenerator.Generate(this);
+
+            return TypeNameRaw;
+        }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonIgnore]
@@ -184,7 +195,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
-        [JsonProperty("enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Collection<string> EnumerationNamesRaw
         {
             get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
