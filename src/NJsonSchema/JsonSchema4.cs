@@ -207,6 +207,7 @@ namespace NJsonSchema
                     if (value != null)
                     {
                         // only $ref property is allowed when schema is a reference
+                        // TODO: Fix all SchemaReference assignments so that this code is not needed 
                         Type = JsonObjectType.None;
                         TypeNameRaw = null; 
                     }
