@@ -413,8 +413,8 @@ namespace NJsonSchema.Generation
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
                 return true;
 
-            var hasDataContractAttribute = parentType.GetTypeInfo().GetCustomAttribute<DataContractAttribute>() != null;
-            if (hasDataContractAttribute && !propertyAttributes.Any(a => a is DataMemberAttribute) && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+            var hasDataContractAttribute = parentType.GetTypeInfo().GetCustomAttributes().Any(a => a.GetType().Name == "DataContractAttribute");
+            if (hasDataContractAttribute && propertyAttributes.All(a => a.GetType().Name != "DataMemberAttribute") && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
                 return true;
 
             return false;

@@ -93,7 +93,7 @@ namespace NJsonSchema
         /// <returns>The name.</returns>
         public static string GetPropertyName(PropertyInfo property)
         {
-            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+            return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo.Name == property.Name).GetName();
         }
 
         private static string GetJsonPath(object obj, object objectToSearch, string basePath, HashSet<object> checkedObjects)
