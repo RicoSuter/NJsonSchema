@@ -101,7 +101,7 @@ namespace NJsonSchema
             switch (propertyNameHandling)
             {
                 case PropertyNameHandling.Default:
-                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo == property).GetName();
+                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo.Name == property.Name).GetName();
 
                 case PropertyNameHandling.CamelCase:
                     return CamelCaseResolverLazy.Value.GetResolvedPropertyName(property.Name);
