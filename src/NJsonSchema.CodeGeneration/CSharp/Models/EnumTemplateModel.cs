@@ -27,6 +27,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Description => _schema.Description;
 
+        public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
+
         public IEnumerable<EnumerationEntry> Enums
         {
             get
@@ -37,12 +39,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     var value = _schema.Enumeration.ElementAt(i);
                     var name = _schema.EnumerationNames.Count > i ?
                         _schema.EnumerationNames.ElementAt(i) :
-                        _schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
+                        _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
                     entries.Add(new EnumerationEntry
                     {
-                        Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
-                        Name = ConversionUtilities.ConvertToUpperCamelCase(name)
+                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
+                        Value = value.ToString(),
+                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true)
                     });
                 }
                 return entries;

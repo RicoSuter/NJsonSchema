@@ -157,14 +157,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             public string Generate(JsonProperty property)
             {
-                return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name);
+                return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name, true);
             }
         }
         class CustomTypeNameGenerator : ITypeNameGenerator
         {
             public string Generate(JsonSchema4 schema)
             {
-                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw);
+                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw, true);
             }
 
         }
@@ -516,6 +516,42 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema4.FromType<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
             var schemaJson = schema.ToJson();
 
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
+        }
+
+        [TestMethod]
+        public void When_enum_type_name_is_missing_then_default_value_is_still_correctly_set()
+        {
+            //// Arrange
+            var schemaJson = @"{
+  ""type"": ""object"",
+  ""additionalProperties"": false,
+  ""properties"": {
+    ""ConstructionCode"": {
+      ""type"": ""integer"",
+      ""x-enumNames"": [
+        ""FIRE_RSTV"",
+        ""FRAME"",
+        ""JOIST_MAS"",
+        ""NON_CBST""
+      ],
+      ""enum"": [
+        0,
+        1,
+        2,
+        3
+      ],
+      ""default"": 3
+    }
+  }
+}";
+            var schema = JsonSchema4.FromJson(schemaJson);
+            
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();

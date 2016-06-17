@@ -13,19 +13,20 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>Converts the default value to a language specific identifier.</summary>
     public class DefaultValueGenerator
     {
-        private readonly CodeGeneratorSettingsBase _settings;
+        private readonly ITypeResolver _typeResolver;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultValueGenerator" /> class.</summary>
-        /// <param name="settings">The settings.</param>
-        public DefaultValueGenerator(CodeGeneratorSettingsBase settings)
+        /// <param name="typeResolver">The type typeResolver.</param>
+        public DefaultValueGenerator(ITypeResolver typeResolver)
         {
-            _settings = settings;
+            _typeResolver = typeResolver;
         }
 
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema4 schema)
+        public virtual string GetDefaultValue(JsonSchema4 schema, string typeNameHint)
         {
             if (schema.Default == null)
                 return null;
@@ -33,12 +34,13 @@ namespace NJsonSchema.CodeGeneration
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualPropertySchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration)
             {
-                var typeName = actualSchema.GetTypeName(_settings.TypeNameGenerator);
+                var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
+
                 var enumName = schema.Default is string ?
                     schema.Default.ToString() :
                     actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
 
-                return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName);
+                return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
             }
 
             if (schema.Type.HasFlag(JsonObjectType.String))

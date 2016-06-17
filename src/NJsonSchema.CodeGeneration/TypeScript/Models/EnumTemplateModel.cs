@@ -37,12 +37,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 var value = schema.Enumeration.ElementAt(i);
                 var name = schema.EnumerationNames.Count > i ?
                     schema.EnumerationNames.ElementAt(i) :
-                    schema.Type == JsonObjectType.Integer ? "Value" + value : value.ToString();
+                    schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
                 entries.Add(new EnumerationEntry
                 {
                     Value = schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
-                    Name = ConversionUtilities.ConvertToUpperCamelCase(name)
+                    Name = ConversionUtilities.ConvertToUpperCamelCase(name, true)
                 });
             }
             return entries;
