@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptTypeResolver _resolver;
 
         public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, new TypeScriptDefaultValueGenerator())
+            : base(property, new DefaultValueGenerator(settings))
         {
             _property = property;
             _resolver = resolver;
@@ -56,7 +56,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = GetGeneratedPropertyName(),
-                        Resolver = _resolver
+                        Resolver = _resolver, 
+                        Settings = _settings
                     });
                 }
                 return string.Empty;
@@ -77,7 +78,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = GetGeneratedPropertyName(),
-                        Resolver = _resolver
+                        Resolver = _resolver,
+                        Settings = _settings
                     });
                 }
                 return string.Empty;
