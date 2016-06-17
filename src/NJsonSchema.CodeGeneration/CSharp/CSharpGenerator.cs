@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
@@ -59,7 +60,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var template = new FileTemplate() as ITemplate;
             template.Initialize(new FileTemplateModel
             {
-                Toolchain = JsonSchema4.ToolchainVersion, 
+                Toolchain = JsonSchema4.ToolchainVersion,
                 Namespace = Settings.Namespace ?? string.Empty,
                 Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(null))
             });
@@ -88,16 +89,29 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 
-            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties); 
+            RenamePropertyWithSameNameAsClass(typeName, properties);
 
+            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties);
             var template = new ClassTemplate() as ITemplate;
             template.Initialize(model);
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                BaseTypeName = model.BaseClass, 
+                BaseTypeName = model.BaseClass,
                 Code = template.Render()
             };
+        }
+
+        private void RenamePropertyWithSameNameAsClass(string typeName, List<PropertyModel> properties)
+        {
+            var propertyWithSameNameAsClass = properties.SingleOrDefault(p => p.PropertyName == typeName);
+            if (propertyWithSameNameAsClass != null)
+            {
+                var number = 1;
+                while (properties.Any(p => p.PropertyName == typeName + number))
+                    number++;
+                propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
+            }
         }
 
         private TypeGeneratorResult GenerateEnum(string typeName)

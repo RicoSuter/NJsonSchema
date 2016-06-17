@@ -559,5 +559,29 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
         }
+
+        [TestMethod]
+        public void When_property_has_same_name_as_class_then_it_is_renamed()
+        {
+            //// Arrange
+            var schemaJson = @"{
+  ""type"": ""object"",
+  ""x-typeName"": ""Foo"",
+  ""properties"": {
+    ""Foo"": {
+      ""type"": ""string""
+    }
+  }
+}";
+            var schema = JsonSchema4.FromJson(schemaJson);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull)]"));
+            Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
+        }
     }
 }
