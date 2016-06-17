@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private static string Render(ITemplate template, DataConversionParameters parameters)
         {
-            var defaultValueGenerator = new TypeScriptDefaultValueGenerator();
+            var defaultValueGenerator = new DefaultValueGenerator(parameters.Settings);
             template.Initialize(new
             {
                 Variable = parameters.Variable,

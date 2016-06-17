@@ -3,9 +3,9 @@ namespace NJsonSchema.CodeGeneration.Models
     internal class PropertyModelBase
     {
         private readonly JsonProperty _property;
-        private readonly DefaultValueGeneratorBase _defaultValueGenerator;
+        private readonly DefaultValueGenerator _defaultValueGenerator;
 
-        public PropertyModelBase(JsonProperty property, DefaultValueGeneratorBase defaultValueGenerator)
+        public PropertyModelBase(JsonProperty property, DefaultValueGenerator defaultValueGenerator)
         {
             _property = property;
             _defaultValueGenerator = defaultValueGenerator; 
