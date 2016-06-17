@@ -5,6 +5,9 @@
 <# } #>public enum <#=Model.Name#>
 {
 <# foreach(var pair in Model.Enums){ #>
-    <#=pair.Name#> = <#=pair.Value#>,
+<#if(Model.IsStringEnum){#>    [EnumMember(Value = "<#=pair.Value#>")]
+<#}#>
+    <#=pair.Name#> = <#=pair.InternalValue#>,
+
 <# } #>
 }

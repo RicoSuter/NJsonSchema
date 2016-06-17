@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptTypeResolver _resolver;
 
         public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, new DefaultValueGenerator(settings))
+            : base(property, new DefaultValueGenerator(resolver))
         {
             _property = property;
             _resolver = resolver;
@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         
         public string InterfaceName => _property.Name.Contains("-") ? $"\"{_property.Name}\"" : _property.Name;
 
-        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName()).Replace("-", "_");
+        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
 
         public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
 

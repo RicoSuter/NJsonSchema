@@ -29,14 +29,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private static string Render(ITemplate template, DataConversionParameters parameters)
         {
-            var defaultValueGenerator = new DefaultValueGenerator(parameters.Settings);
+            var defaultValueGenerator = new DefaultValueGenerator(parameters.Resolver);
             template.Initialize(new
             {
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema) != null,
-                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema),
+                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.TypeNameHint) != null,
+                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.TypeNameHint),
 
                 Type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint),
 

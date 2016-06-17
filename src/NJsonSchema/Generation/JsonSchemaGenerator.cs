@@ -293,7 +293,7 @@ namespace NJsonSchema.Generation
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
 
-            foreach (var enumName in GetEnumNames(type, typeDescription))
+            foreach (var enumName in Enum.GetNames(type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
                 {
@@ -301,26 +301,17 @@ namespace NJsonSchema.Generation
                     schema.Enumeration.Add(value);
                 }
                 else
-                    schema.Enumeration.Add(enumName);
-                schema.EnumerationNames.Add(enumName);
-            }
-        }
-
-        private string[] GetEnumNames(Type type, JsonObjectTypeDescription typeDescription)
-        {
-            if (typeDescription.Type == JsonObjectType.String)
-            {
-                return Enum.GetNames(type).Select(name =>
                 {
-                    var attributes = type.GetTypeInfo().GetDeclaredField(name).GetCustomAttributes();
+                    var attributes = type.GetTypeInfo().GetDeclaredField(enumName).GetCustomAttributes(); // EnumMember only checked if StringEnumConverter is used
                     dynamic enumMemberAttribute = TryGetAttribute(attributes, "System.Runtime.Serialization.EnumMemberAttribute");
                     if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
-                        return (string)enumMemberAttribute.Value;
-                    return name;
-                }).ToArray();
-            }
+                        schema.Enumeration.Add((string)enumMemberAttribute.Value);
+                    else
+                        schema.Enumeration.Add(enumName);
+                }
 
-            return Enum.GetNames(type);
+                schema.EnumerationNames.Add(enumName);
+            }
         }
 
         private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, JsonSchema4 rootSchema,

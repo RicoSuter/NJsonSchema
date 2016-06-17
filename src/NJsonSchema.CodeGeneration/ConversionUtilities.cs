@@ -16,24 +16,36 @@ namespace NJsonSchema.CodeGeneration
     {
         /// <summary>Converts the first letter to lower case and dashes to camel case.</summary>
         /// <param name="input">The input.</param>
-        /// <returns>The converted input. </returns>
-        public static string ConvertToLowerCamelCase(string input)
+        /// <param name="firstCharacterMustBeAlpha">Specifies whether to add an _ when the first character is not alpha.</param>
+        /// <returns>The converted input.</returns>
+        public static string ConvertToLowerCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
+            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1)).Replace(" ", "_"));
+
+            if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+                return "_" + input;
+
+            return input;
         }
 
         /// <summary>Converts the first letter to upper case and dashes to camel case.</summary>
         /// <param name="input">The input.</param>
-        /// <returns>The converted input. </returns>
-        public static string ConvertToUpperCamelCase(string input)
+        /// <param name="firstCharacterMustBeAlpha">Specifies whether to add an _ when the first character is not alpha.</param>
+        /// <returns>The converted input.</returns>
+        public static string ConvertToUpperCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            return ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
+            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1)).Replace(" ", "_"));
+
+            if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+                return "_" + input;
+
+            return input;
         }
 
         /// <summary>Converts the input to a camel case identifier.</summary>

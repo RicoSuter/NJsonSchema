@@ -13,6 +13,6 @@ namespace NJsonSchema.CodeGeneration.Models
 
         public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);
 
-        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property);
+        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property, _property.Name);
     }
 }
