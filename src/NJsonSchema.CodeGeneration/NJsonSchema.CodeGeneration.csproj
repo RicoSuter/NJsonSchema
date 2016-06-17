@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGeneratorSettingsBase.cs" />
+    <Compile Include="CSharp\CSharpDefaultValueGenerator.cs" />
     <Compile Include="CSharp\Models\ClassTemplateModel.cs" />
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="CSharp\Models\EnumTemplateModel.cs" />
     <Compile Include="IPropertyNameGenerator.cs" />
+    <Compile Include="DefaultValueGeneratorBase.cs" />
     <Compile Include="Models\PropertyModelBase.cs" />
     <Compile Include="CSharp\Templates\ClassTemplate.cs">
       <AutoGen>True</AutoGen>
@@ -111,6 +113,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EnumerationEntry.cs" />
     <Compile Include="ClassOrderUtilities.cs" />
+    <Compile Include="TypeScript\TypeScriptDefaultValueGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptExtensionCode.cs" />
     <Compile Include="TypeScript\DataConversionParameters.cs" />
     <Compile Include="ExtensionCode.cs" />

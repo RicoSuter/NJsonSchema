@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -476,6 +478,50 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
+        }
+
+        public enum ConstructionCode
+        {
+            FIRE_RSTV = 0,
+            FRAME = 1,
+            JOIST_MAS = 2,
+            NON_CBST = 3,
+        }
+
+        public class ClassWithDefaultEnumProperty
+        {
+            [DefaultValue(ConstructionCode.NON_CBST)]
+            public ConstructionCode ConstructionCode { get; set; }
+        }
+
+        [TestMethod]
+        public void When_enum_property_has_default_and_int_serialization_then_correct_csharp_code_generated()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<ClassWithDefaultEnumProperty>();
+            var schemaJson = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
+        }
+
+        [TestMethod]
+        public void When_enum_property_has_default_and_string_serialization_then_correct_csharp_code_generated()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
+            var schemaJson = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
         }
     }
 }

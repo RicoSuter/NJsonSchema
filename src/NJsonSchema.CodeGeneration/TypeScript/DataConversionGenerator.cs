@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.CodeGeneration.Models;
 using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -30,13 +29,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private static string Render(ITemplate template, DataConversionParameters parameters)
         {
+            var defaultValueGenerator = new TypeScriptDefaultValueGenerator();
             template.Initialize(new
             {
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = PropertyModelBase.GetDefaultValue(parameters.Schema) != null,
-                DefaultValue = PropertyModelBase.GetDefaultValue(parameters.Schema),
+                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema) != null,
+                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema),
 
                 Type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint),
 

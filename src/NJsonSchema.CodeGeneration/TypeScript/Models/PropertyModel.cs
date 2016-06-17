@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptTypeResolver _resolver;
 
         public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property)
+            : base(property, new TypeScriptDefaultValueGenerator())
         {
             _property = property;
             _resolver = resolver;
