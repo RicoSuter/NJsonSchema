@@ -16,12 +16,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
 
-        internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings) 
+        internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
             : base(property, new DefaultValueGenerator(resolver))
         {
             _property = property;
             _settings = settings;
             _resolver = resolver;
+
+            PropertyName = ConversionUtilities.ConvertToUpperCamelCase(GetGeneratedPropertyName(), true);
         }
 
         public string Name => _property.Name;
@@ -32,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string Description => _property.Description;
 
-        public string PropertyName => ConversionUtilities.ConvertToUpperCamelCase(GetGeneratedPropertyName(), true);
+        public string PropertyName { get; set; }
 
         public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true);
 
