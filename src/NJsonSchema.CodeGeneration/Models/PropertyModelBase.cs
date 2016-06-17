@@ -2,29 +2,17 @@ namespace NJsonSchema.CodeGeneration.Models
 {
     internal class PropertyModelBase
     {
-        public PropertyModelBase(JsonProperty property)
-        {
-            DefaultValue = GetDefaultValue(property);
-        }
+        private readonly JsonProperty _property;
+        private readonly DefaultValueGeneratorBase _defaultValueGenerator;
 
-        internal static string GetDefaultValue(JsonSchema4 property)
+        public PropertyModelBase(JsonProperty property, DefaultValueGeneratorBase defaultValueGenerator)
         {
-            if (property.Default == null)
-                return null;
-
-            if (property.Type.HasFlag(JsonObjectType.String))
-                return "\"" + property.Default + "\"";
-            else if (property.Type.HasFlag(JsonObjectType.Boolean))
-                return property.Default.ToString().ToLower();
-            else if (property.Type.HasFlag(JsonObjectType.Integer) ||
-                     property.Type.HasFlag(JsonObjectType.Number) ||
-                     property.Type.HasFlag(JsonObjectType.Integer))
-                return property.Default.ToString();
-            return null;
+            _property = property;
+            _defaultValueGenerator = defaultValueGenerator; 
         }
 
         public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);
 
-        public string DefaultValue { get; set; }
+        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property);
     }
 }

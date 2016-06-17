@@ -28,11 +28,7 @@ namespace NJsonSchema
         {
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum =
-                    HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) ||
-                    (parentAttributes != null && HasStringEnumConverter(parentAttributes)) ||
-                    defaultEnumHandling == EnumHandling.String;
-
+                var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);
                 return new JsonObjectTypeDescription(isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false)
                 {
                     IsEnum = true
@@ -106,6 +102,20 @@ namespace NJsonSchema
             }
 
             return new JsonObjectTypeDescription(JsonObjectType.Object, true);
+        }
+
+        /// <summary>Determines whether the an enum property serializes to a string.</summary>
+        /// <param name="classType">Type of the class.</param>
+        /// <param name="propertyAttributes">The property attributes.</param>
+        /// <param name="defaultEnumHandling"></param>
+        /// <returns>True or false</returns>
+        public static bool IsStringEnum(Type classType, IEnumerable<Attribute> propertyAttributes, EnumHandling defaultEnumHandling)
+        {
+            if (defaultEnumHandling == EnumHandling.String)
+                return true;
+
+            return HasStringEnumConverter(classType.GetTypeInfo().GetCustomAttributes()) ||
+                (propertyAttributes != null && HasStringEnumConverter(propertyAttributes));
         }
 
         private JsonObjectTypeDescription(JsonObjectType type, bool isNullable, bool isDictionary = false, string format = null)

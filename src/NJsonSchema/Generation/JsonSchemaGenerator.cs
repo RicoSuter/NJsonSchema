@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
@@ -417,7 +416,7 @@ namespace NJsonSchema.Generation
 
                 jsonProperty.Description = GetDescription(property, attributes);
 
-                ApplyPropertyAnnotations(jsonProperty, attributes, propertyTypeDescription);
+                ApplyPropertyAnnotations(jsonProperty, parentType, attributes, propertyTypeDescription);
             }
         }
 
@@ -433,11 +432,12 @@ namespace NJsonSchema.Generation
             return false;
         }
 
-        /// <summary></summary>
-        /// <param name="jsonProperty"></param>
-        /// <param name="attributes"></param>
-        /// <param name="propertyTypeDescription"></param>
-        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, IEnumerable<Attribute> attributes, JsonObjectTypeDescription propertyTypeDescription)
+        /// <summary>Applies the property annotations to the JSON property.</summary>
+        /// <param name="jsonProperty">The JSON property.</param>
+        /// <param name="parentType">The type of the parent.</param>
+        /// <param name="attributes">The attributes.</param>
+        /// <param name="propertyTypeDescription">The property type description.</param>
+        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, Type parentType, IList<Attribute> attributes, JsonObjectTypeDescription propertyTypeDescription)
         {
             dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null && displayAttribute.Name != null)
@@ -445,7 +445,7 @@ namespace NJsonSchema.Generation
 
             dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
-                jsonProperty.Default = defaultValueAttribute.Value;
+                jsonProperty.Default = ConvertDefaultValue(parentType, attributes, defaultValueAttribute);
 
             dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
@@ -484,6 +484,19 @@ namespace NJsonSchema.Generation
                 else if (propertyTypeDescription.Type == JsonObjectType.Array)
                     jsonProperty.MaxItems = maxLengthAttribute.Length;
             }
+        }
+
+        private object ConvertDefaultValue(Type parentType, IEnumerable<Attribute> propertyAttributes, dynamic defaultValueAttribute)
+        {
+            if (((Type) defaultValueAttribute.Value.GetType()).GetTypeInfo().IsEnum)
+            {
+                if (JsonObjectTypeDescription.IsStringEnum(parentType, propertyAttributes, Settings.DefaultEnumHandling))
+                    return defaultValueAttribute.Value.ToString();
+                else
+                    return (int) defaultValueAttribute.Value;
+            }
+            else
+                return defaultValueAttribute.Value;
         }
 
         private string GetDescription(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
