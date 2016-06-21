@@ -41,17 +41,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint),
 
                 IsNewableObject = IsNewableObject(parameters.Schema),
-                IsDate = parameters.Schema.Format == JsonFormatStrings.DateTime,
+                IsDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String && 
+                         parameters.Schema.Format == JsonFormatStrings.DateTime,
 
                 IsDictionary = parameters.Schema.IsDictionary,
                 DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any",
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
-                IsDictionaryValueDate = parameters.Schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
+                IsDictionaryValueDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String && 
+                                        parameters.Schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                 IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
                 ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
                 IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
-                IsArrayItemDate = parameters.Schema.Item?.Format == JsonFormatStrings.DateTime
+                IsArrayItemDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String &&
+                                  parameters.Schema.Item?.Format == JsonFormatStrings.DateTime,
+                
+                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" : "moment",
+                DateToStringCode = "toISOString()"
             });
             return template.Render();
         }

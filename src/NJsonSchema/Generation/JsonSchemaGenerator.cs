@@ -155,14 +155,14 @@ namespace NJsonSchema.Generation
             if (parentAttributes == null)
             {
                 // class
-                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>();
+                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
                     schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
             }
             else
             {
                 // property or parameter
-                var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>();
+                var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
                     schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
             }
@@ -240,6 +240,7 @@ namespace NJsonSchema.Generation
         private void GeneratePropertiesAndInheritance(Type type, JsonSchema4 schema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
             var properties = GetTypeProperties(type);
+
             foreach (var property in type.GetTypeInfo().DeclaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
                 LoadProperty(type, property, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
 
@@ -479,12 +480,12 @@ namespace NJsonSchema.Generation
 
         private object ConvertDefaultValue(Type parentType, IEnumerable<Attribute> propertyAttributes, dynamic defaultValueAttribute)
         {
-            if (((Type) defaultValueAttribute.Value.GetType()).GetTypeInfo().IsEnum)
+            if (((Type)defaultValueAttribute.Value.GetType()).GetTypeInfo().IsEnum)
             {
                 if (JsonObjectTypeDescription.IsStringEnum(parentType, propertyAttributes, Settings.DefaultEnumHandling))
                     return defaultValueAttribute.Value.ToString();
                 else
-                    return (int) defaultValueAttribute.Value;
+                    return (int)defaultValueAttribute.Value;
             }
             else
                 return defaultValueAttribute.Value;

@@ -25,6 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ModuleName = "";
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Interface;
+            DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
         }
 
@@ -33,6 +34,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
+
+        /// <summary>Gets or sets the date time type (default: 'Date').</summary>
+        public TypeScriptDateTimeType DateTimeType { get; set; }
 
         /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
         public string ModuleName { get; set; }

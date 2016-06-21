@@ -62,6 +62,7 @@
     <Compile Include="DefaultGenerationTests.cs" />
     <Compile Include="TypeScript\ClassGenerationTests.cs" />
     <Compile Include="TypeScript\ClassOrderTests.cs" />
+    <Compile Include="TypeScript\DateCodeGenerationTests.cs" />
     <Compile Include="TypeScript\ExtensionCodeTests.cs" />
     <Compile Include="TypeScript\TypeScriptObjectTests.cs" />
     <Compile Include="TypeScript\TypeScriptDictionaryTests.cs" />

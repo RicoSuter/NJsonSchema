@@ -104,8 +104,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private string ResolveString(JsonSchema4 schema, string typeNameHint)
         {
-            if (schema.Format == JsonFormatStrings.DateTime)
-                return "Date";
+            if (schema.Format == JsonFormatStrings.DateTime && Settings.DateTimeType != TypeScriptDateTimeType.String)
+                return Settings.DateTimeType == TypeScriptDateTimeType.Date ? "Date" : "moment.Moment";
 
             if (schema.IsEnumeration)
                 return AddGenerator(schema, typeNameHint);

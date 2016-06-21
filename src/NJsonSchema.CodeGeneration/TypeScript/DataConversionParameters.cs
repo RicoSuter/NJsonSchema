@@ -30,6 +30,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeResolver Resolver { get; set; }
 
         /// <summary>Gets or sets the settings.</summary>
-        public CodeGeneratorSettingsBase Settings { get; set; }
+        public TypeScriptGeneratorSettings Settings { get; set; }
     }
 }
