@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration
             _types[typeName] = generator;
         }
 
-        /// <summary>Tries the resolve the schema and returns null there was a problem.</summary>
+        /// <summary>Tries to resolve the schema and returns null if there was a problem.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
@@ -101,6 +101,10 @@ namespace NJsonSchema.CodeGeneration
             {
                 var generator = CreateTypeGenerator(schema);
                 AddOrReplaceTypeGenerator(typeName, generator);
+
+                // add all definitions so that all schemas are generated (also subschemas in inheritance trees)
+                foreach (var pair in schema.Definitions)
+                    AddGenerator(pair.Value, pair.Key);
             }
             return typeName;
         }

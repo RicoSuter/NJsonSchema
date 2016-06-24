@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 Toolchain = JsonSchema4.ToolchainVersion,
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(null))
+                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
             });
             return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
@@ -86,6 +86,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         private TypeGeneratorResult GenerateClass(string typeName)
         {
             var properties = _schema.AllProperties.Values
+                .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
 

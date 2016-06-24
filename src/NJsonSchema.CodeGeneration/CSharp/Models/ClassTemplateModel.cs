@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             _resolver = resolver;
             _schema = schema;
-            _settings = settings; 
+            _settings = settings;
 
             Class = typeName;
             Properties = properties;
@@ -38,6 +38,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Description => _schema.Description;
 
         public bool Inpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
+
+        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
+
+        public string Discriminator => _schema.Discriminator;
 
         public bool HasInheritance => _schema.InheritedSchemas.Count >= 1;
 

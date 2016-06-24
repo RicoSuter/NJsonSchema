@@ -45,14 +45,14 @@ if(Model.IsNewableObject){
             
             #line default
             #line hidden
-            this.Write(" ? new ");
+            this.Write(" ? ");
             
             #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Type));
             
             #line default
             #line hidden
-            this.Write("(");
+            this.Write(".fromJS(");
             
             #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
@@ -114,14 +114,14 @@ if(Model.IsArrayItemNewableObject){
             
             #line default
             #line hidden
-            this.Write(".push(new ");
+            this.Write(".push(");
             
             #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.ArrayItemType));
             
             #line default
             #line hidden
-            this.Write("(item));\r\n");
+            this.Write(".fromJS(item));\r\n");
             
             #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }else{
@@ -141,7 +141,14 @@ if(Model.IsArrayItemDate){
             
             #line default
             #line hidden
-            this.Write(".push(new Date(item));\r\n");
+            this.Write(".push(");
+            
+            #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.StringToDateCode));
+            
+            #line default
+            #line hidden
+            this.Write("(item));\r\n");
             
             #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }else{
@@ -224,14 +231,14 @@ if(Model.IsDictionaryValueNewableObject){
             
             #line default
             #line hidden
-            this.Write("[key] ? new ");
+            this.Write("[key] ? ");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.DictionaryValueType));
             
             #line default
             #line hidden
-            this.Write("(");
+            this.Write(".fromJS(");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
@@ -265,7 +272,14 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write("[key] ? new Date(");
+            this.Write("[key] ? ");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.StringToDateCode));
+            
+            #line default
+            #line hidden
+            this.Write("(");
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
@@ -334,7 +348,14 @@ if(Model.IsDate){
             
             #line default
             #line hidden
-            this.Write(" ? new Date(");
+            this.Write(" ? ");
+            
+            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.StringToDateCode));
+            
+            #line default
+            #line hidden
+            this.Write("(");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
@@ -348,7 +369,13 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("new Date(");
+            
+            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.StringToDateCode));
+            
+            #line default
+            #line hidden
+            this.Write("(");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));

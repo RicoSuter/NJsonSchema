@@ -106,6 +106,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     Class = Settings.ExtendedClasses?.Contains(typeName) == true ? typeName + "Base" : typeName,
                     RealClass = typeName,
 
+                    HasDiscriminator = !string.IsNullOrEmpty(_schema.BaseDiscriminator),
+                    Discriminator = _schema.BaseDiscriminator,
+                    DiscriminatorProperty = GetDiscriminatorProperty(_schema),
+
                     HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
                     Description = ConversionUtilities.RemoveLineBreaks(_schema.Description),
 
@@ -121,6 +125,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     Code = template.Render()
                 };
             }
+        }
+
+        private PropertyModel GetDiscriminatorProperty(JsonSchema4 schema)
+        {
+            var property = schema.ActualSchema.AllProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
+            if (property.Value != null)
+                return new PropertyModel(property.Value, string.Empty, _resolver, Settings);
+
+            foreach (var baseSchema in schema.InheritedSchemas)
+            {
+                var propertyModel = GetDiscriminatorProperty(baseSchema);
+                if (propertyModel != null)
+                    return propertyModel;
+            }
+
+            return null; 
         }
     }
 }

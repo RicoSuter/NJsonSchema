@@ -12,7 +12,6 @@
 <#if(Model.HasModuleName){#>
 module <#=Model.ModuleName#> {
 <#}#>
-
 <#=Model.Types#>
 
 <#=Model.ExtensionCodeAfter#>

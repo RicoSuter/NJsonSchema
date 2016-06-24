@@ -161,7 +161,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = JsonSchema4.FromType<Teacher>();
-            var generator = new TypeScriptGenerator(schema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
 
             //// Act
             var output = generator.GenerateFile();
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 Type = JsonObjectType.String
             };
 
-            var generator = new TypeScriptGenerator(schema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
 
             //// Act
             var output = generator.GenerateFile();
@@ -209,7 +209,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             var schema = JsonSchema4.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             return generator;
         }
     }

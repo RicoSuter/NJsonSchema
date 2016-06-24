@@ -4,18 +4,32 @@
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {<#foreach(var property in Model.Properties){#> 
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
+<#}#>    <#if(property.IsDiscriminator){#>private <#}#><#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
 
 
     constructor(data?: any) {
 <#if(Model.HasInheritance){#>
         super(data);
 <#}#>
+<#if(Model.HasDiscriminator){#>
+        this.<#=Model.DiscriminatorProperty.PropertyName#> = "<#=Model.Class#>";
+<#}#>
         if (data !== undefined) {
 <#foreach (var property in Model.Properties){#>
             <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
 <#}#>
         }
+    }
+
+    static fromJS(data: any): <#=Model.Class#> {
+<#if(Model.HasDiscriminator){#>
+        if (/^[$A-Z_][0-9A-Z_$]*$/i.test(data["<#=Model.Discriminator#>"]))
+            return <any>eval("new " + data["<#=Model.Discriminator#>"] + "(data)");
+        else
+            throw new Error("Invalid discriminator '" + data["<#=Model.Discriminator#>"] + "'.");
+<#}else{#>
+        return new <#=Model.Class#>(data);
+<#}#>
     }
 
     toJS(data?: any) {
