@@ -234,10 +234,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CSharp\Templates\JsonInheritanceConverterTemplate.tt">
+    <None Include="CSharp\Templates\JsonInheritanceConverterTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>JsonInheritanceConverterTemplate.cs</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
