@@ -54,6 +54,14 @@ namespace NJsonSchema
         {
             return new JsonSchema4();
         }
+        
+        /// <summary>Creates a schema which matches any data.</summary>
+        /// <returns>The any schema.</returns>
+        public static TSchemaType CreateAnySchema<TSchemaType>()
+            where TSchemaType : JsonSchema4, new()
+        {
+            return new TSchemaType();
+        }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
         public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
@@ -154,6 +162,26 @@ namespace NJsonSchema
             get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
         }
 
+        /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
+        [JsonIgnore]
+        public string BaseDiscriminator
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Discriminator))
+                    return Discriminator;
+
+                foreach (var inheritedSchema in InheritedSchemas)
+                {
+                    var baseDiscriminator = inheritedSchema.ActualSchema.BaseDiscriminator;
+                    if (!string.IsNullOrEmpty(baseDiscriminator))
+                        return baseDiscriminator;
+                }
+
+                return null; 
+            }
+        }
+
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
@@ -209,7 +237,7 @@ namespace NJsonSchema
                         // only $ref property is allowed when schema is a reference
                         // TODO: Fix all SchemaReference assignments so that this code is not needed 
                         Type = JsonObjectType.None;
-                        TypeNameRaw = null; 
+                        TypeNameRaw = null;
                     }
                 }
             }

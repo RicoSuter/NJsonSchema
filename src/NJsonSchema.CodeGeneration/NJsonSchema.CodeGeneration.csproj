@@ -82,6 +82,11 @@
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="CSharp\Models\EnumTemplateModel.cs" />
+    <Compile Include="CSharp\Templates\JsonInheritanceConverterTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>JsonInheritanceConverterTemplate.tt</DependentUpon>
+    </Compile>
     <Compile Include="IPropertyNameGenerator.cs" />
     <Compile Include="DefaultValueGenerator.cs" />
     <Compile Include="ITypeResolver.cs" />
@@ -227,6 +232,12 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>FileTemplate.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CSharp\Templates\JsonInheritanceConverterTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>JsonInheritanceConverterTemplate.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

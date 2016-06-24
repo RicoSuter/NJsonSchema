@@ -13,6 +13,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
+using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
@@ -138,7 +139,7 @@ namespace NJsonSchema.Generation
                 {
                     var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
                     if (jsonSchemaAttribute?.ArrayItem != null)
-                        schema.Item = Generate(jsonSchemaAttribute?.ArrayItem, rootSchema, null, schemaDefinitionAppender, schemaResolver);
+                        schema.Item = Generate(jsonSchemaAttribute.ArrayItem, rootSchema, null, schemaDefinitionAppender, schemaResolver);
                     else
                         schema.Item = JsonSchema4.CreateAnySchema();
                 }
@@ -172,7 +173,7 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return new TSchemaType(); // any schema
+                return JsonSchema4.CreateAnySchema<TSchemaType>(); 
 
             return null;
         }
@@ -264,6 +265,8 @@ namespace NJsonSchema.Generation
 
         private void GenerateInheritance(Type type, JsonSchema4 schema, JsonSchema4 rootSchema, ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaResolver schemaResolver)
         {
+            GenerateInheritanceDiscriminator(type, schema);
+
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object))
             {
@@ -275,6 +278,42 @@ namespace NJsonSchema.Generation
                     schema.AllOf.Add(baseSchema);
                 }
             }
+        }
+
+        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
+        {
+            if (!Settings.FlattenInheritanceHierarchy)
+            {
+                var discriminator = TryGetInheritanceDiscriminator(type.GetTypeInfo().GetCustomAttributes(false));
+                if (!string.IsNullOrEmpty(discriminator))
+                {
+                    if (schema.Properties.ContainsKey(discriminator))
+                        throw new InvalidOperationException("The JSON property '" + discriminator + "' is defined multiple times on type '" + type.FullName + "'.");
+
+                    schema.Discriminator = discriminator;
+                    schema.Properties[discriminator] = new JsonProperty
+                    {
+                        Type = JsonObjectType.String,
+                        IsRequired = true
+                    };
+                }
+            }
+        }
+
+        private string TryGetInheritanceDiscriminator(IEnumerable<Attribute> typeAttributes)
+        {
+            dynamic jsonConverterAttribute = typeAttributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            if (jsonConverterAttribute != null)
+            {
+                var converterType = (Type)jsonConverterAttribute.ConverterType;
+                if (converterType.Name == "JsonInheritanceConverter")
+                {
+                    if (jsonConverterAttribute.ConverterParameters != null && jsonConverterAttribute.ConverterParameters.Length > 0)
+                        return jsonConverterAttribute.ConverterParameters[0];
+                    return JsonInheritanceConverter.DefaultDiscriminatorName;
+                }
+            }
+            return null; 
         }
 
         /// <summary>Gets the properties of the given type or null to take all properties.</summary>

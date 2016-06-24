@@ -8,6 +8,7 @@
 
 using System;
 using System.Linq;
+using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -73,6 +74,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             return AddGenerator(schema, typeNameHint);
+        }
+
+        /// <summary>Generates all necessary classes.</summary>
+        /// <returns>The code.</returns>
+        public string GenerateClasses()
+        {
+            var classes = GenerateTypes(null);
+            if (classes.Contains("JsonInheritanceConverter"))
+                classes += "\n\n" + new JsonInheritanceConverterTemplate().TransformText();
+            return classes;
         }
 
         /// <summary>Adds a generator for the given schema if necessary.</summary>

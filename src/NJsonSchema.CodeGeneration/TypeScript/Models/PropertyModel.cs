@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _parentTypeName = parentTypeName;
             _settings = settings;
         }
-        
+
         public string InterfaceName => _property.Name.Contains("-") ? $"\"{_property.Name}\"" : _property.Name;
 
         public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
@@ -42,6 +42,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
+        public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
+
         public string DataConversionCode
         {
             get
@@ -56,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = GetGeneratedPropertyName(),
-                        Resolver = _resolver, 
+                        Resolver = _resolver,
                         Settings = _settings
                     });
                 }
