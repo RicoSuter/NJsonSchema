@@ -24,14 +24,14 @@
 <#}#>        }
     }
 
-    static fromJS(data: any): <#=Model.Class#> {
+    static fromJS(data: any): <#=Model.RealClass#> {
 <#if(Model.HasDiscriminator){#>
         if (/^[$A-Z_][0-9A-Z_$]*$/i.test(data["<#=Model.Discriminator#>"]))
             return <any>eval("new " + data["<#=Model.Discriminator#>"] + "(data)");
         else
             throw new Error("Invalid discriminator '" + data["<#=Model.Discriminator#>"] + "'.");
 <#}else{#>
-        return new <#=Model.Class#>(data);
+        return new <#=Model.RealClass#>(data);
 <#}#>
     }
 
