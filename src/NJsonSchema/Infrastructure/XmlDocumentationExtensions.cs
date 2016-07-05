@@ -186,7 +186,13 @@ namespace NJsonSchema.Infrastructure
                 case "Method":
                     prefixCode = 'M';
 
-                    var paramTypesList = string.Join(",", ((MethodBase)member).GetParameters().Select(x => x.ParameterType.FullName).ToArray());
+                    var paramTypesList = string.Join(",", ((MethodBase)member).GetParameters()
+                        .Select(x => Regex
+                            .Replace(x.ParameterType.FullName, "(`[0-9]+)|(, .*?PublicKeyToken=[0-9a-z]*)", string.Empty)
+                            .Replace("[[", "{")
+                            .Replace("]]", "}"))
+                        .ToArray());
+
                     if (!string.IsNullOrEmpty(paramTypesList))
                         memberName += "(" + paramTypesList + ")";
                     break;
