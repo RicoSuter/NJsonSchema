@@ -107,8 +107,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static JsonSchema4 FromFile(string filePath)
         {
-            var data = FullDotNetMethods.FileReadAllText(filePath);
-            var rootDirectory = FullDotNetMethods.PathGetDirectoryName(filePath);
+            var data = DynamicApis.FileReadAllText(filePath);
+            var rootDirectory = DynamicApis.PathGetDirectoryName(filePath);
             return FromJson(data, rootDirectory);
         }
 

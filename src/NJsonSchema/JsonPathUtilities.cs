@@ -68,19 +68,19 @@ namespace NJsonSchema
             }
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
             {
-                if (FullDotNetMethods.SupportsFullDotNetMethods)
-                    return JsonSchema4.FromJson(FullDotNetMethods.HttpGet(path));
+                if (DynamicApis.SupportsWebClientApis)
+                    return JsonSchema4.FromJson(DynamicApis.HttpGet(path));
                 else
                     throw new NotSupportedException("Could not resolve the path '" + path +
                         "' because JSON web references are not supported on this platform.");
             }
             else
             {
-                if (FullDotNetMethods.SupportsFullDotNetMethods)
+                if (DynamicApis.SupportsFileApis)
                 {
                     var schema = root as JsonSchema4;
                     if (schema != null && schema.RootDirectory != null)
-                        return JsonSchema4.FromJson(FullDotNetMethods.FileReadAllText(FullDotNetMethods.PathCombine(schema.RootDirectory, path)));
+                        return JsonSchema4.FromJson(DynamicApis.FileReadAllText(DynamicApis.PathCombine(schema.RootDirectory, path)));
                     else
                         throw new NotSupportedException("Could not resolve the path '" + path +
                             "' because no root path is available.");
