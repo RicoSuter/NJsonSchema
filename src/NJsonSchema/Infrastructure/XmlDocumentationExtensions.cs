@@ -19,9 +19,9 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private static readonly object _lock = new object();
+        private static readonly object Lock = new object();
 
-        private static readonly Dictionary<string, XDocument> _cache =
+        private static readonly Dictionary<string, XDocument> Cache =
             new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -37,13 +37,13 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlDocumentation(this MemberInfo member)
         {
-            if (FullDotNetMethods.SupportsFullDotNetMethods == false)
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                 return string.Empty;
 
-            lock (_lock)
+            lock (Lock)
             {
                 var assemblyName = member.Module.Assembly.GetName();
-                if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                     return string.Empty;
 
                 return GetXmlDocumentation(member, GetXmlDocumentationPath(member.Module.Assembly));
@@ -55,13 +55,13 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "returns" or "param" tag.</returns>
         public static string GetXmlDocumentation(this ParameterInfo parameter)
         {
-            if (FullDotNetMethods.SupportsFullDotNetMethods == false)
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                 return string.Empty;
 
-            lock (_lock)
+            lock (Lock)
             {
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                     return string.Empty;
 
                 return GetXmlDocumentation(parameter, GetXmlDocumentationPath(parameter.Member.Module.Assembly));
@@ -85,25 +85,25 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
+                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                     return string.Empty;
 
-                lock (_lock)
+                lock (Lock)
                 {
                     var assemblyName = member.Module.Assembly.GetName();
-                    if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
+                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                         return string.Empty;
 
-                    if (!FullDotNetMethods.FileExists(pathToXmlFile))
+                    if (!DynamicApis.FileExists(pathToXmlFile))
                     {
-                        _cache[assemblyName.FullName] = null;
+                        Cache[assemblyName.FullName] = null;
                         return string.Empty;
                     }
 
-                    if (!_cache.ContainsKey(assemblyName.FullName))
-                        _cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile);
+                    if (!Cache.ContainsKey(assemblyName.FullName))
+                        Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile);
 
-                    return GetXmlDocumentation(member, _cache[assemblyName.FullName]);
+                    return GetXmlDocumentation(member, Cache[assemblyName.FullName]);
                 }
             }
             catch
@@ -120,25 +120,25 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || FullDotNetMethods.SupportsFullDotNetMethods == false)
+                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                     return string.Empty;
 
-                lock (_lock)
+                lock (Lock)
                 {
                     var assemblyName = parameter.Member.Module.Assembly.GetName();
-                    if (_cache.ContainsKey(assemblyName.FullName) && _cache[assemblyName.FullName] == null)
+                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                         return string.Empty;
 
-                    if (!FullDotNetMethods.FileExists(pathToXmlFile))
+                    if (!DynamicApis.FileExists(pathToXmlFile))
                     {
-                        _cache[assemblyName.FullName] = null;
+                        Cache[assemblyName.FullName] = null;
                         return string.Empty;
                     }
 
-                    if (!_cache.ContainsKey(assemblyName.FullName))
-                        _cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile);
+                    if (!Cache.ContainsKey(assemblyName.FullName))
+                        Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile);
 
-                    return GetXmlDocumentation(parameter, _cache[assemblyName.FullName]);
+                    return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
                 }
             }
             catch
@@ -150,7 +150,7 @@ namespace NJsonSchema.Infrastructure
         private static string GetXmlDocumentation(this MemberInfo member, XDocument xml)
         {
             var name = GetMemberElementName(member);
-            var documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/summary)", name)).ToString().Trim();
+            var documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/summary)", name)).ToString().Trim();
             return RemoveLineBreakWhiteSpaces(documentation);
         }
 
@@ -160,9 +160,9 @@ namespace NJsonSchema.Infrastructure
 
             var name = GetMemberElementName(parameter.Member);
             if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
-                documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/returns)", name)).ToString().Trim();
+                documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/returns)", name)).ToString().Trim();
             else
-                documentation = FullDotNetMethods.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
+                documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
 
             return RemoveLineBreakWhiteSpaces(documentation);
         }
@@ -231,16 +231,16 @@ namespace NJsonSchema.Infrastructure
                 if (string.IsNullOrEmpty(assemblyName.Name))
                     return null;
 
-                var path = FullDotNetMethods.PathCombine(FullDotNetMethods.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
-                if (FullDotNetMethods.FileExists(path))
+                var path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
+                if (DynamicApis.FileExists(path))
                     return path;
 
                 dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-                path = FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
-                if (FullDotNetMethods.FileExists(path))
+                path = DynamicApis.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
+                if (DynamicApis.FileExists(path))
                     return path;
 
-                return FullDotNetMethods.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                return DynamicApis.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
             }
             catch
             {
