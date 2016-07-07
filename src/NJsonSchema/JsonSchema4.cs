@@ -608,7 +608,7 @@ namespace NJsonSchema
         public ICollection<ValidationError> Validate(string jsonData)
         {
             var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None };
-            var jsonObject = JsonConvert.DeserializeObject<JObject>(jsonData, settings);
+            var jsonObject = JsonConvert.DeserializeObject<JToken>(jsonData, settings);
             return Validate(jsonObject);
         }
 
