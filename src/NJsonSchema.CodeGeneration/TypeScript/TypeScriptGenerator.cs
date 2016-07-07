@@ -59,7 +59,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var template = new FileTemplate() as ITemplate;
             template.Initialize(new FileTemplateModel
             {
-                Toolchain = JsonSchema4.ToolchainVersion,
                 Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
 
                 HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
