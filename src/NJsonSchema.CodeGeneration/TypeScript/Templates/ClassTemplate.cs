@@ -94,7 +94,7 @@ if(property.IsDiscriminator){
             
             #line default
             #line hidden
-            this.Write("private ");
+            this.Write("protected ");
             
             #line 7 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 }
