@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
                     "oolchain v");
             
             #line 6 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\FileTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Toolchain));
+            this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
             #line hidden
