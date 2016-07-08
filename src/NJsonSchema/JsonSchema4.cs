@@ -168,10 +168,9 @@ namespace NJsonSchema
         public bool Inherits(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
-            return schema.InheritedSchemas.Any(s => s.ActualSchema == ActualSchema) ||
-                   schema.InheritedSchemas.Any(s => s.Inherits(schema));
+            return InheritedSchemas.Any(s => s.ActualSchema == schema || s.Inherits(schema));
         }
-
+        
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
         public string BaseDiscriminator

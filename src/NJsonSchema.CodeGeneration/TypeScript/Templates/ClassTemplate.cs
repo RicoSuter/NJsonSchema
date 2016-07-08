@@ -219,11 +219,11 @@ foreach (var property in Model.Properties){
             
             #line 24 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 if(Model.HasDiscriminator){
-    foreach (var derivedClass in Model.DerivedClassNames){
+    foreach (var derivedClass in Model.DerivedClassNamesWithPropertyCheck){
             
             #line default
             #line hidden
-            this.Write("    static is");
+            this.Write("    is");
             
             #line 26 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
@@ -237,31 +237,72 @@ if(Model.HasDiscriminator){
             
             #line default
             #line hidden
-            this.Write(" { return this instanceof ");
+            this.Write(" { return this.");
+            
+            #line 26 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DiscriminatorProperty.PropertyName));
+            
+            #line default
+            #line hidden
+            this.Write(" === \"");
             
             #line 26 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
             
             #line default
             #line hidden
-            this.Write("; }\r\n");
+            this.Write("\"; }\r\n");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
   }
-  }
+            
+            #line default
+            #line hidden
+            this.Write("    is");
+            
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            
+            #line default
+            #line hidden
+            this.Write("(): this is ");
+            
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            
+            #line default
+            #line hidden
+            this.Write(" { return this.");
+            
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DiscriminatorProperty.PropertyName));
+            
+            #line default
+            #line hidden
+            this.Write(" === \"");
+            
+            #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            
+            #line default
+            #line hidden
+            this.Write("\"; }\r\n");
+            
+            #line 29 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+}
             
             #line default
             #line hidden
             this.Write("\r\n    static fromJS(data: any): ");
             
-            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
             
             #line default
             #line hidden
             this.Write(" {\r\n");
             
-            #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 if(Model.HasDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){
             
@@ -269,63 +310,56 @@ if(Model.HasDiscriminator){
             #line hidden
             this.Write("        if (data[\"");
             
-            #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 34 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Discriminator));
             
             #line default
             #line hidden
             this.Write("\"] === \"");
             
-            #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 34 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
             
             #line default
             #line hidden
             this.Write("\")\r\n            return new ");
             
-            #line 34 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 35 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
             
             #line default
             #line hidden
             this.Write("(data);\r\n");
             
-            #line 35 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 36 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
   }
-            
-            #line default
-            #line hidden
-            this.Write("        throw new Error(\"Invalid discriminator \'\" + data[\"");
-            
-            #line 36 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Discriminator));
-            
-            #line default
-            #line hidden
-            this.Write("\"] + \"\' for type ");
-            
-            #line 36 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
-            
-            #line default
-            #line hidden
-            this.Write(".\");\r\n");
-            
-            #line 37 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-}else{
             
             #line default
             #line hidden
             this.Write("        return new ");
             
-            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 37 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
             
             #line default
             #line hidden
             this.Write("(data);\r\n");
             
+            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("        return new ");
+            
             #line 39 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            
+            #line default
+            #line hidden
+            this.Write("(data);\r\n");
+            
+            #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 }
             
             #line default
@@ -333,28 +367,28 @@ if(Model.HasDiscriminator){
             this.Write("    }\r\n\r\n    toJS(data?: any) {\r\n        data = data === undefined ? {} : data;\r\n" +
                     "");
             
-            #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 foreach (var property in Model.Properties){
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 46 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataBackConversionCode, 2)));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 46 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 47 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 } if(Model.HasInheritance){
             
             #line default
             #line hidden
             this.Write("        super.toJS(data);\r\n");
             
-            #line 48 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 49 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
 }
             
             #line default
@@ -363,7 +397,7 @@ foreach (var property in Model.Properties){
                     "s.toJS());\r\n    }\r\n\r\n    clone() {\r\n        var json = this.toJSON();\r\n        r" +
                     "eturn new ");
             
-            #line 58 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
+            #line 59 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
             
             #line default
