@@ -54,7 +54,7 @@ namespace NJsonSchema
         {
             return new JsonSchema4();
         }
-        
+
         /// <summary>Creates a schema which matches any data.</summary>
         /// <returns>The any schema.</returns>
         public static TSchemaType CreateAnySchema<TSchemaType>()
@@ -154,12 +154,22 @@ namespace NJsonSchema
             };
         }
 
-        /// <summary>Gets the list of inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
+        /// <summary>Gets the list of parent/inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
         public IReadOnlyCollection<JsonSchema4> InheritedSchemas
         {
             get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
+        }
+
+        /// <summary>Determines whether the given schema is the parent schema of this schema (i.e. super/base class).</summary>
+        /// <param name="schema">The possible subtype schema.</param>
+        /// <returns>true or false</returns>
+        public bool Inherits(JsonSchema4 schema)
+        {
+            schema = schema.ActualSchema;
+            return schema.InheritedSchemas.Any(s => s.ActualSchema == ActualSchema) ||
+                   schema.InheritedSchemas.Any(s => s.Inherits(schema));
         }
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
@@ -178,7 +188,7 @@ namespace NJsonSchema
                         return baseDiscriminator;
                 }
 
-                return null; 
+                return null;
             }
         }
 

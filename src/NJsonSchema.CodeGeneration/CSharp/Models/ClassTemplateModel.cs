@@ -25,7 +25,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
             Class = typeName;
             Properties = properties;
+            DerivedClassNames = resolver.TypeNames.Where(p => p.Key.Inherits(schema)).Select(p => p.Value);
         }
+
+        public IEnumerable<string> DerivedClassNames { get; set; }
 
         public string Class { get; set; }
 
