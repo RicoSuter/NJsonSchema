@@ -9,6 +9,19 @@ namespace NJsonSchema.Tests.Validation
     public class ArrayValidationTests
     {
         [TestMethod]
+        public void When_json_is_array_then_validate_should_not_throw_an_exception()
+        {
+            //// Act
+            var svc = JsonSchema4.FromJson(@"{ ""type"": ""array"", ""items"": { ""type"":""string"" } }");
+
+            //// Assert
+            Assert.AreEqual(0, svc.Validate(JToken.Parse("[]")).Count);
+            Assert.AreEqual(0, svc.Validate(JToken.Parse(@"[""test""]")).Count);
+            Assert.AreEqual(0, svc.Validate("[]").Count);
+            Assert.AreEqual(0, svc.Validate(@"[""test""]").Count);
+        }
+
+        [TestMethod]
         public void When_type_is_array_and_items_and_item_is_not_defined_then_any_items_are_allowed()
         {
             //// Arrange
