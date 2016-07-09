@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .ToList();
 
             RenamePropertyWithSameNameAsClass(typeName, properties);
-
+            
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties);
             var template = new ClassTemplate() as ITemplate;
             template.Initialize(model);

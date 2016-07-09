@@ -59,7 +59,7 @@ namespace NJsonSchema
             }
             else if (path.StartsWith("#/"))
             {
-                var allSegments = path.Split('/').Skip(1).ToList(); 
+                var allSegments = path.Split('/').Skip(1).ToList();
                 var schema = GetObjectFromJsonPath(root, allSegments, allSegments, new HashSet<object>());
                 if (schema == null)
                     throw new InvalidOperationException("Could not resolve the path '" + path + "'.");
@@ -175,7 +175,7 @@ namespace NJsonSchema
                 }
 
                 return jsonSchema;
-            } 
+            }
 
             checkedObjects.Add(obj);
             var firstSegment = segments[0];

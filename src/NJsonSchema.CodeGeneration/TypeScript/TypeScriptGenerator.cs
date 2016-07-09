@@ -29,20 +29,25 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="settings">The generator settings.</param>
         /// <param name="schema">The schema.</param>
         public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings)
-            : this(schema, settings, new TypeScriptTypeResolver(settings))
+            : this(schema, settings, new TypeScriptTypeResolver(settings, schema), null)
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator" /> class.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver)
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
+        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject)
         {
             _schema = schema;
             _resolver = resolver;
+            RootObject = rootObject ?? schema;
             Settings = settings;
         }
+
+        /// <summary>Gets or sets the root object.</summary>
+        public object RootObject { get; set; }
 
         /// <summary>Gets the generator settings.</summary>
         public TypeScriptGeneratorSettings Settings { get; set; }
@@ -99,11 +104,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var hasInheritance = _schema.InheritedSchemas.Count >= 1;
                 var baseClass = hasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
 
+                var derivedClassNames = _schema.GetDerivedSchemas(RootObject, _resolver)
+                    .Where(s => s.Value.Inherits(_schema))
+                    .Select(s => s.Key)
+                    .ToList();
+
                 var template = Settings.CreateTemplate(typeName);
                 template.Initialize(new // TODO: Create model class
                 {
                     Class = Settings.ExtendedClasses?.Contains(typeName) == true ? typeName + "Base" : typeName,
                     RealClass = typeName,
+                    DerivedClassNames = derivedClassNames,
+                    DerivedClassNamesWithPropertyCheck = derivedClassNames.Where(n => properties.All(p => p.PropertyName != n)),
 
                     HasDiscriminator = !string.IsNullOrEmpty(_schema.BaseDiscriminator),
                     Discriminator = _schema.BaseDiscriminator,
@@ -139,7 +151,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return propertyModel;
             }
 
-            return null; 
+            return null;
         }
     }
 }

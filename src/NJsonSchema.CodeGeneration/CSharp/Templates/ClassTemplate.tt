@@ -3,7 +3,8 @@
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#><#if(Model.HasDiscriminator){#>[JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
-<#}#>public partial class <#=Model.Class#> <#=Model.Inheritance#>
+<#}#>[JsonObject(MemberSerialization.OptIn)]
+public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
     private <#=property.Type#> _<#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
 
