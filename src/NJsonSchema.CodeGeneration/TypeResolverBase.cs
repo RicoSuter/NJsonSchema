@@ -113,9 +113,9 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        protected virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        public virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
-            var typeName = schema.GetTypeName(_typeNameGenerator); 
+            var typeName = schema.GetTypeName(_typeNameGenerator);
 
             if (string.IsNullOrEmpty(typeName))
             {
@@ -126,13 +126,6 @@ namespace NJsonSchema.CodeGeneration
             }
 
             return typeName;
-        }
-
-        /// <summary>Generates a unique type name.</summary>
-        /// <returns>The type name.</returns>
-        public string GenerateTypeName()
-        {
-            return GenerateTypeName(string.Empty);
         }
 
         /// <summary>Generates a unique type name with the given hint.</summary>

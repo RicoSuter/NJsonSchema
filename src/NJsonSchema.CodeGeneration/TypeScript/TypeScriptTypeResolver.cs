@@ -14,20 +14,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
     public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptGenerator>
     {
-        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver"/> class.</summary>
-        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings) : base(settings.TypeNameGenerator)
+        private readonly object _rootObject;
+
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
+        /// <param name="settings">The settings.</param>
+        /// <param name="rootObject">The root object to search for JSON Schemas.</param>
+        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings, object rootObject)
+            : this(settings, rootObject, null)
         {
-            Settings = settings;
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
-        /// <param name="knownSchemes">The known schemes.</param>
         /// <param name="settings">The generator settings.</param>
-        public TypeScriptTypeResolver(JsonSchema4[] knownSchemes, TypeScriptGeneratorSettings settings)
-            : this(settings)
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="knownSchemes">The known schemes.</param>
+        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings, object rootObject, JsonSchema4[] knownSchemes)
+            : base(settings.TypeNameGenerator)
         {
-            foreach (var type in knownSchemes)
-                AddOrReplaceTypeGenerator(type.GetTypeName(Settings.TypeNameGenerator), new TypeScriptGenerator(type.ActualSchema, Settings, this));
+            _rootObject = rootObject;
+            Settings = settings;
+
+            if (knownSchemes != null)
+            {
+                // TODO: Only relies on type name raw => find better way...
+                foreach (var type in knownSchemes)
+                    AddOrReplaceTypeGenerator(type.GetTypeName(settings.TypeNameGenerator), new TypeScriptGenerator(type.ActualSchema, settings, this, rootObject));
+            }
         }
 
         /// <summary>Gets the generator settings.</summary>
@@ -79,20 +91,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             return AddGenerator(schema, typeNameHint);
         }
-        
+
         /// <summary>Creates a type generator.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The generator.</returns>
         protected override TypeScriptGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            return new TypeScriptGenerator(schema, Settings, this);
+            return new TypeScriptGenerator(schema, Settings, this, _rootObject);
         }
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        protected override string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        public override string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
             var typeName = base.GetOrGenerateTypeName(schema, typeNameHint);
 

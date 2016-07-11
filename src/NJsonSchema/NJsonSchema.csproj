@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonExceptionConverter.cs" />
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
     <Compile Include="Annotations\MultipleOfAttribute.cs" />

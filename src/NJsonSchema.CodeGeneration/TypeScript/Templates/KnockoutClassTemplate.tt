@@ -25,11 +25,12 @@
     }
 
     static fromJS(data: any): <#=Model.RealClass#> {
-<#if(Model.HasDiscriminator){#>
-        if (/^[$A-Z_][0-9A-Z_$]*$/i.test(data["<#=Model.Discriminator#>"]))
-            return <any>eval("new " + data["<#=Model.Discriminator#>"] + "(data)");
-        else
-            throw new Error("Invalid discriminator '" + data["<#=Model.Discriminator#>"] + "'.");
+<#if(Model.HasDiscriminator){
+    foreach (var derivedClass in Model.DerivedClassNames){#>
+        if (data["<#=Model.Discriminator#>"] === "<#=derivedClass#>")
+            return new <#=derivedClass#>(data);
+<#  }#>
+        return new <#=Model.RealClass#>(data);
 <#}else{#>
         return new <#=Model.RealClass#>(data);
 <#}#>

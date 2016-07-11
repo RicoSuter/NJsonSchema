@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Annotations;
 
@@ -73,11 +72,11 @@ namespace NJsonSchema.Tests.Serialization
         public void When_extension_data_attribute_is_used_on_class_then_extension_data_property_is_set()
         {
             //// Arrange
-            
+
 
             //// Act
             var schema = JsonSchema4.FromType<MyTest>();
-            
+
             //// Assert
             Assert.AreEqual(123, schema.ExtensionData["MyClass"]);
         }
