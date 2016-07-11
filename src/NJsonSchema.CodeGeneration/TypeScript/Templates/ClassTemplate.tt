@@ -21,13 +21,6 @@
         }
     }
 
-<#if(Model.HasDiscriminator){
-    foreach (var derivedClass in Model.DerivedClassNamesWithPropertyCheck){#>
-    is<#=derivedClass#>(): this is <#=derivedClass#> { return this.<#=Model.DiscriminatorProperty.PropertyName#> === "<#=derivedClass#>"; }
-<#  }#>
-    is<#=Model.RealClass#>(): this is <#=Model.RealClass#> { return this.<#=Model.DiscriminatorProperty.PropertyName#> === "<#=Model.RealClass#>"; }
-<#}#>
-
     static fromJS(data: any): <#=Model.RealClass#> {
 <#if(Model.HasDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){#>
