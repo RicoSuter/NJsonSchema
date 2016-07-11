@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,7 +37,8 @@ namespace NJsonSchema
                 jObject.Add(resolver.GetResolvedPropertyName("Message"), exception.Message);
                 jObject.Add(resolver.GetResolvedPropertyName("StackTrace"), exception.StackTrace);
                 jObject.Add(resolver.GetResolvedPropertyName("Source"), exception.Source);
-                jObject.Add(resolver.GetResolvedPropertyName("InnerException"), exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null);
+                jObject.Add(resolver.GetResolvedPropertyName("InnerException"), 
+                    exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null);
 
                 foreach (var property in value.GetType().GetRuntimeProperties())
                 {
@@ -73,8 +73,14 @@ namespace NJsonSchema
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var jObject = serializer.Deserialize<JObject>(reader);
+            if (jObject == null)
+                return null;
 
-            dynamic resolver = serializer.ContractResolver;
+            var originalResolver = serializer.ContractResolver;
+            serializer.ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType());
+            typeof(DefaultContractResolver).GetTypeInfo().GetDeclaredField("_sharedCache").SetValue(serializer.ContractResolver, false);
+
+            dynamic resolver = serializer.ContractResolver = serializer.ContractResolver;
             resolver.IgnoreSerializableAttribute = true;
             resolver.IgnoreSerializableInterface = true;
 
@@ -87,11 +93,25 @@ namespace NJsonSchema
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 if (attribute != null)
                 {
-                    var jValue = jObject.GetValue(attribute.PropertyName);
-                    property.SetValue(value, jValue?.ToObject(objectType));
+                    var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(attribute.PropertyName));
+                    property.SetValue(value, jValue?.ToObject(property.PropertyType));
                 }
             }
+
+            SetExceptionFieldValue(jObject, "Message", value, "_message", resolver, serializer);
+            SetExceptionFieldValue(jObject, "StackTrace", value, "_stackTraceString", resolver, serializer);
+            SetExceptionFieldValue(jObject, "Source", value, "_source", resolver, serializer);
+            SetExceptionFieldValue(jObject, "InnerException", value, "_innerException", resolver, serializer);
+
+            serializer.ContractResolver = originalResolver;
             return value;
+        }
+
+        private void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, DefaultContractResolver resolver, JsonSerializer serializer)
+        {
+            var field = typeof(Exception).GetTypeInfo().GetDeclaredField(fieldName);
+            var fieldValue = jObject[resolver.GetResolvedPropertyName(propertyName)].ToObject(field.FieldType, serializer);
+            field.SetValue(value, fieldValue);
         }
     }
 }
