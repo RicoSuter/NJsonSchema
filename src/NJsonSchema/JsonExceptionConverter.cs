@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -72,19 +73,24 @@ namespace NJsonSchema
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var jObject = serializer.Deserialize<JObject>(reader);
-            var contract = serializer.ContractResolver.ResolveContract(objectType);
 
-            contract.Converter = null;
-            var value = serializer.Deserialize(jObject.CreateReader(), objectType);
-            contract.Converter = this;
+            dynamic resolver = serializer.ContractResolver;
+            resolver.IgnoreSerializableAttribute = true;
+            resolver.IgnoreSerializableInterface = true;
+
+            serializer.Converters.Remove(this);
+            var value = jObject.ToObject(objectType, serializer);
+            serializer.Converters.Add(this);
 
             foreach (var property in objectType.GetRuntimeProperties())
             {
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 if (attribute != null)
-                    property.SetValue(value, jObject.GetValue(attribute.PropertyName).ToObject(objectType));
+                {
+                    var jValue = jObject.GetValue(attribute.PropertyName);
+                    property.SetValue(value, jValue?.ToObject(objectType));
+                }
             }
-
             return value;
         }
     }
