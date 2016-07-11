@@ -115,17 +115,18 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
-            var typeName = schema.GetTypeName(_typeNameGenerator);
+            schema = schema.ActualSchema;
 
-            if (string.IsNullOrEmpty(typeName))
+            if (!_generatedTypeNames.ContainsKey(schema))
             {
-                if (!_generatedTypeNames.ContainsKey(schema))
+                var typeName = schema.GetTypeName(_typeNameGenerator);
+                if (!string.IsNullOrEmpty(typeName))
+                    _generatedTypeNames[schema] = typeName;
+                else
                     _generatedTypeNames[schema] = GenerateTypeName(typeNameHint);
-
-                return _generatedTypeNames[schema];
             }
 
-            return typeName;
+            return _generatedTypeNames[schema];
         }
 
         /// <summary>Generates a unique type name with the given hint.</summary>
@@ -135,13 +136,13 @@ namespace NJsonSchema.CodeGeneration
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {
-                if (!HasTypeGenerator(typeNameHint))
+                if (!_generatedTypeNames.ContainsValue(typeNameHint))
                     return typeNameHint;
 
                 do
                 {
                     _anonymousTypeCount++;
-                } while (HasTypeGenerator(typeNameHint + _anonymousTypeCount));
+                } while (_generatedTypeNames.ContainsValue(typeNameHint + _anonymousTypeCount));
 
                 return typeNameHint + _anonymousTypeCount;
             }
