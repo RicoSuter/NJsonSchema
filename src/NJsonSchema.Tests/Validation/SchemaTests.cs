@@ -328,7 +328,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.IsNotNull(error);
-            Assert.AreEqual("#", error.Path);
+            Assert.AreEqual("#/Key", error.Path);
         }
     }
 }
