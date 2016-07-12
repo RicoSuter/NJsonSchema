@@ -25,8 +25,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count());
-            Assert.AreEqual(ValidationErrorKind.NoAdditionalPropertiesAllowed, errors.First().Kind);
+            Assert.AreEqual(2, errors.Count());
+            foreach (var validationError in errors)
+            {
+                Assert.AreEqual(ValidationErrorKind.NoAdditionalPropertiesAllowed, validationError.Kind);
+            }
         }
 
         [TestMethod]

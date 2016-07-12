@@ -369,7 +369,10 @@ namespace NJsonSchema.Validation
             else
             {
                 if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
-                    errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, propertyName, propertyPath));
+                {
+                    foreach (var property in additionalProperties)
+                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, property.Path));
+                }
             }
         }
 
