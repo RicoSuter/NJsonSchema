@@ -64,7 +64,8 @@ namespace NJsonSchema.Tests.Serialization
         [JsonSchemaExtensionData("MyClass", 123)]
         public class MyTest
         {
-            [JsonSchemaExtensionData("MyProperty", 123)]
+            [JsonSchemaExtensionData("Foo", 2)]
+            [JsonSchemaExtensionData("Bar", 3)]
             public string Property { get; set; }
         }
 
@@ -91,7 +92,8 @@ namespace NJsonSchema.Tests.Serialization
             var schema = JsonSchema4.FromType<MyTest>();
 
             //// Assert
-            Assert.AreEqual(123, schema.Properties["Property"].ExtensionData["MyProperty"]);
+            Assert.AreEqual(2, schema.Properties["Property"].ExtensionData["Foo"]);
+            Assert.AreEqual(3, schema.Properties["Property"].ExtensionData["Bar"]);
         }
     }
 }
