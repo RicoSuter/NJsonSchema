@@ -60,9 +60,9 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n    ");
+            this.Write("\r\n{\r\n    #pragma warning disable // Disable all warnings\r\n\r\n    ");
             
-            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
+            #line 29 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(Model.Classes, 1)));
             
             #line default
