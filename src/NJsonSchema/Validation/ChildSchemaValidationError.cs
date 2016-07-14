@@ -32,7 +32,7 @@ namespace NJsonSchema.Validation
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            var output = string.Format("{0} error in {1}:\n", Kind, Path);
+            var output = string.Format("{0}: {1}\n", Kind, Path);
             foreach (var error in Errors)
             {
                 output += "{\n";
