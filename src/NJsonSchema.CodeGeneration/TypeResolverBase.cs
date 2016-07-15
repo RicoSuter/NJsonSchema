@@ -136,6 +136,8 @@ namespace NJsonSchema.CodeGeneration
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {
+                typeNameHint.Split('.').Last();
+
                 if (!_generatedTypeNames.ContainsValue(typeNameHint))
                     return typeNameHint;
 
