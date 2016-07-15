@@ -191,8 +191,7 @@ namespace NJsonSchema.Validation
                         if (_schema.Format == JsonFormatStrings.IpV4)
                         {
                             var isIpV4 = Regex.IsMatch(value,
-                                @"^(0[0-7]{10,11}|0(x|X)[0-9a-fA-F]{8}|(\b4\d{8}[0-5]\b|\b[1-3]?\d{8}\d?\b)|((2[0-5][0-5]|1\d{2}|[1-9]\d?)" +
-                                @"|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))(\.((2[0-5][0-5]|1\d{2}|\d\d?)|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))){3})$", RegexOptions.IgnoreCase);
+                                @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", RegexOptions.IgnoreCase);
 
                             if (!isIpV4)
                                 errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath));
