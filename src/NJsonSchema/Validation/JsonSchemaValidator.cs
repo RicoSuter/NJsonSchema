@@ -191,8 +191,7 @@ namespace NJsonSchema.Validation
                         if (_schema.Format == JsonFormatStrings.IpV4)
                         {
                             var isIpV4 = Regex.IsMatch(value,
-                                @"^(0[0-7]{10,11}|0(x|X)[0-9a-fA-F]{8}|(\b4\d{8}[0-5]\b|\b[1-3]?\d{8}\d?\b)|((2[0-5][0-5]|1\d{2}|[1-9]\d?)" +
-                                @"|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))(\.((2[0-5][0-5]|1\d{2}|\d\d?)|(0(x|X)[0-9a-fA-F]{2})|(0[0-7]{3}))){3})$", RegexOptions.IgnoreCase);
+                                @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", RegexOptions.IgnoreCase);
 
                             if (!isIpV4)
                                 errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath));
@@ -296,7 +295,7 @@ namespace NJsonSchema.Validation
             var obj = token as JObject;
             foreach (var propertyInfo in _schema.Properties)
             {
-                var newPropertyPath = propertyName != null ? propertyName + "." + propertyInfo.Key : propertyInfo.Key;
+                var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyInfo.Key : propertyInfo.Key;
 
                 var property = obj?.Property(propertyInfo.Key);
                 if (property != null)
@@ -371,7 +370,10 @@ namespace NJsonSchema.Validation
                 if (!_schema.AllowAdditionalProperties && additionalProperties.Any())
                 {
                     foreach (var property in additionalProperties)
-                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, property.Path));
+                    {
+                        var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + property.Name : property.Name;
+                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, newPropertyPath));
+                    }
                 }
             }
         }
@@ -396,7 +398,7 @@ namespace NJsonSchema.Validation
                     var item = array[index];
 
                     var propertyIndex = string.Format("[{0}]", index);
-                    var itemPath = propertyName != null ? propertyName + "." + propertyIndex : propertyIndex;
+                    var itemPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + propertyIndex : propertyIndex;
 
                     if (_schema.Item != null && itemValidator != null)
                     {
@@ -453,7 +455,7 @@ namespace NJsonSchema.Validation
 
         private ChildSchemaValidationError TryCreateChildSchemaError(JsonSchemaValidator validator, JsonSchema4 schema, JToken token, ValidationErrorKind errorKind, string property, string path)
         {
-            var errors = validator.Validate(token, null, null);
+            var errors = validator.Validate(token, null, path);
             if (errors.Count == 0)
                 return null;
 

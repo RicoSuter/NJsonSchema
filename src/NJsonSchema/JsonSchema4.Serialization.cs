@@ -40,9 +40,9 @@ namespace NJsonSchema
         public string GetTypeName(ITypeNameGenerator typeNameGenerator)
         {
             if (typeNameGenerator != null)
-                return typeNameGenerator.Generate(this);
+                return typeNameGenerator.Generate(this)?.Split('.').Last();
 
-            return TypeNameRaw;
+            return TypeNameRaw?.Split('.').Last();
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
