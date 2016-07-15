@@ -627,7 +627,7 @@ namespace NJsonSchema
         public ICollection<ValidationError> Validate(JToken token)
         {
             var validator = new JsonSchemaValidator(ActualSchema);
-            return validator.Validate(token, null, null);
+            return validator.Validate(token, null, token.Path);
         }
 
         /// <summary>Finds the root parent of this schema. </summary>
