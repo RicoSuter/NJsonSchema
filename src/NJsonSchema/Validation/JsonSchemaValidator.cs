@@ -399,7 +399,7 @@ namespace NJsonSchema.Validation
                     var item = array[index];
 
                     var propertyIndex = string.Format("[{0}]", index);
-                    var itemPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyIndex : propertyIndex;
+                    var itemPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + propertyIndex : propertyIndex;
 
                     if (_schema.Item != null && itemValidator != null)
                     {
