@@ -25,6 +25,24 @@ namespace NJsonSchema.Validation
         }
         
         /// <summary>Gets the errors for each validated subschema. </summary>
-        public IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; } 
+        public IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        /// <filterpriority>2</filterpriority>
+        public override string ToString()
+        {
+            var output = string.Format("{0}: {1}\n", Kind, Path);
+            foreach (var error in Errors)
+            {
+                output += "{\n";
+                foreach (var validationError in error.Value)
+                {
+                    output += string.Format("  {0}\n", validationError.ToString().Replace("\n", "\n  "));
+                }
+                output += "}\n";
+            }
+            return output;
+        }        
     }
 }
