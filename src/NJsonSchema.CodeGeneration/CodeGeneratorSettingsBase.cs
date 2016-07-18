@@ -11,6 +11,12 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>The code generator settings base.</summary>
     public class CodeGeneratorSettingsBase
     {
+        /// <summary>Initializes a new instance of the <see cref="CodeGeneratorSettingsBase"/> class.</summary>
+        public CodeGeneratorSettingsBase()
+        {
+            GenerateDefaultValues = true;
+        }
+
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; } = NullHandling.JsonSchema;
 
@@ -19,5 +25,8 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
+        public bool GenerateDefaultValues { get; set; }
     }
 }

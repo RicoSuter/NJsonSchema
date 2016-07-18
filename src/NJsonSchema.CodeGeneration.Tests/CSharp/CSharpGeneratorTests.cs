@@ -241,19 +241,48 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [TestMethod]
         public void When_property_has_boolean_default_it_is_reflected_in_the_poco()
         {
-            var schema = @"{'properties': {
+            var data = @"{'properties': {
                                 'boolWithDefault': {
                                     'type': 'boolean',
                                     'default': false
                                  }
                              }}";
 
-            var s = JsonSchema4.FromJson(schema);
-            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
-            var gen = new CSharpGenerator(s, settings);
+            var schema = JsonSchema4.FromJson(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns",
+                GenerateDefaultValues = true
+            };
+            var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile();
 
-            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false"));
+            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
+        }
+
+        [TestMethod]
+        public void When_property_has_boolean_default_and_default_value_generation_is_disabled_then_default_value_is_not_generated()
+        {
+            var data = @"{'properties': {
+                                'boolWithDefault': {
+                                    'type': 'boolean',
+                                    'default': false
+                                 }
+                             }}";
+
+            var schema = JsonSchema4.FromJson(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns",
+                GenerateDefaultValues = false
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile();
+
+            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; }"));
+            Assert.IsFalse(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
         }
 
         [TestMethod]
@@ -551,7 +580,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
   }
 }";
             var schema = JsonSchema4.FromJson(schemaJson);
-            
+
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
