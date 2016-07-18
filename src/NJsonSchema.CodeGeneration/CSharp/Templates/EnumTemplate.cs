@@ -46,57 +46,64 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             
             #line default
             #line hidden
-            this.Write("public enum ");
+            this.Write("[GeneratedCode(\"NJsonSchema\", \"");
             
             #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
+            
+            #line default
+            #line hidden
+            this.Write("\")]\r\npublic enum ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Name));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
  foreach(var pair in Model.Enums){ 
             
             #line default
             #line hidden
             
-            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
 if(Model.IsStringEnum){
             
             #line default
             #line hidden
             this.Write("    [EnumMember(Value = \"");
             
-            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(pair.Value));
             
             #line default
             #line hidden
             this.Write("\")]\r\n");
             
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 10 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 10 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(pair.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 10 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(pair.InternalValue));
             
             #line default
             #line hidden
             this.Write(",\r\n\r\n");
             
-            #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
+            #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
  } 
             
             #line default
