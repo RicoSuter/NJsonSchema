@@ -2,7 +2,8 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <# if(Model.HasDescription){ #>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
-<# } #>public enum <#=Model.Name#>
+<# } #>[GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+public enum <#=Model.Name#>
 {
 <# foreach(var pair in Model.Enums){ #>
 <#if(Model.IsStringEnum){#>    [EnumMember(Value = "<#=pair.Value#>")]

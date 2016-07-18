@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         private readonly CSharpTypeResolver _resolver;
 
         internal PropertyModel(JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(property, new DefaultValueGenerator(resolver))
+            : base(property, new DefaultValueGenerator(resolver), settings)
         {
             _property = property;
             _settings = settings;
