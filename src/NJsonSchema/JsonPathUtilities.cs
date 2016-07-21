@@ -96,9 +96,16 @@ namespace NJsonSchema
         {
             if (DynamicApis.SupportsFileApis)
             {
-                var arr = url.Split('#');
-                var result = JsonSchema4.FromFile(arr[0]);
-                return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+                try
+                {
+                    var arr = url.Split('#');
+                    var result = JsonSchema4.FromFile(arr[0]);
+                    return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "': " + exception.Message, exception);
+                }
             }
             else
                 throw new NotSupportedException("Could not resolve the path '" + jsonPath +
@@ -109,9 +116,16 @@ namespace NJsonSchema
         {
             if (DynamicApis.SupportsWebClientApis)
             {
-                var arr = filePath.Split('#');
-                var result = JsonSchema4.FromUrl(arr[0]);
-                return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+                try
+                {
+                    var arr = filePath.Split('#');
+                    var result = JsonSchema4.FromUrl(arr[0]);
+                    return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "': " + exception.Message, exception);
+                }
             }
             else
                 throw new NotSupportedException("Could not resolve the path '" + jsonPath +
