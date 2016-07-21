@@ -67,28 +67,55 @@ namespace NJsonSchema
                 return schema;
             }
             else if (path.StartsWith("http://") || path.StartsWith("https://"))
-            {
-                if (DynamicApis.SupportsWebClientApis)
-                    return JsonSchema4.FromJson(DynamicApis.HttpGet(path));
-                else
-                    throw new NotSupportedException("Could not resolve the path '" + path +
-                        "' because JSON web references are not supported on this platform.");
-            }
+                return GetObjectFromJsonPathInUrl(path, path);
             else
             {
-                if (DynamicApis.SupportsFileApis)
+                var documentPathProvider = root as IDocumentPathProvider;
+
+                var documentPath = documentPathProvider?.DocumentPath;
+                if (documentPath != null)
                 {
-                    var schema = root as JsonSchema4;
-                    if (schema != null && schema.RootDirectory != null)
-                        return JsonSchema4.FromJson(DynamicApis.FileReadAllText(DynamicApis.PathCombine(schema.RootDirectory, path)));
+                    if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
+                    {
+                        var url = new Uri(new Uri(documentPath), path).ToString();
+                        return GetObjectFromJsonPathInUrl(url, path);
+                    }
                     else
-                        throw new NotSupportedException("Could not resolve the path '" + path +
-                            "' because no root path is available.");
+                    {
+                        var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), path);
+                        return GetObjectFromJsonPathInFile(filePath, path);
+                    }
                 }
                 else
                     throw new NotSupportedException("Could not resolve the path '" + path +
-                        "' because JSON file references are not supported on this platform.");
+                        "' because no document path is available.");
             }
+        }
+
+        private static JsonSchema4 GetObjectFromJsonPathInFile(string url, string jsonPath)
+        {
+            if (DynamicApis.SupportsFileApis)
+            {
+                var arr = url.Split('#');
+                var result = JsonSchema4.FromFile(arr[0]);
+                return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+            }
+            else
+                throw new NotSupportedException("Could not resolve the path '" + jsonPath +
+                    "' because JSON file references are not supported on this platform.");
+        }
+
+        private static JsonSchema4 GetObjectFromJsonPathInUrl(string filePath, string jsonPath)
+        {
+            if (DynamicApis.SupportsWebClientApis)
+            {
+                var arr = filePath.Split('#');
+                var result = JsonSchema4.FromUrl(arr[0]);
+                return arr.Length == 1 ? result : GetObjectFromJsonPath(result, arr[1]);
+            }
+            else
+                throw new NotSupportedException("Could not resolve the path '" + jsonPath +
+                    "' because JSON web references are not supported on this platform.");
         }
 
         private static readonly Lazy<CamelCasePropertyNamesContractResolver> CamelCaseResolverLazy = new Lazy<CamelCasePropertyNamesContractResolver>();
