@@ -104,7 +104,7 @@ namespace NJsonSchema
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the URL '" + url + "': " + exception.Message, exception);
+                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the file path '" + url + "': " + exception.Message, exception);
                 }
             }
             else
@@ -124,7 +124,7 @@ namespace NJsonSchema
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the file path '" + filePath + "': " + exception.Message, exception);
+                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the URL '" + filePath + "': " + exception.Message, exception);
                 }
             }
             else
