@@ -21,7 +21,8 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var foundObject = JsonPathUtilities.GetObjectFromJsonPath(obj, "#/Property/Property2");
+            var resolver = new JsonReferenceResolver();
+            var foundObject = resolver.ResolveReference(obj, "#/Property/Property2");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -46,7 +47,8 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var foundObject = JsonPathUtilities.GetObjectFromJsonPath(obj, "#/Property/List/2");
+            var resolver = new JsonReferenceResolver();
+            var foundObject = resolver.ResolveReference(obj, "#/Property/List/2");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -71,7 +73,8 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var foundObject = JsonPathUtilities.GetObjectFromJsonPath(obj, "#/Property/List/Test3");
+            var resolver = new JsonReferenceResolver();
+            var foundObject = resolver.ResolveReference(obj, "#/Property/List/Test3");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -82,9 +85,10 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
-            
+
             //// Act
-            var foundObject = JsonPathUtilities.GetObjectFromJsonPath(objectToSearch, "#");
+            var resolver = new JsonReferenceResolver();
+            var foundObject = resolver.ResolveReference(objectToSearch, "#");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);

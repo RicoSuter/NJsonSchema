@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+using System.Text;
 using System.Xml.Linq;
 
 namespace NJsonSchema.Infrastructure
@@ -53,7 +54,7 @@ namespace NJsonSchema.Infrastructure
 
         public static string FileReadAllText(string filePath)
         {
-            return (string)FileType.GetRuntimeMethod("ReadAllText", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
+            return (string)FileType.GetRuntimeMethod("ReadAllText", new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 });
         }
 
         public static string PathCombine(string path1, string path2)

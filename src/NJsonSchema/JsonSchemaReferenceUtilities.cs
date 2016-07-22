@@ -21,7 +21,7 @@ namespace NJsonSchema
         /// <param name="root">The root.</param>
         public static void UpdateSchemaReferences(object root)
         {
-            UpdateSchemaReferences(root, root, new HashSet<object>());
+            UpdateSchemaReferences(root, root, new HashSet<object>(), new JsonReferenceResolver());
         }
 
         /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
@@ -85,24 +85,24 @@ namespace NJsonSchema
             }
         }
 
-        private static void UpdateSchemaReferences(object root, object obj, HashSet<object> checkedObjects)
+        private static void UpdateSchemaReferences(object root, object obj, HashSet<object> checkedObjects, JsonReferenceResolver jsonReferenceResolver)
         {
             if (obj == null || obj is string)
                 return;
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReferencePath != null)
-                schema.SchemaReference = JsonPathUtilities.GetObjectFromJsonPath(root, schema.SchemaReferencePath);
+                schema.SchemaReference = jsonReferenceResolver.ResolveReference(root, schema.SchemaReferencePath);
 
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values)
-                    UpdateSchemaReferences(root, item, checkedObjects);
+                    UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
             }
-            else if(obj is IEnumerable)
+            else if (obj is IEnumerable)
             {
                 foreach (var item in (IEnumerable)obj)
-                    UpdateSchemaReferences(root, item, checkedObjects);
+                    UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
             }
             else
             {
@@ -114,7 +114,7 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-                            UpdateSchemaReferences(root, value, checkedObjects);
+                            UpdateSchemaReferences(root, value, checkedObjects, jsonReferenceResolver);
                         }
                     }
                 }

@@ -21,7 +21,7 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    public partial class JsonSchema4
+    public partial class JsonSchema4 : IDocumentPathProvider
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonProperty> _patternProperties;
@@ -108,15 +108,23 @@ namespace NJsonSchema
         public static JsonSchema4 FromFile(string filePath)
         {
             var data = DynamicApis.FileReadAllText(filePath);
-            var rootDirectory = DynamicApis.PathGetDirectoryName(filePath);
-            return FromJson(data, rootDirectory);
+            return FromJson(data, filePath);
+        }
+
+        /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
+        /// <param name="url">The URL to the document.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromUrl(string url)
+        {
+            var data = DynamicApis.HttpGet(url);
+            return FromJson(data, url);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
         /// <param name="data">The JSON string. </param>
-        /// <param name="rootDirectory">The document root directory for resolving relative document references.</param>
+        /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <returns>The JSON Schema.</returns>
-        public static JsonSchema4 FromJson(string data, string rootDirectory = null)
+        public static JsonSchema4 FromJson(string data, string documentPath = null)
         {
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -125,7 +133,7 @@ namespace NJsonSchema
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
-            schema.RootDirectory = rootDirectory;
+            schema.DocumentPath = documentPath;
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema);
             return schema;
         }
@@ -252,9 +260,9 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets or sets the document root directory for resolving relative document references.</summary>
+        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
         [JsonIgnore]
-        internal string RootDirectory { get; set; }
+        public string DocumentPath { get; set; }
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
