@@ -618,17 +618,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schemaJson = @"{
-    ""properties"": {
-        ""dict"": {
-            ""type"": ""object"", 
-            ""patternProperties"": {
-              ""[a-zA-Z_$][a-zA-Z_$0-9]*"": {
-                ""type"": ""string""
-              }
-            }
-        }
-    }
-}";
+                ""properties"": {
+                    ""dict"": {
+                        ""type"": ""object"", 
+                        ""patternProperties"": {
+                          ""[a-zA-Z_$][a-zA-Z_$0-9]*"": {
+                            ""type"": ""string""
+                          }
+                        }
+                    }
+                }
+            }";
 
             var schema = JsonSchema4.FromJson(schemaJson);
 

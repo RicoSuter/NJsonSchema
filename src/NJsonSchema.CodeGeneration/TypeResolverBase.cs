@@ -151,5 +151,19 @@ namespace NJsonSchema.CodeGeneration
             else
                 return GenerateTypeName("Anonymous");
         }
+
+        /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
+        /// <returns>The type.</returns>
+        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType)
+        {
+            if (schema.AdditionalPropertiesSchema != null)
+                return Resolve(schema.AdditionalPropertiesSchema, false, null);
+            else if (schema.PatternProperties.Any())
+                return Resolve(schema.PatternProperties.First().Value, false, null);
+            else
+                return fallbackType;
+        }
     }
 }
