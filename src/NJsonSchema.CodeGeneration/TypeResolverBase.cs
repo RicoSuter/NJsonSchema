@@ -161,8 +161,16 @@ namespace NJsonSchema.CodeGeneration
             if (schema.AdditionalPropertiesSchema != null)
                 return Resolve(schema.AdditionalPropertiesSchema, false, null);
 
-            if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Count == 1)
-                return Resolve(schema.PatternProperties.First().Value, false, null);
+            if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
+            {
+                var valueTypes = schema.PatternProperties
+                    .Select(p => Resolve(p.Value, false, null))
+                    .Distinct()
+                    .ToList();
+
+                if (valueTypes.Count == 1)
+                    return valueTypes.First();
+            }
 
             return fallbackType;
         }
