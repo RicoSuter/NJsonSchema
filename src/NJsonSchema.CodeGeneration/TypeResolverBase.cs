@@ -155,16 +155,17 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
+        /// <param name="nullHandling">The null handling.</param>
         /// <returns>The type.</returns>
-        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType)
+        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType, NullHandling nullHandling)
         {
             if (schema.AdditionalPropertiesSchema != null)
-                return Resolve(schema.AdditionalPropertiesSchema, false, null);
+                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.IsNullable(nullHandling), null);
 
             if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
             {
                 var valueTypes = schema.PatternProperties
-                    .Select(p => Resolve(p.Value, false, null))
+                    .Select(p => Resolve(p.Value, p.Value.IsNullable(nullHandling), null))
                     .Distinct()
                     .ToList();
 

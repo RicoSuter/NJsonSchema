@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
     {
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings) 
+        public CSharpTypeResolver(CSharpGeneratorSettings settings)
             : base(settings.TypeNameGenerator)
         {
             Settings = settings;
@@ -69,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
             {
-                var valueType = ResolveDictionaryValueType(schema, "object");
+                var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
                 return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
             }
 
