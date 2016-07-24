@@ -116,7 +116,7 @@ namespace NJsonSchema
         {
             get
             {
-                if(_typeRaw == null)
+                if (_typeRaw == null)
                     ResetTypeRaw();
 
                 return _typeRaw.Value;
@@ -186,8 +186,8 @@ namespace NJsonSchema
             set
             {
                 PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) :
-                    new ObservableDictionary<string, JsonProperty>();
+                    new ObservableDictionary<string, JsonSchema4>(value.ToDictionary(p => p.Key, p => p.Value)) :
+                    new ObservableDictionary<string, JsonSchema4>();
             }
         }
 

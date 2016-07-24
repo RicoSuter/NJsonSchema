@@ -69,7 +69,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
             {
-                var valueType = schema.AdditionalPropertiesSchema != null ? Resolve(schema.AdditionalPropertiesSchema, false, null) : "object";
+                var valueType = "object";
+
+                if (schema.AdditionalPropertiesSchema != null)
+                    valueType = Resolve(schema.AdditionalPropertiesSchema, false, null);
+                else if (schema.PatternProperties.Any())
+                    valueType = Resolve(schema.PatternProperties.First().Value, false, null);
+
                 return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
             }
 
