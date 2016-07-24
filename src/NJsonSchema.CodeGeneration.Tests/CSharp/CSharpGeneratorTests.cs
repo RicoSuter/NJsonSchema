@@ -621,10 +621,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 
+                        ""additionalProperties"": false,
                         ""patternProperties"": {
-                          ""[a-zA-Z_$][a-zA-Z_$0-9]*"": {
-                            ""type"": ""string""
-                          }
+                            ""^[a-zA-Z_$][a-zA-Z_$0-9]*$"": {
+                                ""type"": ""string""
+                            }
                         }
                     }
                 }

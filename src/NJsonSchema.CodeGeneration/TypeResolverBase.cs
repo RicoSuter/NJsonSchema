@@ -160,10 +160,11 @@ namespace NJsonSchema.CodeGeneration
         {
             if (schema.AdditionalPropertiesSchema != null)
                 return Resolve(schema.AdditionalPropertiesSchema, false, null);
-            else if (schema.PatternProperties.Any())
+
+            if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Count == 1)
                 return Resolve(schema.PatternProperties.First().Value, false, null);
-            else
-                return fallbackType;
+
+            return fallbackType;
         }
     }
 }

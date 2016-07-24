@@ -178,7 +178,7 @@ namespace NJsonSchema
             schema = schema.ActualSchema;
             return InheritedSchemas.Any(s => s.ActualSchema == schema || s.Inherits(schema));
         }
-        
+
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
         public string BaseDiscriminator
@@ -571,14 +571,17 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) && Properties.Count == 0 && AllowAdditionalProperties;
+        public bool IsDictionary =>
+            Type.HasFlag(JsonObjectType.Object) &&
+            Properties.Count == 0 &&
+            (AllowAdditionalProperties || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
                                  (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
-                                 PatternProperties.Count == 0 && 
+                                 PatternProperties.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  AllOf.Count == 0 &&
                                  OneOf.Count == 0 &&
