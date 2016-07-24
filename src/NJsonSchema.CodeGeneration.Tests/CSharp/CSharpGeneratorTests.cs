@@ -612,5 +612,33 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull)]"));
             Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
         }
+
+        [TestMethod]
+        public void When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
+        {
+            //// Arrange
+            var schemaJson = @"{
+                ""properties"": {
+                    ""dict"": {
+                        ""type"": ""object"", 
+                        ""additionalProperties"": false,
+                        ""patternProperties"": {
+                            ""^[a-zA-Z_$][a-zA-Z_$0-9]*$"": {
+                                ""type"": ""string""
+                            }
+                        }
+                    }
+                }
+            }";
+
+            var schema = JsonSchema4.FromJson(schemaJson);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; }"));
+        }
     }
 }

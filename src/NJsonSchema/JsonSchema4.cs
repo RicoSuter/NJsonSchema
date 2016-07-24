@@ -24,7 +24,7 @@ namespace NJsonSchema
     public partial class JsonSchema4 : IDocumentPathProvider
     {
         private IDictionary<string, JsonProperty> _properties;
-        private IDictionary<string, JsonProperty> _patternProperties;
+        private IDictionary<string, JsonSchema4> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
 
         private ICollection<JsonSchema4> _allOf;
@@ -178,7 +178,7 @@ namespace NJsonSchema
             schema = schema.ActualSchema;
             return InheritedSchemas.Any(s => s.ActualSchema == schema || s.Inherits(schema));
         }
-        
+
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
         public string BaseDiscriminator
@@ -378,14 +378,14 @@ namespace NJsonSchema
 
         /// <summary>Gets the pattern properties of the type. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonProperty> PatternProperties
+        public IDictionary<string, JsonSchema4> PatternProperties
         {
             get { return _patternProperties; }
             internal set
             {
                 if (_patternProperties != value)
                 {
-                    RegisterProperties(_patternProperties, value);
+                    RegisterSchemaDictionary(_patternProperties, value);
                     _patternProperties = value;
                 }
             }
@@ -571,13 +571,17 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) && Properties.Count == 0 && AllowAdditionalProperties;
+        public bool IsDictionary =>
+            Type.HasFlag(JsonObjectType.Object) &&
+            Properties.Count == 0 &&
+            (AllowAdditionalProperties || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
                                  (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
+                                 PatternProperties.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  AllOf.Count == 0 &&
                                  OneOf.Count == 0 &&
@@ -690,7 +694,7 @@ namespace NJsonSchema
                 Properties = new ObservableDictionary<string, JsonProperty>();
 
             if (PatternProperties == null)
-                PatternProperties = new ObservableDictionary<string, JsonProperty>();
+                PatternProperties = new ObservableDictionary<string, JsonSchema4>();
 
             if (Definitions == null)
                 Definitions = new ObservableDictionary<string, JsonSchema4>();

@@ -6,7 +6,7 @@
 <#@ import namespace="System.IO" #>
 <#@ import namespace="Microsoft.CSharp" #>
 <#@ import namespace="NJsonSchema" #>
-<#@ import namespace="NJsonSchema.CodeGeneration.Generators" #>
+<#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
 <#@ output extension=".cs" #>
 <#
     var schema = new JsonSchema4();
@@ -15,8 +15,11 @@
     schema.Properties.Add("LastName", new JsonProperty { Type = JsonObjectType.String });
     schema.Properties.Add("Birthday", new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, IsRequired = true });
 
-    var generator = new CSharpClassGenerator(schema);
-	generator.Namespace = Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint");
+	var settings = new CSharpGeneratorSettings();
+    settings.Namespace = Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint");
+
+    var generator = new CSharpGenerator(schema, settings);
+
     var code = generator.GenerateFile();
 #>
 <#= code #>

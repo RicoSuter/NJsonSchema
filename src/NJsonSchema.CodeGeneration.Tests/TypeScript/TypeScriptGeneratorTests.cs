@@ -212,5 +212,33 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             return generator;
         }
+
+        [TestMethod]
+        public void When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
+        {
+            //// Arrange
+            var schemaJson = @"{
+                ""properties"": {
+                    ""dict"": {
+                        ""type"": ""object"", 
+                        ""additionalProperties"": false,
+                        ""patternProperties"": {
+                            ""^[a-zA-Z_$][a-zA-Z_$0-9]*$"": {
+                                ""type"": ""string""
+                            }
+                        }
+                    }
+                }
+            }";
+
+            var schema = JsonSchema4.FromJson(schemaJson);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("dict: { [key: string] : string; };"));
+        }
     }
 }
