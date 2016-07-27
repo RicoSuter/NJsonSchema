@@ -20,6 +20,7 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 - Generate JSON Schema from .NET type via reflection (with support for many attributes/annotations)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
+- Support for .NET Core (via PCL 259 / .NET Standard 1.0)
 
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
 
