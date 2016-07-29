@@ -18,14 +18,22 @@ namespace NJsonSchema.Validation
         /// <param name="property">The property name. </param>
         /// <param name="path">The property path. </param>
         /// <param name="errors">The error list. </param>
+#if !LEGACY
         public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors)
+#else
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors)
+#endif
             : base(kind, property, path)
         {
             Errors = errors;
         }
-        
+
         /// <summary>Gets the errors for each validated subschema. </summary>
+#if !LEGACY
         public IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
+#else
+        public IDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
+#endif
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

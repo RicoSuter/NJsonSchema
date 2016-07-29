@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -88,7 +89,11 @@ namespace NJsonSchema
 
             if (type.Name == "Nullable`1")
             {
+#if !LEGACY
                 var typeDescription = FromType(type.GenericTypeArguments[0], parentAttributes, defaultEnumHandling);
+#else
+                var typeDescription = FromType(type.GetGenericArguments()[0], parentAttributes, defaultEnumHandling);
+#endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
             }
@@ -162,6 +167,8 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
         public bool IsAny => Type == JsonObjectType.None;
 
+#if !LEGACY
+
         private static bool IsArrayType(Type type)
         {
             if (IsDictionaryType(type))
@@ -189,6 +196,38 @@ namespace NJsonSchema
                 (type.GetTypeInfo().BaseType == null ||
                 !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
+
+#else
+
+        private static bool IsArrayType(Type type)
+        {
+            if (IsDictionaryType(type))
+                return false;
+
+            return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
+                (type.GetTypeInfo().BaseType == null ||
+                !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
+        }
+
+        private static bool IsFileType(Type type)
+        {
+            var parameterTypeName = type.Name;
+            return parameterTypeName == "IFormFile" ||
+                   parameterTypeName == "HttpPostedFileBase" ||
+                   type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
+        }
+
+        private static bool IsDictionaryType(Type type)
+        {
+            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
+                return true;
+
+            return type.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
+                (type.GetTypeInfo().BaseType == null ||
+                !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
+        }
+
+#endif
 
         /// <summary>Applies the type and format to the given schema.</summary>
         /// <param name="schema">The JSON schema.</param>
