@@ -18,8 +18,8 @@
         <file src="bin\Release\NJsonSchema.pdb" target="lib\netstandard1.0" />
         <file src="bin\Release\NJsonSchema.xml" target="lib\netstandard1.0" />
 
-        <file src="..\NJsonSchema.Net4\bin\Release\NJsonSchema.dll" target="lib\net40" />
-        <file src="..\NJsonSchema.Net4\bin\Release\NJsonSchema.pdb" target="lib\net40" />
-        <file src="..\NJsonSchema.Net4\bin\Release\NJsonSchema.xml" target="lib\net40" />
+        <file src="bin\ReleaseNet4\NJsonSchema.dll" target="lib\net40" />
+        <file src="bin\ReleaseNet4\NJsonSchema.pdb" target="lib\net40" />
+        <file src="bin\ReleaseNet4\NJsonSchema.xml" target="lib\net40" />
     </files>
 </package>
