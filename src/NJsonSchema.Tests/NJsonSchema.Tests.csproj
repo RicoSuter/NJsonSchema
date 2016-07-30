@@ -79,7 +79,6 @@
     <Compile Include="Generation\NullPropertyTests.cs" />
     <Compile Include="Generation\PrimitiveTypeGenerationTests.cs" />
     <Compile Include="Generation\SchemaGenerationTests.cs" />
-    <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="Schema\JsonPathUtilitiesGetJsonPathTests.cs" />
     <Compile Include="Schema\JsonPathUtilitiesGetObjectFromJsonPathTests.cs" />
     <Compile Include="Schema\DataContractTests.cs" />
@@ -100,17 +99,13 @@
     <Compile Include="Validation\ValueTypeValidationTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj">
-      <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
-      <Name>NJsonSchema.CodeGeneration</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7b7a2e32-e808-4a19-98b1-37e766580f8c}</Project>
       <Name>NJsonSchema</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

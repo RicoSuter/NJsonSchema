@@ -11,6 +11,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -94,7 +95,7 @@ namespace NJsonSchema
                 if (attribute != null)
                 {
                     var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(attribute.PropertyName));
-                    property.SetValue(value, jValue?.ToObject(property.PropertyType));
+                    property.SetValue(value, (object)jValue?.ToObject(property.PropertyType));
                 }
             }
 
