@@ -165,7 +165,11 @@ namespace NJsonSchema
         /// <summary>Gets the list of parent/inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
+#if !LEGACY
         public IReadOnlyCollection<JsonSchema4> InheritedSchemas
+#else
+        public ICollection<JsonSchema4> InheritedSchemas
+#endif
         {
             get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
         }
@@ -202,11 +206,19 @@ namespace NJsonSchema
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
+#if !LEGACY
         public IReadOnlyDictionary<string, JsonProperty> AllProperties
         {
             get
             {
                 return new ReadOnlyDictionary<string, JsonProperty>(Properties
+#else
+        public IDictionary<string, JsonProperty> AllProperties
+        {
+            get
+            {
+                return new Dictionary<string, JsonProperty>(Properties
+#endif
                     .Union(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.None)
                     .SelectMany(s => s.ActualSchema.AllProperties))
                     .ToDictionary(p => p.Key, p => p.Value));

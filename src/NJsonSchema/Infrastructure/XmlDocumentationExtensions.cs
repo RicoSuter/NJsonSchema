@@ -24,6 +24,8 @@ namespace NJsonSchema.Infrastructure
         private static readonly Dictionary<string, XDocument> Cache =
             new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
+#if !LEGACY
+
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
@@ -31,6 +33,8 @@ namespace NJsonSchema.Infrastructure
         {
             return type.GetTypeInfo().GetXmlDocumentation();
         }
+
+#endif
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>

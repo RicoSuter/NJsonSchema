@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
 
-namespace NJsonSchema.Tests.Samples
+namespace NJsonSchema.CodeGeneration.Tests.Samples
 {
     [TestClass]
     public class SampleTests

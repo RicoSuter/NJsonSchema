@@ -173,15 +173,20 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return JsonSchema4.CreateAnySchema<TSchemaType>(); 
+                return JsonSchema4.CreateAnySchema<TSchemaType>();
 
             return null;
         }
 
         private string GetTypeName(Type type)
         {
+#if !LEGACY
             if (type.IsConstructedGenericType)
                 return type.Name.Split('`').First() + GetTypeName(type.GenericTypeArguments[0]);
+#else
+            if (type.IsGenericType)
+                return type.Name.Split('`').First() + GetTypeName(type.GetGenericArguments()[0]);
+#endif
 
             return type.Name;
         }
@@ -209,6 +214,8 @@ namespace NJsonSchema.Generation
         /// <returns>The type arguments.</returns>
         public Type[] GetGenericTypeArguments(Type type)
         {
+#if !LEGACY
+
             var genericTypeArguments = type.GenericTypeArguments;
             while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
             {
@@ -217,6 +224,19 @@ namespace NJsonSchema.Generation
                     genericTypeArguments = type.GenericTypeArguments;
             }
             return genericTypeArguments;
+
+#else
+
+            var genericTypeArguments = type.GetGenericArguments();
+            while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
+            {
+                type = type.GetTypeInfo().BaseType;
+                if (type != null)
+                    genericTypeArguments = type.GetGenericArguments();
+            }
+            return genericTypeArguments;
+
+#endif
         }
 
         /// <summary>Generates the properties for the given type and schema.</summary>
@@ -242,7 +262,12 @@ namespace NJsonSchema.Generation
         {
             var properties = GetTypeProperties(type);
 
-            foreach (var property in type.GetTypeInfo().DeclaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
+#if !LEGACY
+            var declaredProperties = type.GetTypeInfo().DeclaredProperties;
+#else
+            var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+#endif
+            foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
                 LoadProperty(type, property, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
 
             GenerateInheritance(type, schema, rootSchema, schemaDefinitionAppender, schemaResolver);
@@ -284,7 +309,7 @@ namespace NJsonSchema.Generation
         {
             if (!Settings.FlattenInheritanceHierarchy)
             {
-                var discriminator = TryGetInheritanceDiscriminator(type.GetTypeInfo().GetCustomAttributes(false));
+                var discriminator = TryGetInheritanceDiscriminator(type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>());
                 if (!string.IsNullOrEmpty(discriminator))
                 {
                     if (schema.Properties.ContainsKey(discriminator))
@@ -313,7 +338,7 @@ namespace NJsonSchema.Generation
                     return JsonInheritanceConverter.DefaultDiscriminatorName;
                 }
             }
-            return null; 
+            return null;
         }
 
         /// <summary>Gets the properties of the given type or null to take all properties.</summary>
@@ -366,7 +391,11 @@ namespace NJsonSchema.Generation
                 JsonProperty jsonProperty;
 
                 if (propertyType.Name == "Nullable`1")
+#if !LEGACY
                     propertyType = propertyType.GenericTypeArguments[0];
+#else
+                    propertyType = propertyType.GetGenericArguments()[0];
+#endif
 
                 var useSchemaReference =
                     !propertyTypeDescription.IsDictionary &&
