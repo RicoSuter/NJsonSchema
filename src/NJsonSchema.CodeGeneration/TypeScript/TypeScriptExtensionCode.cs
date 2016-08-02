@@ -11,7 +11,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="extendedClasses">The list of extended class names.</param>
         public TypeScriptExtensionCode(string code, string[] extendedClasses)
         {
-            code = code.Replace("\r", string.Empty);
+            code = code
+                .Replace("\r", string.Empty)
+                .Replace("generated.", string.Empty);
 
             code = Regex.Replace(code, "import generated = (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "(import (.*?) = (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
@@ -27,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var className = match.Groups[2].Value;
                 if (extendedClasses?.Contains(className) == true)
                 {
-                    Classes[className] = (match.Groups[1].Success ? match.Groups[0].Value : "export " + match.Groups[0].Value).Replace("generated.", string.Empty);
+                    Classes[className] = match.Groups[1].Success ? match.Groups[0].Value : "export " + match.Groups[0].Value;
                     return string.Empty;
                 }
                 return match.Groups[0].Value;
