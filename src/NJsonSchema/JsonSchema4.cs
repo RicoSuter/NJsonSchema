@@ -245,6 +245,10 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
 
+        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
+        [JsonIgnore]
+        public string DocumentPath { get; set; }
+
         /// <summary>Gets or sets the type reference path ($ref). </summary>
         [JsonProperty("schemaReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal string SchemaReferencePath { get; set; }
@@ -271,10 +275,6 @@ namespace NJsonSchema
                 }
             }
         }
-
-        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
-        [JsonIgnore]
-        public string DocumentPath { get; set; }
 
         /// <summary>Gets a value indicating whether this is a type reference.</summary>
         [JsonIgnore]
