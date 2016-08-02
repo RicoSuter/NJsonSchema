@@ -389,7 +389,7 @@ namespace NJsonSchema.Validation
                 if (_schema.MaxItems > 0 && array.Count > _schema.MaxItems)
                     errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath));
 
-                if (_schema.UniqueItems && array.Count != array.Distinct().Count())
+                if (_schema.UniqueItems && array.Count != array.Select(a => a.ToString()).Distinct().Count())
                     errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath));
 
                 var itemValidator = _schema.Item != null ? new JsonSchemaValidator(_schema.Item) : null;

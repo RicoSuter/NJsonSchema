@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             ModuleName = "";
             GenerateReadOnlyKeywords = true;
-            TypeStyle = TypeScriptTypeStyle.Interface;
+            TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
         }
@@ -32,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets a value indicating whether to generate the readonly keywords (only available in TS 2.0+, default: true).</summary>
         public bool GenerateReadOnlyKeywords { get; set; }
 
-        /// <summary>Gets or sets the type style (experimental, default: Interface).</summary>
+        /// <summary>Gets or sets the type style (experimental, default: Class).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
