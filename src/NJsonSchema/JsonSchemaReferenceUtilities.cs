@@ -9,6 +9,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -68,9 +69,13 @@ namespace NJsonSchema
                 foreach (var item in (IEnumerable)obj)
                     UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
             }
-            else
+
+            if (!(obj is JToken))
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.PropertyInfo.CanRead && p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
+                    p.PropertyInfo.CanRead &&
+                    p.PropertyInfo.GetIndexParameters().Length == 0 &&
+                    p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
@@ -104,9 +109,13 @@ namespace NJsonSchema
                 foreach (var item in (IEnumerable)obj)
                     UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
             }
-            else
+
+            if (!(obj is JToken))
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.PropertyInfo.CanRead && p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
+                    p.PropertyInfo.CanRead &&
+                    p.PropertyInfo.GetIndexParameters().Length == 0 &&
+                    p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var value = property.PropertyInfo.GetValue(obj);
                     if (value != null)
