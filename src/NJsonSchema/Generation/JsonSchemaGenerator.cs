@@ -196,10 +196,8 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             var genericTypeArguments = GetGenericTypeArguments(type);
-            if (genericTypeArguments.Length != 2)
-                throw new InvalidOperationException("Could not find value type of dictionary type '" + type.FullName + "'.");
 
-            var valueType = genericTypeArguments[1];
+            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
             if (valueType == typeof(object))
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else

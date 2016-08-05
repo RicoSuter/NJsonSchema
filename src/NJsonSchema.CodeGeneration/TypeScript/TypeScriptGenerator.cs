@@ -100,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.AllProperties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
+                var properties = _schema.ActualProperties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
                 var hasInheritance = _schema.InheritedSchemas.Count >= 1;
                 var baseClass = hasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
 
@@ -140,7 +140,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private PropertyModel GetDiscriminatorProperty(JsonSchema4 schema)
         {
-            var property = schema.ActualSchema.AllProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
+            var property = schema.ActualSchema.ActualProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
             if (property.Value != null)
                 return new PropertyModel(property.Value, string.Empty, _resolver, Settings);
 
