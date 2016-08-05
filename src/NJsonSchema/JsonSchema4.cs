@@ -207,20 +207,20 @@ namespace NJsonSchema
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
 #if !LEGACY
-        public IReadOnlyDictionary<string, JsonProperty> AllProperties
+        public IReadOnlyDictionary<string, JsonProperty> ActualProperties
         {
             get
             {
                 return new ReadOnlyDictionary<string, JsonProperty>(Properties
 #else
-        public IDictionary<string, JsonProperty> AllProperties
+        public IDictionary<string, JsonProperty> ActualProperties
         {
             get
             {
                 return new Dictionary<string, JsonProperty>(Properties
 #endif
                     .Union(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.None)
-                    .SelectMany(s => s.ActualSchema.AllProperties))
+                    .SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToDictionary(p => p.Key, p => p.Value));
             }
         }

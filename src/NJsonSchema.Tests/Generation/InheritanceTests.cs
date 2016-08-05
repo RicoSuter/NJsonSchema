@@ -32,9 +32,9 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(0, schema.InheritedSchemas.Count);
-            Assert.AreEqual(2, schema.AllProperties.Count);
-            Assert.IsTrue(schema.AllProperties.ContainsKey("prop1"));
-            Assert.IsTrue(schema.AllProperties.ContainsKey("prop2"));
+            Assert.AreEqual(2, schema.ActualProperties.Count);
+            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
+            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop2"));
         }
 
         [TestMethod]
@@ -64,8 +64,8 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(1, schema.InheritedSchemas.Count);
-            Assert.AreEqual(1, schema.AllProperties.Count);
-            Assert.IsTrue(schema.AllProperties.ContainsKey("prop1"));
+            Assert.AreEqual(1, schema.ActualProperties.Count);
+            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
         }
 
         [TestMethod]

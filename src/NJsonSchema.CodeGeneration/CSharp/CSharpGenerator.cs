@@ -85,7 +85,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
-            var properties = _schema.AllProperties.Values
+            var properties = _schema.ActualProperties.Values
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(property, _resolver, Settings))
                 .ToList();
