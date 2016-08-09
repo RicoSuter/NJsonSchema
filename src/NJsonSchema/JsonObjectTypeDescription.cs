@@ -98,7 +98,8 @@ namespace NJsonSchema
                 return typeDescription;
             }
 
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ?? 
+                parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
