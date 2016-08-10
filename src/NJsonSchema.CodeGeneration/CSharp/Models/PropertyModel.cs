@@ -38,6 +38,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true);
 
+        public bool IsRequired => _property.IsRequired;
+
         public string JsonPropertyRequired
         {
             get
