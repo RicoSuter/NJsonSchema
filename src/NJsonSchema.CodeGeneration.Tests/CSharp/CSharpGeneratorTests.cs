@@ -446,7 +446,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile();
 
             // Assert
-            Assert.IsTrue(output.Contains(@"[JsonProperty(""foo-bar"", "));
+            Assert.IsTrue(output.Contains(@"[JsonProperty(""foo-bar"""));
             Assert.IsTrue(output.Contains(@"public string FooBar"));
         }
 
@@ -609,7 +609,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull)]"));
+            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\")]"));
             Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
         }
 
