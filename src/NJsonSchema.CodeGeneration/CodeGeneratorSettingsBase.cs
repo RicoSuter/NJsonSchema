@@ -26,6 +26,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }
 
+        /// <summary>Gets or sets the template factory.</summary>
+        public ITemplateFactory TemplateFactory { get; set; } = new DefaultTemplateFactory();
+
         /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
         public bool GenerateDefaultValues { get; set; }
     }

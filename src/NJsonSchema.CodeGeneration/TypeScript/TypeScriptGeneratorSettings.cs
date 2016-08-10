@@ -8,7 +8,6 @@
 
 using System;
 using System.Linq;
-using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -64,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (value != _extensionCode)
                 {
                     _extensionCode = value;
-                    _processedExtensionCode = null; 
+                    _processedExtensionCode = null;
                 }
             }
         }
@@ -78,27 +77,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             get
             {
                 if (_processedExtensionCode == null)
-                    _processedExtensionCode = new TypeScriptExtensionCode(ExtensionCode ?? string.Empty, ExtendedClasses); 
+                    _processedExtensionCode = new TypeScriptExtensionCode(ExtensionCode ?? string.Empty, ExtendedClasses);
 
                 return _processedExtensionCode;
             }
         }
 
-        internal ITemplate CreateTemplate(string typeName)
+        internal ITemplate CreateTemplate(string typeName, object model)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
-                return new ClassTemplate();
+                return TemplateFactory.CreateTemplate("TypeScript", "Class", model);
 
-            if (TypeStyle == TypeScriptTypeStyle.Interface)
-                return new InterfaceTemplate();
-
-            if (TypeStyle == TypeScriptTypeStyle.Class)
-                return new ClassTemplate();
-
-            if (TypeStyle == TypeScriptTypeStyle.KnockoutClass)
-                return new KnockoutClassTemplate();
-
-            throw new NotImplementedException();
+            return TemplateFactory.CreateTemplate("TypeScript", TypeStyle.ToString(), model);
         }
 
         /// <summary>Gets the type style of the given type name.</summary>
