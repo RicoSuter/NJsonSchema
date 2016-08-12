@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Newtonsoft.Json;
+
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The code generator settings base.</summary>
@@ -20,16 +22,19 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; } = NullHandling.JsonSchema;
 
+        /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
+        public bool GenerateDefaultValues { get; set; }
+
         /// <summary>Gets or sets the property name generator.</summary>
+        [JsonIgnore]
         public IPropertyNameGenerator PropertyNameGenerator { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
+        [JsonIgnore]
         public ITypeNameGenerator TypeNameGenerator { get; set; }
 
         /// <summary>Gets or sets the template factory.</summary>
+        [JsonIgnore]
         public ITemplateFactory TemplateFactory { get; set; } = new DefaultTemplateFactory();
-
-        /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
-        public bool GenerateDefaultValues { get; set; }
     }
 }
