@@ -6,7 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace NJsonSchema.Generation
 {
@@ -19,11 +22,12 @@ namespace NJsonSchema.Generation
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            TypeMappings = new Dictionary<Type, Action<JsonSchema4, JsonSchemaGenerator>>();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
-        
+
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
@@ -38,5 +42,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the type mappings.</summary>
+        [JsonIgnore]
+        public IDictionary<Type, Action<JsonSchema4, JsonSchemaGenerator>> TypeMappings { get; set; }
     }
 }

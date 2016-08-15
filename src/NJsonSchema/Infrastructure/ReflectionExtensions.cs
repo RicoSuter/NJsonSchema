@@ -12,10 +12,53 @@ using System.Reflection;
 
 namespace NJsonSchema.Infrastructure
 {
-#if LEGACY
-
     internal static class ReflectionExtensions
     {
+        public static string GetTypeName(Type type)
+        {
+#if !LEGACY
+            if (type.IsConstructedGenericType)
+                return type.Name.Split('`').First() + GetTypeName(type.GenericTypeArguments[0]);
+#else
+            if (type.IsGenericType)
+                return type.Name.Split('`').First() + GetTypeName(type.GetGenericArguments()[0]);
+#endif
+
+            return type.Name;
+        }
+
+        /// <summary>Gets the generic type arguments of a type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The type arguments.</returns>
+        public static Type[] GetGenericTypeArguments(Type type)
+        {
+#if !LEGACY
+
+            var genericTypeArguments = type.GenericTypeArguments;
+            while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
+            {
+                type = type.GetTypeInfo().BaseType;
+                if (type != null)
+                    genericTypeArguments = type.GenericTypeArguments;
+            }
+            return genericTypeArguments;
+
+#else
+
+            var genericTypeArguments = type.GetGenericArguments();
+            while (type != null && type != typeof(object) && genericTypeArguments.Length == 0)
+            {
+                type = type.GetTypeInfo().BaseType;
+                if (type != null)
+                    genericTypeArguments = type.GetGenericArguments();
+            }
+            return genericTypeArguments;
+
+#endif
+        }
+
+#if LEGACY
+
         public static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
         {
             return type.GetMethod(name, types);
@@ -89,7 +132,7 @@ namespace NJsonSchema.Infrastructure
         {
             propertyInfo.SetValue(obj, value, null);
         }
-    }
 
 #endif
+    }
 }

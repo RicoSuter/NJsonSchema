@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IDocumentPathProvider.cs" />
+    <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="JsonExceptionConverter.cs" />
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />

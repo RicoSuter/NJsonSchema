@@ -66,6 +66,7 @@
     <Compile Include="Generation\PropertyNamesGenerationTests.cs" />
     <Compile Include="Generation\FlattenInheritanceHierarchyTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
+    <Compile Include="Generation\TypeMappingsTests.cs" />
     <Compile Include="Serialization\ExceptionSerializationTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />

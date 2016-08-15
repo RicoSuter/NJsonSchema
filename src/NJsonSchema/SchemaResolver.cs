@@ -47,7 +47,7 @@ namespace NJsonSchema
 
 //#if DEBUG
 //            // TODO: (low-prio) Check code so that type names are unique
-//            if (Schemes.Any(s => s.TypeName == schema.TypeName))
+//            if (Schemas.Any(s => s.TypeName == schema.TypeName))
 //                throw new InvalidOperationException("The type name '"+ schema.TypeName + "' is already registered in the schema resolver.");
 //#endif
 
@@ -55,7 +55,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets all the schemas.</summary>
-        public IEnumerable<JsonSchema4> Schemes => _mappings.Values;
+        public IEnumerable<JsonSchema4> Schemas => _mappings.Values;
 
         private string GetKey(Type type, bool isIntegerEnum)
         {
