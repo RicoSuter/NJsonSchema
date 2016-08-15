@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
 
@@ -23,18 +23,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
             Settings = settings;
         }
 
-        /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
-        /// <param name="settings">The generator settings.</param>
-        /// <param name="knownSchemes">The known schemes.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings, JsonSchema4[] knownSchemes)
-            : this(settings)
-        {
-            foreach (var type in knownSchemes)
-                AddOrReplaceTypeGenerator(type.GetTypeName(settings.TypeNameGenerator), new CSharpGenerator(type.ActualSchema, Settings, this));
-        }
-
         /// <summary>Gets the generator settings.</summary>
         public CSharpGeneratorSettings Settings { get; private set; }
+
+        /// <summary>Adds all schemas to the resolver.</summary>
+        /// <param name="schemas">The schemas (typeNameHint-schema pairs).</param>
+        public override void AddSchemas(IDictionary<string, JsonSchema4> schemas)
+        {
+            if (schemas != null)
+            {
+                foreach (var pair in schemas)
+                    AddOrReplaceTypeGenerator(GetOrGenerateTypeName(pair.Value, pair.Key), new CSharpGenerator(pair.Value.ActualSchema, Settings, this));
+            }
+        }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>

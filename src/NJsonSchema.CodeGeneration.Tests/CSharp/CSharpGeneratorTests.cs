@@ -640,5 +640,25 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; }"));
         }
+
+        [TestMethod]
+        public void When_object_has_generic_name_then_it_is_transformed()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.TypeNameRaw = "Foo[Bar]";
+            schema.Type = JsonObjectType.Object;
+            schema.Properties["foo"] = new JsonProperty
+            {
+                Type = JsonObjectType.Number
+            };
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public partial class FooOfBar"));
+        }
     }
 }
