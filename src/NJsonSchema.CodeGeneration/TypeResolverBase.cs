@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -27,6 +28,10 @@ namespace NJsonSchema.CodeGeneration
         {
             _typeNameGenerator = typeNameGenerator;
         }
+
+        /// <summary>Adds all schemas to the resolver.</summary>
+        /// <param name="schemas">The schemas (typeNameHint-schema pairs).</param>
+        public abstract void AddSchemas(IDictionary<string, JsonSchema4> schemas);
 
         /// <summary>Determines whether the generator for a given type name is registered.</summary>
         /// <param name="typeName">Name of the type.</param>
@@ -120,10 +125,14 @@ namespace NJsonSchema.CodeGeneration
             if (!_generatedTypeNames.ContainsKey(schema))
             {
                 var typeName = schema.GetTypeName(_typeNameGenerator);
-                if (!string.IsNullOrEmpty(typeName))
-                    _generatedTypeNames[schema] = typeName;
-                else
-                    _generatedTypeNames[schema] = GenerateTypeName(typeNameHint);
+
+                if (string.IsNullOrEmpty(typeName))
+                    typeName = GenerateTypeName(typeNameHint);
+
+                typeName = Regex.Replace(typeName, "^(.*?)\\[(.*?)\\]$",
+                    match => match.Groups[1].Value + "Of" + match.Groups[2].Value);
+
+                _generatedTypeNames[schema] = typeName; 
             }
 
             return _generatedTypeNames[schema];

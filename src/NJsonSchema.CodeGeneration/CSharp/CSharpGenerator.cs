@@ -68,14 +68,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Generates the type.</summary>
-        /// <param name="fallbackTypeName">The fallback type name when TypeName is not available on schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string fallbackTypeName)
+        public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
-            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
-
-            if (string.IsNullOrEmpty(typeName))
-                typeName = fallbackTypeName;
+            var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
 
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);
@@ -91,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .ToList();
 
             RenamePropertyWithSameNameAsClass(typeName, properties);
-            
+
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties);
             var template = new ClassTemplate() as ITemplate;
             template.Initialize(model);
