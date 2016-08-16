@@ -12,7 +12,7 @@ namespace NJsonSchema.CodeGeneration
     public interface ITemplateFactory
     {
         /// <summary>Creates a template for the given language, template name and template model.</summary>
-        /// <param name="package">The package name (i.e. language).</param>
+        /// <param name="package">The package name (i.e. the language, 'CSharp' or 'TypeScript').</param>
         /// <param name="template">The template name.</param>
         /// <param name="model">The template model.</param>
         /// <returns>The template.</returns>

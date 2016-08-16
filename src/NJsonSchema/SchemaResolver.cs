@@ -16,7 +16,7 @@ namespace NJsonSchema
     public class SchemaResolver : ISchemaResolver
     {
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
-
+        
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>

@@ -66,7 +66,7 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                foreach (var item in (IEnumerable)obj)
+                foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
                     UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
             }
 
@@ -106,7 +106,7 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                foreach (var item in (IEnumerable)obj)
+                foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
                     UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
             }
 

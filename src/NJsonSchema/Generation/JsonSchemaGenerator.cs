@@ -24,39 +24,12 @@ namespace NJsonSchema.Generation
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
         public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
-            : this(settings, new SchemaResolver())
         {
-            Settings = settings;
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
-        /// <param name="settings">The settings.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings, ISchemaResolver schemaResolver) 
-            : this(settings, schemaResolver, new JsonSchemaDefinitionAppender(null, settings.TypeNameGenerator))
-        {
-            Settings = settings;
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
-        /// <param name="settings">The settings.</param>
-        /// <param name="schemaResolver"></param>
-        /// <param name="schemaDefinitionAppender"></param>
-        public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
-        {
-            Settings = settings;
-            SchemaResolver = schemaResolver;
-            SchemaDefinitionAppender = schemaDefinitionAppender;
+            Settings = settings; 
         }
 
         /// <summary>Gets the settings.</summary>
         public JsonSchemaGeneratorSettings Settings { get; }
-
-        /// <summary>Gets the schema resolver.</summary>
-        public ISchemaResolver SchemaResolver { get; }
-
-        /// <summary>Gets the schema definition appender.</summary>
-        protected ISchemaDefinitionAppender SchemaDefinitionAppender { get; private set; }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
@@ -64,25 +37,29 @@ namespace NJsonSchema.Generation
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public JsonSchema4 Generate(Type type)
         {
-            return Generate<JsonSchema4>(type, null);
+            return Generate<JsonSchema4>(type, null, new SchemaResolver(), new JsonSchemaDefinitionAppender(null, null));
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent property or parameter attributes.</param>
+        /// <param name="schemaResolver"></param>
+        /// <param name="schemaDefinitionAppender"></param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        public JsonSchema4 Generate(Type type, IEnumerable<Attribute> parentAttributes)
+        public JsonSchema4 Generate(Type type, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
-            return Generate<JsonSchema4>(type, parentAttributes);
+            return Generate<JsonSchema4>(type, null, schemaResolver, schemaDefinitionAppender);
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent property or parameter attributes.</param>
+        /// <param name="schemaResolver"></param>
+        /// <param name="schemaDefinitionAppender"></param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        public virtual TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes)
+        public virtual TSchemaType Generate<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, 
+            ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
             where TSchemaType : JsonSchema4, new()
         {
             var schema = HandleSpecialTypes<TSchemaType>(type);
@@ -91,8 +68,8 @@ namespace NJsonSchema.Generation
 
             schema = new TSchemaType();
 
-            if (SchemaDefinitionAppender.RootObject == null)
-                SchemaDefinitionAppender.RootObject = schema;
+            if (schemaDefinitionAppender.RootObject == null)
+                schemaDefinitionAppender.RootObject = schema;
 
             var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
             typeDescription.ApplyType(schema);
@@ -102,24 +79,24 @@ namespace NJsonSchema.Generation
             if (schema.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
-                    GenerateDictionary(type, schema);
+                    GenerateDictionary(type, schema, schemaResolver, schemaDefinitionAppender);
                 else
                 {
                     schema.TypeNameRaw = ReflectionExtensions.GetTypeName(type);
-                    if (SchemaResolver.HasSchema(type, false))
+                    if (schemaResolver.HasSchema(type, false))
                     {
-                        schema.SchemaReference = SchemaResolver.GetSchema(type, false);
+                        schema.SchemaReference = schemaResolver.GetSchema(type, false);
                         return schema;
                     }
 
                     if (schema.GetType() == typeof(JsonSchema4))
                     {
                         schema.Description = GetDescription(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes());
-                        GenerateObject(type, schema);
+                        GenerateObject(type, schema, schemaResolver, schemaDefinitionAppender);
                     }
                     else
                     {
-                        schema.SchemaReference = Generate<JsonSchema4>(type, parentAttributes);
+                        schema.SchemaReference = Generate<JsonSchema4>(type, parentAttributes, schemaResolver, schemaDefinitionAppender);
                         return schema;
                     }
                 }
@@ -127,10 +104,10 @@ namespace NJsonSchema.Generation
             else if (type.GetTypeInfo().IsEnum)
             {
                 var isIntegerEnumeration = typeDescription.Type == JsonObjectType.Integer;
-                if (SchemaResolver.HasSchema(type, isIntegerEnumeration))
+                if (schemaResolver.HasSchema(type, isIntegerEnumeration))
                 {
                     schema.Type = typeDescription.Type;
-                    schema.SchemaReference = SchemaResolver.GetSchema(type, isIntegerEnumeration);
+                    schema.SchemaReference = schemaResolver.GetSchema(type, isIntegerEnumeration);
                     return schema;
                 }
 
@@ -140,11 +117,11 @@ namespace NJsonSchema.Generation
 
                     schema.TypeNameRaw = ReflectionExtensions.GetTypeName(type);
                     schema.Description = type.GetXmlDocumentation();
-                    SchemaResolver.AddSchema(type, isIntegerEnumeration, schema);
+                    schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
                 }
                 else
                 {
-                    schema.SchemaReference = Generate(type, parentAttributes);
+                    schema.SchemaReference = Generate<JsonSchema4>(type, parentAttributes, schemaResolver, schemaDefinitionAppender);
                     return schema;
                 }
             }
@@ -158,12 +135,12 @@ namespace NJsonSchema.Generation
                 {
                     var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
                     if (jsonSchemaAttribute?.ArrayItem != null)
-                        schema.Item = Generate(jsonSchemaAttribute.ArrayItem, null);
+                        schema.Item = Generate(jsonSchemaAttribute.ArrayItem, schemaResolver, schemaDefinitionAppender);
                     else
                         schema.Item = JsonSchema4.CreateAnySchema();
                 }
                 else
-                    schema.Item = Generate(itemType, null);
+                    schema.Item = Generate(itemType, schemaResolver, schemaDefinitionAppender);
             }
 
             return schema;
@@ -205,7 +182,7 @@ namespace NJsonSchema.Generation
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema)
+        private void GenerateDictionary<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
             where TSchemaType : JsonSchema4, new()
         {
             var genericTypeArguments = ReflectionExtensions.GetGenericTypeArguments(type);
@@ -214,7 +191,7 @@ namespace NJsonSchema.Generation
             if (valueType == typeof(object))
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else
-                schema.AdditionalPropertiesSchema = Generate(valueType);
+                schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver, schemaDefinitionAppender);
 
             schema.AllowAdditionalProperties = true;
         }
@@ -223,18 +200,20 @@ namespace NJsonSchema.Generation
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
         /// <param name="schema">The properties</param>
-        protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema)
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <param name="schemaDefinitionAppender"></param>
+        protected virtual void GenerateObject<TSchemaType>(Type type, TSchemaType schema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
             where TSchemaType : JsonSchema4, new()
         {
-            SchemaResolver.AddSchema(type, false, schema);
+            schemaResolver.AddSchema(type, false, schema);
             schema.AllowAdditionalProperties = false;
 
-            GeneratePropertiesAndInheritance(type, schema);
+            GeneratePropertiesAndInheritance(type, schema, schemaResolver, schemaDefinitionAppender);
             if (Settings.GenerateKnownTypes)
-                GenerateKnownTypes(type);
+                GenerateKnownTypes(type, schemaResolver, schemaDefinitionAppender);
         }
 
-        private void GeneratePropertiesAndInheritance(Type type, JsonSchema4 schema)
+        private void GeneratePropertiesAndInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
             var properties = GetTypeProperties(type);
 
@@ -244,27 +223,27 @@ namespace NJsonSchema.Generation
             var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
 #endif
             foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-                LoadProperty(type, property, schema);
+                LoadProperty(type, property, schema, schemaResolver, schemaDefinitionAppender);
 
-            GenerateInheritance(type, schema);
+            GenerateInheritance(type, schema, schemaResolver, schemaDefinitionAppender);
         }
 
-        private void GenerateKnownTypes(Type type)
+        private void GenerateKnownTypes(Type type, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
             foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute"))
             {
                 var typeDescription = JsonObjectTypeDescription.FromType(knownTypeAttribute.Type, null, Settings.DefaultEnumHandling);
                 var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
-                if (!SchemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
+                if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
                 {
-                    var knownSchema = Generate(knownTypeAttribute.Type);
-                    SchemaDefinitionAppender.Append(knownSchema.ActualSchema);
+                    var knownSchema = Generate(knownTypeAttribute.Type, schemaResolver, schemaDefinitionAppender);
+                    schemaDefinitionAppender.Append(knownSchema.ActualSchema);
                 }
             }
         }
 
-        private void GenerateInheritance(Type type, JsonSchema4 schema)
+        private void GenerateInheritance(Type type, JsonSchema4 schema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
             GenerateInheritanceDiscriminator(type, schema);
 
@@ -272,10 +251,10 @@ namespace NJsonSchema.Generation
             if (baseType != null && baseType != typeof(object))
             {
                 if (Settings.FlattenInheritanceHierarchy)
-                    GeneratePropertiesAndInheritance(baseType, schema);
+                    GeneratePropertiesAndInheritance(baseType, schema, schemaResolver, schemaDefinitionAppender);
                 else
                 {
-                    var baseSchema = Generate(baseType);
+                    var baseSchema = Generate(baseType, schemaResolver, schemaDefinitionAppender);
                     schema.AllOf.Add(baseSchema);
                 }
             }
@@ -355,7 +334,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema)
+        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
             var propertyType = property.PropertyType;
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, property.GetCustomAttributes(), Settings.DefaultEnumHandling);
@@ -372,7 +351,7 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
-                var propertySchema = Generate<JsonSchema4>(propertyType, property.GetCustomAttributes());
+                var propertySchema = Generate<JsonSchema4>(propertyType, property.GetCustomAttributes(), schemaResolver, schemaDefinitionAppender);
                 var useSchemaReference =
                     !propertySchema.IsDictionary &&
                     (propertySchema.Type.HasFlag(JsonObjectType.Object) || propertySchema.IsEnumeration);
@@ -398,7 +377,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes());
+                    jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver, schemaDefinitionAppender);
 
                     if (!Settings.TypeMappings.ContainsKey(propertyType))
                         propertyTypeDescription.ApplyType(jsonProperty);
