@@ -12,8 +12,8 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 
 <#foreach(var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
-<#}#>    [JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
-<#if(property.RenderRequiredAttribute){#>    [Required]
+<#}#>    [JsonProperty("<#=property.Name#>"<#if(property.IsRequired){#>, Required = <#=property.JsonPropertyRequired#><#}#>)]
+<#if(property.IsRequired){#>    [Required]
 <#}#><#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]
 <#}#>
     public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>

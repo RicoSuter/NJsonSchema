@@ -174,17 +174,30 @@ if(property.HasDescription){
             
             #line default
             #line hidden
-            this.Write("\", Required = ");
+            this.Write("\"");
+            
+            #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+if(property.IsRequired){
+            
+            #line default
+            #line hidden
+            this.Write(", Required = ");
             
             #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.JsonPropertyRequired));
             
             #line default
             #line hidden
+            
+            #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
             this.Write(")]\r\n");
             
             #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
-if(property.RenderRequiredAttribute){
+if(property.IsRequired){
             
             #line default
             #line hidden
