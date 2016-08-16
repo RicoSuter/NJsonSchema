@@ -62,7 +62,7 @@ namespace NJsonSchema.Generation
             ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
             where TSchemaType : JsonSchema4, new()
         {
-            var schema = HandleSpecialTypes<TSchemaType>(type);
+            var schema = HandleSpecialTypes<TSchemaType>(type, schemaResolver);
             if (schema != null)
                 return schema;
 
@@ -170,23 +170,16 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type)
+        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             if (Settings.TypeMappings.ContainsKey(type))
             {
-                if (typeof(TSchemaType) == typeof(JsonSchema4))
-                    return (TSchemaType)Settings.TypeMappings[type];
-
-                return new TSchemaType
-                {
-                    SchemaReference = Settings.TypeMappings[type]
-                };
+                if (!schemaResolver.HasSchema(type, false))
+                    schemaResolver.AddSchema(type, false, Settings.TypeMappings[type]);
             }
-
-            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+            else if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
                 return JsonSchema4.CreateAnySchema<TSchemaType>();
-
             return null;
         }
 
