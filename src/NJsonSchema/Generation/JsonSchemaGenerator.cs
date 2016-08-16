@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
+using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation

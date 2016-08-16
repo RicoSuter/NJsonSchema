@@ -1,6 +1,6 @@
 using System;
 
-namespace NJsonSchema.Generation
+namespace NJsonSchema.Generation.TypeMappers
 {
     /// <summary>Maps .NET type to a generated JSON Schema describing an object.</summary>
     public class ObjectTypeMapper : ITypeMapper

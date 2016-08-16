@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
+using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Tests.Generation
 {

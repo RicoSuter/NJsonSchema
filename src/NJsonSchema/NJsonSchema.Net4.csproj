@@ -45,8 +45,11 @@
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
     <Compile Include="EnumHandling.cs" />
+    <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\JsonSchemaGenerator.cs" />
     <Compile Include="Generation\JsonSchemaGeneratorSettings.cs" />
+    <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
+    <Compile Include="Generation\TypeMappers\PrimitiveTypeMapper.cs" />
     <Compile Include="IDocumentPathProvider.cs" />
     <Compile Include="Infrastructure\DynamicApis.cs" />
     <Compile Include="Infrastructure\ReflectionCache.cs" />
