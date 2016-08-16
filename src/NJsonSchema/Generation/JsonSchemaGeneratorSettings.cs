@@ -22,7 +22,7 @@ namespace NJsonSchema.Generation
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
-            TypeMappings = new Dictionary<Type, Action<JsonSchema4, JsonSchemaGenerator>>();
+            TypeMappings = new Dictionary<Type, JsonSchema4>();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -45,6 +45,6 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
-        public IDictionary<Type, Action<JsonSchema4, JsonSchemaGenerator>> TypeMappings { get; set; }
+        public IDictionary<Type, JsonSchema4> TypeMappings { get; set; }
     }
 }

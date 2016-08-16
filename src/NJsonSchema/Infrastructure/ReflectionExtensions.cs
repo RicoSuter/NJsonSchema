@@ -18,10 +18,10 @@ namespace NJsonSchema.Infrastructure
         {
 #if !LEGACY
             if (type.IsConstructedGenericType)
-                return type.Name.Split('`').First() + GetTypeName(type.GenericTypeArguments[0]);
+                return type.Name.Split('`').First() + "Of" + GetTypeName(type.GenericTypeArguments[0]);
 #else
             if (type.IsGenericType)
-                return type.Name.Split('`').First() + GetTypeName(type.GetGenericArguments()[0]);
+                return type.Name.Split('`').First() + "Of" + GetTypeName(type.GetGenericArguments()[0]);
 #endif
 
             return type.Name;

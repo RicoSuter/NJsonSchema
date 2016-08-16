@@ -8,7 +8,9 @@ namespace NJsonSchema.Tests.Generation
     {
         public class Foo
         {
-            public Bar Bar { get; set; }
+            public Bar Bar1 { get; set; }
+
+            public Bar Bar2 { get; set; }
         }
 
         public class Bar
@@ -17,24 +19,67 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_type_mapping_is_available_for_type_then_it_is_called()
+        public void When_simple_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
             var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappings =
                 {
-                    {typeof(Bar), (s, schemaGenerator) =>
+                    {
+                        typeof(Bar),
+                        new JsonSchema4
                         {
-                            s.Type = JsonObjectType.String;
+                            Type = JsonObjectType.String
                         }
                     }
                 }
             });
 
             //// Assert
-            var property = schema.Properties["Bar"].ActualSchema;
+            var json = schema.ToJson();
+            var property = schema.Properties["Bar1"].ActualPropertySchema;
+
             Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
+        }
+
+        [TestMethod]
+        public void When_object_type_mapping_is_available_for_type_then_it_is_called()
+        {
+            //// Act
+            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            {
+                TypeMappings =
+                {
+                    {
+                        typeof(Bar),
+                        new JsonSchema4
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {
+                                    "Prop",
+                                    new JsonProperty
+                                    {
+                                        IsRequired = true,
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            //// Assert
+            var json = schema.ToJson();
+
+            var property1 = schema.Properties["Bar1"];
+            var property2 = schema.Properties["Bar2"];
+
+            Assert.IsTrue(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
+            Assert.IsTrue(property1.ActualPropertySchema == property2.ActualPropertySchema);
         }
     }
 }
