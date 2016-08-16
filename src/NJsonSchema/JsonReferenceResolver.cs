@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -127,7 +128,7 @@ namespace NJsonSchema
             {
                 try
                 {
-                    var arr = url.Split('#');
+                    var arr = Regex.Split(url, @"(?=#)");
 
                     if (!_resolvedSchemas.ContainsKey(arr[0]))
                         _resolvedSchemas[arr[0]] = JsonSchema4.FromFile(arr[0]);
