@@ -19,20 +19,14 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_simple_type_mapping_is_available_for_type_then_it_is_called()
+        public void When_primitive_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
             var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
-                TypeMappings =
+                TypeMappers =
                 {
-                    {
-                        typeof(Bar),
-                        new JsonSchema4
-                        {
-                            Type = JsonObjectType.String
-                        }
-                    }
+                    new PrimitiveTypeMapper(typeof(Bar), s => s.Type = JsonObjectType.String)
                 }
             });
 
@@ -41,6 +35,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Bar1"].ActualPropertySchema;
 
             Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
+            Assert.IsFalse(json.Contains("$ref"));
         }
 
         [TestMethod]
@@ -49,11 +44,9 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
-                TypeMappings =
+                TypeMappers =
                 {
-                    {
-                        typeof(Bar),
-                        new JsonSchema4
+                    new ObjectTypeMapper(typeof(Bar), new JsonSchema4
                         {
                             Type = JsonObjectType.Object,
                             Properties =
@@ -68,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
                                 }
                             }
                         }
-                    }
+                    )
                 }
             });
 
@@ -80,6 +73,8 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.IsTrue(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
             Assert.IsTrue(property1.ActualPropertySchema == property2.ActualPropertySchema);
+
+            Assert.IsTrue(json.Contains("$ref"));
         }
     }
 }

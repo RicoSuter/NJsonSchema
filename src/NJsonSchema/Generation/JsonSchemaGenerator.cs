@@ -173,13 +173,17 @@ namespace NJsonSchema.Generation
         private TSchemaType HandleSpecialTypes<TSchemaType>(Type type, ISchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (Settings.TypeMappings.ContainsKey(type))
+            var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
+            if (typeMapper != null)
             {
-                if (!schemaResolver.HasSchema(type, false))
-                    schemaResolver.AddSchema(type, false, Settings.TypeMappings[type]);
+                var schema = typeMapper.GetSchema<TSchemaType>(this, schemaResolver);
+                if (schema != null)
+                    return schema;
             }
-            else if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+
+            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
                 return JsonSchema4.CreateAnySchema<TSchemaType>();
+
             return null;
         }
 
@@ -353,7 +357,10 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
+                var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == propertyType);
                 var useSchemaReference =
+                    typeMapper?.UseReference != false && 
+                    !Settings.TypeMappers.Any(m => m is PrimitiveTypeMapper) &&
                     !propertyTypeDescription.IsDictionary &&
                     (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
 
@@ -382,7 +389,8 @@ namespace NJsonSchema.Generation
                 {
                     jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver, schemaDefinitionAppender);
 
-                    if (!Settings.TypeMappings.ContainsKey(propertyType))
+                    // TODO (important): Refactor out these two lines!
+                    if (Settings.TypeMappers.All(m => m.MappedType != propertyType))
                         propertyTypeDescription.ApplyType(jsonProperty);
                 }
 

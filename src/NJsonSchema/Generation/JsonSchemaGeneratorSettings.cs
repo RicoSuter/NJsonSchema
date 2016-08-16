@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
@@ -22,7 +22,6 @@ namespace NJsonSchema.Generation
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
-            TypeMappings = new Dictionary<Type, JsonSchema4>();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -45,6 +44,6 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
-        public IDictionary<Type, JsonSchema4> TypeMappings { get; set; }
+        public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
     }
 }
