@@ -63,6 +63,7 @@
     <Compile Include="Conversion\SchemaReferenceTests.cs" />
     <Compile Include="Conversion\ArrayTypeToSchemaTests.cs" />
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
+    <Compile Include="Generation\FieldGenerationTests.cs" />
     <Compile Include="Generation\PropertyNamesGenerationTests.cs" />
     <Compile Include="Generation\FlattenInheritanceHierarchyTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />

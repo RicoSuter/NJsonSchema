@@ -229,11 +229,17 @@ namespace NJsonSchema.Generation
 
 #if !LEGACY
             var declaredProperties = type.GetTypeInfo().DeclaredProperties;
+            var declaredFields = type.GetTypeInfo().DeclaredFields.Where(f => f.IsPublic);
 #else
             var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+            var declaredFields = type.GetTypeInfo().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
 #endif
+
             foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-                LoadProperty(type, property, schema, schemaResolver, schemaDefinitionAppender);
+                LoadPropertyOrField(property, property.PropertyType, type, schema, schemaResolver, schemaDefinitionAppender);
+
+            foreach (var field in declaredFields.Where(p => properties == null || properties.Contains(p.Name)))
+                LoadPropertyOrField(field, field.FieldType, type, schema, schemaResolver, schemaDefinitionAppender);
 
             GenerateInheritance(type, schema, schemaResolver, schemaDefinitionAppender);
         }
@@ -344,12 +350,11 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void LoadProperty(Type parentType, PropertyInfo property, JsonSchema4 parentSchema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
+        private void LoadPropertyOrField(MemberInfo property, Type propertyType, Type parentType, JsonSchema4 parentSchema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
-            var propertyType = property.PropertyType;
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, property.GetCustomAttributes(), Settings.DefaultEnumHandling);
+            var attributes = property.GetCustomAttributes(true).OfType<Attribute>().ToArray();
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, attributes, Settings.DefaultEnumHandling);
 
-            var attributes = property.GetCustomAttributes().ToArray();
             if (IsPropertyIgnored(parentType, attributes) == false)
             {
                 JsonProperty jsonProperty;
@@ -370,7 +375,7 @@ namespace NJsonSchema.Generation
 
                 if (useSchemaReference)
                 {
-                    var propertySchema = Generate<JsonSchema4>(propertyType, property.GetCustomAttributes(), schemaResolver, schemaDefinitionAppender);
+                    var propertySchema = Generate<JsonSchema4>(propertyType, attributes, schemaResolver, schemaDefinitionAppender);
 
                     // The schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
                     if (Settings.NullHandling == NullHandling.JsonSchema)
@@ -391,7 +396,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    jsonProperty = Generate<JsonProperty>(propertyType, property.GetCustomAttributes(), schemaResolver, schemaDefinitionAppender);
+                    jsonProperty = Generate<JsonProperty>(propertyType, attributes, schemaResolver, schemaDefinitionAppender);
 
                     // TODO (important): Refactor out these two lines!
                     if (Settings.TypeMappers.All(m => m.MappedType != propertyType))
@@ -405,7 +410,7 @@ namespace NJsonSchema.Generation
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
                 var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
-                var jsonPropertyAttribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+                var jsonPropertyAttribute = attributes.OfType<JsonPropertyAttribute>().SingleOrDefault();
 
                 var hasJsonNetAttributeRequired = jsonPropertyAttribute != null && (
                     jsonPropertyAttribute.Required == Required.Always ||

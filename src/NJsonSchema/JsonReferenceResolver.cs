@@ -112,7 +112,7 @@ namespace NJsonSchema
                     var pathSegment = property.GetName();
                     if (pathSegment == firstSegment)
                     {
-                        var value = property.PropertyInfo.GetValue(obj);
+                        var value = property.GetValue(obj);
                         return ResolveReference(value, segments.Skip(1).ToList(), allSegments, checkedObjects);
                     }
                 }

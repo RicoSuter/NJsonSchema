@@ -24,12 +24,12 @@ namespace NJsonSchema
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
         /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
-        public static string GetPropertyName(PropertyInfo property, PropertyNameHandling propertyNameHandling)
+        public static string GetPropertyName(MemberInfo property, PropertyNameHandling propertyNameHandling)
         {
             switch (propertyNameHandling)
             {
                 case PropertyNameHandling.Default:
-                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.PropertyInfo.Name == property.Name).GetName();
+                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.MemberInfo.Name == property.Name).GetName();
 
                 case PropertyNameHandling.CamelCase:
                     return CamelCaseResolverLazy.Value.GetResolvedPropertyName(property.Name);
@@ -97,7 +97,7 @@ namespace NJsonSchema
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.PropertyInfo.GetValue(obj);
+                    var value = property.GetValue(obj);
                     if (value != null)
                     {
                         var pathSegment = property.GetName();
