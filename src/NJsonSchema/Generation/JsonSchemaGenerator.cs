@@ -78,7 +78,10 @@ namespace NJsonSchema.Generation
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
+                {
+                    typeDescription.ApplyType(schema);
                     GenerateDictionary(type, schema, schemaResolver, schemaDefinitionAppender);
+                }
                 else
                 {
                     if (schemaResolver.HasSchema(type, false))
