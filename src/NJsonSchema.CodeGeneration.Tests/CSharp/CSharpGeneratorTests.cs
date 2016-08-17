@@ -1,7 +1,10 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.Generation;
@@ -609,7 +612,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull)]"));
+            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull"));
             Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
         }
 
@@ -659,6 +662,65 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("public partial class FooOfBar"));
+        }
+
+        [JsonObject(MemberSerialization.OptIn)]
+        [GeneratedCode("NJsonSchema", "3.4.6065.33501")]
+        public partial class Person2
+        {
+            [JsonProperty("FirstName", Required = Required.Always)]
+            [Required]
+            public string FirstName { get; set; }
+
+            [JsonProperty("MiddleName", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+            public string MiddleName { get; set; }
+
+            [JsonProperty("Age", Required = Required.AllowNull)]
+            public int? Age { get; set; }
+        }
+
+        [TestMethod]
+        public void When_property_is_required_then_CSharp_code_is_correct()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<Person2>();
+            var schemaJson = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(schemaJson.Contains(
+@"  ""required"": [
+    ""FirstName"",
+    ""Age""
+  ],
+  ""properties"": {
+    ""FirstName"": {
+      ""type"": ""string""
+    },
+    ""MiddleName"": {
+      ""type"": ""string""
+    },
+    ""Age"": {
+      ""type"": [
+        ""integer"",
+        ""null""
+      ]
+    }
+  }"));
+
+            Assert.IsTrue(code.Contains(
+@"        [JsonProperty(""FirstName"", Required = Required.Always)]
+        [Required]
+        public string FirstName { get; set; }
+    
+        [JsonProperty(""MiddleName"", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string MiddleName { get; set; }
+    
+        [JsonProperty(""Age"", Required = Required.AllowNull)]
+        public int? Age { get; set; }"));
         }
     }
 }

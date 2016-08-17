@@ -72,9 +72,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.PropertyInfo.GetValue(obj);
+                    var value = property.GetValue(obj);
                     if (value != null)
-                        FindAllSchemas(value, checkedObjects, schemas, typeResolver, property.PropertyInfo.Name);
+                        FindAllSchemas(value, checkedObjects, schemas, typeResolver, property.MemberInfo.Name);
                 }
             }
         }

@@ -90,8 +90,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JsonInheritanceConverterTemplate.tt</DependentUpon>
     </Compile>
+    <Compile Include="DefaultTemplateFactory.cs" />
     <Compile Include="IPropertyNameGenerator.cs" />
     <Compile Include="DefaultValueGenerator.cs" />
+    <Compile Include="ITemplateFactory.cs" />
     <Compile Include="ITypeResolver.cs" />
     <Compile Include="Models\PropertyModelBase.cs" />
     <Compile Include="CSharp\Templates\ClassTemplate.cs">

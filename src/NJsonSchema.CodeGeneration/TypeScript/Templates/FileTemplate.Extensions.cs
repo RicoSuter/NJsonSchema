@@ -4,17 +4,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
     internal partial class FileTemplate : ITemplate
     {
-        public FileTemplateModel Model { get; private set; }
-
-        /// <summary>Initializes the template with a model.</summary>
-        /// <param name="model">The model.</param>
-        public void Initialize(object model)
+        public FileTemplate(FileTemplateModel model)
         {
-            Model = (FileTemplateModel)model;
+            Model = model;
         }
 
-        /// <summary>Renders the template.</summary>
-        /// <returns>The output.</returns>
+        public FileTemplateModel Model { get; }
+        
         public string Render()
         {
             return ConversionUtilities.TrimWhiteSpaces(TransformText());

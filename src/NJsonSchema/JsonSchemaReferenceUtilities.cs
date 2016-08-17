@@ -66,18 +66,17 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                foreach (var item in (IEnumerable)obj)
+                foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
                     UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
             }
 
             if (!(obj is JToken))
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
-                    p.PropertyInfo.CanRead &&
-                    p.PropertyInfo.GetIndexParameters().Length == 0 &&
+                    p.CanRead && p.IsIndexer == false &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.PropertyInfo.GetValue(obj);
+                    var value = property.GetValue(obj);
                     if (value != null)
                     {
                         if (!checkedObjects.Contains(value))
@@ -106,18 +105,17 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                foreach (var item in (IEnumerable)obj)
+                foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
                     UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
             }
 
             if (!(obj is JToken))
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
-                    p.PropertyInfo.CanRead &&
-                    p.PropertyInfo.GetIndexParameters().Length == 0 &&
+                    p.CanRead && p.IsIndexer == false &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.PropertyInfo.GetValue(obj);
+                    var value = property.GetValue(obj);
                     if (value != null)
                     {
                         if (!checkedObjects.Contains(value))

@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
@@ -27,6 +28,11 @@ namespace NJsonSchema
         /// <returns>The <see cref="JsonObjectTypeDescription"/>. </returns>
         public static JsonObjectTypeDescription FromType(Type type, IEnumerable<Attribute> parentAttributes, EnumHandling defaultEnumHandling)
         {
+            var allowsNull = true;
+            var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
+            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
+                allowsNull = false;
+
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);
@@ -52,7 +58,7 @@ namespace NJsonSchema
                 return new JsonObjectTypeDescription(JsonObjectType.Boolean, false);
 
             if (type == typeof(string) || type == typeof(Type))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true);
+                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull);
 
             if (type == typeof(char))
                 return new JsonObjectTypeDescription(JsonObjectType.String, false);
@@ -73,19 +79,19 @@ namespace NJsonSchema
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
 
             if (type == typeof(byte[]))
-                return new JsonObjectTypeDescription(JsonObjectType.String, true, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull, false, JsonFormatStrings.Byte);
 
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return new JsonObjectTypeDescription(JsonObjectType.None, true);
+                return new JsonObjectTypeDescription(JsonObjectType.None, allowsNull);
 
             if (IsFileType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.File, true);
+                return new JsonObjectTypeDescription(JsonObjectType.File, allowsNull);
 
             if (IsDictionaryType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.Object, true, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull, true);
 
             if (IsArrayType(type))
-                return new JsonObjectTypeDescription(JsonObjectType.Array, true);
+                return new JsonObjectTypeDescription(JsonObjectType.Array, allowsNull);
 
             if (type.Name == "Nullable`1")
             {
@@ -94,7 +100,7 @@ namespace NJsonSchema
 #else
                 var typeDescription = FromType(type.GetGenericArguments()[0], parentAttributes, defaultEnumHandling);
 #endif
-                typeDescription.IsNullable = true;
+                typeDescription.IsNullable = allowsNull;
                 return typeDescription;
             }
 
@@ -104,10 +110,10 @@ namespace NJsonSchema
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return new JsonObjectTypeDescription(classType, true, false, format);
+                return new JsonObjectTypeDescription(classType, allowsNull, false, format);
             }
 
-            return new JsonObjectTypeDescription(JsonObjectType.Object, true);
+            return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull);
         }
 
         /// <summary>Determines whether the an enum property serializes to a string.</summary>

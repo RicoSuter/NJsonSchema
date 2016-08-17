@@ -89,7 +89,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType), null, null, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator), new SchemaResolver());
+            return generator.Generate(typeof(TType));
         }
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
@@ -99,7 +99,7 @@ namespace NJsonSchema
         public static JsonSchema4 FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type, null, null, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator), new SchemaResolver());
+            return generator.Generate(type);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -627,7 +627,7 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(typeNameGenerator));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, typeNameGenerator));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
 

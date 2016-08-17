@@ -72,7 +72,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
+    <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
+    <Compile Include="Generation\TypeMappers\PrimitiveTypeMapper.cs" />
     <Compile Include="IDocumentPathProvider.cs" />
+    <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="JsonExceptionConverter.cs" />
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />

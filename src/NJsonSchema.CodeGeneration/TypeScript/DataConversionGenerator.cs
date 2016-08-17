@@ -17,20 +17,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The generated code.</returns>
         public static string RenderConvertToJavaScriptCode(DataConversionParameters parameters)
         {
-            return Render(new ConvertToJavaScriptTemplate(), parameters);
+            return new ConvertToJavaScriptTemplate(CreateModel(parameters)).Render();
         }
 
         /// <summary>Generates the code to convert a data object to the target class instances.</summary>
         /// <returns>The generated code.</returns>
         public static string RenderConvertToClassCode(DataConversionParameters parameters)
         {
-            return Render(new ConvertToClassTemplate(), parameters);
+            return new ConvertToClassTemplate(CreateModel(parameters)).Render();
         }
 
-        private static string Render(ITemplate template, DataConversionParameters parameters)
+        private static object CreateModel(DataConversionParameters parameters)
         {
             var defaultValueGenerator = new DefaultValueGenerator(parameters.Resolver);
-            template.Initialize(new
+            return new
             {
                 Variable = parameters.Variable,
                 Value = parameters.Value,
@@ -41,13 +41,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint),
 
                 IsNewableObject = IsNewableObject(parameters.Schema),
-                IsDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String && 
+                IsDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String &&
                          parameters.Schema.Format == JsonFormatStrings.DateTime,
 
                 IsDictionary = parameters.Schema.IsDictionary,
                 DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any",
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
-                IsDictionaryValueDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String && 
+                IsDictionaryValueDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String &&
                                         parameters.Schema.AdditionalPropertiesSchema?.Format == JsonFormatStrings.DateTime,
 
                 IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
@@ -55,11 +55,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
                 IsArrayItemDate = parameters.Settings.DateTimeType != TypeScriptDateTimeType.String &&
                                   parameters.Schema.Item?.Format == JsonFormatStrings.DateTime,
-                
+
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" : "moment",
                 DateToStringCode = "toISOString()"
-            });
-            return template.Render();
+            };
         }
 
         private static bool IsNewableObject(JsonSchema4 schema)

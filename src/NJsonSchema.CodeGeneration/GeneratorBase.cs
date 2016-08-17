@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.IO;
-using System.Reflection;
-
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The base class of the code generators</summary>

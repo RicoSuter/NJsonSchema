@@ -15,19 +15,24 @@ namespace NJsonSchema
     {
         private readonly ITypeNameGenerator _typeNameGenerator;
 
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender"/> class.</summary>
-        public JsonSchemaDefinitionAppender(ITypeNameGenerator typeNameGenerator)
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="typeNameGenerator">The type name generator.</param>
+        public JsonSchemaDefinitionAppender(object rootObject, ITypeNameGenerator typeNameGenerator)
         {
+            RootObject = rootObject; 
             _typeNameGenerator = typeNameGenerator; 
         }
 
+        /// <summary>Gets or sets the root object to append schemas to.</summary>
+        public object RootObject { get; set; }
+
         /// <summary>Appends the schema to the root object.</summary>
-        /// <param name="root">The root object.</param>
         /// <param name="objectToAppend">The object to append.</param>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        public void Append(object root, JsonSchema4 objectToAppend)
+        public void Append(JsonSchema4 objectToAppend)
         {
-            var rootSchema = root as JsonSchema4;
+            var rootSchema = RootObject as JsonSchema4;
             if (rootSchema != null && objectToAppend != null)
             {
                 var typeName = objectToAppend.GetTypeName(_typeNameGenerator); 
