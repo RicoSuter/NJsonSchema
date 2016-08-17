@@ -52,9 +52,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 else
                 {
                     if (!_property.IsNullable(_settings.NullHandling))
-                        return "Required.DisallowNull";
+                        return "Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore";
                     else
-                        return "Required.Default";
+                        return "Required.Default, NullValueHandling = NullValueHandling.Ignore";
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (_property.IsNullable(_settings.NullHandling))
+                if (!_settings.RequiredPropertiesMustBeDefined || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
                     return false;
 
                 return _property.ActualPropertySchema.IsAnyType ||
