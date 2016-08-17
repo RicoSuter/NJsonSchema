@@ -686,8 +686,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema4.FromType<Person2>();
             var schemaJson = schema.ToJson();
 
-
-
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
@@ -724,15 +722,5 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [JsonProperty(""Age"", Required = Required.AllowNull)]
         public int? Age { get; set; }"));
         }
-
-        [JsonProperty("FirstName", Required = Required.Always)]
-        [Required]
-        public string FirstName { get; set; }
-
-        [JsonProperty("MiddleName", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
-
-        [JsonProperty("Age", Required = Required.AllowNull)]
-        public int? Age { get; set; }
     }
 }
