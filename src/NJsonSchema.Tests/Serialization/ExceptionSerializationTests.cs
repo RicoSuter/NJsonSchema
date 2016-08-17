@@ -2,7 +2,6 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Annotations;
 
 namespace NJsonSchema.Tests.Serialization
 {
@@ -39,8 +38,9 @@ namespace NJsonSchema.Tests.Serialization
                 Converters =
                 {
                     new JsonExceptionConverter()
-                },
+                }
             };
+
             try
             {
                 throw new CompanyNotFoundException("Foo", new Exception("Bar", new Exception("Hello World")))

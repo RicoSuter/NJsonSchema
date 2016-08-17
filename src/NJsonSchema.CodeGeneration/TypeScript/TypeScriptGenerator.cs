@@ -84,9 +84,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (_schema.IsEnumeration)
             {
-                if (_schema.Type == JsonObjectType.Integer)
-                    typeName = typeName + "AsInteger";
-
                 var model = new EnumTemplateModel(typeName, _schema);
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
                 return new TypeGeneratorResult
