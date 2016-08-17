@@ -30,7 +30,7 @@ The project is maintained and developed by [Rico Suter](http://rsuter.com) and o
 
 ## NJsonSchema usage
 
-The [JsonSchema](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema4) class can be used as follows: 
+The [JsonSchema4](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema4) class can be used as follows: 
 
 ```cs
 var schema = JsonSchema4.FromType<Person>();
