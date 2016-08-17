@@ -9,6 +9,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 
@@ -73,7 +74,7 @@ namespace NJsonSchema
             if (!(obj is JToken))
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
-                    p.CanRead && p.IsIndexer == false &&
+                    p.CanRead && p.IsIndexer == false && p.MemberInfo is PropertyInfo &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var value = property.GetValue(obj);
@@ -112,7 +113,7 @@ namespace NJsonSchema
             if (!(obj is JToken))
             {
                 foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
-                    p.CanRead && p.IsIndexer == false &&
+                    p.CanRead && p.IsIndexer == false && p.MemberInfo is PropertyInfo &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var value = property.GetValue(obj);
