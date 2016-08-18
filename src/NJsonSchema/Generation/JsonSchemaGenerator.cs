@@ -228,11 +228,18 @@ namespace NJsonSchema.Generation
             var properties = GetTypeProperties(type);
 
 #if !LEGACY
-            var declaredProperties = type.GetTypeInfo().DeclaredProperties;
-            var declaredFields = type.GetTypeInfo().DeclaredFields.Where(f => f.IsPublic);
+            var declaredFields = type.GetTypeInfo().DeclaredFields
+                .Where(f => f.IsPublic);
+
+            var declaredProperties = type.GetTypeInfo().DeclaredProperties
+                .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true);
 #else
-            var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
-            var declaredFields = type.GetTypeInfo().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+            var declaredFields = type.GetTypeInfo()
+                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+
+            var declaredProperties = type.GetTypeInfo()
+                .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetGetMethod()?.IsPublic == true || p.GetSetMethod()?.IsPublic == true);
 #endif
 
             foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
@@ -368,7 +375,7 @@ namespace NJsonSchema.Generation
 
                 var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == propertyType);
                 var useSchemaReference =
-                    typeMapper?.UseReference != false && 
+                    typeMapper?.UseReference != false &&
                     !Settings.TypeMappers.Any(m => m is PrimitiveTypeMapper) &&
                     !propertyTypeDescription.IsDictionary &&
                     (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
@@ -395,13 +402,7 @@ namespace NJsonSchema.Generation
                     }
                 }
                 else
-                {
                     jsonProperty = Generate<JsonProperty>(propertyType, attributes, schemaResolver, schemaDefinitionAppender);
-
-                    // TODO (important): Refactor out these two lines!
-                    if (Settings.TypeMappers.All(m => m.MappedType != propertyType))
-                        propertyTypeDescription.ApplyType(jsonProperty);
-                }
 
                 var propertyName = JsonPathUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))

@@ -30,7 +30,7 @@ namespace NJsonSchema.Infrastructure
                     var declaredProperties = type.GetRuntimeProperties();
                     var declaredFields = type.GetRuntimeFields().Where(f => f.IsPublic);
 #else
-                    var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.Instance);
                     var declaredFields = type.GetTypeInfo().GetFields(BindingFlags.Public | BindingFlags.Instance);
 #endif
 
