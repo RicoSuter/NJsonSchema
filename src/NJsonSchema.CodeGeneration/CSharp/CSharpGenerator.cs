@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
-using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -57,25 +56,23 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var template = new FileTemplate() as ITemplate;
-            template.Initialize(new FileTemplateModel
+            var model = new FileTemplateModel
             {
                 Toolchain = JsonSchema4.ToolchainVersion,
                 Namespace = Settings.Namespace ?? string.Empty,
                 Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
-            });
+            };
+
+            var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
             return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
-        /// <param name="fallbackTypeName">The fallback type name when TypeName is not available on schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string fallbackTypeName)
+        public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
-            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
-
-            if (string.IsNullOrEmpty(typeName))
-                typeName = fallbackTypeName;
+            var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
 
             if (_schema.IsEnumeration)
                 return GenerateEnum(typeName);
@@ -91,10 +88,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 .ToList();
 
             RenamePropertyWithSameNameAsClass(typeName, properties);
-            
+
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties);
-            var template = new ClassTemplate() as ITemplate;
-            template.Initialize(model);
+            var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
@@ -117,8 +113,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateEnum(string typeName)
         {
-            var template = new EnumTemplate() as ITemplate;
-            template.Initialize(new EnumTemplateModel(typeName, _schema));
+            var model = new EnumTemplateModel(typeName, _schema); 
+            var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
             return new TypeGeneratorResult
             {
                 TypeName = typeName,

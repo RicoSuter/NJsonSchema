@@ -11,9 +11,11 @@ namespace NJsonSchema
     /// <summary>Appends a schema to the definition list of the root object.</summary>
     public interface ISchemaDefinitionAppender
     {
+        /// <summary>Gets or sets the root object to append schemas to.</summary>
+        object RootObject { get; set; }
+
         /// <summary>Appends the schema to the root object.</summary>
-        /// <param name="root">The root object.</param>
         /// <param name="objectToAppend">The object to append.</param>
-        void Append(object root, JsonSchema4 objectToAppend);
+        void Append(JsonSchema4 objectToAppend);
     }
 }

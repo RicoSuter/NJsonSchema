@@ -7,12 +7,16 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace NJsonSchema
 {
     /// <summary>Manager which resolves types to schemas.</summary>
     public interface ISchemaResolver
     {
+        /// <summary>Gets all the schemas.</summary>
+        IEnumerable<JsonSchema4> Schemas { get; }
+
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>

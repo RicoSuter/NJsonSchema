@@ -8,7 +8,6 @@
 
 using System.Linq;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
-using NJsonSchema.CodeGeneration.TypeScript.Templates;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -61,8 +60,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var template = new FileTemplate() as ITemplate;
-            template.Initialize(new FileTemplateModel
+            var model = new FileTemplateModel
             {
                 Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
 
@@ -71,27 +69,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
                 ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
-            });
+            };
+
+            var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File", model);
             return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
-        /// <param name="fallbackTypeName">The fallback type name.</param>
+        /// <param name="typeNameHint">The fallback type name.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string fallbackTypeName)
+        public override TypeGeneratorResult GenerateType(string typeNameHint)
         {
-            var typeName = _schema.GetTypeName(Settings.TypeNameGenerator);
-
-            if (string.IsNullOrEmpty(typeName))
-                typeName = fallbackTypeName;
+            var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
 
             if (_schema.IsEnumeration)
             {
-                if (_schema.Type == JsonObjectType.Integer)
-                    typeName = typeName + "AsInteger";
-
-                var template = new EnumTemplate() as ITemplate;
-                template.Initialize(new EnumTemplateModel(typeName, _schema));
+                var model = new EnumTemplateModel(typeName, _schema);
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
                 return new TypeGeneratorResult
                 {
                     TypeName = typeName,
@@ -109,8 +103,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     .Select(s => s.Key)
                     .ToList();
 
-                var template = Settings.CreateTemplate(typeName);
-                template.Initialize(new // TODO: Create model class
+                var template = Settings.CreateTemplate(typeName, new // TODO: Create model class
                 {
                     Class = Settings.ExtendedClasses?.Contains(typeName) == true ? typeName + "Base" : typeName,
                     RealClass = typeName,

@@ -6,7 +6,11 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
+using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
 {
@@ -23,7 +27,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
-        
+
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
@@ -38,5 +42,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type name generator.</summary>
         public ITypeNameGenerator TypeNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the type mappings.</summary>
+        [JsonIgnore]
+        public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
     }
 }
