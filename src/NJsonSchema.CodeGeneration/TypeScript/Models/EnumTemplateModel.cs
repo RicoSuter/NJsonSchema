@@ -11,22 +11,30 @@ using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
-    internal class EnumTemplateModel
+    /// <summary>The TypeScript enum template model.</summary>
+    public class EnumTemplateModel
     {
         private readonly JsonSchema4 _schema;
 
+        /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel"/> class.</summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="schema">The schema.</param>
         public EnumTemplateModel(string typeName, JsonSchema4 schema)
         {
             _schema = schema; 
             Name = typeName;
         }
 
+        /// <summary>Gets the name of the enum.</summary>
         public string Name { get; }
 
+        /// <summary>Gets the enum values.</summary>
         public List<EnumerationEntry> Enums => GetEnumeration(_schema);
 
+        /// <summary>Gets a value indicating whether the enum has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
+        /// <summary>Gets the description.</summary>
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
         private List<EnumerationEntry> GetEnumeration(JsonSchema4 schema)

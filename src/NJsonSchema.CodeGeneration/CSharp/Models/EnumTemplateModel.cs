@@ -11,24 +11,33 @@ using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    internal class EnumTemplateModel
+    /// <summary>The CSharp enum template model.</summary>
+    public class EnumTemplateModel
     {
         private readonly JsonSchema4 _schema;
 
+        /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel"/> class.</summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="schema">The schema.</param>
         public EnumTemplateModel(string typeName, JsonSchema4 schema)
         {
-            _schema = schema; 
+            _schema = schema;
             Name = typeName;
         }
 
+        /// <summary>Gets the name.</summary>
         public string Name { get; }
 
+        /// <summary>Gets a value indicating whether the enum has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
+        /// <summary>Gets the description.</summary>
         public string Description => _schema.Description;
 
+        /// <summary>Gets a value indicating whether the enum is of type string.</summary>
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
 
+        /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationEntry> Enums
         {
             get

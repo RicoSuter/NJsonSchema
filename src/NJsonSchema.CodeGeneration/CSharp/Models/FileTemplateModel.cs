@@ -8,12 +8,16 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    internal class FileTemplateModel
+    /// <summary>The CSharp file template model.</summary>
+    public class FileTemplateModel
     {
+        /// <summary>Gets or sets the toolchain version.</summary>
         public string Toolchain { get; set; }
 
+        /// <summary>Gets or sets the namespace.</summary>
         public string Namespace { get; set; }
 
+        /// <summary>Gets or sets the classes code.</summary>
         public string Classes { get; set; }
     }
 }
