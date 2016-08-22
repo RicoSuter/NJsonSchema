@@ -11,6 +11,7 @@ using NJsonSchema.CodeGeneration.Models;
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     /// <summary>The TypeScript property template model.</summary>
+    /// <seealso cref="NJsonSchema.CodeGeneration.Models.PropertyModelBase" />
     public class PropertyModel : PropertyModelBase
     {
         private readonly string _parentTypeName;
@@ -38,14 +39,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
 
-        /// <summary>Gets the type of the property.</summary>
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
-
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);
 
         /// <summary>Gets the description.</summary>
         public string Description => _property.Description;
+
+
+        /// <summary>Gets the type of the property.</summary>
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
@@ -53,14 +55,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName()) ?? "any";
 
+
         /// <summary>Gets a value indicating whether the property is read only.</summary>
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
 
-        /// <summary>Gets the data conversion code.</summary>
-        public string DataConversionCode
+        /// <summary>Gets the convert to class code.</summary>
+        public string ConvertToClassCode
         {
             get
             {
@@ -82,8 +85,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             }
         }
 
-        /// <summary>Gets the data back conversion code.</summary>
-        public string DataBackConversionCode
+        /// <summary>Gets the convert to JavaScript code.</summary>
+        public string ConvertToJavaScriptCode
         {
             get
             {

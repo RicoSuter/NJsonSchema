@@ -245,7 +245,7 @@ foreach(var property in Model.Properties){
             this.Write(" = null; \r\n            ");
             
             #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataConversionCode, 3)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
             
             #line default
             #line hidden
@@ -366,7 +366,7 @@ foreach (var property in Model.Properties){
             this.Write("(); \r\n        ");
             
             #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataBackConversionCode, 2)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)));
             
             #line default
             #line hidden

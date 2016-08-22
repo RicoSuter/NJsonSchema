@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
@@ -38,11 +39,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
 
         /// <summary>Gets the enum values.</summary>
-        public IEnumerable<EnumerationEntry> Enums
+        public IEnumerable<EnumerationItemModel> Enums
         {
             get
             {
-                var entries = new List<EnumerationEntry>();
+                var entries = new List<EnumerationItemModel>();
                 for (int i = 0; i < _schema.Enumeration.Count; i++)
                 {
                     var value = _schema.Enumeration.ElementAt(i);
@@ -50,11 +51,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         _schema.EnumerationNames.ElementAt(i) :
                         _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
-                    entries.Add(new EnumerationEntry
+                    entries.Add(new EnumerationItemModel
                     {
-                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
+                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true),
                         Value = value.ToString(),
-                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true)
+                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
                     });
                 }
                 return entries;

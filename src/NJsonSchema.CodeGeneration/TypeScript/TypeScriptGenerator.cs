@@ -59,12 +59,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var model = new FileTemplateModel
+            var model = new FileTemplateModel(Settings)
             {
                 Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
-
-                HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
-                ModuleName = Settings.ModuleName,
 
                 ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
                 ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter

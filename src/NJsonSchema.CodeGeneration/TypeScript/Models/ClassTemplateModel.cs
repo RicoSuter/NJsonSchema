@@ -35,11 +35,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _resolver = resolver;
         }
 
-        /// <summary>Gets the class name.</summary>
+        /// <summary>Gets the class name (the postfix 'Base' is used when using an extension class).</summary>
         public string Class => _settings.ExtendedClasses?.Contains(_typeName) == true ? _typeName + "Base" : _typeName;
 
-        /// <summary>Gets the real class name.</summary>
-        public string RealClass => _typeName;
+        /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
+        public string ActualClass => _typeName;
 
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
@@ -47,16 +47,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             .Select(s => s.Key)
             .ToList();
 
-        /// <summary>Gets the derived class names with property check.</summary>
-        public IEnumerable<string> DerivedClassNamesWithPropertyCheck => DerivedClassNames.Where(n => Properties.All(p => p.PropertyName != n));
-
-        /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
+        /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.BaseDiscriminator);
 
-        /// <summary>Gets the class discriminator property name.</summary>
+        /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
         public string Discriminator => _schema.BaseDiscriminator;
 
-        /// <summary>Gets the discriminator property model.</summary>
+        /// <summary>Gets the discriminator property model of this inheritance hierarchy.</summary>
         public PropertyModel DiscriminatorProperty => GetDiscriminatorProperty(_schema);
 
         /// <summary>Gets a value indicating whether the class has description.</summary>

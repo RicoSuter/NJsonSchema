@@ -18,7 +18,7 @@
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>_: <#=property.Type#> = null; 
-            <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
+            <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
             this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
 <#}#>        }
@@ -40,7 +40,7 @@
         data = data === undefined ? {} : data;
 <#foreach (var property in Model.Properties){#>
         var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
-        <#=ConversionUtilities.Tab(property.DataBackConversionCode, 2)#>
+        <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
         super.toJS(data);

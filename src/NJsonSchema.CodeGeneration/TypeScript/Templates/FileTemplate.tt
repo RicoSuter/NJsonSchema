@@ -11,11 +11,17 @@
 
 <#if(Model.HasModuleName){#>
 module <#=Model.ModuleName#> {
+<#}
+  if(Model.HasNamespace){#>
+namespace <#=Model.Namespace#> {
 <#}#>
 <#=Model.Types#>
 
 <#=Model.ExtensionCodeAfter#>
 
-<#if(Model.HasModuleName){#>
+<#if(Model.HasNamespace){#>
+}
+<#}
+ if(Model.HasModuleName){#>
 }
 <#}#>
