@@ -20,6 +20,14 @@ namespace NJsonSchema
     {
         private readonly Dictionary<string, JsonSchema4> _resolvedSchemas = new Dictionary<string, JsonSchema4>();
 
+        /// <summary>Adds a document reference.</summary>
+        /// <param name="documentPath">The document path.</param>
+        /// <param name="schema">The referenced schema.</param>
+        public void AddDocumentReference(string documentPath, JsonSchema4 schema)
+        {
+            _resolvedSchemas[documentPath] = schema;
+        }
+        
         /// <summary>Gets the object from the given JSON path.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path.</param>
@@ -131,7 +139,7 @@ namespace NJsonSchema
                     var arr = Regex.Split(url, @"(?=#)");
 
                     if (!_resolvedSchemas.ContainsKey(arr[0]))
-                        _resolvedSchemas[arr[0]] = JsonSchema4.FromFile(arr[0]);
+                        JsonSchema4.FromFile(arr[0], this);
 
                     var result = _resolvedSchemas[arr[0]];
                     return arr.Length == 1 ? result : ResolveReference(result, arr[1]);
@@ -155,10 +163,10 @@ namespace NJsonSchema
                     var arr = filePath.Split('#');
 
                     if (!_resolvedSchemas.ContainsKey(arr[0]))
-                        _resolvedSchemas[arr[0]] = JsonSchema4.FromUrl(arr[0]);
+                        JsonSchema4.FromUrl(arr[0], this);
 
                     var result = _resolvedSchemas[arr[0]];
-                    return arr.Length == 1 ? result : ResolveReference(result, arr[1]);
+                    return arr.Length == 1 ? result : ResolveReference(result, "#" + arr[1]);
                 }
                 catch (Exception exception)
                 {

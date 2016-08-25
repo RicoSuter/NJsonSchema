@@ -26,6 +26,15 @@ namespace NJsonSchema
             UpdateSchemaReferences(root, root, new HashSet<object>(), new JsonReferenceResolver());
         }
 
+        /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
+        /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
+        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <param name="root">The root.</param>
+        public static void UpdateSchemaReferences(object root, JsonReferenceResolver jsonReferenceResolver)
+        {
+            UpdateSchemaReferences(root, root, new HashSet<object>(), jsonReferenceResolver);
+        }
+
         /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
         /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
         /// <param name="root">The root.</param>

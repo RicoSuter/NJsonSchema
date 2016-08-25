@@ -107,8 +107,17 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static JsonSchema4 FromFile(string filePath)
         {
+            return FromFile(filePath, new JsonReferenceResolver());
+        }
+
+        /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromFile(string filePath, JsonReferenceResolver jsonReferenceResolver)
+        {
             var data = DynamicApis.FileReadAllText(filePath);
-            return FromJson(data, filePath);
+            return FromJson(data, filePath, jsonReferenceResolver);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -116,15 +125,42 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static JsonSchema4 FromUrl(string url)
         {
+            return FromUrl(url, new JsonReferenceResolver());
+        }
+
+        /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
+        /// <param name="url">The URL to the document.</param>
+        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromUrl(string url, JsonReferenceResolver jsonReferenceResolver)
+        {
             var data = DynamicApis.HttpGet(url);
-            return FromJson(data, url);
+            return FromJson(data, url, jsonReferenceResolver);
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
+        /// <param name="data">The JSON string. </param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromJson(string data)
+        {
+            return FromJson(data, null, new JsonReferenceResolver());
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
         /// <param name="data">The JSON string. </param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <returns>The JSON Schema.</returns>
-        public static JsonSchema4 FromJson(string data, string documentPath = null)
+        public static JsonSchema4 FromJson(string data, string documentPath)
+        {
+            return FromJson(data, documentPath, new JsonReferenceResolver());
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
+        /// <param name="data">The JSON string. </param>
+        /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
+        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromJson(string data, string documentPath, JsonReferenceResolver jsonReferenceResolver)
         {
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -134,10 +170,14 @@ namespace NJsonSchema
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
             schema.DocumentPath = documentPath;
-            JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema);
+
+            if (jsonReferenceResolver != null && !string.IsNullOrEmpty(documentPath))
+                jsonReferenceResolver.AddDocumentReference(documentPath, schema);
+
+            JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema, jsonReferenceResolver);
             return schema;
         }
-
+        
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
         {
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -468,6 +508,10 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets or sets the resource definitions (not in the standard, needed in some JSON Schemas).</summary>
+        [JsonProperty("resourceDefinitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public IDictionary<string, JsonSchema4> ResourceDefinitions { get; set; }
+
         /// <summary>Gets the collection of schemas where each schema must be valid. </summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> AllOf
@@ -629,7 +673,7 @@ namespace NJsonSchema
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, typeNameGenerator));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
-            JsonSchemaReferenceUtilities.UpdateSchemaReferences(this);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferences(this, new JsonReferenceResolver());
 
             SchemaVersion = oldSchema;
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
