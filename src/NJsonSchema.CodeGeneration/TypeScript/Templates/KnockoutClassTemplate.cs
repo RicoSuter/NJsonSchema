@@ -245,7 +245,7 @@ foreach(var property in Model.Properties){
             this.Write(" = null; \r\n            ");
             
             #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataConversionCode, 3)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
             
             #line default
             #line hidden
@@ -273,7 +273,7 @@ foreach(var property in Model.Properties){
             this.Write("        }\r\n    }\r\n\r\n    static fromJS(data: any): ");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -316,7 +316,7 @@ if(Model.HasDiscriminator){
             this.Write("        return new ");
             
             #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -330,7 +330,7 @@ if(Model.HasDiscriminator){
             this.Write("        return new ");
             
             #line 35 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -366,7 +366,7 @@ foreach (var property in Model.Properties){
             this.Write("(); \r\n        ");
             
             #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataBackConversionCode, 2)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)));
             
             #line default
             #line hidden
@@ -389,7 +389,7 @@ foreach (var property in Model.Properties){
                     "eturn new ");
             
             #line 57 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden

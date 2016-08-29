@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Linq;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -60,12 +59,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, string.Empty); // register root type
 
-            var model = new FileTemplateModel
+            var model = new FileTemplateModel(Settings)
             {
                 Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
-
-                HasModuleName = !string.IsNullOrEmpty(Settings.ModuleName),
-                ModuleName = Settings.ModuleName,
 
                 ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
                 ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
@@ -94,57 +90,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var properties = _schema.ActualProperties.Values.Select(property => new PropertyModel(property, typeName, _resolver, Settings)).ToList();
-                var hasInheritance = _schema.InheritedSchemas.Count >= 1;
-                var baseClass = hasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
-
-                var derivedClassNames = _schema.GetDerivedSchemas(RootObject, _resolver)
-                    .Where(s => s.Value.Inherits(_schema))
-                    .Select(s => s.Key)
-                    .ToList();
-
-                var template = Settings.CreateTemplate(typeName, new // TODO: Create model class
-                {
-                    Class = Settings.ExtendedClasses?.Contains(typeName) == true ? typeName + "Base" : typeName,
-                    RealClass = typeName,
-                    DerivedClassNames = derivedClassNames,
-                    DerivedClassNamesWithPropertyCheck = derivedClassNames.Where(n => properties.All(p => p.PropertyName != n)),
-
-                    HasDiscriminator = !string.IsNullOrEmpty(_schema.BaseDiscriminator),
-                    Discriminator = _schema.BaseDiscriminator,
-                    DiscriminatorProperty = GetDiscriminatorProperty(_schema),
-
-                    HasDescription = !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description),
-                    Description = ConversionUtilities.RemoveLineBreaks(_schema.Description),
-
-                    HasInheritance = hasInheritance,
-                    Inheritance = hasInheritance ? " extends " + baseClass : string.Empty,
-                    Properties = properties
-                });
-
+                var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, RootObject);
+                var template = Settings.CreateTemplate(typeName, model);
                 return new TypeGeneratorResult
                 {
                     TypeName = typeName,
-                    BaseTypeName = baseClass,
+                    BaseTypeName = model.BaseClass,
                     Code = template.Render()
                 };
             }
-        }
-
-        private PropertyModel GetDiscriminatorProperty(JsonSchema4 schema)
-        {
-            var property = schema.ActualSchema.ActualProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
-            if (property.Value != null)
-                return new PropertyModel(property.Value, string.Empty, _resolver, Settings);
-
-            foreach (var baseSchema in schema.InheritedSchemas)
-            {
-                var propertyModel = GetDiscriminatorProperty(baseSchema);
-                if (propertyModel != null)
-                    return propertyModel;
-            }
-
-            return null;
         }
     }
 }

@@ -18,21 +18,21 @@
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>_: <#=property.Type#> = null; 
-            <#=ConversionUtilities.Tab(property.DataConversionCode, 3)#>
+            <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
             this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
 <#}#>        }
     }
 
-    static fromJS(data: any): <#=Model.RealClass#> {
+    static fromJS(data: any): <#=Model.ActualClass#> {
 <#if(Model.HasDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.Discriminator#>"] === "<#=derivedClass#>")
             return new <#=derivedClass#>(data);
 <#  }#>
-        return new <#=Model.RealClass#>(data);
+        return new <#=Model.ActualClass#>(data);
 <#}else{#>
-        return new <#=Model.RealClass#>(data);
+        return new <#=Model.ActualClass#>(data);
 <#}#>
     }
 
@@ -40,7 +40,7 @@
         data = data === undefined ? {} : data;
 <#foreach (var property in Model.Properties){#>
         var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
-        <#=ConversionUtilities.Tab(property.DataBackConversionCode, 2)#>
+        <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
         super.toJS(data);
@@ -54,6 +54,6 @@
 
     clone() {
         var json = this.toJSON();
-        return new <#=Model.RealClass#>(JSON.parse(json));
+        return new <#=Model.ActualClass#>(JSON.parse(json));
     }
 }

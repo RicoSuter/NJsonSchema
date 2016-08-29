@@ -37,7 +37,7 @@ namespace NJsonSchema.Converters
             _discriminator = discriminator;
         }
 
-        /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
+        /// <summary>Gets a value indicating whether this <see cref="JsonConverter" /> can write JSON.</summary>
         public override bool CanWrite => true;
 
         /// <summary>Writes the JSON representation of the object.</summary>

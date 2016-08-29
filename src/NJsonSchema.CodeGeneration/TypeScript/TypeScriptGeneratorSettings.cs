@@ -22,6 +22,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptGeneratorSettings()
         {
             ModuleName = "";
+            Namespace = "";
             GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
@@ -39,6 +40,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
         public string ModuleName { get; set; }
+
+        /// <summary>Gets or sets the TypeScript namespace (default: '', no namespace).</summary>
+        public string Namespace { get; set; }
 
         /// <summary>Gets or sets the list of extended classes (the classes must be implemented in the <see cref="ExtensionCode"/>).</summary>
         public string[] ExtendedClasses

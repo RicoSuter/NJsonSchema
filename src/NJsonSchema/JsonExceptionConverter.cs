@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,16 +40,16 @@ namespace NJsonSchema
                 jObject.Add(resolver.GetResolvedPropertyName("Message"), exception.Message);
                 jObject.Add(resolver.GetResolvedPropertyName("StackTrace"), exception.StackTrace);
                 jObject.Add(resolver.GetResolvedPropertyName("Source"), exception.Source);
-                jObject.Add(resolver.GetResolvedPropertyName("InnerException"), 
+                jObject.Add(resolver.GetResolvedPropertyName("InnerException"),
                     exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null);
 
-                foreach (var property in value.GetType().GetRuntimeProperties())
+                foreach (var property in GetExceptionProperties(value.GetType()))
                 {
-                    var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-                    if (attribute != null)
+                    var propertyValue = property.Key.GetValue(exception);
+                    if (propertyValue != null)
                     {
-                        var propertyValue = property.GetValue(exception);
-                        jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(attribute.PropertyName), JToken.FromObject(propertyValue, serializer)));
+                        jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
+                            JToken.FromObject(propertyValue, serializer)));
                     }
                 }
 
@@ -79,7 +81,8 @@ namespace NJsonSchema
 
             var originalResolver = serializer.ContractResolver;
             serializer.ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType());
-            typeof(DefaultContractResolver).GetTypeInfo().GetDeclaredField("_sharedCache").SetValue(serializer.ContractResolver, false);
+
+            GetField(typeof(DefaultContractResolver), "_sharedCache").SetValue(serializer.ContractResolver, false);
 
             dynamic resolver = serializer.ContractResolver = serializer.ContractResolver;
             resolver.IgnoreSerializableAttribute = true;
@@ -89,14 +92,30 @@ namespace NJsonSchema
             var value = jObject.ToObject(objectType, serializer);
             serializer.Converters.Add(this);
 
-            foreach (var property in objectType.GetRuntimeProperties())
+            foreach (var property in GetExceptionProperties(value.GetType()))
             {
-                var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
-                if (attribute != null)
+                var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(property.Value));
+                var propertyValue = (object)jValue?.ToObject(property.Key.PropertyType);
+#if !LEGACY
+                if (property.Key.SetMethod != null)
+                    property.Key.SetValue(value, propertyValue);
+                else
                 {
-                    var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(attribute.PropertyName));
-                    property.SetValue(value, (object)jValue?.ToObject(property.PropertyType));
+                    var field = GetField(objectType, "m_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1));
+                    if (field != null)
+                        field.SetValue(value, propertyValue);
                 }
+#else
+                if (property.Key.GetSetMethod() != null)
+                    property.Key.SetValue(value, propertyValue);
+                else
+                {
+                    var field = objectType.GetField("m_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1), 
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    if (field != null)
+                        field.SetValue(value, propertyValue);
+                }
+#endif
             }
 
             SetExceptionFieldValue(jObject, "Message", value, "_message", resolver, serializer);
@@ -106,6 +125,32 @@ namespace NJsonSchema
 
             serializer.ContractResolver = originalResolver;
             return value;
+        }
+
+        private FieldInfo GetField(Type type, string fieldName)
+        {
+            var field = type.GetTypeInfo().GetDeclaredField(fieldName);
+            if (field == null && type.GetTypeInfo().BaseType != null)
+                return GetField(type.GetTypeInfo().BaseType, fieldName);
+            return field;
+        }
+
+        private IDictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
+        {
+            var result = new Dictionary<PropertyInfo, string>();
+#if !LEGACY
+            foreach (var property in exceptionType.GetRuntimeProperties().Where(p => p.GetMethod?.IsPublic == true))
+#else
+            foreach (var property in exceptionType.GetRuntimeProperties().Where(p => p.GetGetMethod() != null))
+#endif
+            {
+                var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
+                var propertyName = attribute != null ? attribute.PropertyName : property.Name;
+
+                if (!new[] { "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult" }.Contains(propertyName))
+                    result[property] = propertyName;
+            }
+            return result;
         }
 
         private void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, DefaultContractResolver resolver, JsonSerializer serializer)

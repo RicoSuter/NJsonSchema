@@ -204,7 +204,7 @@ foreach (var property in Model.Properties){
             this.Write("            ");
             
             #line 19 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataConversionCode, 3)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
             
             #line default
             #line hidden
@@ -218,7 +218,7 @@ foreach (var property in Model.Properties){
             this.Write("        }\r\n    }\r\n\r\n    static fromJS(data: any): ");
             
             #line 24 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -261,7 +261,7 @@ if(Model.HasDiscriminator){
             this.Write("        return new ");
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -275,7 +275,7 @@ if(Model.HasDiscriminator){
             this.Write("        return new ");
             
             #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden
@@ -297,7 +297,7 @@ foreach (var property in Model.Properties){
             this.Write("        ");
             
             #line 39 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.DataBackConversionCode, 2)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)));
             
             #line default
             #line hidden
@@ -320,7 +320,7 @@ foreach (var property in Model.Properties){
                     "eturn new ");
             
             #line 52 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.RealClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));
             
             #line default
             #line hidden

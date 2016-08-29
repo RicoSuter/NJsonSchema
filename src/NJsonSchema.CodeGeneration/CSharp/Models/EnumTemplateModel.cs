@@ -8,32 +8,42 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    internal class EnumTemplateModel
+    /// <summary>The CSharp enum template model.</summary>
+    public class EnumTemplateModel
     {
         private readonly JsonSchema4 _schema;
 
+        /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel"/> class.</summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="schema">The schema.</param>
         public EnumTemplateModel(string typeName, JsonSchema4 schema)
         {
-            _schema = schema; 
+            _schema = schema;
             Name = typeName;
         }
 
+        /// <summary>Gets the name.</summary>
         public string Name { get; }
 
+        /// <summary>Gets a value indicating whether the enum has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
+        /// <summary>Gets the description.</summary>
         public string Description => _schema.Description;
 
+        /// <summary>Gets a value indicating whether the enum is of type string.</summary>
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
 
-        public IEnumerable<EnumerationEntry> Enums
+        /// <summary>Gets the enum values.</summary>
+        public IEnumerable<EnumerationItemModel> Enums
         {
             get
             {
-                var entries = new List<EnumerationEntry>();
+                var entries = new List<EnumerationItemModel>();
                 for (int i = 0; i < _schema.Enumeration.Count; i++)
                 {
                     var value = _schema.Enumeration.ElementAt(i);
@@ -41,11 +51,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         _schema.EnumerationNames.ElementAt(i) :
                         _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
-                    entries.Add(new EnumerationEntry
+                    entries.Add(new EnumerationItemModel
                     {
-                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString(),
+                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true),
                         Value = value.ToString(),
-                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true)
+                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
                     });
                 }
                 return entries;

@@ -8,20 +8,40 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
-    internal class FileTemplateModel
+    /// <summary>The TypeScript file template model.</summary>
+    public class FileTemplateModel
     {
+        private readonly TypeScriptGeneratorSettings _settings;
+
+        /// <summary>Initializes a new instance of the <see cref="FileTemplateModel"/> class.</summary>
+        /// <param name="settings">The settings.</param>
+        public FileTemplateModel(TypeScriptGeneratorSettings settings)
+        {
+            _settings = settings; 
+        }
+
+        /// <summary>Gets or sets the toolchain version.</summary>
         public string Toolchain { get; set; }
 
-        public string Namespace { get; set; }
-
+        /// <summary>Gets or sets the code of all types.</summary>
         public string Types { get; set; }
 
+        /// <summary>Gets or sets the extension code to insert at the beginning.</summary>
         public string ExtensionCodeBefore { get; set; }
 
+        /// <summary>Gets or sets the extension code to insert at the end.</summary>
         public string ExtensionCodeAfter { get; set; }
 
-        public bool HasModuleName { get; set; }
+        /// <summary>Gets or sets a value indicating whether the file has module name.</summary>
+        public bool HasModuleName => !string.IsNullOrEmpty(_settings.ModuleName);
 
-        public string ModuleName { get; set; }
+        /// <summary>Gets or sets the name of the module.</summary>
+        public string ModuleName => _settings.ModuleName;
+
+        /// <summary>Gets or sets a value indicating whether the file has module name.</summary>
+        public bool HasNamespace => !string.IsNullOrEmpty(_settings.Namespace);
+
+        /// <summary>Gets or sets the name of the module.</summary>
+        public string Namespace => _settings.Namespace;
     }
 }
