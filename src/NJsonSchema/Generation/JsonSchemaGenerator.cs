@@ -472,11 +472,13 @@ namespace NJsonSchema.Generation
         /// <param name="parentType">The type of the parent.</param>
         /// <param name="attributes">The attributes.</param>
         /// <param name="propertyTypeDescription">The property type description.</param>
-        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, Type parentType, IList<Attribute> attributes, JsonObjectTypeDescription propertyTypeDescription)
+        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, Type parentType, IList<Attribute> attributes,
+            JsonObjectTypeDescription propertyTypeDescription)
         {
             // TODO: Refactor out
 
-            dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+            dynamic displayAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null && displayAttribute.Name != null)
                 jsonProperty.Title = displayAttribute.Name;
 
@@ -484,13 +486,16 @@ namespace NJsonSchema.Generation
             if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
                 jsonProperty.Default = ConvertDefaultValue(parentType, attributes, defaultValueAttribute);
 
-            dynamic regexAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            dynamic regexAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
                 jsonProperty.Pattern = regexAttribute.Pattern;
 
-            if (propertyTypeDescription.Type == JsonObjectType.Number || propertyTypeDescription.Type == JsonObjectType.Integer)
+            if (propertyTypeDescription.Type == JsonObjectType.Number ||
+                propertyTypeDescription.Type == JsonObjectType.Integer)
             {
-                dynamic rangeAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RangeAttribute");
+                dynamic rangeAttribute = TryGetAttribute(attributes,
+                    "System.ComponentModel.DataAnnotations.RangeAttribute");
                 if (rangeAttribute != null)
                 {
                     if (rangeAttribute.Minimum != null)
@@ -504,7 +509,8 @@ namespace NJsonSchema.Generation
                     jsonProperty.MultipleOf = multipleOfAttribute.MultipleOf;
             }
 
-            dynamic minLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MinLengthAttribute");
+            dynamic minLengthAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.MinLengthAttribute");
             if (minLengthAttribute != null && minLengthAttribute.Length != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -513,7 +519,8 @@ namespace NJsonSchema.Generation
                     jsonProperty.MinItems = minLengthAttribute.Length;
             }
 
-            dynamic maxLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+            dynamic maxLengthAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
             if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -522,7 +529,8 @@ namespace NJsonSchema.Generation
                     jsonProperty.MaxItems = maxLengthAttribute.Length;
             }
 
-            dynamic stringLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.StringLengthAttribute");
+            dynamic stringLengthAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.StringLengthAttribute");
             if (stringLengthAttribute != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -530,6 +538,27 @@ namespace NJsonSchema.Generation
                     jsonProperty.MinLength = stringLengthAttribute.MinimumLength;
                     jsonProperty.MaxLength = stringLengthAttribute.MaximumLength;
                 }
+            }
+
+            dynamic dataTypeAttribute = TryGetAttribute(attributes,
+                "System.ComponentModel.DataAnnotations.DataTypeAttribute");
+            if (dataTypeAttribute != null)
+            {
+                var knownFormats = new Dictionary<string, string>
+                {
+                    {"DateTime", "date-time"},
+                    {"Date", "date"},
+                    {"Time", "time"},
+                    {"EmailAddress", "email" },
+                    {"PhoneNumber", "phone"},
+                    {"Url", "uri"},
+                    {"Upload", "data-url"}
+                };
+
+                var dataType = dataTypeAttribute.DataType.ToString();
+
+                if (knownFormats.ContainsKey(dataType))
+                    jsonProperty.Format = knownFormats[dataType];
             }
         }
 

@@ -150,5 +150,92 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(5, property.MinLength);
             Assert.AreEqual(10, property.MaxLength);
         }
+
+        public class DataTypeAttributeClass
+        {
+            [DataType(DataType.EmailAddress)]
+            public string EmailAddress { get; set; }
+
+            [DataType(DataType.PhoneNumber)]
+            public string PhoneNumber { get; set; }
+
+            [DataType(DataType.DateTime)]
+            public string DateTime { get; set; }
+
+            [DataType(DataType.Date)]
+            public string Date { get; set; }
+
+            [DataType(DataType.Time)]
+            public string Time { get; set; }
+
+            [DataType(DataType.Url)]
+            public string Url { get; set; }
+
+            [DataType(DataType.Upload)]
+            public string Upload { get; set; }
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_DateTime_then_the_format_property_is_datetime()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["DateTime"];
+
+            Assert.AreEqual("date-time", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_Date_then_the_format_property_is_date()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["Date"];
+
+            Assert.AreEqual("date", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_Time_then_the_format_property_is_time()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["Time"];
+
+            Assert.AreEqual("time", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_EmailAddress_then_the_format_property_is_email()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["EmailAddress"];
+
+            Assert.AreEqual("email", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_PhoneNumber_then_the_format_property_is_phone()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["PhoneNumber"];
+
+            Assert.AreEqual("phone", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_Url_then_the_format_property_is_uri()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["Url"];
+
+            Assert.AreEqual("uri", property.Format);
+        }
+
+        [TestMethod]
+        public void When_DataTypeAttribute_is_Upload_then_the_format_property_is_data_url()
+        {
+            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var property = schema.Properties["Upload"];
+
+            Assert.AreEqual("data-url", property.Format);
+        }
     }
 }
