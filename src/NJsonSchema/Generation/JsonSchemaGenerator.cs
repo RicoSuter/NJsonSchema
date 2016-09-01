@@ -22,6 +22,16 @@ namespace NJsonSchema.Generation
     /// <summary>Generates a <see cref="JsonSchema4"/> object for a given type. </summary>
     public class JsonSchemaGenerator
     {
+        private static readonly Dictionary<string, string> WellKnownFormats = new Dictionary<string, string>
+                {
+                    {"DateTime", JsonFormatStrings.DateTime},
+                    {"Date", JsonFormatStrings.Date},
+                    {"Time", JsonFormatStrings.Time},
+                    {"EmailAddress", JsonFormatStrings.Email},
+                    {"PhoneNumber", JsonFormatStrings.Phone},
+                    {"Url", JsonFormatStrings.Uri}
+                };
+
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
         public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
@@ -544,21 +554,10 @@ namespace NJsonSchema.Generation
                 "System.ComponentModel.DataAnnotations.DataTypeAttribute");
             if (dataTypeAttribute != null)
             {
-                var knownFormats = new Dictionary<string, string>
-                {
-                    {"DateTime", "date-time"},
-                    {"Date", "date"},
-                    {"Time", "time"},
-                    {"EmailAddress", "email" },
-                    {"PhoneNumber", "phone"},
-                    {"Url", "uri"},
-                    {"Upload", "data-url"}
-                };
-
                 var dataType = dataTypeAttribute.DataType.ToString();
 
-                if (knownFormats.ContainsKey(dataType))
-                    jsonProperty.Format = knownFormats[dataType];
+                if (WellKnownFormats.ContainsKey(dataType))
+                    jsonProperty.Format = WellKnownFormats[dataType];
             }
         }
 

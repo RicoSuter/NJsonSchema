@@ -228,14 +228,5 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.AreEqual("uri", property.Format);
         }
-
-        [TestMethod]
-        public void When_DataTypeAttribute_is_Upload_then_the_format_property_is_data_url()
-        {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
-            var property = schema.Properties["Upload"];
-
-            Assert.AreEqual("data-url", property.Format);
-        }
     }
 }
