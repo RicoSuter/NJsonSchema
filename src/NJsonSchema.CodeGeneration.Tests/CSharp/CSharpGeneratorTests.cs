@@ -649,7 +649,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeNameRaw = "Foo[Bar]";
+            schema.TypeNameRaw = "Foo[Bar[Inner]]";
             schema.Type = JsonObjectType.Object;
             schema.Properties["foo"] = new JsonProperty
             {
@@ -661,7 +661,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public partial class FooOfBar"));
+            Assert.IsTrue(code.Contains("public partial class FooOfBarOfInner"));
         }
 
         [JsonObject(MemberSerialization.OptIn)]
