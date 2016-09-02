@@ -359,7 +359,7 @@ namespace NJsonSchema.Generation
 
         private void LoadPropertyOrField(MemberInfo property, Type propertyType, Type parentType, JsonSchema4 parentSchema, ISchemaResolver schemaResolver, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
-            var attributes = property.GetCustomAttributes(true).OfType<Attribute>().ToArray();
+            var attributes = property.GetCustomAttributes(inherit: true).OfType<Attribute>().ToArray();
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, attributes, Settings.DefaultEnumHandling);
 
             if (IsPropertyIgnored(parentType, attributes) == false)
