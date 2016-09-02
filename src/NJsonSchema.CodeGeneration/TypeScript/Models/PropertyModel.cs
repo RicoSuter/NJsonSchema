@@ -20,24 +20,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
+        /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="property">The property.</param>
         /// <param name="parentTypeName">Name of the parent type.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
-        public PropertyModel(JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, new DefaultValueGenerator(resolver), settings)
+        public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
+            : base(classTemplateModel, property, new DefaultValueGenerator(resolver), settings)
         {
             _property = property;
             _resolver = resolver;
             _parentTypeName = parentTypeName;
             _settings = settings;
+
+            PropertyName = ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
         public string InterfaceName => _property.Name.Contains("-") ? $"\"{_property.Name}\"" : _property.Name;
-
-        /// <summary>Gets the name of the property.</summary>
-        public string PropertyName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);
@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
 
         /// <summary>Gets the type of the property.</summary>
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetGeneratedPropertyName());
+        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
@@ -106,14 +106,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 }
                 return string.Empty;
             }
-        }
-
-        private string GetGeneratedPropertyName()
-        {
-            if (_settings.PropertyNameGenerator != null)
-                return _settings.PropertyNameGenerator.Generate(_property);
-
-            return _property.Name;
         }
     }
 }

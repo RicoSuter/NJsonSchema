@@ -81,6 +81,7 @@
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpClassStyle.cs" />
+    <Compile Include="Models\ClassTemplateModelBase.cs" />
     <Compile Include="CSharp\Models\PropertyModel.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
     <Compile Include="ConversionUtilities.cs" />
