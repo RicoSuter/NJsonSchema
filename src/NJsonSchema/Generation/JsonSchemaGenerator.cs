@@ -521,6 +521,16 @@ namespace NJsonSchema.Generation
                 else if (propertyTypeDescription.Type == JsonObjectType.Array)
                     jsonProperty.MaxItems = maxLengthAttribute.Length;
             }
+
+            dynamic stringLengthAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.StringLengthAttribute");
+            if (stringLengthAttribute != null)
+            {
+                if (propertyTypeDescription.Type == JsonObjectType.String)
+                {
+                    jsonProperty.MinLength = stringLengthAttribute.MinimumLength;
+                    jsonProperty.MaxLength = stringLengthAttribute.MaximumLength;
+                }
+            }
         }
 
         private object ConvertDefaultValue(Type parentType, IEnumerable<Attribute> propertyAttributes, dynamic defaultValueAttribute)

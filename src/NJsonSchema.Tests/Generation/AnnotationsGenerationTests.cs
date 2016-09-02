@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Annotations;
 
@@ -128,6 +128,27 @@ namespace NJsonSchema.Tests.Generation
     ""type"": ""string""
   }
 }", json);
+        }
+
+        public class StringLengthAttributeClass
+        {
+            [StringLength(10, MinimumLength = 5)]
+            public string Foo { get; set; }
+        }
+
+        [TestMethod]
+        public void When_StringLengthAttribute_is_set_then_minLength_and_maxLenght_is_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema4.FromType<StringLengthAttributeClass>();
+
+            //// Assert
+            var property = schema.Properties["Foo"];
+
+            Assert.AreEqual(5, property.MinLength);
+            Assert.AreEqual(10, property.MaxLength);
         }
     }
 }
