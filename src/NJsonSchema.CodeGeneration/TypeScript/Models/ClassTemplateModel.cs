@@ -8,11 +8,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     /// <summary>The TypeScript class template model.</summary>
-    public class ClassTemplateModel
+    public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly string _typeName;
@@ -39,7 +40,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Class => _settings.ExtendedClasses?.Contains(_typeName) == true ? _typeName + "Base" : _typeName;
 
         /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
-        public string ActualClass => _typeName;
+        public override string ActualClass => _typeName;
 
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
@@ -72,13 +73,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
-        public List<PropertyModel> Properties => _schema.ActualProperties.Values.Select(property => new PropertyModel(property, _typeName, _resolver, _settings)).ToList();
+        public List<PropertyModel> Properties => _schema.ActualProperties.Values.Select(property => new PropertyModel(this, property, _typeName, _resolver, _settings)).ToList();
 
         private PropertyModel GetDiscriminatorProperty(JsonSchema4 schema)
         {
             var property = schema.ActualSchema.ActualProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
             if (property.Value != null)
-                return new PropertyModel(property.Value, string.Empty, _resolver, _settings);
+                return new PropertyModel(this, property.Value, string.Empty, _resolver, _settings);
 
             foreach (var baseSchema in schema.InheritedSchemas)
             {

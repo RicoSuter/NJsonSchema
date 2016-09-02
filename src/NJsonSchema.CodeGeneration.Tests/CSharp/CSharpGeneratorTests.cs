@@ -85,7 +85,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains("public partial class tAgg"));
+            Assert.IsTrue(output.Contains("public partial class TAgg"));
             Assert.IsTrue(output.Contains("public string Val1 { get; set; }"));
             Assert.IsTrue(output.Contains("public string Val2 { get; set; }"));
             Assert.IsTrue(output.Contains("public string Val3 { get; set; }"));
@@ -238,7 +238,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = gen.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
+            Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
         }
 
         [TestMethod]
@@ -649,7 +649,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeNameRaw = "Foo[Bar]";
+            schema.TypeNameRaw = "Foo[Bar[Inner]]";
             schema.Type = JsonObjectType.Object;
             schema.Properties["foo"] = new JsonProperty
             {
@@ -661,7 +661,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public partial class FooOfBar"));
+            Assert.IsTrue(code.Contains("public partial class FooOfBarOfInner"));
         }
 
         [JsonObject(MemberSerialization.OptIn)]

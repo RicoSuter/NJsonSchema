@@ -8,11 +8,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     /// <summary>The CSharp class template model.</summary>
-    public class ClassTemplateModel
+    public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly CSharpTypeResolver _resolver;
         private readonly JsonSchema4 _schema;
@@ -23,19 +24,24 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="settings">The settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
-        /// <param name="properties">The properties.</param>
-        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema, IEnumerable<PropertyModel> properties)
+        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema)
         {
             _resolver = resolver;
             _schema = schema;
             _settings = settings;
 
             Class = typeName;
-            Properties = properties;
+            Properties = _schema.ActualProperties.Values
+                .Where(p => !p.IsInheritanceDiscriminator)
+                .Select(property => new PropertyModel(this, property, _resolver, _settings))
+                .ToList();
         }
 
         /// <summary>Gets or sets the class name.</summary>
         public string Class { get; set; }
+
+        /// <summary>Gets the class.</summary>
+        public override string ActualClass => Class;
 
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;

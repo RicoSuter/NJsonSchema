@@ -82,14 +82,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
-            var properties = _schema.ActualProperties.Values
-                .Where(p => !p.IsInheritanceDiscriminator)
-                .Select(property => new PropertyModel(property, _resolver, Settings))
-                .ToList();
+            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema);
 
-            RenamePropertyWithSameNameAsClass(typeName, properties);
+            RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 
-            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, properties);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
             return new TypeGeneratorResult
             {
@@ -99,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             };
         }
 
-        private void RenamePropertyWithSameNameAsClass(string typeName, List<PropertyModel> properties)
+        private void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
         {
             var propertyWithSameNameAsClass = properties.SingleOrDefault(p => p.PropertyName == typeName);
             if (propertyWithSameNameAsClass != null)

@@ -129,10 +129,11 @@ namespace NJsonSchema.CodeGeneration
                 if (string.IsNullOrEmpty(typeName))
                     typeName = GenerateTypeName(typeNameHint);
 
-                typeName = Regex.Replace(typeName, "^(.*?)\\[(.*?)\\]$",
-                    match => match.Groups[1].Value + "Of" + match.Groups[2].Value);
+                typeName = typeName
+                    .Replace("[", "Of")
+                    .Replace("]", string.Empty);
 
-                _generatedTypeNames[schema] = typeName; 
+                _generatedTypeNames[schema] = ConversionUtilities.ConvertToUpperCamelCase(typeName, true);
             }
 
             return _generatedTypeNames[schema];
