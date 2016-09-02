@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.Models
             if (propertyName.StartsWith(className, StringComparison.OrdinalIgnoreCase))
                 return propertyName;
 
-            return _classTemplateModel.ActualClass + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
+            return className + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
         }
     }
 }
