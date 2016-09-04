@@ -14,7 +14,7 @@ NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v
 -   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (PCL 259): JSON Schema 4 validation and parsing classes
 -   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (PCL 259): Classes to generate code from a JSON Schema 4 (C# and TypeScript)
 
-The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
+The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
 
 **Features:**
 
@@ -26,7 +26,7 @@ The project is developed and maintained by [Rico Suter](http://rsuter.com) and o
 
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
 
-The project is maintained and developed by [Rico Suter](http://rsuter.com) and other contributors. 
+The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. 
 
 ## NJsonSchema usage
 
