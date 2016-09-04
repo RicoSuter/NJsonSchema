@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(classTemplateModel, property, new DefaultValueGenerator(resolver), settings)
+            : base(classTemplateModel, property, new TypeScriptDefaultValueGenerator(resolver, settings.NullHandling), settings)
         {
             _property = property;
             _resolver = resolver;
@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
 
         /// <summary>Gets the type of the property.</summary>
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
