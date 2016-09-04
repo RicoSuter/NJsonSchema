@@ -2,7 +2,7 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.IsNewableObject){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Type#>.fromJS(<#=Model.Value#>) : null;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Type#>.fromJS(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
 <#}else{#>
 <#if(Model.IsArray){#>
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
@@ -24,12 +24,12 @@ if (<#=Model.Value#>) {
     for (let key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
 <#if(Model.IsDictionaryValueNewableObject){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.DictionaryValueType#>.fromJS(<#=Model.Value#>[key]) : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.DictionaryValueType#>.fromJS(<#=Model.Value#>[key]) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.StringToDateCode#>(<#=Model.Value#>[key].toString()) : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.StringToDateCode#>(<#=Model.Value#>[key].toString()) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
 <#}else{#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
 <#}}#>
     }
 }

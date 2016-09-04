@@ -119,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Class, 
+                TypeStyle = TypeScriptTypeStyle.Class,
                 NullHandling = NullHandling.Swagger
             });
             var code = generator.GenerateFile();
@@ -171,6 +171,61 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
             Assert.IsTrue(code.Contains("a: { [key: string] : string; } = {};"));
             Assert.IsTrue(code.Contains("b: { [key: string] : string; };"));
+        }
+
+        [TestMethod]
+        public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("a: A = new A();"));
+            Assert.IsTrue(code.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();"));
+
+            Assert.IsTrue(code.Contains("b: B;"));
+            Assert.IsTrue(code.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : null;"));
         }
     }
 }

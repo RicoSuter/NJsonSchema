@@ -59,7 +59,33 @@ if(Model.IsNewableObject){
             
             #line default
             #line hidden
-            this.Write(") : null;\r\n");
+            this.Write(") : ");
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+if(Model.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("null");
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
             
             #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }else{
@@ -245,7 +271,33 @@ if(Model.IsDictionaryValueNewableObject){
             
             #line default
             #line hidden
-            this.Write("[key]) : null;\r\n");
+            this.Write("[key]) : ");
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+if(Model.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("null");
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
             
             #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }else{
@@ -286,7 +338,33 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write("[key].toString()) : null;\r\n");
+            this.Write("[key].toString()) : ");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+if(Model.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("null");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
             
             #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }else{
@@ -314,7 +392,33 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write("[key] : null;\r\n");
+            this.Write("[key] : ");
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+if(Model.HasDefaultValue){
+            
+            #line default
+            #line hidden
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            
+            #line default
+            #line hidden
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("null");
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
             
             #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }}
