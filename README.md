@@ -14,7 +14,7 @@ NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v
 -   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (PCL 259): JSON Schema 4 validation and parsing classes
 -   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (PCL 259): Classes to generate code from a JSON Schema 4 (C# and TypeScript)
 
-The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
+The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
 
 **Features:**
 
