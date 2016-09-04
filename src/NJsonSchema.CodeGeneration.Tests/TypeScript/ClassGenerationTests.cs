@@ -84,5 +84,93 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
             return code;
         }
+
+        [TestMethod]
+        public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Array,
+                            Item = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Array,
+                            Item = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class, 
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("a: string[] = [];"));
+            Assert.IsTrue(code.Contains("b: string[];"));
+        }
+
+        [TestMethod]
+        public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            AdditionalPropertiesSchema = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            AdditionalPropertiesSchema = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("a: { [key: string] : string; } = {};"));
+            Assert.IsTrue(code.Contains("b: { [key: string] : string; };"));
+        }
     }
 }

@@ -238,7 +238,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("dict: { [key: string] : string; };"));
+            Assert.IsTrue(code.Contains("dict: { [key: string] : string; } = {};")); // property not nullable, must be initialized with {}
         }
     }
 }

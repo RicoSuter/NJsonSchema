@@ -34,8 +34,11 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets a value indicating whether the property has default value.</summary>
         public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);
 
+        /// <summary>Gets the type of the property.</summary>
+        public abstract string Type { get; }
+
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => _settings.GenerateDefaultValues ? _defaultValueGenerator.GetDefaultValue(_property, _property.Name) : null;
+        public string DefaultValue => _settings.GenerateDefaultValues ? _defaultValueGenerator.GetDefaultValue(_property, Type, _property.Name) : null;
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }

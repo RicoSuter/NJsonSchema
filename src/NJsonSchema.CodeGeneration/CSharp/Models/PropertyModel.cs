@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(classTemplateModel, property, new DefaultValueGenerator(resolver), settings)
+            : base(classTemplateModel, property, new CSharpDefaultValueGenerator(resolver,  settings.NullHandling), settings)
         {
             _property = property;
             _settings = settings;
@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name => _property.Name;
 
         /// <summary>Gets the type of the property.</summary>
-        public string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
