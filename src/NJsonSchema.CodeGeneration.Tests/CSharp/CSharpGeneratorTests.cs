@@ -810,5 +810,58 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(code.Contains("public Dictionary<string, string> A { get; set; } = new Dictionary<string, string>();"));
             Assert.IsFalse(code.Contains("public Dictionary<string, string> B { get; set; } = new Dictionary<string, string>();"));
         }
+
+
+        [TestMethod]
+        public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public A A { get; set; } = new A();"));
+            Assert.IsFalse(code.Contains("public B B { get; set; } = new B();"));
+        }
     }
 }
