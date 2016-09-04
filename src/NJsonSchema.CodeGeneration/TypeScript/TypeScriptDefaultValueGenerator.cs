@@ -32,13 +32,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (value == null)
             {
                 var property = schema as JsonProperty;
-                if (property != null && property.IsNullable(_nullHandling) == false)
+                if (property != null && property.ActualPropertySchema.IsNullable(_nullHandling) == false)
                 {
-                    if (property.Type.HasFlag(JsonObjectType.Array))
+                    if (property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array))
                         return "[]";
 
-                    if (property.IsDictionary)
+                    if (property.ActualPropertySchema.IsDictionary)
                         return "{}";
+
+                    if (property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Object))
+                        return "new " + targetType + "()";
                 }
             }
             return value;
