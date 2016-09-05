@@ -133,7 +133,7 @@ namespace NJsonSchema.CodeGeneration
                     .Replace("[", "Of")
                     .Replace("]", string.Empty);
 
-                _generatedTypeNames[schema] = typeName; 
+                _generatedTypeNames[schema] = ConversionUtilities.ConvertToUpperCamelCase(typeName, true);
             }
 
             return _generatedTypeNames[schema];

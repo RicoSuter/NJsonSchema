@@ -5,7 +5,7 @@
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach (var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsDiscriminator){#>private <#}#><#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>()<#}else{#>ko.observable<<#=property.Type#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
+<#}#>    <#if(property.IsDiscriminator){#>private <#}#><#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}else{#>ko.observable<<#=property.Type#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
 <#}#>
 
     constructor(data?: any) {

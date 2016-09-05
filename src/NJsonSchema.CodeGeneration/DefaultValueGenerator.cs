@@ -11,22 +11,23 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>Converts the default value to a language specific identifier.</summary>
-    public class DefaultValueGenerator
+    public abstract class DefaultValueGenerator
     {
         private readonly ITypeResolver _typeResolver;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultValueGenerator" /> class.</summary>
         /// <param name="typeResolver">The type typeResolver.</param>
-        public DefaultValueGenerator(ITypeResolver typeResolver)
+        protected DefaultValueGenerator(ITypeResolver typeResolver)
         {
             _typeResolver = typeResolver;
         }
 
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="targetType">The type of the target.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema4 schema, string typeNameHint)
+        public virtual string GetDefaultValue(JsonSchema4 schema, string targetType, string typeNameHint)
         {
             if (schema.Default == null)
                 return null;

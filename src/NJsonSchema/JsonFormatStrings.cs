@@ -53,5 +53,14 @@ namespace NJsonSchema
 
         /// <summary>Format for a hostname (DNS name).</summary>
         public const string Hostname = "hostname";
+
+        /// <summary>Format for a phone number.</summary>
+        public const string Phone = "phone";
+
+        /// <summary>Format for a full date per RFC3339 Section 5.6.</summary>
+        public const string Date = "date";
+
+        /// <summary>Format for a full time per RFC3339 Section 5.6.</summary>
+        public const string Time = "time";
     }
 }

@@ -85,7 +85,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains("public partial class tAgg"));
+            Assert.IsTrue(output.Contains("public partial class TAgg"));
             Assert.IsTrue(output.Contains("public string Val1 { get; set; }"));
             Assert.IsTrue(output.Contains("public string Val2 { get; set; }"));
             Assert.IsTrue(output.Contains("public string Val3 { get; set; }"));
@@ -238,7 +238,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = gen.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(output.Contains("public ObservableCollection<pRef>"));
+            Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
         }
 
         [TestMethod]
@@ -641,7 +641,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; }"));
+            Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; } = new Dictionary<string, string>();"));
         }
 
         [TestMethod]
@@ -721,6 +721,147 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     
         [JsonProperty(""Age"", Required = Required.AllowNull)]
         public int? Age { get; set; }"));
+        }
+
+        [TestMethod]
+        public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Array,
+                            Item = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Array,
+                            Item = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public ObservableCollection<string> A { get; set; } = new ObservableCollection<string>();"));
+            Assert.IsFalse(code.Contains("public ObservableCollection<string> B { get; set; } = new ObservableCollection<string>();"));
+        }
+
+        [TestMethod]
+        public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            AdditionalPropertiesSchema = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            AdditionalPropertiesSchema = new JsonSchema4
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public Dictionary<string, string> A { get; set; } = new Dictionary<string, string>();"));
+            Assert.IsFalse(code.Contains("public Dictionary<string, string> B { get; set; } = new Dictionary<string, string>();"));
+        }
+
+
+        [TestMethod]
+        public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
+        {
+            //// Arrange
+            var schema = new JsonSchema4
+            {
+                Properties =
+                {
+                    { "A", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = true
+                        }
+                    },
+                    { "B", new JsonProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            Properties =
+                            {
+                                {"A", new JsonProperty
+                                    {
+                                        Type = JsonObjectType.String
+                                    }
+                                }
+                            },
+                            IsRequired = false
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public A A { get; set; } = new A();"));
+            Assert.IsFalse(code.Contains("public B B { get; set; } = new B();"));
         }
     }
 }
