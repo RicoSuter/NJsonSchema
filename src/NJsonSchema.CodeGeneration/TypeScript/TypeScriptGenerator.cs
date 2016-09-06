@@ -90,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, RootObject);
+                var model = new ClassTemplateModel(typeName, typeNameHint, Settings, _resolver, _schema, RootObject);
                 var template = Settings.CreateTemplate(typeName, model);
                 return new TypeGeneratorResult
                 {
