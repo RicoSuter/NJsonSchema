@@ -42,6 +42,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
         public override string ActualClass => _typeName;
 
+        // TODO: Use original definition name for discriminator check (not ActualClass => this one is upper cased)
+
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
             .Where(s => s.Value.Inherits(_schema))
