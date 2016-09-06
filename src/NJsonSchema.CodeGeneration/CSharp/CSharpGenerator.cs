@@ -58,7 +58,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             var model = new FileTemplateModel
             {
-                Toolchain = JsonSchema4.ToolchainVersion,
                 Namespace = Settings.Namespace ?? string.Empty,
                 Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
             };
