@@ -12,7 +12,7 @@
         super(data);
 <#}#>
 <#if(Model.HasDiscriminator){#>
-        this.<#=Model.DiscriminatorProperty.PropertyName#> = "<#=Model.Class#>";
+        this.<#=Model.DiscriminatorProperty.PropertyName#> = "<#=Model.DiscriminatorName#>";
 <#}#>
         if (data !== undefined) {
 <#foreach (var property in Model.Properties){#>

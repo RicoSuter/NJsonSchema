@@ -23,17 +23,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
         /// <param name="typeName">The type name.</param>
+        /// <param name="discriminatorName">The name to compare the discriminator against.</param>
         /// <param name="settings">The settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, JsonSchema4 schema, object rootObject)
+        public ClassTemplateModel(string typeName, string discriminatorName, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, JsonSchema4 schema, object rootObject)
         {
             _typeName = typeName;
             _settings = settings;
             _schema = schema;
             _rootObject = rootObject;
             _resolver = resolver;
+
+            DiscriminatorName = discriminatorName;
         }
 
         /// <summary>Gets the class name (the postfix 'Base' is used when using an extension class).</summary>
@@ -41,6 +44,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
         public override string ActualClass => _typeName;
+
+        /// <summary>Gets the name for the discriminator check.</summary>
+        public string DiscriminatorName { get; }
 
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)

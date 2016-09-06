@@ -183,7 +183,7 @@ if(Model.HasDiscriminator){
             this.Write(" = \"");
             
             #line 15 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DiscriminatorName));
             
             #line default
             #line hidden
