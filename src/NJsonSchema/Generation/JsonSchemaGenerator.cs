@@ -104,7 +104,7 @@ namespace NJsonSchema.Generation
                     {
                         typeDescription.ApplyType(schema);
 
-                        schema.TypeNameRaw = ReflectionExtensions.GetTypeName(type);
+                        schema.TypeNameRaw = ReflectionExtensions.GetSafeTypeName(type);
                         schema.Description = GetDescription(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes());
 
                         GenerateObject(type, schema, schemaResolver, schemaDefinitionAppender);
@@ -131,7 +131,7 @@ namespace NJsonSchema.Generation
 
                     typeDescription.ApplyType(schema);
 
-                    schema.TypeNameRaw = ReflectionExtensions.GetTypeName(type);
+                    schema.TypeNameRaw = ReflectionExtensions.GetSafeTypeName(type);
                     schema.Description = type.GetXmlDocumentation();
 
                     schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
@@ -356,7 +356,7 @@ namespace NJsonSchema.Generation
                 else
                 {
                     var attributes = type.GetTypeInfo().GetDeclaredField(enumName).GetCustomAttributes(); // EnumMember only checked if StringEnumConverter is used
-                    dynamic enumMemberAttribute = TryGetAttribute(attributes, "System.Runtime.Serialization.EnumMemberAttribute");
+                    dynamic enumMemberAttribute = attributes.TryGetIfAssignableTo("System.Runtime.Serialization.EnumMemberAttribute");
                     if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
                         schema.Enumeration.Add((string)enumMemberAttribute.Value);
                     else
@@ -420,7 +420,7 @@ namespace NJsonSchema.Generation
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
-                var requiredAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.RequiredAttribute");
+                var requiredAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RequiredAttribute");
                 var jsonPropertyAttribute = attributes.OfType<JsonPropertyAttribute>().SingleOrDefault();
 
                 var hasJsonNetAttributeRequired = jsonPropertyAttribute != null && (
@@ -455,7 +455,7 @@ namespace NJsonSchema.Generation
                         parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                dynamic readOnlyAttribute = TryGetAttribute(attributes, "System.ComponentModel.ReadOnlyAttribute");
+                dynamic readOnlyAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.ReadOnlyAttribute");
                 if (readOnlyAttribute != null)
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
@@ -487,25 +487,22 @@ namespace NJsonSchema.Generation
         {
             // TODO: Refactor out
 
-            dynamic displayAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.DisplayAttribute");
+            dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null && displayAttribute.Name != null)
                 jsonProperty.Title = displayAttribute.Name;
 
-            dynamic defaultValueAttribute = TryGetAttribute(attributes, "System.ComponentModel.DefaultValueAttribute");
+            dynamic defaultValueAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
                 jsonProperty.Default = ConvertDefaultValue(parentType, attributes, defaultValueAttribute);
 
-            dynamic regexAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
                 jsonProperty.Pattern = regexAttribute.Pattern;
 
             if (propertyTypeDescription.Type == JsonObjectType.Number ||
                 propertyTypeDescription.Type == JsonObjectType.Integer)
             {
-                dynamic rangeAttribute = TryGetAttribute(attributes,
-                    "System.ComponentModel.DataAnnotations.RangeAttribute");
+                dynamic rangeAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RangeAttribute");
                 if (rangeAttribute != null)
                 {
                     if (rangeAttribute.Minimum != null)
@@ -519,8 +516,7 @@ namespace NJsonSchema.Generation
                     jsonProperty.MultipleOf = multipleOfAttribute.MultipleOf;
             }
 
-            dynamic minLengthAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.MinLengthAttribute");
+            dynamic minLengthAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.MinLengthAttribute");
             if (minLengthAttribute != null && minLengthAttribute.Length != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -529,8 +525,7 @@ namespace NJsonSchema.Generation
                     jsonProperty.MinItems = minLengthAttribute.Length;
             }
 
-            dynamic maxLengthAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+            dynamic maxLengthAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
             if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -539,8 +534,7 @@ namespace NJsonSchema.Generation
                     jsonProperty.MaxItems = maxLengthAttribute.Length;
             }
 
-            dynamic stringLengthAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.StringLengthAttribute");
+            dynamic stringLengthAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.StringLengthAttribute");
             if (stringLengthAttribute != null)
             {
                 if (propertyTypeDescription.Type == JsonObjectType.String)
@@ -550,8 +544,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            dynamic dataTypeAttribute = TryGetAttribute(attributes,
-                "System.ComponentModel.DataAnnotations.DataTypeAttribute");
+            dynamic dataTypeAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DataTypeAttribute");
             if (dataTypeAttribute != null)
             {
                 var dataType = dataTypeAttribute.DataType.ToString();
@@ -575,12 +568,12 @@ namespace NJsonSchema.Generation
 
         private string GetDescription(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
         {
-            dynamic descriptionAttribute = TryGetAttribute(attributes, "System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute", TypeNameStyle.FullName);
             if (descriptionAttribute != null && descriptionAttribute.Description != null)
                 return descriptionAttribute.Description;
             else
             {
-                dynamic displayAttribute = TryGetAttribute(attributes, "System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute", TypeNameStyle.FullName);
                 if (displayAttribute != null && displayAttribute.Description != null)
                     return displayAttribute.Description;
                 else
@@ -592,11 +585,6 @@ namespace NJsonSchema.Generation
             }
 
             return null;
-        }
-
-        private Attribute TryGetAttribute(IEnumerable<Attribute> attributes, string attributeType)
-        {
-            return attributes.FirstOrDefault(a => a.GetType().FullName == attributeType);
         }
     }
 }

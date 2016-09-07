@@ -20,9 +20,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _settings = settings; 
         }
 
-        /// <summary>Gets or sets the toolchain version.</summary>
-        public string Toolchain { get; set; }
-
         /// <summary>Gets or sets the code of all types.</summary>
         public string Types { get; set; }
 

@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
                     "hema v");
             
             #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\FileTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Toolchain));
+            this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
             #line hidden
