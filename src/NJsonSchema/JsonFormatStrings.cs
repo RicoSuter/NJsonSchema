@@ -28,6 +28,10 @@ namespace NJsonSchema
         /// <summary>Format for an GUID. </summary>
         public const string Guid = "guid";
 
+        /// <summary>Format for an UUID (same as GUID). </summary>
+        [Obsolete("Now made redundant. Use \"guid\" instead.")]
+        public const string Uuid = "uuid";
+
         /// <summary>Format for a long integer. </summary>
         public const string Long = "long";
 
@@ -45,7 +49,7 @@ namespace NJsonSchema
 
         /// <summary>Format for binary data encoded with Base64.</summary>
         /// <remarks>Should not be used. Prefer using Byte property of <see cref="JsonFormatStrings"/></remarks>
-        [Obsolete("Now made redundant. Use \"byte\" instead")]
+        [Obsolete("Now made redundant. Use \"byte\" instead.")]
         public const string Base64 = "base64";
 
         /// <summary>Format for a byte if used with numeric type or for base64 encoded value otherwise.</summary>
