@@ -13,10 +13,10 @@ namespace NJsonSchema.Tests.Generation
         [DataContract]
         public class Foo
         {
-            [JsonProperty("BARbar1")]
+            [JsonProperty("BarBar1JsonProperty")]
             public string BarBar1 { get; set; }
 
-            [DataMember(Name = "BARbar2")]
+            [DataMember(Name = "BarBar2DataMember")]
             public string BarBar2 { get; set; }
         }
 
@@ -34,10 +34,10 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("BARbar1"));
-            Assert.AreEqual("BARbar1", schema.Properties["BARbar1"].Name);
-            Assert.IsTrue(schema.Properties.ContainsKey("BARbar2"));
-            Assert.AreEqual("BARbar2", schema.Properties["BARbar2"].Name);
+            Assert.IsTrue(schema.Properties.ContainsKey("BarBar1JsonProperty"));
+            Assert.AreEqual("BarBar1JsonProperty", schema.Properties["BarBar1JsonProperty"].Name);
+            Assert.IsTrue(schema.Properties.ContainsKey("BarBar2DataMember"));
+            Assert.AreEqual("BarBar2DataMember", schema.Properties["BarBar2DataMember"].Name);
         }
 
         [TestMethod]
@@ -54,10 +54,10 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("barBar1"));
-            Assert.AreEqual("barBar1", schema.Properties["barBar1"].Name);
-            Assert.IsTrue(schema.Properties.ContainsKey("barBar2"));
-            Assert.AreEqual("barBar2", schema.Properties["barBar2"].Name);
+            Assert.IsTrue(schema.Properties.ContainsKey("barBar1JsonProperty"));
+            Assert.AreEqual("barBar1JsonProperty", schema.Properties["barBar1JsonProperty"].Name);
+            Assert.IsTrue(schema.Properties.ContainsKey("barBar2DataMember"));
+            Assert.AreEqual("barBar2DataMember", schema.Properties["barBar2DataMember"].Name);
         }
     }
 }
