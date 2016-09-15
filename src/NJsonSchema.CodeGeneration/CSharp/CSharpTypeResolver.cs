@@ -120,16 +120,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.Format == JsonFormatStrings.TimeSpan)
                 return isNullable ? "TimeSpan?" : "TimeSpan";
 
-            if (schema.Format == JsonFormatStrings.Guid)
+#pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
+
+            if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
                 return isNullable ? "Guid?" : "Guid";
 
-#pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
             if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
-#pragma warning restore 618
                 return "byte[]";
 
+#pragma warning restore 618
+
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint);
+                return AddGenerator(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             return "string";
         }

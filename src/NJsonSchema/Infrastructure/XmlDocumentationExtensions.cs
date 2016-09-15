@@ -245,6 +245,14 @@ namespace NJsonSchema.Infrastructure
                 if (DynamicApis.FileExists(path))
                     return path;
 
+                if (((object)assembly).GetType().GetRuntimeProperty("CodeBase") != null)
+                {
+                    path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.CodeBase), assemblyName.Name + ".xml")
+                        .Replace("file:\\", string.Empty);
+                    if (DynamicApis.FileExists(path))
+                        return path;
+                }
+
                 dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
                 path = DynamicApis.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
                 if (DynamicApis.FileExists(path))
