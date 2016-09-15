@@ -330,7 +330,18 @@ namespace NJsonSchema
                 if (SchemaReferencePath != null && SchemaReference == null)
                     throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
 
-                return HasSchemaReference ? SchemaReference.ActualSchema : this;
+                if (HasSchemaReference)
+                    return SchemaReference.ActualSchema;
+
+                // May use oneOf to reference another schema (used in Swagger parameters)
+                if (Type == JsonObjectType.None)
+                {
+                    var oneOfWithType = OneOf.Where(s => s.ActualSchema.Type != JsonObjectType.None).ToList();
+                    if (oneOfWithType.Count == 1)
+                        return oneOfWithType.Single().ActualSchema;
+                }
+
+                return this;
             }
         }
 
