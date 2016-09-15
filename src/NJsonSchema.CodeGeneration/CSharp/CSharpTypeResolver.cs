@@ -131,7 +131,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 #pragma warning restore 618
 
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint);
+                return AddGenerator(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             return "string";
         }
