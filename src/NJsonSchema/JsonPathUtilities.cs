@@ -26,13 +26,14 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
         public static string GetPropertyName(MemberInfo property, PropertyNameHandling propertyNameHandling)
         {
+            var propertyName = ReflectionCache.GetProperties(property.DeclaringType).First(p => p.MemberInfo.Name == property.Name).GetName();
             switch (propertyNameHandling)
             {
                 case PropertyNameHandling.Default:
-                    return ReflectionCache.GetProperties(property.DeclaringType).First(p => p.MemberInfo.Name == property.Name).GetName();
+                    return propertyName;
 
                 case PropertyNameHandling.CamelCase:
-                    return CamelCaseResolverLazy.Value.GetResolvedPropertyName(property.Name);
+                    return CamelCaseResolverLazy.Value.GetResolvedPropertyName(propertyName);
 
                 default:
                     throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");
