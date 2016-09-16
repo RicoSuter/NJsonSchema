@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("Rico Suter")]
 [assembly: AssemblyProduct("NJsonSchema.CodeGeneration")]
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
-[assembly: AssemblyVersion("4.10.*")]
+[assembly: AssemblyVersion("4.11.*")]
 
 [assembly: InternalsVisibleTo("NJsonSchema.CodeGeneration.Tests,PublicKey=" +
                               "0024000004800000940000000602000000240000525341310004000001000100337d8a0b73ac39" +

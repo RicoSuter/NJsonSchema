@@ -78,7 +78,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return ResolveString(schema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
-                return "any";
+                return "FileParameter";
 
             if (schema.IsDictionary)
             {
