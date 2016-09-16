@@ -12,7 +12,7 @@ using NJsonSchema.CodeGeneration.CSharp.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
-    /// <summary>The CSharp code generator. </summary>
+    /// <summary>The CSharp code generator.</summary>
     public class CSharpGenerator : TypeGeneratorBase
     {
         private readonly JsonSchema4 _schema;
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateEnum(string typeName)
         {
-            var model = new EnumTemplateModel(typeName, _schema); 
+            var model = new EnumTemplateModel(typeName, _schema);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
             return new TypeGeneratorResult
             {

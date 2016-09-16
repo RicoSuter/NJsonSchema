@@ -1,6 +1,7 @@
 ﻿<#@ template visibility="internal" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
 <#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#><#if(Model.HasDiscriminator){#>[JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
 <#}#>[JsonObject(MemberSerialization.OptIn)]
@@ -37,12 +38,12 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#}#>
     public string ToJson() 
     {
-        return JsonConvert.SerializeObject(this);
+        return JsonConvert.SerializeObject(this<#=Model.JsonConverters#>);
     }
     
     public static <#=Model.Class#> FromJson(string data)
     {
-        return JsonConvert.DeserializeObject<<#=Model.Class#>>(data);
+        return JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonConverters#>);
     }
 <#if(Model.Inpc){#>
     

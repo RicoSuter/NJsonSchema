@@ -71,6 +71,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the base class name.</summary>
         public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), false, string.Empty) : null;
 
+        /// <summary>Gets the JSON converters code.</summary>
+        public string JsonConverters => CSharpJsonConverters.GenerateConverters(_settings);
+
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance
         {
