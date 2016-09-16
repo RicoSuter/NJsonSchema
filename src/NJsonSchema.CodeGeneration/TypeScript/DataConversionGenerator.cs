@@ -30,14 +30,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver, parameters.Settings.NullHandling);
+            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver);
             return new
             {
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, type, parameters.TypeNameHint) != null,
-                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, type, parameters.TypeNameHint),
+                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.IsPropertyNullable, type, parameters.TypeNameHint) != null,
+                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.IsPropertyNullable, type, parameters.TypeNameHint),
 
                 Type = type,
 

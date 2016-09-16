@@ -24,10 +24,11 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="allowsNull">Specifies whether the default value assignment also allows null.</param>
         /// <param name="targetType">The type of the target.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema4 schema, string targetType, string typeNameHint)
+        public virtual string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint)
         {
             if (schema.Default == null)
                 return null;
