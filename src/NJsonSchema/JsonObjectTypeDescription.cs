@@ -104,7 +104,7 @@ namespace NJsonSchema
                 return typeDescription;
             }
 
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ?? 
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
                 parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
             if (jsonSchemaAttribute != null)
             {
@@ -190,7 +190,8 @@ namespace NJsonSchema
         {
             var parameterTypeName = type.Name;
             return parameterTypeName == "IFormFile" ||
-                   parameterTypeName == "HttpPostedFileBase" ||
+                   type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
+                   type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
                    type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
         }
 

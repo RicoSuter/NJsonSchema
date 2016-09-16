@@ -330,7 +330,10 @@ namespace NJsonSchema
                 if (SchemaReferencePath != null && SchemaReference == null)
                     throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
 
-                return HasSchemaReference ? SchemaReference.ActualSchema : this;
+                if (HasSchemaReference)
+                    return SchemaReference.ActualSchema;
+
+                return this;
             }
         }
 
