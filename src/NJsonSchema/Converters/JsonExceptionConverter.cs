@@ -15,12 +15,25 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
-namespace NJsonSchema
+namespace NJsonSchema.Converters
 {
     /// <summary>A converter to correctly serialize exception objects.</summary>
     public class JsonExceptionConverter : JsonConverter
     {
         private readonly DefaultContractResolver _defaultContractResolver = new DefaultContractResolver();
+        private readonly IDictionary<string, Assembly> _searchedNamespaces;
+
+        /// <summary>Initializes a new instance of the <see cref="JsonExceptionConverter"/> class.</summary>
+        public JsonExceptionConverter() : this(new Dictionary<string, Assembly> { { typeof(JsonExceptionConverter).Name, typeof(JsonExceptionConverter).GetTypeInfo().Assembly } })
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonExceptionConverter"/> class.</summary>
+        /// <param name="searchedNamespaces">The namespaces to search for exception types.</param>
+        public JsonExceptionConverter(IDictionary<string, Assembly> searchedNamespaces)
+        {
+            _searchedNamespaces = searchedNamespaces;
+        }
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
         public override bool CanWrite => true;
@@ -37,6 +50,7 @@ namespace NJsonSchema
                 var resolver = serializer.ContractResolver as DefaultContractResolver ?? _defaultContractResolver;
 
                 var jObject = new JObject();
+                jObject.Add(resolver.GetResolvedPropertyName("discriminator"), exception.GetType().Name);
                 jObject.Add(resolver.GetResolvedPropertyName("Message"), exception.Message);
                 jObject.Add(resolver.GetResolvedPropertyName("StackTrace"), exception.StackTrace);
                 jObject.Add(resolver.GetResolvedPropertyName("Source"), exception.Source);
@@ -87,6 +101,31 @@ namespace NJsonSchema
             dynamic resolver = serializer.ContractResolver = serializer.ContractResolver;
             resolver.IgnoreSerializableAttribute = true;
             resolver.IgnoreSerializableInterface = true;
+
+            JToken token;
+            if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
+            {
+                var discriminator = token.Value<string>();
+                if (objectType.GetType().Name.Equals(discriminator) == false)
+                {
+                    var exceptionType = Type.GetType("System." + discriminator, false);
+                    if (exceptionType != null)
+                        objectType = exceptionType;
+                    else
+                    {
+                        foreach (var pair in _searchedNamespaces)
+                        {
+                            exceptionType = pair.Value.GetType(pair.Key + "." + discriminator);
+                            if (exceptionType != null)
+                            {
+                                objectType = exceptionType;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            }
 
             serializer.Converters.Remove(this);
             var value = jObject.ToObject(objectType, serializer);

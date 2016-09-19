@@ -78,7 +78,7 @@
     <Compile Include="IDocumentPathProvider.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\TypeNameStyle.cs" />
-    <Compile Include="JsonExceptionConverter.cs" />
+    <Compile Include="Converters\JsonExceptionConverter.cs" />
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
     <Compile Include="Annotations\MultipleOfAttribute.cs" />

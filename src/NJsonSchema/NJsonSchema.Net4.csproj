@@ -43,6 +43,7 @@
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="Converters\JsonExceptionConverter.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
@@ -59,7 +60,6 @@
     <Compile Include="ISchemaDefinitionAppender.cs" />
     <Compile Include="ISchemaResolver.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
-    <Compile Include="JsonExceptionConverter.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonObjectType.cs" />
     <Compile Include="JsonObjectTypeDescription.cs" />
