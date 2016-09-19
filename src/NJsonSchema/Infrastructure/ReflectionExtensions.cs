@@ -106,10 +106,10 @@ namespace NJsonSchema.Infrastructure
         {
 #if !LEGACY
             if (type.IsConstructedGenericType)
-                return type.Name.Split('`').First() + "Of" + GetSafeTypeName(type.GenericTypeArguments[0]);
+                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GenericTypeArguments.Select(GetSafeTypeName));
 #else
             if (type.IsGenericType)
-                return type.Name.Split('`').First() + "Of" + GetSafeTypeName(type.GetGenericArguments()[0]);
+                return type.Name.Split('`').First() + "Of" + string.Join("And", type.GetGenericArguments().Select(GetSafeTypeName));
 #endif
 
             return type.Name;
