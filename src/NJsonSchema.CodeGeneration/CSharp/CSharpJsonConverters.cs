@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -22,6 +23,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return jsonConverterTypes != null && jsonConverterTypes.Any() ?
                 ", new JsonConverter[] { " + string.Join(", ", jsonConverterTypes.Select(c => "new " + c + "()")) + " }" :
                 string.Empty;
+        }
+
+        /// <summary>Gets the JSON exception converter code.</summary>
+        /// <returns>The code.</returns>
+        public static string GetJsonExceptionConverterCode(int tabCount)
+        {
+            return ConversionUtilities.Tab(new JsonExceptionConverterTemplate().TransformText(), tabCount);
         }
     }
 }
