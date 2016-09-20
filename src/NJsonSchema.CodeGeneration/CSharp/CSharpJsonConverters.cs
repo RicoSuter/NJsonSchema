@@ -24,12 +24,5 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 ", new JsonConverter[] { " + string.Join(", ", jsonConverterTypes.Select(c => "new " + c + "()")) + " }" :
                 string.Empty;
         }
-
-        /// <summary>Gets the JSON exception converter code.</summary>
-        /// <returns>The code.</returns>
-        public static string GetJsonExceptionConverterCode(int tabCount)
-        {
-            return ConversionUtilities.Tab(new JsonExceptionConverterTemplate().TransformText(), tabCount);
-        }
     }
 }
