@@ -1,32 +1,35 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema.Converters;
 using NJsonSchema.Tests.Generation;
 
 namespace NJsonSchema.Tests.Serialization
 {
+    public class CompanyNotFoundException : Exception
+    {
+        internal CompanyNotFoundException()
+        {
+        }
+
+        public CompanyNotFoundException(string message) : base(message)
+        {
+        }
+
+        public CompanyNotFoundException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        [JsonProperty("CompanyKey")]
+        public Guid CompanyKey { get; set; }
+    }
+
     [TestClass]
     public class ExceptionSerializationTests
     {
-        public class CompanyNotFoundException : Exception
-        {
-            internal CompanyNotFoundException()
-            {
-            }
-
-            public CompanyNotFoundException(string message) : base(message)
-            {
-            }
-
-            public CompanyNotFoundException(string message, Exception innerException) : base(message, innerException)
-            {
-            }
-
-            [JsonProperty("CompanyKey")]
-            public Guid CompanyKey { get; set; }
-        }
-
         [TestMethod]
         public void When_custom_exception_is_serialized_then_everything_works()
         {
@@ -44,7 +47,7 @@ namespace NJsonSchema.Tests.Serialization
             {
                 //// Act
                 var json = JsonConvert.SerializeObject(exception, settings);
-                var newException = JsonConvert.DeserializeObject<CompanyNotFoundException>(json, settings);
+                var newException = JsonConvert.DeserializeObject<Exception>(json, settings) as CompanyNotFoundException;
                 var newJson = JsonConvert.SerializeObject(newException, settings);
 
                 //// Assert
@@ -68,7 +71,10 @@ namespace NJsonSchema.Tests.Serialization
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Converters =
                 {
-                    new JsonExceptionConverter()
+                    new JsonExceptionConverter(new Dictionary<string, Assembly>
+                    {
+                        { typeof(ExceptionSerializationTests).Namespace , typeof(ExceptionSerializationTests).Assembly}
+                    })
                 }
             };
             return settings;
@@ -88,7 +94,7 @@ namespace NJsonSchema.Tests.Serialization
             {
                 //// Act
                 var json = JsonConvert.SerializeObject(exception, settings);
-                var newException = JsonConvert.DeserializeObject<ArgumentException>(json, settings);
+                var newException = JsonConvert.DeserializeObject<Exception>(json, settings) as ArgumentException;
                 var newJson = JsonConvert.SerializeObject(newException, settings);
 
                 //// Assert
@@ -110,7 +116,7 @@ namespace NJsonSchema.Tests.Serialization
             {
                 //// Act
                 var json = JsonConvert.SerializeObject(exception, settings);
-                var newException = JsonConvert.DeserializeObject<InvalidOperationException>(json, settings);
+                var newException = JsonConvert.DeserializeObject<Exception>(json, settings) as InvalidOperationException;
                 var newJson = JsonConvert.SerializeObject(newException, settings);
 
                 //// Assert
@@ -132,7 +138,7 @@ namespace NJsonSchema.Tests.Serialization
             {
                 //// Act
                 var json = JsonConvert.SerializeObject(exception, settings);
-                var newException = JsonConvert.DeserializeObject<ArgumentOutOfRangeException>(json, settings);
+                var newException = JsonConvert.DeserializeObject<Exception>(json, settings) as ArgumentOutOfRangeException;
                 var newJson = JsonConvert.SerializeObject(newException, settings);
 
                 //// Assert
