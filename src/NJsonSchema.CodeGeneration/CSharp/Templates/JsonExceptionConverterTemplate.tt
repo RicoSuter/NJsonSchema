@@ -13,7 +13,6 @@ internal class JsonExceptionConverter : JsonConverter
         _searchedNamespaces = searchedNamespaces;
     }
 
-    /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
     public override bool CanWrite => true;
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -63,9 +62,11 @@ internal class JsonExceptionConverter : JsonConverter
 
         GetField(typeof(DefaultContractResolver), "_sharedCache").SetValue(serializer.ContractResolver, false);
 
-        dynamic resolver = serializer.ContractResolver = serializer.ContractResolver;
-        resolver.IgnoreSerializableAttribute = true;
-        resolver.IgnoreSerializableInterface = true;
+        dynamic resolver = serializer.ContractResolver as DefaultContractResolver;
+        if (serializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableAttribute") != null)
+            resolver.IgnoreSerializableAttribute = true;
+        if (serializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableInterface") != null)
+            resolver.IgnoreSerializableInterface = true;
 
         JToken token;
         if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))

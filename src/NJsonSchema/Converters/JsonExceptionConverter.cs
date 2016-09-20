@@ -98,9 +98,11 @@ namespace NJsonSchema.Converters
 
             GetField(typeof(DefaultContractResolver), "_sharedCache").SetValue(serializer.ContractResolver, false);
 
-            dynamic resolver = serializer.ContractResolver = serializer.ContractResolver;
-            resolver.IgnoreSerializableAttribute = true;
-            resolver.IgnoreSerializableInterface = true;
+            dynamic resolver = serializer.ContractResolver as DefaultContractResolver;
+            if (serializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableAttribute") != null)
+                resolver.IgnoreSerializableAttribute = true;
+            if (serializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableInterface") != null)
+                resolver.IgnoreSerializableInterface = true;
 
             JToken token;
             if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
