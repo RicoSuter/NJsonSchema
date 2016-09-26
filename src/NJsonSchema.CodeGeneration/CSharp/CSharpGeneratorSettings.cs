@@ -14,9 +14,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            DateType = "DateTime";
             DateTimeType = "DateTime";
+            TimeType = "TimeSpan";
+            TimeSpanType = "TimeSpan";
+
             ArrayType = "ObservableCollection";
-            DictionaryType = "Dictionary"; 
+            DictionaryType = "Dictionary";
+
             RequiredPropertiesMustBeDefined = true; 
             ClassStyle = CSharpClassStyle.Inpc;
         }
@@ -28,8 +33,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
+        /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
+        public string DateType { get; set; }
+
         /// <summary>Gets or sets the date time .NET type (default: 'DateTime').</summary>
         public string DateTimeType { get; set; }
+
+        /// <summary>Gets or sets the time .NET type (default: 'TimeSpan').</summary>
+        public string TimeType { get; set; }
+
+        /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
+        public string TimeSpanType { get; set; }
 
         /// <summary>Gets or sets the generic array .NET type (default: 'ObservableCollection').</summary>
         public string ArrayType { get; set; }
