@@ -114,11 +114,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
+            if (schema.Format == JsonFormatStrings.Date)
+                return isNullable ? Settings.DateType + "?" : Settings.DateType;
+
             if (schema.Format == JsonFormatStrings.DateTime)
                 return isNullable ? Settings.DateTimeType + "?" : Settings.DateTimeType;
 
+            if (schema.Format == JsonFormatStrings.Time)
+                return isNullable ? Settings.TimeType + "?" : Settings.TimeType;
+
             if (schema.Format == JsonFormatStrings.TimeSpan)
-                return isNullable ? "TimeSpan?" : "TimeSpan";
+                return isNullable ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
 
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
