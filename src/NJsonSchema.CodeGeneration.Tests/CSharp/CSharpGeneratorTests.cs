@@ -863,5 +863,38 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(code.Contains("public A A { get; set; } = new A();"));
             Assert.IsFalse(code.Contains("public B B { get; set; } = new B();"));
         }
+
+        [TestMethod]
+        public void When_definition_is_named_Object_then_JObject_is_generated()
+        {
+            //// Arrange
+            var json = 
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+			""$ref"": ""#/definitions/Object""
+		}
+	}, 
+	""definitions"": {
+		""Object"": { 
+			""type"": ""object"", 
+			""properties"": {} 
+		}
+	}
+}";
+            var schema = JsonSchema4.FromJson(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public JObject Foo { get; set; }"));
+        }
     }
 }
