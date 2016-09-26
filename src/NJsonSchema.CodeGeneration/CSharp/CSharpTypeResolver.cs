@@ -70,8 +70,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
             {
-                var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
-                return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+                if (schema.TypeNameRaw == "Object")
+                    return "JObject";
+                else
+                {
+                    var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
+                    return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+                }
             }
 
             return AddGenerator(schema, typeNameHint);

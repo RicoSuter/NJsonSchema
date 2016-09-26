@@ -131,7 +131,9 @@ namespace NJsonSchema.CodeGeneration
 
                 typeName = typeName
                     .Replace("[", "Of")
-                    .Replace("]", string.Empty);
+                    .Replace("]", string.Empty)
+                    .Replace(",", "And")
+                    .Replace(" ", string.Empty);
 
                 _generatedTypeNames[schema] = ConversionUtilities.ConvertToUpperCamelCase(typeName, true);
             }
