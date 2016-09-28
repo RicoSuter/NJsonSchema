@@ -16,7 +16,7 @@
 <#if(Model.HasInheritance){#>
         super(data);
 <#}#>
-<#if(Model.HasDiscriminator){#>
+<#if(Model.HasBaseDiscriminator){#>
         this._discriminator = "<#=Model.DiscriminatorName#>";
 <#}#>
         if (data !== undefined) {
@@ -29,9 +29,9 @@
     }
 
     static fromJS(data: any): <#=Model.ActualClass#> {
-<#if(Model.HasDiscriminator){
+<#if(Model.HasBaseDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){#>
-        if (data["<#=Model.Discriminator#>"] === "<#=derivedClass#>")
+        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
             return new <#=derivedClass#>(data);
 <#  }#>
         return new <#=Model.ActualClass#>(data);
@@ -43,7 +43,7 @@
     toJS(data?: any) {
         data = data === undefined ? {} : data;
 <#if(Model.HasDiscriminator){#>
-        data["<#=Model.DiscriminatorPropertyName#>"] = this._discriminator; 
+        data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
 <#}#>
 <#foreach (var property in Model.Properties){#>
         var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 

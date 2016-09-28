@@ -216,7 +216,7 @@ if(Model.HasInheritance){
             #line hidden
             
             #line 19 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-if(Model.HasDiscriminator){
+if(Model.HasBaseDiscriminator){
             
             #line default
             #line hidden
@@ -293,7 +293,7 @@ foreach(var property in Model.Properties){
             this.Write(" {\r\n");
             
             #line 32 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-if(Model.HasDiscriminator){
+if(Model.HasBaseDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){
             
             #line default
@@ -301,7 +301,7 @@ if(Model.HasDiscriminator){
             this.Write("        if (data[\"");
             
             #line 34 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Discriminator));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.BaseDiscriminator));
             
             #line default
             #line hidden
@@ -365,7 +365,7 @@ if(Model.HasDiscriminator){
             this.Write("        data[\"");
             
             #line 46 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DiscriminatorPropertyName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.BaseDiscriminator));
             
             #line default
             #line hidden
