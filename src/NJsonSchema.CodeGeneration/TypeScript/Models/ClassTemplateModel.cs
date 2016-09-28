@@ -45,23 +45,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
         public override string ActualClass => _typeName;
 
-        /// <summary>Gets the name for the discriminator check.</summary>
-        public string DiscriminatorName { get; }
-
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
             .Where(s => s.Value.Inherits(_schema))
             .Select(s => s.Key)
             .ToList();
 
+        /// <summary>Gets the name for the discriminator check.</summary>
+        public string DiscriminatorName { get; }
+
+        /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
+        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
+        
         /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.BaseDiscriminator);
-
+        public bool HasBaseDiscriminator => !string.IsNullOrEmpty(_schema.BaseDiscriminator);
+       
         /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
-        public string Discriminator => _schema.BaseDiscriminator;
-
-        /// <summary>Gets the discriminator property model of this inheritance hierarchy.</summary>
-        public string DiscriminatorPropertyName => GetDiscriminatorPropertyName(_schema);
+        public string BaseDiscriminator => _schema.BaseDiscriminator;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
@@ -82,20 +82,5 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
             .Where(v => v.IsInheritanceDiscriminator == false)
             .Select(property => new PropertyModel(this, property, _typeName, _resolver, _settings)).ToList();
-
-        private string GetDiscriminatorPropertyName(JsonSchema4 schema)
-        {
-            if (!string.IsNullOrEmpty(schema.ActualSchema.Discriminator))
-                return schema.ActualSchema.Discriminator;
-            
-            foreach (var baseSchema in schema.InheritedSchemas)
-            {
-                var propertyModel = GetDiscriminatorPropertyName(baseSchema);
-                if (propertyModel != null)
-                    return propertyModel;
-            }
-
-            return null;
-        }
     }
 }

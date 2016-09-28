@@ -170,7 +170,7 @@ if(Model.HasInheritance){
             #line hidden
             
             #line 17 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-if(Model.HasDiscriminator){
+if(Model.HasBaseDiscriminator){
             
             #line default
             #line hidden
@@ -219,7 +219,7 @@ foreach (var property in Model.Properties){
             this.Write(" {\r\n");
             
             #line 28 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-if(Model.HasDiscriminator){
+if(Model.HasBaseDiscriminator){
     foreach (var derivedClass in Model.DerivedClassNames){
             
             #line default
@@ -227,7 +227,7 @@ if(Model.HasDiscriminator){
             this.Write("        if (data[\"");
             
             #line 30 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Discriminator));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.BaseDiscriminator));
             
             #line default
             #line hidden
@@ -291,7 +291,7 @@ if(Model.HasDiscriminator){
             this.Write("        data[\"");
             
             #line 42 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DiscriminatorPropertyName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.BaseDiscriminator));
             
             #line default
             #line hidden
