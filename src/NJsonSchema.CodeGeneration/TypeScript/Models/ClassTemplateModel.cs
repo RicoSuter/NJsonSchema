@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Discriminator => _schema.BaseDiscriminator;
 
         /// <summary>Gets the discriminator property model of this inheritance hierarchy.</summary>
-        public PropertyModel DiscriminatorProperty => GetDiscriminatorProperty(_schema);
+        public string DiscriminatorPropertyName => GetDiscriminatorPropertyName(_schema);
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
@@ -79,17 +79,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
-        public List<PropertyModel> Properties => _schema.ActualProperties.Values.Select(property => new PropertyModel(this, property, _typeName, _resolver, _settings)).ToList();
+        public List<PropertyModel> Properties => _schema.ActualProperties.Values
+            .Where(v => v.IsInheritanceDiscriminator == false)
+            .Select(property => new PropertyModel(this, property, _typeName, _resolver, _settings)).ToList();
 
-        private PropertyModel GetDiscriminatorProperty(JsonSchema4 schema)
+        private string GetDiscriminatorPropertyName(JsonSchema4 schema)
         {
-            var property = schema.ActualSchema.ActualProperties.FirstOrDefault(p => p.Value.IsInheritanceDiscriminator);
-            if (property.Value != null)
-                return new PropertyModel(this, property.Value, string.Empty, _resolver, _settings);
-
+            if (!string.IsNullOrEmpty(schema.ActualSchema.Discriminator))
+                return schema.ActualSchema.Discriminator;
+            
             foreach (var baseSchema in schema.InheritedSchemas)
             {
-                var propertyModel = GetDiscriminatorProperty(baseSchema);
+                var propertyModel = GetDiscriminatorPropertyName(baseSchema);
                 if (propertyModel != null)
                     return propertyModel;
             }

@@ -4,15 +4,18 @@
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {<#foreach(var property in Model.Properties){#> 
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsDiscriminator){#>protected <#}#><#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
 
+<#if(Model.HasDiscriminator){#>
+    protected _discriminator: string;
+<#}#>
 
     constructor(data?: any) {
 <#if(Model.HasInheritance){#>
         super(data);
 <#}#>
 <#if(Model.HasDiscriminator){#>
-        this.<#=Model.DiscriminatorProperty.PropertyName#> = "<#=Model.DiscriminatorName#>";
+        this._discriminator = "<#=Model.DiscriminatorName#>";
 <#}#>
         if (data !== undefined) {
 <#foreach (var property in Model.Properties){#>
@@ -35,6 +38,9 @@
 
     toJS(data?: any) {
         data = data === undefined ? {} : data;
+<#if(Model.HasDiscriminator){#>
+        data["<#=Model.DiscriminatorPropertyName#>"] = this._discriminator; 
+<#}#>
 <#foreach (var property in Model.Properties){#>
         <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 <#} if(Model.HasInheritance){#>
