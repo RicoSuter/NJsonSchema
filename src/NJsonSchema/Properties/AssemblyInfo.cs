@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("Rico Suter")]
 [assembly: AssemblyProduct("NJsonSchema")]
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
-[assembly: AssemblyVersion("4.15.*")]
+[assembly: AssemblyVersion("4.16.*")]
 
 [assembly: InternalsVisibleTo("NSwag.Core,PublicKey=" +
                               "0024000004800000940000000602000000240000525341310004000001000100eba55a5211cd31" +
