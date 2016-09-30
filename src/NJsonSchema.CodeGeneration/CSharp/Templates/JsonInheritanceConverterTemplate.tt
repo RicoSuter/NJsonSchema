@@ -1,5 +1,5 @@
 ﻿<#@ template visibility="internal" #>
-public class JsonInheritanceConverter : JsonConverter
+internal class JsonInheritanceConverter : JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
