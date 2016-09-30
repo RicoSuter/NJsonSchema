@@ -1,4 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -47,6 +50,26 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(deserializedContainer.Animal is Dog);
+        }
+
+        [TestMethod]
+        public void JsonInheritanceConverter_is_thread_safe()
+        {
+            //// Arrange
+            var tasks = new List<Task>();
+            for (int i = 0; i < 100; i++)
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized();
+                }));
+            }
+
+            //// Act
+            Task.WaitAll(tasks.ToArray());
+
+            //// Assert
+            // No exceptions
         }
 
         [TestMethod]

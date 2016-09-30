@@ -23,6 +23,12 @@ namespace NJsonSchema.Converters
         internal static readonly string DefaultDiscriminatorName = "discriminator";
 
         private readonly string _discriminator;
+        
+        [ThreadStatic]
+        private static bool _isReading;
+
+        [ThreadStatic]
+        private static bool _isWriting;
 
         /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
         public JsonInheritanceConverter()
@@ -37,23 +43,36 @@ namespace NJsonSchema.Converters
             _discriminator = discriminator;
         }
 
-        /// <summary>Gets a value indicating whether this <see cref="JsonConverter" /> can write JSON.</summary>
-        public override bool CanWrite => true;
-
         /// <summary>Writes the JSON representation of the object.</summary>
         /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var contract = serializer.ContractResolver.ResolveContract(value.GetType());
-            contract.Converter = null;
+            try
+            {
+                _isWriting = true;
 
-            var jObject = JObject.FromObject(value, serializer);
-            jObject.AddFirst(new JProperty(_discriminator, value.GetType().Name));
-            writer.WriteToken(jObject.CreateReader());
+                var jObject = JObject.FromObject(value, serializer);
+                jObject.AddFirst(new JProperty(_discriminator, value.GetType().Name));
+                writer.WriteToken(jObject.CreateReader());
+            }
+            finally
+            {
+                _isWriting = false;
+            }
+        }
 
-            contract.Converter = this;
+        /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
+        public override bool CanWrite
+        {
+            get { return !_isWriting; }
+        }
+
+        /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON.</summary>
+        public override bool CanRead
+        {
+            get { return !_isReading; }
         }
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
@@ -76,11 +95,15 @@ namespace NJsonSchema.Converters
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
             var subtype = GetObjectSubtype(objectType, discriminator);
 
-            var contract = serializer.ContractResolver.ResolveContract(subtype);
-            contract.Converter = null;
-            var value = serializer.Deserialize(jObject.CreateReader(), subtype);
-            contract.Converter = this;
-            return value;
+            try
+            {
+                _isReading = true;
+                return serializer.Deserialize(jObject.CreateReader(), subtype);
+            }
+            finally
+            {
+                _isReading = false;
+            }
         }
 
         private Type GetObjectSubtype(Type objectType, string discriminator)
