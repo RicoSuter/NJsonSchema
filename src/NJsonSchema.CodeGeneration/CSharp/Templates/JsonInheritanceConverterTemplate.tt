@@ -4,6 +4,12 @@ internal class JsonInheritanceConverter : JsonConverter
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
     private readonly string _discriminator;
+        
+    [ThreadStatic]
+    private static bool _isReading;
+
+    [ThreadStatic]
+    private static bool _isWriting;
 
     public JsonInheritanceConverter()
     {
@@ -15,18 +21,30 @@ internal class JsonInheritanceConverter : JsonConverter
         _discriminator = discriminator;
     }
 
-    public override bool CanWrite => true;
-
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        var contract = serializer.ContractResolver.ResolveContract(value.GetType());
-        contract.Converter = null;
+        try
+        {
+            _isWriting = true;
 
-        var jObject = JObject.FromObject(value, serializer);
-        jObject.AddFirst(new JProperty(_discriminator, value.GetType().Name));
-        writer.WriteToken(jObject.CreateReader());
+            var jObject = JObject.FromObject(value, serializer);
+            jObject.AddFirst(new JProperty(_discriminator, value.GetType().Name));
+            writer.WriteToken(jObject.CreateReader());
+        }
+        finally
+        {
+            _isWriting = false;
+        }
+    }
 
-        contract.Converter = this;
+    public override bool CanWrite
+    {
+        get { return !_isWriting; }
+    }
+
+    public override bool CanRead
+    {
+        get { return !_isReading; }
     }
 
     public override bool CanConvert(Type objectType)
@@ -40,11 +58,15 @@ internal class JsonInheritanceConverter : JsonConverter
         var discriminator = jObject.GetValue(_discriminator).Value<string>();
         var subtype = GetObjectSubtype(objectType, discriminator);
 
-        var contract = serializer.ContractResolver.ResolveContract(subtype);
-        contract.Converter = null;
-        var value = serializer.Deserialize(jObject.CreateReader(), subtype);
-        contract.Converter = this;
-        return value;
+        try
+        {
+            _isReading = true;
+            return serializer.Deserialize(jObject.CreateReader(), subtype);
+        }
+        finally
+        {
+            _isReading = false;
+        }
     }
 
     private Type GetObjectSubtype(Type objectType, string discriminator)
