@@ -39,12 +39,28 @@ internal class JsonInheritanceConverter : JsonConverter
 
     public override bool CanWrite
     {
-        get { return !_isWriting; }
+        get
+        {
+            if (_isWriting)
+            {
+                _isWriting = false;
+                return false; 
+            }
+            return true;
+        }
     }
 
     public override bool CanRead
     {
-        get { return !_isReading; }
+        get
+        {
+            if (_isReading)
+            {
+                _isReading = false;
+                return false;
+            }
+            return true;
+        }
     }
 
     public override bool CanConvert(Type objectType)

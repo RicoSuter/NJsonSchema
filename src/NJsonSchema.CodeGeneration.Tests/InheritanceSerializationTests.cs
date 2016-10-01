@@ -25,6 +25,24 @@ namespace NJsonSchema.CodeGeneration.Tests
     public class Dog : Animal
     {
         public string Bar { get; set; }
+        public List<SubClass> SubElements { get; set; }
+    }
+
+    [JsonConverter(typeof(JsonInheritanceConverter), "discriminator")]
+    [KnownType(typeof(SubClass1))]
+    [KnownType(typeof(SubClass2))]
+    public class SubClass
+    {
+    }
+
+    public class SubClass1 : SubClass
+    {
+        public string Prop1 { get; set; }
+    }
+
+    public class SubClass2 : SubClass
+    {
+        public string Prop2 { get; set; }
     }
 
     [TestClass]
@@ -40,8 +58,8 @@ namespace NJsonSchema.CodeGeneration.Tests
                 {
                     Foo = "foo",
                     Bar = "bar",
+                    SubElements = new List<SubClass> { new SubClass1 { Prop1 = "x" }, new SubClass2 { Prop2 = "x" } }
                 }
-
             };
 
             //// Act
@@ -50,6 +68,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(deserializedContainer.Animal is Dog);
+            Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
         }
 
         [TestMethod]
