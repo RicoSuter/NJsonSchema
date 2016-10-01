@@ -66,13 +66,29 @@ namespace NJsonSchema.Converters
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
         public override bool CanWrite
         {
-            get { return !_isWriting; }
+            get
+            {
+                if (_isWriting)
+                {
+                    _isWriting = false;
+                    return false; 
+                }
+                return true;
+            }
         }
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON.</summary>
         public override bool CanRead
         {
-            get { return !_isReading; }
+            get
+            {
+                if (_isReading)
+                {
+                    _isReading = false;
+                    return false;
+                }
+                return true;
+            }
         }
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
