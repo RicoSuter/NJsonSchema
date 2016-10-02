@@ -9,11 +9,11 @@
         <projectUrl>https://github.com/rsuter/NJsonSchema</projectUrl>
         <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
 
-        <dependencies>
+        <!--<dependencies>
             <group targetFramework=".NETCore5.0">
                 <dependency id="Microsoft.NETCore.Portable.Compatibility" version="1.0.0" />
             </group>
-        </dependencies>
+        </dependencies>-->
     </metadata>
     <files>
         <file src="bin\Release\NJsonSchema.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
