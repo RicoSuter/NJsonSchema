@@ -29,7 +29,7 @@ namespace NJsonSchema.Infrastructure
             FileType = TryLoadType("System.IO.File", "System.IO.File, System.IO.FileSystem");
             PathType = TryLoadType("System.IO.Path", "System.IO.Path, System.IO.FileSystem");
 
-            WebClientType = Type.GetType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", false);
+            WebClientType = TryLoadType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         }
 
         public static bool SupportsFileApis => FileType != null && PathType != null;
