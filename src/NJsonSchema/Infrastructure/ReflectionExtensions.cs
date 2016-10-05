@@ -72,6 +72,13 @@ namespace NJsonSchema.Infrastructure
             return false;
         }
 
+        /// <summary>Gets the type of the array item.</summary>
+        public static Type GetEnumerableItemType(this Type type)
+        {
+            var genericTypeArguments = GetGenericTypeArguments(type);
+            return genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
+        }
+
         /// <summary>Gets the generic type arguments of a type.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The type arguments.</returns>
