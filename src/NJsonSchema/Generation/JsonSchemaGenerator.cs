@@ -427,13 +427,15 @@ namespace NJsonSchema.Generation
                     jsonPropertyAttribute.Required == Required.Always ||
                     jsonPropertyAttribute.Required == Required.AllowNull);
 
+                var isDataContractMemberRequired = GetDataMemberAttribute(parentType, attributes)?.IsRequired == true;
+
                 var hasRequiredAttribute = requiredAttribute != null;
-                if (hasRequiredAttribute || hasJsonNetAttributeRequired)
+                if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
 
                 var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
 
-                var isNullable = !hasRequiredAttribute && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
+                var isNullable = !hasRequiredAttribute && !isDataContractMemberRequired && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
                 if (isNullable)
                 {
                     if (Settings.NullHandling == NullHandling.JsonSchema)
@@ -470,11 +472,23 @@ namespace NJsonSchema.Generation
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
                 return true;
 
-            var hasDataContractAttribute = parentType.GetTypeInfo().GetCustomAttributes().Any(a => a.GetType().Name == "DataContractAttribute");
-            if (hasDataContractAttribute && propertyAttributes.All(a => a.GetType().Name != "DataMemberAttribute") && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+            if (HasDataContractAttribute(parentType) && GetDataMemberAttribute(parentType, propertyAttributes) == null && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
                 return true;
 
             return false;
+        }
+
+        private static dynamic GetDataMemberAttribute(Type parentType, Attribute[] propertyAttributes)
+        {
+            if (!HasDataContractAttribute(parentType))
+                return null;
+
+            return propertyAttributes.FirstOrDefault(a => a.GetType().Name == "DataMemberAttribute");
+        }
+
+        private static bool HasDataContractAttribute(Type parentType)
+        {
+            return parentType.GetTypeInfo().GetCustomAttributes().Any(a => a.GetType().Name == "DataContractAttribute");
         }
 
         /// <summary>Applies the property annotations to the JSON property.</summary>
