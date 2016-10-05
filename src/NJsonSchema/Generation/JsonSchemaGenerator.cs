@@ -146,8 +146,7 @@ namespace NJsonSchema.Generation
             {
                 typeDescription.ApplyType(schema);
 
-                var genericTypeArguments = ReflectionExtensions.GetGenericTypeArguments(type);
-                var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
+                var itemType = type.GetEnumerableItemType(); 
                 if (itemType == null)
                 {
                     var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
