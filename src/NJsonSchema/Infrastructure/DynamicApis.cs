@@ -23,7 +23,7 @@ namespace NJsonSchema.Infrastructure
         static DynamicApis()
         {
             XPathExtensionsType = TryLoadType(
-                "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument", 
+                "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument",
                 "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
             FileType = TryLoadType("System.IO.File", "System.IO.File, System.IO.FileSystem");
@@ -74,18 +74,17 @@ namespace NJsonSchema.Infrastructure
 
         private static Type TryLoadType(params string[] typeNames)
         {
-            try
+            foreach (var typeName in typeNames)
             {
-                foreach (var typeName in typeNames)
+                try
                 {
                     var type = Type.GetType(typeName, false);
                     if (type != null)
                         return type;
                 }
-            }
-            catch
-            {
-                return null;
+                catch
+                {
+                }
             }
             return null;
         }
