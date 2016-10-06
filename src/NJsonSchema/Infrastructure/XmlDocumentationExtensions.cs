@@ -224,7 +224,7 @@ namespace NJsonSchema.Infrastructure
                 default:
                     throw new ArgumentException("Unknown member type.", "member");
             }
-            return string.Format("{0}:{1}", prefixCode, memberName);
+            return string.Format("{0}:{1}", prefixCode, memberName.Replace("+", "."));
         }
 
         private static string GetXmlDocumentationPath(dynamic assembly)
