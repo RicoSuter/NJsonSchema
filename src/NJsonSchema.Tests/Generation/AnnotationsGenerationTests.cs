@@ -171,8 +171,10 @@ namespace NJsonSchema.Tests.Generation
             [DataType(DataType.Url)]
             public string Url { get; set; }
 
+#if !LEGACY
             [DataType(DataType.Upload)]
             public string Upload { get; set; }
+#endif
         }
 
         [TestMethod]
