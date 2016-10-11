@@ -7,6 +7,8 @@ namespace NJsonSchema.Tests.Generation
     [TestClass]
     public class AttributeGenerationTests
     {
+#if !LEGACY
+
         [TestMethod]
         public void When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
@@ -34,6 +36,8 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(3, property.MinLength);
             Assert.AreEqual(5, property.MaxLength);
         }
+
+#endif
 
         [TestMethod]
         public void When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
