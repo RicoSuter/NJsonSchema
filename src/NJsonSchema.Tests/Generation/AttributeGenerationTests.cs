@@ -137,12 +137,16 @@ namespace NJsonSchema.Tests.Generation
 
         public class AttributeTestClass
         {
+#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
+#endif
             public string[] Items { get; set; }
 
+#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
+#endif
             public string String { get; set; }
 
             [Range(5, 10)]
