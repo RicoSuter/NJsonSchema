@@ -904,7 +904,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [TestMethod]
-        public void METHOD()
+        public void When_property_is_ObservableCollection_then_generated_code_uses_the_same_class()
         {
             //// Arrange
             var schema = JsonSchema4.FromType<ObsClass>();
@@ -916,7 +916,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Console.WriteLine(output);
 
             //// Assert
-            Assert.IsTrue(true);
+            Assert.IsTrue(output.Contains("ObservableCollection<string>"));
         }
     }
 }
