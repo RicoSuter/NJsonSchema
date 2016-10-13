@@ -181,6 +181,10 @@ namespace NJsonSchema
             if (IsDictionaryType(type))
                 return false;
 
+            // TODO: Improve these checks
+            if (type.Name == "ObservableCollection`1") 
+                return true;
+
             return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
                 (type.GetTypeInfo().BaseType == null ||
                 !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
@@ -211,6 +215,10 @@ namespace NJsonSchema
         {
             if (IsDictionaryType(type))
                 return false;
+
+            // TODO: Improve these checks
+            if (type.Name == "ObservableCollection`1") 
+                return true;
 
             return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
                 (type.GetTypeInfo().BaseType == null ||

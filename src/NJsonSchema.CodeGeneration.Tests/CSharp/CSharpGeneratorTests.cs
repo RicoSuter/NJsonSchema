@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -895,6 +896,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("public JObject Foo { get; set; }"));
+        }
+
+        public class ObsClass
+        {
+            public ObservableCollection<string> Test { get; set; }
+        }
+
+        [TestMethod]
+        public void METHOD()
+        {
+            //// Arrange
+            var schema = JsonSchema4.FromType<ObsClass>();
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile();
+            Console.WriteLine(output);
+
+            //// Assert
+            Assert.IsTrue(true);
         }
     }
 }
