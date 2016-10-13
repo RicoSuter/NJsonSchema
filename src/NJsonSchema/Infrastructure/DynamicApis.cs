@@ -23,13 +23,13 @@ namespace NJsonSchema.Infrastructure
         static DynamicApis()
         {
             XPathExtensionsType = TryLoadType(
-                    "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
-                    "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument");
+                "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument",
+                "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
             FileType = TryLoadType("System.IO.File", "System.IO.File, System.IO.FileSystem");
             PathType = TryLoadType("System.IO.Path", "System.IO.Path, System.IO.FileSystem");
 
-            WebClientType = Type.GetType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+            WebClientType = TryLoadType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         }
 
         public static bool SupportsFileApis => FileType != null && PathType != null;
@@ -74,18 +74,17 @@ namespace NJsonSchema.Infrastructure
 
         private static Type TryLoadType(params string[] typeNames)
         {
-            try
+            foreach (var typeName in typeNames)
             {
-                foreach (var typeName in typeNames)
+                try
                 {
-                    var type = Type.GetType(typeName);
+                    var type = Type.GetType(typeName, false);
                     if (type != null)
                         return type;
                 }
-            }
-            catch
-            {
-                return null;
+                catch
+                {
+                }
             }
             return null;
         }

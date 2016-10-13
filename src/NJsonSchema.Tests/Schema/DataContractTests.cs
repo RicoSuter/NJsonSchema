@@ -96,5 +96,25 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.AreEqual(0, schema.Properties.Count);
         }
+
+        [DataContract]
+        public class DataContractWithRequiredProperty
+        {
+            [DataMember(Name = "req", IsRequired = true)]
+            public string Required { get; set; }
+        }
+
+        [TestMethod]
+        public void When_DataMemberAttribute_is_required_then_schema_property_is_required()
+        {
+            // Newtonsoft.Json also respects DataMemberAttribute.IsRequired => this throws an exception
+            //var json = JsonConvert.DeserializeObject<DataContractWithRequiredProperty>("{}");
+
+            //// Act
+            var schema = JsonSchema4.FromType<DataContractWithRequiredProperty>();
+
+            //// Assert
+            Assert.IsTrue(schema.Properties["req"].IsRequired);
+        }
     }
 }
