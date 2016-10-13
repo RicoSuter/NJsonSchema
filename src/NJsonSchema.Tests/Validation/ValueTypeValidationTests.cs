@@ -227,7 +227,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Number;
-            schema.Minimum = 1.5;
+            schema.Minimum = 1.5m;
 
             var token = new JValue(1.4);
 
@@ -244,7 +244,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Number;
-            schema.Maximum = 1.5;
+            schema.Maximum = 1.5m;
 
             var token = new JValue(1.6);
 

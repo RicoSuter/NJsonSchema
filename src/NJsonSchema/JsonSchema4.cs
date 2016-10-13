@@ -351,11 +351,11 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the required multiple of for the number value. </summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public double? MultipleOf { get; set; }
+        public decimal? MultipleOf { get; set; }
 
         /// <summary>Gets or sets the maximum allowed value. </summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public double? Maximum { get; set; }
+        public decimal? Maximum { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -363,7 +363,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the minimum allowed value. </summary>
         [JsonProperty("minimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public double? Minimum { get; set; }
+        public decimal? Minimum { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the minimum value is excluded. </summary>
         [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

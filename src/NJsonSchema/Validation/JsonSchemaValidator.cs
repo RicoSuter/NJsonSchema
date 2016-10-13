@@ -249,7 +249,7 @@ namespace NJsonSchema.Validation
 
             if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
             {
-                var value = token.Value<double>();
+                var value = token.Value<decimal>();
 
                 if (_schema.Minimum.HasValue && (_schema.IsExclusiveMinimum ? value <= _schema.Minimum : value < _schema.Minimum))
                     errors.Add(new ValidationError(ValidationErrorKind.NumberTooSmall, propertyName, propertyPath));

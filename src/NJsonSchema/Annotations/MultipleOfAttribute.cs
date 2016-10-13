@@ -18,10 +18,17 @@ namespace NJsonSchema.Annotations
         /// <param name="multipleOf">The multipleOf value.</param>
         public MultipleOfAttribute(double multipleOf)
         {
+            MultipleOf = (decimal) multipleOf;
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="MultipleOfAttribute"/> class.</summary>
+        /// <param name="multipleOf">The multipleOf value.</param>
+        public MultipleOfAttribute(decimal multipleOf)
+        {
             MultipleOf = multipleOf;
         }
 
         /// <summary>Gets the value whose modulo the the JSON value must be zero.</summary>
-        public double MultipleOf { get; private set; }
+        public decimal MultipleOf { get; private set; }
     }
 }
