@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 
 namespace NJsonSchema.Tests.Generation
@@ -70,7 +71,55 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Number"];
 
             //// Assert
-            Assert.AreEqual(4.5, property.MultipleOf.Value);
+            Assert.AreEqual(4.5m, property.MultipleOf.Value);
+        }
+
+        public class SimpleClass
+        {
+            [JsonProperty("number")]
+            public decimal Number { get; set; }
+
+            public SimpleClass(decimal number)
+            {
+                Number = number;
+            }
+        }
+
+        [TestMethod]
+        public void When_multipleOf_is_fraction_then_it_is_validated_correctly()
+        {
+            //// Arrange
+            List<SimpleClass> testClasses = new List<SimpleClass>();
+            for (int i = 0; i < 100; i++)
+            {
+                testClasses.Add(new SimpleClass((decimal)(0.1 * i)));
+            }
+
+            string jsonData = JsonConvert.SerializeObject(testClasses, Formatting.Indented);
+            var schema = JsonSchema4.FromJson(@"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""array"",
+  ""items"": {
+    ""type"": ""object"",
+    ""properties"": {
+      ""number"": {
+        ""type"": ""number"",
+          ""multipleOf"": 0.1,
+          ""minimum"": 0.0,
+          ""maximum"": 4903700.0
+      }
+    },
+    ""required"": [
+      ""number""
+    ]
+  }
+}");
+
+            //// Act
+            var errors = schema.Validate(jsonData);
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
         }
 
         [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
