@@ -1,4 +1,5 @@
 ﻿<#@ template visibility="internal" #>
+[GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 internal class JsonInheritanceConverter : JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
