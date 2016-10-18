@@ -202,7 +202,7 @@ namespace NJsonSchema
             };
         }
 
-        /// <summary>Gets the list of parent/inherited schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
+        /// <summary>Gets the list of directly inherited/parent schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
 #if !LEGACY
@@ -212,6 +212,22 @@ namespace NJsonSchema
 #endif
         {
             get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
+        }
+
+        /// <summary>Gets the list of all inherited/parent schemas.</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+#if !LEGACY
+        public IReadOnlyCollection<JsonSchema4> AllInheritedSchemas
+#else
+        public ICollection<JsonSchema4> AllInheritedSchemas
+#endif
+        {
+            get
+            {
+                var inheritedSchemas = InheritedSchemas;
+                return inheritedSchemas.Concat(inheritedSchemas.SelectMany(s => s.AllInheritedSchemas)).ToList();
+            }
         }
 
         /// <summary>Determines whether the given schema is the parent schema of this schema (i.e. super/base class).</summary>
