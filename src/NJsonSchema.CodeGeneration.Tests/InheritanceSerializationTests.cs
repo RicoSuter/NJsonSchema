@@ -66,6 +66,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
+            var schema = JsonSchema4.FromType<Container>();
+            var schemaJson = schema.ToJson();
+            var errors = schema.Validate(json);
+
             //// Assert
             Assert.IsTrue(deserializedContainer.Animal is Dog);
             Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
