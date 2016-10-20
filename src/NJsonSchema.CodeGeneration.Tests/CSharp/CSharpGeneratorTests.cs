@@ -167,7 +167,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
         class CustomTypeNameGenerator : ITypeNameGenerator
         {
-            public string Generate(JsonSchema4 schema)
+            public string Generate(JsonSchema4 schema, string typeNameHint)
             {
                 return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw, true);
             }

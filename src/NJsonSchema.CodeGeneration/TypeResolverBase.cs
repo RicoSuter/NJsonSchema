@@ -121,7 +121,7 @@ namespace NJsonSchema.CodeGeneration
 
             if (!_generatedTypeNames.ContainsKey(schema))
             {
-                var typeName = schema.GetTypeName(_typeNameGenerator);
+                var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
                 var isIntegerEnum = schema.IsEnumeration && schema.Type == JsonObjectType.Integer;
 
                 if (string.IsNullOrEmpty(typeName))

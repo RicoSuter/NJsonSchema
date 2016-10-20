@@ -13,7 +13,8 @@ namespace NJsonSchema
     {
         /// <summary>Generates the type name.</summary>
         /// <param name="schema">The property.</param>
+        /// <param name="typeNameHint">The type name hint (the property name or definition key).</param>
         /// <returns>The new name.</returns>
-        string Generate(JsonSchema4 schema);
+        string Generate(JsonSchema4 schema, string typeNameHint);
     }
 }
