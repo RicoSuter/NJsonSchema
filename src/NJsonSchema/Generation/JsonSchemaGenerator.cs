@@ -210,7 +210,12 @@ namespace NJsonSchema.Generation
             if (valueType == typeof(object))
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else
-                schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver, schemaDefinitionAppender);
+            {
+                schema.AdditionalPropertiesSchema = new JsonSchema4
+                {
+                    SchemaReference = Generate(valueType, schemaResolver, schemaDefinitionAppender)
+                };
+            }
 
             schema.AllowAdditionalProperties = true;
         }

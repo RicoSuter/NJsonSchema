@@ -97,20 +97,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return new TypeScriptGenerator(schema, Settings, this, _rootObject);
         }
 
-        /// <summary>Gets or generates the type name for the given schema.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The type name.</returns>
-        public override string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
-        {
-            var typeName = base.GetOrGenerateTypeName(schema, typeNameHint);
-
-            if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
-                return typeName + "AsInteger";
-
-            return typeName;
-        }
-
         private string ResolveString(JsonSchema4 schema, string typeNameHint)
         {
             // TODO: Make this more generic (see DataConversionGenerator.IsDate)
