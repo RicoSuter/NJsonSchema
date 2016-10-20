@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
-            Assert.AreEqual(2, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // one found
+            Assert.AreEqual(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
             Assert.AreEqual(3, code.Split(new[] { "[JsonConverter(typeof(StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
         }
 

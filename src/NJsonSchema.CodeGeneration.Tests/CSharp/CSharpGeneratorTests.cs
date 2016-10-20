@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.Generation;
@@ -523,6 +524,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
         public class ClassWithDefaultEnumProperty
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             [DefaultValue(ConstructionCode.NON_CBST)]
             public ConstructionCode ConstructionCode { get; set; }
         }
@@ -574,12 +576,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         ""NON_CBST""
       ],
       ""enum"": [
-        0,
-        1,
-        2,
-        3
+        ""FIRE_RSTV"",
+        ""FRAME"",
+        ""JOIST_MAS"",
+        ""NON_CBST""
       ],
-      ""default"": 3
+      ""default"": ""JOIST_MAS""
     }
   }
 }";
@@ -590,7 +592,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
+            Assert.IsTrue(code.Contains("public ConstructionCodeAsInteger ConstructionCode { get; set; } = ConstructionCodeAsInteger.JOIST_MAS;"));
         }
 
         [TestMethod]

@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -19,8 +18,6 @@ namespace NJsonSchema.CodeGeneration
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
         private readonly Dictionary<JsonSchema4, string> _generatedTypeNames = new Dictionary<JsonSchema4, string>();
         private readonly ITypeNameGenerator _typeNameGenerator;
-
-        private int _anonymousTypeCount = 0;
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase{TGenerator}"/> class.</summary>
         /// <param name="typeNameGenerator">The type name generator.</param>
@@ -125,9 +122,22 @@ namespace NJsonSchema.CodeGeneration
             if (!_generatedTypeNames.ContainsKey(schema))
             {
                 var typeName = schema.GetTypeName(_typeNameGenerator);
+                var isIntegerEnum = schema.IsEnumeration && schema.Type == JsonObjectType.Integer;
 
                 if (string.IsNullOrEmpty(typeName))
-                    typeName = GenerateTypeName(typeNameHint);
+                {
+                    typeName = isIntegerEnum ? 
+                        GenerateTypeName(typeNameHint + "AsInteger") : 
+                        GenerateTypeName(typeNameHint);
+                }
+                else
+                {
+                    if (isIntegerEnum)
+                        typeName = typeName + "AsInteger";
+
+                    if (_generatedTypeNames.ContainsValue(typeName))
+                        typeName = GenerateTypeName(typeName);
+                }
 
                 typeName = typeName
                     .Replace("[", "Of")
@@ -148,17 +158,18 @@ namespace NJsonSchema.CodeGeneration
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {
-                typeNameHint.Split('.').Last();
+                typeNameHint = typeNameHint.Split('.').Last();
 
                 if (!_generatedTypeNames.ContainsValue(typeNameHint))
                     return typeNameHint;
 
+                var count = 1;
                 do
                 {
-                    _anonymousTypeCount++;
-                } while (_generatedTypeNames.ContainsValue(typeNameHint + _anonymousTypeCount));
+                    count++;
+                } while (_generatedTypeNames.ContainsValue(typeNameHint + count));
 
-                return typeNameHint + _anonymousTypeCount;
+                return typeNameHint + count;
             }
             else
                 return GenerateTypeName("Anonymous");

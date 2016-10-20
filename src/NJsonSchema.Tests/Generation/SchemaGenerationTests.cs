@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.Type);
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.ActualSchema.Type);
             // "#/definitions/ref_7de8187d_d860_41fa_a17b_3f395c053cae"
         }
 
