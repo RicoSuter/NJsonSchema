@@ -36,5 +36,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets or sets the template factory.</summary>
         [JsonIgnore]
         public ITemplateFactory TemplateFactory { get; set; } = new DefaultTemplateFactory();
+
+        /// <summary>Gets or sets the enum name generator.</summary>
+        [JsonIgnore]
+        public IEnumNameGenerator EnumNameGenerator { get; set; } = new DefaultEnumNameGenerator();
     }
 }

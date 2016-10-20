@@ -78,6 +78,8 @@
   <ItemGroup>
     <Compile Include="CodeGeneratorSettingsBase.cs" />
     <Compile Include="CSharp\CSharpJsonConverters.cs" />
+    <Compile Include="DefaultEnumNameGenerator.cs" />
+    <Compile Include="IEnumNameGenerator.cs" />
     <Compile Include="CSharp\Models\ClassTemplateModel.cs" />
     <Compile Include="CSharp\CSharpGenerator.cs" />
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />

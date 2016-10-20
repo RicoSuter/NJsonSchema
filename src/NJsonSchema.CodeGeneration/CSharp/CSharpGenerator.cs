@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateEnum(string typeName)
         {
-            var model = new EnumTemplateModel(typeName, _schema);
+            var model = new EnumTemplateModel(typeName, _schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
             return new TypeGeneratorResult
             {
