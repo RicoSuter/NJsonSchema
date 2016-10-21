@@ -36,11 +36,12 @@ namespace NJsonSchema
 
         /// <summary>Gets the type name of the schema.</summary>
         /// <param name="typeNameGenerator">The type name generator.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        public string GetTypeName(ITypeNameGenerator typeNameGenerator)
+        public string GetTypeName(ITypeNameGenerator typeNameGenerator, string typeNameHint)
         {
             if (typeNameGenerator != null)
-                return typeNameGenerator.Generate(this)?.Split('.').Last();
+                return typeNameGenerator.Generate(this, typeNameHint)?.Split('.').Last();
 
             return TypeNameRaw?.Split('.').Last();
         }

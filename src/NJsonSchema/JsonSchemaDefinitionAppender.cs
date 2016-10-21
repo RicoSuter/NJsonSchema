@@ -35,7 +35,7 @@ namespace NJsonSchema
             var rootSchema = RootObject as JsonSchema4;
             if (rootSchema != null && objectToAppend != null)
             {
-                var typeName = objectToAppend.GetTypeName(_typeNameGenerator); 
+                var typeName = objectToAppend.GetTypeName(_typeNameGenerator, string.Empty); 
                 if (!string.IsNullOrEmpty(typeName) && !rootSchema.Definitions.ContainsKey(typeName))
                     rootSchema.Definitions[typeName] = objectToAppend;
                 else

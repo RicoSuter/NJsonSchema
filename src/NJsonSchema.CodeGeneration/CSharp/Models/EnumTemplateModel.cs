@@ -16,13 +16,17 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     public class EnumTemplateModel
     {
         private readonly JsonSchema4 _schema;
+        private readonly CSharpGeneratorSettings _settings;
 
-        /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel" /> class.</summary>
         /// <param name="typeName">Name of the type.</param>
         /// <param name="schema">The schema.</param>
-        public EnumTemplateModel(string typeName, JsonSchema4 schema)
+        /// <param name="settings">The settings.</param>
+        public EnumTemplateModel(string typeName, JsonSchema4 schema, CSharpGeneratorSettings settings)
         {
             _schema = schema;
+            _settings = settings;
+
             Name = typeName;
         }
 
@@ -53,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
                     entries.Add(new EnumerationItemModel
                     {
-                        Name = ConversionUtilities.ConvertToUpperCamelCase(name, true),
+                        Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                         Value = value.ToString(),
                         InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
                     });

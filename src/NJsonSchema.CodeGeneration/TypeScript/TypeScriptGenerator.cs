@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (_schema.IsEnumeration)
             {
-                var model = new EnumTemplateModel(typeName, _schema);
+                var model = new EnumTemplateModel(typeName, _schema, Settings);
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
                 return new TypeGeneratorResult
                 {

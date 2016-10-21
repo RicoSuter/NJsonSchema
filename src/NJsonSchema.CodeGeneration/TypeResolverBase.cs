@@ -121,20 +121,12 @@ namespace NJsonSchema.CodeGeneration
 
             if (!_generatedTypeNames.ContainsKey(schema))
             {
-                var typeName = schema.GetTypeName(_typeNameGenerator);
-                var isIntegerEnum = schema.IsEnumeration && schema.Type == JsonObjectType.Integer;
+                var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
 
                 if (string.IsNullOrEmpty(typeName))
-                {
-                    typeName = isIntegerEnum ? 
-                        GenerateTypeName(typeNameHint + "AsInteger") : 
-                        GenerateTypeName(typeNameHint);
-                }
+                    typeName = GenerateTypeName(typeNameHint);
                 else
                 {
-                    if (isIntegerEnum)
-                        typeName = typeName + "AsInteger";
-
                     if (_generatedTypeNames.ContainsValue(typeName))
                         typeName = GenerateTypeName(typeName);
                 }
@@ -183,7 +175,7 @@ namespace NJsonSchema.CodeGeneration
         protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType, NullHandling nullHandling)
         {
             if (schema.AdditionalPropertiesSchema != null)
-                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.IsNullable(nullHandling), null);
+                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(nullHandling), null);
 
             if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
             {

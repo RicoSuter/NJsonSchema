@@ -167,7 +167,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
         class CustomTypeNameGenerator : ITypeNameGenerator
         {
-            public string Generate(JsonSchema4 schema)
+            public string Generate(JsonSchema4 schema, string typeNameHint)
             {
                 return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw, true);
             }
@@ -592,7 +592,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCodeAsInteger ConstructionCode { get; set; } = ConstructionCodeAsInteger.JOIST_MAS;"));
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.JOIST_MAS;"));
         }
 
         [TestMethod]
