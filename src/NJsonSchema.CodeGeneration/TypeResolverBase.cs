@@ -175,7 +175,7 @@ namespace NJsonSchema.CodeGeneration
         protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType, NullHandling nullHandling)
         {
             if (schema.AdditionalPropertiesSchema != null)
-                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.IsNullable(nullHandling), null);
+                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(nullHandling), null);
 
             if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
             {

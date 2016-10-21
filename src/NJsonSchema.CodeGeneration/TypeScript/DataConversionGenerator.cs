@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDictionary = parameters.Schema.IsDictionary,
                 DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any",
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
-                IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.Format, parameters.Settings.DateTimeType),
+                IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
 
                 IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
                 ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
