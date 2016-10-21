@@ -211,10 +211,15 @@ namespace NJsonSchema.Generation
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else
             {
-                schema.AdditionalPropertiesSchema = new JsonSchema4
+                if (RequiresSchemaReference(valueType, null))
                 {
-                    SchemaReference = Generate(valueType, schemaResolver, schemaDefinitionAppender)
-                };
+                    schema.AdditionalPropertiesSchema = new JsonSchema4
+                    {
+                        SchemaReference = Generate(valueType, schemaResolver, schemaDefinitionAppender)
+                    };
+                }
+                else
+                    schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver, schemaDefinitionAppender); 
             }
 
             schema.AllowAdditionalProperties = true;
@@ -387,14 +392,8 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
-                var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == propertyType);
-                var useSchemaReference =
-                    typeMapper?.UseReference != false &&
-                    !Settings.TypeMappers.Any(m => m is PrimitiveTypeMapper) &&
-                    !propertyTypeDescription.IsDictionary &&
-                    (propertyTypeDescription.Type.HasFlag(JsonObjectType.Object) || propertyTypeDescription.IsEnum);
-
-                if (useSchemaReference)
+                var requiresSchemaReference = RequiresSchemaReference(propertyType, attributes);
+                if (requiresSchemaReference)
                 {
                     var propertySchema = Generate<JsonSchema4>(propertyType, attributes, schemaResolver, schemaDefinitionAppender);
 
@@ -444,7 +443,7 @@ namespace NJsonSchema.Generation
                 {
                     if (Settings.NullHandling == NullHandling.JsonSchema)
                     {
-                        if (useSchemaReference)
+                        if (requiresSchemaReference)
                             jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                         else if (jsonProperty.Type == JsonObjectType.None)
                         {
@@ -469,6 +468,17 @@ namespace NJsonSchema.Generation
 
                 ApplyPropertyAnnotations(jsonProperty, parentType, attributes, propertyTypeDescription);
             }
+        }
+
+        private bool RequiresSchemaReference(Type type, IEnumerable<Attribute> parentAttributes)
+        {
+            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+
+            var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
+            if (typeMapper != null)
+                return typeMapper.UseReference;
+            
+            return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
 
         private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
