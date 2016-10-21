@@ -475,8 +475,8 @@ namespace NJsonSchema.Generation
             var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
 
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
-            if (typeMapper != null && typeMapper.UseReference)
-                return true;
+            if (typeMapper != null)
+                return typeMapper.UseReference;
             
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
