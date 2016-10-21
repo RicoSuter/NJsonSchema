@@ -122,19 +122,11 @@ namespace NJsonSchema.CodeGeneration
             if (!_generatedTypeNames.ContainsKey(schema))
             {
                 var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
-                var isIntegerEnum = schema.IsEnumeration && schema.Type == JsonObjectType.Integer;
 
                 if (string.IsNullOrEmpty(typeName))
-                {
-                    typeName = isIntegerEnum ? 
-                        GenerateTypeName(typeNameHint + "AsInteger") : 
-                        GenerateTypeName(typeNameHint);
-                }
+                    typeName = GenerateTypeName(typeNameHint);
                 else
                 {
-                    if (isIntegerEnum)
-                        typeName = typeName + "AsInteger";
-
                     if (_generatedTypeNames.ContainsValue(typeName))
                         typeName = GenerateTypeName(typeName);
                 }
