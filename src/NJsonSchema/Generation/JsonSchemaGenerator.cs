@@ -534,9 +534,9 @@ namespace NJsonSchema.Generation
                 if (rangeAttribute != null)
                 {
                     if (rangeAttribute.Minimum != null)
-                        jsonProperty.Minimum = rangeAttribute.Minimum;
+                        jsonProperty.Minimum = (decimal?)(double)rangeAttribute.Minimum;
                     if (rangeAttribute.Maximum != null)
-                        jsonProperty.Maximum = rangeAttribute.Maximum;
+                        jsonProperty.Maximum = (decimal?)(double)rangeAttribute.Maximum;
                 }
 
                 var multipleOfAttribute = attributes.OfType<MultipleOfAttribute>().SingleOrDefault();
