@@ -49,8 +49,8 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Double"];
 
             //// Assert
-            Assert.AreEqual(5, property.Minimum);
-            Assert.AreEqual(10, property.Maximum);
+            Assert.AreEqual(5.5m, property.Minimum);
+            Assert.AreEqual(10.5m, property.Maximum);
         }
 
         [TestMethod]
@@ -153,7 +153,7 @@ namespace NJsonSchema.Tests.Generation
 #endif
             public string String { get; set; }
 
-            [Range(5, 10)]
+            [Range(5.5, 10.5)]
             public double Double { get; set; }
 
             [Range(5, 10)]
