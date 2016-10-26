@@ -592,7 +592,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCodeAsInteger ConstructionCode { get; set; } = ConstructionCodeAsInteger.JOIST_MAS;"));
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.JOIST_MAS;"));
         }
 
         [TestMethod]
