@@ -17,6 +17,7 @@ namespace NJsonSchema.Infrastructure
     {
         private static readonly Type XPathExtensionsType;
         private static readonly Type FileType;
+        private static readonly Type DirectoryType;
         private static readonly Type PathType;
         private static readonly Type WebClientType;
 
@@ -27,6 +28,7 @@ namespace NJsonSchema.Infrastructure
                 "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
             FileType = TryLoadType("System.IO.File", "System.IO.File, System.IO.FileSystem");
+            DirectoryType = TryLoadType("System.IO.Directory", "System.IO.Directory, System.IO.FileSystem");
             PathType = TryLoadType("System.IO.Path", "System.IO.Path, System.IO.FileSystem");
 
             WebClientType = TryLoadType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
@@ -44,6 +46,16 @@ namespace NJsonSchema.Infrastructure
                 return client.DownloadString(url);
         }
 
+        public static string DirectoryGetCurrentDirectory()
+        {
+            return (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { });
+        }
+
+        public static string[] DirectoryGetFiles(string directory, string filter)
+        {
+            return (string[])DirectoryType.GetRuntimeMethod("GetFiles", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { directory, filter });
+        }
+
         public static bool FileExists(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
@@ -55,6 +67,11 @@ namespace NJsonSchema.Infrastructure
         public static string FileReadAllText(string filePath)
         {
             return (string)FileType.GetRuntimeMethod("ReadAllText", new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 });
+        }
+
+        public static string FileWriteAllText(string filePath, string text)
+        {
+            return (string)FileType.GetRuntimeMethod("WriteAllText", new[] { typeof(string), typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, text, Encoding.UTF8 });
         }
 
         public static string PathCombine(string path1, string path2)
