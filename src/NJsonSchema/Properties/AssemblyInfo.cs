@@ -6,9 +6,15 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyCompany("Rico Suter")]
 [assembly: AssemblyProduct("NJsonSchema")]
 [assembly: AssemblyCopyright("Copyright © Rico Suter, 2016")]
-[assembly: AssemblyVersion("5.10.*")]
+[assembly: AssemblyVersion("5.11.*")]
 
 [assembly: InternalsVisibleTo("NSwag.Core,PublicKey=" +
+                              "0024000004800000940000000602000000240000525341310004000001000100eba55a5211cd31" +
+                              "98b5ba4b96c5cb70484b376ce083664d47dcb7439a97c3368a26ea54de3ec6d90d2899d39c4e3b" +
+                              "65cb4ac7ef8ba5c9ded7c8aa6538757b31291624e96f374c23fdbeeaa85dfe841ab6afffbd3593" +
+                              "d2a40c96a0f0888f25d7bd9361611db9450041b57776d33e3acb90794254c428251ddd63aa329d" +
+                              "86ec809f")]
+[assembly: InternalsVisibleTo("NSwag.Commands,PublicKey=" +
                               "0024000004800000940000000602000000240000525341310004000001000100eba55a5211cd31" +
                               "98b5ba4b96c5cb70484b376ce083664d47dcb7439a97c3368a26ea54de3ec6d90d2899d39c4e3b" +
                               "65cb4ac7ef8ba5c9ded7c8aa6538757b31291624e96f374c23fdbeeaa85dfe841ab6afffbd3593" +
