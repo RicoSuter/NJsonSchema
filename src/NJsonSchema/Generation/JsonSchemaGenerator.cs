@@ -533,10 +533,10 @@ namespace NJsonSchema.Generation
                 dynamic rangeAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RangeAttribute");
                 if (rangeAttribute != null)
                 {
-                    if (rangeAttribute.Minimum != null)
-                        jsonProperty.Minimum = rangeAttribute.Minimum;
-                    if (rangeAttribute.Maximum != null)
-                        jsonProperty.Maximum = rangeAttribute.Maximum;
+                    if (rangeAttribute.Minimum != null && rangeAttribute.Minimum > double.MinValue)
+                        jsonProperty.Minimum = (decimal?)(double)rangeAttribute.Minimum;
+                    if (rangeAttribute.Maximum != null && rangeAttribute.Maximum < double.MaxValue)
+                        jsonProperty.Maximum = (decimal?)(double)rangeAttribute.Maximum;
                 }
 
                 var multipleOfAttribute = attributes.OfType<MultipleOfAttribute>().SingleOrDefault();
