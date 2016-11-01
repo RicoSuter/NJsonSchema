@@ -27,9 +27,9 @@ namespace NJsonSchema.Infrastructure
                 "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument",
                 "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
-            FileType = TryLoadType("System.IO.File", "System.IO.File, System.IO.FileSystem");
-            DirectoryType = TryLoadType("System.IO.Directory", "System.IO.Directory, System.IO.FileSystem");
-            PathType = TryLoadType("System.IO.Path", "System.IO.Path, System.IO.FileSystem");
+            FileType = TryLoadType("System.IO.File, System.IO.FileSystem", "System.IO.File");
+            DirectoryType = TryLoadType("System.IO.Directory, System.IO.FileSystem", "System.IO.Directory");
+            PathType = TryLoadType("System.IO.Path, System.IO.FileSystem", "System.IO.Path");
 
             WebClientType = TryLoadType("System.Net.WebClient, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         }
@@ -54,6 +54,11 @@ namespace NJsonSchema.Infrastructure
         public static string[] DirectoryGetFiles(string directory, string filter)
         {
             return (string[])DirectoryType.GetRuntimeMethod("GetFiles", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { directory, filter });
+        }
+
+        public static void DirectoryCreateDirectory(string directory)
+        {
+            DirectoryType.GetRuntimeMethod("CreateDirectory", new[] { typeof(string) }).Invoke(null, new object[] { directory });
         }
 
         public static bool FileExists(string filePath)
