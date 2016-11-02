@@ -66,7 +66,7 @@ namespace NJsonSchema.Demo
             Console.WriteLine("Fails: " + fails);
             Console.WriteLine("Exceptions: " + exceptions);
 
-            var expectedFails = 12;
+            var expectedFails = 11;
             var expectedExceptions = 14;
             if (fails != expectedFails || exceptions != expectedExceptions)
                 Console.WriteLine("========================\n" +

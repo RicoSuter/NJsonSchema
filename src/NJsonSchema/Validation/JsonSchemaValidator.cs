@@ -293,6 +293,9 @@ namespace NJsonSchema.Validation
         private void ValidateProperties(JToken token, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             var obj = token as JObject;
+            if (obj == null && _schema.Type.HasFlag(JsonObjectType.Null))
+                return;
+
             foreach (var propertyInfo in _schema.Properties)
             {
                 var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyInfo.Key : propertyInfo.Key;

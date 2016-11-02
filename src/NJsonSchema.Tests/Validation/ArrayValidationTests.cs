@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema4();
             schema.Type = JsonObjectType.Array;
-            
+
             var token = new JValue(10);
 
             //// Act
@@ -140,7 +140,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.ArrayItemNotValid, errors.First().Kind);
 
-            var firstItemError = ((ChildSchemaValidationError) errors.First()).Errors.First().Value.First();
+            var firstItemError = ((ChildSchemaValidationError)errors.First()).Errors.First().Value.First();
             Assert.AreEqual(ValidationErrorKind.StringExpected, firstItemError.Kind);
             Assert.AreEqual("[1]", errors.First().Property);
             Assert.AreEqual("#/[1]", errors.First().Path);
@@ -209,6 +209,31 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
+        }
+
+        [TestMethod]
+        public void When_null_is_allowed_then_properties_are_not_checked()
+        {
+            //// Arrange
+            var schemaJson = @"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""array"",
+  ""items"": {
+    ""type"": [ ""object"", ""null"" ],
+    ""properties"": {
+      ""value"": { ""type"": ""integer"" }
+    },
+    ""required"": [ ""value"" ],
+    ""additionalProperties"": false
+  }
+}";
+            var schema = JsonSchema4.FromJson(schemaJson);
+
+            //// Act
+            var errors = schema.Validate("[{\"value\":2},null]");
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
         }
     }
 }
