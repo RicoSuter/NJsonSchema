@@ -29,9 +29,26 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocumentation(this Type type)
+        public static string GetXmlSummary(this Type type)
         {
-            return type.GetTypeInfo().GetXmlDocumentation();
+            return type.GetTypeInfo().GetXmlDocumentation("summary");
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static string GetXmlRemarks(this Type type)
+        {
+            return type.GetTypeInfo().GetXmlDocumentation("remarks");
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="tagName">Name of the tag.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static string GetXmlDocumentation(this Type type, string tagName)
+        {
+            return type.GetTypeInfo().GetXmlDocumentation(tagName);
         }
 
 #endif
@@ -39,7 +56,24 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member)
+        public static string GetXmlSummary(this MemberInfo member)
+        {
+            return member.GetXmlDocumentation("summary");
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static string GetXmlRemarks(this MemberInfo member)
+        {
+            return member.GetXmlDocumentation("remarks");
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <param name="tagName">Name of the tag.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static string GetXmlDocumentation(this MemberInfo member, string tagName)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                 return string.Empty;
@@ -50,7 +84,7 @@ namespace NJsonSchema.Infrastructure
                 if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                     return string.Empty;
 
-                return GetXmlDocumentation(member, GetXmlDocumentationPath(member.Module.Assembly));
+                return GetXmlDocumentation(member, GetXmlDocumentationPath(member.Module.Assembly), tagName);
             }
         }
 
@@ -75,17 +109,19 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocumentation(this Type type, string pathToXmlFile)
+        public static string GetXmlDocumentation(this Type type, string pathToXmlFile, string tagName)
         {
-            return type.GetTypeInfo().GetXmlDocumentation(pathToXmlFile);
+            return type.GetTypeInfo().GetXmlDocumentation(pathToXmlFile, tagName);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static string GetXmlDocumentation(this MemberInfo member, string pathToXmlFile)
+        public static string GetXmlDocumentation(this MemberInfo member, string pathToXmlFile, string tagName)
         {
             try
             {
@@ -107,7 +143,7 @@ namespace NJsonSchema.Infrastructure
                     if (!Cache.ContainsKey(assemblyName.FullName))
                         Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile);
 
-                    return GetXmlDocumentation(member, Cache[assemblyName.FullName]);
+                    return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
                 }
             }
             catch
@@ -151,10 +187,10 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-        private static string GetXmlDocumentation(this MemberInfo member, XDocument xml)
+        private static string GetXmlDocumentation(this MemberInfo member, XDocument xml, string tagName)
         {
             var name = GetMemberElementName(member);
-            var documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/summary)", name)).ToString().Trim();
+            var documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/" + tagName + ")", name)).ToString().Trim();
             return RemoveLineBreakWhiteSpaces(documentation);
         }
 
