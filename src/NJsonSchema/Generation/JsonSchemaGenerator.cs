@@ -132,7 +132,7 @@ namespace NJsonSchema.Generation
                     typeDescription.ApplyType(schema);
 
                     schema.TypeNameRaw = ReflectionExtensions.GetSafeTypeName(type);
-                    schema.Description = type.GetXmlDocumentation();
+                    schema.Description = type.GetXmlSummary();
 
                     schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
                 }
@@ -606,7 +606,7 @@ namespace NJsonSchema.Generation
                     return displayAttribute.Description;
                 else
                 {
-                    var summary = memberInfo.GetXmlDocumentation();
+                    var summary = memberInfo.GetXmlSummary();
                     if (summary != string.Empty)
                         return summary;
                 }
