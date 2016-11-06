@@ -34,7 +34,7 @@ namespace NJsonSchema.Infrastructure
             return type.GetTypeInfo().GetXmlDocumentation("summary");
         }
 
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlRemarks(this Type type)
@@ -43,6 +43,15 @@ namespace NJsonSchema.Infrastructure
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        [Obsolete("Use GetXmlSummary instead.")]
+        public static string GetXmlDocumentation(this Type type)
+        {
+            return GetXmlDocumentation(type, "summary");
+        }
+
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
@@ -61,7 +70,7 @@ namespace NJsonSchema.Infrastructure
             return member.GetXmlDocumentation("summary");
         }
 
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static string GetXmlRemarks(this MemberInfo member)
@@ -70,6 +79,15 @@ namespace NJsonSchema.Infrastructure
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        [Obsolete("Use GetXmlSummary instead.")]
+        public static string GetXmlDocumentation(this MemberInfo member)
+        {
+            return GetXmlDocumentation(member, "summary");
+        }
+
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
