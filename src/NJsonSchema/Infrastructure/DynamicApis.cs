@@ -61,6 +61,14 @@ namespace NJsonSchema.Infrastructure
             DirectoryType.GetRuntimeMethod("CreateDirectory", new[] { typeof(string) }).Invoke(null, new object[] { directory });
         }
 
+        public static bool DirectoryExists(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return false;
+
+            return (bool)DirectoryType.GetRuntimeMethod("Exists", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
+        }
+
         public static bool FileExists(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
