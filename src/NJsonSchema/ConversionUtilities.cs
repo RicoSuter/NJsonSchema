@@ -23,7 +23,9 @@ namespace NJsonSchema
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1)).Replace(" ", "_").Replace("/", "_"));
+            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1))
+                .Replace(" ", "_")
+                .Replace("/", "_"));
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
                 return "_" + input;
@@ -40,7 +42,9 @@ namespace NJsonSchema
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1)).Replace(" ", "_").Replace("/", "_"));
+            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1))
+                .Replace(" ", "_")
+                .Replace("/", "_"));
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
                 return "_" + input;

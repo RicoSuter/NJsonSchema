@@ -525,7 +525,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public class ClassWithDefaultEnumProperty
         {
             [JsonConverter(typeof(StringEnumConverter))]
-            [DefaultValue(ConstructionCode.NON_CBST)]
+            [DefaultValue(CSharpGeneratorTests.ConstructionCode.NON_CBST)]
             public ConstructionCode ConstructionCode { get; set; }
         }
 
@@ -919,6 +919,22 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(output.Contains("ObservableCollection<string>"));
+        }
+
+        [TestMethod]
+        public void When_enum_has_special_chars_then_they_should_be_converted()
+        {
+            //// Arrange
+            var schemaJson = @"{ ""type"": ""string"", ""enum"": [""application/json"",""application/vnd.ms-excel""] }";
+            var schema = JsonSchema4.FromJson(schemaJson);
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(output.Contains("Application_vnd_msExcel = 1,"));
         }
     }
 }
