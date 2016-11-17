@@ -23,6 +23,7 @@ namespace NJsonSchema.Generation
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            TypeNameGenerator = new DefaultTypeNameGenerator();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>

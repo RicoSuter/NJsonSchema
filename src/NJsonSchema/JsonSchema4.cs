@@ -177,7 +177,7 @@ namespace NJsonSchema
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema, jsonReferenceResolver);
             return schema;
         }
-        
+
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
         {
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -679,7 +679,7 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(null);
+            return ToJson(new DefaultTypeNameGenerator());
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>

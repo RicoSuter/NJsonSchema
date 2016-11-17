@@ -27,6 +27,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
+
+            PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
         }
 
         /// <summary>Gets or sets a value indicating whether to generate the readonly keywords (only available in TS 2.0+, default: true).</summary>
