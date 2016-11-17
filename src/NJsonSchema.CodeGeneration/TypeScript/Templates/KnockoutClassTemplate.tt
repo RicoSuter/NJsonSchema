@@ -22,7 +22,7 @@
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>_: <#=property.Type#> = null; 
-            <#=NJsonSchema.ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
+            <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
             this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
 <#}#>        }
@@ -47,7 +47,7 @@
 <#}#>
 <#foreach (var property in Model.Properties){#>
         var <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
-        <#=NJsonSchema.ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
+        <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
         super.toJS(data);

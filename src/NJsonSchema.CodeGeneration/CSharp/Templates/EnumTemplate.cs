@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             this.Write("/// <summary>");
             
             #line 4 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\EnumTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(NJsonSchema.ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)));
             
             #line default
             #line hidden

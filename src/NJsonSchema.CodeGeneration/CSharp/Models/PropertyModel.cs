@@ -43,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the name of the field.</summary>
-        public string FieldName => "_" + NJsonSchema.ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
+        public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequired

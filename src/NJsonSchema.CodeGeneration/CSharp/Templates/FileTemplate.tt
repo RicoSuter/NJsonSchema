@@ -27,5 +27,5 @@ namespace <#=Model.Namespace#>
 {
     #pragma warning disable // Disable all warnings
 
-    <#=NJsonSchema.ConversionUtilities.Tab(Model.Classes, 1)#>
+    <#=ConversionUtilities.Tab(Model.Classes, 1)#>
 }

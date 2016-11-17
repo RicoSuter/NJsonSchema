@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => NJsonSchema.ConversionUtilities.RemoveLineBreaks(_schema.Description);
+        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
         /// <summary>Gets the enum values.</summary>
         public List<EnumerationItemModel> Enums

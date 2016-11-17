@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonProperty property)
         {
-            return NJsonSchema.ConversionUtilities.ConvertToUpperCamelCase(property.Name, true)
+            return ConversionUtilities.ConvertToUpperCamelCase(property.Name, true)
                 .Replace("-", "_");
         }
     }

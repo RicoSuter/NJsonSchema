@@ -67,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => NJsonSchema.ConversionUtilities.RemoveLineBreaks(_schema.Description);
+        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedSchemas.Count >= 1;

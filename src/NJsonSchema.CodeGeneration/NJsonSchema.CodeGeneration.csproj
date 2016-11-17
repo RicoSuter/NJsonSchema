@@ -77,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGeneratorSettingsBase.cs" />
-    <Compile Include="ConversionUtilities.cs" />
     <Compile Include="CSharp\CSharpPropertyNameGenerator.cs" />
     <Compile Include="CSharp\CSharpJsonConverters.cs" />
     <Compile Include="DefaultEnumNameGenerator.cs" />

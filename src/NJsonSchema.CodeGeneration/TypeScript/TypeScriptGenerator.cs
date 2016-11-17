@@ -61,14 +61,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             var model = new FileTemplateModel(Settings)
             {
-                Types = NJsonSchema.ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
+                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
 
                 ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
                 ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File", model);
-            return NJsonSchema.ConversionUtilities.TrimWhiteSpaces(template.Render());
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>

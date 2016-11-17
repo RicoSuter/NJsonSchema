@@ -2,7 +2,7 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
-<#if(Model.HasDescription){#>/// <summary><#=NJsonSchema.ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
+<#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#><#if(Model.HasDiscriminator){#>[JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
 <#}#>[JsonObject(MemberSerialization.OptIn)]
 [GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
@@ -12,7 +12,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 
 
 <#foreach(var property in Model.Properties){#>
-<#if(property.HasDescription){#>    /// <summary><#=NJsonSchema.ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
+<#if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#}#>    [JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
 <#if(property.RenderRequiredAttribute){#>    [Required]
 <#}#><#if(property.IsStringEnum){#>    [JsonConverter(typeof(StringEnumConverter))]

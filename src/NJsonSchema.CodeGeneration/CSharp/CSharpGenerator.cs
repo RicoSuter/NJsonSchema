@@ -59,11 +59,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = NJsonSchema.ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
+                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
-            return NJsonSchema.ConversionUtilities.TrimWhiteSpaces(template.Render());
+            return ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>

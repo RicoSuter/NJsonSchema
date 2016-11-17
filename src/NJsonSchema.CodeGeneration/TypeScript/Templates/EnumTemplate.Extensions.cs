@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         
         public string Render()
         {
-            return NJsonSchema.ConversionUtilities.TrimWhiteSpaces(TransformText());
+            return ConversionUtilities.TrimWhiteSpaces(TransformText());
         }
     }
 }

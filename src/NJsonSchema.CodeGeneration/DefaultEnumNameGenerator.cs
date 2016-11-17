@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The enumeration name.</returns>
         public string Generate(int index, string name, object value, JsonSchema4 schema)
         {
-            return NJsonSchema.ConversionUtilities.ConvertToUpperCamelCase(name, true);
+            return ConversionUtilities.ConvertToUpperCamelCase(name, true);
         }
     }
 }

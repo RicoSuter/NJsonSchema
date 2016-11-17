@@ -198,7 +198,7 @@ foreach (var property in Model.Properties){
             this.Write("            ");
             
             #line 22 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(NJsonSchema.ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
             
             #line default
             #line hidden
@@ -311,7 +311,7 @@ foreach (var property in Model.Properties){
             this.Write("        ");
             
             #line 45 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(NJsonSchema.ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)));
             
             #line default
             #line hidden
