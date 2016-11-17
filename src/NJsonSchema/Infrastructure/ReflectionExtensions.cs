@@ -76,7 +76,21 @@ namespace NJsonSchema.Infrastructure
         public static Type GetEnumerableItemType(this Type type)
         {
             var genericTypeArguments = GetGenericTypeArguments(type);
-            return genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
+            var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
+            if (itemType == null)
+            {
+#if !LEGACY
+                foreach (var iface in type.GetTypeInfo().ImplementedInterfaces)
+#else
+                foreach (var iface in type.GetTypeInfo().GetInterfaces())
+#endif
+                {
+                    itemType = GetEnumerableItemType(iface);
+                    if (itemType != null)
+                        return itemType;
+                }
+            }
+            return itemType;
         }
 
         /// <summary>Gets the generic type arguments of a type.</summary>
