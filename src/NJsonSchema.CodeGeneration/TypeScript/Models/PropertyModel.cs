@@ -32,8 +32,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _resolver = resolver;
             _parentTypeName = parentTypeName;
             _settings = settings;
-
-            PropertyName = ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true).Replace("-", "_");
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
@@ -44,8 +42,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the description.</summary>
         public string Description => _property.Description;
-
-
+        
         /// <summary>Gets the type of the property.</summary>
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
 
@@ -53,9 +50,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
 
         /// <summary>Gets the type of the array item.</summary>
-        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, GetGeneratedPropertyName()) ?? "any";
-
-
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, PropertyName) ?? "any";
+        
         /// <summary>Gets a value indicating whether the property is read only.</summary>
         public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
 
@@ -76,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
-                        TypeNameHint = GetGeneratedPropertyName(),
+                        TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         Settings = _settings
                     });
@@ -99,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
-                        TypeNameHint = GetGeneratedPropertyName(),
+                        TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         Settings = _settings
                     });

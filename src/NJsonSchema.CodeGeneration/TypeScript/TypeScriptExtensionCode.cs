@@ -22,11 +22,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             // Add other imports to CodeBefore
             code = Regex.Replace(code, "(import (.*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
             {
-                CodeBefore += ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
+                CodeBefore += NJsonSchema.ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
                 return string.Empty;
             }, RegexOptions.Multiline);
 
-            CodeBefore = ConversionUtilities.TrimWhiteSpaces(CodeBefore);
+            CodeBefore = NJsonSchema.ConversionUtilities.TrimWhiteSpaces(CodeBefore);
 
             code = Regex.Replace(code, "(export )?class (.*?) ([\\s\\S]*?)\\n}", match =>
             {
@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return match.Groups[0].Value;
             }, RegexOptions.Multiline);
 
-            CodeAfter = ConversionUtilities.TrimWhiteSpaces(code);
+            CodeAfter = NJsonSchema.ConversionUtilities.TrimWhiteSpaces(code);
         }
     }
 }

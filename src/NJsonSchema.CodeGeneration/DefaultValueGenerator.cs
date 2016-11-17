@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration
                     schema.Default.ToString() :
                     actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
 
-                return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
+                return typeName + "." + NJsonSchema.ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
             }
 
             if (schema.Type.HasFlag(JsonObjectType.String))

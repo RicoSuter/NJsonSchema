@@ -1,7 +1,7 @@
 ﻿<#@ template visibility="internal" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
-<# if(Model.HasDescription){ #>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
+<# if(Model.HasDescription){ #>/// <summary><#=NJsonSchema.ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <# } #>[GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public enum <#=Model.Name#>
 {

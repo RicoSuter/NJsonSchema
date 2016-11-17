@@ -19,7 +19,7 @@
 <#}#>
         if (data !== undefined) {
 <#foreach (var property in Model.Properties){#>
-            <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
+            <#=NJsonSchema.ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
 <#}#>
         }
     }
@@ -42,7 +42,7 @@
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
 <#}#>
 <#foreach (var property in Model.Properties){#>
-        <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
+        <#=NJsonSchema.ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 <#} if(Model.HasInheritance){#>
         super.toJS(data);
 <#}#>

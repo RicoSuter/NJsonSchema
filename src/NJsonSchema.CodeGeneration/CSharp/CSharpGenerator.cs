@@ -59,11 +59,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
+                Classes = NJsonSchema.ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
-            return ConversionUtilities.TrimWhiteSpaces(template.Render());
+            return NJsonSchema.ConversionUtilities.TrimWhiteSpaces(template.Render());
         }
 
         /// <summary>Generates the type.</summary>
@@ -102,6 +102,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 var number = 1;
                 while (properties.Any(p => p.PropertyName == typeName + number))
                     number++;
+
                 propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
             }
         }

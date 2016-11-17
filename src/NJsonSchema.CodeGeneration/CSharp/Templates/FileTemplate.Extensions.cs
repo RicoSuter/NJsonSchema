@@ -13,7 +13,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
 
         public string Render()
         {
-            return ConversionUtilities.TrimWhiteSpaces(TransformText());
+            return NJsonSchema.ConversionUtilities.TrimWhiteSpaces(TransformText());
         }
     }
 }

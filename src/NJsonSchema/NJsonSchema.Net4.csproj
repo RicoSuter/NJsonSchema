@@ -43,7 +43,9 @@
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="ConversionUtilities.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\JsonSchemaGenerator.cs" />

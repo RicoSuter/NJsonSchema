@@ -28,8 +28,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = resolver;
-
-            PropertyName = ConversionUtilities.ConvertToUpperCamelCase(GetGeneratedPropertyName(), true);
         }
 
         /// <summary>Gets the name of the property.</summary>
@@ -45,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the name of the field.</summary>
-        public string FieldName => ConversionUtilities.ConvertToLowerCamelCase(GetGeneratedPropertyName(), true);
+        public string FieldName => "_" + NJsonSchema.ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequired

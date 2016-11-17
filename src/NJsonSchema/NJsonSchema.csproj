@@ -72,6 +72,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConversionUtilities.cs" />
+    <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\PrimitiveTypeMapper.cs" />
