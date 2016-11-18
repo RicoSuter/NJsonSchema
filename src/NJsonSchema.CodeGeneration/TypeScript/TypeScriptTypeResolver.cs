@@ -62,6 +62,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return "any";
 
             var type = schema.Type;
+            if (type == JsonObjectType.None && schema.IsEnumeration)
+            {
+                type = schema.Enumeration.All(v => v is int) ? 
+                    JsonObjectType.Integer :
+                    JsonObjectType.String;
+            }
+
             if (type.HasFlag(JsonObjectType.Array))
                 return ResolveArray(schema, typeNameHint);
 

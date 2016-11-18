@@ -666,7 +666,8 @@ namespace NJsonSchema
                                  OneOf.Count == 0 &&
                                  AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
-                                 MultipleOf == null;
+                                 MultipleOf == null &&
+                                 IsEnumeration == false;
 
         #endregion
 
