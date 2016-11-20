@@ -35,8 +35,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
         public decimal TypeScriptVersion { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to generate the optional properties (default: true).</summary>
-        public bool GenerateOptionalProperties { get; set; }
+        /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
+        public bool MarkOptionalProperties { get; set; }
 
         /// <summary>Gets or sets the type style (experimental, default: Class).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
