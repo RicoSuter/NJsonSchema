@@ -3,6 +3,7 @@
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
 <#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
+[Description("<#=Model.Description#>")]
 <#}#><#if(Model.HasDiscriminator){#>[JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
 <#}#>[JsonObject(MemberSerialization.OptIn)]
 [GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
