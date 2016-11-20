@@ -23,16 +23,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             ModuleName = "";
             Namespace = "";
-            GenerateReadOnlyKeywords = true;
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
+            TypeScriptVersion = 1.8m;
 
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
         }
 
-        /// <summary>Gets or sets a value indicating whether to generate the readonly keywords (only available in TS 2.0+, default: true).</summary>
-        public bool GenerateReadOnlyKeywords { get; set; }
+        /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
+        public decimal TypeScriptVersion { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate the optional properties (default: true).</summary>
+        public bool GenerateOptionalProperties { get; set; }
 
         /// <summary>Gets or sets the type style (experimental, default: Class).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }

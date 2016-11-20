@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the description.</summary>
         public string Description => _property.Description;
-        
+
         /// <summary>Gets the type of the property.</summary>
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
 
@@ -51,9 +51,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, PropertyName) ?? "any";
-        
+
         /// <summary>Gets a value indicating whether the property is read only.</summary>
-        public bool IsReadOnly => _property.IsReadOnly && _settings.GenerateReadOnlyKeywords;
+        public bool IsReadOnly => _property.IsReadOnly && _settings.TypeScriptVersion >= 2.0m;
+
+        /// <summary>Gets a value indicating whether the property is optional.</summary>
+        public bool IsOptional => !_property.IsRequired && _settings.GenerateOptionalProperties;
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
