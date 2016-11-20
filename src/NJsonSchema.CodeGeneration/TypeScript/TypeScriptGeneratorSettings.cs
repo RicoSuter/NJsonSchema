@@ -23,6 +23,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             ModuleName = "";
             Namespace = "";
+
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
