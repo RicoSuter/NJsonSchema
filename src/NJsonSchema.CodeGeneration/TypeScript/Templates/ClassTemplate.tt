@@ -1,10 +1,8 @@
 ﻿<#@ template visibility="internal" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {<#foreach(var property in Model.Properties){#> 
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
+<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
 
 <#if(Model.HasDiscriminator){#>
     protected _discriminator: string;

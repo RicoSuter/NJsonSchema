@@ -108,7 +108,7 @@ foreach(var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write(" _");
+            this.Write(" ");
             
             #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
@@ -256,21 +256,21 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("\r\n    {\r\n        get { return _");
+            this.Write("\r\n    {\r\n        get { return ");
             
             #line 24 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
             
             #line default
             #line hidden
-            this.Write("; }\r\n        set \r\n        {\r\n            if (_");
+            this.Write("; }\r\n        set \r\n        {\r\n            if (");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
             
             #line default
             #line hidden
-            this.Write(" != value)\r\n            {\r\n                _");
+            this.Write(" != value)\r\n            {\r\n                ");
             
             #line 29 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));

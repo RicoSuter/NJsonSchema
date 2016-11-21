@@ -63,6 +63,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="CSharp\CSharpEnumGeneratorTests.cs" />
     <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />

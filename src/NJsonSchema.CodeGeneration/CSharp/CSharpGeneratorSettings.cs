@@ -24,6 +24,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             RequiredPropertiesMustBeDefined = true; 
             ClassStyle = CSharpClassStyle.Inpc;
+
+            PropertyNameGenerator = new CSharpPropertyNameGenerator();
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types.</summary>

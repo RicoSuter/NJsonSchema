@@ -29,6 +29,8 @@ namespace NJsonSchema.CodeGeneration.Models
             _property = property;
             _defaultValueGenerator = defaultValueGenerator;
             _settings = settings;
+
+            PropertyName = _settings.PropertyNameGenerator.Generate(_property); 
         }
 
         /// <summary>Gets a value indicating whether the property has default value.</summary>
@@ -43,16 +45,6 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
-
-        /// <summary>Gets the generated property name.</summary>
-        /// <returns></returns>
-        protected string GetGeneratedPropertyName()
-        {
-            if (_settings.PropertyNameGenerator != null)
-                return _settings.PropertyNameGenerator.Generate(_property);
-
-            return _property.Name;
-        }
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()

@@ -177,7 +177,7 @@ namespace NJsonSchema
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema, jsonReferenceResolver);
             return schema;
         }
-        
+
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
         {
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -529,7 +529,11 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the resource definitions (not in the standard, needed in some JSON Schemas).</summary>
         [JsonProperty("resourceDefinitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public IDictionary<string, JsonSchema4> ResourceDefinitions { get; set; }
+        internal IDictionary<string, JsonSchema4> ResourceDefinitions { get; set; }
+
+        /// <summary>Gets or sets the constraint definitions (not in the standard, needed in some JSON Schemas).</summary>
+        [JsonProperty("constraints", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal IDictionary<string, JsonSchema4> ConstraintsDefinitions { get; set; }
 
         /// <summary>Gets the collection of schemas where each schema must be valid. </summary>
         [JsonIgnore]
@@ -662,7 +666,8 @@ namespace NJsonSchema
                                  OneOf.Count == 0 &&
                                  AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
-                                 MultipleOf == null;
+                                 MultipleOf == null &&
+                                 IsEnumeration == false;
 
         #endregion
 
@@ -679,7 +684,7 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(null);
+            return ToJson(new DefaultTypeNameGenerator());
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>

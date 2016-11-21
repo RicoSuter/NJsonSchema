@@ -161,7 +161,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = JsonSchema4.FromType<Teacher>();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface, 
+                TypeScriptVersion = 2.0m
+            });
 
             //// Act
             var output = generator.GenerateFile();

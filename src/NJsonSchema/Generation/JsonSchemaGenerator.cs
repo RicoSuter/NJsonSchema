@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
-using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
@@ -48,7 +47,7 @@ namespace NJsonSchema.Generation
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public JsonSchema4 Generate(Type type)
         {
-            return Generate<JsonSchema4>(type, null, new SchemaResolver(), new JsonSchemaDefinitionAppender(null, null));
+            return Generate<JsonSchema4>(type, null, new SchemaResolver(), new JsonSchemaDefinitionAppender(null, new DefaultTypeNameGenerator()));
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
