@@ -145,7 +145,7 @@ namespace NJsonSchema.Generation
             {
                 typeDescription.ApplyType(schema);
 
-                var itemType = type.GetEnumerableItemType(); 
+                var itemType = type.GetEnumerableItemType();
                 if (itemType == null)
                 {
                     var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
@@ -155,7 +155,12 @@ namespace NJsonSchema.Generation
                         schema.Item = JsonSchema4.CreateAnySchema();
                 }
                 else
-                    schema.Item = Generate(itemType, schemaResolver, schemaDefinitionAppender);
+                {
+                    if (itemType.GetTypeInfo().IsEnum)
+                        schema.Item = new JsonSchema4 { SchemaReference = Generate(itemType, schemaResolver, schemaDefinitionAppender) };
+                    else
+                        schema.Item = Generate(itemType, schemaResolver, schemaDefinitionAppender);
+                }
             }
             else
                 typeDescription.ApplyType(schema);
@@ -218,7 +223,7 @@ namespace NJsonSchema.Generation
                     };
                 }
                 else
-                    schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver, schemaDefinitionAppender); 
+                    schema.AdditionalPropertiesSchema = Generate(valueType, schemaResolver, schemaDefinitionAppender);
             }
 
             schema.AllowAdditionalProperties = true;
@@ -476,7 +481,7 @@ namespace NJsonSchema.Generation
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
                 return typeMapper.UseReference;
-            
+
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
 
