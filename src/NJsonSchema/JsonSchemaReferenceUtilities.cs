@@ -82,11 +82,11 @@ namespace NJsonSchema
 
             if (!(obj is JToken))
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
                     p.CanRead && p.IsIndexer == false && p.MemberInfo is PropertyInfo &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = member.GetValue(obj);
                     if (value != null)
                     {
                         if (!checkedObjects.Contains(value))
@@ -121,7 +121,7 @@ namespace NJsonSchema
 
             if (!(obj is JToken))
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p =>
+                foreach (var property in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
                     p.CanRead && p.IsIndexer == false && p.MemberInfo is PropertyInfo &&
                     p.CustomAttributes.JsonIgnoreAttribute == null))
                 {

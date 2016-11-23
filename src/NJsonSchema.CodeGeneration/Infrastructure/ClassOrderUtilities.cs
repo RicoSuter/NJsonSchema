@@ -9,9 +9,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NJsonSchema.CodeGeneration
+namespace NJsonSchema.CodeGeneration.Infrastructure
 {
-    internal static class ClassOrderUtilities
+    /// <summary>Utility class to order classes.</summary>
+    public static class ClassOrderUtilities
     {
         /// <summary>Reorders the results so that base classes are always before child classes.</summary>
         /// <param name="results">The results.</param>

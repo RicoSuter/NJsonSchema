@@ -70,11 +70,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = member.GetValue(obj);
                     if (value != null)
-                        FindAllSchemas(value, checkedObjects, schemas, typeResolver, property.MemberInfo.Name);
+                        FindAllSchemas(value, checkedObjects, schemas, typeResolver, member.MemberInfo.Name);
                 }
             }
         }

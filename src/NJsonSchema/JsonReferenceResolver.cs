@@ -116,12 +116,12 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var pathSegment = property.GetName();
+                    var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)
                     {
-                        var value = property.GetValue(obj);
+                        var value = member.GetValue(obj);
                         return ResolveReference(value, segments.Skip(1).ToList(), allSegments, checkedObjects);
                     }
                 }
