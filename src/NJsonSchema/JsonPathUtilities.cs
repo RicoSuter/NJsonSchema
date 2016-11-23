@@ -26,7 +26,8 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
         public static string GetPropertyName(MemberInfo property, PropertyNameHandling propertyNameHandling)
         {
-            var propertyName = ReflectionCache.GetProperties(property.DeclaringType).First(p => p.MemberInfo.Name == property.Name).GetName();
+            var propertyName = ReflectionCache.GetPropertiesAndFields(property.DeclaringType)
+                .First(p => p.MemberInfo.Name == property.Name).GetName();
             switch (propertyNameHandling)
             {
                 case PropertyNameHandling.Default:
@@ -96,12 +97,12 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var property in ReflectionCache.GetProperties(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
-                    var value = property.GetValue(obj);
+                    var value = member.GetValue(obj);
                     if (value != null)
                     {
-                        var pathSegment = property.GetName();
+                        var pathSegment = member.GetName();
                         var path = GetJsonPath(value, searchedObject, basePath + "/" + pathSegment, checkedObjects);
                         if (path != null)
                             return path;
