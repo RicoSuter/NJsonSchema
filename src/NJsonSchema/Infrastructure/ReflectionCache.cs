@@ -14,13 +14,17 @@ using Newtonsoft.Json;
 
 namespace NJsonSchema.Infrastructure
 {
-    internal static class ReflectionCache
+    /// <summary>Provides cached reflection APIs for better performance.</summary>
+    public static class ReflectionCache
     {
         private static readonly Dictionary<Type, IList<PropertyOrField>> PropertyCacheByType = new Dictionary<Type, IList<PropertyOrField>>();
 
         private static readonly Dictionary<Type, Attribute> DataContractAttributeCacheByType = new Dictionary<Type, Attribute>();
 
-        public static IEnumerable<PropertyOrField> GetProperties(Type type)
+        /// <summary>Gets the properties and fields of a given type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The properties.</returns>
+        public static IEnumerable<PropertyOrField> GetPropertiesAndFields(Type type)
         {
             lock (PropertyCacheByType)
             {
@@ -65,6 +69,9 @@ namespace NJsonSchema.Infrastructure
             return new CustomAttributes(jsonIgnoreAttribute, jsonPropertyAttribute, GetDataContractAttribute(property.DeclaringType), dataMemberAttribute);
         }
 
+        /// <summary>Gets the data contract attribute of a given type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The DataContractAttribute.</returns>
         public static Attribute GetDataContractAttribute(Type type)
         {
             lock (DataContractAttributeCacheByType)
@@ -79,22 +86,33 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
+        /// <summary>A property or field.</summary>
         public class PropertyOrField
         {
+            /// <summary>Initializes a new instance of the <see cref="PropertyOrField"/> class.</summary>
+            /// <param name="memberInfo">The member information.</param>
+            /// <param name="customAttributes">The custom attributes.</param>
             public PropertyOrField(MemberInfo memberInfo, CustomAttributes customAttributes)
             {
                 MemberInfo = memberInfo;
                 CustomAttributes = customAttributes;
             }
 
+            /// <summary>Gets the member information.</summary>
             public MemberInfo MemberInfo { get; }
 
+            /// <summary>Gets the custom attributes.</summary>
             public CustomAttributes CustomAttributes { get; }
 
+            /// <summary>Gets a value indicating whether this instance can read.</summary>
             public bool CanRead => (MemberInfo as PropertyInfo)?.CanRead ?? true;
 
+            /// <summary>Gets a value indicating whether this instance is indexer.</summary>
             public bool IsIndexer => MemberInfo is PropertyInfo && ((PropertyInfo)MemberInfo).GetIndexParameters().Length > 0;
 
+            /// <summary>Gets the value of the property or field.</summary>
+            /// <param name="obj">The object.</param>
+            /// <returns>The value.</returns>
             public object GetValue(object obj)
             {
                 if (MemberInfo is PropertyInfo)
@@ -119,8 +137,14 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
+        /// <summary>The custom attributes.</summary>
         public class CustomAttributes
         {
+            /// <summary>Initializes a new instance of the <see cref="CustomAttributes"/> class.</summary>
+            /// <param name="jsonIgnoreAttribute">The json ignore attribute.</param>
+            /// <param name="jsonPropertyAttribute">The json property attribute.</param>
+            /// <param name="dataContractAttribute">The data contract attribute.</param>
+            /// <param name="dataMemberAttribute">The data member attribute.</param>
             public CustomAttributes(
                 JsonIgnoreAttribute jsonIgnoreAttribute,
                 JsonPropertyAttribute jsonPropertyAttribute,
@@ -133,12 +157,16 @@ namespace NJsonSchema.Infrastructure
                 DataMemberAttribute = dataMemberAttribute;
             }
 
+            /// <summary>Gets the json ignore attribute.</summary>
             public JsonIgnoreAttribute JsonIgnoreAttribute { get; }
 
+            /// <summary>Gets the json property attribute.</summary>
             public JsonPropertyAttribute JsonPropertyAttribute { get; }
 
+            /// <summary>Gets the data contract attribute.</summary>
             public Attribute DataContractAttribute { get; }
 
+            /// <summary>Gets the data member attribute.</summary>
             public dynamic DataMemberAttribute { get; }
         }
     }
