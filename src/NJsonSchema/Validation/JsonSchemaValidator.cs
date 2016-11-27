@@ -28,10 +28,18 @@ namespace NJsonSchema.Validation
 
         /// <summary>Validates the given JSON token. </summary>
         /// <param name="token">The token. </param>
+        /// <returns>The list of validation errors. </returns>
+        public virtual List<ValidationError> Validate(JToken token)
+        {
+            return Validate(token, null, token.Path);
+        }
+
+        /// <summary>Validates the given JSON token. </summary>
+        /// <param name="token">The token. </param>
         /// <param name="propertyName">The current property name. </param>
         /// <param name="propertyPath">The current property path. </param>
         /// <returns>The list of validation errors. </returns>
-        public virtual List<ValidationError> Validate(JToken token, string propertyName, string propertyPath)
+        protected virtual List<ValidationError> Validate(JToken token, string propertyName, string propertyPath)
         {
             var errors = new List<ValidationError>();
 

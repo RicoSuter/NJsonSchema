@@ -16,6 +16,22 @@ namespace NJsonSchema.Demo
         public byte Foo { get; set; }
     }
 
+    public class Mno
+    {
+        public string IncludeMe { get; set; }
+
+        [JsonIgnoreAttribute]
+        public string IgnoreMe { get; set; }
+    }
+
+    public class TestSchema
+    {
+        public static string testMnoSchema()
+        {
+            return JsonSchema4.FromType<Mno>().ToJson();
+        }
+    }
+
     public class Program
     {
         static void Main(string[] args)
@@ -30,6 +46,9 @@ namespace NJsonSchema.Demo
             //    Bar = new byte[] { 1, 2, 3 }, 
             //    Foo = 123
             //};
+
+            var x = TestSchema.testMnoSchema();
+
             var json = JsonConvert.SerializeObject(DateTime.Now);
             var foo = Convert.FromBase64String("AQID");
 
