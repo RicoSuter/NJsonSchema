@@ -69,12 +69,12 @@ namespace NJsonSchema.CodeGeneration
         public abstract string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint);
 
         /// <summary>Adds all schemas to the resolver.</summary>
-        /// <param name="schemas">The schemas (typeNameHint-schema pairs).</param>
-        public void AddGenerators(IDictionary<string, JsonSchema4> schemas)
+        /// <param name="definitions">The schema definitions.</param>
+        public void AddGenerators(IDictionary<string, JsonSchema4> definitions)
         {
-            if (schemas != null)
+            if (definitions != null)
             {
-                foreach (var pair in schemas)
+                foreach (var pair in definitions)
                     AddGenerator(pair.Value.ActualSchema, pair.Key);
             }
         }

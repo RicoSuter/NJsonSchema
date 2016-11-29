@@ -144,22 +144,25 @@ namespace NJsonSchema.Generation
                 {
                     var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
                     if (jsonSchemaAttribute?.ArrayItem != null)
-                        schema.Item = Generate(jsonSchemaAttribute.ArrayItem, schemaResolver);
+                        schema.Item = GenerateWithReference(schemaResolver, itemType);
                     else
                         schema.Item = JsonSchema4.CreateAnySchema();
                 }
                 else
-                {
-                    if (itemType.GetTypeInfo().IsEnum)
-                        schema.Item = new JsonSchema4 { SchemaReference = Generate(itemType, schemaResolver) };
-                    else
-                        schema.Item = Generate(itemType, schemaResolver);
-                }
+                    schema.Item = GenerateWithReference(schemaResolver, itemType);
             }
             else
                 typeDescription.ApplyType(schema);
 
             return schema;
+        }
+
+        private JsonSchema4 GenerateWithReference(SchemaResolver schemaResolver, Type itemType)
+        {
+            if (RequiresSchemaReference(itemType, null))
+                return new JsonSchema4 { SchemaReference = Generate(itemType, schemaResolver) };
+
+            return Generate(itemType, schemaResolver);
         }
 
         private void ApplyExtensionDataAttributes<TSchemaType>(TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes)
