@@ -11,9 +11,6 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>The base class of the code generators</summary>
     public abstract class GeneratorBase
     {
-        /// <summary>Gets the language.</summary>
-        protected abstract string Language { get; }
-
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <param name="rootTypeNameHint">The root type name hint.</param>
         /// <returns>The code</returns>

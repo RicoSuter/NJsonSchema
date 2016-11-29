@@ -45,10 +45,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Gets the generator settings.</summary>
-        public CSharpGeneratorSettings Settings { get; private set; }
-
-        /// <summary>Gets the language.</summary>
-        protected override string Language => "CSharp";
+        public CSharpGeneratorSettings Settings { get; }
 
         /// <summary>Generates the file.</summary>
         /// <param name="rootTypeNameHint">The root type name hint.</param>

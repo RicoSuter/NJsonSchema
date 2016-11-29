@@ -48,10 +48,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public object RootObject { get; set; }
 
         /// <summary>Gets the generator settings.</summary>
-        public TypeScriptGeneratorSettings Settings { get; set; }
-
-        /// <summary>Gets the language.</summary>
-        protected override string Language => "TypeScript";
+        public TypeScriptGeneratorSettings Settings { get; }
 
         /// <summary>Generates the file.</summary>
         /// <param name="rootTypeNameHint">The root type name hint.</param>
