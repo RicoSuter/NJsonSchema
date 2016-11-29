@@ -45,6 +45,7 @@
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="Infrastructure\TypeNameStyle.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
     <Compile Include="ISchemaDefinitionAppender.cs" />
-    <Compile Include="ISchemaResolver.cs" />
+    <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonObjectType.cs" />

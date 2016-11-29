@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Act
             var generator = new TypeScriptGenerator(schema, settings);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
             return code;
         }
 
@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("a: string[] = [];"));
@@ -166,7 +166,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("a: { [key: string] : string; } = {};"));
@@ -218,7 +218,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("a: A = new A();"));

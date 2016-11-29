@@ -18,7 +18,6 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
             Assert.IsNotNull(schema.AllOf.First().Properties["Foo"]);
-            Assert.AreEqual(typeof(DictionarySubType).Name, schema.TypeNameRaw);
         }
 
         [TestMethod]
@@ -63,7 +62,7 @@ namespace NJsonSchema.Tests.Conversion
 
             Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
             Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.ActualSchema.Item.ActualSchema.TypeNameRaw);
+            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
             Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
 

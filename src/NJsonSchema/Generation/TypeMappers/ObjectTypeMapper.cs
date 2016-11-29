@@ -5,7 +5,7 @@ namespace NJsonSchema.Generation.TypeMappers
     /// <summary>Maps .NET type to a generated JSON Schema describing an object.</summary>
     public class ObjectTypeMapper : ITypeMapper
     {
-        private readonly Func<JsonSchemaGenerator, ISchemaResolver, JsonSchema4> _schemaFactory;
+        private readonly Func<JsonSchemaGenerator, SchemaResolver, JsonSchema4> _schemaFactory;
 
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
@@ -18,7 +18,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schemaFactory">The schema factory.</param>
-        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, ISchemaResolver, JsonSchema4> schemaFactory)
+        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, SchemaResolver, JsonSchema4> schemaFactory)
         {
             _schemaFactory = schemaFactory;
             MappedType = mappedType;
@@ -36,7 +36,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <param name="schemaGenerator"></param>
         /// <param name="schemaResolver"></param>
         /// <returns></returns>
-        public virtual TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, ISchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
+        public virtual TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, SchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
         {
             if (!schemaResolver.HasSchema(MappedType, false))
                 schemaResolver.AddSchema(MappedType, false, _schemaFactory(schemaGenerator, schemaResolver));

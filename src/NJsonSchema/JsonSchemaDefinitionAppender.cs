@@ -14,35 +14,48 @@ namespace NJsonSchema
     public class JsonSchemaDefinitionAppender : ISchemaDefinitionAppender
     {
         private readonly ITypeNameGenerator _typeNameGenerator;
+        private JsonSchema4 _rootSchema;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class.</summary>
-        /// <param name="rootObject">The root object.</param>
+        /// <param name="rootSchema">The root object.</param>
         /// <param name="typeNameGenerator">The type name generator.</param>
-        public JsonSchemaDefinitionAppender(object rootObject, ITypeNameGenerator typeNameGenerator)
+        public JsonSchemaDefinitionAppender(JsonSchema4 rootSchema, ITypeNameGenerator typeNameGenerator)
         {
-            RootObject = rootObject; 
-            _typeNameGenerator = typeNameGenerator; 
+            _rootSchema = rootSchema;
+            _typeNameGenerator = typeNameGenerator;
         }
 
-        /// <summary>Gets or sets the root object to append schemas to.</summary>
-        public object RootObject { get; set; }
+        /// <summary>Tries to set the root of the appender.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <returns>true when the root was not set before.</returns>
+        public bool TrySetRoot(object rootObject)
+        {
+            if (_rootSchema == null && rootObject is JsonSchema4)
+            {
+                _rootSchema = (JsonSchema4)rootObject;
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>Appends the schema to the root object.</summary>
-        /// <param name="objectToAppend">The object to append.</param>
+        /// <param name="schema">The schema to append.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        public void Append(JsonSchema4 objectToAppend)
+        /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null"/></exception>
+        public void AppendSchema(JsonSchema4 schema, string typeNameHint)
         {
-            var rootSchema = RootObject as JsonSchema4;
-            if (rootSchema != null && objectToAppend != null)
-            {
-                var typeName = objectToAppend.GetTypeName(_typeNameGenerator, string.Empty); 
-                if (!string.IsNullOrEmpty(typeName) && !rootSchema.Definitions.ContainsKey(typeName))
-                    rootSchema.Definitions[typeName] = objectToAppend;
-                else
-                    rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = objectToAppend;
-            }
-            else
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            if (_rootSchema == null)
                 throw new InvalidOperationException("Could not find the JSON path of a child object.");
+
+            var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
+            if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
+                _rootSchema.Definitions[typeName] = schema;
+            else
+                _rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
         }
     }
 }

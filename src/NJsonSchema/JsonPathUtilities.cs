@@ -55,7 +55,7 @@ namespace NJsonSchema
                 var searchedSchema = searchedObject as JsonSchema4;
                 if (schemaDefinitionAppender != null && searchedSchema != null)
                 {
-                    schemaDefinitionAppender.Append(searchedSchema);
+                    schemaDefinitionAppender.AppendSchema(searchedSchema, null);
                     return GetJsonPath(root, searchedObject, schemaDefinitionAppender);
                 }
                 else

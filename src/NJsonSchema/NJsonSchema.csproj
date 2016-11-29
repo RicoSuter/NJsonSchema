@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConversionUtilities.cs" />
+    <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
@@ -85,13 +86,13 @@
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="JsonReferenceResolver.cs" />
     <Compile Include="PropertyNameHandling.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\DynamicApis.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
     <Compile Include="ISchemaDefinitionAppender.cs" />
-    <Compile Include="ISchemaResolver.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />

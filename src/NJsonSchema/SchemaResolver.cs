@@ -8,15 +8,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NJsonSchema
 {
-    /// <summary>Manager which resolves types to schemas.</summary>
-    public class SchemaResolver : ISchemaResolver
+    /// <summary>Manager which resolves types to schemas and appends missing schemas to the root object.</summary>
+    public class SchemaResolver
     {
+        private readonly ISchemaDefinitionAppender _schemaDefinitionAppender;
+        private readonly ISchemaNameGenerator _schemaNameGenerator;
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
-        
+
+        /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
+        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
+        /// <param name="schemaNameGenerator">The schema name generator.</param>
+        public SchemaResolver(ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaNameGenerator schemaNameGenerator)
+        {
+            _schemaDefinitionAppender = schemaDefinitionAppender;
+            _schemaNameGenerator = schemaNameGenerator;
+        }
+
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
@@ -40,16 +50,13 @@ namespace NJsonSchema
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
         /// <param name="schema">The schema.</param>
         /// <exception cref="InvalidOperationException">Added schema is not a JsonSchema4 instance.</exception>
-        public void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema4 schema)
+        public virtual void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema4 schema)
         {
             if (schema.GetType() != typeof(JsonSchema4))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
-//#if DEBUG
-//            // TODO: (low-prio) Check code so that type names are unique
-//            if (Schemas.Any(s => s.TypeName == schema.TypeName))
-//                throw new InvalidOperationException("The type name '"+ schema.TypeName + "' is already registered in the schema resolver.");
-//#endif
+            if (_schemaDefinitionAppender.TrySetRoot(schema) == false)
+                _schemaDefinitionAppender.AppendSchema(schema, _schemaNameGenerator.Generate(type));
 
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }

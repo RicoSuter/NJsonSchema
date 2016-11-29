@@ -15,7 +15,8 @@ namespace NJsonSchema.CodeGeneration
         protected abstract string Language { get; }
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
+        /// <param name="rootTypeNameHint">The root type name hint.</param>
         /// <returns>The code</returns>
-        public abstract string GenerateFile();
+        public abstract string GenerateFile(string rootTypeNameHint);
     }
 }

@@ -24,6 +24,7 @@ namespace NJsonSchema.Generation
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
             TypeNameGenerator = new DefaultTypeNameGenerator();
+            SchemaNameGenerator = new DefaultSchemaNameGenerator();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -42,7 +43,12 @@ namespace NJsonSchema.Generation
         public NullHandling NullHandling { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
+        [JsonIgnore]
         public ITypeNameGenerator TypeNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the schema name generator.</summary>
+        [JsonIgnore]
+        public ISchemaNameGenerator SchemaNameGenerator { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]

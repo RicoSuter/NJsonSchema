@@ -51,10 +51,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         protected override string Language => "CSharp";
 
         /// <summary>Generates the file.</summary>
+        /// <param name="rootTypeNameHint">The root type name hint.</param>
         /// <returns>The file contents.</returns>
-        public override string GenerateFile()
+        public override string GenerateFile(string rootTypeNameHint)
         {
-            _resolver.Resolve(_schema, false, string.Empty); // register root type
+            _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
 
             var model = new FileTemplateModel
             {

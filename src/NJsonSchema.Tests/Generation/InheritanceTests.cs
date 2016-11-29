@@ -77,11 +77,10 @@ namespace NJsonSchema.Tests.Generation
             var schema = JsonSchema4.FromType<Teacher>();
 
             //// Assert
-            Assert.AreEqual("Teacher", schema.TypeNameRaw);
             Assert.IsNotNull(schema.Properties["Class"]);
 
             Assert.AreEqual(1, schema.AllOf.Count);
-            Assert.AreEqual("Person", schema.AllOf.First().ActualSchema.TypeNameRaw);
+            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "Person"));
             Assert.IsNotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
 

@@ -189,19 +189,6 @@ namespace NJsonSchema
             return schema;
         }
 
-        /// <summary>Creates the type reference.</summary>
-        /// <param name="schema">The referenced schema.</param>
-        /// <returns>The type reference.</returns>
-        public static JsonSchema4 CreateTypeReference(JsonSchema4 schema)
-        {
-            return new JsonSchema4
-            {
-                Type = JsonObjectType.Object,
-                TypeNameRaw = schema.TypeNameRaw,
-                SchemaReference = schema
-            };
-        }
-
         /// <summary>Gets the list of directly inherited/parent schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
@@ -326,7 +313,6 @@ namespace NJsonSchema
                         // only $ref property is allowed when schema is a reference
                         // TODO: Fix all SchemaReference assignments so that this code is not needed 
                         Type = JsonObjectType.None;
-                        TypeNameRaw = null;
                     }
                 }
             }
@@ -657,8 +643,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
-                                 (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+        public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
                                  AnyOf.Count == 0 &&
