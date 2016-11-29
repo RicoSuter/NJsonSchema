@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema);
-            var code = generator.GenerateFile("MyClass");
+            var code = generator.GenerateFile();
         }
 
         [TestMethod]

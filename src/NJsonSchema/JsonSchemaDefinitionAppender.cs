@@ -16,6 +16,12 @@ namespace NJsonSchema
         private readonly ITypeNameGenerator _typeNameGenerator;
         private JsonSchema4 _rootSchema;
 
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class which uses the first touched schema as root object.</summary>
+        /// <param name="typeNameGenerator">The type name generator.</param>
+        public JsonSchemaDefinitionAppender(ITypeNameGenerator typeNameGenerator) : this(null, typeNameGenerator)
+        {
+        }
+
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class.</summary>
         /// <param name="rootSchema">The root object.</param>
         /// <param name="typeNameGenerator">The type name generator.</param>

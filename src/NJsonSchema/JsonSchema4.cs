@@ -277,7 +277,7 @@ namespace NJsonSchema
         public string Id { get; set; }
 
         /// <summary>Gets or sets the title. </summary>
-        [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         public string Title { get; set; }
 
         /// <summary>Gets or sets the description. </summary>

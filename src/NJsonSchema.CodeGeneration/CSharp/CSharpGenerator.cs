@@ -37,7 +37,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver)
+        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver) 
+            : base(schema)
         {
             _schema = schema;
             _resolver = resolver;

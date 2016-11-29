@@ -49,7 +49,7 @@ namespace NJsonSchema.Generation
         {
             var typeNameGenerator = new DefaultTypeNameGenerator();
             var schemaNameGenerator = new DefaultSchemaNameGenerator();
-            var schemaDefinitionAppender = new JsonSchemaDefinitionAppender(null, typeNameGenerator);
+            var schemaDefinitionAppender = new JsonSchemaDefinitionAppender(typeNameGenerator);
             var schemaResolver = new SchemaResolver(schemaDefinitionAppender, schemaNameGenerator);
 
             return Generate<JsonSchema4>(type, null, schemaResolver);
@@ -79,6 +79,8 @@ namespace NJsonSchema.Generation
                 return schema;
 
             schema = new TSchemaType();
+            if (!schemaResolver.Schemas.Any() && type.GetTypeInfo().IsClass)
+                schema.Title = Settings.SchemaNameGenerator.Generate(type);
 
             ApplyExtensionDataAttributes(schema, type, parentAttributes);
 
