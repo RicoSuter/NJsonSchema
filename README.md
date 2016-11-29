@@ -172,26 +172,125 @@ The generated JSON schema data stored in the `schemaData` variable:
   },
   "definitions": {
     "Gender": {
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "FirstName",
+    "LastName"
+  ],
+  "properties": {
+    "FirstName": {
+      "type": "string"
+    },
+    "MiddleName": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "LastName": {
+      "type": "string"
+    },
+    "Gender": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Gender"
+        }
+      ]
+    },
+    "NumberWithRange": {
       "type": "integer",
-      "typeName": "Gender",
-      "enumNames": [
+      "maximum": 5.0,
+      "minimum": 2.0
+    },
+    "Birthday": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Company": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Company"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Cars": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "Manufacturer": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Company"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Gender": {
+      "type": "integer",
+      "x-enumNames": [
         "Male",
         "Female"
       ],
       "enum": [
         0,
         1
-      ]
+      ],
+      "description": ""
     },
     "Company": {
       "type": "object",
-      "typeName": "Company",
       "additionalProperties": false,
       "properties": {
         "Name": {
           "type": [
             "null",
             "string"
+          ]
+        }
+      }
+    },
+    "Car": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "Manufacturer": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Company"
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
