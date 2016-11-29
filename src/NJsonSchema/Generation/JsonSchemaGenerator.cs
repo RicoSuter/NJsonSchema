@@ -47,11 +47,7 @@ namespace NJsonSchema.Generation
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public JsonSchema4 Generate(Type type)
         {
-            var typeNameGenerator = new DefaultTypeNameGenerator();
-            var schemaNameGenerator = new DefaultSchemaNameGenerator();
-            var schemaDefinitionAppender = new JsonSchemaDefinitionAppender(typeNameGenerator);
-            var schemaResolver = new SchemaResolver(schemaDefinitionAppender, schemaNameGenerator);
-
+            var schemaResolver = new SchemaResolver();
             return Generate<JsonSchema4>(type, null, schemaResolver);
         }
 

@@ -19,6 +19,19 @@ namespace NJsonSchema
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
 
         /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
+        public SchemaResolver()
+            : this(new JsonSchemaDefinitionAppender(), new DefaultSchemaNameGenerator())
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
+        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
+        public SchemaResolver(ISchemaDefinitionAppender schemaDefinitionAppender)
+            : this(schemaDefinitionAppender, new DefaultSchemaNameGenerator())
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
         /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
         /// <param name="schemaNameGenerator">The schema name generator.</param>
         public SchemaResolver(ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaNameGenerator schemaNameGenerator)
