@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Reflection;
+using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -19,6 +21,10 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(Type type)
         {
+            var attribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            if (!string.IsNullOrEmpty(attribute?.Name))
+                return attribute.Name; 
+
             return ReflectionExtensions.GetSafeTypeName(type);
         }
     }

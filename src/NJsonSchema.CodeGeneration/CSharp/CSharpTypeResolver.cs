@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
 
@@ -89,12 +88,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The type name of the created generator.</returns>
         protected override string AddGenerator(JsonSchema4 schema, string typeNameHint)
         {
-            if (typeNameHint == "Object" && schema.IsDictionary)
-                return "JObject";
-
             if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
             {
-                // Recreate generator because it be better (defined enum values) than the current one
+                // Regenerate generator because it is be better than the current one (defined enum values)
                 var typeName = GetOrGenerateTypeName(schema, typeNameHint);
                 var generator = CreateTypeGenerator(schema);
                 AddOrReplaceTypeGenerator(typeName, generator);
