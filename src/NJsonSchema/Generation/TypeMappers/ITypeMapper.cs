@@ -1,3 +1,11 @@
+//-----------------------------------------------------------------------
+// <copyright file="ITypeMapper.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
 using System;
 
 namespace NJsonSchema.Generation.TypeMappers
@@ -16,7 +24,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <param name="schemaGenerator">The schema generator.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
-        TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, SchemaResolver schemaResolver)
+        TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new();
     }
 }

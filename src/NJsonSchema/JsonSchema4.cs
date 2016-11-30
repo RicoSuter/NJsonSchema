@@ -669,7 +669,8 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(new JsonSchemaGeneratorSettings());
+            var settings = new JsonSchemaGeneratorSettings();
+            return ToJson(settings);
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
@@ -680,7 +681,7 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, settings));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaResolver(settings));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(this, new JsonReferenceResolver());
 

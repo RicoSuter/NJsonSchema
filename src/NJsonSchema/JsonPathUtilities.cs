@@ -44,19 +44,19 @@ namespace NJsonSchema
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="root">The root object.</param>
         /// <param name="searchedObject">The object to search.</param>
-        /// <param name="schemaDefinitionAppender">Appends the <paramref name="searchedObject"/> to the 'definitions' if it could not be found.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        public static string GetJsonPath(object root, object searchedObject, ISchemaDefinitionAppender schemaDefinitionAppender = null)
+        public static string GetJsonPath(object root, object searchedObject, JsonSchemaResolver schemaResolver = null)
         {
             var path = GetJsonPath(root, searchedObject, "#", new HashSet<object>());
             if (path == null)
             {
                 var searchedSchema = searchedObject as JsonSchema4;
-                if (schemaDefinitionAppender != null && searchedSchema != null)
+                if (schemaResolver != null && searchedSchema != null)
                 {
-                    schemaDefinitionAppender.AppendSchema(searchedSchema, null);
-                    return GetJsonPath(root, searchedObject, schemaDefinitionAppender);
+                    schemaResolver.AppendSchema(searchedSchema, null);
+                    return GetJsonPath(root, searchedObject, schemaResolver);
                 }
                 else
                     throw new InvalidOperationException("Could not find the JSON path of a child object.");

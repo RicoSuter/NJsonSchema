@@ -20,28 +20,28 @@ namespace NJsonSchema
     {
         /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
         /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
-        /// <param name="root">The root.</param>
-        public static void UpdateSchemaReferences(object root)
+        /// <param name="rootObject">The root object.</param>
+        public static void UpdateSchemaReferences(object rootObject)
         {
-            UpdateSchemaReferences(root, root, new HashSet<object>(), new JsonReferenceResolver());
+            UpdateSchemaReferences(rootObject, rootObject, new HashSet<object>(), new JsonReferenceResolver());
         }
 
         /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
         /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
-        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
-        /// <param name="root">The root.</param>
-        public static void UpdateSchemaReferences(object root, JsonReferenceResolver jsonReferenceResolver)
+        /// <param name="referenceResolver">The JSON document resolver.</param>
+        /// <param name="rootObject">The root object.</param>
+        public static void UpdateSchemaReferences(object rootObject, JsonReferenceResolver referenceResolver)
         {
-            UpdateSchemaReferences(root, root, new HashSet<object>(), jsonReferenceResolver);
+            UpdateSchemaReferences(rootObject, rootObject, new HashSet<object>(), referenceResolver);
         }
 
         /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
         /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
-        /// <param name="root">The root.</param>
-        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
-        public static void UpdateSchemaReferencePaths(object root, ISchemaDefinitionAppender schemaDefinitionAppender)
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        public static void UpdateSchemaReferencePaths(object rootObject, JsonSchemaResolver schemaResolver)
         {
-            UpdateSchemaReferencePaths(root, root, new HashSet<object>(), schemaDefinitionAppender);
+            UpdateSchemaReferencePaths(rootObject, rootObject, new HashSet<object>(), schemaResolver);
         }
 
         /// <summary>Converts JSON references ($ref) to property references.</summary>
@@ -60,24 +60,24 @@ namespace NJsonSchema
             return data.Replace("schemaReferencePath", "$ref");
         }
 
-        private static void UpdateSchemaReferencePaths(object root, object obj, HashSet<object> checkedObjects, ISchemaDefinitionAppender schemaDefinitionAppender)
+        private static void UpdateSchemaReferencePaths(object rootObject, object obj, HashSet<object> checkedObjects, JsonSchemaResolver schemaResolver)
         {
             if (obj == null || obj is string)
                 return;
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReference != null)
-                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(root, schema.SchemaReference.ActualSchema, schemaDefinitionAppender);
+                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema, schemaResolver);
 
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values.OfType<object>().ToList())
-                    UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
+                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects, schemaResolver);
             }
             else if (obj is IEnumerable)
             {
                 foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
-                    UpdateSchemaReferencePaths(root, item, checkedObjects, schemaDefinitionAppender);
+                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects, schemaResolver);
             }
 
             if (!(obj is JToken))
@@ -92,31 +92,31 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-                            UpdateSchemaReferencePaths(root, value, checkedObjects, schemaDefinitionAppender);
+                            UpdateSchemaReferencePaths(rootObject, value, checkedObjects, schemaResolver);
                         }
                     }
                 }
             }
         }
 
-        private static void UpdateSchemaReferences(object root, object obj, HashSet<object> checkedObjects, JsonReferenceResolver jsonReferenceResolver)
+        private static void UpdateSchemaReferences(object rootObject, object obj, HashSet<object> checkedObjects, JsonReferenceResolver jsonReferenceResolver)
         {
             if (obj == null || obj is string)
                 return;
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReferencePath != null)
-                schema.SchemaReference = jsonReferenceResolver.ResolveReference(root, schema.SchemaReferencePath);
+                schema.SchemaReference = jsonReferenceResolver.ResolveReference(rootObject, schema.SchemaReferencePath);
 
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values)
-                    UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
+                    UpdateSchemaReferences(rootObject, item, checkedObjects, jsonReferenceResolver);
             }
             else if (obj is IEnumerable)
             {
                 foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
-                    UpdateSchemaReferences(root, item, checkedObjects, jsonReferenceResolver);
+                    UpdateSchemaReferences(rootObject, item, checkedObjects, jsonReferenceResolver);
             }
 
             if (!(obj is JToken))
@@ -131,7 +131,7 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-                            UpdateSchemaReferences(root, value, checkedObjects, jsonReferenceResolver);
+                            UpdateSchemaReferences(rootObject, value, checkedObjects, jsonReferenceResolver);
                         }
                     }
                 }
