@@ -669,18 +669,18 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(new DefaultTypeNameGenerator());
+            return ToJson(new JsonSchemaGeneratorSettings());
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
-        /// <param name="typeNameGenerator">The type name generator.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The JSON string.</returns>
-        public string ToJson(ITypeNameGenerator typeNameGenerator)
+        public string ToJson(JsonSchemaGeneratorSettings settings)
         {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, typeNameGenerator));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, settings));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(this, new JsonReferenceResolver());
 

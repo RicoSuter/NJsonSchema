@@ -17,23 +17,14 @@ namespace NJsonSchema
     {
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
 
-        private readonly ISchemaDefinitionAppender _schemaDefinitionAppender;
-        private readonly ISchemaNameGenerator _schemaNameGenerator;
+        private ISchemaDefinitionAppender _schemaDefinitionAppender;
+        private readonly JsonSchemaGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
         /// <param name="settings">The settings.</param>
         public SchemaResolver(JsonSchemaGeneratorSettings settings)
-            : this(settings, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator))
         {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
-        /// <param name="settings">The settings.</param>
-        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
-        public SchemaResolver(JsonSchemaGeneratorSettings settings, ISchemaDefinitionAppender schemaDefinitionAppender)
-        {
-            _schemaNameGenerator = settings.SchemaNameGenerator;
-            _schemaDefinitionAppender = schemaDefinitionAppender;
+            _settings = settings;
         }
 
         /// <summary>Determines whether the specified type has a schema.</summary>
@@ -64,9 +55,10 @@ namespace NJsonSchema
             if (schema.GetType() != typeof(JsonSchema4))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
-            if (_schemaDefinitionAppender.TrySetRoot(schema) == false)
-                _schemaDefinitionAppender.AppendSchema(schema, _schemaNameGenerator.Generate(type));
+            if (_schemaDefinitionAppender == null)
+                _schemaDefinitionAppender = _settings.SchemaDefinitionAppenderFactory(schema, _settings);
 
+            _schemaDefinitionAppender.AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }
 

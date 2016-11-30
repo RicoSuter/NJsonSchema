@@ -27,6 +27,7 @@ namespace NJsonSchema.Generation
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
+            SchemaDefinitionAppenderFactory = (schema, settings) => new JsonSchemaDefinitionAppender(schema, settings);
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -51,6 +52,10 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema name generator.</summary>
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the schema definition appender factory (inputs: rootSchema).</summary>
+        [JsonIgnore]
+        public Func<JsonSchema4, JsonSchemaGeneratorSettings, ISchemaDefinitionAppender> SchemaDefinitionAppenderFactory { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]

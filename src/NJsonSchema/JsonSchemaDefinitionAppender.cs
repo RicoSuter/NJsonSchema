@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema
 {
@@ -14,34 +15,19 @@ namespace NJsonSchema
     public class JsonSchemaDefinitionAppender : ISchemaDefinitionAppender
     {
         private readonly ITypeNameGenerator _typeNameGenerator;
-        private JsonSchema4 _rootSchema;
-
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class which uses the first touched schema as root object.</summary>
-        /// <param name="typeNameGenerator">The type name generator.</param>
-        public JsonSchemaDefinitionAppender(ITypeNameGenerator typeNameGenerator) : this(null, typeNameGenerator)
-        {
-        }
+        private readonly JsonSchema4 _rootSchema;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaDefinitionAppender" /> class.</summary>
         /// <param name="rootSchema">The root object.</param>
-        /// <param name="typeNameGenerator">The type name generator.</param>
-        public JsonSchemaDefinitionAppender(JsonSchema4 rootSchema, ITypeNameGenerator typeNameGenerator)
+        /// <param name="settings">The settings.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="rootSchema" /> is <see langword="null" /></exception>
+        public JsonSchemaDefinitionAppender(JsonSchema4 rootSchema, JsonSchemaGeneratorSettings settings)
         {
-            _rootSchema = rootSchema;
-            _typeNameGenerator = typeNameGenerator;
-        }
+            if (rootSchema == null)
+                throw new ArgumentNullException(nameof(rootSchema));
 
-        /// <summary>Tries to set the root of the appender.</summary>
-        /// <param name="rootObject">The root object.</param>
-        /// <returns>true when the root was not set before.</returns>
-        public bool TrySetRoot(object rootObject)
-        {
-            if (_rootSchema == null && rootObject is JsonSchema4)
-            {
-                _rootSchema = (JsonSchema4)rootObject;
-                return true;
-            }
-            return false;
+            _rootSchema = rootSchema;
+            _typeNameGenerator = settings.TypeNameGenerator;
         }
 
         /// <summary>Appends the schema to the root object.</summary>
@@ -57,11 +43,14 @@ namespace NJsonSchema
             if (_rootSchema == null)
                 throw new InvalidOperationException("Could not find the JSON path of a child object.");
 
-            var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
-            if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
-                _rootSchema.Definitions[typeName] = schema;
-            else
-                _rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
+            if (schema != _rootSchema)
+            {
+                var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
+                if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
+                    _rootSchema.Definitions[typeName] = schema;
+                else
+                    _rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
+            }
         }
     }
 }
