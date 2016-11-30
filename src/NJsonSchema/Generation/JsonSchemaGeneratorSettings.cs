@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -23,6 +24,7 @@ namespace NJsonSchema.Generation
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
+
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
         }

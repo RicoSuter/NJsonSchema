@@ -8,36 +8,32 @@
 
 using System;
 using System.Collections.Generic;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema
 {
     /// <summary>Manager which resolves types to schemas and appends missing schemas to the root object.</summary>
     public class SchemaResolver
     {
-        private readonly ISchemaDefinitionAppender _schemaDefinitionAppender;
-        private readonly ISchemaNameGenerator _schemaNameGenerator;
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
 
+        private readonly ISchemaDefinitionAppender _schemaDefinitionAppender;
+        private readonly ISchemaNameGenerator _schemaNameGenerator;
+
         /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
-        public SchemaResolver()
-            : this(new JsonSchemaDefinitionAppender(), new DefaultSchemaNameGenerator())
+        /// <param name="settings">The settings.</param>
+        public SchemaResolver(JsonSchemaGeneratorSettings settings)
+            : this(settings, new JsonSchemaDefinitionAppender(settings.TypeNameGenerator))
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
+        /// <param name="settings">The settings.</param>
         /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
-        public SchemaResolver(ISchemaDefinitionAppender schemaDefinitionAppender)
-            : this(schemaDefinitionAppender, new DefaultSchemaNameGenerator())
+        public SchemaResolver(JsonSchemaGeneratorSettings settings, ISchemaDefinitionAppender schemaDefinitionAppender)
         {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="SchemaResolver" /> class.</summary>
-        /// <param name="schemaDefinitionAppender">The schema definition appender.</param>
-        /// <param name="schemaNameGenerator">The schema name generator.</param>
-        public SchemaResolver(ISchemaDefinitionAppender schemaDefinitionAppender, ISchemaNameGenerator schemaNameGenerator)
-        {
+            _schemaNameGenerator = settings.SchemaNameGenerator;
             _schemaDefinitionAppender = schemaDefinitionAppender;
-            _schemaNameGenerator = schemaNameGenerator;
         }
 
         /// <summary>Determines whether the specified type has a schema.</summary>
