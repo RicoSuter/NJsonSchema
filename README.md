@@ -95,7 +95,7 @@ The generated JSON schema data stored in the `schemaData` variable:
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "typeName": "Person",
+  "title": "Person",
   "additionalProperties": false,
   "required": [
     "FirstName",
@@ -146,52 +146,53 @@ The generated JSON schema data stored in the `schemaData` variable:
         "null"
       ],
       "items": {
-        "type": "object",
-        "typeName": "Car",
-        "additionalProperties": false,
-        "properties": {
-          "Name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "Manufacturer": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/Company"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        }
+        "$ref": "#/definitions/Car"
       }
     }
   },
   "definitions": {
     "Gender": {
       "type": "integer",
-      "typeName": "Gender",
-      "enumNames": [
+      "x-enumNames": [
         "Male",
         "Female"
       ],
       "enum": [
         0,
         1
-      ]
+      ],
+      "description": ""
     },
     "Company": {
       "type": "object",
-      "typeName": "Company",
       "additionalProperties": false,
       "properties": {
         "Name": {
           "type": [
             "null",
             "string"
+          ]
+        }
+      }
+    },
+    "Car": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "Manufacturer": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Company"
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
