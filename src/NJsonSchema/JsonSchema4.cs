@@ -689,27 +689,26 @@ namespace NJsonSchema
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
 
-        /// <summary>Validates the given JSON data against this schema. </summary>
+        /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData)
         {
-            var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None };
-            var jsonObject = JsonConvert.DeserializeObject<JToken>(jsonData, settings);
-            return Validate(jsonObject);
+            var validator = new JsonSchemaValidator();
+            return validator.Validate(jsonData, ActualSchema);
         }
 
-        /// <summary>Validates the given JSON token against this schema. </summary>
+        /// <summary>Validates the given JSON token against this schema.</summary>
         /// <param name="token">The token to validate. </param>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(JToken token)
         {
-            var validator = new JsonSchemaValidator(ActualSchema);
-            return validator.Validate(token);
+            var validator = new JsonSchemaValidator();
+            return validator.Validate(token, ActualSchema);
         }
 
-        /// <summary>Finds the root parent of this schema. </summary>
-        /// <returns>The parent schema or this when this is the root. </returns>
+        /// <summary>Finds the root parent of this schema.</summary>
+        /// <returns>The parent schema or this when this is the root.</returns>
         public JsonSchema4 FindRootParent()
         {
             var parent = ParentSchema;
