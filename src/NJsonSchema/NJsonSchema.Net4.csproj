@@ -45,6 +45,7 @@
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
@@ -58,8 +59,7 @@
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\TypeNameStyle.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
-    <Compile Include="ISchemaDefinitionAppender.cs" />
-    <Compile Include="ISchemaResolver.cs" />
+    <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonObjectType.cs" />
@@ -69,12 +69,11 @@
     <Compile Include="JsonReferenceResolver.cs" />
     <Compile Include="JsonSchema4.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
-    <Compile Include="JsonSchemaDefinitionAppender.cs" />
     <Compile Include="JsonSchemaReferenceUtilities.cs" />
+    <Compile Include="JsonSchemaResolver.cs" />
     <Compile Include="NullHandling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyNameHandling.cs" />
-    <Compile Include="SchemaResolver.cs" />
     <Compile Include="Validation\ChildSchemaValidationError.cs" />
     <Compile Include="Validation\JsonSchemaValidator.cs" />
     <Compile Include="Validation\ValidationError.cs" />

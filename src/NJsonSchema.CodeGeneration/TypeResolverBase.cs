@@ -27,26 +27,6 @@ namespace NJsonSchema.CodeGeneration
             _typeNameGenerator = typeNameGenerator;
         }
 
-        /// <summary>Adds all schemas to the resolver.</summary>
-        /// <param name="schemas">The schemas (typeNameHint-schema pairs).</param>
-        public abstract void AddSchemas(IDictionary<string, JsonSchema4> schemas);
-
-        /// <summary>Determines whether the generator for a given type name is registered.</summary>
-        /// <param name="typeName">Name of the type.</param>
-        /// <returns></returns>
-        public bool HasTypeGenerator(string typeName)
-        {
-            return _types.ContainsKey(typeName);
-        }
-
-        /// <summary>Adds the type generator for a given type name.</summary>
-        /// <param name="typeName">Name of the type.</param>
-        /// <param name="generator">The generator.</param>
-        public void AddOrReplaceTypeGenerator(string typeName, TGenerator generator)
-        {
-            _types[typeName] = generator;
-        }
-
         /// <summary>Tries to resolve the schema and returns null if there was a problem.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
@@ -88,28 +68,15 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public abstract string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint);
 
-        /// <summary>Creates a type generator.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <returns>The generator.</returns>
-        protected abstract TGenerator CreateTypeGenerator(JsonSchema4 schema);
-
-        /// <summary>Adds a generator for the given schema if necessary.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The type name of the created generator.</returns>
-        protected virtual string AddGenerator(JsonSchema4 schema, string typeNameHint)
+        /// <summary>Adds all schemas to the resolver.</summary>
+        /// <param name="definitions">The schema definitions.</param>
+        public void AddGenerators(IDictionary<string, JsonSchema4> definitions)
         {
-            var typeName = GetOrGenerateTypeName(schema, typeNameHint);
-            if (!HasTypeGenerator(typeName))
+            if (definitions != null)
             {
-                var generator = CreateTypeGenerator(schema);
-                AddOrReplaceTypeGenerator(typeName, generator);
-
-                // add all definitions so that all schemas are generated (also subschemas in inheritance trees)
-                foreach (var pair in schema.Definitions)
-                    AddGenerator(pair.Value, pair.Key);
+                foreach (var pair in definitions)
+                    AddGenerator(pair.Value.ActualSchema, pair.Key);
             }
-            return typeName;
         }
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
@@ -166,6 +133,44 @@ namespace NJsonSchema.CodeGeneration
             }
             else
                 return GenerateTypeName("Anonymous");
+        }
+
+        /// <summary>Determines whether the generator for a given type name is registered.</summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <returns></returns>
+        public bool HasTypeGenerator(string typeName)
+        {
+            return _types.ContainsKey(typeName);
+        }
+
+        /// <summary>Creates a type generator.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The generator.</returns>
+        protected abstract TGenerator CreateTypeGenerator(JsonSchema4 schema);
+
+        /// <summary>Adds the type generator for a given type name.</summary>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="generator">The generator.</param>
+        protected void AddOrReplaceTypeGenerator(string typeName, TGenerator generator)
+        {
+            _types[typeName] = generator;
+        }
+
+        /// <summary>Adds a generator for the given schema if necessary.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The type name of the created generator.</returns>
+        protected virtual string AddGenerator(JsonSchema4 schema, string typeNameHint)
+        {
+            var typeName = GetOrGenerateTypeName(schema, typeNameHint);
+            if (!HasTypeGenerator(typeName))
+            {
+                AddGenerators(schema.Definitions);
+
+                var generator = CreateTypeGenerator(schema);
+                AddOrReplaceTypeGenerator(typeName, generator);
+            }
+            return typeName;
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>

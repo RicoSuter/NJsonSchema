@@ -12,14 +12,14 @@ namespace NJsonSchema.Validation
     public class ValidationError
     {
         /// <summary>Initializes a new instance of the <see cref="ValidationError"/> class. </summary>
-        /// <param name="kind">The error kind. </param>
-        /// <param name="property">The property name. </param>
-        /// <param name="path">The property path. </param>
-        public ValidationError(ValidationErrorKind kind, string property, string path)
+        /// <param name="errorKind">The error kind. </param>
+        /// <param name="propertyName">The property name. </param>
+        /// <param name="propertyPath">The property path. </param>
+        public ValidationError(ValidationErrorKind errorKind, string propertyName, string propertyPath)
         {
-            Kind = kind; 
-            Property = property;
-            Path = path != null ? "#/" + path : "#";
+            Kind = errorKind;
+            Property = propertyName;
+            Path = propertyPath != null ? "#/" + propertyPath : "#";
         }
 
         /// <summary>Gets the error kind. </summary>

@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 DateTimeType = TypeScriptDateTimeType.String
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: string"));
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 DateTimeType = TypeScriptDateTimeType.MomentJS
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: moment.Moment"));
@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Class,
                 //DateTimeType = TypeScriptDateTimeType.Date
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: Date"));
@@ -84,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 //DateTimeType = TypeScriptDateTimeType.Date 
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("MyDateTime: Date;"));
@@ -102,7 +102,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 DateTimeType = TypeScriptDateTimeType.MomentJS
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("MyDateTime: moment.Moment;"));
@@ -121,7 +121,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 DateTimeType = TypeScriptDateTimeType.String
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("MyDateTime: string;"));

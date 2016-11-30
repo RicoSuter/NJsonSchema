@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("[Required]"));
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 ClassStyle = CSharpClassStyle.Poco
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("[Required]"));
@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsFalse(code.Contains("[Required]"));
@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 ClassStyle = CSharpClassStyle.Poco
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsFalse(code.Contains("[Required]"));

@@ -84,17 +84,7 @@ namespace NJsonSchema
                 return null;
 
             if (segments.Count == 0)
-            {
-                var jsonSchema = obj as JsonSchema4;
-                if (jsonSchema != null && jsonSchema.TypeNameRaw == null)
-                {
-                    var referencesSchemaInDefinitionsList = allSegments.Count >= 2 && allSegments.ElementAt(allSegments.Count - 2) == "definitions";
-                    if (referencesSchemaInDefinitionsList)
-                        jsonSchema.TypeNameRaw = allSegments.Last();
-                }
-
-                return jsonSchema;
-            }
+                return obj as JsonSchema4;
 
             checkedObjects.Add(obj);
             var firstSegment = segments[0];

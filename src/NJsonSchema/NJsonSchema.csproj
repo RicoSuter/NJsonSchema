@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConversionUtilities.cs" />
+    <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
@@ -85,18 +86,16 @@
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="JsonReferenceResolver.cs" />
     <Compile Include="PropertyNameHandling.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\DynamicApis.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
-    <Compile Include="ISchemaDefinitionAppender.cs" />
-    <Compile Include="ISchemaResolver.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />
     <Compile Include="JsonPathUtilities.cs" />
     <Compile Include="JsonProperty.cs" />
-    <Compile Include="JsonSchemaDefinitionAppender.cs" />
     <Compile Include="Generation\JsonSchemaGeneratorSettings.cs" />
     <Compile Include="JsonSchemaReferenceUtilities.cs" />
     <Compile Include="JsonSchema4.Serialization.cs" />
@@ -108,7 +107,7 @@
     <Compile Include="Generation\JsonSchemaGenerator.cs" />
     <Compile Include="JsonObjectType.cs" />
     <Compile Include="JsonObjectTypeDescription.cs" />
-    <Compile Include="SchemaResolver.cs" />
+    <Compile Include="JsonSchemaResolver.cs" />
     <Compile Include="Validation\ChildSchemaValidationError.cs" />
     <Compile Include="Validation\ValidationError.cs" />
     <Compile Include="Validation\ValidationErrorKind.cs" />

@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new TypeScriptGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.AreEqual(3, code.Split(new[] { "export enum " }, StringSplitOptions.None).Count()); // two found
@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             // No exception
@@ -111,7 +111,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("[EnumMember(Value = \"0562\")]"));
@@ -129,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new TypeScriptGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("_0562 = <any>\"0562\", "));
@@ -163,7 +163,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsFalse(code.Contains("[EnumMember(Value = \"0562\")]"));
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new TypeScriptGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("_0562 = 10, "));
@@ -232,7 +232,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("[EnumMember(Value = \"0562\")]"));

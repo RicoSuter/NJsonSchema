@@ -20,12 +20,22 @@ namespace NJsonSchema.Annotations
             Type = JsonObjectType.None;
         }
 
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaAttribute" /> class.</summary>
+        /// <param name="name">The identifier of the schema which is used as key in the 'definitions' list.</param>
+        public JsonSchemaAttribute(string name) : this()
+        {
+            Name = name; 
+        }
+
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAttribute"/> class.</summary>
         /// <param name="type">The JSON Schema type.</param>
         public JsonSchemaAttribute(JsonObjectType type)
         {
             Type = type;
         }
+
+        /// <summary>Gets or sets the name identifier of the schema which is used as key in the 'definitions' list.</summary>
+        public string Name { get; set; }
 
         /// <summary>Gets the JSON Schema type (default: <see cref="JsonObjectType.None"/>, i.e. derived from <see cref="System.Type"/>).</summary>
         public JsonObjectType Type { get; private set; }

@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsFalse(code.Contains("public string Discriminator")); // discriminator property is not generated
@@ -142,7 +142,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 TypeStyle = TypeScriptTypeStyle.Class
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("Container");
 
             //// Assert
             Assert.IsTrue(code.Contains("export class Container"));

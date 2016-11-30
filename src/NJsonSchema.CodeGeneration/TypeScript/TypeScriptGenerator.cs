@@ -36,7 +36,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject)
+        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject) 
+            : base(schema)
         {
             _schema = schema;
             _resolver = resolver;
@@ -48,16 +49,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public object RootObject { get; set; }
 
         /// <summary>Gets the generator settings.</summary>
-        public TypeScriptGeneratorSettings Settings { get; set; }
-
-        /// <summary>Gets the language.</summary>
-        protected override string Language => "TypeScript";
+        public TypeScriptGeneratorSettings Settings { get; }
 
         /// <summary>Generates the file.</summary>
+        /// <param name="rootTypeNameHint">The root type name hint.</param>
         /// <returns>The file contents.</returns>
-        public override string GenerateFile()
+        public override string GenerateFile(string rootTypeNameHint)
         {
-            _resolver.Resolve(_schema, false, string.Empty); // register root type
+            _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
 
             var model = new FileTemplateModel(Settings)
             {

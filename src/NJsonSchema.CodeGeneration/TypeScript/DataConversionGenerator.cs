@@ -96,7 +96,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static bool IsNewableObject(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
-            return (schema.Type == JsonObjectType.None || schema.Type.HasFlag(JsonObjectType.Object)) 
+            return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None) 
                 && !schema.IsAnyType && !schema.IsDictionary;
         }
     }

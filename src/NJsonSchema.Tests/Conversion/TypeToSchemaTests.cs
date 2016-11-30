@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -12,16 +13,6 @@ namespace NJsonSchema.Tests.Conversion
     [TestClass]
     public class TypeToSchemaTests
     {
-        [TestMethod]
-        public void When_converting_type_then_title_of_schema_must_be_the_class_name()
-        {
-            //// Act
-            var schema = JsonSchema4.FromType<MyType>();
-
-            //// Assert
-            Assert.AreEqual(typeof(MyType).Name, schema.TypeNameRaw);
-        }
-
         [TestMethod]
         public void When_converting_in_round_trip_then_json_should_be_the_same()
         {
@@ -156,23 +147,14 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = JsonSchema4.FromType<MyType>();
+            var json = schema.ToJson();
 
             //// Assert
             var property = schema.Properties["Reference"];
             Assert.IsTrue(property.IsNullable(NullHandling.JsonSchema));
-            Assert.AreEqual(typeof(MySubtype).Name, property.ActualPropertySchema.TypeNameRaw);
+            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
         }
-
-        [TestMethod]
-        public void When_converting_simple_type_then_title_should_not_be_set()
-        {
-            //// Act
-            var schema = JsonSchema4.FromType<MyType>();
-
-            //// Assert
-            Assert.IsNull(schema.Properties["Integer"].TypeNameRaw);
-        }
-
+        
         [TestMethod]
         public void When_converting_enum_then_enum_array_must_be_set()
         {
@@ -238,7 +220,7 @@ namespace NJsonSchema.Tests.Conversion
 
             Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
             Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.AreEqual(typeof(MySubtype).Name, property.ActualSchema.Item.ActualSchema.TypeNameRaw);
+            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
             Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
 
