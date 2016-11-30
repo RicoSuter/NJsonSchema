@@ -37,7 +37,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver)
+        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver) 
+            : base(schema)
         {
             _schema = schema;
             _resolver = resolver;
@@ -45,16 +46,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Gets the generator settings.</summary>
-        public CSharpGeneratorSettings Settings { get; private set; }
-
-        /// <summary>Gets the language.</summary>
-        protected override string Language => "CSharp";
+        public CSharpGeneratorSettings Settings { get; }
 
         /// <summary>Generates the file.</summary>
+        /// <param name="rootTypeNameHint">The root type name hint.</param>
         /// <returns>The file contents.</returns>
-        public override string GenerateFile()
+        public override string GenerateFile(string rootTypeNameHint)
         {
-            _resolver.Resolve(_schema, false, string.Empty); // register root type
+            _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
 
             var model = new FileTemplateModel
             {

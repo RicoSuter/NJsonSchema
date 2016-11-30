@@ -26,10 +26,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             //// Act
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public enum Category"));
+            Assert.IsTrue(code.Contains("public enum MyClassCategory"));
         }
     }
 }

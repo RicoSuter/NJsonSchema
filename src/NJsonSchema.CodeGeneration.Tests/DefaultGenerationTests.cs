@@ -46,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Act
             var generator = new CSharpGenerator(schema);
             generator.Settings.ClassStyle = CSharpClassStyle.Inpc;
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("private string _test = \"foo\";"));
@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Act
             var generator = new CSharpGenerator(schema);
             generator.Settings.ClassStyle = CSharpClassStyle.Poco;
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public string Test { get; set; } = \"foo\";"));

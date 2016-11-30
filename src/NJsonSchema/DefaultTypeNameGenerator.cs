@@ -19,7 +19,7 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonSchema4 schema, string typeNameHint)
         {
-            return ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw?.Split('.').Last(), true);
+            return ConversionUtilities.ConvertToUpperCamelCase(typeNameHint?.Split('.').Last() ?? "Anonymous", true);
         }
     }
 }

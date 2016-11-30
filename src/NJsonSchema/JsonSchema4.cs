@@ -189,19 +189,6 @@ namespace NJsonSchema
             return schema;
         }
 
-        /// <summary>Creates the type reference.</summary>
-        /// <param name="schema">The referenced schema.</param>
-        /// <returns>The type reference.</returns>
-        public static JsonSchema4 CreateTypeReference(JsonSchema4 schema)
-        {
-            return new JsonSchema4
-            {
-                Type = JsonObjectType.Object,
-                TypeNameRaw = schema.TypeNameRaw,
-                SchemaReference = schema
-            };
-        }
-
         /// <summary>Gets the list of directly inherited/parent schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
@@ -290,7 +277,7 @@ namespace NJsonSchema
         public string Id { get; set; }
 
         /// <summary>Gets or sets the title. </summary>
-        [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         public string Title { get; set; }
 
         /// <summary>Gets or sets the description. </summary>
@@ -326,7 +313,6 @@ namespace NJsonSchema
                         // only $ref property is allowed when schema is a reference
                         // TODO: Fix all SchemaReference assignments so that this code is not needed 
                         Type = JsonObjectType.None;
-                        TypeNameRaw = null;
                     }
                 }
             }
@@ -657,8 +643,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
-        public bool IsAnyType => string.IsNullOrEmpty(TypeNameRaw) &&
-                                 (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+        public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
                                  Properties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
                                  AnyOf.Count == 0 &&
@@ -684,18 +669,19 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(new DefaultTypeNameGenerator());
+            var settings = new JsonSchemaGeneratorSettings();
+            return ToJson(settings);
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
-        /// <param name="typeNameGenerator">The type name generator.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The JSON string.</returns>
-        public string ToJson(ITypeNameGenerator typeNameGenerator)
+        public string ToJson(JsonSchemaGeneratorSettings settings)
         {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaDefinitionAppender(this, typeNameGenerator));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, new JsonSchemaResolver(settings));
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
             JsonSchemaReferenceUtilities.UpdateSchemaReferences(this, new JsonReferenceResolver());
 
@@ -703,27 +689,26 @@ namespace NJsonSchema
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
         }
 
-        /// <summary>Validates the given JSON data against this schema. </summary>
+        /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData)
         {
-            var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None };
-            var jsonObject = JsonConvert.DeserializeObject<JToken>(jsonData, settings);
-            return Validate(jsonObject);
+            var validator = new JsonSchemaValidator();
+            return validator.Validate(jsonData, ActualSchema);
         }
 
-        /// <summary>Validates the given JSON token against this schema. </summary>
+        /// <summary>Validates the given JSON token against this schema.</summary>
         /// <param name="token">The token to validate. </param>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(JToken token)
         {
-            var validator = new JsonSchemaValidator(ActualSchema);
-            return validator.Validate(token);
+            var validator = new JsonSchemaValidator();
+            return validator.Validate(token, ActualSchema);
         }
 
-        /// <summary>Finds the root parent of this schema. </summary>
-        /// <returns>The parent schema or this when this is the root. </returns>
+        /// <summary>Finds the root parent of this schema.</summary>
+        /// <returns>The parent schema or this when this is the root.</returns>
         public JsonSchema4 FindRootParent()
         {
             var parent = ParentSchema;

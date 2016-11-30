@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
 
@@ -24,18 +23,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Gets the generator settings.</summary>
-        public CSharpGeneratorSettings Settings { get; private set; }
-
-        /// <summary>Adds all schemas to the resolver.</summary>
-        /// <param name="schemas">The schemas (typeNameHint-schema pairs).</param>
-        public override void AddSchemas(IDictionary<string, JsonSchema4> schemas)
-        {
-            if (schemas != null)
-            {
-                foreach (var pair in schemas)
-                    AddOrReplaceTypeGenerator(GetOrGenerateTypeName(pair.Value, pair.Key), new CSharpGenerator(pair.Value.ActualSchema, Settings, this));
-            }
-        }
+        public CSharpGeneratorSettings Settings { get; }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
         /// <param name="schema">The schema.</param>
@@ -77,13 +65,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
             {
-                if (schema.TypeNameRaw == "Object")
-                    return "JObject";
-                else
-                {
-                    var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
-                    return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
-                }
+                var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
+                return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
             }
 
             return AddGenerator(schema, typeNameHint);
@@ -107,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
             {
-                // Recreate generator because it be better (defined enum values) than the current one
+                // Regenerate generator because it is be better than the current one (defined enum values)
                 var typeName = GetOrGenerateTypeName(schema, typeNameHint);
                 var generator = CreateTypeGenerator(schema);
                 AddOrReplaceTypeGenerator(typeName, generator);

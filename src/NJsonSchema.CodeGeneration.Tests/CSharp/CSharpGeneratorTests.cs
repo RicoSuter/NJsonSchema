@@ -28,9 +28,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema4.FromJson(json);
 
             //// Act
-            var settings = new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
             var generator = new CSharpGenerator(schema, settings);
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains("public ObservableCollection<object> EmptySchema { get; set; }"));
@@ -43,7 +43,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'id': 'http://some.domain.com/foo.json',
-                'x-typeName': 'foo',
                 'type': 'object',
                 'additionalProperties': false,
                 'definitions': {
@@ -84,7 +83,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema4.FromJson(json);
             var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
             var generator = new CSharpGenerator(schema, settings);
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("Foo");
 
             //// Assert
             Assert.IsTrue(output.Contains("public partial class TAgg"));
@@ -100,7 +99,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
-                'x-typeName': 'Foo', 
                 'properties': { 
                     'prop1' : { 'type' : 'string' } 
                 },
@@ -116,7 +114,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = JsonSchema4.FromJson(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("Foo");
 
             //// Assert
             Assert.IsTrue(code.Contains("class Foo"));
@@ -132,25 +130,28 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
-                'x-typeName': 'Foo', 
                 'properties': { 
                     'prop1' : { 'type' : 'string' } 
                 },
                 'allOf': [
                     {
+                        '$ref': '#/definitions/Bar'
+                    }
+                ], 
+                'definitions': {
+                    'Bar':  {
                         'type': 'object', 
-                        'x-typeName': 'Bar', 
                         'properties': { 
                             'prop2' : { 'type' : 'string' } 
                         }
                     }
-                ]
+                }
             }";
 
             //// Act
             var schema = JsonSchema4.FromJson(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("Foo");
 
             //// Assert
             Assert.IsTrue(code.Contains("class Foo : Bar"));
@@ -169,7 +170,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             public string Generate(JsonSchema4 schema, string typeNameHint)
             {
-                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(schema.TypeNameRaw, true);
+                return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(typeNameHint, true);
             }
 
         }
@@ -187,7 +188,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("Teacher");
             Console.WriteLine(output);
 
             //// Assert
@@ -237,7 +238,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var gen = new CSharpGenerator(schema, settings);
 
             //// Act
-            var output = gen.GenerateFile();
+            var output = gen.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
@@ -261,7 +262,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 GenerateDefaultValues = true
             };
             var gen = new CSharpGenerator(schema, settings);
-            var output = gen.GenerateFile();
+            var output = gen.GenerateFile("MyClass");
 
             Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
         }
@@ -284,7 +285,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 GenerateDefaultValues = false
             };
             var gen = new CSharpGenerator(schema, settings);
-            var output = gen.GenerateFile();
+            var output = gen.GenerateFile("MyClass");
 
             Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; }"));
             Assert.IsFalse(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
@@ -297,7 +298,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = CreateGenerator();
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains("namespace MyNamespace"));
@@ -312,7 +313,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             generator.Settings.ClassStyle = CSharpClassStyle.Poco;
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains("{ get; set; }"));
@@ -325,7 +326,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = CreateGenerator();
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));
@@ -341,7 +342,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"public TimeSpan TimeSpan"));
@@ -354,7 +355,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = CreateGenerator();
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("Teacher");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"class Teacher : Person, "));
@@ -369,7 +370,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"/// <summary>EnumDesc.</summary>"));
@@ -384,7 +385,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"/// <summary>ClassDesc.</summary>"));
@@ -399,7 +400,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
@@ -413,7 +414,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             // Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             // Assert
             Assert.IsTrue(output.Contains("public byte[] Content"));
@@ -428,7 +429,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             // Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             // Assert
             Assert.IsTrue(output.Contains("public byte[] Content"));
@@ -439,7 +440,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeNameRaw = "MyClass";
             schema.Properties["foo-bar"] = new JsonProperty
             {
                 Type = JsonObjectType.String
@@ -448,7 +448,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             // Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             // Assert
             Assert.IsTrue(output.Contains(@"[JsonProperty(""foo-bar"", "));
@@ -463,7 +463,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema);
 
             // Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsFalse(output.Contains(@"class  :"));
@@ -508,7 +508,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
@@ -538,7 +538,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
@@ -553,7 +553,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
@@ -589,10 +589,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.JOIST_MAS;"));
+            Assert.IsTrue(code.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = MyClassConstructionCode.JOIST_MAS;"));
         }
 
         [TestMethod]
@@ -601,7 +601,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Arrange
             var schemaJson = @"{
   ""type"": ""object"",
-  ""x-typeName"": ""Foo"",
   ""properties"": {
     ""Foo"": {
       ""type"": ""string""
@@ -612,7 +611,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("Foo");
 
             //// Assert
             Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull"));
@@ -641,7 +640,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; } = new Dictionary<string, string>();"));
@@ -652,7 +651,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = new JsonSchema4();
-            schema.TypeNameRaw = "Foo[Bar[Inner]]";
             schema.Type = JsonObjectType.Object;
             schema.Properties["foo"] = new JsonProperty
             {
@@ -661,7 +659,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("Foo[Bar[Inner]]");
 
             //// Assert
             Assert.IsTrue(code.Contains("public partial class FooOfBarOfInner"));
@@ -691,7 +689,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(schemaJson.Contains(
@@ -763,7 +761,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public ObservableCollection<string> A { get; set; } = new ObservableCollection<string>();"));
@@ -807,7 +805,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public Dictionary<string, string> A { get; set; } = new Dictionary<string, string>();"));
@@ -860,7 +858,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("public A A { get; set; } = new A();"));
@@ -894,10 +892,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger
             });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public JObject Foo { get; set; }"));
+            Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
         }
 
         public class ObsClass
@@ -914,7 +912,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
             Console.WriteLine(output);
 
             //// Assert
@@ -931,7 +929,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
-            var output = generator.GenerateFile();
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(output.Contains("Application_vnd_msExcel = 1,"));

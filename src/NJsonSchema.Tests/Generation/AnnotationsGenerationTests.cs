@@ -146,13 +146,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(@"{
-  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-  ""type"": ""array"",
-  ""items"": {
-    ""type"": ""string""
-  }
-}", json);
+            Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
         }
 
         [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
@@ -170,13 +164,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(@"{
-  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
-  ""type"": ""array"",
-  ""items"": {
-    ""type"": ""string""
-  }
-}", json);
+            Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
         }
 
         public class StringLengthAttributeClass

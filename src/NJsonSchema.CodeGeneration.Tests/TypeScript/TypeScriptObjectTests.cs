@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("Test: any;"));
@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
-            var code = generator.GenerateFile();
+            var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.IsTrue(code.Contains("Test: { [key: string] : any; };"));
