@@ -58,12 +58,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
 
+            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses); 
             var model = new FileTemplateModel(Settings)
             {
-                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(Settings.ProcessedExtensionCode)),
-
-                ExtensionCodeBefore = Settings.ProcessedExtensionCode.CodeBefore,
-                ExtensionCodeAfter = Settings.ProcessedExtensionCode.CodeAfter
+                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(extensionCode)),
+                ExtensionCode = extensionCode
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File", model);

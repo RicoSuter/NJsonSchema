@@ -13,10 +13,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>The generator settings.</summary>
     public class TypeScriptGeneratorSettings : CodeGeneratorSettingsBase
     {
-        private string _extensionCode;
-        private string[] _extendedClasses;
-        private ExtensionCode _processedExtensionCode;
-
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGeneratorSettings"/> class.</summary>
         public TypeScriptGeneratorSettings()
         {
@@ -50,47 +46,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public string Namespace { get; set; }
 
         /// <summary>Gets or sets the list of extended classes (the classes must be implemented in the <see cref="ExtensionCode"/>).</summary>
-        public string[] ExtendedClasses
-        {
-            get { return _extendedClasses; }
-            set
-            {
-                if (value != _extendedClasses)
-                {
-                    _extendedClasses = value;
-                    _processedExtensionCode = null;
-                }
-            }
-        }
+        public string[] ExtendedClasses { get; set; }
 
         /// <summary>Gets or sets the extension code to append to the generated code.</summary>
-        public string ExtensionCode
-        {
-            get { return _extensionCode; }
-            set
-            {
-                if (value != _extensionCode)
-                {
-                    _extensionCode = value;
-                    _processedExtensionCode = null;
-                }
-            }
-        }
+        public string ExtensionCode { get; set; }
 
         /// <summary>Gets or sets the type names which always generate plain TypeScript classes.</summary>
         public string[] ClassTypes { get; set; }
-
-        /// <summary>Gets the transformed additional code.</summary>
-        public ExtensionCode ProcessedExtensionCode
-        {
-            get
-            {
-                if (_processedExtensionCode == null)
-                    _processedExtensionCode = new TypeScriptExtensionCode(ExtensionCode ?? string.Empty, ExtendedClasses);
-
-                return _processedExtensionCode;
-            }
-        }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

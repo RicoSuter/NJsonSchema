@@ -54,8 +54,8 @@ namespace NJsonSchema.CodeGeneration
 
             return string.Join("\n\n", ClassOrderUtilities.Order(types.Values).Select(p =>
             {
-                if (extensionCode?.Classes.ContainsKey(p.TypeName) == true)
-                    return p.Code + "\n\n" + extensionCode.Classes[p.TypeName];
+                if (extensionCode?.ExtensionClasses.ContainsKey(p.TypeName) == true)
+                    return p.Code + "\n\n" + extensionCode.ExtensionClasses[p.TypeName];
 
                 return p.Code;
             }));

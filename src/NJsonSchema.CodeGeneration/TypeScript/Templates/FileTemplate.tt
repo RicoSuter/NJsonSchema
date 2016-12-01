@@ -7,7 +7,7 @@
 // </auto-generated>
 //----------------------
 
-<#=Model.ExtensionCodeBefore#>
+<#=Model.ExtensionCode.ImportCode#>
 
 <#if(Model.HasModuleName){#>
 module <#=Model.ModuleName#> {
@@ -15,9 +15,11 @@ module <#=Model.ModuleName#> {
   if(Model.HasNamespace){#>
 namespace <#=Model.Namespace#> {
 <#}#>
+<#=Model.ExtensionCode.TopCode#>
+
 <#=Model.Types#>
 
-<#=Model.ExtensionCodeAfter#>
+<#=Model.ExtensionCode.BottomCode#>
 
 <#if(Model.HasNamespace){#>
 }
