@@ -43,20 +43,20 @@ var x = 10;";
             var ext = new TypeScriptExtensionCode(code, new []{ "Foo", "Bar" });
 
             //// Assert
-            Assert.IsTrue(ext.Classes.ContainsKey("Foo"));
-            Assert.IsTrue(ext.Classes["Foo"].StartsWith("export class Foo extends FooBase {"));
+            Assert.IsTrue(ext.ExtensionClasses.ContainsKey("Foo"));
+            Assert.IsTrue(ext.ExtensionClasses["Foo"].StartsWith("export class Foo extends FooBase {"));
 
-            Assert.IsTrue(ext.Classes.ContainsKey("Bar"));
-            Assert.IsTrue(ext.Classes["Bar"].StartsWith("export class Bar extends BarBase {"));
+            Assert.IsTrue(ext.ExtensionClasses.ContainsKey("Bar"));
+            Assert.IsTrue(ext.ExtensionClasses["Bar"].StartsWith("export class Bar extends BarBase {"));
 
-            Assert.IsTrue(ext.CodeBefore.Contains("<reference path"));
-            Assert.IsTrue(ext.CodeBefore.Contains("import foo = require(\"foo/bar\")"));
-            Assert.IsTrue(ext.CodeBefore.Contains("import bar = require(\"foo/bar\")"));
+            Assert.IsTrue(ext.ImportCode.Contains("<reference path"));
+            Assert.IsTrue(ext.ImportCode.Contains("import foo = require(\"foo/bar\")"));
+            Assert.IsTrue(ext.ImportCode.Contains("import bar = require(\"foo/bar\")"));
 
-            Assert.IsTrue(ext.CodeAfter.StartsWith("var clientClasses"));
-            Assert.IsTrue(ext.CodeAfter.Contains("if (clientClasses.hasOwnProperty(clientClass))"));
-            Assert.IsTrue(ext.CodeAfter.Contains("export class Test"));
-            Assert.IsTrue(ext.CodeAfter.EndsWith("var x = 10;"));
+            Assert.IsTrue(ext.BottomCode.StartsWith("var clientClasses"));
+            Assert.IsTrue(ext.BottomCode.Contains("if (clientClasses.hasOwnProperty(clientClass))"));
+            Assert.IsTrue(ext.BottomCode.Contains("export class Test"));
+            Assert.IsTrue(ext.BottomCode.EndsWith("var x = 10;"));
         }
     }
 }

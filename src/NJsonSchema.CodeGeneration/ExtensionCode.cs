@@ -14,12 +14,15 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ExtensionCode
     {
         /// <summary>Gets the code of the class extension.</summary>
-        public Dictionary<string, string> Classes { get; protected set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> ExtensionClasses { get; protected set; } = new Dictionary<string, string>();
 
-        /// <summary>Gets the extension code which is inserted at the start of the generated code (e.g. TypeScript imports).</summary>
-        public string CodeBefore { get; protected set; } = string.Empty;
+        /// <summary>Gets or sets the imports.</summary>
+        public string ImportCode { get; protected set; } = string.Empty;
+
+        /// <summary>Gets the extension code which is inserted at the start of the generated code.</summary>
+        public string TopCode { get; protected set; } = string.Empty;
 
         /// <summary>Gets the extension code which is appended at the end of the generated code.</summary>
-        public string CodeAfter { get; protected set; }
+        public string BottomCode { get; protected set; }
     }
 }
