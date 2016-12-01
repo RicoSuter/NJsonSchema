@@ -16,9 +16,9 @@ using Newtonsoft.Json.Linq;
 namespace NJsonSchema.Validation
 {
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
-    internal class JsonSchemaValidator
+    public class JsonSchemaValidator
     {
-        /// <summary>Validates the given JSON token.</summary>
+        /// <summary>Validates the given JSON data.</summary>
         /// <param name="jsonData">The json data.</param>
         /// <param name="schema">The schema.</param>
         /// <returns>The list of validation errors.</returns>
@@ -29,6 +29,10 @@ namespace NJsonSchema.Validation
             return Validate(jsonObject, schema);
         }
 
+        /// <summary>Validates the given JSON token.</summary>
+        /// <param name="token">The token.</param>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The list of validation errors.</returns>
         public ICollection<ValidationError> Validate(JToken token, JsonSchema4 schema)
         {
             return Validate(token, schema.ActualSchema, null, token.Path);
