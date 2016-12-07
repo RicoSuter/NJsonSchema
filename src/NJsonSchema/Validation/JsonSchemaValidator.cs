@@ -106,7 +106,7 @@ namespace NJsonSchema.Validation
         {
             if (schema.AnyOf.Count > 0)
             {
-                var propertyErrors = schema.AnyOf.ToDictionary(s => s, s => s.Validate(token));
+                var propertyErrors = schema.AnyOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.All(s => s.Value.Count != 0))
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath, propertyErrors));
             }
@@ -116,7 +116,7 @@ namespace NJsonSchema.Validation
         {
             if (schema.AllOf.Count > 0)
             {
-                var propertyErrors = schema.AllOf.ToDictionary(s => s, s => s.Validate(token));
+                var propertyErrors = schema.AllOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.Any(s => s.Value.Count != 0))
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath, propertyErrors));
             }
@@ -126,7 +126,7 @@ namespace NJsonSchema.Validation
         {
             if (schema.OneOf.Count > 0)
             {
-                var propertyErrors = schema.OneOf.ToDictionary(s => s, s => s.Validate(token));
+                var propertyErrors = schema.OneOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.Count(s => s.Value.Count == 0) != 1)
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath, propertyErrors));
             }
@@ -136,7 +136,7 @@ namespace NJsonSchema.Validation
         {
             if (schema.Not != null)
             {
-                if (schema.Not.Validate(token).Count == 0)
+                if (Validate(token, schema.Not).Count == 0)
                     errors.Add(new ValidationError(ValidationErrorKind.ExcludedSchemaValidates, propertyName, propertyPath));
             }
         }
