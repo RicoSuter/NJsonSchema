@@ -59,7 +59,7 @@ namespace NJsonSchema.Validation
         /// <summary>Gets the line number the validation failed on. </summary>
         public int LineNumber { get; private set; }
 
-        /// <summary>Gets the line number the validation failed on. </summary>
+        /// <summary>Gets the line position the validation failed on. </summary>
         public int LinePosition { get; private set; }
 
         /// <summary>Returns a string that represents the current object.</summary>
