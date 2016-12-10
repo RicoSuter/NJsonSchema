@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Validation
 {
@@ -18,12 +19,13 @@ namespace NJsonSchema.Validation
         /// <param name="property">The property name. </param>
         /// <param name="path">The property path. </param>
         /// <param name="errors">The error list. </param>
+        /// <param name="token">The token that failed to validate. </param>
 #if !LEGACY
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
 #else
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
 #endif
-            : base(kind, property, path)
+            : base(kind, property, path, token)
         {
             Errors = errors;
         }
