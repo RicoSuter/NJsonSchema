@@ -45,12 +45,7 @@ namespace NJsonSchema
             }
             else if (jsonPath.StartsWith("#/"))
             {
-                var allSegments = jsonPath.Split('/').Skip(1).ToList();
-                var schema = ResolveReference(rootObject, allSegments, allSegments, new HashSet<object>());
-                if (schema == null)
-                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
-
-                return schema;
+                return ResolveDocumentReference(rootObject, jsonPath);
             }
             else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
                 return ResolveUrlReference(jsonPath, jsonPath);
@@ -78,7 +73,80 @@ namespace NJsonSchema
             }
         }
 
-        private JsonSchema4 ResolveReference(object obj, List<string> segments, List<string> allSegments, HashSet<object> checkedObjects)
+        /// <summary>Resolves a document reference.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="jsonPath">The JSON path to resolve.</param>
+        /// <returns>The resolved JSON Schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        protected virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath)
+        {
+            var allSegments = jsonPath.Split('/').Skip(1).ToList();
+            var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>());
+            if (schema == null)
+                throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
+
+            return schema;
+        }
+
+        /// <summary>Resolves a file reference.</summary>
+        /// <param name="fullJsonPath">The full JSON path to resolve.</param>
+        /// <param name="jsonPath">The JSON path to resolve.</param>
+        /// <returns>The resolved JSON Schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        /// <exception cref="NotSupportedException">Could not resolve the JSON path because JSON web references are not supported on this platform.</exception>
+        protected virtual JsonSchema4 ResolveFileReference(string fullJsonPath, string jsonPath)
+        {
+            if (DynamicApis.SupportsFileApis)
+            {
+                try
+                {
+                    var arr = Regex.Split(fullJsonPath, @"(?=#)");
+
+                    if (!_resolvedSchemas.ContainsKey(arr[0]))
+                        JsonSchema4.FromFile(arr[0], this);
+
+                    var result = _resolvedSchemas[arr[0]];
+                    return arr.Length == 1 ? result : ResolveReference(result, arr[1]);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Could not resolve the JSON path '" + jsonPath + "' with the file path '" + fullJsonPath + "': " + exception.Message, exception);
+                }
+            }
+            else
+                throw new NotSupportedException("Could not resolve the JSON path '" + jsonPath + "' because JSON file references are not supported on this platform.");
+        }
+
+        /// <summary>Resolves an URL reference.</summary>
+        /// <param name="fullJsonPath">The full JSON path to resolve.</param>
+        /// <param name="jsonPath">The JSON path to resolve.</param>
+        /// <returns>The resolved JSON Schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        /// <exception cref="NotSupportedException">Could not resolve the JSON path because JSON web references are not supported on this platform.</exception>
+        protected virtual JsonSchema4 ResolveUrlReference(string fullJsonPath, string jsonPath)
+        {
+            if (DynamicApis.SupportsWebClientApis)
+            {
+                try
+                {
+                    var arr = fullJsonPath.Split('#');
+
+                    if (!_resolvedSchemas.ContainsKey(arr[0]))
+                        JsonSchema4.FromUrl(arr[0], this);
+
+                    var result = _resolvedSchemas[arr[0]];
+                    return arr.Length == 1 ? result : ResolveReference(result, "#" + arr[1]);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Could not resolve the JSON path '" + jsonPath + "' with the URL '" + fullJsonPath + "': " + exception.Message, exception);
+                }
+            }
+            else
+                throw new NotSupportedException("Could not resolve the JSON path '" + jsonPath + "' because JSON web references are not supported on this platform.");
+        }
+
+        private JsonSchema4 ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -92,7 +160,7 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 if (((IDictionary)obj).Contains(firstSegment))
-                    return ResolveReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), allSegments, checkedObjects);
+                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
             }
             else if (obj is IEnumerable)
             {
@@ -101,7 +169,7 @@ namespace NJsonSchema
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
-                        return ResolveReference(enumerable[index], segments.Skip(1).ToList(), allSegments, checkedObjects);
+                        return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), checkedObjects);
                 }
             }
             else
@@ -112,60 +180,12 @@ namespace NJsonSchema
                     if (pathSegment == firstSegment)
                     {
                         var value = member.GetValue(obj);
-                        return ResolveReference(value, segments.Skip(1).ToList(), allSegments, checkedObjects);
+                        return ResolveDocumentReference(value, segments.Skip(1).ToList(), checkedObjects);
                     }
                 }
             }
 
             return null;
-        }
-
-        private JsonSchema4 ResolveFileReference(string url, string jsonPath)
-        {
-            if (DynamicApis.SupportsFileApis)
-            {
-                try
-                {
-                    var arr = Regex.Split(url, @"(?=#)");
-
-                    if (!_resolvedSchemas.ContainsKey(arr[0]))
-                        JsonSchema4.FromFile(arr[0], this);
-
-                    var result = _resolvedSchemas[arr[0]];
-                    return arr.Length == 1 ? result : ResolveReference(result, arr[1]);
-                }
-                catch (Exception exception)
-                {
-                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the file path '" + url + "': " + exception.Message, exception);
-                }
-            }
-            else
-                throw new NotSupportedException("Could not resolve the path '" + jsonPath +
-                    "' because JSON file references are not supported on this platform.");
-        }
-
-        private JsonSchema4 ResolveUrlReference(string filePath, string jsonPath)
-        {
-            if (DynamicApis.SupportsWebClientApis)
-            {
-                try
-                {
-                    var arr = filePath.Split('#');
-
-                    if (!_resolvedSchemas.ContainsKey(arr[0]))
-                        JsonSchema4.FromUrl(arr[0], this);
-
-                    var result = _resolvedSchemas[arr[0]];
-                    return arr.Length == 1 ? result : ResolveReference(result, "#" + arr[1]);
-                }
-                catch (Exception exception)
-                {
-                    throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "' with the URL '" + filePath + "': " + exception.Message, exception);
-                }
-            }
-            else
-                throw new NotSupportedException("Could not resolve the path '" + jsonPath +
-                    "' because JSON web references are not supported on this platform.");
         }
     }
 }
