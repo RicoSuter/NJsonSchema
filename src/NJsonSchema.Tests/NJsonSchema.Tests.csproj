@@ -74,6 +74,7 @@
     <Compile Include="Generation\TypeMappingsTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\EnumValidationTests.cs" />
+    <Compile Include="Validation\LineInformationTest.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />
     <Compile Include="Validation\PatternPropertyValidationTests.cs" />
     <Compile Include="Validation\FormatBase64Tests.cs" />
