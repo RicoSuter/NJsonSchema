@@ -71,7 +71,7 @@ namespace NJsonSchema.Tests.Validation
         {
             foreach (var error in errors)
             {
-                Assert.AreEqual(hasLineInfo, error.HasLineInfo(), "HasLineInfo incorrect.");
+                Assert.AreEqual(hasLineInfo, error.HasLineInfo, "HasLineInfo incorrect.");
 
                 if (hasLineInfo)
                 {
