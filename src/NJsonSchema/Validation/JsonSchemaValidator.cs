@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Validation
@@ -24,8 +23,7 @@ namespace NJsonSchema.Validation
         /// <returns>The list of validation errors.</returns>
         public ICollection<ValidationError> Validate(string jsonData, JsonSchema4 schema)
         {
-            var settings = new JsonLoadSettings { LineInfoHandling = LineInfoHandling.Ignore };
-            var jsonObject = JToken.Parse(jsonData, settings);
+            var jsonObject = JToken.Parse(jsonData);
             return Validate(jsonObject, schema);
         }
 
