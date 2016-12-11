@@ -72,7 +72,7 @@ namespace NJsonSchema
                 _rootSchema = schema;
             else if (schema != _rootSchema)
             {
-                var typeName = schema.GetTypeName(_settings.TypeNameGenerator, typeNameHint);
+                var typeName = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _rootSchema.Definitions.Keys);
                 if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
                     _rootSchema.Definitions[typeName] = schema;
                 else

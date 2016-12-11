@@ -30,15 +30,6 @@ namespace NJsonSchema
         [JsonProperty("discriminator", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 5)]
         public string Discriminator { get; set; }
 
-        /// <summary>Gets the type name of the schema.</summary>
-        /// <param name="typeNameGenerator">The type name generator.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The type name.</returns>
-        public string GetTypeName(ITypeNameGenerator typeNameGenerator, string typeNameHint)
-        {
-            return typeNameGenerator.Generate(this, typeNameHint);
-        }
-
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonIgnore]
         public Collection<string> EnumerationNames { get; set; }
