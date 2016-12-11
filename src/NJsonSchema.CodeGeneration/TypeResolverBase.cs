@@ -88,51 +88,9 @@ namespace NJsonSchema.CodeGeneration
             schema = schema.ActualSchema;
 
             if (!_generatedTypeNames.ContainsKey(schema))
-            {
-                var typeName = schema.GetTypeName(_typeNameGenerator, typeNameHint);
-
-                if (string.IsNullOrEmpty(typeName))
-                    typeName = GenerateTypeName(typeNameHint);
-                else
-                {
-                    if (_generatedTypeNames.ContainsValue(typeName))
-                        typeName = GenerateTypeName(typeName);
-                }
-
-                typeName = typeName
-                    .Replace("[", "Of")
-                    .Replace("]", string.Empty)
-                    .Replace(",", "And")
-                    .Replace(" ", string.Empty);
-
-                _generatedTypeNames[schema] = typeName;
-            }
+                _generatedTypeNames[schema] = _typeNameGenerator.Generate(schema, typeNameHint, _generatedTypeNames.Values);
 
             return _generatedTypeNames[schema];
-        }
-
-        /// <summary>Generates a unique type name with the given hint.</summary>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The type name.</returns>
-        public string GenerateTypeName(string typeNameHint)
-        {
-            if (!string.IsNullOrEmpty(typeNameHint))
-            {
-                typeNameHint = typeNameHint.Split('.').Last();
-
-                if (!_generatedTypeNames.ContainsValue(typeNameHint))
-                    return typeNameHint;
-
-                var count = 1;
-                do
-                {
-                    count++;
-                } while (_generatedTypeNames.ContainsValue(typeNameHint + count));
-
-                return typeNameHint + count;
-            }
-            else
-                return GenerateTypeName("Anonymous");
         }
 
         /// <summary>Determines whether the generator for a given type name is registered.</summary>

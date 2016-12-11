@@ -14,13 +14,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
-            DateType = "DateTime";
-            DateTimeType = "DateTime";
-            TimeType = "TimeSpan";
-            TimeSpanType = "TimeSpan";
+            DateType = "System.DateTime";
+            DateTimeType = "System.DateTime";
+            TimeType = "System.TimeSpan";
+            TimeSpanType = "System.TimeSpan";
 
-            ArrayType = "ObservableCollection";
-            DictionaryType = "Dictionary";
+            ArrayType = "System.Collections.ObjectModel.ObservableCollection";
+            DictionaryType = "System.Collections.Generic.Dictionary";
 
             RequiredPropertiesMustBeDefined = true; 
             ClassStyle = CSharpClassStyle.Inpc;

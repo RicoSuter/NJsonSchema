@@ -126,7 +126,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsFalse(code.Contains("public string Discriminator")); // discriminator property is not generated
-            Assert.IsTrue(code.Contains("[JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]")); // attribute is generated
+            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]")); // attribute is generated
             Assert.IsTrue(code.Contains("class JsonInheritanceConverter")); // converter is generated
         }
 

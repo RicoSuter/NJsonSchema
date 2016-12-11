@@ -53,16 +53,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
                     if (!_property.IsNullable(_settings.NullHandling))
-                        return "Required.Always";
+                        return "Newtonsoft.Json.Required.Always";
                     else
-                        return "Required.AllowNull";
+                        return "Newtonsoft.Json.Required.AllowNull";
                 }
                 else
                 {
                     if (!_property.IsNullable(_settings.NullHandling))
-                        return "Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore";
+                        return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
                     else
-                        return "Required.Default, NullValueHandling = NullValueHandling.Ignore";
+                        return "Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
                 }
             }
         }

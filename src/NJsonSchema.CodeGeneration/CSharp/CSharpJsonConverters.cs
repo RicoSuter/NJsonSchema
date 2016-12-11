@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public static string GenerateConverters(IEnumerable<string> jsonConverterTypes)
         {
             return jsonConverterTypes != null && jsonConverterTypes.Any() ?
-                ", new JsonConverter[] { " + string.Join(", ", jsonConverterTypes.Select(c => "new " + c + "()")) + " }" :
+                ", new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverterTypes.Select(c => "new " + c + "()")) + " }" :
                 string.Empty;
         }
     }

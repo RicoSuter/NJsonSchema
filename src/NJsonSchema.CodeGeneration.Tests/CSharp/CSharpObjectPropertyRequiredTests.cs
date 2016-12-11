@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[Required]"));
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Required]"));
             Assert.IsTrue(code.Contains("public object Property { get; set; }"));
         }
 
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[Required]"));
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Required]"));
             Assert.IsTrue(code.Contains("public object Property { get; set; }"));
         }
 
