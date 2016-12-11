@@ -65,9 +65,13 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
+            Assert.IsFalse(code.Contains("Ref_"));
+            Assert.IsTrue(code.Contains("public enum Bar\r"));
+            Assert.IsTrue(code.Contains("public enum Bar2\r"));
+
             Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
             Assert.AreEqual(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
-            Assert.AreEqual(3, code.Split(new[] { "[JsonConverter(typeof(StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
+            Assert.AreEqual(3, code.Split(new[] { "[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
         }
 
         [TestMethod]
@@ -114,9 +118,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[EnumMember(Value = \"0562\")]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]"));
             Assert.IsTrue(code.Contains("_0562 = 0,"));
-            Assert.IsTrue(code.Contains("[EnumMember(Value = \"0532\")]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]"));
             Assert.IsTrue(code.Contains("_0532 = 1,"));
         }
 
@@ -235,9 +239,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[EnumMember(Value = \"0562\")]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]"));
             Assert.IsTrue(code.Contains("_0562 = 0,"));
-            Assert.IsTrue(code.Contains("[EnumMember(Value = \"0532\")]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]"));
             Assert.IsTrue(code.Contains("_0532 = 1,"));
         }
     }

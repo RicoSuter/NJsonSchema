@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
 
@@ -124,7 +125,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
             if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
-                return isNullable ? "Guid?" : "Guid";
+                return isNullable ? "System.Guid?" : "System.Guid";
 
             if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
                 return "byte[]";
@@ -171,7 +172,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
 
             if (property.Items != null && property.Items.Count > 0)
-                return string.Format("Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
+                return string.Format("System.Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
 
             return Settings.ArrayType + "<object>";
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -33,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public ObservableCollection<object> EmptySchema { get; set; }"));
+            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; }"));
         }
 
         [TestMethod]
@@ -168,11 +169,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
         class CustomTypeNameGenerator : ITypeNameGenerator
         {
-            public string Generate(JsonSchema4 schema, string typeNameHint)
+            public string Generate(JsonSchema4 schema, string typeNameHint, ICollection<string> reservedTypeNames)
             {
                 return "MyCustomType" + ConversionUtilities.ConvertToUpperCamelCase(typeNameHint, true);
             }
-
         }
 
         [TestMethod]
@@ -192,7 +192,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Console.WriteLine(output);
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));
+            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
             Assert.IsTrue(output.Contains(@"public string MyCustomLastName"));
             Assert.IsTrue(output.Contains(@"public partial class MyCustomTypeTeacher"));
             Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
@@ -241,7 +241,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = gen.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public ObservableCollection<PRef>"));
+            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<PRef>"));
         }
 
         [TestMethod]
@@ -329,7 +329,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"[JsonProperty(""lastName"""));
+            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
             Assert.IsTrue(output.Contains(@"public string LastName"));
         }
 
@@ -345,7 +345,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"public TimeSpan TimeSpan"));
+            Assert.IsTrue(output.Contains(@"public System.TimeSpan TimeSpan"));
         }
 
         [TestMethod]
@@ -451,7 +451,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.IsTrue(output.Contains(@"[JsonProperty(""foo-bar"", "));
+            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""foo-bar"", "));
             Assert.IsTrue(output.Contains(@"public string FooBar"));
         }
 
@@ -614,7 +614,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[JsonProperty(\"Foo\", Required = Required.DisallowNull"));
+            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonProperty(\"Foo\", Required = Newtonsoft.Json.Required.DisallowNull"));
             Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
         }
 
@@ -643,7 +643,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public Dictionary<string, string> Dict { get; set; } = new Dictionary<string, string>();"));
+            Assert.IsTrue(code.Contains("public System.Collections.Generic.Dictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
         }
 
         [TestMethod]
@@ -713,14 +713,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
   }"));
 
             Assert.IsTrue(code.Contains(
-@"        [JsonProperty(""FirstName"", Required = Required.Always)]
-        [Required]
+@"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
     
-        [JsonProperty(""MiddleName"", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty(""MiddleName"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MiddleName { get; set; }
     
-        [JsonProperty(""Age"", Required = Required.AllowNull)]
+        [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
         public int? Age { get; set; }"));
         }
 
@@ -764,8 +764,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ObservableCollection<string> A { get; set; } = new ObservableCollection<string>();"));
-            Assert.IsFalse(code.Contains("public ObservableCollection<string> B { get; set; } = new ObservableCollection<string>();"));
+            Assert.IsTrue(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> A { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
+            Assert.IsFalse(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> B { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
         }
 
         [TestMethod]
@@ -808,8 +808,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public Dictionary<string, string> A { get; set; } = new Dictionary<string, string>();"));
-            Assert.IsFalse(code.Contains("public Dictionary<string, string> B { get; set; } = new Dictionary<string, string>();"));
+            Assert.IsTrue(code.Contains("public System.Collections.Generic.Dictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
+            Assert.IsFalse(code.Contains("public System.Collections.Generic.Dictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
         }
 
 

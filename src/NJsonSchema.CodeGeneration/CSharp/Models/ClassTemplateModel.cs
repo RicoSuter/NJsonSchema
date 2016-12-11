@@ -80,9 +80,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (HasInheritance)
-                    return ": " + BaseClass + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", INotifyPropertyChanged" : "");
+                    return ": " + BaseClass + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", System.ComponentModel.INotifyPropertyChanged" : "");
                 else
-                    return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": INotifyPropertyChanged" : "";
+                    return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": System.ComponentModel.INotifyPropertyChanged" : "";
             }
         }
     }
