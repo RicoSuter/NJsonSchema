@@ -77,7 +77,8 @@ namespace NJsonSchema.Generation
 
             schema = new TSchemaType();
 
-            if (!schemaResolver.Schemas.Any() && type.GetTypeInfo().IsClass)
+            // TODO: Remove this from here but keep feature
+            if (!schemaResolver.Schemas.Any() && type.GetTypeInfo().IsClass && schema.GetType() == typeof(JsonSchema4))
                 schema.Title = Settings.SchemaNameGenerator.Generate(type);
 
             ApplyExtensionDataAttributes(schema, type, parentAttributes);
