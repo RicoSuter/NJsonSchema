@@ -16,15 +16,15 @@ namespace NJsonSchema.CodeGeneration
     public abstract class TypeResolverBase<TGenerator> : ITypeResolver
         where TGenerator : TypeGeneratorBase
     {
+        private readonly CodeGeneratorSettingsBase _settings;
         private readonly Dictionary<string, TGenerator> _types = new Dictionary<string, TGenerator>();
         private readonly Dictionary<JsonSchema4, string> _generatedTypeNames = new Dictionary<JsonSchema4, string>();
-        private readonly ITypeNameGenerator _typeNameGenerator;
 
-        /// <summary>Initializes a new instance of the <see cref="TypeResolverBase{TGenerator}"/> class.</summary>
-        /// <param name="typeNameGenerator">The type name generator.</param>
-        protected TypeResolverBase(ITypeNameGenerator typeNameGenerator)
+        /// <summary>Initializes a new instance of the <see cref="TypeResolverBase{TGenerator}" /> class.</summary>
+        /// <param name="settings">The settings.</param>
+        protected TypeResolverBase(CodeGeneratorSettingsBase settings)
         {
-            _typeNameGenerator = typeNameGenerator;
+            _settings = settings;
         }
 
         /// <summary>Tries to resolve the schema and returns null if there was a problem.</summary>
@@ -52,13 +52,15 @@ namespace NJsonSchema.CodeGeneration
                 }
             }
 
-            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values).Select(p =>
-            {
-                if (extensionCode?.ExtensionClasses.ContainsKey(p.TypeName) == true)
-                    return p.Code + "\n\n" + extensionCode.ExtensionClasses[p.TypeName];
+            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values)
+                .Where(p => !_settings.ExcludedTypeNames.Contains(p.TypeName))
+                .Select(p =>
+                {
+                    if (extensionCode?.ExtensionClasses.ContainsKey(p.TypeName) == true)
+                        return p.Code + "\n\n" + extensionCode.ExtensionClasses[p.TypeName];
 
-                return p.Code;
-            }));
+                    return p.Code;
+                }));
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
@@ -75,7 +77,14 @@ namespace NJsonSchema.CodeGeneration
             if (definitions != null)
             {
                 foreach (var pair in definitions)
-                    AddGenerator(pair.Value.ActualSchema, pair.Key);
+                {
+                    var schema = pair.Value.ActualSchema;
+                    var isCodeGeneratingSchema = !schema.IsDictionary && !schema.IsAnyType &&
+                        (schema.IsEnumeration || schema.Type == JsonObjectType.None || schema.Type.HasFlag(JsonObjectType.Object));
+
+                    if (isCodeGeneratingSchema)
+                        AddGenerator(schema, pair.Key);
+                }
             }
         }
 
@@ -88,7 +97,7 @@ namespace NJsonSchema.CodeGeneration
             schema = schema.ActualSchema;
 
             if (!_generatedTypeNames.ContainsKey(schema))
-                _generatedTypeNames[schema] = _typeNameGenerator.Generate(schema, typeNameHint, _generatedTypeNames.Values);
+                _generatedTypeNames[schema] = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _generatedTypeNames.Values);
 
             return _generatedTypeNames[schema];
         }
