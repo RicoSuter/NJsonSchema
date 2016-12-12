@@ -342,8 +342,8 @@ foreach (var property in Model.Properties){
             #line default
             #line hidden
             this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
-                    "s.toJS());\r\n    }\r\n\r\n    clone() {\r\n        var json = this.toJSON();\r\n        r" +
-                    "eturn new ");
+                    "s.toJS());\r\n    }\r\n\r\n    clone() {\r\n        const json = this.toJSON();\r\n       " +
+                    " return new ");
             
             #line 56 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.ActualClass));

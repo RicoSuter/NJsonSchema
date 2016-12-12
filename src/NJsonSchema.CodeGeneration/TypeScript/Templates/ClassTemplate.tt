@@ -52,7 +52,7 @@
     }
 
     clone() {
-        var json = this.toJSON();
+        const json = this.toJSON();
         return new <#=Model.ActualClass#>(JSON.parse(json));
     }
 }

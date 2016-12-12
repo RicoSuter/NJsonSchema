@@ -14,11 +14,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             code = code
                 .Replace("\r", string.Empty)
-                .Replace("generated.", string.Empty);
+                .Replace("generated.", string.Empty) + "\n";
 
             code = Regex.Replace(code, "import generated (=|from) (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "import \\* as generated from (.*?)\\n", string.Empty, RegexOptions.Multiline);
-            code = Regex.Replace(code, "(import (.*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
+            code = Regex.Replace(code, "(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
             {
                 ImportCode += ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
                 return string.Empty;
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             ImportCode = ConversionUtilities.TrimWhiteSpaces(ImportCode);
             TopCode = ConversionUtilities.TrimWhiteSpaces(TopCode);
-            BottomCode = ConversionUtilities.TrimWhiteSpaces(code);
+            BottomCode = ConversionUtilities.TrimWhiteSpaces(code.Trim());
         }
     }
 }
