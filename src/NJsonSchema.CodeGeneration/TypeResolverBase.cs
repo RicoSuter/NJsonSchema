@@ -75,7 +75,14 @@ namespace NJsonSchema.CodeGeneration
             if (definitions != null)
             {
                 foreach (var pair in definitions)
-                    AddGenerator(pair.Value.ActualSchema, pair.Key);
+                {
+                    var schema = pair.Value.ActualSchema;
+                    var isCodeGeneratingSchema = !schema.IsDictionary && !schema.IsAnyType &&
+                        (schema.IsEnumeration || schema.Type == JsonObjectType.None || schema.Type.HasFlag(JsonObjectType.Object));
+
+                    if (isCodeGeneratingSchema)
+                        AddGenerator(schema, pair.Key);
+                }
             }
         }
 
