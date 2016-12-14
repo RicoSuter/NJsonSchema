@@ -77,8 +77,11 @@ namespace NJsonSchema.Generation
 
             schema = new TSchemaType();
 
-            if (!schemaResolver.Schemas.Any() && type.GetTypeInfo().IsClass)
+            if (!schemaResolver.HasRootObject)
+            {
                 schema.Title = Settings.SchemaNameGenerator.Generate(type);
+                schemaResolver.SetRootObject(schema);
+            }
 
             ApplyExtensionDataAttributes(schema, type, parentAttributes);
 

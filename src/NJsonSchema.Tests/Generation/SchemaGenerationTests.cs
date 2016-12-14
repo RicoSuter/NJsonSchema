@@ -122,7 +122,15 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(0, errors.Count);
         }
 
+        [TestMethod]
+        public void When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
+        {
+            //// Generate JSON
+            var result = JsonSchema4.FromType<IEnumerable<Tuple<string, string>>>().ToJson();
 
+            //// Should be reached and not StackOverflowed
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+        }
 
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
 
@@ -138,7 +146,7 @@ namespace NJsonSchema.Tests.Generation
         //{
         //    public string Test { get; set; }
         //}
-        
+
         //[TestMethod]
         //public void Demo()
         //{

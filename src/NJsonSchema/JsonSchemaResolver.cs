@@ -55,22 +55,35 @@ namespace NJsonSchema
             if (schema.GetType() != typeof(JsonSchema4))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
-            AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
+            if (schema != _rootSchema)
+                AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
+
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
+        }
+
+        /// <summary>Gets a value indicating whether a root object is defined.</summary>
+        public virtual bool HasRootObject => _rootSchema != null;
+
+        /// <summary>Sets the root object.</summary>
+        /// <param name="rootObject">The root object.</param>
+        public virtual void SetRootObject(object rootObject)
+        {
+            _rootSchema = (JsonSchema4)rootObject;
         }
 
         /// <summary>Appends the schema to the root object.</summary>
         /// <param name="schema">The schema to append.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null"/></exception>
+        /// <exception cref="ArgumentException">The root schema cannot be appended.</exception>
         public virtual void AppendSchema(JsonSchema4 schema, string typeNameHint)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
+            if (schema == _rootSchema)
+                throw new ArgumentException("The root schema cannot be appended.");
 
-            if (_rootSchema == null)
-                _rootSchema = schema;
-            else if (schema != _rootSchema)
+            if (!_rootSchema.Definitions.Values.Contains(schema))
             {
                 var typeName = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _rootSchema.Definitions.Keys);
                 if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
