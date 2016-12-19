@@ -13,14 +13,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
     public class CSharpDefaultValueGenerator : DefaultValueGenerator
     {
-        private readonly NullHandling _nullHandling;
-
         /// <summary>Initializes a new instance of the <see cref="TypeScriptDefaultValueGenerator"/> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
-        /// <param name="nullHandling">The null handling.</param>
-        public CSharpDefaultValueGenerator(ITypeResolver typeResolver, NullHandling nullHandling) : base(typeResolver)
+        public CSharpDefaultValueGenerator(ITypeResolver typeResolver) : base(typeResolver)
         {
-            _nullHandling = nullHandling;
         }
 
         /// <summary>Gets the default value code.</summary>
@@ -35,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (value == null)
             {
                 schema = schema.ActualSchema;
-                if (schema != null && schema.IsNullable(_nullHandling) == false)
+                if (schema != null && allowsNull == false)
                 {
                     if (schema.Type.HasFlag(JsonObjectType.Array) ||
                         schema.Type.HasFlag(JsonObjectType.Object))
