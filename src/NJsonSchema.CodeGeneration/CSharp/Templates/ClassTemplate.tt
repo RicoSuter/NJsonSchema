@@ -18,6 +18,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#}#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 <#}#>
     public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
+    
 <#  }else{#>
 
     {
@@ -30,10 +31,15 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
                 RaisePropertyChanged();
             }
         }
-    }<#}#>
+    }
+<#}#>
+    
+<#}#><#if(Model.HasAdditionalPropertiesType){#>
+    [Newtonsoft.Json.JsonExtensionData]
+    public IDictionary<string, <#=Model.AdditionalPropertiesType#>> AdditionalProperties { get; set; }
 
-
-<#}#><#if(Model.Inpc){#>    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+<#}#><#if(Model.Inpc){#>
+    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
 <#}#>
     public string ToJson() 

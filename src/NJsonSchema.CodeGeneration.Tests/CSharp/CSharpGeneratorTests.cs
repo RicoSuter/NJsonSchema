@@ -715,11 +715,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsTrue(code.Contains(
 @"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public string FirstName { get; set; }
-    
+        public string FirstName { get; set; }    
+        
         [Newtonsoft.Json.JsonProperty(""MiddleName"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
-    
+        public string MiddleName { get; set; }    
+        
         [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
         public int? Age { get; set; }"));
         }
