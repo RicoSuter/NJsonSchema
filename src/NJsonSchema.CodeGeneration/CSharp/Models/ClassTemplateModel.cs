@@ -46,6 +46,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
 
+        /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
+        public bool HasAdditionalPropertiesType => _schema.AdditionalPropertiesSchema != null;
+
+        /// <summary>Gets the type of the additional properties.</summary>
+        public string AdditionalPropertiesType => _resolver.Resolve(
+            _schema.AdditionalPropertiesSchema,
+            _schema.AdditionalPropertiesSchema.IsNullable(_settings.NullHandling),
+            string.Empty);
+
         /// <summary>Gets the property models.</summary>
         public IEnumerable<PropertyModel> Properties { get; }
 
