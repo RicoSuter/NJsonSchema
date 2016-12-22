@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -20,10 +20,8 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private static readonly object Lock = new object();
-
-        private static readonly Dictionary<string, XDocument> Cache =
-            new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, XDocument> Cache =
+            new ConcurrentDictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
 #if !LEGACY
 
@@ -97,12 +95,9 @@ namespace NJsonSchema.Infrastructure
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                 return string.Empty;
 
-            lock (Lock)
-            {
-                var assemblyName = member.Module.Assembly.GetName();
-                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                    return string.Empty;
-            }
+            var assemblyName = member.Module.Assembly.GetName();
+            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                return string.Empty;
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false); 
             return await GetXmlDocumentationAsync(member, documentationPath, tagName).ConfigureAwait(false);
@@ -116,12 +111,9 @@ namespace NJsonSchema.Infrastructure
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
                 return string.Empty;
 
-            lock (Lock)
-            {
-                var assemblyName = parameter.Member.Module.Assembly.GetName();
-                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                    return string.Empty;
-            }
+            var assemblyName = parameter.Member.Module.Assembly.GetName();
+            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                return string.Empty;
 
             var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
             return await GetXmlDocumentationAsync(parameter, documentationPath).ConfigureAwait(false);
@@ -150,28 +142,19 @@ namespace NJsonSchema.Infrastructure
                     return string.Empty;
 
                 var assemblyName = member.Module.Assembly.GetName();
-                lock (Lock)
-                {
-                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                        return string.Empty;
-                }
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                    return string.Empty;
 
                 if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
                 {
-                    lock (Lock)
-                    {
-                        Cache[assemblyName.FullName] = null;
-                        return string.Empty;
-                    }
+                    Cache[assemblyName.FullName] = null;
+                    return string.Empty;
                 }
 
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(assemblyName.FullName))
-                        Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile); // TODO: Make async
+                if (!Cache.ContainsKey(assemblyName.FullName))
+                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false); 
 
-                    return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
-                }
+                return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
             }
             catch
             {
@@ -191,28 +174,19 @@ namespace NJsonSchema.Infrastructure
                     return string.Empty;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                lock (Lock)
-                {
-                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                        return string.Empty;
-                }
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                    return string.Empty;
 
                 if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
                 {
-                    lock (Lock)
-                    {
-                        Cache[assemblyName.FullName] = null;
-                        return string.Empty;
-                    }
+                    Cache[assemblyName.FullName] = null;
+                    return string.Empty;
                 }
 
-                lock (Lock)
-                {
-                    if (!Cache.ContainsKey(assemblyName.FullName))
-                        Cache[assemblyName.FullName] = XDocument.Load(pathToXmlFile); // TODO: Make async
+                if (!Cache.ContainsKey(assemblyName.FullName))
+                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false); 
 
-                    return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
-                }
+                return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
             }
             catch
             {
@@ -223,7 +197,7 @@ namespace NJsonSchema.Infrastructure
         private static string GetXmlDocumentation(this MemberInfo member, XDocument xml, string tagName)
         {
             var name = GetMemberElementName(member);
-            var documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/" + tagName + ")", name)).ToString().Trim();
+            var documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/" + tagName + ")", name)).Trim();
             return RemoveLineBreakWhiteSpaces(documentation);
         }
 
@@ -233,9 +207,9 @@ namespace NJsonSchema.Infrastructure
 
             var name = GetMemberElementName(parameter.Member);
             if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
-                documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/returns)", name)).ToString().Trim();
+                documentation = DynamicApis.XPathEvaluate(xml, $"string(/doc/members/member[@name='{name}']/returns)").Trim();
             else
-                documentation = DynamicApis.XPathEvaluate(xml, string.Format("string(/doc/members/member[@name='{0}']/param[@name='{1}'])", name, parameter.Name)).ToString().Trim();
+                documentation = DynamicApis.XPathEvaluate(xml, $"string(/doc/members/member[@name='{name}']/param[@name='{parameter.Name}'])").Trim();
 
             return RemoveLineBreakWhiteSpaces(documentation);
         }
