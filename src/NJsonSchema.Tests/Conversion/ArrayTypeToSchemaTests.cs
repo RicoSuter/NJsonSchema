@@ -22,34 +22,33 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_array_then_items_must_correctly_be_loaded()
+        public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_array_then_items_must_correctly_be_loaded("Array");
         }
 
         [TestMethod]
-        public void When_converting_collection_then_items_must_correctly_be_loaded()
+        public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
         }
 
         [TestMethod]
-        public void When_converting_list_then_items_must_correctly_be_loaded()
+        public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("List");
-        }
-
-
-        [TestMethod]
-        public void When_converting_interface_list_then_items_must_correctly_be_loaded()
-        {
-            When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
+            await When_converting_array_then_items_must_correctly_be_loaded("List");
         }
 
         [TestMethod]
-        public void When_converting_enumerable_list_then_items_must_correctly_be_loaded()
+        public async Task When_converting_interface_list_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
+            await When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
+        }
+
+        [TestMethod]
+        public async Task When_converting_enumerable_list_then_items_must_correctly_be_loaded()
+        {
+            await When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
         }
 
         public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)

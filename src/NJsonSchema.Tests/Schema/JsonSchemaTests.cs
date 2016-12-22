@@ -180,7 +180,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_adding_property_to_schema_then_parent_should_be_set()
+        public void When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -194,7 +194,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_setting_property_required_then_the_key_should_be_added()
+        public void When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -208,7 +208,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_setting_property_not_required_then_the_key_should_be_added()
+        public void When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -223,7 +223,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_number_property_is_null_and_not_required_then_it_is_invalid()
+        public void When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -241,7 +241,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_property_matches_one_of_the_types_then_it_should_succeed()
+        public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -262,7 +262,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_property_type_not_specified_then_anything_should_succeed()
+        public void When_property_type_not_specified_then_anything_should_succeed()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -281,7 +281,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_DateTimeOffset_is_validated_then_it_should_not_throw()
+        public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
         {
             //// Arrange
             var schema = new JsonSchema4
