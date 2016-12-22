@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.Tests
     public class InheritanceSerializationTests
     {
         [TestMethod]
-        public void When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized()
+        public async Task When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized()
         {
             //// Arrange
             var container = new Container
@@ -66,8 +66,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
-            var schema = JsonSchema4.FromType<Container>();
-            var schemaJson = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schemaJson = await schema.ToJsonAsync();
             var errors = schema.Validate(json);
 
             //// Assert
@@ -82,9 +82,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             var tasks = new List<Task>();
             for (int i = 0; i < 100; i++)
             {
-                tasks.Add(Task.Run(() =>
+                tasks.Add(Task.Run(async () =>
                 {
-                    When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized();
+                    await When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized();
                 }));
             }
 
@@ -96,17 +96,17 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
+        public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Container>();
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
 
             //// Act
             var baseSchema = schema.Properties["Animal"].ActualPropertySchema.ActualSchema;
             var discriminator = baseSchema.Discriminator;
             var property = baseSchema.Properties["discriminator"];
 
-            var json = schema.ToJson();
+            var json = await schema.ToJsonAsync();
 
             //// Assert
             Assert.IsNotNull(property);
@@ -115,10 +115,10 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
+        public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Container>();
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
@@ -131,11 +131,11 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
+        public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Container>();
-            var json = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var json = await schema.ToJsonAsync();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

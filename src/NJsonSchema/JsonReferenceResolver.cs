@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -18,7 +19,17 @@ namespace NJsonSchema
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
+        // TODO: Use JsonSchemaResolver
+
+        //private readonly JsonSchemaResolver _schemaResolver;
         private readonly Dictionary<string, JsonSchema4> _resolvedSchemas = new Dictionary<string, JsonSchema4>();
+
+        ///// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
+        ///// <param name="schemaResolver">The schema resolver.</param>
+        //public JsonReferenceResolver()
+        //{
+        //    _schemaResolver = schemaResolver;
+        //}
 
         /// <summary>Adds a document reference.</summary>
         /// <param name="documentPath">The document path.</param>
@@ -34,7 +45,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public JsonSchema4 ResolveReference(object rootObject, string jsonPath)
+        public async Task<JsonSchema4> ResolveReferenceAsync(object rootObject, string jsonPath)
         {
             if (jsonPath == "#")
             {
@@ -48,7 +59,7 @@ namespace NJsonSchema
                 return ResolveDocumentReference(rootObject, jsonPath);
             }
             else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
-                return ResolveUrlReferenceWithAlreadyResolvedCheck(jsonPath, jsonPath);
+                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath).ConfigureAwait(false);
             else
             {
                 var documentPathProvider = rootObject as IDocumentPathProvider;
@@ -59,12 +70,12 @@ namespace NJsonSchema
                     if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
                     {
                         var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return ResolveUrlReferenceWithAlreadyResolvedCheck(url, jsonPath);
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath).ConfigureAwait(false);
                     }
                     else
                     {
                         var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), jsonPath);
-                        return ResolveFileReferenceWithAlreadyResolvedCheck(filePath, jsonPath);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath).ConfigureAwait(false);
                     }
                 }
                 else
@@ -90,10 +101,10 @@ namespace NJsonSchema
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="System.NotSupportedException">Could not resolve the JSON path because file references are not supported on this platform.</exception>
-        protected virtual JsonSchema4 ResolveFileReference(string filePath)
+        protected virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
         {
             if (DynamicApis.SupportsFileApis)
-                return JsonSchema4.FromFile(filePath, this);
+                return await JsonSchema4.FromFileAsync(filePath, this).ConfigureAwait(false);
             else
                 throw new NotSupportedException("Could not resolve the JSON path because file references are not supported on this platform.");
         }
@@ -101,24 +112,28 @@ namespace NJsonSchema
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path because web references are not supported on this platform.</exception>
-        protected virtual JsonSchema4 ResolveUrlReference(string url)
+        protected virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
         {
-            if (DynamicApis.SupportsWebClientApis)
-                return JsonSchema4.FromUrl(url, this);
+            if (DynamicApis.SupportsHttpClientApis)
+                return await JsonSchema4.FromUrlAsync(url, this).ConfigureAwait(false);
             else
                 throw new NotSupportedException("Could not resolve the JSON path because web references are not supported on this platform.");
         }
 
-        private JsonSchema4 ResolveFileReferenceWithAlreadyResolvedCheck(string fullJsonPath, string jsonPath)
+        private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
         {
             try
             {
                 var arr = Regex.Split(fullJsonPath, @"(?=#)");
                 if (!_resolvedSchemas.ContainsKey(arr[0]))
-                    _resolvedSchemas[arr[0]] = ResolveFileReference(arr[0]);
+                {
+                    var schema = await ResolveFileReferenceAsync(arr[0]).ConfigureAwait(false);
+                    //_schemaResolver.AppendSchema(schema, null);
+                    _resolvedSchemas[arr[0]] = schema;
+                }
 
                 var result = _resolvedSchemas[arr[0]];
-                return arr.Length == 1 ? result : ResolveReference(result, arr[1]);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1]).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -126,16 +141,20 @@ namespace NJsonSchema
             }
         }
 
-        private JsonSchema4 ResolveUrlReferenceWithAlreadyResolvedCheck(string fullJsonPath, string jsonPath)
+        private async Task<JsonSchema4> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
         {
             try
             {
                 var arr = fullJsonPath.Split('#');
                 if (!_resolvedSchemas.ContainsKey(arr[0]))
-                    _resolvedSchemas[arr[0]] = ResolveUrlReference(arr[0]);
+                {
+                    var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
+                    //_schemaResolver.AppendSchema(schema, null);
+                    _resolvedSchemas[arr[0]] = schema;
+                }
 
                 var result = _resolvedSchemas[arr[0]];
-                return arr.Length == 1 ? result : ResolveReference(result, "#" + arr[1]);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1]).ConfigureAwait(false);
             }
             catch (Exception exception)
             {

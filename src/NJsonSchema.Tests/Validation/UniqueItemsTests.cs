@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Validation
@@ -7,7 +8,7 @@ namespace NJsonSchema.Tests.Validation
     public class UniqueItemsTests
     {
         [TestMethod]
-        public void When_unique_items_is_set_and_items_are_objects_then_validation_works()
+        public async Task When_unique_items_is_set_and_items_are_objects_then_validation_works()
         {
             //// Arrange
             var jsonSchema = @"{
@@ -43,7 +44,7 @@ namespace NJsonSchema.Tests.Validation
 }]";
             
             //// Act
-            var schema = JsonSchema4.FromJson(jsonSchema);
+            var schema = await JsonSchema4.FromJsonAsync(jsonSchema);
             var errors = schema.Validate(jsonData).ToList();
 
             //// Assert

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.CodeGeneration.TypeScript;
@@ -9,7 +10,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     public class TypeScriptGeneratorTests
     {
         [TestMethod]
-        public void When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
+        public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
         {
             //// Arrange
             var json = @"{
@@ -28,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("Foo");
 
@@ -40,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
+        public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
         {
             //// Arrange
             var json = @"{
@@ -65,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("Foo");
 
@@ -74,10 +75,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_property_name_does_not_match_property_name_then_casing_is_correct_in_output()
+        public async Task When_property_name_does_not_match_property_name_then_casing_is_correct_in_output()
         {
             //// Arrange
-            var generator = CreateGenerator();
+            var generator = await CreateGeneratorAsync();
 
             //// Act
             var output = generator.GenerateFile("Teacher");
@@ -88,10 +89,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_property_is_required_name_then_TypeScript_property_is_not_optional()
+        public async Task When_property_is_required_name_then_TypeScript_property_is_not_optional()
         {
             //// Arrange
-            var generator = CreateGenerator();
+            var generator = await CreateGeneratorAsync();
 
             //// Act
             var output = generator.GenerateFile("Teacher");
@@ -101,10 +102,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
+        public async Task When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
             //// Arrange
-            var generator = CreateGenerator();
+            var generator = await CreateGeneratorAsync();
 
             //// Act
             var output = generator.GenerateFile("Teacher");
@@ -114,10 +115,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_enum_has_description_then_typescript_has_comment()
+        public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Teacher>();
+            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             schema.AllOf.First().Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -129,10 +130,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_class_has_description_then_typescript_has_comment()
+        public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Teacher>();
+            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -144,10 +145,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_property_has_description_then_csharp_has_xml_comment()
+        public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Teacher>();
+            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             schema.Properties["Class"].Description = "PropertyDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -159,10 +160,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_property_is_readonly_then_ts_property_is_also_readonly()
+        public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Teacher>();
+            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface, 
@@ -210,16 +211,16 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             Assert.IsFalse(output.Contains(@"interface  {"));
         }
 
-        private static TypeScriptGenerator CreateGenerator()
+        private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
-            var schema = JsonSchema4.FromType<Teacher>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schemaData = await schema.ToJsonAsync();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             return generator;
         }
 
         [TestMethod]
-        public void When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
+        public async Task When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
         {
             //// Arrange
             var schemaJson = @"{
@@ -236,7 +237,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 }
             }";
 
-            var schema = JsonSchema4.FromJson(schemaJson);
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });

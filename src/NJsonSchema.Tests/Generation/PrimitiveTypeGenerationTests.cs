@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -22,13 +23,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_byte_array_then_schema_type_is_string()
+        public async Task When_property_is_byte_array_then_schema_type_is_string()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Bytes"].Type);
@@ -36,13 +37,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_byte_then_schema_type_is_string()
+        public async Task When_property_is_byte_then_schema_type_is_string()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Byte"].Type);
@@ -50,13 +51,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_timespan_then_schema_type_is_string()
+        public async Task When_property_is_timespan_then_schema_type_is_string()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["TimeSpan"].Type);
@@ -64,14 +65,14 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_type_then_schema_type_is_string()
+        public async Task When_property_is_type_then_schema_type_is_string()
         {
             //// Arrange
             var data = JsonConvert.SerializeObject(new Foo { Type = typeof(Foo) }); // Type property is serialized as string
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
-            var json = schema.ToJson(); 
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var json = await schema.ToJsonAsync(); 
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Type"].Type);

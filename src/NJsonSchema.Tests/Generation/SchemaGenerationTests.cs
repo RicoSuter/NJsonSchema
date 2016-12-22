@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -24,26 +24,26 @@ namespace NJsonSchema.Tests.Generation
         }
         
         [TestMethod]
-        public void When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
+        public async Task When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schemaData = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
         }
 
         [TestMethod]
-        public void When_generating_DateTimeOffset_property_then_format_datetime_must_be_set()
+        public async Task When_generating_DateTimeOffset_property_then_format_datetime_must_be_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schemaData = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Time"].Type);
@@ -51,13 +51,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_generating_schema_with_dictionary_property_then_it_must_allow_additional_properties()
+        public async Task When_generating_schema_with_dictionary_property_then_it_must_allow_additional_properties()
         {
             //// Arrange
             
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schemaData = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
@@ -66,13 +66,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
+        public async Task When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schemaData = await schema.ToJsonAsync();
 
             //// Assert
             Assert.IsTrue(schemaData.Contains("#/definitions/Bar"));
@@ -85,10 +85,10 @@ namespace NJsonSchema.Tests.Generation
         }
         
         [TestMethod]
-        public void When_default_value_is_set_on_property_then_default_is_set_in_schema()
+        public async Task When_default_value_is_set_on_property_then_default_is_set_in_schema()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<DefaultTests>();
+            var schema = await JsonSchema4.FromTypeAsync<DefaultTests>();
 
             //// Act
             var property = schema.Properties["Number"];
@@ -103,11 +103,11 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_dictionary_value_is_null_then_string_values_are_allowed()
+        public async Task When_dictionary_value_is_null_then_string_values_are_allowed()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<DictTest>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<DictTest>();
+            var schemaData = await schema.ToJsonAsync();
 
             var data = @"{
                 ""values"": { 
@@ -123,13 +123,14 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
+        public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
             //// Generate JSON
-            var result = JsonSchema4.FromType<IEnumerable<Tuple<string, string>>>().ToJson();
+            var result = await JsonSchema4.FromTypeAsync<IEnumerable<Tuple<string, string>>>();
+            var json = await result.ToJsonAsync();
 
             //// Should be reached and not StackOverflowed
-            Assert.IsTrue(!string.IsNullOrEmpty(result));
+            Assert.IsTrue(!string.IsNullOrEmpty(json));
         }
 
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
@@ -150,8 +151,8 @@ namespace NJsonSchema.Tests.Generation
         //[TestMethod]
         //public void Demo()
         //{
-        //    var schema = JsonSchema4.FromType<TestClass>();
-        //    var json = schema.ToJson();
+        //    var schema = await JsonSchema4.FromTypeAsync<TestClass>();
+        //    var json = await schema.ToJsonAsync();
         //}
     }
 }

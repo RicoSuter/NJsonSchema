@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 
@@ -13,11 +14,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
+        public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ObjectTest>();
-            var data = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<ObjectTest>();
+            var data = await schema.ToJsonAsync();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
@@ -33,11 +34,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_dictionary_value_is_object_then_typescript_uses_any()
+        public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<DictionaryObjectTest>();
-            var data = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<DictionaryObjectTest>();
+            var data = await schema.ToJsonAsync();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });

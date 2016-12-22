@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -14,10 +15,10 @@ namespace NJsonSchema.Tests.Conversion
     public class TypeToSchemaTests
     {
         [TestMethod]
-        public void When_converting_in_round_trip_then_json_should_be_the_same()
+        public async Task When_converting_in_round_trip_then_json_should_be_the_same()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Act
             var schemaData1 = JsonConvert.SerializeObject(schema, Formatting.Indented);
@@ -29,11 +30,11 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_simple_property_then_property_must_be_in_schema()
+        public async Task When_converting_simple_property_then_property_must_be_in_schema()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
-            var data = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Integer"].Type);
@@ -45,10 +46,10 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_nullable_simple_property_then_property_must_be_in_schema()
+        public async Task When_converting_nullable_simple_property_then_property_must_be_in_schema()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer | JsonObjectType.Null, schema.Properties["NullableInteger"].Type);
@@ -58,40 +59,40 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_property_with_description_then_description_should_be_in_schema()
+        public async Task When_converting_property_with_description_then_description_should_be_in_schema()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.AreEqual("Test", schema.Properties["Integer"].Description);
         }
 
         [TestMethod]
-        public void When_converting_required_property_then_it_should_be_required_in_schema()
+        public async Task When_converting_required_property_then_it_should_be_required_in_schema()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.IsTrue(schema.Properties["RequiredReference"].IsRequired);
         }
 
         [TestMethod]
-        public void When_converting_regex_property_then_it_should_be_set_as_pattern()
+        public async Task When_converting_regex_property_then_it_should_be_set_as_pattern()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.AreEqual("regex", schema.Properties["RegexString"].Pattern);
         }
 
         [TestMethod]
-        public void When_converting_range_property_then_it_should_be_set_as_min_max()
+        public async Task When_converting_range_property_then_it_should_be_set_as_min_max()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.AreEqual(5, schema.Properties["RangeInteger"].Minimum);
@@ -99,10 +100,10 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_not_nullable_properties_then_they_should_have_null_type()
+        public async Task When_converting_not_nullable_properties_then_they_should_have_null_type()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.IsFalse(schema.Properties["Integer"].IsRequired);
@@ -119,10 +120,10 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_generating_nullable_primitive_properties_then_they_should_have_null_type()
+        public async Task When_generating_nullable_primitive_properties_then_they_should_have_null_type()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.IsTrue(schema.Properties["NullableInteger"].Type.HasFlag(JsonObjectType.Null));
@@ -132,10 +133,10 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_property_is_renamed_then_the_name_must_be_correct()
+        public async Task When_property_is_renamed_then_the_name_must_be_correct()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("abc"));
@@ -143,11 +144,11 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_object_then_it_should_be_correct()
+        public async Task When_converting_object_then_it_should_be_correct()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
-            var json = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             var property = schema.Properties["Reference"];
@@ -156,10 +157,10 @@ namespace NJsonSchema.Tests.Conversion
         }
         
         [TestMethod]
-        public void When_converting_enum_then_enum_array_must_be_set()
+        public async Task When_converting_enum_then_enum_array_must_be_set()
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<MyType>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -178,11 +179,11 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_type_is_JObject_then_generated_type_is_any()
+        public async Task When_type_is_JObject_then_generated_type_is_any()
         {
             //// Act
-            var schema = JsonSchema4.FromType<ClassWithJObjectProperty>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithJObjectProperty>();
+            var schemaData = await schema.ToJsonAsync();
             var property = schema.Properties["Property"];
 
             //// Assert
@@ -193,27 +194,27 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_array_then_items_must_correctly_be_loaded()
+        public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_array_then_items_must_correctly_be_loaded("Array");
         }
 
         [TestMethod]
-        public void When_converting_collection_then_items_must_correctly_be_loaded()
+        public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
         }
 
         [TestMethod]
-        public void When_converting_list_then_items_must_correctly_be_loaded()
+        public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("List");
+            await When_converting_array_then_items_must_correctly_be_loaded("List");
         }
 
-        public void When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
             var property = schema.Properties[propertyName];

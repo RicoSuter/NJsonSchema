@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
@@ -51,17 +52,17 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         }
 
         [TestMethod]
-        public void Demo()
+        public async Task Demo()
         {
-            var schema = JsonSchema4.FromType<Person>();
-            var schemaJsonData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schemaJsonData = await schema.ToJsonAsync();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema);
             var code = generator.GenerateFile();
         }
 
         [TestMethod]
-        public void When_JSON_contains_DateTime_is_available_then_string_validator_validates_correctly()
+        public async Task When_JSON_contains_DateTime_is_available_then_string_validator_validates_correctly()
         {
             //// Arrange
             var schemaJson = @"{
@@ -78,7 +79,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
                     }
                 }
             }";
-            var schema = JsonSchema4.FromJson(schemaJson);
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
 
             var dataJson = @"{
                 ""SimpleDate"":""2012-05-18T00:00:00Z"",
@@ -93,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         }
 
         [TestMethod]
-        public void When_JSON_contains_DateTime_is_available_then_JObject_validator_validates_correctly()
+        public async Task When_JSON_contains_DateTime_is_available_then_JObject_validator_validates_correctly()
         {
             //// Arrange
             var schemaJson = @"{
@@ -110,7 +111,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
                     }
                 }
             }";
-            var schema = JsonSchema4.FromJson(schemaJson);
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
 
             var data = JObject.Parse(@"{
                 ""SimpleDate"":""2012-05-18T00:00:00Z"",

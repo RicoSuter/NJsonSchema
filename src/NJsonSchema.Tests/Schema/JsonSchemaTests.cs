@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,24 +12,24 @@ namespace NJsonSchema.Tests.Schema
     public class JsonSchemaTests
     {
         [TestMethod]
-        public void When_creating_schema_without_setting_properties_then_it_is_empty()
+        public async Task When_creating_schema_without_setting_properties_then_it_is_empty()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
-            var json = schema.ToJson();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}", json);
+}", data);
             Assert.IsTrue(schema.IsAnyType);
         }
 
         [TestMethod]
-        public void When_schema_contains_refs_then_they_should_be_resolved()
+        public async Task When_schema_contains_refs_then_they_should_be_resolved()
         {
             //// Arrange
             var data =
@@ -69,7 +70,7 @@ namespace NJsonSchema.Tests.Schema
 ";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsNotNull(schema.Definitions["diskDevice"]);
@@ -77,7 +78,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_schema_then_it_should_be_read_correctly()
+        public async Task When_deserializing_schema_then_it_should_be_read_correctly()
         {
             //// Arrange
             var data =
@@ -101,9 +102,8 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
-
-            var x = schema.ToJson();
+            var schema = await JsonSchema4.FromJsonAsync(data);
+            var x = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(3, schema.Properties.Count);
@@ -111,7 +111,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_multiple_types_then_flags_should_be_set_correctly()
+        public async Task When_deserializing_multiple_types_then_flags_should_be_set_correctly()
         {
             //// Arrange
             var data =
@@ -123,7 +123,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -131,7 +131,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_single_type_then_flags_should_be_set_correctly()
+        public async Task When_deserializing_single_type_then_flags_should_be_set_correctly()
         {
             //// Arrange
             var data =
@@ -140,7 +140,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -148,28 +148,28 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_setting_single_type_then_it_should_be_serialized_correctly()
+        public async Task When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer;
-            var data = schema.ToJson();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             Assert.IsTrue(data.Contains(@"""type"": ""integer"""));
         }
 
         [TestMethod]
-        public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
+        public async Task When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
-            var data = schema.ToJson();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             Assert.IsTrue(data.Contains(
@@ -180,7 +180,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_adding_property_to_schema_then_parent_should_be_set()
+        public async Task When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -194,7 +194,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_setting_property_required_then_the_key_should_be_added()
+        public async Task When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -208,7 +208,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_setting_property_not_required_then_the_key_should_be_added()
+        public async Task When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -223,7 +223,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_number_property_is_null_and_not_required_then_it_is_invalid()
+        public async Task When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -241,7 +241,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_property_matches_one_of_the_types_then_it_should_succeed()
+        public async Task When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -262,7 +262,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_property_type_not_specified_then_anything_should_succeed()
+        public async Task When_property_type_not_specified_then_anything_should_succeed()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -281,7 +281,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
+        public async Task When_DateTimeOffset_is_validated_then_it_should_not_throw()
         {
             //// Arrange
             var schema = new JsonSchema4

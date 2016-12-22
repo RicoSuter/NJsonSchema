@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Annotations;
 
@@ -8,7 +9,7 @@ namespace NJsonSchema.Tests.Serialization
     public class ExtensionDataTests
     {
         [TestMethod]
-        public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
+        public async Task When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -18,7 +19,7 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             //// Act
-            var json = schema.ToJson();
+            var json = await schema.ToJsonAsync();
 
             //// Assert
             Assert.IsTrue(json.Contains(
@@ -29,7 +30,7 @@ namespace NJsonSchema.Tests.Serialization
         }
 
         [TestMethod]
-        public void When_json_schema_contains_unknown_data_then_extension_data_is_filled()
+        public async Task When_json_schema_contains_unknown_data_then_extension_data_is_filled()
         {
             //// Arrange
             var json =
@@ -39,14 +40,14 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
             Assert.AreEqual((long)123, schema.ExtensionData["Test"]);
         }
 
         [TestMethod]
-        public void When_no_extension_data_is_available_then_property_is_null()
+        public async Task When_no_extension_data_is_available_then_property_is_null()
         {
             //// Arrange
             var json =
@@ -55,7 +56,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
             Assert.IsNull(schema.ExtensionData);
@@ -70,26 +71,26 @@ namespace NJsonSchema.Tests.Serialization
         }
 
         [TestMethod]
-        public void When_extension_data_attribute_is_used_on_class_then_extension_data_property_is_set()
+        public async Task When_extension_data_attribute_is_used_on_class_then_extension_data_property_is_set()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<MyTest>();
+            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.AreEqual(123, schema.ExtensionData["MyClass"]);
         }
 
         [TestMethod]
-        public void When_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
+        public async Task When_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<MyTest>();
+            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.AreEqual(2, schema.Properties["Property"].ExtensionData["Foo"]);

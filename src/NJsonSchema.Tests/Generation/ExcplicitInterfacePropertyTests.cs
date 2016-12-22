@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Tests.Generation
@@ -33,12 +34,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_a_property_is_explicit_interface_then_it_is_not_added_to_schema()
+        public async Task When_a_property_is_explicit_interface_then_it_is_not_added_to_schema()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Assert
             Assert.AreEqual(1, schema.Properties.Count);

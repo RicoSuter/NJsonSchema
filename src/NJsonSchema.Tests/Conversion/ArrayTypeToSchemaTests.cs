@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Conversion
@@ -9,11 +10,11 @@ namespace NJsonSchema.Tests.Conversion
     public class ArrayTypeToSchemaTests
     {
         [TestMethod]
-        public void When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
+        public async Task When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
         {
             //// Act
-            var schema = JsonSchema4.FromType<DictionarySubType>();
-            var data = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<DictionarySubType>();
+            var data = await schema.ToJsonAsync();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
@@ -51,11 +52,11 @@ namespace NJsonSchema.Tests.Conversion
             When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
         }
 
-        public void When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
+            var schemaData = await schema.ToJsonAsync();
 
             //// Assert
             var property = schema.Properties[propertyName];
