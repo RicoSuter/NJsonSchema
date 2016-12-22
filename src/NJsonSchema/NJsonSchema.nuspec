@@ -1,36 +1,38 @@
 <?xml version="1.0"?>
 <package>
-    <metadata>
-        <id>$id$</id>
-        <version>$version$</version>
-        <authors>$author$</authors>
-        <description>$description$</description>
-        <tags>json schema validation generator .net</tags>
-        <projectUrl>https://github.com/rsuter/NJsonSchema</projectUrl>
-        <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <description>$description$</description>
+    <tags>json schema validation generator .net</tags>
+    <projectUrl>https://github.com/rsuter/NJsonSchema</projectUrl>
+    <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
 
-        <dependencies>
-          <dependency id="Newtonsoft.Json" version="9.0.1" />
-          <group targetFramework="net40">
-                <dependency id="Microsoft.Bcl.Async" version="1.0.168" />
-            </group>
-        </dependencies>
-    </metadata>
-    <files>
-        <file src="bin\Release\NJsonSchema.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
-        <file src="bin\Release\NJsonSchema.pdb" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
-        <file src="bin\Release\NJsonSchema.xml" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+    <dependencies>
+      <group>
+        <dependency id="Newtonsoft.Json" version="9.0.1" />
+      </group>
+      <group targetFramework="net40">
+        <dependency id="Microsoft.Bcl.Async" version="1.0.168" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\NJsonSchema.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+    <file src="bin\Release\NJsonSchema.pdb" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+    <file src="bin\Release\NJsonSchema.xml" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
 
-        <file src="bin\Release\NJsonSchema.dll" target="lib\netstandard1.0" />
-        <file src="bin\Release\NJsonSchema.pdb" target="lib\netstandard1.0" />
-        <file src="bin\Release\NJsonSchema.xml" target="lib\netstandard1.0" />
+    <file src="bin\Release\NJsonSchema.dll" target="lib\netstandard1.0" />
+    <file src="bin\Release\NJsonSchema.pdb" target="lib\netstandard1.0" />
+    <file src="bin\Release\NJsonSchema.xml" target="lib\netstandard1.0" />
 
-        <file src="bin\Release\NJsonSchema.dll" target="lib\net45" />
-        <file src="bin\Release\NJsonSchema.pdb" target="lib\net45" />
-        <file src="bin\Release\NJsonSchema.xml" target="lib\net45" />
+    <file src="bin\Release\NJsonSchema.dll" target="lib\net45" />
+    <file src="bin\Release\NJsonSchema.pdb" target="lib\net45" />
+    <file src="bin\Release\NJsonSchema.xml" target="lib\net45" />
 
-        <file src="bin\ReleaseNet4\NJsonSchema.dll" target="lib\net40" />
-        <file src="bin\ReleaseNet4\NJsonSchema.pdb" target="lib\net40" />
-        <file src="bin\ReleaseNet4\NJsonSchema.xml" target="lib\net40" />
-    </files>
+    <file src="bin\ReleaseNet4\NJsonSchema.dll" target="lib\net40" />
+    <file src="bin\ReleaseNet4\NJsonSchema.pdb" target="lib\net40" />
+    <file src="bin\ReleaseNet4\NJsonSchema.xml" target="lib\net40" />
+  </files>
 </package>
