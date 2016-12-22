@@ -10,7 +10,7 @@
         <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
 
         <dependencies>
-          <dependency id="Newtonsoft.Json" version="9.0.1" targetFramework="net40-client" />
+          <dependency id="Newtonsoft.Json" version="9.0.1" />
           <group targetFramework="net40">
                 <dependency id="Microsoft.Bcl.Async" version="1.0.168" />
             </group>
