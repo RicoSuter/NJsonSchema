@@ -302,5 +302,28 @@ namespace NJsonSchema.Tests.Schema
                 Assert.Fail("Validating JToken with a DateTimeOffset value threw an exception.");
             }
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task When_schema_has_cyclic_references_then_exception_is_thrown()
+        {
+            //// Arrange
+            var json = @"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""object"",
+  ""properties"": {
+    ""topProp"": {
+      ""$ref"": ""#/properties/topProp""
+    }
+  }
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var data = await schema.ToJsonAsync();
+
+            //// Assert
+            var propertySchema = schema.Properties["topProp"].ActualPropertySchema;
+        }
     }
 }

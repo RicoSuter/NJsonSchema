@@ -325,20 +325,28 @@ namespace NJsonSchema
         public bool HasSchemaReference => SchemaReference != null;
 
         /// <summary>Gets the actual schema, either this or the reference schema.</summary>
-        /// <exception cref="InvalidOperationException" accessor="get">The schema reference path has not been resolved.</exception>
+        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
+        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema4 ActualSchema
+        public virtual JsonSchema4 ActualSchema => GetActualSchema(new List<JsonSchema4>());
+
+        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
+        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
+        private JsonSchema4 GetActualSchema(IList<JsonSchema4> checkedSchemas)
         {
-            get
+            if (checkedSchemas.Contains(this))
+                throw new InvalidOperationException("Cyclic references detected.");
+
+            if (SchemaReferencePath != null && SchemaReference == null)
+                throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
+
+            if (HasSchemaReference)
             {
-                if (SchemaReferencePath != null && SchemaReference == null)
-                    throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
-
-                if (HasSchemaReference)
-                    return SchemaReference.ActualSchema;
-
-                return this;
+                checkedSchemas.Add(this);
+                return SchemaReference.GetActualSchema(checkedSchemas);
             }
+
+            return this;
         }
 
         /// <summary>Gets the parent schema of this schema. </summary>
@@ -683,8 +691,7 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var resolver = new JsonSchemaResolver(settings);
-            resolver.SetRootObject(this);
+            var resolver = new JsonSchemaResolver(this, settings);
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, resolver);
             var data = JsonConvert.SerializeObject(this, Formatting.Indented);
