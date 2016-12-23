@@ -32,24 +32,23 @@ namespace NJsonSchema.Generation.TypeMappers
             MappedType = mappedType;
         }
 
-        /// <summary>
-        /// </summary>
+        /// <summary>Gets the mapped type.</summary>
         public Type MappedType { get; }
 
         /// <summary>Gets a value indicating whether to use a JSON Schema reference for the type.</summary>
         public bool UseReference { get; } = true;
 
-        /// <summary>Gets the schema.</summary>
-        /// <typeparam name="TSchemaType">The schema type.</typeparam>
+        /// <summary>Gets the schema for the mapped type.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
+        /// <param name="schema">The schema.</param>
         /// <param name="schemaGenerator">The schema generator.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
-        /// <returns></returns>
-        public virtual TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
+        public void GenerateSchema<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
         {
             if (!schemaResolver.HasSchema(MappedType, false))
                 schemaResolver.AddSchema(MappedType, false, _schemaFactory(schemaGenerator, schemaResolver));
 
-            return null;
+            schema.SchemaReference = schemaResolver.GetSchema(MappedType, false);
         }
     }
 }

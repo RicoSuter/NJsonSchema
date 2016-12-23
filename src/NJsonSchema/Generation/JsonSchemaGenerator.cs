@@ -72,11 +72,10 @@ namespace NJsonSchema.Generation
         public virtual async Task<TSchemaType> GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            var schema = HandleSpecialTypes<TSchemaType>(type, schemaResolver);
-            if (schema != null)
-                return schema;
+            var schema = new TSchemaType();
 
-            schema = new TSchemaType();
+            if (TryHandleSpecialTypes(type, schema, schemaResolver))
+                return schema;
 
             if (!schemaResolver.HasRootObject)
             {
@@ -188,21 +187,20 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private TSchemaType HandleSpecialTypes<TSchemaType>(Type type, JsonSchemaResolver schemaResolver)
+        private bool TryHandleSpecialTypes<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
             {
-                var schema = typeMapper.GetSchema<TSchemaType>(this, schemaResolver);
-                if (schema != null)
-                    return schema;
+                typeMapper.GenerateSchema(schema, this, schemaResolver);
+                return true;
             }
 
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return JsonSchema4.CreateAnySchema<TSchemaType>();
+                return true;
 
-            return null;
+            return false;
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
