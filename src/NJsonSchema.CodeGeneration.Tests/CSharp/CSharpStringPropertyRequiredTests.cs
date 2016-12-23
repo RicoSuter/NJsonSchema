@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 NullHandling = NullHandling.Swagger
             });
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -43,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -70,7 +70,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 NullHandling = NullHandling.Swagger
             });
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithoutRequiredObject>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

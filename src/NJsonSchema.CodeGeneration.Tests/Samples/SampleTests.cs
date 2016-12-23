@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         public async Task Demo()
         {
             var schema = await JsonSchema4.FromTypeAsync<Person>();
-            var schemaJsonData = await schema.ToJsonAsync();
+            var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema);
             var code = generator.GenerateFile();

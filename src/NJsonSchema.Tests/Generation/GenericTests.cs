@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Smth>();
 
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Array, schema.Type);

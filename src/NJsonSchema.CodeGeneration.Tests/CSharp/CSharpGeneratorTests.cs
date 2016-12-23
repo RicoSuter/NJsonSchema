@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
 
             settings.TypeNameGenerator = new CustomTypeNameGenerator();
@@ -339,7 +339,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Person>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -473,7 +473,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         private static async Task<CSharpGenerator> CreateGeneratorAsync()
         {
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
             settings.Namespace = "MyNamespace";
             var generator = new CSharpGenerator(schema, settings);
@@ -498,7 +498,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.AreEqual(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}", await schema.Properties["Foo"].ActualPropertySchema.ToJsonAsync());
+}", schema.Properties["Foo"].ActualPropertySchema.ToJson());
         }
 
         [TestMethod]
@@ -535,7 +535,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithDefaultEnumProperty>();
-            var schemaJson = await schema.ToJsonAsync();
+            var schemaJson = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
@@ -550,7 +550,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
-            var schemaJson = await schema.ToJsonAsync();
+            var schemaJson = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
@@ -686,7 +686,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Person2>();
-            var schemaJson = await schema.ToJsonAsync();
+            var schemaJson = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });

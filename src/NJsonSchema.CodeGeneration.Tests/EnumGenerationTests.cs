@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema);
@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema);
@@ -83,7 +83,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema);
@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithStringEnum>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
             
             //// Act
             var generator = new CSharpGenerator(schema);
@@ -130,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithStringEnum>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema);
@@ -162,7 +162,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithIntegerEnum>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema);
@@ -180,7 +180,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithIntegerEnum>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema);

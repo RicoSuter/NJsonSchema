@@ -36,7 +36,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = await schema.ToJsonAsync(); 
+            var data = schema.ToJson(); 
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].ActualPropertySchema.Type);
@@ -57,7 +57,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsNotNull(schema.Properties["Bar"].ActualPropertySchema);

@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             // Assert
             Assert.IsTrue(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once

@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
             var property = schema.Properties["Bar1"].ActualPropertySchema;
 
             Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
@@ -68,7 +68,7 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             var property1 = schema.Properties["Bar1"];
             var property2 = schema.Properties["Bar2"];

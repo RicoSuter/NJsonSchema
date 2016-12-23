@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Container>();
-            var schemaData = await schema.ToJsonAsync(); 
+            var schemaData = schema.ToJson(); 
 
             //// Assert
             Assert.IsTrue(schema.Definitions.Any(s => s.Key == "Teacher"));

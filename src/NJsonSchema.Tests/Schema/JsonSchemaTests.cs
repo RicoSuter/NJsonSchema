@@ -12,13 +12,13 @@ namespace NJsonSchema.Tests.Schema
     public class JsonSchemaTests
     {
         [TestMethod]
-        public async Task When_creating_schema_without_setting_properties_then_it_is_empty()
+        public void When_creating_schema_without_setting_properties_then_it_is_empty()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(
@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(data);
-            var x = await schema.ToJsonAsync();
+            var x = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(3, schema.Properties.Count);
@@ -148,28 +148,28 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public async Task When_setting_single_type_then_it_should_be_serialized_correctly()
+        public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer;
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(data.Contains(@"""type"": ""integer"""));
         }
 
         [TestMethod]
-        public async Task When_setting_multiple_type_then_it_should_be_serialized_correctly()
+        public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
             var schema = new JsonSchema4();
 
             //// Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(data.Contains(
@@ -320,10 +320,45 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(json);
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             var propertySchema = schema.Properties["topProp"].ActualPropertySchema;
+        }
+
+        [TestMethod]
+        public async Task When_schema_is_loaded_then_all_refs_are_resolved()
+        {
+            //// Arrange
+            var json = @"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""object"",
+  ""allOf"": [
+    {
+      ""$ref"": ""http://json-schema.org/draft-04/schema#""
+    },
+    {
+      ""type"": ""object"",
+      ""properties"": {
+        ""simpleRef"": {
+          ""type"": ""string""
+        }
+      }
+    }
+  ],
+  ""properties"": {
+    ""simpleRef2"": {
+      ""type"": ""string""
+    }
+  }
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(schema.AllOf.First().SchemaReference);
         }
     }
 }

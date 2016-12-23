@@ -72,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
-            var json = await schema.ToJsonAsync(); 
+            var json = schema.ToJson(); 
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Type"].Type);

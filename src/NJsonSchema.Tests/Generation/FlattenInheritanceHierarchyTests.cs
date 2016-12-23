@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync(typeof(Teacher), settings);
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("Name"));

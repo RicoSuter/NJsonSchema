@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Mno>();
 
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsFalse(json.Contains("IgnoreMe"));
@@ -48,7 +48,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Xyz>();
 
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsFalse(json.Contains("IgnoreMe"));
@@ -80,7 +80,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(2, schema.Properties.Count);

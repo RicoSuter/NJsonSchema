@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<EnumValueDictionaryTest>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });

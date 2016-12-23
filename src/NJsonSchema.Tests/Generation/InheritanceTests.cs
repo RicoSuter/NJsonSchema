@@ -105,7 +105,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 FlattenInheritanceHierarchy = true
             });
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(3, schema.Properties.Count);

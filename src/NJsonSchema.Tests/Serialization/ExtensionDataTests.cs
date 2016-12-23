@@ -9,7 +9,7 @@ namespace NJsonSchema.Tests.Serialization
     public class ExtensionDataTests
     {
         [TestMethod]
-        public async Task When_schema_has_extension_data_property_then_property_is_in_serialized_json()
+        public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
             //// Arrange
             var schema = new JsonSchema4();
@@ -19,7 +19,7 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(json.Contains(

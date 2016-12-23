@@ -34,7 +34,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Integer"].Type);
@@ -148,7 +148,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             var property = schema.Properties["Reference"];
@@ -183,7 +183,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<ClassWithJObjectProperty>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
             var property = schema.Properties["Property"];
 
             //// Assert

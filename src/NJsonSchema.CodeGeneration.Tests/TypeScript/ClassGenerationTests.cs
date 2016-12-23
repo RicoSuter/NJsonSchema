@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         private static async Task<string> PrepareAsync(TypeScriptTypeStyle style)
         {
             var schema = await JsonSchema4.FromTypeAsync<MyClassTest>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
             var settings = new TypeScriptGeneratorSettings
             {
                 TypeStyle = style

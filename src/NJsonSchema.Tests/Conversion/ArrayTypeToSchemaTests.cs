@@ -14,7 +14,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<DictionarySubType>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Conversion
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Assert
             var property = schema.Properties[propertyName];

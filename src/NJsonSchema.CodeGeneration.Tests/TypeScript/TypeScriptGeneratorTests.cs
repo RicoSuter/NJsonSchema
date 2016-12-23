@@ -214,7 +214,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             return generator;
         }

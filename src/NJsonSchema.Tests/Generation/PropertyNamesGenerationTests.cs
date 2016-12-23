@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
                 DefaultPropertyNameHandling = PropertyNameHandling.Default
             });
 
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("BarBar1JsonProperty"));
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Generation
                 DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
             });
 
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("barBar1JsonProperty"));

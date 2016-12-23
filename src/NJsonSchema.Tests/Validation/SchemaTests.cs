@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Act
             var schema = await JsonSchema4.FromUrlAsync("http://json-schema.org/card");
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsNotNull(json);

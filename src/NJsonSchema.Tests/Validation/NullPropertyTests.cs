@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Validation
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<NullablePropertyClass>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Act
             var data = "{ 'ReportRules': null }";

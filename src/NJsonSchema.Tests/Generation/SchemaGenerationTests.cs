@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Time"].Type);
@@ -57,7 +57,7 @@ namespace NJsonSchema.Tests.Generation
             
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
@@ -72,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(schemaData.Contains("#/definitions/Bar"));
@@ -107,7 +107,7 @@ namespace NJsonSchema.Tests.Generation
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<DictTest>();
-            var schemaData = await schema.ToJsonAsync();
+            var schemaData = schema.ToJson();
 
             var data = @"{
                 ""values"": { 
@@ -126,8 +126,8 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
             //// Generate JSON
-            var result = await JsonSchema4.FromTypeAsync<IEnumerable<Tuple<string, string>>>();
-            var json = await result.ToJsonAsync();
+            var schema = await JsonSchema4.FromTypeAsync<IEnumerable<Tuple<string, string>>>();
+            var json = schema.ToJson();
 
             //// Should be reached and not StackOverflowed
             Assert.IsTrue(!string.IsNullOrEmpty(json));
@@ -152,7 +152,7 @@ namespace NJsonSchema.Tests.Generation
         //public void Demo()
         //{
         //    var schema = await JsonSchema4.FromTypeAsync<TestClass>();
-        //    var json = await schema.ToJsonAsync();
+        //    var json = schema.ToJson();
         //}
     }
 }

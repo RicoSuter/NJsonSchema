@@ -22,7 +22,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<ClassRoom>();
             
             //// Act
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsFalse(schema.Properties["Id"].IsRequired);

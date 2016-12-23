@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.Generation
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var property = schema.Properties["Point"];
@@ -46,7 +46,7 @@ namespace NJsonSchema.Tests.Generation
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Act
             var property = schema.Properties["ClassAsString"];
@@ -144,7 +144,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<ArrayModel>();
 
             //// Act
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
@@ -162,7 +162,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<ArrayModel<string>>();
 
             //// Act
-            var data = await schema.ToJsonAsync();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);

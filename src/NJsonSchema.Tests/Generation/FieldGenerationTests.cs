@@ -20,7 +20,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyTest>();
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsTrue(schema.Properties["MyField"].Type.HasFlag(JsonObjectType.String));

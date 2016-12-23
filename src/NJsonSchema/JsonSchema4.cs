@@ -677,28 +677,26 @@ namespace NJsonSchema
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
         /// <returns>The JSON string.</returns>
-        public async Task<string> ToJsonAsync()
+        public string ToJson()
         {
             var settings = new JsonSchemaGeneratorSettings();
-            return await ToJsonAsync(settings).ConfigureAwait(false);
+            return ToJson(settings);
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
         /// <param name="settings">The settings.</param>
         /// <returns>The JSON string.</returns>
-        public async Task<string> ToJsonAsync(JsonSchemaGeneratorSettings settings)
+        public string ToJson(JsonSchemaGeneratorSettings settings)
         {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
             var resolver = new JsonSchemaResolver(this, settings);
-
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, resolver);
-            var data = JsonConvert.SerializeObject(this, Formatting.Indented);
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(this, new JsonReferenceResolver()).ConfigureAwait(false);
+            var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
 
             SchemaVersion = oldSchema;
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(data);
+            return json; 
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>

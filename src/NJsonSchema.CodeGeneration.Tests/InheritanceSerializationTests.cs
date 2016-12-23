@@ -67,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
             var schema = await JsonSchema4.FromTypeAsync<Container>();
-            var schemaJson = await schema.ToJsonAsync();
+            var schemaJson = schema.ToJson();
             var errors = schema.Validate(json);
 
             //// Assert
@@ -106,7 +106,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var discriminator = baseSchema.Discriminator;
             var property = baseSchema.Properties["discriminator"];
 
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Assert
             Assert.IsNotNull(property);
@@ -135,7 +135,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Container>();
-            var json = await schema.ToJsonAsync();
+            var json = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
