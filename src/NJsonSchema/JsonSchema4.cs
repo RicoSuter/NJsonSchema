@@ -115,6 +115,7 @@ namespace NJsonSchema
         /// <param name="filePath">The file path.</param>
         /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
         /// <returns>The JSON Schema.</returns>
+        /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromFileAsync(string filePath, JsonReferenceResolver jsonReferenceResolver)
         {
             var data = await DynamicApis.FileReadAllTextAsync(filePath);
@@ -124,6 +125,7 @@ namespace NJsonSchema
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
         /// <param name="url">The URL to the document.</param>
         /// <returns>The JSON Schema.</returns>
+        /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
         {
             return await FromUrlAsync(url, new JsonReferenceResolver()).ConfigureAwait(false);
@@ -133,6 +135,7 @@ namespace NJsonSchema
         /// <param name="url">The URL to the document.</param>
         /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
         /// <returns>The JSON Schema.</returns>
+        /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url, JsonReferenceResolver jsonReferenceResolver)
         {
             var data = await DynamicApis.HttpGetAsync(url);

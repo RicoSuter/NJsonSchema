@@ -100,24 +100,18 @@ namespace NJsonSchema
         /// <summary>Resolves a file reference.</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
-        /// <exception cref="System.NotSupportedException">Could not resolve the JSON path because file references are not supported on this platform.</exception>
+        /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         protected virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
         {
-            if (DynamicApis.SupportsFileApis)
-                return await JsonSchema4.FromFileAsync(filePath, this).ConfigureAwait(false);
-            else
-                throw new NotSupportedException("Could not resolve the JSON path because file references are not supported on this platform.");
+            return await JsonSchema4.FromFileAsync(filePath, this).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
-        /// <exception cref="NotSupportedException">Could not resolve the JSON path because web references are not supported on this platform.</exception>
+        /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         protected virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
         {
-            if (DynamicApis.SupportsHttpClientApis)
-                return await JsonSchema4.FromUrlAsync(url, this).ConfigureAwait(false);
-            else
-                throw new NotSupportedException("Could not resolve the JSON path because web references are not supported on this platform.");
+            return await JsonSchema4.FromUrlAsync(url, this).ConfigureAwait(false);
         }
 
         private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)

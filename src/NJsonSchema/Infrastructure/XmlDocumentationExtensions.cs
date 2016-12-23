@@ -92,7 +92,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static async Task<string> GetXmlDocumentationAsync(this MemberInfo member, string tagName)
         {
-            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                 return string.Empty;
 
             var assemblyName = member.Module.Assembly.GetName();
@@ -108,7 +108,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "returns" or "param" tag.</returns>
         public static async Task<string> GetXmlDocumentationAsync(this ParameterInfo parameter)
         {
-            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                 return string.Empty;
 
             var assemblyName = parameter.Member.Module.Assembly.GetName();
@@ -138,7 +138,7 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
+                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                     return string.Empty;
 
                 var assemblyName = member.Module.Assembly.GetName();
@@ -170,7 +170,7 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false)
+                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                     return string.Empty;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
