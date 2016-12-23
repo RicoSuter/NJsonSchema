@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -15,10 +16,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_nullable_then_property_schema_type_is_also_null()
+        public async Task When_property_is_nullable_then_property_schema_type_is_also_null()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ClassRoom>();
+            var schema = await JsonSchema4.FromTypeAsync<ClassRoom>();
             
             //// Act
             var json = schema.ToJson();

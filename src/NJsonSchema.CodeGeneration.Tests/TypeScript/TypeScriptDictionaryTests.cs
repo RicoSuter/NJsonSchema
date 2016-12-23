@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -23,10 +24,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_dictionary_key_is_enum_then_typescript_has_string_key()
+        public async Task When_dictionary_key_is_enum_then_typescript_has_string_key()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -53,10 +54,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_dictionary_value_is_enum_then_typescript_has_enum_value()
+        public async Task When_dictionary_value_is_enum_then_typescript_has_enum_value()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<EnumValueDictionaryTest>();
+            var schema = await JsonSchema4.FromTypeAsync<EnumValueDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act

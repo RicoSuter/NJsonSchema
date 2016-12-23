@@ -1,6 +1,6 @@
 **/bin/**
 **/obj/**
-src/packages/**
+src/packages/Newtonsoft.Json**
 
 **.suo
 **.user

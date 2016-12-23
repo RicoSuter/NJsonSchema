@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Tests.Generation
@@ -12,13 +13,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_public_field_is_available_then_it_is_added_as_property()
+        public async Task When_public_field_is_available_then_it_is_added_as_property()
         {
             //// Arrange
             
 
             //// Act
-            var schema = JsonSchema4.FromType<MyTest>();
+            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
             var json = schema.ToJson();
 
             //// Assert

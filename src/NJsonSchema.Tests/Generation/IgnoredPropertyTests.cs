@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -19,10 +20,10 @@ namespace NJsonSchema.Tests.Generation
 
 
         [TestMethod]
-        public void When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
+        public async Task When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Mno>();
+            var schema = await JsonSchema4.FromTypeAsync<Mno>();
 
             //// Act
             var json = schema.ToJson();
@@ -41,10 +42,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_field_has_no_DataMemberAttribute_then_it_is_ignored()
+        public async Task When_field_has_no_DataMemberAttribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Xyz>();
+            var schema = await JsonSchema4.FromTypeAsync<Xyz>();
 
             //// Act
             var json = schema.ToJson();
@@ -53,8 +54,11 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsFalse(json.Contains("IgnoreMe"));
         }
 
+        [Serializable]
         public class Foo
         {
+            public int Id { get; set; }
+
             public Dictionary<string, object> DynamicValues { get; set; }
 
             [JsonIgnore]
@@ -63,14 +67,17 @@ namespace NJsonSchema.Tests.Generation
                 get { throw new NotImplementedException(); }
             }
 
-            public string Bar { get; set; }
+            public Foo()
+            {
+                DynamicValues = new Dictionary<string, object>();
+            }
         }
 
         [TestMethod]
-        public void When_indexer_property_has_ignore_attribute_then_it_is_ignored()
+        public async Task When_indexer_property_has_ignore_attribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Foo>();
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Act
             var json = schema.ToJson();

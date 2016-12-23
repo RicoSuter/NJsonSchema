@@ -86,6 +86,7 @@
     <Compile Include="CSharp\CSharpGeneratorSettings.cs" />
     <Compile Include="CSharp\CSharpClassStyle.cs" />
     <Compile Include="CSharp\CSharpDefaultValueGenerator.cs" />
+    <Compile Include="JsonSchemaGraphUtilities.cs" />
     <Compile Include="Models\ClassTemplateModelBase.cs" />
     <Compile Include="CSharp\Models\PropertyModel.cs" />
     <Compile Include="CSharp\CSharpTypeResolver.cs" />
@@ -131,7 +132,6 @@
     <Compile Include="TypeScript\TypeScriptPropertyNameGenerator.cs" />
     <Compile Include="TypeScript\TypeScriptDefaultValueGenerator.cs" />
     <Compile Include="TypeScript\Models\ClassTemplateModel.cs" />
-    <Compile Include="TypeScript\JsonSchemaGraphUtilities.cs" />
     <Compile Include="TypeScript\TypeScriptDateTimeType.cs" />
     <Compile Include="TypeScript\TypeScriptExtensionCode.cs" />
     <Compile Include="TypeScript\DataConversionParameters.cs" />

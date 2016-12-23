@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -22,10 +23,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_class_inherits_from_IEnumerable_then_it_should_become_a_json_array_type()
+        public async Task When_class_inherits_from_IEnumerable_then_it_should_become_a_json_array_type()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<Smth>();
+            var schema = await JsonSchema4.FromTypeAsync<Smth>();
 
             //// Act
             var json = schema.ToJson();

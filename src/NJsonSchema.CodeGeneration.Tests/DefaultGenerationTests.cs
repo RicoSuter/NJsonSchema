@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -20,12 +21,12 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_property_has_default_attribute_then_default_is_in_schema()
+        public async Task When_property_has_default_attribute_then_default_is_in_schema()
         {
             //// Arrange
             
             //// Act
-            var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -35,10 +36,10 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
+        public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -53,10 +54,10 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [TestMethod]
-        public void When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
+        public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

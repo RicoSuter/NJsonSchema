@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -25,13 +26,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_integer_enum_then_schema_has_enum()
+        public async Task When_property_is_integer_enum_then_schema_has_enum()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -46,13 +47,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_string_and_integer_enum_used_then_two_refs_are_generated()
+        public async Task When_string_and_integer_enum_used_then_two_refs_are_generated()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -65,13 +66,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_is_string_enum_then_schema_has_enum()
+        public async Task When_property_is_string_enum_then_schema_has_enum()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.String
             });
@@ -85,13 +86,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_enum_is_generated_then_names_are_set()
+        public async Task When_enum_is_generated_then_names_are_set()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

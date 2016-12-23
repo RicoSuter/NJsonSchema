@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
@@ -9,10 +10,10 @@ namespace NJsonSchema.Tests.Validation
     public class ArrayValidationTests
     {
         [TestMethod]
-        public void When_json_is_array_then_validate_should_not_throw_an_exception()
+        public async Task When_json_is_array_then_validate_should_not_throw_an_exception()
         {
             //// Act
-            var svc = JsonSchema4.FromJson(@"{ ""type"": ""array"", ""items"": { ""type"":""string"" } }");
+            var svc = await JsonSchema4.FromJsonAsync(@"{ ""type"": ""array"", ""items"": { ""type"":""string"" } }");
 
             //// Assert
             Assert.AreEqual(0, svc.Validate(JToken.Parse("[]")).Count);
@@ -22,7 +23,7 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_type_is_array_and_items_and_item_is_not_defined_then_any_items_are_allowed()
+        public async Task When_type_is_array_and_items_and_item_is_not_defined_then_any_items_are_allowed()
         {
             //// Arrange
             var json = @"{
@@ -30,7 +31,7 @@ namespace NJsonSchema.Tests.Validation
                     'emptySchema': { 'type': 'array' }
                 }
             }";
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Act
             var errors1 = schema.Validate("{ 'emptySchema': [1, 2, 'abc'] }");
@@ -212,7 +213,7 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_null_is_allowed_then_properties_are_not_checked()
+        public async Task When_null_is_allowed_then_properties_are_not_checked()
         {
             //// Arrange
             var schemaJson = @"{
@@ -227,7 +228,7 @@ namespace NJsonSchema.Tests.Validation
     ""additionalProperties"": false
   }
 }";
-            var schema = JsonSchema4.FromJson(schemaJson);
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
 
             //// Act
             var errors = schema.Validate("[{\"value\":2},null]");

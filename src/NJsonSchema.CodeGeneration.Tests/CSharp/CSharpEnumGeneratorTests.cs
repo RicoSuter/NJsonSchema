@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -7,7 +8,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     public class CSharpEnumGeneratorTests
     {
         [TestMethod]
-        public void When_enum_has_no_type_then_enum_is_generated()
+        public async Task When_enum_has_no_type_then_enum_is_generated()
         {
             //// Arrange
             var json =
@@ -22,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                     }
                 }
             }";
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
             //// Act

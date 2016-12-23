@@ -20,6 +20,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="template">The template name.</param>
         /// <param name="model">The template model.</param>
         /// <returns>The template.</returns>
+        /// <exception cref="InvalidOperationException">Could not load template..</exception>
         public virtual ITemplate CreateTemplate(string package, string template, object model)
         {
             var typeName = "NSwag.CodeGeneration.CodeGenerators." + package + ".Templates." + template + "Template";

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -7,7 +8,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     public class AdditionalPropertiesTests
     {
         [TestMethod]
-        public void When_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered()
+        public async Task When_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered()
         {
             //// Arrange
             var json =
@@ -30,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());

@@ -22,7 +22,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_FlattenInheritanceHierarchy_is_enabled_then_all_properties_are_in_one_schema()
+        public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_properties_are_in_one_schema()
         {
             //// Arrange
             var settings = new JsonSchemaGeneratorSettings
@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema4.FromType(typeof(Teacher), settings);
+            var schema = await JsonSchema4.FromTypeAsync(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert

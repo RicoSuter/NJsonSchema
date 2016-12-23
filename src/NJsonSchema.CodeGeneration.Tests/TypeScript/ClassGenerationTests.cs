@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 
@@ -44,35 +45,35 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_generating_TypeScript_classes_then_output_is_correct()
+        public async Task When_generating_TypeScript_classes_then_output_is_correct()
         {
-            var code = Prepare(TypeScriptTypeStyle.Class);
+            var code = await PrepareAsync(TypeScriptTypeStyle.Class);
 
             //// Assert
             Assert.IsTrue(code.Contains("constructor(data?: any) {"));
         }
 
         [TestMethod]
-        public void When_default_value_is_available_then_variable_is_initialized()
+        public async Task When_default_value_is_available_then_variable_is_initialized()
         {
-            var code = Prepare(TypeScriptTypeStyle.Class);
+            var code = await PrepareAsync(TypeScriptTypeStyle.Class);
 
             //// Assert
             Assert.IsTrue(code.Contains("name: string = \"foo\"; "));
         }
 
         [TestMethod]
-        public void When_generating_TypeScript_knockout_classes_then_output_is_correct()
+        public async Task When_generating_TypeScript_knockout_classes_then_output_is_correct()
         {
-            var code = Prepare(TypeScriptTypeStyle.KnockoutClass);
+            var code = await PrepareAsync(TypeScriptTypeStyle.KnockoutClass);
 
             //// Assert
             Assert.IsTrue(code.Contains("dateOfBirth = ko.observable<Date>();"));
         }
 
-        private static string Prepare(TypeScriptTypeStyle style)
+        private static async Task<string> PrepareAsync(TypeScriptTypeStyle style)
         {
-            var schema = JsonSchema4.FromType<MyClassTest>();
+            var schema = await JsonSchema4.FromTypeAsync<MyClassTest>();
             var data = schema.ToJson();
             var settings = new TypeScriptGeneratorSettings
             {

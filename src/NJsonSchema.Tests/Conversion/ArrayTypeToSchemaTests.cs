@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Conversion
@@ -9,10 +10,10 @@ namespace NJsonSchema.Tests.Conversion
     public class ArrayTypeToSchemaTests
     {
         [TestMethod]
-        public void When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
+        public async Task When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
         {
             //// Act
-            var schema = JsonSchema4.FromType<DictionarySubType>();
+            var schema = await JsonSchema4.FromTypeAsync<DictionarySubType>();
             var data = schema.ToJson();
 
             //// Assert
@@ -21,40 +22,39 @@ namespace NJsonSchema.Tests.Conversion
         }
 
         [TestMethod]
-        public void When_converting_array_then_items_must_correctly_be_loaded()
+        public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_array_then_items_must_correctly_be_loaded("Array");
         }
 
         [TestMethod]
-        public void When_converting_collection_then_items_must_correctly_be_loaded()
+        public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
         }
 
         [TestMethod]
-        public void When_converting_list_then_items_must_correctly_be_loaded()
+        public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("List");
-        }
-
-
-        [TestMethod]
-        public void When_converting_interface_list_then_items_must_correctly_be_loaded()
-        {
-            When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
+            await When_converting_array_then_items_must_correctly_be_loaded("List");
         }
 
         [TestMethod]
-        public void When_converting_enumerable_list_then_items_must_correctly_be_loaded()
+        public async Task When_converting_interface_list_then_items_must_correctly_be_loaded()
         {
-            When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
+            await When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
         }
 
-        public void When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        [TestMethod]
+        public async Task When_converting_enumerable_list_then_items_must_correctly_be_loaded()
+        {
+            await When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
+        }
+
+        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
-            var schema = JsonSchema4.FromType<MyType>();
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
             var schemaData = schema.ToJson();
 
             //// Assert

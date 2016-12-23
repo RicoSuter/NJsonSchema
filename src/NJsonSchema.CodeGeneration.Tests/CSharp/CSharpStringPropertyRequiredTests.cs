@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
@@ -15,10 +16,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [TestMethod]
-        public void When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
+        public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
             {
                 NullHandling = NullHandling.Swagger
             });
@@ -38,10 +39,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [TestMethod]
-        public void When_property_is_required_then_required_attribute_is_rendered()
+        public async Task When_property_is_required_then_required_attribute_is_rendered()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ClassWithRequiredObject>();
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>();
             var schemaData = schema.ToJson();
 
             //// Act
@@ -62,10 +63,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [TestMethod]
-        public void When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
+        public async Task When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ClassWithoutRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithoutRequiredObject>(new JsonSchemaGeneratorSettings
             {
                 NullHandling = NullHandling.Swagger
             });
@@ -86,10 +87,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
 
         [TestMethod]
-        public void When_property_is_not_required_then_required_attribute_is_not_rendered()
+        public async Task When_property_is_not_required_then_required_attribute_is_not_rendered()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ClassWithoutRequiredObject>();
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithoutRequiredObject>();
             var schemaData = schema.ToJson();
 
             //// Act

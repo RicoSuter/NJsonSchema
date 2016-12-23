@@ -21,10 +21,11 @@ namespace NJsonSchema.Generation.TypeMappers
 
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
+        /// <param name="schema">The schema.</param>
         /// <param name="schemaGenerator">The schema generator.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
-        TSchemaType GetSchema<TSchemaType>(JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        void GenerateSchema<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new();
     }
 }
