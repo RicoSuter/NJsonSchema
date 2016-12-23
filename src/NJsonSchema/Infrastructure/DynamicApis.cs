@@ -59,7 +59,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<string> HttpGetAsync(string url)
         {
-            if (SupportsHttpClientApis)
+            if (!SupportsHttpClientApis)
                 throw new NotSupportedException("The System.Net.Http.HttpClient API is not available on this platform.");
 
             using (dynamic client = (IDisposable) Activator.CreateInstance(HttpClientType))
@@ -75,7 +75,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static Task<string> DirectoryGetCurrentDirectoryAsync()
         {
-            if (SupportsDirectoryApis)
+            if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
             return Task.Factory.StartNew(() => (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { }));
@@ -88,7 +88,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static Task<string[]> DirectoryGetFilesAsync(string directory, string filter)
         {
-            if (SupportsDirectoryApis)
+            if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
             return Task.Factory.StartNew(() => (string[])DirectoryType.GetRuntimeMethod("GetFiles", 
@@ -100,7 +100,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static Task DirectoryCreateDirectoryAsync(string directory)
         {
-            if (SupportsDirectoryApis)
+            if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
             return Task.Factory.StartNew(() => DirectoryType.GetRuntimeMethod("CreateDirectory", 
@@ -113,7 +113,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
         public static async Task<bool> DirectoryExistsAsync(string filePath)
         {
-            if (SupportsDirectoryApis)
+            if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
             if (string.IsNullOrEmpty(filePath))
@@ -129,7 +129,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static async Task<bool> FileExistsAsync(string filePath)
         {
-            if (SupportsFileApis)
+            if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
             if (string.IsNullOrEmpty(filePath))
@@ -145,7 +145,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static Task<string> FileReadAllTextAsync(string filePath)
         {
-            if (SupportsFileApis)
+            if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
             return Task.Factory.StartNew(() =>(string)FileType.GetRuntimeMethod("ReadAllText", 
@@ -159,7 +159,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static Task FileWriteAllTextAsync(string filePath, string text)
         {
-            if (SupportsFileApis)
+            if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
             return Task.Factory.StartNew(() => FileType.GetRuntimeMethod("WriteAllText",
@@ -173,7 +173,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
         public static string PathCombine(string path1, string path2)
         {
-            if (SupportsPathApis)
+            if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
             
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
@@ -185,7 +185,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
         public static string PathGetDirectoryName(string filePath)
         {
-            if (SupportsPathApis)
+            if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
             return (string)PathType.GetRuntimeMethod("GetDirectoryName", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
@@ -198,7 +198,7 @@ namespace NJsonSchema.Infrastructure
         /// <exception cref="NotSupportedException">The System.Xml.XPath.Extensions API is not available on this platform.</exception>
         public static string XPathEvaluate(XDocument document, string path)
         {
-            if (SupportsXPathApis)
+            if (!SupportsXPathApis)
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
             
             return (string)XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
