@@ -78,6 +78,7 @@
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
+    <Compile Include="Generation\JsonReflectionUtilities.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\PrimitiveTypeMapper.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generation\JsonSchemaGenerator.cs" />
     <Compile Include="JsonObjectType.cs" />
-    <Compile Include="JsonObjectTypeDescription.cs" />
+    <Compile Include="Generation\JsonObjectTypeDescription.cs" />
     <Compile Include="JsonSchemaResolver.cs" />
     <Compile Include="Validation\ChildSchemaValidationError.cs" />
     <Compile Include="Validation\ValidationError.cs" />

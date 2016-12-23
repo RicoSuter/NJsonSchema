@@ -8,7 +8,7 @@
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
-    /// <summary></summary>
+    /// <summary>Generates the property name for a given TypeScript <see cref="JsonProperty"/>.</summary>
     public class TypeScriptPropertyNameGenerator : IPropertyNameGenerator
     {
         /// <summary>Generates the property name.</summary>

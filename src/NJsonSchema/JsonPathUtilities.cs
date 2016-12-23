@@ -10,8 +10,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -19,28 +17,6 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
-        private static readonly Lazy<CamelCasePropertyNamesContractResolver> CamelCaseResolverLazy = new Lazy<CamelCasePropertyNamesContractResolver>();
-
-        /// <summary>Gets the name of the property for JSON serialization.</summary>
-        /// <returns>The name.</returns>
-        /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
-        public static string GetPropertyName(MemberInfo property, PropertyNameHandling propertyNameHandling)
-        {
-            var propertyName = ReflectionCache.GetPropertiesAndFields(property.DeclaringType)
-                .First(p => p.MemberInfo.Name == property.Name).GetName();
-            switch (propertyNameHandling)
-            {
-                case PropertyNameHandling.Default:
-                    return propertyName;
-
-                case PropertyNameHandling.CamelCase:
-                    return CamelCaseResolverLazy.Value.GetResolvedPropertyName(propertyName);
-
-                default:
-                    throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");
-            }
-        }
-
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="searchedObject">The object to search.</param>
@@ -48,7 +24,7 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-        public static string GetJsonPath(object rootObject, object searchedObject, JsonSchemaResolver schemaResolver = null)
+        public static string GetJsonPath(object rootObject, object searchedObject, JsonSchemaResolver schemaResolver)
         {
             if (rootObject == null)
                 throw new ArgumentNullException(nameof(rootObject));
