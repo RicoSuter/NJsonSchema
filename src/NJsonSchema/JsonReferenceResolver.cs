@@ -19,17 +19,15 @@ namespace NJsonSchema
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
-        // TODO: Use JsonSchemaResolver
-
-        //private readonly JsonSchemaResolver _schemaResolver;
+        private readonly JsonSchemaResolver _schemaResolver;
         private readonly Dictionary<string, JsonSchema4> _resolvedSchemas = new Dictionary<string, JsonSchema4>();
 
-        ///// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
-        ///// <param name="schemaResolver">The schema resolver.</param>
-        //public JsonReferenceResolver()
-        //{
-        //    _schemaResolver = schemaResolver;
-        //}
+        /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        public JsonReferenceResolver(JsonSchemaResolver schemaResolver)
+        {
+            _schemaResolver = schemaResolver;
+        }
 
         /// <summary>Adds a document reference.</summary>
         /// <param name="documentPath">The document path.</param>
@@ -103,7 +101,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         protected virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
         {
-            return await JsonSchema4.FromFileAsync(filePath, this).ConfigureAwait(false);
+            return await JsonSchema4.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
@@ -111,7 +109,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         protected virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
         {
-            return await JsonSchema4.FromUrlAsync(url, this).ConfigureAwait(false);
+            return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
 
         private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
@@ -122,7 +120,7 @@ namespace NJsonSchema
                 if (!_resolvedSchemas.ContainsKey(arr[0]))
                 {
                     var schema = await ResolveFileReferenceAsync(arr[0]).ConfigureAwait(false);
-                    //_schemaResolver.AppendSchema(schema, null);
+                    _schemaResolver.AppendSchema(schema, null);
                     _resolvedSchemas[arr[0]] = schema;
                 }
 
@@ -143,7 +141,7 @@ namespace NJsonSchema
                 if (!_resolvedSchemas.ContainsKey(arr[0]))
                 {
                     var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
-                    //_schemaResolver.AppendSchema(schema, null);
+                    _schemaResolver.AppendSchema(schema, null);
                     _resolvedSchemas[arr[0]] = schema;
                 }
 

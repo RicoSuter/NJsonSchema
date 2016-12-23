@@ -108,18 +108,21 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            return await FromFileAsync(filePath, new JsonReferenceResolver()).ConfigureAwait(false);
+            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
+                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
+
+            return await FromFileAsync(filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
-        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static async Task<JsonSchema4> FromFileAsync(string filePath, JsonReferenceResolver jsonReferenceResolver)
+        public static async Task<JsonSchema4> FromFileAsync(string filePath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
             var data = await DynamicApis.FileReadAllTextAsync(filePath);
-            return await FromJsonAsync(data, filePath, jsonReferenceResolver).ConfigureAwait(false);
+            return await FromJsonAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -128,18 +131,21 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
         {
-            return await FromUrlAsync(url, new JsonReferenceResolver()).ConfigureAwait(false);
+            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
+                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
+
+            return await FromUrlAsync(url, referenceResolverFactory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
         /// <param name="url">The URL to the document.</param>
-        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<JsonSchema4> FromUrlAsync(string url, JsonReferenceResolver jsonReferenceResolver)
+        public static async Task<JsonSchema4> FromUrlAsync(string url, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
             var data = await DynamicApis.HttpGetAsync(url);
-            return await FromJsonAsync(data, url, jsonReferenceResolver).ConfigureAwait(false);
+            return await FromJsonAsync(data, url, referenceResolverFactory).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
@@ -147,7 +153,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data)
         {
-            return await FromJsonAsync(data, null, new JsonReferenceResolver()).ConfigureAwait(false);
+            return await FromJsonAsync(data, null).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
@@ -156,15 +162,18 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath)
         {
-            return await FromJsonAsync(data, documentPath, new JsonReferenceResolver()).ConfigureAwait(false);
+            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
+                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
+
+            return await FromJsonAsync(data, documentPath, referenceResolverFactory).ConfigureAwait(false);
         }
 
-        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4"/>. </summary>
-        /// <param name="data">The JSON string. </param>
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
+        /// <param name="data">The JSON string.</param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
-        /// <param name="jsonReferenceResolver">The JSON document resolver.</param>
+        /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, JsonReferenceResolver jsonReferenceResolver)
+        public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
@@ -176,10 +185,11 @@ namespace NJsonSchema
 
             schema.DocumentPath = documentPath;
 
-            if (jsonReferenceResolver != null && !string.IsNullOrEmpty(documentPath))
-                jsonReferenceResolver.AddDocumentReference(documentPath, schema);
+            var referenceResolver = referenceResolverFactory(schema);
+            if (!string.IsNullOrEmpty(documentPath))
+                referenceResolver.AddDocumentReference(documentPath, schema);
 
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, jsonReferenceResolver).ConfigureAwait(false);
+            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver).ConfigureAwait(false);
             return schema;
         }
 
@@ -693,13 +703,10 @@ namespace NJsonSchema
         {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
-
-            var resolver = new JsonSchemaResolver(this, settings);
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, resolver);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this);
             var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
-
             SchemaVersion = oldSchema;
-            return json; 
+            return json;
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>

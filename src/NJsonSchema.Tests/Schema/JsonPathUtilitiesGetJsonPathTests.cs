@@ -21,7 +21,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, null);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
             Assert.AreEqual("#/Property/Property2", path);
@@ -46,7 +46,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, null);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
             Assert.AreEqual("#/Property/List/2", path);
@@ -71,7 +71,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, null);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
             Assert.AreEqual("#/Property/List/Test3", path);
@@ -84,7 +84,7 @@ namespace NJsonSchema.Tests.Schema
             var objectToSearch = new JsonSchema4();
             
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch, null);
+            var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch);
 
             //// Assert
             Assert.AreEqual("#", path);

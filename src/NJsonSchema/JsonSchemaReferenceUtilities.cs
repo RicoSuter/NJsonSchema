@@ -21,14 +21,6 @@ namespace NJsonSchema
     {
         /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
         /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
-        /// <param name="rootObject">The root object.</param>
-        public static async Task UpdateSchemaReferencesAsync(object rootObject)
-        {
-            await UpdateSchemaReferencesAsync(rootObject, rootObject, new HashSet<object>(), new JsonReferenceResolver()).ConfigureAwait(false);
-        }
-
-        /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
-        /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
         public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver)
@@ -39,10 +31,9 @@ namespace NJsonSchema
         /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
         /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        public static void UpdateSchemaReferencePaths(object rootObject, JsonSchemaResolver schemaResolver)
+        public static void UpdateSchemaReferencePaths(object rootObject)
         {
-            UpdateSchemaReferencePaths(rootObject, rootObject, new HashSet<object>(), schemaResolver);
+            UpdateSchemaReferencePaths(rootObject, rootObject, new HashSet<object>());
         }
 
         /// <summary>Converts JSON references ($ref) to property references.</summary>
@@ -61,24 +52,24 @@ namespace NJsonSchema
             return data.Replace("schemaReferencePath", "$ref");
         }
 
-        private static void UpdateSchemaReferencePaths(object rootObject, object obj, HashSet<object> checkedObjects, JsonSchemaResolver schemaResolver)
+        private static void UpdateSchemaReferencePaths(object rootObject, object obj, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string)
                 return;
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReference != null)
-                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema, schemaResolver);
+                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema);
 
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values.OfType<object>().ToList())
-                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects, schemaResolver);
+                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects);
             }
             else if (obj is IEnumerable)
             {
                 foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
-                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects, schemaResolver);
+                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects);
             }
 
             if (!(obj is JToken))
@@ -93,7 +84,7 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-                            UpdateSchemaReferencePaths(rootObject, value, checkedObjects, schemaResolver);
+                            UpdateSchemaReferencePaths(rootObject, value, checkedObjects);
                         }
                     }
                 }

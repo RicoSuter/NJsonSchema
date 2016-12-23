@@ -28,35 +28,35 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlSummaryAsync(this Type type)
+        public static Task<string> GetXmlSummaryAsync(this Type type)
         {
-            return await type.GetTypeInfo().GetXmlDocumentationAsync("summary").ConfigureAwait(false);
+            return type.GetTypeInfo().GetXmlDocumentationAsync("summary");
         }
 
         /// <summary>Returns the contents of the "remarks" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlRemarksAsync(this Type type)
+        public static Task<string> GetXmlRemarksAsync(this Type type)
         {
-            return await type.GetTypeInfo().GetXmlDocumentationAsync("remarks").ConfigureAwait(false);
+            return type.GetTypeInfo().GetXmlDocumentationAsync("remarks");
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
         [Obsolete("Use GetXmlSummary instead.")]
-        public static async Task<string> GetXmlDocumentationAsync(this Type type)
+        public static Task<string> GetXmlDocumentationAsync(this Type type)
         {
-            return await GetXmlDocumentationAsync(type, "summary").ConfigureAwait(false);
+            return GetXmlDocumentationAsync(type, "summary");
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlDocumentationAsync(this Type type, string tagName)
+        public static Task<string> GetXmlDocumentationAsync(this Type type, string tagName)
         {
-            return await type.GetTypeInfo().GetXmlDocumentationAsync(tagName).ConfigureAwait(false);
+            return type.GetTypeInfo().GetXmlDocumentationAsync(tagName);
         }
 
 #endif
@@ -99,7 +99,7 @@ namespace NJsonSchema.Infrastructure
             if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
                 return string.Empty;
 
-            var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false); 
+            var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
             return await GetXmlDocumentationAsync(member, documentationPath, tagName).ConfigureAwait(false);
         }
 
@@ -124,9 +124,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <param name="tagName">Name of the tag.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlDocumentationAsync(this Type type, string pathToXmlFile, string tagName)
+        public static Task<string> GetXmlDocumentationAsync(this Type type, string pathToXmlFile, string tagName)
         {
-            return await type.GetTypeInfo().GetXmlDocumentationAsync(pathToXmlFile, tagName).ConfigureAwait(false);
+            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationAsync(pathToXmlFile, tagName);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -152,7 +152,7 @@ namespace NJsonSchema.Infrastructure
                 }
 
                 if (!Cache.ContainsKey(assemblyName.FullName))
-                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false); 
+                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
 
                 return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
             }
@@ -184,7 +184,7 @@ namespace NJsonSchema.Infrastructure
                 }
 
                 if (!Cache.ContainsKey(assemblyName.FullName))
-                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false); 
+                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
 
                 return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
             }

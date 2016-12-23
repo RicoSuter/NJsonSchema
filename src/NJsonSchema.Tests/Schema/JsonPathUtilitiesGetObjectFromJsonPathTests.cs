@@ -22,7 +22,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
+            var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2");
 
             //// Assert
@@ -48,7 +48,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
+            var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2");
 
             //// Assert
@@ -74,7 +74,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
+            var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3");
 
             //// Assert
@@ -88,7 +88,7 @@ namespace NJsonSchema.Tests.Schema
             var objectToSearch = new JsonSchema4();
 
             //// Act
-            var resolver = new JsonReferenceResolver();
+            var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#");
 
             //// Assert
