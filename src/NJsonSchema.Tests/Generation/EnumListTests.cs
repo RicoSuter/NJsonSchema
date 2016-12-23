@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
 
@@ -34,12 +35,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_enum_is_used_multiple_times_in_array_then_it_is_always_referenced()
+        public async Task When_enum_is_used_multiple_times_in_array_then_it_is_always_referenced()
         {
             // Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<MyController>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<MyController>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

@@ -30,6 +30,7 @@ namespace NJsonSchema
         public string Name { get; internal set; }
 
         /// <summary>Gets the parent schema of this property schema. </summary>
+        [JsonIgnore]
         public override JsonSchema4 ParentSchema
         {
             get { return _parentSchema; }

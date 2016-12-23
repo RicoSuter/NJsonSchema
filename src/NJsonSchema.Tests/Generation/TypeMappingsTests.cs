@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
 
@@ -20,10 +21,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_primitive_type_mapping_is_available_for_type_then_it_is_called()
+        public async Task When_primitive_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappers =
                 {
@@ -40,10 +41,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_object_type_mapping_is_available_for_type_then_it_is_called()
+        public async Task When_object_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
-            var schema = JsonSchema4.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappers =
                 {

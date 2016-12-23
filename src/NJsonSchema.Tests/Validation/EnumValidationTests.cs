@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Validation
 {
@@ -6,7 +7,7 @@ namespace NJsonSchema.Tests.Validation
     public class EnumValidationTests
     {
         [TestMethod]
-        public void When_enum_is_defined_without_type_then_validation_succeeds_for_correct_value()
+        public async Task When_enum_is_defined_without_type_then_validation_succeeds_for_correct_value()
         {
             //// Arrange
             var json = 
@@ -16,7 +17,7 @@ namespace NJsonSchema.Tests.Validation
                     ""residential""
                 ]
             }";
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"""commercial""");
@@ -26,7 +27,7 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_enum_is_defined_without_type_then_validation_fails_for_wrong_value()
+        public async Task When_enum_is_defined_without_type_then_validation_fails_for_wrong_value()
         {
             //// Arrange
             var json =
@@ -36,7 +37,7 @@ namespace NJsonSchema.Tests.Validation
                     ""residential""
                 ]
             }";
-            var schema = JsonSchema4.FromJson(json);
+            var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"""wrong""");

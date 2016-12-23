@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Validation
@@ -39,10 +40,10 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_property_can_be_null_then_null_is_allowed2()
+        public async Task When_property_can_be_null_then_null_is_allowed2()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<NullablePropertyClass>();
+            var schema = await JsonSchema4.FromTypeAsync<NullablePropertyClass>();
             var schemaData = schema.ToJson();
 
             //// Act

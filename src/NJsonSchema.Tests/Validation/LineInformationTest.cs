@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -10,13 +11,13 @@ namespace NJsonSchema.Tests.Validation
     [TestClass]
     public class LineInformationTest
     {
-        private static JsonSchema4 Schema { get; set; }
-        private static string Json { get; set; }
+        private JsonSchema4 Schema { get; set; }
 
-        [ClassInitialize]
-        public static void Init(TestContext context)
+        private string Json { get; set; }
+
+        public async Task InitAsync()
         {
-            Schema = JsonSchema4.FromJson(@"{
+            Schema = await JsonSchema4.FromJsonAsync(@"{
                 ""type"": ""object"",
                 ""required"": [""prop1"", ""prop3""],
                 ""additionalProperties"": false,
@@ -40,8 +41,11 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_validating_from_string_parse_line_information()
+        public async Task When_validating_from_string_parse_line_information()
         {
+            //// Arrange
+            await InitAsync();
+
             //// Act
             var errors = Schema.Validate(Json);
 
@@ -51,8 +55,11 @@ namespace NJsonSchema.Tests.Validation
         }
 
         [TestMethod]
-        public void When_validating_from_jtoken_parse_line_information_if_exists()
+        public async Task When_validating_from_jtoken_parse_line_information_if_exists()
         {
+            //// Arrange
+            await InitAsync();
+
             //// Act
             var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Ignore});
             var errorsWithInfo = Schema.Validate(tokenWithInfo);

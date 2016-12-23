@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
@@ -26,11 +27,11 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_class_annotation_is_available_then_type_and_format_can_be_customized()
+        public async Task When_class_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<AnnotationClass>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
+            var data = schema.ToJson();
 
             //// Act
             var property = schema.Properties["Point"];
@@ -41,11 +42,11 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_property_annotation_is_available_then_type_and_format_can_be_customized()
+        public async Task When_property_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<AnnotationClass>();
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
+            var data = schema.ToJson();
 
             //// Act
             var property = schema.Properties["ClassAsString"];
@@ -62,12 +63,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_multipleOf_attribute_is_available_then_value_is_set_in_schema()
+        public async Task When_multipleOf_attribute_is_available_then_value_is_set_in_schema()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<MultipleOfClass>();
+            var schema = await JsonSchema4.FromTypeAsync<MultipleOfClass>();
             var property = schema.Properties["Number"];
 
             //// Assert
@@ -86,7 +87,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_multipleOf_is_fraction_then_it_is_validated_correctly()
+        public async Task When_multipleOf_is_fraction_then_it_is_validated_correctly()
         {
             //// Arrange
             List<SimpleClass> testClasses = new List<SimpleClass>();
@@ -96,7 +97,7 @@ namespace NJsonSchema.Tests.Generation
             }
 
             string jsonData = JsonConvert.SerializeObject(testClasses, Formatting.Indented);
-            var schema = JsonSchema4.FromJson(@"{
+            var schema = await JsonSchema4.FromJsonAsync(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""type"": ""array"",
   ""items"": {
@@ -137,13 +138,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_class_has_array_item_type_defined_then_schema_has_this_item_type()
+        public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ArrayModel>();
+            var schema = await JsonSchema4.FromTypeAsync<ArrayModel>();
 
             //// Act
-            var json = schema.ToJson();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
@@ -155,13 +156,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
+        public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<ArrayModel<string>>();
+            var schema = await JsonSchema4.FromTypeAsync<ArrayModel<string>>();
 
             //// Act
-            var json = schema.ToJson();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
@@ -174,12 +175,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_StringLengthAttribute_is_set_then_minLength_and_maxLenght_is_set()
+        public async Task When_StringLengthAttribute_is_set_then_minLength_and_maxLenght_is_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<StringLengthAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<StringLengthAttributeClass>();
 
             //// Assert
             var property = schema.Properties["Foo"];
@@ -215,54 +216,54 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_DateTime_then_the_format_property_is_datetime()
+        public async Task When_DataTypeAttribute_is_DateTime_then_the_format_property_is_datetime()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["DateTime"];
 
             Assert.AreEqual("date-time", property.Format);
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_Date_then_the_format_property_is_date()
+        public async Task When_DataTypeAttribute_is_Date_then_the_format_property_is_date()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Date"];
 
             Assert.AreEqual("date", property.Format);
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_Time_then_the_format_property_is_time()
+        public async Task When_DataTypeAttribute_is_Time_then_the_format_property_is_time()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Time"];
 
             Assert.AreEqual("time", property.Format);
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_EmailAddress_then_the_format_property_is_email()
+        public async Task When_DataTypeAttribute_is_EmailAddress_then_the_format_property_is_email()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["EmailAddress"];
 
             Assert.AreEqual("email", property.Format);
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_PhoneNumber_then_the_format_property_is_phone()
+        public async Task When_DataTypeAttribute_is_PhoneNumber_then_the_format_property_is_phone()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["PhoneNumber"];
 
             Assert.AreEqual("phone", property.Format);
         }
 
         [TestMethod]
-        public void When_DataTypeAttribute_is_Url_then_the_format_property_is_uri()
+        public async Task When_DataTypeAttribute_is_Url_then_the_format_property_is_uri()
         {
-            var schema = JsonSchema4.FromType<DataTypeAttributeClass>();
+            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Url"];
 
             Assert.AreEqual("uri", property.Format);

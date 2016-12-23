@@ -21,8 +21,10 @@ namespace NJsonSchema
         /// <returns>The type name.</returns>
         public virtual string Generate(JsonSchema4 schema, string typeNameHint, ICollection<string> reservedTypeNames)
         {
-            var typeName = Generate(schema, typeNameHint);
+            if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
+                typeNameHint = schema.DocumentPath.Replace("\\", "/").Split('/').Last();
 
+            var typeName = Generate(schema, typeNameHint);
             if (string.IsNullOrEmpty(typeName) || reservedTypeNames.Contains(typeName))
                 typeName = GenerateTypeName(typeNameHint, reservedTypeNames);
 

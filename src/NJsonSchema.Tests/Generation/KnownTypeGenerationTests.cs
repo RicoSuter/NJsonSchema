@@ -26,12 +26,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_KnownType_attribute_exists_then_specified_classes_are_also_generated()
+        public async Task When_KnownType_attribute_exists_then_specified_classes_are_also_generated()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<Container>();
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
             var schemaData = schema.ToJson(); 
 
             //// Assert

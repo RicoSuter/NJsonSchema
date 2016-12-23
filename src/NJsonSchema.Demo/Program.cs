@@ -3,55 +3,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Demo
 {
-    public class Test
-    {
-        public byte[] Bar { get; set; }
-
-        public byte Foo { get; set; }
-    }
-
-    public class Mno
-    {
-        public string IncludeMe { get; set; }
-
-        [JsonIgnoreAttribute]
-        public string IgnoreMe { get; set; }
-    }
-
-    public class TestSchema
-    {
-        public static string testMnoSchema()
-        {
-            return JsonSchema4.FromType<Mno>().ToJson();
-        }
-    }
-
     public class Program
     {
         static void Main(string[] args)
         {
-            //var schema = JsonSchema4.FromJson(File.ReadAllText(@"c:\data\person.json"), @"c:\data");
-            //var x = JToken.Parse(File.ReadAllText(@"c:\data\data.json"));
-            //var errors = schema.Validate(x);
-            //var u = schema.ToJson(); 
-
-            //var t = new Test
-            //{
-            //    Bar = new byte[] { 1, 2, 3 }, 
-            //    Foo = 123
-            //};
-
-            var x = TestSchema.testMnoSchema();
-
-            var json = JsonConvert.SerializeObject(DateTime.Now);
-            var foo = Convert.FromBase64String("AQID");
-
             Console.BufferHeight = 2000;
 
             var passes = 0;
@@ -105,7 +65,7 @@ namespace NJsonSchema.Demo
             //foreach (var error in errors)
             //    Console.WriteLine(error.Path + ": " + error.Kind);
 
-            //schema = JsonSchema4.FromJson(schemaData);
+            //schema = await JsonSchema4.FromJsonAsync(schemaData);
 
             //Console.ReadLine();
         }
@@ -114,7 +74,7 @@ namespace NJsonSchema.Demo
         {
             try
             {
-                var schema = JsonSchema4.FromJson(suite["schema"].ToString(), Path.GetDirectoryName(file));
+                var schema = JsonSchema4.FromJsonAsync(suite["schema"].ToString(), Path.GetDirectoryName(file)).Result;
                 var errors = schema.Validate(value);
                 var success = expectedResult ? errors.Count == 0 : errors.Count > 0;
 

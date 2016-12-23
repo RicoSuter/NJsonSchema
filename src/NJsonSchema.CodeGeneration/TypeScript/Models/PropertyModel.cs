@@ -11,7 +11,7 @@ using NJsonSchema.CodeGeneration.Models;
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
 {
     /// <summary>The TypeScript property template model.</summary>
-    /// <seealso cref="NJsonSchema.CodeGeneration.Models.PropertyModelBase" />
+    /// <seealso cref="PropertyModelBase" />
     public class PropertyModel : PropertyModelBase
     {
         private readonly string _parentTypeName;

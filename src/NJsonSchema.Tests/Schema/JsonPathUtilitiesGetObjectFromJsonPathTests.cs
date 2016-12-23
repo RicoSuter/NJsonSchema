@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Schema
@@ -7,7 +8,7 @@ namespace NJsonSchema.Tests.Schema
     public class JsonPathUtilitiesGetObjectFromJsonPathTests
     {
         [TestMethod]
-        public void When_object_is_in_property_then_path_should_be_built_correctly()
+        public async Task When_object_is_in_property_then_path_should_be_built_correctly()
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
@@ -21,15 +22,15 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
-            var foundObject = resolver.ResolveReference(obj, "#/Property/Property2");
+            var resolver = new JsonReferenceResolver(null);
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
         }
 
         [TestMethod]
-        public void When_object_is_in_list_then_path_should_be_built_correctly()
+        public async Task When_object_is_in_list_then_path_should_be_built_correctly()
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
@@ -47,15 +48,15 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
-            var foundObject = resolver.ResolveReference(obj, "#/Property/List/2");
+            var resolver = new JsonReferenceResolver(null);
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
         }
 
         [TestMethod]
-        public void When_object_is_in_dictionary_then_path_should_be_built_correctly()
+        public async Task When_object_is_in_dictionary_then_path_should_be_built_correctly()
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
@@ -73,22 +74,22 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var resolver = new JsonReferenceResolver();
-            var foundObject = resolver.ResolveReference(obj, "#/Property/List/Test3");
+            var resolver = new JsonReferenceResolver(null);
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
         }
 
         [TestMethod]
-        public void When_object_is_root_then_path_should_be_built_correctly()
+        public async Task When_object_is_root_then_path_should_be_built_correctly()
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
 
             //// Act
-            var resolver = new JsonReferenceResolver();
-            var foundObject = resolver.ResolveReference(objectToSearch, "#");
+            var resolver = new JsonReferenceResolver(null);
+            var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#");
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);

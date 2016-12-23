@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -7,10 +8,10 @@ namespace NJsonSchema.Tests.Generation
     public class JsonPropertyAttributeTests
     {
         [TestMethod]
-        public void When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
+        public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["NewName"];
@@ -20,10 +21,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
+        public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
             //// Arrange
-            var schema = JsonSchema4.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["Required"];

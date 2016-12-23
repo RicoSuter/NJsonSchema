@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Validation;
@@ -12,7 +9,20 @@ namespace NJsonSchema.Tests.Validation
     public class SchemaTests
     {
         [TestMethod]
-        public void When_no_additional_properties_are_allowed_then_this_error_is_returned()
+        public async Task When_json_schem_is_loaded_via_url_then_it_works()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromUrlAsync("http://json-schema.org/card");
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(json);
+        }
+
+        [TestMethod]
+        public async Task When_no_additional_properties_are_allowed_then_this_error_is_returned()
         {
             //// Arrange
             var schemaData = @"{
@@ -320,7 +330,7 @@ namespace NJsonSchema.Tests.Validation
 }
 
 ";
-            var schema = JsonSchema4.FromJson(schemaData);
+            var schema = await JsonSchema4.FromJsonAsync(schemaData);
 
             //// Act
             var errors = schema.Validate(@"{""Key"": ""Value""}");

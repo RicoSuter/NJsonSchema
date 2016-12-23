@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NJsonSchema.Tests.Generation
@@ -10,12 +11,12 @@ namespace NJsonSchema.Tests.Generation
 #if !LEGACY
 
         [TestMethod]
-        public void When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
+        public async Task When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Items"];
 
             //// Assert
@@ -24,12 +25,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_minLength_and_maxLength_attribute_are_set_on_string_then_minLength_and_maxLenght_are_set()
+        public async Task When_minLength_and_maxLength_attribute_are_set_on_string_then_minLength_and_maxLenght_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["String"];
 
             //// Assert
@@ -40,12 +41,12 @@ namespace NJsonSchema.Tests.Generation
 #endif
 
         [TestMethod]
-        public void When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
+        public async Task When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Double"];
 
             //// Assert
@@ -54,12 +55,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_Range_attribute_has_double_max_then_max_is_not_set()
+        public async Task When_Range_attribute_has_double_max_then_max_is_not_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["DoubleOnlyMin"];
 
             //// Assert
@@ -68,12 +69,12 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_Range_attribute_is_set_on_integer_then_minimum_and_maximum_are_set()
+        public async Task When_Range_attribute_is_set_on_integer_then_minimum_and_maximum_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Integer"];
 
             //// Assert
@@ -82,13 +83,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_display_attribute_is_available_then_name_and_description_are_read()
+        public async Task When_display_attribute_is_available_then_name_and_description_are_read()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Display"];
 
             //// Assert
@@ -97,13 +98,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_description_attribute_is_available_then_description_are_read()
+        public async Task When_description_attribute_is_available_then_description_are_read()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -111,13 +112,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_required_attribute_is_available_then_property_is_required()
+        public async Task When_required_attribute_is_available_then_property_is_required()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Required"];
 
             //// Assert
@@ -125,13 +126,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_required_attribute_is_not_available_then_property_is_can_be_null()
+        public async Task When_required_attribute_is_not_available_then_property_is_can_be_null()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -140,13 +141,13 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [TestMethod]
-        public void When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
+        public async Task When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
         {
             //// Arrange
 
 
             //// Act
-            var schema = JsonSchema4.FromType<AttributeTestClass>();
+            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["ReadOnly"];
 
             //// Assert

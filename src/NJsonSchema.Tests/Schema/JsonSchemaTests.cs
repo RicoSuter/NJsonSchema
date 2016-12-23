@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,18 +18,18 @@ namespace NJsonSchema.Tests.Schema
             var schema = new JsonSchema4();
 
             //// Act
-            var json = schema.ToJson();
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}", json);
+}", data);
             Assert.IsTrue(schema.IsAnyType);
         }
 
         [TestMethod]
-        public void When_schema_contains_refs_then_they_should_be_resolved()
+        public async Task When_schema_contains_refs_then_they_should_be_resolved()
         {
             //// Arrange
             var data =
@@ -69,7 +70,7 @@ namespace NJsonSchema.Tests.Schema
 ";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsNotNull(schema.Definitions["diskDevice"]);
@@ -77,7 +78,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_schema_then_it_should_be_read_correctly()
+        public async Task When_deserializing_schema_then_it_should_be_read_correctly()
         {
             //// Arrange
             var data =
@@ -101,8 +102,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
-
+            var schema = await JsonSchema4.FromJsonAsync(data);
             var x = schema.ToJson();
 
             //// Assert
@@ -111,7 +111,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_multiple_types_then_flags_should_be_set_correctly()
+        public async Task When_deserializing_multiple_types_then_flags_should_be_set_correctly()
         {
             //// Arrange
             var data =
@@ -123,7 +123,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -131,7 +131,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
-        public void When_deserializing_single_type_then_flags_should_be_set_correctly()
+        public async Task When_deserializing_single_type_then_flags_should_be_set_correctly()
         {
             //// Arrange
             var data =
@@ -140,7 +140,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = JsonSchema4.FromJson(data);
+            var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
             Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
@@ -301,6 +301,64 @@ namespace NJsonSchema.Tests.Schema
                 //// Assert
                 Assert.Fail("Validating JToken with a DateTimeOffset value threw an exception.");
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task When_schema_has_cyclic_references_then_exception_is_thrown()
+        {
+            //// Arrange
+            var json = @"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""object"",
+  ""properties"": {
+    ""topProp"": {
+      ""$ref"": ""#/properties/topProp""
+    }
+  }
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var data = schema.ToJson();
+
+            //// Assert
+            var propertySchema = schema.Properties["topProp"].ActualPropertySchema;
+        }
+
+        [TestMethod]
+        public async Task When_schema_is_loaded_then_all_refs_are_resolved()
+        {
+            //// Arrange
+            var json = @"{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""type"": ""object"",
+  ""allOf"": [
+    {
+      ""$ref"": ""http://json-schema.org/draft-04/schema#""
+    },
+    {
+      ""type"": ""object"",
+      ""properties"": {
+        ""simpleRef"": {
+          ""type"": ""string""
+        }
+      }
+    }
+  ],
+  ""properties"": {
+    ""simpleRef2"": {
+      ""type"": ""string""
+    }
+  }
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(schema.AllOf.First().SchemaReference);
         }
     }
 }

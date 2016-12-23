@@ -18,14 +18,19 @@ namespace NJsonSchema
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
         private readonly JsonSchemaGeneratorSettings _settings;
 
-        private JsonSchema4 _rootSchema;
+        private JsonSchema4 RootSchema => (JsonSchema4)RootObject;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaResolver" /> class.</summary>
+        /// <param name="rootObject">The root schema.</param>
         /// <param name="settings">The settings.</param>
-        public JsonSchemaResolver(JsonSchemaGeneratorSettings settings)
+        public JsonSchemaResolver(object rootObject, JsonSchemaGeneratorSettings settings)
         {
             _settings = settings;
+            RootObject = rootObject; 
         }
+
+        /// <summary>Gets the root object.</summary>
+        public object RootObject { get; }
 
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
@@ -55,20 +60,10 @@ namespace NJsonSchema
             if (schema.GetType() != typeof(JsonSchema4))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
-            if (schema != _rootSchema)
+            if (schema != RootObject)
                 AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
 
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
-        }
-
-        /// <summary>Gets a value indicating whether a root object is defined.</summary>
-        public virtual bool HasRootObject => _rootSchema != null;
-
-        /// <summary>Sets the root object.</summary>
-        /// <param name="rootObject">The root object.</param>
-        public virtual void SetRootObject(object rootObject)
-        {
-            _rootSchema = (JsonSchema4)rootObject;
         }
 
         /// <summary>Appends the schema to the root object.</summary>
@@ -80,16 +75,16 @@ namespace NJsonSchema
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
-            if (schema == _rootSchema)
+            if (schema == RootObject)
                 throw new ArgumentException("The root schema cannot be appended.");
 
-            if (!_rootSchema.Definitions.Values.Contains(schema))
+            if (!RootSchema.Definitions.Values.Contains(schema))
             {
-                var typeName = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _rootSchema.Definitions.Keys);
-                if (!string.IsNullOrEmpty(typeName) && !_rootSchema.Definitions.ContainsKey(typeName))
-                    _rootSchema.Definitions[typeName] = schema;
+                var typeName = _settings.TypeNameGenerator.Generate(schema, typeNameHint, RootSchema.Definitions.Keys);
+                if (!string.IsNullOrEmpty(typeName) && !RootSchema.Definitions.ContainsKey(typeName))
+                    RootSchema.Definitions[typeName] = schema;
                 else
-                    _rootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
+                    RootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
             }
         }
 
