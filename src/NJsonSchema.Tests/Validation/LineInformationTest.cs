@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,14 +30,45 @@ namespace NJsonSchema.Tests.Validation
                         ""type"": ""number"",
                         ""enum"": [""this"", ""that""]
                     },
-                    ""prop3"": {}
-                }
+                    ""prop3"": {},
+                    ""prop4"": {}
+                },
+                ""oneOf"": [
+                    {
+                        ""properties"": {
+                            ""prop4"": { ""uniqueItems"": true }
+                        }
+                    },
+                    {
+                        ""properties"": {
+                            ""prop2"": { ""minLength"": 123 }
+                        }
+                    },
+                    {
+                        ""properties"": {
+                            ""prop1"": { ""maximum"": 10 }
+                        }
+                    }
+                ],
+                ""allOf"": [
+                    {
+                        ""properties"": {
+                            ""prop1"": { ""minimum"": 22 }
+                        }
+                    },
+                    {
+                        ""properties"": {
+                            ""prop2"": { ""pattern"": ""anything"" }
+                        }
+                    }
+                ]
             }");
 
             Json = @"{
                 ""prop1"": 12,
                 ""prop2"": ""something"",
-                ""prop4"": null
+                ""prop4"": [1,2,3,1],
+                ""prop5"": null
             }";
         }
 
@@ -50,7 +82,9 @@ namespace NJsonSchema.Tests.Validation
             var errors = Schema.Validate(Json);
 
             //// Assert
-            Assert.AreEqual(5, errors.Count, "Five validation errors expected.");
+            Assert.AreEqual(7, errors.Count, "Seven validation errors expected.");
+            Assert.AreEqual(3, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotOneOf).Errors.Count, "Three NotOneOf clause violations expected");
+            Assert.AreEqual(2, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotAllOf).Errors.Count, "Two NotAllOf clause violations expected");
             ValidateErrors(errors, true);
         }
 
@@ -85,24 +119,40 @@ namespace NJsonSchema.Tests.Validation
                     switch (error.Kind)
                     {
                     case ValidationErrorKind.StringExpected:
-                        Assert.AreEqual(2, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-                        Assert.AreEqual(27, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+                        AssertLineNumber(2, 27, error);
                         break;
                     case ValidationErrorKind.NumberExpected:
-                        Assert.AreEqual(3, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-                        Assert.AreEqual(36, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+                        AssertLineNumber(3, 36, error);
                         break;
                     case ValidationErrorKind.NotInEnumeration:
-                        Assert.AreEqual(3, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-                        Assert.AreEqual(36, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+                        AssertLineNumber(3, 36, error);
+                        break;
+                    case ValidationErrorKind.StringTooShort:
+                        AssertLineNumber(3, 36, error);
+                        break;
+                    case ValidationErrorKind.PatternMismatch:
+                        AssertLineNumber(3, 36, error);
                         break;
                     case ValidationErrorKind.PropertyRequired:
-                        Assert.AreEqual(1, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-                        Assert.AreEqual(1, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+                        AssertLineNumber(1, 1, error);
+                        break;
+                    case ValidationErrorKind.NumberTooBig:
+                        AssertLineNumber(2, 27, error);
+                        break;
+                    case ValidationErrorKind.NumberTooSmall:
+                        AssertLineNumber(2, 27, error);
+                        break;
+                    case ValidationErrorKind.ItemsNotUnique:
+                        AssertLineNumber(4, 26, error);
                         break;
                     case ValidationErrorKind.NoAdditionalPropertiesAllowed:
-                        Assert.AreEqual(1, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-                        Assert.AreEqual(1, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+                        AssertLineNumber(5, 24, error);
+                        break;
+                    case ValidationErrorKind.NotOneOf:
+                        AssertLineNumber(1, 1, error);
+                        break;
+                    case ValidationErrorKind.NotAllOf:
+                        AssertLineNumber(1, 1, error);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(error.Kind));
@@ -113,7 +163,19 @@ namespace NJsonSchema.Tests.Validation
                     Assert.AreEqual(0, error.LineNumber, "Line number not zero with no error info.");
                     Assert.AreEqual(0, error.LinePosition, "Line position not zero with no error info.");
                 }
+
+                var childSchemaError = error as ChildSchemaValidationError;
+                if (childSchemaError != null)
+                {
+                    ValidateErrors(childSchemaError.Errors.Values.SelectMany(x => x), hasLineInfo);
+                }
             }
+        }
+
+        private static void AssertLineNumber(int lineNumber, int linePosition, ValidationError error)
+        {
+            Assert.AreEqual(lineNumber, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
+            Assert.AreEqual(linePosition, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
         }
     }
 }
