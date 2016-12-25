@@ -7,10 +7,11 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -20,8 +21,10 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private static readonly ConcurrentDictionary<string, XDocument> Cache =
-            new ConcurrentDictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
+        private static readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+
+        private static readonly Dictionary<string, XDocument> Cache =
+            new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
 #if !LEGACY
 
@@ -96,8 +99,21 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                return string.Empty;
+
+#if !LEGACY
+            await _lock.WaitAsync();
+#else
+            _lock.Wait();
+#endif
+            try
+            {
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                    return string.Empty;
+            }
+            finally
+            {
+                _lock.Release();
+            }
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
             return await GetXmlDocumentationAsync(member, documentationPath, tagName).ConfigureAwait(false);
@@ -112,8 +128,21 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = parameter.Member.Module.Assembly.GetName();
-            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                return string.Empty;
+
+#if !LEGACY
+            await _lock.WaitAsync();
+#else
+            _lock.Wait();
+#endif
+            try
+            {
+                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                    return string.Empty;
+            }
+            finally
+            {
+                _lock.Release();
+            }
 
             var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
             return await GetXmlDocumentationAsync(parameter, documentationPath).ConfigureAwait(false);
@@ -142,19 +171,32 @@ namespace NJsonSchema.Infrastructure
                     return string.Empty;
 
                 var assemblyName = member.Module.Assembly.GetName();
-                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                    return string.Empty;
 
-                if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+#if !LEGACY
+                await _lock.WaitAsync();
+#else
+                _lock.Wait();
+#endif
+                try
                 {
-                    Cache[assemblyName.FullName] = null;
-                    return string.Empty;
+                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                        return string.Empty;
+
+                    if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+                    {
+                        Cache[assemblyName.FullName] = null;
+                        return string.Empty;
+                    }
+
+                    if (!Cache.ContainsKey(assemblyName.FullName))
+                        Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
+
+                    return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
                 }
-
-                if (!Cache.ContainsKey(assemblyName.FullName))
-                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
-
-                return GetXmlDocumentation(member, Cache[assemblyName.FullName], tagName);
+                finally
+                {
+                    _lock.Release();
+                }
             }
             catch
             {
@@ -174,19 +216,32 @@ namespace NJsonSchema.Infrastructure
                     return string.Empty;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                    return string.Empty;
 
-                if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+#if !LEGACY
+                await _lock.WaitAsync();
+#else
+                _lock.Wait();
+#endif
+                try
                 {
-                    Cache[assemblyName.FullName] = null;
-                    return string.Empty;
+                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                        return string.Empty;
+
+                    if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+                    {
+                        Cache[assemblyName.FullName] = null;
+                        return string.Empty;
+                    }
+
+                    if (!Cache.ContainsKey(assemblyName.FullName))
+                        Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
+
+                    return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
                 }
-
-                if (!Cache.ContainsKey(assemblyName.FullName))
-                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
-
-                return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
+                finally
+                {
+                    _lock.Release();
+                }
             }
             catch
             {
