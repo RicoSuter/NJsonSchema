@@ -271,7 +271,7 @@ namespace NJsonSchema.Infrastructure
 
         private static string RemoveLineBreakWhiteSpaces(string documentation)
         {
-            return Regex.Replace(documentation.Replace("\r", string.Empty), "\\n\\s+", "\n");
+            return Regex.Replace(documentation.Replace("\r", string.Empty), "\\n[ \\t]+", "\n");
         }
 
         /// <exception cref="ArgumentException">Unknown member type.</exception>
