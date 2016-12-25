@@ -80,15 +80,6 @@ namespace NJsonSchema.Infrastructure
             return await member.GetXmlDocumentationAsync("remarks").ConfigureAwait(false);
         }
 
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        [Obsolete("Use GetXmlSummary instead.")]
-        public static async Task<string> GetXmlDocumentationAsync(this MemberInfo member)
-        {
-            return await GetXmlDocumentationAsync(member, "summary").ConfigureAwait(false);
-        }
-
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="tagName">Name of the tag.</param>
@@ -116,7 +107,7 @@ namespace NJsonSchema.Infrastructure
             }
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-            return await GetXmlDocumentationAsync(member, documentationPath, tagName).ConfigureAwait(false);
+            return await GetXmlDocumentationAsync(member, tagName, documentationPath).ConfigureAwait(false);
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -150,20 +141,20 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<string> GetXmlDocumentationAsync(this Type type, string pathToXmlFile, string tagName)
+        public static Task<string> GetXmlDocumentationAsync(this Type type, string tagName, string pathToXmlFile)
         {
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationAsync(pathToXmlFile, tagName);
+            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationAsync(tagName, pathToXmlFile);
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <param name="tagName">Name of the tag.</param>
+        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile, string tagName)
+        public static async Task<string> GetXmlDocumentationAsync(this MemberInfo member, string tagName, string pathToXmlFile)
         {
             try
             {

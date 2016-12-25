@@ -39,5 +39,26 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.IsTrue(summary.Contains("\n\n"));
         }
+
+        //public class WithTagsInXmlDoc
+        //{
+        //    /// <summary>Gets or sets the foo.</summary>
+        //    /// <response code="201">Account created</response>
+        //    /// <response code="400">Username already in use</response>
+        //    public string Foo { get; set; }
+        //}
+
+        //[TestMethod]
+        //public async Task When_xml_doc_contains_xml_then_it_is_fully_read()
+        //{
+        //    //// Arrange
+
+
+        //    //// Act
+        //    var fullDoc = await typeof(WithTagsInXmlDoc).GetProperty("Foo").GetXmlDocumentationAsync("");
+
+        //    //// Assert
+        //    Assert.IsTrue(fullDoc.Contains("\n\n"));
+        //}
     }
 }
