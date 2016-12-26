@@ -388,7 +388,7 @@ namespace NJsonSchema.Validation
                     foreach (var property in additionalProperties)
                     {
                         var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + property.Name : property.Name;
-                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, newPropertyPath, token));
+                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, newPropertyPath, property));
                     }
                 }
             }
