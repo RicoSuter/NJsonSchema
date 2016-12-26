@@ -196,12 +196,12 @@ namespace NJsonSchema.Infrastructure
         /// <param name="path">The path.</param>
         /// <returns>The value.</returns>
         /// <exception cref="NotSupportedException">The System.Xml.XPath.Extensions API is not available on this platform.</exception>
-        public static string XPathEvaluate(XDocument document, string path)
+        public static object XPathEvaluate(XDocument document, string path)
         {
             if (!SupportsXPathApis)
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
             
-            return (string)XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
+            return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
         }
 
         private static Type TryLoadType(params string[] typeNames)
