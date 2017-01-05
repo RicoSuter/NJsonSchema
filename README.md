@@ -35,14 +35,14 @@ The project is developed and maintained by [Rico Suter](http://rsuter.com) and o
 The [JsonSchema4](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema4) class can be used as follows: 
 
 ```cs
-var schema = JsonSchema4.FromType<Person>();
+var schema = await JsonSchema4.FromTypeAsync<Person>();
 var schemaData = schema.ToJson();
 var errors = schema.Validate("{...}");
 
 foreach (var error in errors)
     Console.WriteLine(error.Path + ": " + error.Kind);
 
-schema = JsonSchema4.FromJson(schemaData);
+schema = await JsonSchema4.FromJsonAsync(schemaData);
 ```
 
 The `Person` class: 
