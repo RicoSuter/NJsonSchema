@@ -42,8 +42,11 @@ namespace NJsonSchema.Generation
                 };
             }
 
-            if (type == typeof(int) || type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
+            if (type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, false);
+
+            if (type == typeof(int))
+                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Integer);
 
             if ((type == typeof(long)) || (type == typeof(ulong)))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Long);
@@ -182,7 +185,7 @@ namespace NJsonSchema.Generation
                 return false;
 
             // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1") 
+            if (type.Name == "ObservableCollection`1")
                 return true;
 
             return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&

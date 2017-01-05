@@ -709,7 +709,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
       ""type"": [
         ""integer"",
         ""null""
-      ]
+      ],
+      ""format"": ""int32""
     }
   }"));
 
