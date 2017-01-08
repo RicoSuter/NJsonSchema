@@ -185,6 +185,9 @@ namespace NJsonSchema.Generation
             if (RequiresSchemaReference(itemType, null))
                 return new JsonSchema4 { SchemaReference = schema };
 
+            if (Settings.GenerateXmlObject)
+                await GenerateXmlObjectForItemTypeAsync(itemType, schema);
+
             return schema;
         }
 
@@ -264,6 +267,90 @@ namespace NJsonSchema.Generation
             await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+
+            if (Settings.GenerateXmlObject)
+                await GenerateXmlObjectForTypeAsync(type, schema);
+        }
+
+        private async Task GenerateXmlObjectForTypeAsync(Type type, JsonSchema4 schema)
+        {
+            var attributes = type.GetTypeInfo().GetCustomAttributes();
+            if (attributes.Any())
+            {
+                dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+                if (xmlTypeAttribute != null)
+                {
+                    await GenerateXmlObjectAsync(xmlTypeAttribute.TypeName, xmlTypeAttribute.Namespace, false, false, schema);
+                }
+            }               
+        }
+
+        private async Task GenerateXmlObjectForItemTypeAsync(Type type, JsonSchema4 schema)
+        {
+           await GenerateXmlObjectAsync(type.Name, null, false, false, schema);
+        }
+
+        private async Task GenerateXmlObjectForPropertyAsync(Type type, string propertyName, IEnumerable<Attribute> attributes, JsonProperty propertySchema)
+        {
+            string xmlName = null;
+            string xmlNamespace = null;
+            bool xmlWrapped = false;
+
+            if (propertySchema.Type == JsonObjectType.Array)
+            {
+                dynamic xmlArrayAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlArrayAttribute");
+                if (xmlArrayAttribute != null)
+                {
+                    xmlName = xmlArrayAttribute.ElementName;
+                    xmlNamespace = xmlArrayAttribute.Namespace;
+                }
+
+                dynamic xmlArrayItemsAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlArrayItemAttribute");
+                if (xmlArrayItemsAttribute != null)
+                {
+                    var xmlItemName = xmlArrayItemsAttribute.ElementName;
+                    var xmlItemNamespace = xmlArrayItemsAttribute.Namespace;
+
+                    await GenerateXmlObjectAsync(xmlItemName, xmlItemNamespace, true, false, propertySchema.Item);
+                }
+
+                xmlWrapped = true;
+            }
+
+            dynamic xmlElementAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlElementAttribute");
+            if (xmlElementAttribute != null)
+            {
+                xmlName = xmlElementAttribute.ElementName;
+                xmlNamespace = xmlElementAttribute.Namespace;
+            }
+
+            dynamic xmlAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlAttributeAttribute");
+            if (xmlAttribute != null)
+            {
+                if(!String.IsNullOrEmpty(xmlAttribute.AttributeName))
+                    xmlName = xmlAttribute.AttributeName;
+                if (!String.IsNullOrEmpty(xmlAttribute.Namespace))
+                    xmlNamespace = xmlAttribute.Namespace;
+            }
+
+            if(!String.IsNullOrEmpty(xmlName) || xmlWrapped)
+                await GenerateXmlObjectAsync(xmlName, xmlNamespace, xmlWrapped, xmlAttribute != null ? true : false, propertySchema);
+        }
+
+        private async Task GenerateXmlObjectAsync(string name, string @namespace, bool wrapped, bool isAttribute, JsonSchema4 schema)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                schema.Xml = new JsonXmlObject()
+                {
+                    Name = name,
+                    Wrapped = wrapped,
+                    Namespace = @namespace,
+                    ParentSchema = schema,
+                    Attribute = isAttribute
+                };
+                return 1;
+            });
         }
 
         private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -441,6 +528,9 @@ namespace NJsonSchema.Generation
                 var propertyName = JsonReflectionUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+
+                if (Settings.GenerateXmlObject)
+                    await GenerateXmlObjectForPropertyAsync(parentType, propertyName, attributes, jsonProperty);
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
