@@ -305,11 +305,32 @@ namespace NJsonSchema.Generation
         {
             foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute"))
             {
-                var typeDescription = JsonObjectTypeDescription.FromType(knownTypeAttribute.Type, null, Settings.DefaultEnumHandling);
-                var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
+                if (knownTypeAttribute.Type != null)
+                {
+                    var typeDescription = JsonObjectTypeDescription.FromType(knownTypeAttribute.Type, null, Settings.DefaultEnumHandling);
+                    var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
-                if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
-                    await GenerateAsync(knownTypeAttribute.Type, schemaResolver).ConfigureAwait(false);
+                    if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
+                        await GenerateAsync(knownTypeAttribute.Type, schemaResolver).ConfigureAwait(false);
+                }
+                else if (!string.IsNullOrWhiteSpace(knownTypeAttribute.MethodName))
+                {
+                    var methodInfo = type.GetRuntimeMethod((string)knownTypeAttribute.MethodName, new Type[0]);
+                    var knownTypes = methodInfo.Invoke(null, null) as Type[];
+
+                    foreach (var knownType in knownTypes)
+                    {
+                        var typeDescription = JsonObjectTypeDescription.FromType(knownType, null, Settings.DefaultEnumHandling);
+                        var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
+
+                        if (!schemaResolver.HasSchema(knownType, isIntegerEnum))
+                            await GenerateAsync(knownType, schemaResolver).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
+                }
             }
         }
 
