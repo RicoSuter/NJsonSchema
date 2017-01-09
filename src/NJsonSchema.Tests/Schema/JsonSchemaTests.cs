@@ -360,5 +360,21 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.IsNotNull(schema.AllOf.First().SchemaReference);
         }
+
+        [TestMethod]
+        public async Task When_json_schema_is_loaded_then_no_collection_modified_exception_is_thrown()
+        {
+            // https://github.com/NJsonSchema/NJsonSchema/issues/288
+
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromUrlAsync("http://schemas.sportradar.com/bsa/json/v1/endpoints/soccer/team_profile.json");
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(json);
+        }
     }
 }
