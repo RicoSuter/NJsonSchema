@@ -1,25 +1,27 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------
+// <copyright file="XmlObjectExtension.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Infrastructure
 {
-    /// <summary>
-    /// Extension methods to help out generating XMLObject structure to schema
-    /// </summary>
+    /// <summary>Extension methods to help out generating XMLObject structure to schema</summary>
     public static class XmlObjectExtension
     {
-        /// <summary>
-        /// Generate XML object for a schema definition
-        /// </summary>
+        /// <summary>Generate XML object for a schema definition</summary>
         /// <param name="schema">The definition</param>
         /// <param name="type">The type of the definition</param>
         public static void GenerateXmlObjectForType(this JsonSchema4 schema, Type type)
         {
-            var attributes = type.GetTypeInfo().GetCustomAttributes();
+            var attributes = type.GetTypeInfo().GetCustomAttributes().ToList();
             if (attributes.Any())
             {
                 dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
@@ -29,20 +31,16 @@ namespace NJsonSchema.Infrastructure
                 }
             }
         }
-        /// <summary>
-        /// Generates XMLObject structure for an array with primitive types
-        /// </summary>
+        /// <summary>Generates XMLObject structure for an array with primitive types</summary>
         /// <param name="schema">The schema for the item</param>
-        /// <param name="type"></param>
+        /// <param name="type">The type.</param>
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
             //Is done all the time for XML to be able to get type name as the element name
             GenerateXmlObject(type.Name, null, false, false, schema);
         }
 
-        /// <summary>
-        /// Generates XMLObject structure for a property
-        /// </summary>
+        /// <summary>Generates XMLObject structure for a property</summary>
         /// <param name="propertySchema">The schema for the property</param>
         /// <param name="type">The type</param>
         /// <param name="propertyName">The property name</param>
@@ -84,19 +82,19 @@ namespace NJsonSchema.Infrastructure
             dynamic xmlAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlAttributeAttribute");
             if (xmlAttribute != null)
             {
-                if (!String.IsNullOrEmpty(xmlAttribute.AttributeName))
+                if (!string.IsNullOrEmpty(xmlAttribute.AttributeName))
                     xmlName = xmlAttribute.AttributeName;
-                if (!String.IsNullOrEmpty(xmlAttribute.Namespace))
+                if (!string.IsNullOrEmpty(xmlAttribute.Namespace))
                     xmlNamespace = xmlAttribute.Namespace;
             }
 
-            if (!String.IsNullOrEmpty(xmlName) || xmlWrapped)
+            if (!string.IsNullOrEmpty(xmlName) || xmlWrapped)
                 GenerateXmlObject(xmlName, xmlNamespace, xmlWrapped, xmlAttribute != null ? true : false, propertySchema);
         }
 
         private static void GenerateXmlObject(string name, string @namespace, bool wrapped, bool isAttribute, JsonSchema4 schema)
         {
-            schema.Xml = new JsonXmlObject()
+            schema.Xml = new JsonXmlObject
             {
                 Name = name,
                 Wrapped = wrapped,
@@ -105,6 +103,5 @@ namespace NJsonSchema.Infrastructure
                 Attribute = isAttribute
             };
         }
-
     }
 }

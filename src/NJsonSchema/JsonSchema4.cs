@@ -458,15 +458,15 @@ namespace NJsonSchema
 
         /// <summary>Gets the xml object of the type. </summary>
         [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonXmlObject Xml {
-            get
-            {
-                return _xmlObject;
-            }
+        public JsonXmlObject Xml
+        {
+            get { return _xmlObject; }
             set
             {
                 _xmlObject = value;
-                //_xmlObject.ParentSchema = this;
+
+                if (_xmlObject != null)
+                    _xmlObject.ParentSchema = this;
             }
         }
 

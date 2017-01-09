@@ -42,7 +42,7 @@ namespace NJsonSchema.Generation
         public bool GenerateKnownTypes { get; set; } = true;
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
-        public bool GenerateXmlObject { get; set; } = false;
+        public bool GenerateXmlObjects { get; set; } = false;
 
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }

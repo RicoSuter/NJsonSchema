@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.ComponentModel;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace NJsonSchema
@@ -15,15 +13,9 @@ namespace NJsonSchema
     /// <summary>A description of a JSON property of a JSON object. </summary>
     public class JsonXmlObject
     {
-        private JsonSchema4 _parentSchema;
-
-        internal static JsonXmlObject FromJsonSchema(string name, JsonSchema4 type)
-        {
-            var data = JsonConvert.SerializeObject(type);
-            var xmlObject = JsonConvert.DeserializeObject<JsonXmlObject>(data);
-            xmlObject.Name = name;
-            return xmlObject;
-        }
+        /// <summary>Gets the parent schema of the XML object schema. </summary>
+        [JsonIgnore]
+        public JsonSchema4 ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the name of the xml object. </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -44,17 +36,5 @@ namespace NJsonSchema
         /// <summary>Gets or sets if the property definition translates into an attribute instead of an element. </summary>
         [JsonProperty("attribute", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool Attribute { get; internal set; }
-
-        /// <summary>Gets the parent schema of the XML object schema. </summary>
-        [JsonIgnore]
-        public JsonSchema4 ParentSchema
-        {
-            get { return _parentSchema; }
-            internal set
-            {
-                var initialize = _parentSchema == null;
-                _parentSchema = value;
-            }
-        }
     }
 }
