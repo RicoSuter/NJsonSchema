@@ -306,32 +306,30 @@ namespace NJsonSchema.Generation
             foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute"))
             {
                 if (knownTypeAttribute.Type != null)
-                {
-                    var typeDescription = JsonObjectTypeDescription.FromType(knownTypeAttribute.Type, null, Settings.DefaultEnumHandling);
-                    var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
-
-                    if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
-                        await GenerateAsync(knownTypeAttribute.Type, schemaResolver).ConfigureAwait(false);
-                }
+                    await AddKnownTypeAsync(knownTypeAttribute.Type, schemaResolver);
                 else if (!string.IsNullOrWhiteSpace(knownTypeAttribute.MethodName))
                 {
                     var methodInfo = type.GetRuntimeMethod((string)knownTypeAttribute.MethodName, new Type[0]);
+
                     var knownTypes = methodInfo.Invoke(null, null) as Type[];
-
-                    foreach (var knownType in knownTypes)
+                    if (knownTypes != null)
                     {
-                        var typeDescription = JsonObjectTypeDescription.FromType(knownType, null, Settings.DefaultEnumHandling);
-                        var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
-
-                        if (!schemaResolver.HasSchema(knownType, isIntegerEnum))
-                            await GenerateAsync(knownType, schemaResolver).ConfigureAwait(false);
+                        foreach (var knownType in knownTypes)
+                            await AddKnownTypeAsync(knownType, schemaResolver);
                     }
                 }
                 else
-                {
                     throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
-                }
             }
+        }
+
+        private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
+        {
+            var typeDescription = JsonObjectTypeDescription.FromType(type, null, Settings.DefaultEnumHandling);
+            var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
+
+            if (!schemaResolver.HasSchema(type, isIntegerEnum))
+                await GenerateAsync(type, schemaResolver).ConfigureAwait(false);
         }
 
         private async Task GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
