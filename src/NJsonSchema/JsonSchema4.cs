@@ -456,6 +456,23 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets the xml object of the type. </summary>
+        [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public JsonXmlObject Xml
+        {
+            get { return _xmlObject; }
+            set
+            {
+                _xmlObject = value;
+
+                if (_xmlObject != null)
+                    _xmlObject.ParentSchema = this;
+            }
+        }
+
+        [JsonIgnore]
+        private JsonXmlObject _xmlObject;
+
         /// <summary>Gets the pattern properties of the type. </summary>
         [JsonIgnore]
         public IDictionary<string, JsonSchema4> PatternProperties

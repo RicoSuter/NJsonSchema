@@ -90,8 +90,10 @@
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Converters\JsonInheritanceConverter.cs" />
+    <Compile Include="Infrastructure\XmlObjectExtension.cs" />
     <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="JsonReferenceResolver.cs" />
+    <Compile Include="JsonXmlObject.cs" />
     <Compile Include="PropertyNameHandling.cs" />
     <Compile Include="EnumHandling.cs" />
     <Compile Include="Infrastructure\DynamicApis.cs" />

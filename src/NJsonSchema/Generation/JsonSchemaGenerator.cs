@@ -51,7 +51,7 @@ namespace NJsonSchema.Generation
             var schema = new JsonSchema4();
             var schemaResolver = new JsonSchemaResolver(schema, Settings);
             await GenerateAsync(type, null, schema, schemaResolver).ConfigureAwait(false);
-            return schema; 
+            return schema;
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
@@ -182,6 +182,9 @@ namespace NJsonSchema.Generation
         {
             var schema = await GenerateAsync(itemType, schemaResolver).ConfigureAwait(false);
 
+            if (Settings.GenerateXmlObjects)
+                schema.GenerateXmlObjectForItemType(itemType);
+
             if (RequiresSchemaReference(itemType, null))
                 return new JsonSchema4 { SchemaReference = schema };
 
@@ -262,8 +265,12 @@ namespace NJsonSchema.Generation
             schema.AllowAdditionalProperties = false;
 
             await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+
+            if (Settings.GenerateXmlObjects)
+                schema.GenerateXmlObjectForType(type);
         }
 
         private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -298,12 +305,31 @@ namespace NJsonSchema.Generation
         {
             foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute"))
             {
-                var typeDescription = JsonObjectTypeDescription.FromType(knownTypeAttribute.Type, null, Settings.DefaultEnumHandling);
-                var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
+                if (knownTypeAttribute.Type != null)
+                    await AddKnownTypeAsync(knownTypeAttribute.Type, schemaResolver);
+                else if (!string.IsNullOrWhiteSpace(knownTypeAttribute.MethodName))
+                {
+                    var methodInfo = type.GetRuntimeMethod((string)knownTypeAttribute.MethodName, new Type[0]);
 
-                if (!schemaResolver.HasSchema(knownTypeAttribute.Type, isIntegerEnum))
-                    await GenerateAsync(knownTypeAttribute.Type, schemaResolver).ConfigureAwait(false);
+                    var knownTypes = methodInfo.Invoke(null, null) as Type[];
+                    if (knownTypes != null)
+                    {
+                        foreach (var knownType in knownTypes)
+                            await AddKnownTypeAsync(knownType, schemaResolver);
+                    }
+                }
+                else
+                    throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
             }
+        }
+
+        private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
+        {
+            var typeDescription = JsonObjectTypeDescription.FromType(type, null, Settings.DefaultEnumHandling);
+            var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
+
+            if (!schemaResolver.HasSchema(type, isIntegerEnum))
+                await GenerateAsync(type, schemaResolver).ConfigureAwait(false);
         }
 
         private async Task GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -441,6 +467,9 @@ namespace NJsonSchema.Generation
                 var propertyName = JsonReflectionUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+
+                if (Settings.GenerateXmlObjects)
+                    jsonProperty.GenerateXmlObjectForProperty(parentType, propertyName, attributes);
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
