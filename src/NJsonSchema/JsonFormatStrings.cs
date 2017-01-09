@@ -32,8 +32,11 @@ namespace NJsonSchema
         [Obsolete("Now made redundant. Use \"guid\" instead.")]
         public const string Uuid = "uuid";
 
+        /// <summary>Format for an integer. </summary>
+        public const string Integer = "int32";
+
         /// <summary>Format for a long integer. </summary>
-        public const string Long = "long";
+        public const string Long = "int64";
 
         /// <summary>Format for a double number. </summary>
         public const string Double = "double";

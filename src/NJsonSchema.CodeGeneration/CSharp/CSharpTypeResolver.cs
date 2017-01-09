@@ -151,7 +151,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.Format == JsonFormatStrings.Byte)
                 return isNullable ? "byte?" : "byte";
 
-            if (schema.Format == JsonFormatStrings.Long)
+            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
                 return isNullable ? "long?" : "long";
 
             return isNullable ? "int?" : "int";
