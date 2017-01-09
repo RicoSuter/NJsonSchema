@@ -102,7 +102,7 @@ namespace NJsonSchema
 
             if (obj is IDictionary)
             {
-                foreach (var item in ((IDictionary)obj).Values)
+                foreach (var item in ((IDictionary)obj).Values.OfType<object>().ToArray())
                     await UpdateSchemaReferencesAsync(rootObject, item, checkedObjects, jsonReferenceResolver).ConfigureAwait(false);
             }
             else if (obj is IEnumerable)
