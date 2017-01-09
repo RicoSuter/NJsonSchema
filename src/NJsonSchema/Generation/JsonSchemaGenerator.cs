@@ -182,6 +182,9 @@ namespace NJsonSchema.Generation
         {
             var schema = await GenerateAsync(itemType, schemaResolver).ConfigureAwait(false);
 
+            if (Settings.GenerateXmlObject)
+                schema.GenerateXmlObjectForItemType(itemType);
+
             if (RequiresSchemaReference(itemType, null))
                 return new JsonSchema4 { SchemaReference = schema };
 
@@ -264,6 +267,9 @@ namespace NJsonSchema.Generation
             await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+
+            if (Settings.GenerateXmlObject)
+                schema.GenerateXmlObjectForType(type);
         }
 
         private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -441,6 +447,9 @@ namespace NJsonSchema.Generation
                 var propertyName = JsonReflectionUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+
+                if (Settings.GenerateXmlObject)
+                    jsonProperty.GenerateXmlObjectForProperty(parentType, propertyName, attributes);
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
