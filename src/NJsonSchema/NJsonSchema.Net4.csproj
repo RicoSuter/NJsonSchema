@@ -61,6 +61,7 @@
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\TypeNameStyle.cs" />
     <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
+    <Compile Include="Infrastructure\XmlObjectExtension.cs" />
     <Compile Include="ISchemaNameGenerator.cs" />
     <Compile Include="ITypeNameGenerator.cs" />
     <Compile Include="JsonFormatStrings.cs" />

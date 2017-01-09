@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 namespace NJsonSchema
 {
     /// <summary>A description of a JSON property of a JSON object. </summary>
-    public class JsonXmlObject : JsonSchema4
+    public class JsonXmlObject
     {
         private JsonSchema4 _parentSchema;
 
@@ -47,7 +47,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent schema of the XML object schema. </summary>
         [JsonIgnore]
-        public override JsonSchema4 ParentSchema
+        public JsonSchema4 ParentSchema
         {
             get { return _parentSchema; }
             internal set
