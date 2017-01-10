@@ -456,7 +456,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets the xml object of the type. </summary>
+        /// <summary>Gets the xml object of the schema (used in Swagger specifications). </summary>
         [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonXmlObject Xml
         {
