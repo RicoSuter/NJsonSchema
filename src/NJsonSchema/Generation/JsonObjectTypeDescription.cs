@@ -76,7 +76,7 @@ namespace NJsonSchema.Generation
                 return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.TimeSpan);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Uri);
+                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull, false, JsonFormatStrings.Uri);
 
             if (type == typeof(byte))
                 return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
