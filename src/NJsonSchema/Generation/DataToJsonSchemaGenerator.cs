@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +37,7 @@ namespace NJsonSchema.Generation
             if (schema != rootSchema && token.Type == JTokenType.Object)
             {
                 var referencedSchema = new JsonSchema4();
-                rootSchema.Definitions["Anonymous" + (rootSchema.Definitions.Count + 1)] = referencedSchema;
+                AddSchemaDefinition(rootSchema, referencedSchema);
 
                 schema.SchemaReference = referencedSchema;
                 GenerateWithoutReference(token, referencedSchema, rootSchema);
@@ -131,24 +132,32 @@ namespace NJsonSchema.Generation
             if (itemSchemas.Count == 0)
                 schema.Item = new JsonSchema4();
             else if (itemSchemas.GroupBy(s => s.Type).Count() == 1)
-            {
-                var firstItemSchema = itemSchemas.First();
-                var itemSchema = new JsonSchema4
-                {
-                    Type = firstItemSchema.Type
-                };
-
-                if (firstItemSchema.Type == JsonObjectType.Object)
-                {
-                    foreach (var property in itemSchemas.SelectMany(s => s.Properties).GroupBy(p => p.Key))
-                        itemSchema.Properties[property.Key] = property.First().Value;
-                }
-
-                rootSchema.Definitions["Anonymous" + (rootSchema.Definitions.Count + 1)] = itemSchema;
-                schema.Item = new JsonSchema4 { SchemaReference = itemSchema };
-            }
+                MergeAndAssignItemSchemas(rootSchema, schema, itemSchemas);
             else
                 schema.Item = itemSchemas.First();
+        }
+
+        private void MergeAndAssignItemSchemas(JsonSchema4 rootSchema, JsonSchema4 schema, List<JsonSchema4> itemSchemas)
+        {
+            var firstItemSchema = itemSchemas.First();
+            var itemSchema = new JsonSchema4
+            {
+                Type = firstItemSchema.Type
+            };
+
+            if (firstItemSchema.Type == JsonObjectType.Object)
+            {
+                foreach (var property in itemSchemas.SelectMany(s => s.Properties).GroupBy(p => p.Key))
+                    itemSchema.Properties[property.Key] = property.First().Value;
+            }
+
+            AddSchemaDefinition(rootSchema, itemSchema);
+            schema.Item = new JsonSchema4 {SchemaReference = itemSchema};
+        }
+
+        private void AddSchemaDefinition(JsonSchema4 rootSchema, JsonSchema4 schema)
+        {
+            rootSchema.Definitions["Anonymous" + (rootSchema.Definitions.Count + 1)] = schema;
         }
     }
 }
