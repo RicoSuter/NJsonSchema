@@ -103,6 +103,14 @@ namespace NJsonSchema
             return await generator.GenerateAsync(type).ConfigureAwait(false);
         }
 
+        /// <summary>Creates a <see cref="JsonSchema4" /> from sample JSON data.</summary>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema4 FromData(string data)
+        {
+            var generator = new DataToJsonSchemaGenerator();
+            return generator.Generate(data);
+        }
+
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The JSON Schema.</returns>

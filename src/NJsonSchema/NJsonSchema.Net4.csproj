@@ -48,6 +48,7 @@
     <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
     <Compile Include="EnumHandling.cs" />
+    <Compile Include="Generation\DataToJsonSchemaGenerator.cs" />
     <Compile Include="Generation\JsonObjectTypeDescription.cs" />
     <Compile Include="Generation\JsonReflectionUtilities.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />

@@ -78,6 +78,7 @@
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />
+    <Compile Include="Generation\DataToJsonSchemaGenerator.cs" />
     <Compile Include="Generation\JsonReflectionUtilities.cs" />
     <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
     <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
