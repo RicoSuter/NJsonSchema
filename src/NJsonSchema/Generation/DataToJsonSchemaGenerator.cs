@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -105,6 +106,15 @@ namespace NJsonSchema.Generation
                     schema.Format = JsonFormatStrings.Uri;
                     break;
             }
+
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
+                schema.Format = JsonFormatStrings.Date;
+
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+                schema.Format = JsonFormatStrings.DateTime;
+
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+                schema.Format = JsonFormatStrings.TimeSpan;
         }
 
         private void GenerateObject(JToken token, JsonSchema4 schema, JsonSchema4 rootSchema)

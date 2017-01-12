@@ -14,8 +14,9 @@ namespace NJsonSchema.Tests.Generation
                 int: 1, 
                 str: ""abc"", 
                 bool: true, 
-                datetime: ""2012-07-19"", 
-                timespan: ""10:11:11"", 
+                date: ""2012-07-19"", 
+                datetime: ""2012-07-19 10:11:11"", 
+                timespan: ""10:11:11""
             }";
             var generator = new DataToJsonSchemaGenerator();
 
@@ -28,11 +29,14 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(JsonObjectType.String, schema.Properties["str"].Type);
             Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["bool"].Type);
 
-            //Assert.AreEqual(JsonObjectType.String, schema.Properties["datetime"].Type);
-            //Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["datetime"].Format);
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["date"].Type);
+            Assert.AreEqual(JsonFormatStrings.Date, schema.Properties["date"].Format);
 
-            //Assert.AreEqual(JsonObjectType.String, schema.Properties["timespan"].Type);
-            //Assert.AreEqual(JsonFormatStrings.TimeSpan, schema.Properties["timespan"].Format);
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["datetime"].Type);
+            Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["datetime"].Format);
+
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["timespan"].Type);
+            Assert.AreEqual(JsonFormatStrings.TimeSpan, schema.Properties["timespan"].Format);
         }
 
         [TestMethod]
