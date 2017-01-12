@@ -125,7 +125,7 @@ namespace NJsonSchema.Converters
         private Type GetObjectSubtype(Type objectType, string discriminator)
         {
             var knownTypeAttributes = objectType.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute");
-            dynamic knownTypeAttribute = knownTypeAttributes.SingleOrDefault(a => IsKnwonTypeTargetType(a, discriminator));
+            dynamic knownTypeAttribute = knownTypeAttributes.SingleOrDefault(a => IsKnownTypeTargetType(a, discriminator));
             if (knownTypeAttribute != null)
                 return knownTypeAttribute.Type;
 
@@ -133,7 +133,7 @@ namespace NJsonSchema.Converters
             return objectType.GetTypeInfo().Assembly.GetType(typeName);
         }
 
-        private bool IsKnwonTypeTargetType(dynamic attribute, string discriminator)
+        private bool IsKnownTypeTargetType(dynamic attribute, string discriminator)
         {
             return attribute?.Type.Name == discriminator;
         }

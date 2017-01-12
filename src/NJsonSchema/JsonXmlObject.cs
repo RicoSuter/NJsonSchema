@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace NJsonSchema
 {
-    /// <summary>A description of a JSON property of a JSON object. </summary>
+    /// <summary>A description of a JSON property of a JSON object (used in Swagger specifications). </summary>
     public class JsonXmlObject
     {
         /// <summary>Gets the parent schema of the XML object schema. </summary>

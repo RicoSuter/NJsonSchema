@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration
             if (schema.Type.HasFlag(JsonObjectType.String))
                 return "\"" + schema.Default + "\"";
             else if (schema.Type.HasFlag(JsonObjectType.Boolean))
-                return schema.Default.ToString().ToLower();
+                return schema.Default.ToString().ToLowerInvariant();
             else if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                      schema.Type.HasFlag(JsonObjectType.Number) ||
                      schema.Type.HasFlag(JsonObjectType.Integer))

@@ -152,7 +152,7 @@ namespace NJsonSchema
                     caseFlag = true;
                 else if (caseFlag)
                 {
-                    sb.Append(char.ToUpper(c));
+                    sb.Append(char.ToUpperInvariant(c));
                     caseFlag = false;
                 }
                 else
