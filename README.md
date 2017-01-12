@@ -20,8 +20,9 @@ The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** 
 
 **Features:**
 
-- Read existing JSON Schemas and validate JSON data
-- Generate JSON Schema from .NET type via reflection (with support for many attributes/annotations)
+- Read existing JSON Schemas and validate JSON data (`JsonSchema4.FromFileAsync()` and `schema.Validate()`)
+- Generate JSON Schema from .NET type via reflection (with support for many attributes/annotations, `JsonSchema4.FromTypeAsync<>()`)
+- Generate JSON Schema from sample JSON data (`JsonSchema4.FromData()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 - Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
