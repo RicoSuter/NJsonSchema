@@ -19,18 +19,22 @@ namespace NJsonSchema.CodeGeneration.Models
         private readonly CodeGeneratorSettingsBase _settings;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModelBase"/> class.</summary>
-        /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="property">The property.</param>
+        /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="defaultValueGenerator">The default value generator.</param>
         /// <param name="settings">The settings.</param>
-        protected PropertyModelBase(ClassTemplateModelBase classTemplateModel, JsonProperty property, DefaultValueGenerator defaultValueGenerator, CodeGeneratorSettingsBase settings)
+        protected PropertyModelBase(
+            JsonProperty property,
+            ClassTemplateModelBase classTemplateModel,
+            DefaultValueGenerator defaultValueGenerator,
+            CodeGeneratorSettingsBase settings)
         {
             _classTemplateModel = classTemplateModel;
             _property = property;
             _defaultValueGenerator = defaultValueGenerator;
             _settings = settings;
 
-            PropertyName = _settings.PropertyNameGenerator.Generate(_property); 
+            PropertyName = _settings.PropertyNameGenerator.Generate(_property);
         }
 
         /// <summary>Gets a value indicating whether the property has default value.</summary>
@@ -40,8 +44,9 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string Type { get; }
 
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => _settings.GenerateDefaultValues ? _defaultValueGenerator.GetDefaultValue(
-            _property, _property.IsNullable(_settings.NullHandling), Type, _property.Name) : null;
+        public string DefaultValue => _settings.GenerateDefaultValues ?
+            _defaultValueGenerator.GetDefaultValue(_property, _property.IsNullable(_settings.NullHandling), Type, _property.Name) :
+            null;
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
