@@ -36,8 +36,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The type.</param>
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
-            //Is done all the time for XML to be able to get type name as the element name
-            GenerateXmlObject(type.Name, null, false, false, schema);
+            //Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
+            if(schema.Xml == null)
+                GenerateXmlObject(type.Name, null, false, false, schema);
         }
 
         /// <summary>Generates XMLObject structure for a property</summary>
@@ -86,6 +87,18 @@ namespace NJsonSchema.Infrastructure
                     xmlName = xmlAttribute.AttributeName;
                 if (!string.IsNullOrEmpty(xmlAttribute.Namespace))
                     xmlNamespace = xmlAttribute.Namespace;
+            }
+
+            //Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
+            //We need to ensure that the property name is preserved
+            if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
+            {
+                var referencedTypeAttributes = type.GetTypeInfo().GetCustomAttributes();
+                dynamic xmlReferenceTypeAttribute = referencedTypeAttributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+                if (xmlReferenceTypeAttribute != null)
+                {
+                    xmlName = propertyName;
+                }
             }
 
             if (!string.IsNullOrEmpty(xmlName) || xmlWrapped)
