@@ -4,8 +4,7 @@
 <#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
 <#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#><#if(Model.HasDiscriminator){#>[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
-<#}#>[Newtonsoft.Json.JsonObject(Newtonsoft.Json.MemberSerialization.OptIn)]
-[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+<#}#>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
     private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
