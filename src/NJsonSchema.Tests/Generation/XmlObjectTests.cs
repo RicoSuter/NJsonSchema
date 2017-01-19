@@ -30,6 +30,24 @@ namespace NJsonSchema.Tests.Generation
                 public string Name { get; set; }
             }
 
+            public static string CreateTestXML()
+            {
+                var types = new System.Collections.Generic.List<System.Type>();
+                types.Add(typeof(WithoutXmlAttributesDefined));
+                var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
+                var testObject = new WithoutXmlAttributesDefined();
+                testObject.Foo = "stringvalue";
+                testObject.StringArray = new string[] { "S1" };
+                testObject.IntArray = new int[] { 1 };
+                testObject.DoubleArray = new double[] { 1 };
+                testObject.DecimalArray = new decimal[] { 1 };
+                testObject.InternalItem = new[] { new WithoutXmlAttributesDefined.WithoutXmlAttributeItem() { Name = "Test" } };
+
+                var sio = new System.IO.StringWriter();
+                serializer.Serialize(sio, testObject);
+                return sio.ToString();
+            }
+
             /*
              * Class above is the XML outputted as presented below by the XMLSerializer 
              *<?xml version="1.0" encoding="utf-16"?>
@@ -61,7 +79,7 @@ namespace NJsonSchema.Tests.Generation
         {
             var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
-            XmlSerializerTestCode();
+            
             //// Assert
             Assert.IsNull(schema.Xml);
             var fooProperty = schema.Properties[Foo];
@@ -131,12 +149,47 @@ namespace NJsonSchema.Tests.Generation
             public int[] TheInts { get; set; }
 
             [XmlArray("ExternalItems")]
-            public WithXmlAttributeItem[] InternalItem { get; set; }
+            public WithXmlAttributeItem[] InternalItems { get; set; }
+
+            public WithXmlAttributeItem2[] ExternalItems2 { get; set; }
+
+            public WithXmlAttributeProperty ReferenceProperty { get; set; }
 
             [XmlType("ExternalItem")]
             public class WithXmlAttributeItem
             {
                 public string Name { get; set; }
+            }
+
+            [XmlType("ExternalItem2")]
+            public class WithXmlAttributeItem2
+            {
+                public string Name { get; set; }
+            }
+
+            [XmlType("NotAPropertyName")]
+            public class WithXmlAttributeProperty
+            {
+                public string Name { get; set; }
+            }
+
+            public static string CreateTestXML()
+            {
+                var types = new System.Collections.Generic.List<System.Type>();
+                types.Add(typeof(WithXmlAttributesDefined));
+                var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
+                var testObject = new WithXmlAttributesDefined();
+                testObject.Foo = "stringvalue";
+                testObject.MightBeAAttribute = "stringvalue";
+                testObject.StringArray = new string[] { "S1" };
+                testObject.TheInts = new int[] { 1 };
+                testObject.InternalItems = new[] { new WithXmlAttributeItem() { Name = "Test" } };
+                testObject.ReferenceProperty = new WithXmlAttributeProperty() { Name = "Test" };
+                testObject.ExternalItems2 = new[] { new WithXmlAttributeItem2() { Name = "Test" } };
+
+                var sio = new System.IO.StringWriter();
+                serializer.Serialize(sio, testObject);
+                return sio.ToString();
             }
 
             /*
@@ -155,6 +208,14 @@ namespace NJsonSchema.Tests.Generation
              *    <Name>Test</Name>
              *  </ExternalItem>
              * </ExternalItems>
+             * <ExternalItems2 xmlns="http://test.shema.org/type">
+             *  <ExternalItem2>
+             *    <Name>Test</Name>
+             *  </ExternalItem2>
+             * </ExternalItems2>
+             * <ReferenceProperty xmlns="http://test.shema.org/type">
+             *   <Name>Test</Name>
+             * </ReferenceProperty>
              *</NotTheSameName>
              * 
              */
@@ -173,7 +234,12 @@ namespace NJsonSchema.Tests.Generation
             var stringArrayProperty = schema.Properties[StringArray];
             var intArrayProperty = schema.Properties["TheInts"];
             var fooProperty = schema.Properties["Foo"];
+            var externalItemsProperty = schema.Properties["InternalItems"];
+            var externalItemType = schema.Definitions["WithXmlAttributeItem"];
+            var externalItems2Property = schema.Properties["ExternalItems2"];
+            var externalItem2Type = schema.Definitions["WithXmlAttributeItem2"];
             var attributeProperty = schema.Properties["MightBeAAttribute"];
+            var referenceProperty = schema.Properties["ReferenceProperty"];
 
             Assert.AreEqual("Bar", fooProperty.Xml.Name);
 
@@ -184,7 +250,19 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.AreEqual("TheString", stringArrayProperty.Item.Xml.Name);
 
-            Assert.AreEqual(true, attributeProperty.Xml.Attribute);
+            Assert.IsTrue(attributeProperty.Xml.Attribute);
+
+            Assert.IsTrue(externalItemsProperty.Xml.Wrapped);
+            Assert.AreEqual("ExternalItems", externalItemsProperty.Xml.Name);
+            Assert.AreEqual("ExternalItem", externalItemType.Xml.Name);
+
+            Assert.IsNull(externalItems2Property.Xml.Name);
+            Assert.IsTrue(externalItems2Property.Xml.Wrapped);
+            Assert.AreEqual("ExternalItem2", externalItem2Type.Xml.Name);
+
+            //https://github.com/swagger-api/swagger-ui/issues/2610
+            Assert.IsNotNull(referenceProperty.Xml, "Make sure that type reference properties have an xml object");
+            Assert.AreEqual(referenceProperty.Name, referenceProperty.Xml.Name, "Make sure that the property name and the xml name is the same");
         }
 
         [TestMethod]
@@ -206,6 +284,9 @@ namespace NJsonSchema.Tests.Generation
 
             var arrayStringPropertyItemXml = schemaObject["properties"][StringArray]["items"]["xml"];
             Assert.AreEqual("TheString", arrayStringPropertyItemXml["name"]);
+
+            var referencePropertyXml = schemaObject["properties"]["ReferenceProperty"]["xml"];
+            Assert.AreEqual("ReferenceProperty", referencePropertyXml["name"]);
         }
 
         public class WithXmlIncorrectAttributesDefined
@@ -227,22 +308,11 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsNull(fooProperty.Xml);
         }
 
-        private void XmlSerializerTestCode()
+        [TestMethod]
+        public async Task When_model_objects_are_created_with_the_example_model_make_sure_that_they_are_serializable()
         {
-            var types = new System.Collections.Generic.List<System.Type>();
-            types.Add(typeof(WithoutXmlAttributesDefined));
-            var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
-            var testObject = new WithoutXmlAttributesDefined();
-            testObject.Foo = "stringvalue";
-            testObject.StringArray = new string[] { "S1" };
-            testObject.IntArray = new int[] { 1 };
-            testObject.DoubleArray = new double[] { 1 };
-            testObject.DecimalArray = new decimal[] { 1 };
-            testObject.InternalItem = new[] { new WithoutXmlAttributesDefined.WithoutXmlAttributeItem() { Name = "Test" } };
-
-            var sio = new System.IO.StringWriter();
-            serializer.Serialize(sio, testObject);
-            sio.ToString();
+            WithXmlAttributesDefined.CreateTestXML();
+            WithoutXmlAttributesDefined.CreateTestXML();
         }
     }
 }
