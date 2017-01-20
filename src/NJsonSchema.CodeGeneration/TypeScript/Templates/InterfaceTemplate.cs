@@ -132,6 +132,26 @@ if(property.IsOptional){
             
             #line default
             #line hidden
+            
+            #line 8 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+if(Model.HasIndexerProperty){
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    [key: string]: ");
+            
+            #line 10 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.IndexerPropertyValueType));
+            
+            #line default
+            #line hidden
+            this.Write("; \r\n");
+            
+            #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\InterfaceTemplate.tt"
+}
+            
+            #line default
+            #line hidden
             this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
