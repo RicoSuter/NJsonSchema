@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(classTemplateModel, property, new TypeScriptDefaultValueGenerator(resolver), settings)
+            : base(property, classTemplateModel, new TypeScriptDefaultValueGenerator(resolver), settings)
         {
             _property = property;
             _resolver = resolver;

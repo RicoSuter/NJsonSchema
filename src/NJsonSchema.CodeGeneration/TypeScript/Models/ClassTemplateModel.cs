@@ -69,14 +69,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the description.</summary>
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
+        /// <summary>Gets the inherited schema.</summary>
+        public JsonSchema4 InheritedSchema => _schema.InheritedSchemas.FirstOrDefault()?.ActualSchema;
+
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
-        public bool HasInheritance => _schema.InheritedSchemas.Count >= 1;
+        public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance => HasInheritance ? " extends " + BaseClass : string.Empty;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), true, string.Empty) : null;
+        public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
+
+        /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
+        public bool HasIndexerProperty => _schema.InheritedSchemas.Any(s => s.IsDictionary);
+
+        /// <summary>Gets the type of the indexer property value.</summary>
+        public string IndexerPropertyValueType => InheritedSchema?.AdditionalPropertiesSchema != null ? 
+            _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) : "any";
 
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties => _schema.ActualProperties.Values

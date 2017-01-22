@@ -4,4 +4,8 @@
 <#foreach(var property in Model.Properties){#>
 <#if(property.HasDescription){#>    /** <#=property.Description#> */
 <#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#>;
+<#}#>
+<#if(Model.HasIndexerProperty){#>
+
+    [key: string]: <#=Model.IndexerPropertyValueType#>; 
 <#}#>}
