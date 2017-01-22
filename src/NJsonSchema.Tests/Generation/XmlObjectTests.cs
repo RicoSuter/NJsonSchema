@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Xml.Serialization;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -224,7 +225,10 @@ namespace NJsonSchema.Tests.Generation
         [TestMethod]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            {
+                GenerateXmlObjects = true
+            });
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -268,13 +272,16 @@ namespace NJsonSchema.Tests.Generation
         [TestMethod]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_and_serialized()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
-            var schemaData = schema.ToJson();
+            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            {
+                GenerateXmlObjects = true
+            });
 
+            var schemaData = schema.ToJson();
             var schemaObject = JObject.Parse(schemaData);
 
-            var definitionXML = schemaObject["xml"];
-            Assert.AreEqual("NotTheSameName", definitionXML["name"]);
+            var definitionXml = schemaObject["xml"];
+            Assert.AreEqual("NotTheSameName", definitionXml["name"]);
 
             var fooPropertyXml = schemaObject["properties"]["Foo"]["xml"];
             Assert.AreEqual("Bar", fooPropertyXml["name"]);
@@ -299,7 +306,10 @@ namespace NJsonSchema.Tests.Generation
         [TestMethod]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_that_are_incorrect()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlIncorrectAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = await JsonSchema4.FromTypeAsync<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
+            {
+                GenerateXmlObjects = true
+            });
             var schemaData = schema.ToJson();
 
             //// Assert
