@@ -77,6 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
+                        NullValue = _settings.NullValue,
                         Settings = _settings
                     });
                 }
@@ -100,6 +101,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
+                        NullValue = _settings.NullValue,
                         Settings = _settings
                     });
                 }
