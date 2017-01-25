@@ -29,6 +29,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets the resolver.</summary>
         public TypeScriptTypeResolver Resolver { get; set; }
 
+        /// <summary>Gets or sets the null value.</summary>
+        public TypeScriptNullValue NullValue { get; set; }
+
         /// <summary>Gets or sets the settings.</summary>
         public TypeScriptGeneratorSettings Settings { get; set; }
     }
