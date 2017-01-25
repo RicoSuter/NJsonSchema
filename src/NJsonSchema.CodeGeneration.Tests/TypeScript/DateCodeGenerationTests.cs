@@ -29,8 +29,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: string"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] !== undefined ? data[\"MyDateTime\"] : null;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime !== undefined ? this.myDateTime : null;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] !== undefined ? data[\"MyDateTime\"] : undefined;"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime !== undefined ? this.myDateTime : undefined;"));
         }
 
         [TestMethod]
@@ -49,8 +49,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: moment.Moment"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? moment(data[\"MyDateTime\"].toString()) : null;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : null;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? moment(data[\"MyDateTime\"].toString()) : undefined;"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined;"));
         }
 
         [TestMethod]
@@ -69,8 +69,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: Date"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? new Date(data[\"MyDateTime\"].toString()) : null;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : null;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? new Date(data[\"MyDateTime\"].toString()) : undefined;"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined;"));
         }
 
         [TestMethod]
