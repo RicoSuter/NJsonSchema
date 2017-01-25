@@ -25,17 +25,20 @@ namespace NJsonSchema.CodeGeneration.Infrastructure
                 if (!string.IsNullOrEmpty(result.BaseTypeName))
                 {
                     var index = newResults.IndexOf(result);
-
-                    var baseResult = newResults.SingleOrDefault(r => r.TypeName == result.BaseTypeName);
-                    if (baseResult != null)
+                    var baseResult = result;
+                    do
                     {
-                        var baseIndex = newResults.IndexOf(baseResult);
-                        if (baseIndex > index)
+                        baseResult = newResults.SingleOrDefault(r => r.TypeName == baseResult.BaseTypeName);
+                        if (baseResult != null)
                         {
-                            newResults.RemoveAt(baseIndex);
-                            newResults.Insert(index, baseResult);
+                            var baseIndex = newResults.IndexOf(baseResult);
+                            if (baseIndex > index)
+                            {
+                                newResults.RemoveAt(baseIndex);
+                                newResults.Insert(index, baseResult);
+                            }
                         }
-                    }
+                    } while (baseResult != null);
                 }
             }
             return newResults;
