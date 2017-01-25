@@ -78,7 +78,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 5 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }
@@ -290,7 +295,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }
@@ -357,7 +367,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }
@@ -411,7 +426,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }
@@ -493,7 +513,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }
@@ -546,7 +571,12 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("null");
+            
+            #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
             
             #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration\TypeScript\Templates\ConvertToClassTemplate.tt"
 }

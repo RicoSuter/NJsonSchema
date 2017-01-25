@@ -19,6 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ModuleName = "";
             Namespace = "";
 
+            NullValue = TypeScriptNullValue.Undefined;
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
@@ -53,6 +54,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the type names which always generate plain TypeScript classes.</summary>
         public string[] ClassTypes { get; set; }
+
+        /// <summary>Gets or sets the TypeScript null value.</summary>
+        public TypeScriptNullValue NullValue { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

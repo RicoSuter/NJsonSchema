@@ -2,7 +2,7 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.IsNewableObject){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.toJS() : null;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.toJS() : <#=Model.NullValue#>;
 <#}else{#>
 <#if(Model.IsArray){#>
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
@@ -24,20 +24,20 @@ if (<#=Model.Value#>) {
     for (let key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
 <#if(Model.IsDictionaryValueNewableObject){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJS() : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJS() : <#=Model.NullValue#>;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : <#=Model.NullValue#>;
 <#}else{#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : null;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : <#=Model.NullValue#>;
 <#}}#>
     }
 }
 <#}else{#>
     <#if(Model.IsDate){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
     <#}else{#>
-<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
     <#}#>
 <#}#>
 <#}#>
