@@ -24,19 +24,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return string.Empty;
             }, RegexOptions.Multiline);
 
-            code = Regex.Replace(code, "(export )?class (.*?) ([\\s\\S]*?)\\n}", match =>
+            code = Regex.Replace(code, "(@.*\r?\n)?(export )?class (.*?) ([\\s\\S]*?)\\n}", match =>
             {
-                var className = match.Groups[2].Value;
+                var hasExport = match.Groups[2].Success; 
+                var className = match.Groups[3].Value;
+                var classCode = hasExport ?  match.Groups[0].Value : match.Groups[0].Value.Replace("class ", "export class ");
 
                 if (extendedClasses?.Contains(className) == true)
                 {
-                    ExtensionClasses[className] = match.Groups[1].Success ? match.Groups[0].Value : "export " + match.Groups[0].Value;
+                    ExtensionClasses[className] = classCode;
                     return string.Empty;
                 }
 
                 if (baseClasses?.Contains(className) == true)
                 {
-                    TopCode += (match.Groups[1].Success ? match.Groups[0].Value : "export " + match.Groups[0].Value) + "\n\n";
+                    TopCode += classCode + "\n\n";
                     return string.Empty;
                 }
 
