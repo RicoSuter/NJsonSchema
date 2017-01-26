@@ -56,10 +56,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
-        
+
         /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
         public bool HasBaseDiscriminator => !string.IsNullOrEmpty(_schema.BaseDiscriminator);
-       
+
         /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
         public string BaseDiscriminator => _schema.BaseDiscriminator;
 
@@ -85,8 +85,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasIndexerProperty => _schema.InheritedSchemas.Any(s => s.IsDictionary);
 
         /// <summary>Gets the type of the indexer property value.</summary>
-        public string IndexerPropertyValueType => InheritedSchema?.AdditionalPropertiesSchema != null ? 
-            _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) : "any";
+        public string IndexerPropertyValueType
+        {
+            get
+            {
+                var valueType = InheritedSchema?.AdditionalPropertiesSchema != null
+                    ? _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty)
+                    : "any";
+
+                // TODO: Find solution to avoid using union with any
+                return valueType != "any" ? valueType + " | any" : valueType;
+            }
+        }
 
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
