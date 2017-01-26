@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsFalse(code.Contains("extends { [key: string] : string; }"));
-            Assert.IsTrue(code.Contains("[key: string]: string; "));
+            Assert.IsTrue(code.Contains("[key: string]: string | any; "));
         }
 
         [TestMethod]
@@ -101,7 +101,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
             Assert.IsFalse(code.Contains("extends { [key: string] : string; }"));
             Assert.IsFalse(code.Contains("super()"));
-            Assert.IsTrue(code.Contains("[key: string]: string; "));
+            Assert.IsTrue(code.Contains("[key: string]: string | any; "));
         }
     }
 }
