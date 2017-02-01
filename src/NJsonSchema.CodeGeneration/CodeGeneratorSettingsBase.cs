@@ -43,6 +43,6 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets the template factory.</summary>
         [JsonIgnore]
-        public ITemplateFactory TemplateFactory { get; set; } = new DefaultTemplateFactory();
+        public ITemplateFactory TemplateFactory { get; set; }
     }
 }

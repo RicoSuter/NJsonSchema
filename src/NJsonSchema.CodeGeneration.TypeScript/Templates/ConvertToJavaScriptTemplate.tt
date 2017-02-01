@@ -1,0 +1,44 @@
+﻿<#@ template visibility="internal" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="NJsonSchema.CodeGeneration" #>
+<#if(Model.IsNewableObject){#>
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.toJS() : null;
+<#}else{#>
+<#if(Model.IsArray){#>
+if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
+    <#=Model.Variable#> = [];
+    for (let item of <#=Model.Value#>)
+<#if(Model.IsArrayItemNewableObject){#>
+        <#=Model.Variable#>.push(item.toJS());
+<#}else{#>
+<#if(Model.IsArrayItemDate){#>
+        <#=Model.Variable#>.push(item.<#=Model.DateToStringCode#>);
+<#}else{#>
+        <#=Model.Variable#>.push(item);
+<#}}#>
+}
+<#}else{#>
+<#if(Model.IsDictionary){#>
+if (<#=Model.Value#>) {
+    <#=Model.Variable#> = {};
+    for (let key in <#=Model.Value#>) {
+        if (<#=Model.Value#>.hasOwnProperty(key))
+<#if(Model.IsDictionaryValueNewableObject){#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJS() : null;
+<#}else{#>
+<#if(Model.IsDictionaryValueDate){#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : null;
+<#}else{#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : null;
+<#}}#>
+    }
+}
+<#}else{#>
+    <#if(Model.IsDate){#>
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
+    <#}else{#>
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#>null<#}#>;
+    <#}#>
+<#}#>
+<#}#>
+<#}#>

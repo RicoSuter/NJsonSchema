@@ -1,0 +1,107 @@
+﻿<#@ template visibility="internal" #>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
+{
+    internal static readonly string DefaultDiscriminatorName = "discriminator";
+
+    private readonly string _discriminator;
+        
+    [System.ThreadStatic]
+    private static bool _isReading;
+
+    [System.ThreadStatic]
+    private static bool _isWriting;
+
+    public JsonInheritanceConverter()
+    {
+        _discriminator = DefaultDiscriminatorName;
+    }
+
+    public JsonInheritanceConverter(string discriminator)
+    {
+        _discriminator = discriminator;
+    }
+
+    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+    {
+        try
+        {
+            _isWriting = true;
+
+            var jObject = Newtonsoft.Json.Linq.JObject.FromObject(value, serializer);
+            jObject.AddFirst(new Newtonsoft.Json.Linq.JProperty(_discriminator, value.GetType().Name));
+            writer.WriteToken(jObject.CreateReader());
+        }
+        finally
+        {
+            _isWriting = false;
+        }
+    }
+
+    public override bool CanWrite
+    {
+        get
+        {
+            if (_isWriting)
+            {
+                _isWriting = false;
+                return false; 
+            }
+            return true;
+        }
+    }
+
+    public override bool CanRead
+    {
+        get
+        {
+            if (_isReading)
+            {
+                _isReading = false;
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public override bool CanConvert(System.Type objectType)
+    {
+        return true;
+    }
+
+    public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+    {
+        var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JObject>(reader);
+        var discriminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValue(_discriminator));
+        var subtype = GetObjectSubtype(objectType, discriminator);
+
+        try
+        {
+            _isReading = true;
+            return serializer.Deserialize(jObject.CreateReader(), subtype);
+        }
+        finally
+        {
+            _isReading = false;
+        }
+    }
+
+    private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
+    {
+        var objectTypeInfo = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType);
+        var customAttributes = System.Reflection.CustomAttributeExtensions.GetCustomAttributes(objectTypeInfo);
+
+        var knownTypeAttributes = System.Linq.Enumerable.Where(customAttributes, a => a.GetType().Name == "KnownTypeAttribute");
+        dynamic knownTypeAttribute = System.Linq.Enumerable.SingleOrDefault(knownTypeAttributes, a => IsKnwonTypeTargetType(a, discriminator));
+        if (knownTypeAttribute != null)
+            return knownTypeAttribute.Type;
+        
+        var typeName = objectType.Namespace + "." + discriminator;
+        return System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
+    }
+
+    private bool IsKnwonTypeTargetType(dynamic attribute, string discriminator)
+    {
+        return attribute?.Type.Name == discriminator;
+    }
+}
