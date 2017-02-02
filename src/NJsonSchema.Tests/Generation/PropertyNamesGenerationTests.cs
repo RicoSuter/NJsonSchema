@@ -60,5 +60,25 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsTrue(schema.Properties.ContainsKey("barBar2DataMember"));
             Assert.AreEqual("barBar2DataMember", schema.Properties["barBar2DataMember"].Name);
         }
+
+        [TestMethod]
+        public async Task When_property_name_is_snake_then_schema_has_snake_names()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            {
+                DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
+            });
+
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.IsTrue(schema.Properties.ContainsKey("bar_bar1_json_property"));
+            Assert.AreEqual("bar_bar1_json_property", schema.Properties["bar_bar1_json_property"].Name);
+            Assert.IsTrue(schema.Properties.ContainsKey("bar_bar2_data_member"));
+            Assert.AreEqual("bar_bar2_data_member", schema.Properties["bar_bar2_data_member"].Name);
+        }
     }
 }

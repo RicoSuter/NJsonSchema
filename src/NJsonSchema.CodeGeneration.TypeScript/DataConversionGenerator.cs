@@ -33,6 +33,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver);
             return new
             {
+                NullValue = parameters.NullValue.ToString().ToLowerInvariant(),
+
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
