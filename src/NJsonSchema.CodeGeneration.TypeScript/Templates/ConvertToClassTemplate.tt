@@ -1,6 +1,4 @@
 ﻿<#@ template visibility="internal" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="NJsonSchema.CodeGeneration" #>
 <#if(Model.IsNewableObject){#>
 <#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Type#>.fromJS(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
 <#}else{#>

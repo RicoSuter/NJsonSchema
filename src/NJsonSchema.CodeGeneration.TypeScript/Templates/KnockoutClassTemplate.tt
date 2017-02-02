@@ -1,5 +1,4 @@
 ﻿<#@ template visibility="internal" #>
-<#@ assembly name="System.Core" #>
 <#@ import namespace="NJsonSchema" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {

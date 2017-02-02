@@ -9,7 +9,6 @@
 // ------------------------------------------------------------------------------
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
-    using NJsonSchema.CodeGeneration;
     using System;
     
     /// <summary>
@@ -26,62 +25,63 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("\n");
             
-            #line 4 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
 if(Model.HasDescription){
             
             #line default
             #line hidden
             this.Write("/** ");
             
-            #line 4 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Description));
             
             #line default
             #line hidden
-            this.Write(" */\r\n");
+            this.Write(" */\n");
             
-            #line 5 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("export enum ");
             
-            #line 5 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Name));
             
             #line default
             #line hidden
-            this.Write(" {\r\n");
+            this.Write(" {\n");
             
-            #line 6 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
 foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
-            this.Write("    ");
+            this.Write("\n    ");
             
-            #line 7 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 7 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Value));
             
             #line default
             #line hidden
-            this.Write(", \r\n");
+            this.Write(", \n");
             
-            #line 8 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
 }
             
             #line default
             #line hidden
-            this.Write("}");
+            this.Write("\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

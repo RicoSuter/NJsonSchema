@@ -1,7 +1,4 @@
 ﻿<#@ template visibility="internal" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="NJsonSchema.CodeGeneration" #>
-<#@ import namespace="NJsonSchema.CodeGeneration.CSharp" #>
 <#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <#}#><#if(Model.HasDiscriminator){#>[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
 <#}#>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
