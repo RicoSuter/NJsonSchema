@@ -14,9 +14,13 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 
 **NuGet packages:** 
 -   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (PCL 259): JSON Schema 4 validation and parsing classes
--   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (PCL 259): Classes to generate code from a JSON Schema 4 (C# and TypeScript)
+-   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (PCL 259): Base classes to generate code from a JSON Schema 4
+-   [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (PCL 259): Generates CSharp classes
+-   [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (PCL 259): Generates TypeScript interfaces or classes
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
+
+CI NuGet Feed: https://www.myget.org/gallery/njsonschema-ci
 
 **Features:**
 
