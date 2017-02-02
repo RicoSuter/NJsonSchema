@@ -133,16 +133,10 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write(";");
+            this.Write(";\n\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }}
-            
-            #line default
-            #line hidden
-            this.Write("\n\n\n");
-            
-            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 foreach(var property in Model.Properties){
             
             #line default
@@ -150,7 +144,7 @@ foreach(var property in Model.Properties){
             this.Write("\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-if(property.HasDescription){
+  if(property.HasDescription){
             
             #line default
             #line hidden
@@ -164,7 +158,7 @@ if(property.HasDescription){
             this.Write("</summary>\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-}
+  }
             
             #line default
             #line hidden
@@ -185,14 +179,14 @@ if(property.HasDescription){
             this.Write(")]\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-if(property.RenderRequiredAttribute){
+  if(property.RenderRequiredAttribute){
             
             #line default
             #line hidden
             this.Write("    [System.ComponentModel.DataAnnotations.Required]\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-}
+  }
             
             #line default
             #line hidden
@@ -206,11 +200,11 @@ if(property.IsStringEnum){
                     "nverter))]\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-}
+  }
             
             #line default
             #line hidden
-            this.Write("\n    public ");
+            this.Write("    public ");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
@@ -251,14 +245,13 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("\n    \n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
   }else{
             
             #line default
             #line hidden
-            this.Write("\n\n    {\n        get { return ");
+            this.Write("\n    {\n        get { return ");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.FieldName));
@@ -287,7 +280,7 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write("\n    \n");
+            this.Write("\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }
@@ -396,7 +389,7 @@ if(Model.Inpc){
             
             #line default
             #line hidden
-            this.Write("\n}");
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

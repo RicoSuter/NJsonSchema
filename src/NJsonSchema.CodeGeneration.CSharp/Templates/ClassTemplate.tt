@@ -4,19 +4,15 @@
 <#}#>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
-    private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}}#>
+    private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
 
-
-<#foreach(var property in Model.Properties){#>
-<#if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
-<#}#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
-<#if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
-<#}#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-<#}#>
-    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
-    
-<#  }else{#>
-
+<#}}
+foreach(var property in Model.Properties){#>
+<#  if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
+<#  }#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
+<#  if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
+<#  }#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+<#  }#>    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#><#  }else{#>
     {
         get { return <#=property.FieldName#>; }
         set 
@@ -29,7 +25,6 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
         }
     }
 <#}#>
-    
 <#}#><#if(Model.HasAdditionalPropertiesType){#>
 	private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
 
@@ -61,5 +56,4 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
         if (handler != null) 
             handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
     }
-<#}#>
-}
+<#}#>}
