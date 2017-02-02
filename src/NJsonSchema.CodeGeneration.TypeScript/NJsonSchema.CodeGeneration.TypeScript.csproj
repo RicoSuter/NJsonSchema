@@ -104,6 +104,7 @@
     <Compile Include="TypeScriptExtensionCode.cs" />
     <Compile Include="TypeScriptGenerator.cs" />
     <Compile Include="TypeScriptGeneratorSettings.cs" />
+    <Compile Include="TypeScriptNullValue.cs" />
     <Compile Include="TypeScriptPropertyNameGenerator.cs" />
     <Compile Include="TypeScriptTypeResolver.cs" />
     <Compile Include="TypeScriptTypeStyle.cs" />
