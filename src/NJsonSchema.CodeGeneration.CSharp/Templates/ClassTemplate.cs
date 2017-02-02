@@ -138,7 +138,13 @@ if(property.HasDefaultValue){
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }}
 foreach(var property in Model.Properties){
-    if(property.HasDescription){
+            
+            #line default
+            #line hidden
+            this.Write("\n");
+            
+            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  if(property.HasDescription){
             
             #line default
             #line hidden

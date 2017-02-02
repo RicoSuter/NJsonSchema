@@ -7,8 +7,8 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
     private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
 
 <#}}
-foreach(var property in Model.Properties){
-    if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
+foreach(var property in Model.Properties){#>
+<#  if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#  }#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
 <#  if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
 <#  }#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
