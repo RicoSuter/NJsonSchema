@@ -60,7 +60,7 @@ foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
-            this.Write("\n    ");
+            this.Write("    ");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeration.Name));
@@ -81,7 +81,7 @@ foreach(var enumeration in Model.Enums){
             
             #line default
             #line hidden
-            this.Write("\n}");
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

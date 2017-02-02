@@ -3,10 +3,8 @@
 <# } #>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public enum <#=Model.Name#>
 {
-<# foreach(var pair in Model.Enums){ #>
-<#if(Model.IsStringEnum){#>    [System.Runtime.Serialization.EnumMember(Value = "<#=pair.Value#>")]
-<#}#>
-    <#=pair.Name#> = <#=pair.InternalValue#>,
+<# foreach(var pair in Model.Enums){ 
+   if(Model.IsStringEnum){#>    [System.Runtime.Serialization.EnumMember(Value = "<#=pair.Value#>")]
+<#}#>    <#=pair.Name#> = <#=pair.InternalValue#>,
 
-<# } #>
-}
+<#} #>}

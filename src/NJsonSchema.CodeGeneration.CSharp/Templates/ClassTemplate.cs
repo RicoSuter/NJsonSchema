@@ -138,13 +138,7 @@ if(property.HasDefaultValue){
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }}
 foreach(var property in Model.Properties){
-            
-            #line default
-            #line hidden
-            this.Write("\n");
-            
-            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-  if(property.HasDescription){
+    if(property.HasDescription){
             
             #line default
             #line hidden
@@ -272,8 +266,7 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write(" = value; \n                RaisePropertyChanged();\n            }\n        }\n    }\n" +
-                    "");
+            this.Write(" = value; \n                RaisePropertyChanged();\n            }\n        }\n    }");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }
@@ -330,7 +323,7 @@ if(Model.Inpc){
             #line default
             #line hidden
             this.Write("\n    public event System.ComponentModel.PropertyChangedEventHandler PropertyChang" +
-                    "ed;\n\n");
+                    "ed;\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }
@@ -375,7 +368,6 @@ if(Model.Inpc){
             #line default
             #line hidden
             this.Write(@"
-    
     protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
     {
         var handler = PropertyChanged;

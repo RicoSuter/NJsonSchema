@@ -104,9 +104,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             B = 5,
             C = 6,
         }
-
-
-
+        
         [TestMethod]
         public async Task When_enum_has_string_value_then_CS_code_has_EnumMember_attribute()
         {

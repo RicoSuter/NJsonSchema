@@ -64,13 +64,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
  foreach(var pair in Model.Enums){ 
-            
-            #line default
-            #line hidden
-            this.Write("\n");
-            
-            #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
-if(Model.IsStringEnum){
+   if(Model.IsStringEnum){
             
             #line default
             #line hidden
@@ -88,7 +82,7 @@ if(Model.IsStringEnum){
             
             #line default
             #line hidden
-            this.Write("\n    ");
+            this.Write("    ");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(pair.Name));
@@ -105,11 +99,11 @@ if(Model.IsStringEnum){
             this.Write(",\n\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
- } 
+} 
             
             #line default
             #line hidden
-            this.Write("\n}");
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

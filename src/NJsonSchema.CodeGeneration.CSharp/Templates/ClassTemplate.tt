@@ -7,8 +7,8 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
     private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
 
 <#}}
-foreach(var property in Model.Properties){#>
-<#  if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
+foreach(var property in Model.Properties){
+    if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#  }#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
 <#  if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
 <#  }#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
@@ -23,8 +23,7 @@ foreach(var property in Model.Properties){#>
                 RaisePropertyChanged();
             }
         }
-    }
-<#}#>
+    }<#}#>
 <#}#><#if(Model.HasAdditionalPropertiesType){#>
 	private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
 
@@ -37,7 +36,6 @@ foreach(var property in Model.Properties){#>
 
 <#}#><#if(Model.Inpc){#>
     public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
 <#}#>
     public string ToJson() 
     {
@@ -49,7 +47,6 @@ foreach(var property in Model.Properties){#>
         return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonConverters#>);
     }
 <#if(Model.Inpc){#>
-    
     protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
     {
         var handler = PropertyChanged;
