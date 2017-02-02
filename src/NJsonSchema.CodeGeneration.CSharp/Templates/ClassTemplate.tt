@@ -5,7 +5,6 @@
 public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
     private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
-
 <#}}
 foreach(var property in Model.Properties){#>
 <#  if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>

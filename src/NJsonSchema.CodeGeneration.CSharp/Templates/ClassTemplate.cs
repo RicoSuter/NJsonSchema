@@ -133,7 +133,7 @@ if(property.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write(";\n\n");
+            this.Write(";\n");
             
             #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }}
