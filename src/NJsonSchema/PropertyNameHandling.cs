@@ -20,5 +20,8 @@ namespace NJsonSchema
 
         /// <summary>Generates lower camel cased property names using <see cref="CamelCasePropertyNamesContractResolver"/>.</summary>
         CamelCase,
+
+        /// <summary>Generates snake cased property names using <see cref="SnakeCaseNamingStrategy"/>.</summary>
+        SnakeCase
     }
 }

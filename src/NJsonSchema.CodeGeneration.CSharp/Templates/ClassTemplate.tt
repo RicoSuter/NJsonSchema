@@ -1,0 +1,55 @@
+﻿<#@ template visibility="internal" #>
+<#if(Model.HasDescription){#>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
+<#}#><#if(Model.HasDiscriminator){#>[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
+<#}#>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+public partial class <#=Model.Class#> <#=Model.Inheritance#>
+{<#if(Model.Inpc){#><#foreach(var property in Model.Properties){#> 
+    private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
+<#}}
+foreach(var property in Model.Properties){#>
+<#  if(property.HasDescription){#>    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
+<#  }#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
+<#  if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
+<#  }#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+<#  }#>    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#><#  }else{#>
+    {
+        get { return <#=property.FieldName#>; }
+        set 
+        {
+            if (<#=property.FieldName#> != value)
+            {
+                <#=property.FieldName#> = value; 
+                RaisePropertyChanged();
+            }
+        }
+    }<#}#>
+<#}#><#if(Model.HasAdditionalPropertiesType){#>
+	private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
+
+    [Newtonsoft.Json.JsonExtensionData]
+    public System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> AdditionalProperties
+	{
+		get { return _additionalProperties; }
+		set { _additionalProperties = value; }
+	}
+
+<#}#><#if(Model.Inpc){#>
+    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+<#}#>
+    public string ToJson() 
+    {
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonConverters#>);
+    }
+    
+    public static <#=Model.Class#> FromJson(string data)
+    {
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonConverters#>);
+    }
+<#if(Model.Inpc){#>
+    protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+    {
+        var handler = PropertyChanged;
+        if (handler != null) 
+            handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+    }
+<#}#>}

@@ -19,6 +19,8 @@ namespace NJsonSchema.Generation
     {
         private static readonly Lazy<CamelCasePropertyNamesContractResolver> CamelCaseResolverLazy = new Lazy<CamelCasePropertyNamesContractResolver>();
 
+        private static readonly Lazy<DefaultContractResolver> SnakeCaseResolverLazy = new Lazy<DefaultContractResolver>(() => new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() });
+
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
         /// <exception cref="NotSupportedException">The PropertyNameHandling is not supported.</exception>
@@ -33,6 +35,9 @@ namespace NJsonSchema.Generation
 
                 case PropertyNameHandling.CamelCase:
                     return CamelCaseResolverLazy.Value.GetResolvedPropertyName(propertyName);
+
+                case PropertyNameHandling.SnakeCase:
+                    return SnakeCaseResolverLazy.Value.GetResolvedPropertyName(propertyName);
 
                 default:
                     throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");

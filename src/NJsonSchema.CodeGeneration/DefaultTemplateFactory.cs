@@ -23,15 +23,13 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
         public virtual ITemplate CreateTemplate(string package, string template, object model)
         {
-            var typeName = "NSwag.CodeGeneration.CodeGenerators." + package + ".Templates." + template + "Template";
-            var type = model.GetType().GetTypeInfo().Assembly.GetType(typeName);
+            var typeName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + "Template";
+            var type = Type.GetType(typeName);
+            if (type == null)
+                type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + package))?.GetType(typeName);
+
             if (type != null)
                 return (ITemplate)Activator.CreateInstance(type, model);
-
-            typeName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + "Template";
-            type = Type.GetType(typeName);
-            if (type != null)
-                return (ITemplate)Activator.CreateInstance(Type.GetType(typeName, true), model);
 
             throw new InvalidOperationException("Could not load template '" + template + "'.");
         }

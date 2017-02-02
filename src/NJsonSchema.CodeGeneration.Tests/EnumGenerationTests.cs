@@ -67,8 +67,8 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsFalse(code.Contains("Ref_"));
-            Assert.IsTrue(code.Contains("public enum Bar\r"));
-            Assert.IsTrue(code.Contains("public enum Bar2\r"));
+            Assert.IsTrue(code.Contains("public enum Bar\n"));
+            Assert.IsTrue(code.Contains("public enum Bar2\n"));
 
             Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
             Assert.AreEqual(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
@@ -104,9 +104,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             B = 5,
             C = 6,
         }
-
-
-
+        
         [TestMethod]
         public async Task When_enum_has_string_value_then_CS_code_has_EnumMember_attribute()
         {
