@@ -146,7 +146,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         private string ResolveInteger(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint);
+                return AddGenerator(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             if (schema.Format == JsonFormatStrings.Byte)
                 return isNullable ? "byte?" : "byte";
