@@ -927,6 +927,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Arrange
             var schemaJson = @"{ ""type"": ""string"", ""enum"": [""application/json"",""application/vnd.ms-excel""] }";
             var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+
             var settings = new CSharpGeneratorSettings();
             var generator = new CSharpGenerator(schema, settings);
 
@@ -935,6 +936,29 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(output.Contains("Application_vnd_msExcel = 1,"));
+        }
+
+        [TestMethod]
+        public async Task When_property_has_not_supported_characters_then_they_are_removed()
+        {
+            //// Arrange
+            var schemaJson = 
+@"{
+  ""type"": ""object"",
+  ""properties"": {
+    ""@odata.context"": { ""type"": ""string"" }
+  }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(output.Contains("public string OdataContext"));
         }
     }
 }
