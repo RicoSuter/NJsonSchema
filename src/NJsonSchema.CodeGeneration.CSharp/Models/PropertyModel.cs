@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -81,6 +82,24 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                        _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
             }
         }
+
+        /// <summary>Gets a value indicating whether to render a range attribute.</summary>
+        public bool RenderRangeAttribute
+        {
+            get
+            {
+                if (!_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
+                    return false;
+
+                return _property.Maximum.HasValue || _property.Minimum.HasValue;
+            }
+        }
+
+        /// <summary>Gets the minimum value of the range attribute.</summary>
+        public string RangeMinimumValue => _property.Minimum.HasValue ? _property.Minimum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MinValue)}";
+
+        /// <summary>Gets the maximum value of the range attribute.</summary>
+        public string RangeMaximumValue => _property.Maximum.HasValue ? _property.Maximum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MaxValue)}";
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;

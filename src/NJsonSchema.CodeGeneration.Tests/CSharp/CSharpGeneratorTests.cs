@@ -972,5 +972,119 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(output.Contains("public string OdataContext"));
         }
+
+        [TestMethod]
+        public async Task When_definition_contains_minimum_a_range_attribute_is_added_with_minimum_and_max_double_maximum()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""integer"",
+		  ""minimum"": ""1"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1.0, double.MaxValue)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_maximum_a_range_attribute_is_added_with_min_double_minimum_and_maximum()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""integer"",
+		  ""maximum"": ""10"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(double.MinValue, 10.0)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_both_minimum_and_maximum_a_range_attribute_is_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""integer"",
+		  ""minimum"": ""1"",
+		  ""maximum"": ""10"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1.0, 10.0)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_maximum_a_range_attribute_is_not_added_for_anything_but_type_number_or_integer()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""string"",
+		  ""maximum"": ""10"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.Range"));
+        }
+
     }
 }
