@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(property, classTemplateModel, new CSharpDefaultValueGenerator(resolver), settings)
+            : base(property, classTemplateModel, new CSharpDefaultValueGenerator(resolver, settings), settings)
         {
             _property = property;
             _settings = settings;

@@ -11,10 +11,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
     public class CSharpDefaultValueGenerator : DefaultValueGenerator
     {
-        /// <summary>Initializes a new instance of the <see cref="CSharpDefaultValueGenerator"/> class.</summary>
+        private readonly CSharpGeneratorSettings _settings;
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpDefaultValueGenerator" /> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
-        public CSharpDefaultValueGenerator(ITypeResolver typeResolver) : base(typeResolver)
+        /// <param name="settings">The settings.</param>
+        public CSharpDefaultValueGenerator(ITypeResolver typeResolver, CSharpGeneratorSettings settings) : base(typeResolver)
         {
+            _settings = settings;
         }
 
         /// <summary>Gets the default value code.</summary>
@@ -37,6 +41,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 }
             }
             return value;
+        }
+
+        /// <summary>Gets the enum default value.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="actualSchema">The actual schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The enum default value.</returns>
+        protected override string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint)
+        {
+            return _settings.Namespace + "." + base.GetEnumDefaultValue(schema, actualSchema, typeNameHint);
         }
     }
 }

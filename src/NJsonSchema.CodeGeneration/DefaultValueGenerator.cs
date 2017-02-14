@@ -34,16 +34,8 @@ namespace NJsonSchema.CodeGeneration
                 return null;
 
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualPropertySchema : schema.ActualSchema;
-            if (actualSchema.IsEnumeration)
-            {
-                var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
-
-                var enumName = schema.Default is string ?
-                    schema.Default.ToString() :
-                    actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
-
-                return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
-            }
+            if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
+                return GetEnumDefaultValue(schema, actualSchema, typeNameHint);
 
             if (schema.Type.HasFlag(JsonObjectType.String))
                 return "\"" + schema.Default + "\"";
@@ -55,6 +47,22 @@ namespace NJsonSchema.CodeGeneration
                 return schema.Default.ToString();
 
             return null;
+        }
+
+        /// <summary>Gets the enum default value.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="actualSchema">The actual schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The enum default value.</returns>
+        protected virtual string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint)
+        {
+            var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
+
+            var enumName = schema.Default is string
+                ? schema.Default.ToString()
+                : actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
+
+            return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
         }
     }
 }
