@@ -538,11 +538,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schemaJson = schema.ToJson();
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco, 
+                Namespace = "Foo"
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
         }
 
         [TestMethod]
@@ -553,11 +557,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schemaJson = schema.ToJson();
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco, 
+                Namespace = "Foo"
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = ConstructionCode.NON_CBST;"));
+            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
         }
 
         [TestMethod]
@@ -589,11 +597,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema4.FromJsonAsync(schemaJson);
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco, 
+                Namespace = "Foo"
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = MyClassConstructionCode.JOIST_MAS;"));
+            Assert.IsTrue(code.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = Foo.MyClassConstructionCode.JOIST_MAS;"));
         }
 
         [TestMethod]
