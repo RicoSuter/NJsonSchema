@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration
                 return null;
 
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualPropertySchema : schema.ActualSchema;
-            if (actualSchema.IsEnumeration)
+            if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
             {
                 var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
 
