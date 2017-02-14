@@ -101,6 +101,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the maximum value of the range attribute.</summary>
         public string RangeMaximumValue => _property.Maximum.HasValue ? _property.Maximum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MaxValue)}";
 
+        /// <summary>Gets a value indicating whether to render a string length attribute.</summary>
+        public bool RenderStringLengthAttribute => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) && (_property.MinLength.HasValue || _property.MaxLength.HasValue);
+
+        /// <summary>Gets the minimum value of the string length attribute.</summary>
+        public int StringLengthMinimumValue => _property.MinLength ?? 0;
+
+        /// <summary>Gets the maximum value of the string length attribute.</summary>
+        public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
     }

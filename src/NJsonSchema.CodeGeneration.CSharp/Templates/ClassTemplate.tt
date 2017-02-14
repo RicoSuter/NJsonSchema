@@ -11,6 +11,7 @@ foreach(var property in Model.Properties){#>
 <#  }#>    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
 <#  if(property.RenderRequiredAttribute){#>    [System.ComponentModel.DataAnnotations.Required]
 <#  }#><#  if(property.RenderRangeAttribute){#>    [System.ComponentModel.DataAnnotations.Range(<#=property.RangeMinimumValue #>, <#=property.RangeMaximumValue #>)]
+<#  }#><#  if(property.RenderStringLengthAttribute){#>    [System.ComponentModel.DataAnnotations.StringLength(<#=property.StringLengthMaximumValue #><#  if(property.StringLengthMinimumValue > 0){ #>, MinimumLength = <#=property.StringLengthMinimumValue #><# } #>)]
 <#  }#><#if(property.IsStringEnum){#>    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 <#  }#>    public <#=property.Type#> <#=property.PropertyName#><#if(!Model.Inpc){#> { get; set; }<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#><#  }else{#>
     {

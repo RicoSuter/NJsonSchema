@@ -219,6 +219,45 @@ foreach(var property in Model.Properties){
             #line hidden
             
             #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  if(property.RenderStringLengthAttribute){
+            
+            #line default
+            #line hidden
+            this.Write("    [System.ComponentModel.DataAnnotations.StringLength(");
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.StringLengthMaximumValue));
+            
+            #line default
+            #line hidden
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  if(property.StringLengthMinimumValue > 0){ 
+            
+            #line default
+            #line hidden
+            this.Write(", MinimumLength = ");
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.StringLengthMinimumValue));
+            
+            #line default
+            #line hidden
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write(")]\n");
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  }
+            
+            #line default
+            #line hidden
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 if(property.IsStringEnum){
             
             #line default

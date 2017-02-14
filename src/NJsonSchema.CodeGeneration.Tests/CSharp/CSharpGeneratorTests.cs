@@ -1086,5 +1086,118 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.Range"));
         }
 
+        [TestMethod]
+        public async Task When_definition_contains_min_length_a_string_length_attribute_is_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""string"",
+		  ""minLength"": ""10"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 10)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_max_length_a_string_length_attribute_is_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""string"",
+		  ""maxLength"": ""20"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_both_min_and_max_length_a_string_length_attribute_is_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""string"",
+		  ""minLength"": ""10"",
+		  ""maxLength"": ""20"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20, MinimumLength = 10)]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_both_min_length_a_string_length_attribute_is_added_only_for_type_string()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""number"",
+		  ""minLength"": ""10"",
+		  ""maxLength"": ""20"",
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.StringLength"));
+        }
     }
 }
