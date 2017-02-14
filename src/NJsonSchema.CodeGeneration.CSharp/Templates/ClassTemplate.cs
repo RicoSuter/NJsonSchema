@@ -258,6 +258,26 @@ foreach(var property in Model.Properties){
             #line hidden
             
             #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  if(property.RenderRegularExpressionAttribute){
+            
+            #line default
+            #line hidden
+            this.Write("    [System.ComponentModel.DataAnnotations.RegularExpression(\"");
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.RegularExpressionValue));
+            
+            #line default
+            #line hidden
+            this.Write("\")]\n");
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+  }
+            
+            #line default
+            #line hidden
+            
+            #line 1 "c:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 if(property.IsStringEnum){
             
             #line default

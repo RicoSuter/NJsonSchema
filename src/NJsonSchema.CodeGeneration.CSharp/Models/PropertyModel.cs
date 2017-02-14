@@ -110,6 +110,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the maximum value of the string length attribute.</summary>
         public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
 
+        /// <summary>Gets a value indicating whether to render a regular expression attribute.</summary>
+        public bool RenderRegularExpressionAttribute => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) && !string.IsNullOrEmpty(_property.Pattern);
+
+        /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
+        public string RegularExpressionValue => _property.Pattern;
+
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
     }

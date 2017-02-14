@@ -983,7 +983,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	""properties"": {
 		""foo"": {
 		  ""type"": ""integer"",
-		  ""minimum"": ""1"",
+		  ""minimum"": ""1""
         }
 	}
 }";
@@ -1011,7 +1011,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	""properties"": {
 		""foo"": {
 		  ""type"": ""integer"",
-		  ""maximum"": ""10"",
+		  ""maximum"": ""10""
         }
 	}
 }";
@@ -1040,7 +1040,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 		""foo"": {
 		  ""type"": ""integer"",
 		  ""minimum"": ""1"",
-		  ""maximum"": ""10"",
+		  ""maximum"": ""10""
         }
 	}
 }";
@@ -1068,7 +1068,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
-		  ""maximum"": ""10"",
+		  ""maximum"": ""10""
         }
 	}
 }";
@@ -1096,7 +1096,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
-		  ""minLength"": ""10"",
+		  ""minLength"": ""10""
         }
 	}
 }";
@@ -1124,7 +1124,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
-		  ""maxLength"": ""20"",
+		  ""maxLength"": ""20""
         }
 	}
 }";
@@ -1153,7 +1153,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 		""foo"": {
 		  ""type"": ""string"",
 		  ""minLength"": ""10"",
-		  ""maxLength"": ""20"",
+		  ""maxLength"": ""20""
         }
 	}
 }";
@@ -1182,7 +1182,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 		""foo"": {
 		  ""type"": ""number"",
 		  ""minLength"": ""10"",
-		  ""maxLength"": ""20"",
+		  ""maxLength"": ""20""
         }
 	}
 }";
@@ -1198,6 +1198,62 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.StringLength"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_pattern_a_regular_expression_attribute_is_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""string"",
+		  ""pattern"": ""^[a-zA-Z''-'\\s]{1,40}$""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(""^[a-zA-Z''-'\s]{1,40}$"")]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_pattern_but_type_is_not_string_a_regular_expression_should_not_be_added()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""number"",
+		  ""pattern"": ""^[a-zA-Z''-'\\s]{1,40}$""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations.RegularExpression"));
         }
     }
 }
