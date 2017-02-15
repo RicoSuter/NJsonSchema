@@ -88,8 +88,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.GenerateDataAnnotations ||
-                    !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
+                if (!_settings.GenerateDataAnnotations)
+                    return false;
+
+                if (!_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
                     return false;
 
                 return _property.Maximum.HasValue || _property.Minimum.HasValue;
