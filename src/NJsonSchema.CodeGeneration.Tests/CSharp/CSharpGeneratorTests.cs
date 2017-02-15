@@ -1255,5 +1255,45 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations.RegularExpression"));
         }
+
+        [TestMethod]
+        public async Task When_definition_contains_restrictions_but_render_data_annotations_is_set_to_false_they_should_not_be_included()
+        {
+            //// Arrange
+            var json =
+                @"{
+	""type"": ""object"", 
+	""properties"": {
+		""a"": {
+		  ""type"": ""integer"",
+		  ""minimum"": ""1"",
+		  ""maximum"": ""10""
+        },
+		""b"": {
+		  ""type"": ""string"",
+		  ""minLength"": ""10"",
+		  ""maxLength"": ""20""
+        },
+		""c"": {
+		  ""type"": ""string"",
+		  ""pattern"": ""^[a-zA-Z''-'\\s]{1,40}$""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                NullHandling = NullHandling.Swagger,
+                // define that no data annotations should be included
+                DataAnnotationsMustBeDefined = false
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations"));
+        }
     }
 }
