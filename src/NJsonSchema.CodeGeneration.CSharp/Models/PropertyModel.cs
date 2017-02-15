@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -72,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.RequiredPropertiesMustBeDefined || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
+                if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
                     return false;
 
                 return _property.ActualPropertySchema.IsAnyType ||
@@ -81,6 +82,60 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                        _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
             }
         }
+
+        /// <summary>Gets a value indicating whether to render a range attribute.</summary>
+        public bool RenderRangeAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations ||
+                    !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
+                    return false;
+
+                return _property.Maximum.HasValue || _property.Minimum.HasValue;
+            }
+        }
+
+        /// <summary>Gets the minimum value of the range attribute.</summary>
+        public string RangeMinimumValue => _property.Minimum.HasValue ? _property.Minimum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MinValue)}";
+
+        /// <summary>Gets the maximum value of the range attribute.</summary>
+        public string RangeMaximumValue => _property.Maximum.HasValue ? _property.Maximum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MaxValue)}";
+
+        /// <summary>Gets a value indicating whether to render a string length attribute.</summary>
+        public bool RenderStringLengthAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                    return false;
+
+                return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
+                       (_property.MinLength.HasValue || _property.MaxLength.HasValue);
+            }
+        }
+
+        /// <summary>Gets the minimum value of the string length attribute.</summary>
+        public int StringLengthMinimumValue => _property.MinLength ?? 0;
+
+        /// <summary>Gets the maximum value of the string length attribute.</summary>
+        public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+
+        /// <summary>Gets a value indicating whether to render a regular expression attribute.</summary>
+        public bool RenderRegularExpressionAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                    return false;
+
+                return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
+                       !string.IsNullOrEmpty(_property.Pattern);
+            }
+        }
+
+        /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
+        public string RegularExpressionValue => _property.Pattern;
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
