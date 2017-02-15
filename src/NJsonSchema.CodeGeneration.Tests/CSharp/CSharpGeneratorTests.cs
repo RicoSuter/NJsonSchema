@@ -1288,7 +1288,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 ClassStyle = CSharpClassStyle.Poco,
                 NullHandling = NullHandling.Swagger,
                 // define that no data annotations should be included
-                DataAnnotationsMustBeDefined = false
+                GenerateDataAnnotations = false
             });
             var code = generator.GenerateFile("MyClass");
 

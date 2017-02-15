@@ -22,8 +22,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ArrayType = "System.Collections.ObjectModel.ObservableCollection";
             DictionaryType = "System.Collections.Generic.Dictionary";
 
-            RequiredPropertyMustBeDefined = true;
-            DataAnnotationsMustBeDefined = true;
+            RequiredPropertiesMustBeDefined = true;
+            GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
@@ -35,11 +35,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
         /// (sets Required.Always when the property is required) (default: true).</summary>
-        public bool RequiredPropertyMustBeDefined { get; set; }
+        public bool RequiredPropertiesMustBeDefined { get; set; }
 
         /// <summary>Gets or sets a value indicating whether data annotation properties should be created 
         /// when generating C# classes (default: true).</summary>
-        public bool DataAnnotationsMustBeDefined { get; set; }
+        public bool GenerateDataAnnotations { get; set; }
 
         /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
         public string DateType { get; set; }

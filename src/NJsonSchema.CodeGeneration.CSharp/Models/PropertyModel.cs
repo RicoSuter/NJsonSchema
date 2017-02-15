@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (_settings.RequiredPropertyMustBeDefined && _property.IsRequired)
+                if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
                     if (!_property.IsNullable(_settings.NullHandling))
                         return "Newtonsoft.Json.Required.Always";
@@ -73,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.DataAnnotationsMustBeDefined || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
+                if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
                     return false;
 
                 return _property.ActualPropertySchema.IsAnyType ||
@@ -88,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.DataAnnotationsMustBeDefined ||
+                if (!_settings.GenerateDataAnnotations ||
                     !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
                     return false;
 
@@ -107,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.DataAnnotationsMustBeDefined)
+                if (!_settings.GenerateDataAnnotations)
                     return false;
 
                 return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
@@ -126,7 +126,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.DataAnnotationsMustBeDefined)
+                if (!_settings.GenerateDataAnnotations)
                     return false;
 
                 return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
