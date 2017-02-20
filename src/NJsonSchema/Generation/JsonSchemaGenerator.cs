@@ -344,7 +344,16 @@ namespace NJsonSchema.Generation
                 else
                 {
                     var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
-                    schema.AllOf.Add(baseSchema);
+                    if (RequiresSchemaReference(baseType, null))
+                    {
+                        schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+                        schema.AllOf.Add(new JsonSchema4
+                        {
+                            SchemaReference = baseSchema.ActualSchema
+                        });
+                    }
+                    else
+                        schema.AllOf.Add(baseSchema);
                 }
             }
         }

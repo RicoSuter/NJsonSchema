@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
-            Assert.IsNotNull(schema.AllOf.First().Properties["Foo"]);
+            Assert.IsNotNull(schema.AllOf.First().ActualSchema.Properties["Foo"]);
         }
 
         [TestMethod]
