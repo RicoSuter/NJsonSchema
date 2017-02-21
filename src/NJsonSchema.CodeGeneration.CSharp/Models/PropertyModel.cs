@@ -137,7 +137,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
-        public string RegularExpressionValue => _property.Pattern;
+        public string RegularExpressionValue => _property.Pattern.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
