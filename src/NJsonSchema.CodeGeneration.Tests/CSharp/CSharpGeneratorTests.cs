@@ -1225,7 +1225,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(""^[a-zA-Z''-'\s]{1,40}$"")]"));
+            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(@""^[a-zA-Z''-'\s]{1,40}$"")]"));
         }
 
         [TestMethod]
