@@ -46,6 +46,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
+        /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
+        public bool HasSetter => 
+            (_property.IsNullable(_settings.NullHandling) == false && (
+                (_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) && _settings.GenerateImmutableArrayProperties) ||
+                (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
+            )) == false;
+
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequired
         {

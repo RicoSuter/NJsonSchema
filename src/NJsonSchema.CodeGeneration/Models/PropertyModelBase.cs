@@ -44,9 +44,8 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string Type { get; }
 
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => _settings.GenerateDefaultValues ?
-            _defaultValueGenerator.GetDefaultValue(_property, _property.IsNullable(_settings.NullHandling), Type, _property.Name) :
-            null;
+        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property, 
+            _property.IsNullable(_settings.NullHandling), Type, _property.Name, _settings.GenerateDefaultValues);
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
