@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -29,7 +30,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.Default
+                //DefaultPropertyNameHandling = PropertyNameHandling.Default
             });
 
             var data = schema.ToJson();
@@ -49,7 +50,8 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                //DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
             });
 
             var data = schema.ToJson();
@@ -69,7 +71,8 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() }
+                //DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
             });
 
             var data = schema.ToJson();

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
@@ -23,7 +24,7 @@ namespace NJsonSchema.Generation
         {
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
-            DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            //DefaultPropertyNameHandling = PropertyNameHandling.Default;
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
@@ -32,8 +33,8 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
 
-        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
-        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
+        ///// <summary>Gets or sets the default property name handling (default: Default).</summary>
+        //public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
@@ -54,6 +55,9 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema name generator.</summary>
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the contract resolver.</summary>
+        public IContractResolver ContractResolver { get; set; } = new DefaultContractResolver();
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
