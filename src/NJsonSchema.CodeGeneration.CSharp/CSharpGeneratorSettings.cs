@@ -25,10 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
-
-            GenerateImmutableArrayProperties = true;
-            GenerateImmutableDictionaryProperties = true; 
-
+            
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
         }
@@ -67,10 +64,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
         public string[] JsonConverters { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: true).</summary>
+        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).</summary>
         public bool GenerateImmutableArrayProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: true).</summary>
+        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: false).</summary>
         public bool GenerateImmutableDictionaryProperties { get; set; }
     }
 }
