@@ -186,6 +186,19 @@ foreach(var property in Model.Properties){
             
             #line default
             #line hidden
+            
+            #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+if(property.IsStringEnumArray){
+            
+            #line default
+            #line hidden
+            this.Write(", ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)");
+            
+            #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
             this.Write(")]\r\n");
             
             #line 22 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"

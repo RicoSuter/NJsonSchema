@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -79,6 +82,33 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("PullrequestUpdated = 0,"));
+        }
+
+        public class MyStringEnumListTest
+        {
+            public List<MyStringEnum> Enums { get; set; }
+        }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum MyStringEnum
+        {
+            Foo = 0,
+            Bar = 1
+        }
+
+        [TestMethod]
+        public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<MyStringEnumListTest>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
         }
     }
 }
