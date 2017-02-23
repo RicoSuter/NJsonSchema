@@ -38,8 +38,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.IsPropertyNullable, type, parameters.TypeNameHint) != null,
-                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, parameters.IsPropertyNullable, type, parameters.TypeNameHint),
+                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, 
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues) != null,
+                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, 
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues),
 
                 Type = type,
 

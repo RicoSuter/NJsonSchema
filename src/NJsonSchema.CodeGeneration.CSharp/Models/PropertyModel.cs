@@ -46,6 +46,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
+        /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
+        public bool HasSetter => 
+            (_property.IsNullable(_settings.NullHandling) == false && (
+                (_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) && _settings.GenerateImmutableArrayProperties) ||
+                (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
+            )) == false;
+
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequired
         {
@@ -137,7 +144,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
-        public string RegularExpressionValue => _property.Pattern;
+        public string RegularExpressionValue => _property.Pattern.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;

@@ -19,13 +19,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
-        /// <param name="allowsNull"></param>
+        /// <param name="allowsNull">Specifies whether the default value assignment also allows null.</param>
         /// <param name="targetType">The type of the target.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
+        /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint)
+        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault)
         {
-            var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint);
+            var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault);
             if (value == null)
             {
                 schema = schema.ActualSchema;

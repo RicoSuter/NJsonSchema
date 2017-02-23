@@ -44,12 +44,18 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string Type { get; }
 
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => _settings.GenerateDefaultValues ?
-            _defaultValueGenerator.GetDefaultValue(_property, _property.IsNullable(_settings.NullHandling), Type, _property.Name) :
-            null;
+        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property, 
+            _property.IsNullable(_settings.NullHandling), Type, _property.Name, _settings.GenerateDefaultValues);
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
+
+        /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
+        public bool IsStringEnumArray =>
+            _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) &&
+            _property.ActualPropertySchema.Item != null &&
+            _property.ActualPropertySchema.Item.ActualSchema.IsEnumeration &&
+            _property.ActualPropertySchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()

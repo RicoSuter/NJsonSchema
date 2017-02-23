@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
-
+            
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
         }
@@ -37,8 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether data annotation properties should be created 
-        /// when generating C# classes (default: true).</summary>
+        /// <summary>Gets or sets a value indicating whether to generated data annotation attributes (default: true).</summary>
         public bool GenerateDataAnnotations { get; set; }
 
         /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
@@ -64,5 +63,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
         public string[] JsonConverters { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).</summary>
+        public bool GenerateImmutableArrayProperties { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: false).</summary>
+        public bool GenerateImmutableDictionaryProperties { get; set; }
     }
 }

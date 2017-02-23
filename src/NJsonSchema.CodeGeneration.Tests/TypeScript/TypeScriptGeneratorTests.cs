@@ -119,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            schema.AllOf.First().Properties["Gender"].Description = "EnumDesc.";
+            schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
             //// Act

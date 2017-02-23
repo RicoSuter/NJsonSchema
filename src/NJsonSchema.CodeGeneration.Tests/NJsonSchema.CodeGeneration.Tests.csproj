@@ -64,9 +64,11 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="CSharp\AdditionalPropertiesTests.cs" />
+    <Compile Include="CSharp\AnnotationsTests.cs" />
     <Compile Include="CSharp\CSharpEnumGeneratorTests.cs" />
     <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
+    <Compile Include="CSharp\InheritanceInterfaceTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
     <Compile Include="InheritanceSerializationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />
