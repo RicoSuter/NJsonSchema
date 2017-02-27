@@ -53,7 +53,7 @@
     <Compile Include="CSharpDefaultValueGenerator.cs" />
     <Compile Include="CSharpGenerator.cs" />
     <Compile Include="CSharpGeneratorSettings.cs" />
-    <Compile Include="CSharpJsonConverters.cs" />
+    <Compile Include="CSharpJsonSerializerGenerator.cs" />
     <Compile Include="CSharpPropertyNameGenerator.cs" />
     <Compile Include="CSharpTypeResolver.cs" />
     <Compile Include="Infrastructure\T4Extensions.cs" />
