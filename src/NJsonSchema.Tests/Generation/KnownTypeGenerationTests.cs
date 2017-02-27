@@ -20,11 +20,11 @@ namespace NJsonSchema.Tests.Generation
         {
         }
 
-        public class Pen
+        public class Pen : WritingInstrument
         {
         }
 
-        public class Pencil
+        public class Pencil : WritingInstrument
         {
         }
 
