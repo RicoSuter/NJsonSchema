@@ -71,12 +71,12 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#}#>
     public string ToJson() 
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonConverters#>);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonSerializerParameterCode#>);
     }
     
     public static <#=Model.Class#> FromJson(string data)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonConverters#>);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonSerializerParameterCode#>);
     }
 <#if(Model.Inpc){#>
 

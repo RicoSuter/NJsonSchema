@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
-            
+
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
         }
@@ -69,5 +69,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable dictionary properties (default: false).</summary>
         public bool GenerateImmutableDictionaryProperties { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer.</summary>
+        public bool HandleReferences { get; set; }
     }
 }
