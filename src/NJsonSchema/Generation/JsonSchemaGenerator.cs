@@ -308,7 +308,9 @@ namespace NJsonSchema.Generation
             foreach (var property in objectContract.Properties)
             {
                 var propertyInfo = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
-                await LoadPropertyOrFieldAsync(property, propertyInfo, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+
+                if (!schema.Properties.ContainsKey(property.PropertyName) && property.ShouldSerialize?.Invoke(null) != false)
+                    await LoadPropertyOrFieldAsync(property, propertyInfo, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
             }
 
 
