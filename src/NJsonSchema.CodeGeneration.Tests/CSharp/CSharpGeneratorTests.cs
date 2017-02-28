@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; }"));
+            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; } = "));
         }
 
         [TestMethod]
@@ -735,7 +735,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public string MiddleName { get; set; }
     
         [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
-        public int? Age { get; set; }".Replace("\r", string.Empty)));
+        public int? Age { get; set; }"));
         }
 
         [TestMethod]
@@ -1225,7 +1225,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(""^[a-zA-Z''-'\s]{1,40}$"")]"));
+            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(@""^[a-zA-Z''-'\s]{1,40}$"")]"));
         }
 
         [TestMethod]
