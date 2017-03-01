@@ -122,8 +122,8 @@ namespace NJsonSchema.Generation
 
             ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
-            var contract = Settings.ContractResolver.ResolveContract(type);
-            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+            var contract = ResolveContract(type);
+            var typeDescription = JsonObjectTypeDescription.FromType(contract, type, parentAttributes, Settings.DefaultEnumHandling);
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
@@ -347,7 +347,7 @@ namespace NJsonSchema.Generation
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var typeDescription = JsonObjectTypeDescription.FromType(type, null, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(ResolveContract(type), type, null, Settings.DefaultEnumHandling);
             var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
             if (!schemaResolver.HasSchema(type, isIntegerEnum))
@@ -363,8 +363,7 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.FlattenInheritanceHierarchy)
                 {
-                    var baseContract = Settings.ContractResolver.ResolveContract(baseType);
-                    await GeneratePropertiesAndInheritanceAsync(baseType, (JsonObjectContract)baseContract, schema, schemaResolver).ConfigureAwait(false);
+                    await GeneratePropertiesAndInheritanceAsync(baseType, (JsonObjectContract)ResolveContract(baseType), schema, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -461,7 +460,7 @@ namespace NJsonSchema.Generation
         {
             var propertyType = property.PropertyType;
             var attributes = property.AttributeProvider.GetAttributes(true).ToArray();
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, null, Settings.DefaultEnumHandling);
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(ResolveContract(propertyType), propertyType, null, Settings.DefaultEnumHandling);
             if (property.Ignored == false)
             {
                 JsonProperty jsonProperty;
@@ -565,7 +564,9 @@ namespace NJsonSchema.Generation
 
         private bool RequiresSchemaReference(Type type, IEnumerable<Attribute> parentAttributes)
         {
-            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+
+            var typeDescription = JsonObjectTypeDescription.FromType(
+                ResolveContract(type), type, parentAttributes, Settings.DefaultEnumHandling);
 
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
@@ -573,6 +574,8 @@ namespace NJsonSchema.Generation
 
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
+
+        private JsonContract ResolveContract(Type type) => Settings.ContractResolver.ResolveContract(type);
 
         private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
         {
