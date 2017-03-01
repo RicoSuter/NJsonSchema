@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
@@ -108,17 +109,19 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(3, schema.Properties.Count);
+            Assert.AreEqual(4, schema.Properties.Count);
         }
 
-        public class AA
+        public abstract class AA
         {
             public string FirstName { get; set; }
+            public abstract int Age { get; set; }
         }
 
         public class BB : AA
         {
             public string LastName { get; set; }
+            public override int Age { get; set; }
         }
 
         public class CC : BB
