@@ -274,7 +274,7 @@ namespace NJsonSchema.Infrastructure
         {
             var name = GetMemberElementName(member);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
-            return result.OfType<XElement>().First();
+            return result.OfType<XElement>().FirstOrDefault();
         }
 
         private static XElement GetXmlDocumentation(this ParameterInfo parameter, XDocument xml)
@@ -287,7 +287,7 @@ namespace NJsonSchema.Infrastructure
             else
                 result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
 
-            return result.OfType<XElement>().First();
+            return result.OfType<XElement>().FirstOrDefault();
         }
 
         private static string RemoveLineBreakWhiteSpaces(string documentation)
