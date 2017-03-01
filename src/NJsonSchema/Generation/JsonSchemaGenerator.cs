@@ -294,7 +294,8 @@ namespace NJsonSchema.Generation
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
                     .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true)
-                );
+                )
+                .ToList();
 #else
             var propertiesAndFields = type.GetTypeInfo()
                 .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
@@ -303,13 +304,20 @@ namespace NJsonSchema.Generation
                     type.GetTypeInfo()
                     .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
                     .Where(p => p.GetGetMethod()?.IsPublic == true || p.GetSetMethod()?.IsPublic == true)
-                );
+                )
+                .ToList();
 #endif
 
-            foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && property.ShouldSerialize?.Invoke(null) != false))
+            foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
             {
-                var propertyInfo = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
-                await LoadPropertyOrFieldAsync(property, propertyInfo, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+                var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
+                var propertyInfo = info as PropertyInfo;
+#if !LEGACY
+                if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
+#else
+                if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
+#endif
+                    await LoadPropertyOrFieldAsync(property, info, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
             }
 
             await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
@@ -560,7 +568,7 @@ namespace NJsonSchema.Generation
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
 
-        private JsonContract ResolveContract(Type type) => Settings.ContractResolver.ResolveContract(type);
+        private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
 
         private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
         {

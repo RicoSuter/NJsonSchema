@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsFalse(schema.Properties.ContainsKey("nameLength"));
 
             Assert.IsTrue(schema.Properties.ContainsKey("location"));
-            Assert.AreEqual(schema.Properties["location"].Type, JsonObjectType.String | JsonObjectType.Null, 
+            Assert.AreEqual(schema.Properties["location"].Type, JsonObjectType.String | JsonObjectType.Null,
                 "Location is resolved to a string contract because it has a type converter");
         }
 
@@ -65,8 +65,8 @@ namespace NJsonSchema.Tests.Generation
 
             public string StringValue
             {
-                get => string.Join("/", Path);
-                set => Path = new List<string>(value.Split('/'));
+                get { return string.Join("/", Path); ; }
+                set { Path = new List<string>(value.Split('/')); }
             }
 
             public override string ToString() => StringValue;
@@ -80,7 +80,7 @@ namespace NJsonSchema.Tests.Generation
 
         class StringConverter<T> : TypeConverter where T : IStringConvertable, new()
         {
-            public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) 
+            public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
                 => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);
 
             public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
