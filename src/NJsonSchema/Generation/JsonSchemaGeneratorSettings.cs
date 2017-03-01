@@ -33,8 +33,8 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
 
-        ///// <summary>Gets or sets the default property name handling (default: Default).</summary>
-        //public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
+        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
+        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
@@ -57,10 +57,31 @@ namespace NJsonSchema.Generation
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
 
         /// <summary>Gets or sets the contract resolver.</summary>
-        public IContractResolver ContractResolver { get; set; } = new DefaultContractResolver();
+        public IContractResolver ContractResolver { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
         public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+
+        /// <summary>Gets the contract resolver.</summary>
+        /// <returns>The contract resolver.</returns>
+        /// <exception cref="InvalidOperationException">The settings DefaultPropertyNameHandling and ContractResolver cannot be used at the same time.</exception>
+        public IContractResolver ActualContractResolver
+        {
+            get
+            {
+                if (DefaultPropertyNameHandling != PropertyNameHandling.Default && ContractResolver != null)
+                    throw new InvalidOperationException("The settingsDefaultPropertyNameHandling and ContractResolver cannot be used at the same time.");
+
+                if (ContractResolver != null)
+                    return ContractResolver;
+
+                if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
+                    return new CamelCasePropertyNamesContractResolver();
+                if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
+                    return new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+                return new DefaultContractResolver();
+            }
+        }
     }
 }

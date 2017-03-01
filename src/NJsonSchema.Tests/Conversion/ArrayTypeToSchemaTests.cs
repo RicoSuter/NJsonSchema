@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace NJsonSchema.Tests.Conversion
 {
@@ -18,7 +19,7 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
-            Assert.IsNotNull(schema.AllOf.First().ActualSchema.Properties["Foo"]);
+            Assert.IsFalse(schema.AllOf.First().ActualSchema.Properties.ContainsKey("Foo"));
         }
 
         [TestMethod]

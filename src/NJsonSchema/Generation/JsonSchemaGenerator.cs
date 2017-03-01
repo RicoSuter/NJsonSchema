@@ -123,11 +123,11 @@ namespace NJsonSchema.Generation
 
             ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
-            var contract = Settings.ContractResolver.ResolveContract(type);
+            var contract = Settings.ActualContractResolver.ResolveContract(type);
             var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
             {
-                if (typeDescription.IsDictionary)
+                if (typeDescription.IsDictionary || contract is JsonDictionaryContract)
                 {
                     typeDescription.ApplyType(schema);
                     await GenerateDictionaryAsync(type, schema, schemaResolver).ConfigureAwait(false);
@@ -306,18 +306,11 @@ namespace NJsonSchema.Generation
                 );
 #endif
 
-            foreach (var property in objectContract.Properties)
+            foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
             {
                 var propertyInfo = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                 await LoadPropertyOrFieldAsync(property, propertyInfo, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
             }
-
-
-            //foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-            //    await LoadPropertyOrFieldAsync(property, property.PropertyType, type, schema, schemaResolver).ConfigureAwait(false);
-
-            //foreach (var field in declaredFields.Where(p => properties == null || properties.Contains(p.Name)))
-            //    await LoadPropertyOrFieldAsync(field, field.FieldType, type, schema, schemaResolver).ConfigureAwait(false);
 
             await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
         }
@@ -362,7 +355,7 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.FlattenInheritanceHierarchy)
                 {
-                    var baseContract = Settings.ContractResolver.ResolveContract(baseType);
+                    var baseContract = Settings.ActualContractResolver.ResolveContract(baseType);
                     await GeneratePropertiesAndInheritanceAsync(baseType, (JsonObjectContract)baseContract, schema, schemaResolver).ConfigureAwait(false);
                 }
                 else
@@ -497,8 +490,9 @@ namespace NJsonSchema.Generation
                 else
                     jsonProperty = await GenerateAsync<JsonProperty>(propertyType, attributes, schemaResolver).ConfigureAwait(false);
 
-                var propertyName = Settings.ContractResolver is DefaultContractResolver ?
-                    ((DefaultContractResolver)Settings.ContractResolver).GetResolvedPropertyName(property.PropertyName) :
+                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
+                var propertyName = contractResolver != null ?
+                    contractResolver.GetResolvedPropertyName(property.PropertyName) :
                     property.PropertyName;
 
                 if (parentSchema.Properties.ContainsKey(propertyName))
@@ -509,8 +503,6 @@ namespace NJsonSchema.Generation
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
-
-
                 var requiredAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                 var hasJsonNetAttributeRequired = property.Required == Required.Always || property.Required == Required.AllowNull;
@@ -520,17 +512,11 @@ namespace NJsonSchema.Generation
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
 
-                var isJsonNetAttributeNullable = property.Required == Required.AllowNull;
-                var isNullable = !hasRequiredAttribute && !isDataContractMemberRequired && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
+                var isNullable = propertyTypeDescription.IsNullable &&
+                    hasRequiredAttribute == false &&
+                    isDataContractMemberRequired == false &&
+                    (property.Required == Required.Default || property.Required == Required.AllowNull);
 
-
-
-                //var isRequired = property.Required == Required.Always || property.Required == Required.AllowNull;
-                //if (isRequired)
-                //    parentSchema.RequiredProperties.Add(propertyName);
-
-                //var isNullable = propertyTypeDescription.IsNullable &&
-                //                 (property.Required == Required.Default || property.Required == Required.AllowNull);
                 if (isNullable)
                 {
                     if (Settings.NullHandling == NullHandling.JsonSchema)

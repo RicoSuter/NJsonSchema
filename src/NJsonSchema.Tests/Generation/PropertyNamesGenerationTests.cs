@@ -50,8 +50,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-                //DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
+                DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
             });
 
             var data = schema.ToJson();
@@ -71,8 +70,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() }
-                //DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
+                DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
             });
 
             var data = schema.ToJson();
