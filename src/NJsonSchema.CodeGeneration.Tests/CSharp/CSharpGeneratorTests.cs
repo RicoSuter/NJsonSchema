@@ -726,7 +726,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     }
   }".Replace("\r", string.Empty)));
 
-            Assert.IsTrue(code.Contains(
+            Assert.IsTrue(code.Replace("\r", string.Empty).Contains(
 @"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
@@ -735,7 +735,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public string MiddleName { get; set; }
     
         [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
-        public int? Age { get; set; }"));
+        public int? Age { get; set; }".Replace("\r", string.Empty)));
         }
 
         [TestMethod]
