@@ -498,7 +498,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.AreEqual(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}", schema.Properties["Foo"].ActualPropertySchema.ToJson());
+}".Replace("\r", string.Empty), schema.Properties["Foo"].ActualPropertySchema.ToJson().Replace("\r", string.Empty));
         }
 
         [TestMethod]
@@ -705,7 +705,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(schemaJson.Contains(
+            Assert.IsTrue(schemaJson.Replace("\r", string.Empty).Contains(
 @"  ""required"": [
     ""FirstName"",
     ""Age""
@@ -724,7 +724,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
       ],
       ""format"": ""int32""
     }
-  }"));
+  }".Replace("\r", string.Empty)));
 
             Assert.IsTrue(code.Contains(
 @"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
