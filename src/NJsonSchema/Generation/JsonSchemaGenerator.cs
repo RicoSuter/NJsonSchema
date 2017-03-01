@@ -124,10 +124,10 @@ namespace NJsonSchema.Generation
             ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
             var contract = ResolveContract(type);
-            var typeDescription = JsonObjectTypeDescription.FromType(contract, type, parentAttributes, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, contract, parentAttributes, Settings.DefaultEnumHandling);
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
             {
-                if (typeDescription.IsDictionary || contract is JsonDictionaryContract)
+                if (typeDescription.IsDictionary)
                 {
                     typeDescription.ApplyType(schema);
                     await GenerateDictionaryAsync(type, schema, schemaResolver).ConfigureAwait(false);
@@ -140,7 +140,7 @@ namespace NJsonSchema.Generation
                     {
                         typeDescription.ApplyType(schema);
                         schema.Description = await GetDescriptionAsync(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-                        await GenerateObjectAsync(type, (JsonObjectContract)contract, schema, schemaResolver).ConfigureAwait(false);
+                        await GenerateObjectAsync(type, contract as JsonObjectContract, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
                         schema.SchemaReference =
@@ -308,16 +308,19 @@ namespace NJsonSchema.Generation
                 .ToList();
 #endif
 
-            foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
+            if (objectContract != null)
             {
-                var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
-                var propertyInfo = info as PropertyInfo;
+                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
+                {
+                    var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
+                    var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
+                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
+                    if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
-                    await LoadPropertyOrFieldAsync(property, info, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+                        await LoadPropertyOrFieldAsync(property, info, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+                }
             }
 
             await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
@@ -347,7 +350,7 @@ namespace NJsonSchema.Generation
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var typeDescription = JsonObjectTypeDescription.FromType(ResolveContract(type), type, null, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, ResolveContract(type), null, Settings.DefaultEnumHandling);
             var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
             if (!schemaResolver.HasSchema(type, isIntegerEnum))
@@ -460,7 +463,7 @@ namespace NJsonSchema.Generation
         {
             var propertyType = property.PropertyType;
             var attributes = property.AttributeProvider.GetAttributes(true).ToArray();
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(ResolveContract(propertyType), propertyType, null, Settings.DefaultEnumHandling);
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, ResolveContract(propertyType), null, Settings.DefaultEnumHandling);
             if (property.Ignored == false)
             {
                 JsonProperty jsonProperty;
@@ -558,8 +561,7 @@ namespace NJsonSchema.Generation
         private bool RequiresSchemaReference(Type type, IEnumerable<Attribute> parentAttributes)
         {
 
-            var typeDescription = JsonObjectTypeDescription.FromType(
-                ResolveContract(type), type, parentAttributes, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, ResolveContract(type), parentAttributes, Settings.DefaultEnumHandling);
 
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)

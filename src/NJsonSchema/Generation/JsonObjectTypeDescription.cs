@@ -13,9 +13,9 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
-using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.Generation
 {
@@ -23,12 +23,12 @@ namespace NJsonSchema.Generation
     public class JsonObjectTypeDescription
     {
         /// <summary>Creates a <see cref="JsonObjectTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="contract">The contract as per Json.NET serialization</param>
         /// <param name="type">The type. </param>
+        /// <param name="contract">The contract as per Json.NET serialization</param>
         /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
         /// <param name="defaultEnumHandling">The default enum handling.</param>
         /// <returns>The <see cref="JsonObjectTypeDescription"/>. </returns>
-        public static JsonObjectTypeDescription FromType(JsonContract contract, Type type, IEnumerable<Attribute> parentAttributes, EnumHandling defaultEnumHandling)
+        public static JsonObjectTypeDescription FromType(Type type, JsonContract contract, IEnumerable<Attribute> parentAttributes, EnumHandling defaultEnumHandling)
         {
             var allowsNull = true;
             var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
@@ -92,18 +92,18 @@ namespace NJsonSchema.Generation
             if (IsFileType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.File, allowsNull);
 
-            if (contract is JsonDictionaryContract)
+            if (IsDictionaryType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull, true);
 
-            if (contract is JsonArrayContract)
+            if (IsArrayType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.Array, allowsNull);
 
             if (type.Name == "Nullable`1")
             {
 #if !LEGACY
-                var typeDescription = FromType(contract, type.GenericTypeArguments[0], parentAttributes, defaultEnumHandling);
+                var typeDescription = FromType(type.GenericTypeArguments[0], contract, parentAttributes, defaultEnumHandling);
 #else
-                var typeDescription = FromType(contract, type.GetGenericArguments()[0], parentAttributes, defaultEnumHandling);
+                var typeDescription = FromType(type.GetGenericArguments()[0], contract, parentAttributes, defaultEnumHandling);
 #endif
                 typeDescription.IsNullable = allowsNull;
                 return typeDescription;
@@ -117,7 +117,6 @@ namespace NJsonSchema.Generation
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
                 return new JsonObjectTypeDescription(classType, allowsNull, false, format);
             }
-
 
             if (contract is JsonStringContract)
                 return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull);
