@@ -1,13 +1,18 @@
 ﻿<#@ template visibility="internal" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
-<#}#>export class <#=Model.Class#><#=Model.Inheritance#> {<#foreach(var property in Model.Properties){#> 
-<#if(property.HasDescription){#>    /** <#=property.Description#> */
-<#}#>    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;<#}#>
+<#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
+<#foreach(var property in Model.Properties){#>
+<#  if(property.HasDescription){#>
+    /** <#=property.Description#> */
+<#  }#>
+    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
+<#}#>
 <#if(Model.HasIndexerProperty){#>
 
     [key: string]: <#=Model.IndexerPropertyValueType#>; 
 <#}#>
 <#if(Model.HasDiscriminator){#>
+
     protected _discriminator: string;
 <#}#>
 

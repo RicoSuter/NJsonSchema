@@ -540,7 +540,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Poco, 
+                ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "Foo"
             });
             var code = generator.GenerateFile("MyClass");
@@ -559,7 +559,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Poco, 
+                ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "Foo"
             });
             var code = generator.GenerateFile("MyClass");
@@ -599,7 +599,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Poco, 
+                ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "Foo"
             });
             var code = generator.GenerateFile("MyClass");
@@ -883,7 +883,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_definition_is_named_Object_then_JObject_is_generated()
         {
             //// Arrange
-            var json = 
+            var json =
 @"{
 	""type"": ""object"", 
 	""properties"": {
@@ -954,7 +954,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_has_not_supported_characters_then_they_are_removed()
         {
             //// Arrange
-            var schemaJson = 
+            var schemaJson =
 @"{
   ""type"": ""object"",
   ""properties"": {
@@ -1294,6 +1294,26 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations"));
+        }
+
+        public class MyByteTest
+        {
+            public byte? Cell { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_property_is_byte_then_its_type_is_preserved()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<MyByteTest>();
+            var json = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public byte? Cell { get; set; }"));
         }
     }
 }
