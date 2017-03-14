@@ -221,7 +221,13 @@ namespace NJsonSchema
         public ICollection<JsonSchema4> InheritedSchemas
 #endif
         {
-            get { return new ReadOnlyCollection<JsonSchema4>(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.Object).ToList()); }
+            get
+            {
+                return new ReadOnlyCollection<JsonSchema4>(AllOf
+                    .Where(s => s.ActualSchema.Type == JsonObjectType.Object)
+                    .Select(s => s.ActualSchema)
+                    .ToList());
+            }
         }
 
         /// <summary>Gets the list of all inherited/parent schemas.</summary>

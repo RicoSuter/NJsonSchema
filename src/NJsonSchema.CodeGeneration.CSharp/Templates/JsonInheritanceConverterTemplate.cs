@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+    #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
     internal partial class JsonInheritanceConverterTemplate : JsonInheritanceConverterTemplateBase
     {
@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
         {
             this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
             
-            #line 2 "C:\Data\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default

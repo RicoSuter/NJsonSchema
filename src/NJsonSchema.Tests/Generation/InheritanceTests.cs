@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -129,5 +132,36 @@ namespace NJsonSchema.Tests.Generation
             public string Address { get; set; }
         }
 
+        public class Dog : Animal
+        {
+            public string Foo { get; set; }
+        }
+
+        public class Horse : Animal
+        {
+            public string Bar { get; set; }
+        }
+
+        [KnownType(typeof(Dog))]
+        [KnownType(typeof(Horse))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
+        public class Animal
+        {
+            public string Baz { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_root_schema_is_inherited_then_schema_is_generated()
+        {
+            //// Arrange
+            
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Animal>();
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(data);
+        }
     }
 }

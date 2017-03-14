@@ -373,7 +373,9 @@ namespace NJsonSchema.Generation
                     var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
                     if (RequiresSchemaReference(baseType, null))
                     {
-                        schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+                        if (schemaResolver.RootObject != baseSchema.ActualSchema)
+                            schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+
                         schema.AllOf.Add(new JsonSchema4
                         {
                             SchemaReference = baseSchema.ActualSchema
@@ -560,7 +562,6 @@ namespace NJsonSchema.Generation
 
         private bool RequiresSchemaReference(Type type, IEnumerable<Attribute> parentAttributes)
         {
-
             var typeDescription = JsonObjectTypeDescription.FromType(type, ResolveContract(type), parentAttributes, Settings.DefaultEnumHandling);
 
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);

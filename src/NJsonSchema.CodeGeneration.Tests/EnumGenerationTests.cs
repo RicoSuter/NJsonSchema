@@ -67,8 +67,8 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Assert
             Assert.IsFalse(code.Contains("Ref_"));
-            Assert.IsTrue(code.Contains("public enum Bar\n"));
-            Assert.IsTrue(code.Contains("public enum Bar2\n"));
+            Assert.IsTrue(code.Contains("public enum Bar\r\n"));
+            Assert.IsTrue(code.Contains("public enum Bar2\r\n"));
 
             Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
             Assert.AreEqual(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)

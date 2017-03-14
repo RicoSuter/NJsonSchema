@@ -30,7 +30,9 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonObjectTypeDescription"/>. </returns>
         public static JsonObjectTypeDescription FromType(Type type, JsonContract contract, IEnumerable<Attribute> parentAttributes, EnumHandling defaultEnumHandling)
         {
-            var allowsNull = true;
+            var isStruct = type.Name != "Nullable`1" && type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive;
+            var allowsNull = isStruct == false;
+
             var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
                 allowsNull = false;
