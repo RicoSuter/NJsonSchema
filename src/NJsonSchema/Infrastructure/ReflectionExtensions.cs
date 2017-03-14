@@ -26,6 +26,22 @@ namespace NJsonSchema.Infrastructure
             return attributes.FirstOrDefault(a => a.GetType().FullName == typeName);
         }
 
+        /// <summary>Finds the first common base of the given types.</summary>
+        /// <param name="types">The types.</param>
+        /// <returns>The common base type.</returns>
+        public static Type FindCommonBaseType(this IEnumerable<Type> types)
+        {
+            var baseType = types.First();
+            while (baseType != typeof(object))
+            {
+                if (types.All(t => baseType.GetTypeInfo().IsAssignableFrom(t.GetTypeInfo())))
+                    return baseType;
+
+                baseType = types.First().GetTypeInfo().BaseType;
+            }
+            return typeof(object); 
+        }
+
         /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
         /// <param name="attributes">The attributes.</param>
         /// <param name="typeName">Type of the attribute.</param>
