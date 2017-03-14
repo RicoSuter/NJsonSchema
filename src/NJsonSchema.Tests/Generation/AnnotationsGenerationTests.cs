@@ -168,6 +168,32 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
         }
 
+        public class MyStructContainer
+        {
+            public MyStruct Struct { get; set; }
+
+            public MyStruct? NullableStruct { get; set; }
+        }
+
+        [JsonSchema(JsonObjectType.String)]
+        public struct MyStruct
+        {
+        }
+
+        [TestMethod]
+        public async Task When_property_is_struct_then_it_is_not_nullable()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<MyStructContainer>();
+
+            //// Act
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Struct"].Type);
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["NullableStruct"].Type);
+        }
+
         public class StringLengthAttributeClass
         {
             [StringLength(10, MinimumLength = 5)]
