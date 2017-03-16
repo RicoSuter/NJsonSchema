@@ -32,12 +32,12 @@ namespace NJsonSchema.Infrastructure
         public static Type FindCommonBaseType(this IEnumerable<Type> types)
         {
             var baseType = types.First();
-            while (baseType != typeof(object))
+            while (baseType != typeof(object) && baseType != null)
             {
                 if (types.All(t => baseType.GetTypeInfo().IsAssignableFrom(t.GetTypeInfo())))
                     return baseType;
 
-                baseType = types.First().GetTypeInfo().BaseType;
+                baseType = baseType.GetTypeInfo().BaseType;
             }
             return typeof(object); 
         }
