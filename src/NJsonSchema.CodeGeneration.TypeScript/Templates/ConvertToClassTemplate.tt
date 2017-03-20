@@ -27,7 +27,11 @@ if (<#=Model.Value#>) {
 <#if(Model.IsDictionaryValueDate){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.StringToDateCode#>(<#=Model.Value#>[key].toString()) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
 <#}else{#>
+<#  if(Model.HasDefaultValue || Model.NullValue != "undefined"){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
+<#  }else{#>
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key];
+<#  }#>
 <#}}#>
     }
 }
@@ -35,7 +39,11 @@ if (<#=Model.Value#>) {
     <#if(Model.IsDate){#>
 <#=Model.Variable#> = <#=Model.Value#> ? <#=Model.StringToDateCode#>(<#=Model.Value#>.toString()) : <#if(Model.HasDefaultValue){#><#=Model.StringToDateCode#>(<#=Model.DefaultValue#>)<#}else{#><#=Model.NullValue#><#}#>;
     <#}else{#>
+<#      if(Model.HasDefaultValue || Model.NullValue != "undefined"){#>
 <#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
+<#      }else{#>
+<#=Model.Variable#> = <#=Model.Value#>;
+<#      }#>
     <#}#>
 <#}#>
 <#}#>
