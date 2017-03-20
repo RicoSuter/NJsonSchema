@@ -72,6 +72,7 @@
     <Compile Include="Generation\EnumListTests.cs" />
     <Compile Include="Generation\ExcplicitInterfacePropertyTests.cs" />
     <Compile Include="Generation\FieldGenerationTests.cs" />
+    <Compile Include="Generation\FindCommonBaseTypeTests.cs" />
     <Compile Include="Generation\GenericTests.cs" />
     <Compile Include="Generation\IgnoredPropertyTests.cs" />
     <Compile Include="Generation\PropertyNamesGenerationTests.cs" />

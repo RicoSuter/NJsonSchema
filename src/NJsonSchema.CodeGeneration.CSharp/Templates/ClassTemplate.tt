@@ -18,7 +18,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#  if(property.HasDescription){#>
     /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#  }#>
-    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#>)]
+    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#><#if(property.IsStringEnumArray){#>, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)<#}#>)]
 <#  if(property.RenderRequiredAttribute){#>
     [System.ComponentModel.DataAnnotations.Required]
 <#  }#>
@@ -71,12 +71,12 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#}#>
     public string ToJson() 
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonConverters#>);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonSerializerParameterCode#>);
     }
     
     public static <#=Model.Class#> FromJson(string data)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonConverters#>);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonSerializerParameterCode#>);
     }
 <#if(Model.Inpc){#>
 

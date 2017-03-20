@@ -58,6 +58,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the property is optional.</summary>
         public bool IsOptional => !_property.IsRequired && _settings.MarkOptionalProperties;
 
+        /// <summary>Gets a value indicating whether the property is nullable.</summary>
+        public bool IsNullable => _property.IsNullable(_settings.NullHandling);
+
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
 

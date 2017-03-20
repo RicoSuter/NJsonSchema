@@ -20,15 +20,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             code = Regex.Replace(code, "import \\* as generated from (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
             {
-                ImportCode += ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
+                var importCode = ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value);
+                if (!importCode.ToLowerInvariant().Contains("// ignore"))
+                    ImportCode += importCode + "\n";
+
                 return string.Empty;
             }, RegexOptions.Multiline);
 
             code = Regex.Replace(code, "(@.*\r?\n)?(export )?class (.*?) ([\\s\\S]*?)\\n}", match =>
             {
-                var hasExport = match.Groups[2].Success; 
+                var hasExport = match.Groups[2].Success;
                 var className = match.Groups[3].Value;
-                var classCode = hasExport ?  match.Groups[0].Value : match.Groups[0].Value.Replace("class ", "export class ");
+                var classCode = hasExport ? match.Groups[0].Value : match.Groups[0].Value.Replace("class ", "export class ");
 
                 if (extendedClasses?.Contains(className) == true)
                 {

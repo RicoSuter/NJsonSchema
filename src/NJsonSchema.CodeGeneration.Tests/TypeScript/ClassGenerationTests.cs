@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = await PrepareAsync(TypeScriptTypeStyle.Class);
 
             //// Assert
-            Assert.IsTrue(code.Contains("name: string = \"foo\"; "));
+            Assert.IsTrue(code.Contains("name: string = \"foo\";"));
         }
 
         [TestMethod]

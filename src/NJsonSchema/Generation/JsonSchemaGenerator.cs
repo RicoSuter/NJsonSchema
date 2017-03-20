@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
+using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation
 {
@@ -303,7 +304,7 @@ namespace NJsonSchema.Generation
 
         private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute"))
+            foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes(false).Where(a => a.GetType().Name == nameof(KnownTypeAttribute)))
             {
                 if (knownTypeAttribute.Type != null)
                     await AddKnownTypeAsync(knownTypeAttribute.Type, schemaResolver);
@@ -346,7 +347,9 @@ namespace NJsonSchema.Generation
                     var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
                     if (RequiresSchemaReference(baseType, null))
                     {
-                        schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+                        if (schemaResolver.RootObject != baseSchema.ActualSchema)
+                            schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+
                         schema.AllOf.Add(new JsonSchema4
                         {
                             SchemaReference = baseSchema.ActualSchema
