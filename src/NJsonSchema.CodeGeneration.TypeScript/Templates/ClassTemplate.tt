@@ -24,6 +24,12 @@
         this._discriminator = "<#=Model.DiscriminatorName#>";
 <#}#>
         if (data !== undefined) {
+<#if(Model.HasIndexerProperty){#>
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    this[property] = data[property];
+            }
+<#}#>
 <#foreach (var property in Model.Properties){#>
             <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
 <#}#>
@@ -44,12 +50,19 @@
 
     toJS(data?: any) {
         data = data === undefined ? {} : data;
+<#if(Model.HasIndexerProperty){#>
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+<#}#>
 <#if(Model.HasDiscriminator){#>
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
 <#}#>
 <#foreach (var property in Model.Properties){#>
         <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
-<#} if(Model.HasInheritance){#>
+<#}#>
+<#if(Model.HasInheritance){#>
         super.toJS(data);
 <#}#>
         return data; 
