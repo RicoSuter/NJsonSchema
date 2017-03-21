@@ -39,8 +39,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             DiscriminatorName = discriminatorName;
         }
 
-        /// <summary>Gets the class name (the postfix 'Base' is used when using an extension class).</summary>
-        public string Class => _settings.ExtendedClasses?.Contains(_typeName) == true ? _typeName + "Base" : _typeName;
+        /// <summary>Gets the class name.</summary>
+        public string Class => _typeName;
 
         /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
         public override string ActualClass => _typeName;
