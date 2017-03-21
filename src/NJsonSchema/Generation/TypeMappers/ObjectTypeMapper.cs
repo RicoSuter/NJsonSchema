@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
 {
@@ -43,7 +44,9 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <param name="schema">The schema.</param>
         /// <param name="schemaGenerator">The schema generator.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
-        public void GenerateSchema<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
+#pragma warning disable 1998
+        public async Task GenerateSchemaAsync<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver) where TSchemaType : JsonSchema4, new()
+#pragma warning restore 1998
         {
             if (!schemaResolver.HasSchema(MappedType, false))
                 schemaResolver.AddSchema(MappedType, false, _schemaFactory(schemaGenerator, schemaResolver));

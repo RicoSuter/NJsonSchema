@@ -59,7 +59,16 @@ namespace NJsonSchema
 
             var schema = obj as JsonSchema4;
             if (schema != null && schema.SchemaReference != null)
-                schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema);
+            {
+                if (schema.SchemaReference.DocumentPath == null)
+                    schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema);
+                else
+                {
+                    var externalReference = schema.SchemaReference;
+                    var externalReferenceRoot = externalReference.FindRootParent();
+                    schema.SchemaReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference);
+                }
+            }
 
             if (obj is IDictionary)
             {
