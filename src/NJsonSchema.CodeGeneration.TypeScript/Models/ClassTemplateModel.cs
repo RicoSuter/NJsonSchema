@@ -101,6 +101,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             }
         }
 
+        /// <summary>Gets a value indicating whether to handle JSON references.</summary>
+        public bool HandleReferences => _settings.HandleReferences;
+
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
             .Where(v => v.IsInheritanceDiscriminator == false)

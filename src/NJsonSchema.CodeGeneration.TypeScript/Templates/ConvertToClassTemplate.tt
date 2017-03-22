@@ -1,13 +1,13 @@
 ﻿<#@ template visibility="internal" #>
 <#if(Model.IsNewableObject){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Type#>.fromJS(<#=Model.Value#>) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Type#>.fromJS(<#=Model.Value#><#if(Model.HandleReferences){#>, mappings<#}#>) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
 <#}else{#>
 <#if(Model.IsArray){#>
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
     <#=Model.Variable#> = [];
     for (let item of <#=Model.Value#>)
 <#if(Model.IsArrayItemNewableObject){#>
-        <#=Model.Variable#>.push(<#=Model.ArrayItemType#>.fromJS(item));
+        <#=Model.Variable#>.push(<#=Model.ArrayItemType#>.fromJS(item<#if(Model.HandleReferences){#>, mappings<#}#>));
 <#}else{#>
 <#if(Model.IsArrayItemDate){#>
         <#=Model.Variable#>.push(<#=Model.StringToDateCode#>(item));
@@ -22,7 +22,7 @@ if (<#=Model.Value#>) {
     for (let key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
 <#if(Model.IsDictionaryValueNewableObject){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.DictionaryValueType#>.fromJS(<#=Model.Value#>[key]) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.DictionaryValueType#>.fromJS(<#=Model.Value#>[key]<#if(Model.HandleReferences){#>, mappings<#}#>) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.StringToDateCode#>(<#=Model.Value#>[key].toString()) : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;

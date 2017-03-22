@@ -37,5 +37,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets or sets the name of the module.</summary>
         public string Namespace => _settings.Namespace;
+
+        /// <summary>Gets a value indicating whether to handle JSON references.</summary>
+        public bool HandleReferences => _settings.HandleReferences;
+
+        /// <summary>Gets the reference handling code.</summary>
+        public string ReferenceHandlingCode => TypeScriptReferenceHandlingCodeGenerator.Generate();
     }
 }
