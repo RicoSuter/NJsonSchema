@@ -62,6 +62,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets a value indicating whether to handle JSON references (supports $ref, $id, $values, default: false).</summary>
         public bool HandleReferences { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
+        public bool GenerateCloneMethod { get; set; }
+
         internal ITemplate CreateTemplate(string typeName, object model)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))

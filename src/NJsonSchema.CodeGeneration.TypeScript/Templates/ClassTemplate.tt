@@ -92,6 +92,7 @@
     toJSON() {
         return JSON.stringify(this.toJS());
     }
+<#if(Model.GenerateCloneMethod){#>
 
     clone() {
         let clone = new <#=Model.Class#>();
@@ -101,4 +102,5 @@
         }
         return clone;
     }
+<#}#>
 }

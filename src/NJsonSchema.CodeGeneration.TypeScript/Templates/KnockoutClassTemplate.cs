@@ -559,16 +559,35 @@ foreach (var property in Model.Properties){
             #line default
             #line hidden
             this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
-                    "s.toJS());\r\n    }\r\n\r\n    clone() {\r\n        let clone = new ");
+                    "s.toJS());\r\n    }\r\n");
             
-            #line 87 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 85 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+if(Model.GenerateCloneMethod){
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    clone() {\r\n        let clone = new ");
+            
+            #line 88 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("();\r\n        for (var property in this) {\r\n            if (this.hasOwnProperty(pr" +
-                    "operty))\r\n                (<any>clone)[property] = this[property];\n        }\r\n  " +
-                    "      return clone;\r\n    }\r\n}");
+            this.Write(@"();
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                (<any>clone)[property] = ko.isObservable(this[property]) ? ko.observable(this[property]()) : this[property];
+        }
+        return clone;
+    }
+");
+            
+            #line 95 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

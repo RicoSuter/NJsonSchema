@@ -82,13 +82,15 @@
     toJSON() {
         return JSON.stringify(this.toJS());
     }
+<#if(Model.GenerateCloneMethod){#>
 
     clone() {
         let clone = new <#=Model.Class#>();
         for (var property in this) {
             if (this.hasOwnProperty(property))
-                (<any>clone)[property] = this[property];
+                (<any>clone)[property] = ko.isObservable(this[property]) ? ko.observable(this[property]()) : this[property];
         }
         return clone;
     }
+<#}#>
 }

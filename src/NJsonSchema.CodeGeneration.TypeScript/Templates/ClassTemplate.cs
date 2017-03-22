@@ -562,16 +562,30 @@ if(Model.HasInheritance){
             #line default
             #line hidden
             this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
-                    "s.toJS());\r\n    }\r\n\r\n    clone() {\r\n        let clone = new ");
+                    "s.toJS());\r\n    }\r\n");
             
-            #line 97 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 95 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+if(Model.GenerateCloneMethod){
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    clone() {\r\n        let clone = new ");
+            
+            #line 98 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
             this.Write("();\r\n        for (var property in this) {\r\n            if (this.hasOwnProperty(pr" +
                     "operty))\r\n                (<any>clone)[property] = this[property];\r\n        }\r\n " +
-                    "       return clone;\r\n    }\r\n}");
+                    "       return clone;\r\n    }\r\n");
+            
+            #line 105 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

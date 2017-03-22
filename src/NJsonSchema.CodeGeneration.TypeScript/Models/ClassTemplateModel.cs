@@ -83,6 +83,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
         public bool HasIndexerProperty => _schema.InheritedSchemas.Any(s => s.IsDictionary);
 
+        /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
+        public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
+
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
         {
