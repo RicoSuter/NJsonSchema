@@ -53,6 +53,6 @@ function ci<T>(data: any, mappings: any, creator: () => T): T {
 
     let result: any = creator();
     mappings.push({ source: data, target: result });
-	result.initialize(data, mappings);
+    result.init(data, mappings);
     return result;
 }

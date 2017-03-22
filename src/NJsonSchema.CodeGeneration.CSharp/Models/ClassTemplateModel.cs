@@ -38,10 +38,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets or sets the class name.</summary>
-        public string Class { get; set; }
-
-        /// <summary>Gets the class.</summary>
-        public override string ActualClass => Class;
+        public override string Class { get; }
 
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;

@@ -23,9 +23,9 @@
     }
 <#}#>
 
-    initialize(data?: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>) {
+    init(data?: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>) {
 <#if(Model.HasInheritance){#>
-        super.initialize(data);
+        super.init(data);
 <#}#>
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
@@ -37,29 +37,29 @@
         }
     }
 
-    static fromJS(data: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>): <#=Model.ActualClass#> {
+    static fromJS(data: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>): <#=Model.Class#> {
 <#if(Model.HandleReferences){#>
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-			return ci<<#=derivedClass#>>(data, mappings, () => new <#=derivedClass#>());
+            return ci<<#=derivedClass#>>(data, mappings, () => new <#=derivedClass#>());
 <#      }#>
-        return ci<<#=Model.ActualClass#>>(data, mappings, () => new <#=Model.ActualClass#>());
+        return ci<<#=Model.Class#>>(data, mappings, () => new <#=Model.Class#>());
 <#  }else{#>
-        return ci<<#=Model.ActualClass#>>(data, mappings, () => new <#=Model.ActualClass#>());
+        return ci<<#=Model.Class#>>(data, mappings, () => new <#=Model.Class#>());
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>") {
-			let result = new <#=derivedClass#>();
-			result.initialize(data);
+            let result = new <#=derivedClass#>();
+            result.init(data);
             return result;
         }
 <#      }#>
 <#  }#>
-        let result = new <#=Model.ActualClass#>();
-		result.initialize();
+        let result = new <#=Model.Class#>();
+        result.init();
         return result;
 <#}#>
     }
@@ -81,5 +81,14 @@
 
     toJSON() {
         return JSON.stringify(this.toJS());
+    }
+
+    clone() {
+        let clone = new <#=Model.Class#>();
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                clone[property] = this[property];
+        }
+        return clone;
     }
 }

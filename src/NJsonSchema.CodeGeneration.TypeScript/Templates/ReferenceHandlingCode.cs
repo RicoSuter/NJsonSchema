@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ReferenceHandlingCode.tt"
+    #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ReferenceHandlingCode.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     internal partial class ReferenceHandlingCode : ReferenceHandlingCodeBase
     {
@@ -44,8 +44,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
                     ")\r\n        mappings = [];\r\n    else {\r\n        let mapping = mappings.filter((m:" +
                     " any) => m.source === data);\r\n        if (mapping.length === 1)\r\n            ret" +
                     "urn <T>mapping[0].target;\r\n    }\r\n\r\n    let result: any = creator();\r\n    mappin" +
-                    "gs.push({ source: data, target: result });\r\n\tresult.initialize(data, mappings);\r" +
-                    "\n    return result;\r\n}");
+                    "gs.push({ source: data, target: result });\r\n    result.init(data, mappings);\r\n  " +
+                    "  return result;\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

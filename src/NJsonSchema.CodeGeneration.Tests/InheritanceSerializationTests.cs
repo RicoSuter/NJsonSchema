@@ -151,8 +151,8 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             // discriminator is available for deserialization
             Assert.IsTrue(code.Contains("protected _discriminator: string;")); // discriminator must be private
-            Assert.IsTrue(code.Contains("return new Dog(data);")); // type is chosen by discriminator 
-            Assert.IsTrue(code.Contains("return new Animal(data);")); // type is chosen by discriminator 
+            Assert.IsTrue(code.Contains("new Dog();")); // type is chosen by discriminator 
+            Assert.IsTrue(code.Contains("new Animal();")); // type is chosen by discriminator 
 
             // discriminator is assign for serialization
             Assert.IsTrue(code.Contains("this._discriminator = \"Animal\""));

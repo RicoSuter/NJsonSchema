@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = await PrepareAsync(TypeScriptTypeStyle.Class);
 
             //// Assert
-            Assert.IsTrue(code.Contains("constructor(data?: any) {"));
+            Assert.IsTrue(code.Contains("init(data?: any) {"));
         }
 
         [TestMethod]
