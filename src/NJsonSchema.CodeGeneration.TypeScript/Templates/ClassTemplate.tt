@@ -64,7 +64,7 @@
 <#      }#>
 <#  }#>
         let result = new <#=Model.Class#>();
-        result.init();
+        result.init(data);
         return result;
 <#}#>
     }
@@ -97,7 +97,7 @@
         let clone = new <#=Model.Class#>();
         for (var property in this) {
             if (this.hasOwnProperty(property))
-                clone[property] = this[property];
+                (<any>clone)[property] = this[property];
         }
         return clone;
     }

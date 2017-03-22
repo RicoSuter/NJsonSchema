@@ -488,7 +488,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("();\r\n        result.init();\r\n        return result;\r\n");
+            this.Write("();\r\n        result.init(data);\r\n        return result;\r\n");
             
             #line 64 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 }
@@ -566,9 +566,9 @@ foreach (var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write("();\r\n        for (var property in this) {\n            if (this.hasOwnProperty(pro" +
-                    "perty))\n                clone[property] = this[property];\n        }\n        retu" +
-                    "rn clone;\n    }\r\n}");
+            this.Write("();\r\n        for (var property in this) {\r\n            if (this.hasOwnProperty(pr" +
+                    "operty))\r\n                (<any>clone)[property] = this[property];\n        }\r\n  " +
+                    "      return clone;\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
