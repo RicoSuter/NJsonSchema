@@ -42,11 +42,11 @@
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-            return ci<<#=derivedClass#>>(data, mappings, () => new <#=derivedClass#>());
+            return ci<<#=derivedClass#>>(data, mappings, <#=derivedClass#>);
 <#      }#>
-        return ci<<#=Model.Class#>>(data, mappings, () => new <#=Model.Class#>());
+        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
 <#  }else{#>
-        return ci<<#=Model.Class#>>(data, mappings, () => new <#=Model.Class#>());
+        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>

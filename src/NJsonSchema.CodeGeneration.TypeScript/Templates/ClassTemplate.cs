@@ -370,14 +370,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 50 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 51 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
       }
@@ -391,14 +391,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 52 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 53 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
   }else{
@@ -412,14 +412,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 54 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 55 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
   }

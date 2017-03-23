@@ -42,7 +42,7 @@ function jp(json: any, reviver?: any) {
     return json;
 }
 
-function ci<T>(data: any, mappings: any, creator: () => T): T {
+function ci<T>(data: any, mappings: any, type: any): T {
     if (!mappings)
         mappings = [];
     else {
@@ -51,7 +51,7 @@ function ci<T>(data: any, mappings: any, creator: () => T): T {
             return <T>mapping[0].target;
     }
 
-    let result: any = creator();
+    let result: any = new type();
     mappings.push({ source: data, target: result });
     result.init(data, mappings);
     return result;

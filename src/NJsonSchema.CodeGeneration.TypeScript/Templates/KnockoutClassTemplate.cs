@@ -373,14 +373,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 46 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
       }
@@ -394,14 +394,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 47 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 48 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
   }else{
@@ -415,14 +415,14 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, () => new ");
+            this.Write(">(data, mappings, ");
             
             #line 49 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("());\r\n");
+            this.Write(");\r\n");
             
             #line 50 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
   }

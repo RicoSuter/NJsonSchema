@@ -40,12 +40,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
                     "ecurse(obj[p], p, obj);\r\n            }\r\n        }\r\n\r\n        return obj;\r\n    })" +
                     "(json);\r\n\r\n    for (let i = 0; i < refs.length; i++) {\r\n        const ref = refs" +
                     "[i];\r\n        ref[0][ref[1]] = byid[ref[2]];\r\n    }\r\n\r\n    return json;\r\n}\r\n\r\nfu" +
-                    "nction ci<T>(data: any, mappings: any, creator: () => T): T {\r\n    if (!mappings" +
-                    ")\r\n        mappings = [];\r\n    else {\r\n        let mapping = mappings.filter((m:" +
-                    " any) => m.source === data);\r\n        if (mapping.length === 1)\r\n            ret" +
-                    "urn <T>mapping[0].target;\r\n    }\r\n\r\n    let result: any = creator();\r\n    mappin" +
-                    "gs.push({ source: data, target: result });\r\n    result.init(data, mappings);\r\n  " +
-                    "  return result;\r\n}");
+                    "nction ci<T>(data: any, mappings: any, type: any): T {\r\n    if (!mappings)\r\n    " +
+                    "    mappings = [];\r\n    else {\r\n        let mapping = mappings.filter((m: any) =" +
+                    "> m.source === data);\r\n        if (mapping.length === 1)\r\n            return <T>" +
+                    "mapping[0].target;\r\n    }\r\n\r\n    let result: any = new type();\r\n    mappings.pus" +
+                    "h({ source: data, target: result });\r\n    result.init(data, mappings);\r\n    retu" +
+                    "rn result;\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
