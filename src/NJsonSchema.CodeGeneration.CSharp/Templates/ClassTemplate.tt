@@ -8,6 +8,9 @@
 <#if(Model.HasCustomName){#>
 [NJsonSchema.Annotations.JsonSchema("<#=Model.CustomName#>")]
 <#}#>
+<#foreach(var knownType in Model.KnownTypes){#>
+[System.Runtime.Serialization.KnownType(typeof(<#=knownType#>))]
+<#}#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {

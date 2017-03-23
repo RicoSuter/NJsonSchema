@@ -35,6 +35,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToList();
+            KnownTypes = (
+                from definition in _schema.ParentSchema?.Definitions ?? new Dictionary<string, JsonSchema4>()
+                from inherited in definition.Value.InheritedSchemas
+                where inherited == _schema
+                select definition.Key).ToList();
         }
 
         /// <summary>Gets or sets the class name.</summary>
@@ -101,5 +106,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": System.ComponentModel.INotifyPropertyChanged" : "";
             }
         }
+
+        /// <summary>Gets the list of known sub-types.</summary>
+        public IEnumerable<string> KnownTypes { get; }
     }
 }
