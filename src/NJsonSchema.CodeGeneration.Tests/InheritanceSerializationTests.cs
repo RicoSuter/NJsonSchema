@@ -158,5 +158,21 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(code.Contains("this._discriminator = \"Animal\""));
             Assert.IsTrue(code.Contains("this._discriminator = \"Dog\""));
         }
+
+        [TestMethod]
+        public async Task Csharp_generate_KnownType_annotations()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
+
+            //// Act
+            var generator = new CSharpGenerator(schema);
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.KnownType(typeof(Dog))]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.KnownType(typeof(SubClass1))]"));
+            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.KnownType(typeof(SubClass2))]"));
+        }
     }
 }
