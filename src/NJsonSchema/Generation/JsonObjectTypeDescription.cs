@@ -94,10 +94,10 @@ namespace NJsonSchema.Generation
             if (IsFileType(type))
                 return new JsonObjectTypeDescription(JsonObjectType.File, allowsNull);
 
-            if (IsDictionaryType(type))
+            if (IsDictionaryType(type) && contract is JsonDictionaryContract)
                 return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull, true);
 
-            if (IsArrayType(type))
+            if (IsArrayType(type) && contract is JsonArrayContract)
                 return new JsonObjectTypeDescription(JsonObjectType.Array, allowsNull);
 
             if (type.Name == "Nullable`1")
