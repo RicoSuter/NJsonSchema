@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -33,10 +34,16 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsFalse(schema.Properties.ContainsKey("nameLength"));
 
             Assert.IsTrue(schema.Properties.ContainsKey("location"));
-            Assert.AreEqual(schema.Properties["location"].Type, JsonObjectType.String | JsonObjectType.Null,
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["location"].Type,
                 "Location is resolved to a string contract because it has a type converter");
         }
 
+        /// <summary>
+        /// A contract resolver that
+        ///  - camel cases properties
+        ///  - does not serialize properties that are read only. 
+        ///  - overrides the array contract if it has a string type converter
+        /// </summary>
         public class CustomContractResolver : CamelCasePropertyNamesContractResolver
         {
             protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
@@ -45,6 +52,35 @@ namespace NJsonSchema.Tests.Generation
                 if (!prop.Writable && member.GetCustomAttribute<JsonPropertyAttribute>(true) == null)
                     prop.ShouldSerialize = o => false;
                 return prop;
+            }
+
+            protected override JsonContract CreateContract(Type objectType)
+            {
+                JsonContract contract = base.CreateContract(objectType);
+                // by default a type that can convert to string and that is also an enum will have an array contract, but serialize to a string!. fix  this
+                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType) 
+                    && CanNonSystemTypeDescriptorConvertString(objectType))
+                    contract = CreateStringContract(objectType);
+
+                return contract;
+            }
+
+            static HashSet<string> _systemConverters = new HashSet<string>(new[] {
+            "System.ComponentModel.ComponentConverter",
+            "System.ComponentModel.ReferenceConverter",
+            "System.ComponentModel.CollectionConverter" });
+
+            public static bool CanNonSystemTypeDescriptorConvertString(Type type)
+            {
+                var typeConverter = TypeDescriptor.GetConverter(type);
+                // use the objectType's TypeConverter if it has one and can convert to a string
+                if (typeConverter != null)
+                {
+                    Type converterType = typeConverter.GetType();
+                    if (!_systemConverters.Contains(converterType.FullName) && converterType != typeof(TypeConverter))
+                        return typeConverter.CanConvertTo(typeof(string));
+                }
+                return false;
             }
         }
 
@@ -56,10 +92,11 @@ namespace NJsonSchema.Tests.Generation
         }
 
         /// <summary>
-        /// A class that with a custom converter could serialize to a string
+        /// A class that with a custom converter could serialize to a string.
+        /// NOTE: The default contract resolver would resolve this as an array contract because it implements IEnumerable
         /// </summary>
         [TypeConverter(typeof(StringConverter<LocationPath>))]
-        public class LocationPath : IStringConvertable
+        public class LocationPath : IStringConvertable, IEnumerable<string>
         {
             public ICollection<string> Path { get; set; } = new List<string>();
 
@@ -68,6 +105,9 @@ namespace NJsonSchema.Tests.Generation
                 get { return string.Join("/", Path); ; }
                 set { Path = new List<string>(value.Split('/')); }
             }
+
+            public IEnumerator<string> GetEnumerator() => Path.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => Path.GetEnumerator();
 
             public override string ToString() => StringValue;
         }
