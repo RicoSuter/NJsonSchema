@@ -57,9 +57,9 @@ namespace NJsonSchema.Tests.Generation
             protected override JsonContract CreateContract(Type objectType)
             {
                 JsonContract contract = base.CreateContract(objectType);
-
                 // by default a type that can convert to string and that is also an enum will have an array contract, but serialize to a string!. fix  this
-                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType) && CanNonSystemTypeDescriptorConvertString(objectType, out var converter))
+                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType) 
+                    && CanNonSystemTypeDescriptorConvertString(objectType))
                     contract = CreateStringContract(objectType);
 
                 return contract;
@@ -70,10 +70,9 @@ namespace NJsonSchema.Tests.Generation
             "System.ComponentModel.ReferenceConverter",
             "System.ComponentModel.CollectionConverter" });
 
-            public static bool CanNonSystemTypeDescriptorConvertString(Type type, out TypeConverter typeConverter)
+            public static bool CanNonSystemTypeDescriptorConvertString(Type type)
             {
-                typeConverter = TypeDescriptor.GetConverter(type);
-
+                var typeConverter = TypeDescriptor.GetConverter(type);
                 // use the objectType's TypeConverter if it has one and can convert to a string
                 if (typeConverter != null)
                 {
@@ -83,7 +82,6 @@ namespace NJsonSchema.Tests.Generation
                 }
                 return false;
             }
-
         }
 
         public class Person
