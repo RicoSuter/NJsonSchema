@@ -43,6 +43,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the class.</summary>
         public override string ActualClass => Class;
 
+        /// <summary>Gets the title.</summary>
+        public string CustomName => _schema.Title;
+
+        /// <summary>Gets whether the model has a custom name which differs from the class name.</summary>
+        public bool HasCustomName => CustomName != null && CustomName != Class;
+
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
 

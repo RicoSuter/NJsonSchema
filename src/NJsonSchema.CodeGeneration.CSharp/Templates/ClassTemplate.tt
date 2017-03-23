@@ -5,6 +5,9 @@
 <#if(Model.HasDiscriminator){#>
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
 <#}#>
+<#if(Model.HasCustomName){#>
+[NJsonSchema.Annotations.JsonSchema("<#=Model.CustomName#>")]
+<#}#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public partial class <#=Model.Class#> <#=Model.Inheritance#>
 {
