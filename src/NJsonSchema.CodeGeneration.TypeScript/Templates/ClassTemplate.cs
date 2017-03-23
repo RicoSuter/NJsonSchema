@@ -492,8 +492,8 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("    }\r\n\r\n    toJS(data?: any) {\r\n        data = data === undefined ? {} : data;\r\n" +
-                    "");
+            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = data === undefined ? {} : data;" +
+                    "\r\n");
             
             #line 74 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 if(Model.HasIndexerProperty){
@@ -554,24 +554,23 @@ if(Model.HasInheritance){
             
             #line default
             #line hidden
-            this.Write("        super.toJS(data);\r\n");
+            this.Write("        super.toJSON(data);\r\n");
             
             #line 88 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 }
             
             #line default
             #line hidden
-            this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
-                    "s.toJS());\r\n    }\r\n");
+            this.Write("        return data; \r\n    }\r\n");
             
-            #line 95 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 91 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 if(Model.GenerateCloneMethod){
             
             #line default
             #line hidden
             this.Write("\r\n    clone() {\r\n        let clone = new ");
             
-            #line 98 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 94 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
@@ -580,7 +579,7 @@ if(Model.GenerateCloneMethod){
                     "operty))\r\n                (<any>clone)[property] = this[property];\r\n        }\r\n " +
                     "       return clone;\r\n    }\r\n");
             
-            #line 105 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 101 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 }
             
             #line default

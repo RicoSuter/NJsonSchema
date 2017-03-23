@@ -64,7 +64,7 @@
 <#}#>
     }
 
-    toJS(data?: any) {
+    toJSON(data?: any) {
         data = data === undefined ? {} : data;
 <#if(Model.HasDiscriminator){#>
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
@@ -74,13 +74,9 @@
         <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
-        super.toJS(data);
+        super.toJSON(data);
 <#}#>
         return data; 
-    }
-
-    toJSON() {
-        return JSON.stringify(this.toJS());
     }
 <#if(Model.GenerateCloneMethod){#>
 

@@ -495,8 +495,8 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("    }\r\n\r\n    toJS(data?: any) {\r\n        data = data === undefined ? {} : data;\r\n" +
-                    "");
+            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = data === undefined ? {} : data;" +
+                    "\r\n");
             
             #line 69 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.HasDiscriminator){
@@ -551,24 +551,23 @@ foreach (var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write("        super.toJS(data);\r\n");
+            this.Write("        super.toJSON(data);\r\n");
             
             #line 78 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
             #line hidden
-            this.Write("        return data; \r\n    }\r\n\r\n    toJSON() {\r\n        return JSON.stringify(thi" +
-                    "s.toJS());\r\n    }\r\n");
+            this.Write("        return data; \r\n    }\r\n");
             
-            #line 85 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 81 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.GenerateCloneMethod){
             
             #line default
             #line hidden
             this.Write("\r\n    clone() {\r\n        let clone = new ");
             
-            #line 88 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 84 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
@@ -582,7 +581,7 @@ if(Model.GenerateCloneMethod){
     }
 ");
             
-            #line 95 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 91 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
