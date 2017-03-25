@@ -67,7 +67,16 @@ namespace NJsonSchema.Tests.Serialization
         {
             [JsonSchemaExtensionData("Foo", 2)]
             [JsonSchemaExtensionData("Bar", 3)]
+            [JsonSchemaExtensionData("example", typeof(MyTest), "PropertyExample")]
             public string Property { get; set; }
+
+            public static object PropertyExample
+            {
+                get
+                {
+                    return new List<string> { "FirstStr", "SecondStr" };
+                }
+            }
         }
 
         [TestMethod]
@@ -95,6 +104,7 @@ namespace NJsonSchema.Tests.Serialization
             //// Assert
             Assert.AreEqual(2, schema.Properties["Property"].ExtensionData["Foo"]);
             Assert.AreEqual(3, schema.Properties["Property"].ExtensionData["Bar"]);
+            Assert.IsInstanceOfType(schema.Properties["Property"].ExtensionData["example"], typeof(List<string>));
         }
     }
 }

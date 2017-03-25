@@ -195,19 +195,50 @@ namespace NJsonSchema.Generation
         private void ApplyExtensionDataAttributes<TSchemaType>(Type type, TSchemaType schema, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
+            JsonSchemaExtensionDataAttribute[] extensionDataAttributes;
             if (parentAttributes == null)
             {
                 // class
-                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
-                if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
             }
             else
             {
                 // property or parameter
-                var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
-                if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
+            }
+
+            if (extensionDataAttributes.Any())
+            {
+                schema.ExtensionData = new Dictionary<string, object>();
+                foreach (var attribute in extensionDataAttributes)
+                {
+                    TryAddExtensionData(schema.ExtensionData, attribute);
+                }
+            }
+        }
+
+        private void TryAddExtensionData(IDictionary<string, object> extensionData, JsonSchemaExtensionDataAttribute attribute)
+        {
+            // Let malformed attribute and value source property exception raise in runtime.
+            // We do not mute any developer error.
+            if (!attribute.IsValueSourceSpecified)
+            {
+                extensionData.Add(attribute.Property, attribute.Value);
+            }
+            else
+            {
+#if !LEGACY
+                var propertyInfo =
+                    attribute.ValueSourceType.GetTypeInfo().GetDeclaredProperty(attribute.ValueSourceProperty);
+#else
+
+                var propertyInfo = attribute.ValueSourceType.GetProperty(
+                    attribute.ValueSourceProperty,
+                    BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Static);
+#endif
+
+                var value = propertyInfo.GetValue(null);
+                extensionData.Add(attribute.Property, value);
             }
         }
 
