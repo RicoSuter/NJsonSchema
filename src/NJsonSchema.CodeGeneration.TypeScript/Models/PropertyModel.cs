@@ -74,7 +74,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 {
                     return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
                     {
-                        Variable = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
+                        Variable = typeStyle == TypeScriptTypeStyle.Class ? 
+                            (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
                         IsPropertyNullable = _property.IsNullable(_settings.NullHandling),

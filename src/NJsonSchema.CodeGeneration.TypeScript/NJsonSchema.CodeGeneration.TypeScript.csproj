@@ -99,6 +99,12 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Templates\KnockoutClassTemplate.Extensions.cs" />
+    <Compile Include="Templates\ReferenceHandlingCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReferenceHandlingCode.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\ReferenceHandlingCode.Extensions.cs" />
     <Compile Include="TypeScriptDateTimeType.cs" />
     <Compile Include="TypeScriptDefaultValueGenerator.cs" />
     <Compile Include="TypeScriptExtensionCode.cs" />
@@ -106,6 +112,7 @@
     <Compile Include="TypeScriptGeneratorSettings.cs" />
     <Compile Include="TypeScriptNullValue.cs" />
     <Compile Include="TypeScriptPropertyNameGenerator.cs" />
+    <Compile Include="TypeScriptReferenceHandlingCodeGenerator.cs" />
     <Compile Include="TypeScriptTypeResolver.cs" />
     <Compile Include="TypeScriptTypeStyle.cs" />
   </ItemGroup>
@@ -163,6 +170,12 @@
       <Project>{7B7A2E32-E808-4A19-98B1-37E766580F8C}</Project>
       <Name>NJsonSchema</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\ReferenceHandlingCode.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ReferenceHandlingCode.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -14,12 +14,18 @@
     protected _discriminator: string;
 <#}#>
 
-    constructor(data?: any) {
-<#if(Model.HasInheritance){#>
-        super(data);
-<#}#>
 <#if(Model.HasBaseDiscriminator){#>
+    constructor() {
+<#if(Model.HasInheritance){#>
+        super();
+<#}#>
         this._discriminator = "<#=Model.DiscriminatorName#>";
+    }
+<#}#>
+
+    init(data?: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>) {
+<#if(Model.HasInheritance){#>
+        super.init(data);
 <#}#>
         if (data !== undefined) {
 <#foreach(var property in Model.Properties){#>
@@ -27,22 +33,38 @@
             <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
             this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
 
-<#}#>        }
+<#}#>
+        }
     }
 
-    static fromJS(data: any): <#=Model.ActualClass#> {
-<#if(Model.HasBaseDiscriminator){
-    foreach (var derivedClass in Model.DerivedClassNames){#>
+    static fromJS(data: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>): <#=Model.Class#> {
+<#if(Model.HandleReferences){#>
+<#  if(Model.HasBaseDiscriminator){#>
+<#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-            return new <#=derivedClass#>(data);
+            return ci<<#=derivedClass#>>(data, mappings, <#=derivedClass#>);
+<#      }#>
+        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
+<#  }else{#>
+        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
 <#  }#>
-        return new <#=Model.ActualClass#>(data);
 <#}else{#>
-        return new <#=Model.ActualClass#>(data);
+<#  if(Model.HasBaseDiscriminator){#>
+<#      foreach (var derivedClass in Model.DerivedClassNames){#>
+        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>") {
+            let result = new <#=derivedClass#>();
+            result.init(data);
+            return result;
+        }
+<#      }#>
+<#  }#>
+        let result = new <#=Model.Class#>();
+        result.init(data);
+        return result;
 <#}#>
     }
 
-    toJS(data?: any) {
+    toJSON(data?: any) {
         data = data === undefined ? {} : data;
 <#if(Model.HasDiscriminator){#>
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
@@ -52,17 +74,17 @@
         <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
-        super.toJS(data);
+        super.toJSON(data);
 <#}#>
         return data; 
     }
-
-    toJSON() {
-        return JSON.stringify(this.toJS());
-    }
+<#if(Model.GenerateCloneMethod){#>
 
     clone() {
-        var json = this.toJSON();
-        return new <#=Model.ActualClass#>(JSON.parse(json));
+        const json = this.toJSON();
+        let result = new <#=Model.Class#>();
+		result.init(json);
+		return result;
     }
+<#}#>
 }

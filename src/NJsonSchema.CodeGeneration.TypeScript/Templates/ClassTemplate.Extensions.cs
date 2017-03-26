@@ -6,16 +6,18 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.CodeGeneration.TypeScript.Models;
+
 namespace NJsonSchema.CodeGeneration.TypeScript.Templates
 {
     internal partial class ClassTemplate : ITemplate
     {
         public ClassTemplate(object model)
         {
-            Model = model;
+            Model = (ClassTemplateModel)model;
         }
 
-        public dynamic Model { get; }
+        public ClassTemplateModel Model { get; }
         
         public string Render()
         {

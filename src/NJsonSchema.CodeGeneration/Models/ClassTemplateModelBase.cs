@@ -12,6 +12,6 @@ namespace NJsonSchema.CodeGeneration.Models
     public abstract class ClassTemplateModelBase
     {
         /// <summary>Gets the class.</summary>
-        public abstract string ActualClass { get; }
+        public abstract string Class { get; }
     }
 }

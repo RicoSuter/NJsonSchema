@@ -16,7 +16,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly TypeScriptGeneratorSettings _settings;
-        private readonly string _typeName;
         private readonly JsonSchema4 _schema;
         private readonly object _rootObject;
         private readonly TypeScriptTypeResolver _resolver;
@@ -30,20 +29,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="rootObject">The root object.</param>
         public ClassTemplateModel(string typeName, string discriminatorName, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, JsonSchema4 schema, object rootObject)
         {
-            _typeName = typeName;
             _settings = settings;
             _schema = schema;
             _rootObject = rootObject;
             _resolver = resolver;
 
+            Class = typeName;
             DiscriminatorName = discriminatorName;
         }
 
         /// <summary>Gets the class name.</summary>
-        public string Class => _typeName;
-
-        /// <summary>Gets the actual class name (i.e. the derived class when using an extension class).</summary>
-        public override string ActualClass => _typeName;
+        public override string Class { get; }
 
         /// <summary>Gets the derived class names.</summary>
         public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
@@ -87,6 +83,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
         public bool HasIndexerProperty => _schema.InheritedSchemas.Any(s => s.IsDictionary);
 
+        /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
+        public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
+
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
         {
@@ -101,9 +100,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             }
         }
 
+        /// <summary>Gets a value indicating whether to handle JSON references.</summary>
+        public bool HandleReferences => _settings.HandleReferences;
+
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
             .Where(v => v.IsInheritanceDiscriminator == false)
-            .Select(property => new PropertyModel(this, property, _typeName, _resolver, _settings)).ToList();
+            .Select(property => new PropertyModel(this, property, Class, _resolver, _settings)).ToList();
     }
 }

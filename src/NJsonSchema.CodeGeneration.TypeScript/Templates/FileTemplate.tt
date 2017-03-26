@@ -18,10 +18,13 @@ namespace <#=Model.Namespace#> {
 <#=Model.Types#>
 
 <#=Model.ExtensionCode.BottomCode#>
+<#if(Model.HandleReferences){#>
+<#=Model.ReferenceHandlingCode#>
+<#}#>
 
 <#if(Model.HasNamespace){#>
 }
 <#}
- if(Model.HasModuleName){#>
+if(Model.HasModuleName){#>
 }
 <#}#>

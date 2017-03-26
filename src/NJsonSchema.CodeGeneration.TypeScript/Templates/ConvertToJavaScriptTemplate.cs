@@ -51,7 +51,7 @@ if(Model.IsNewableObject){
             
             #line default
             #line hidden
-            this.Write(".toJS() : ");
+            this.Write(".toJSON() : ");
             
             #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -113,7 +113,7 @@ if(Model.IsArrayItemNewableObject){
             
             #line default
             #line hidden
-            this.Write(".push(item.toJS());\r\n");
+            this.Write(".push(item.toJSON());\r\n");
             
             #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
 }else{
@@ -230,7 +230,7 @@ if(Model.IsDictionaryValueNewableObject){
             
             #line default
             #line hidden
-            this.Write("[key].toJS() : ");
+            this.Write("[key].toJSON() : ");
             
             #line 25 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
