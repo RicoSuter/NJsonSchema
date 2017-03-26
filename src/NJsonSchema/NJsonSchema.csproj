@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Annotations\JsonSchemaPostProcessAttribute.cs" />
     <Compile Include="ConversionUtilities.cs" />
     <Compile Include="DefaultSchemaNameGenerator.cs" />
     <Compile Include="DefaultTypeNameGenerator.cs" />

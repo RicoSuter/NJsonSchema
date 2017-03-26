@@ -177,6 +177,41 @@ namespace NJsonSchema.Generation
             }
             else
                 typeDescription.ApplyType(schema);
+
+            TryPostProcessSchema(type, parentAttributes, schema, schemaResolver);
+        }
+
+        private void TryPostProcessSchema<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
+            where TSchemaType : JsonSchema4
+        {
+            JsonSchemaPostProcessAttribute[] postProcessAttributes;
+            if (parentAttributes == null)
+            {
+                // class
+                postProcessAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaPostProcessAttribute>().ToArray();
+            }
+            else
+            {
+                // property or parameter
+                postProcessAttributes = parentAttributes.OfType<JsonSchemaPostProcessAttribute>().ToArray();
+            }
+
+            if (postProcessAttributes.Any())
+            {
+                foreach (var attribute in postProcessAttributes)
+                {
+#if !LEGACY
+                    var methodInfo =
+                        attribute.Type.GetTypeInfo().GetDeclaredMethod(attribute.MethodName);
+#else
+
+                    var methodInfo = attribute.Type.GetMethod(
+                        attribute.MethodName,
+                        BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Static);
+#endif
+                    methodInfo.Invoke(null, new object[] { schema });
+                }
+            }
         }
 
         private async Task<JsonSchema4> GenerateWithReferenceAsync(JsonSchemaResolver schemaResolver, Type itemType)
