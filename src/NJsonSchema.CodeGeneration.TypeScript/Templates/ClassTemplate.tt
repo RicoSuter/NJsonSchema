@@ -91,12 +91,10 @@
 <#if(Model.GenerateCloneMethod){#>
 
     clone() {
-        let clone = new <#=Model.Class#>();
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                (<any>clone)[property] = this[property];
-        }
-        return clone;
+        const json = this.toJSON();
+        let result = new <#=Model.Class#>();
+		result.init(json);
+		return result;
     }
 <#}#>
 }

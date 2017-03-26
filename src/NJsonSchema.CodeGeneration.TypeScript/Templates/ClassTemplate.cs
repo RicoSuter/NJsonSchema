@@ -568,18 +568,16 @@ if(Model.GenerateCloneMethod){
             
             #line default
             #line hidden
-            this.Write("\r\n    clone() {\r\n        let clone = new ");
+            this.Write("\r\n    clone() {\r\n        const json = this.toJSON();\r\n        let result = new ");
             
-            #line 94 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 95 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write("();\r\n        for (var property in this) {\r\n            if (this.hasOwnProperty(pr" +
-                    "operty))\r\n                (<any>clone)[property] = this[property];\r\n        }\r\n " +
-                    "       return clone;\r\n    }\r\n");
+            this.Write("();\r\n\t\tresult.init(json);\r\n\t\treturn result;\r\n    }\r\n");
             
-            #line 101 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            #line 99 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 }
             
             #line default

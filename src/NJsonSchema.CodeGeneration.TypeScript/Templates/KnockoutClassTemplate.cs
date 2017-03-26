@@ -565,23 +565,16 @@ if(Model.GenerateCloneMethod){
             
             #line default
             #line hidden
-            this.Write("\r\n    clone() {\r\n        let clone = new ");
+            this.Write("\r\n    clone() {\r\n        const json = this.toJSON();\r\n        let result = new ");
             
-            #line 84 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 85 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
             
             #line default
             #line hidden
-            this.Write(@"();
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                (<any>clone)[property] = ko.isObservable(this[property]) ? ko.observable(this[property]()) : this[property];
-        }
-        return clone;
-    }
-");
+            this.Write("();\r\n\t\tresult.init(json);\r\n\t\treturn result;\r\n    }\r\n");
             
-            #line 91 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            #line 89 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 }
             
             #line default
