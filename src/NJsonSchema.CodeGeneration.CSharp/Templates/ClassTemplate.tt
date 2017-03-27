@@ -55,14 +55,14 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 
 <#}#>
 <#if(Model.HasAdditionalPropertiesType){#>
-	private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
+    private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
 
     [Newtonsoft.Json.JsonExtensionData]
     public System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> AdditionalProperties
-	{
-		get { return _additionalProperties; }
-		set { _additionalProperties = value; }
-	}
+    {
+        get { return _additionalProperties; }
+        set { _additionalProperties = value; }
+    }
 
 <#}#>
 <#if(Model.Inpc){#>

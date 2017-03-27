@@ -572,7 +572,7 @@ if(Model.GenerateCloneMethod){
             
             #line default
             #line hidden
-            this.Write("();\r\n\t\tresult.init(json);\r\n\t\treturn result;\r\n    }\r\n");
+            this.Write("();\r\n        result.init(json);\r\n        return result;\r\n    }\r\n");
             
             #line 89 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 }
