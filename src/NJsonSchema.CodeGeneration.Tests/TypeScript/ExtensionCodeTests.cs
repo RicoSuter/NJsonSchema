@@ -29,13 +29,13 @@ for (var clientClass in clientClasses) {
 
 class Foo extends generated.Foo {
     get title() {
+        super(a, b);
         return this.bar ? this.bar.title : '';
     }
 }
 
 export class Test {
     doIt() {
-        
     }
 }
 
@@ -65,6 +65,10 @@ var x = 10;";
             Assert.IsTrue(ext.BottomCode.Contains("if (clientClasses.hasOwnProperty(clientClass))"));
             Assert.IsTrue(ext.BottomCode.Contains("export class Test"));
             Assert.IsTrue(ext.BottomCode.EndsWith("var x = 10;"));
+
+            var body = ext.GetExtensionClassBody("Foo");
+            Assert.IsTrue(body.Contains("get title() {"));
+            Assert.IsFalse(body.Contains("super(a, b);"));
         }
 
         public class Foo
