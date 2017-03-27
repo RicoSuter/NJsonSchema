@@ -16,6 +16,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 .Replace("\r", string.Empty)
                 .Replace("generated.", string.Empty) + "\n";
 
+            code = Regex.Replace(code, "(.*?)// ignore(.*?)\\n", string.Empty, RegexOptions.Multiline);
+
             code = Regex.Replace(code, "import generated (=|from) (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "import \\* as generated from (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>

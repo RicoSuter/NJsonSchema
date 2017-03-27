@@ -32,7 +32,7 @@ namespace NJsonSchema.CodeGeneration
         public string GetExtensionClassBody(string className)
         {
             var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
-            return Regex.Replace(match.Groups[3].Value, "super\\((.*?)\\);", string.Empty);
+            return match.Groups[3].Value;
         }
     }
 }

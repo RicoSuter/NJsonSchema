@@ -29,7 +29,7 @@ for (var clientClass in clientClasses) {
 
 class Foo extends generated.Foo {
     get title() {
-        super(a, b);
+        ignore(); // ignore
         return this.bar ? this.bar.title : '';
     }
 }
@@ -68,7 +68,7 @@ var x = 10;";
 
             var body = ext.GetExtensionClassBody("Foo");
             Assert.IsTrue(body.Contains("get title() {"));
-            Assert.IsFalse(body.Contains("super(a, b);"));
+            Assert.IsFalse(body.Contains("ignore();"));
         }
 
         public class Foo
