@@ -78,8 +78,10 @@ namespace NJsonSchema.Generation
 
                 if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
                     return new CamelCasePropertyNamesContractResolver();
+
                 if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
                     return new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+
                 return new DefaultContractResolver();
             }
         }
