@@ -16,16 +16,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 .Replace("\r", string.Empty)
                 .Replace("generated.", string.Empty) + "\n";
 
-            code = Regex.Replace(code, "(.*?)// ignore(.*?)\\n", string.Empty, RegexOptions.Multiline);
+            code = Regex.Replace(code, "(.*?)// ignore(.*?)\\n", string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             code = Regex.Replace(code, "import generated (=|from) (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "import \\* as generated from (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
             {
-                var importCode = ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value);
-                if (!importCode.ToLowerInvariant().Contains("// ignore"))
-                    ImportCode += importCode + "\n";
-
+                ImportCode += ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
                 return string.Empty;
             }, RegexOptions.Multiline);
 
