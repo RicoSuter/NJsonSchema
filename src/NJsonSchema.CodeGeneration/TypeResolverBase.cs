@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -56,7 +57,15 @@ namespace NJsonSchema.CodeGeneration
                 .Select(p =>
                 {
                     if (extensionCode?.ExtensionClasses.ContainsKey(p.TypeName) == true)
-                        return p.Code + "\n\n" + extensionCode.ExtensionClasses[p.TypeName];
+                    {
+                        var classCode = p.Code;
+
+                        var index = classCode.IndexOf("class");
+                        index = classCode.IndexOf("{", index);
+
+                        var match = Regex.Match(extensionCode.ExtensionClasses[p.TypeName], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
+                        return classCode.Insert(index + 1, match.Groups[3].Value);
+                    }
 
                     return p.Code;
                 }));

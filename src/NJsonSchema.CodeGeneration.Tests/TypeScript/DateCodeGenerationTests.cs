@@ -29,8 +29,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: string"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] !== undefined ? data[\"MyDateTime\"] : undefined;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime !== undefined ? this.myDateTime : undefined;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"];"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime;"));
         }
 
         [TestMethod]

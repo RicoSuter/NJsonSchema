@@ -94,5 +94,23 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
         }
+
+        [TestMethod]
+        public async Task When_object_is_in_external_file_then_path_should_be_built_correctly()
+        {
+            //// Arrange
+            var schemaToReference = new JsonSchema4 {DocumentPath = "some_schema.json"};
+            var referencingSchema = new JsonSchema4
+            {
+                DocumentPath = "other_schema.json",
+                SchemaReference = schemaToReference
+            };
+
+            //// Act
+            var result = referencingSchema.ToJson();
+
+            //// Assert
+            Assert.IsTrue(result.Contains("some_schema.json#"));
+        }
     }
 }
