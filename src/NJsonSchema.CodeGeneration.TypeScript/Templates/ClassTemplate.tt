@@ -93,8 +93,8 @@
     clone() {
         const json = this.toJSON();
         let result = new <#=Model.Class#>();
-		result.init(json);
-		return result;
+        result.init(json);
+        return result;
     }
 <#}#>
 }
