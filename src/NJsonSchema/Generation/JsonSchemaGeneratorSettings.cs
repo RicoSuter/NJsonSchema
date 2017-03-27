@@ -24,7 +24,7 @@ namespace NJsonSchema.Generation
         {
             DefaultEnumHandling = EnumHandling.Integer;
             NullHandling = NullHandling.JsonSchema;
-            //DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            DefaultPropertyNameHandling = PropertyNameHandling.Default;
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();

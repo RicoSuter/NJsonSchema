@@ -1,10 +1,7 @@
-using System.Dynamic;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -30,7 +27,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                //DefaultPropertyNameHandling = PropertyNameHandling.Default
+                DefaultPropertyNameHandling = PropertyNameHandling.Default
             });
 
             var data = schema.ToJson();
