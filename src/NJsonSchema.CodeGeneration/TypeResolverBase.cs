@@ -63,8 +63,7 @@ namespace NJsonSchema.CodeGeneration
                         var index = classCode.IndexOf("class");
                         index = classCode.IndexOf("{", index);
 
-                        var match = Regex.Match(extensionCode.ExtensionClasses[p.TypeName], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
-                        return classCode.Insert(index + 1, match.Groups[3].Value);
+                        return classCode.Insert(index + 1, extensionCode.GetExtensionClassBody(p.TypeName));
                     }
 
                     return p.Code;

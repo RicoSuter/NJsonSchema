@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -24,5 +25,14 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets the extension code which is appended at the end of the generated code.</summary>
         public string BottomCode { get; protected set; }
+
+        /// <summary>Gets the body of the extension class.</summary>
+        /// <param name="className">The class name.</param>
+        /// <returns>The body code</returns>
+        public string GetExtensionClassBody(string className)
+        {
+            var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
+            return match.Groups[3].Value;
+        }
     }
 }
