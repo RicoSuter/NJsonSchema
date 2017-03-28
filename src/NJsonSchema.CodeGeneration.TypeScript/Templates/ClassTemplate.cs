@@ -266,8 +266,8 @@ if(Model.GenerateConstructorInterface){
             #line default
             #line hidden
             this.Write("        if (data) {\r\n            for (var property in data) {\r\n                if" +
-                    " (data.hasOwnProperty(property))\r\n                    (<any>this)[property] = da" +
-                    "ta[property];\r\n            }\r\n        }\r\n");
+                    " (data.hasOwnProperty(property))\r\n                    (<any>this)[property] = (<" +
+                    "any>data)[property];\r\n            }\r\n        }\r\n");
             
             #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
     }
