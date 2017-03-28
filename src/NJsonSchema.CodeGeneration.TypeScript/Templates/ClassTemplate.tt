@@ -1,23 +1,6 @@
 ﻿<#@ template visibility="internal" #>
-<#if(Model.GenerateConstructorInterface){#>
-<#  if(Model.HasDescription){#>
+<#if(Model.HasDescription){#>
 /** <#=Model.Description#> */
-<#  }#>
-export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
-<#  foreach(var property in Model.Properties){#>
-<#      if(property.HasDescription){#>
-    /** <#=property.Description#> */
-<#      }#>
-    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#>;
-<#  }#>
-<#  if(Model.HasIndexerProperty){#>
-
-    [key: string]: <#=Model.IndexerPropertyValueType#>; 
-<#  }#>
-}
-
-<#}#>
-<#if(Model.HasDescription){#>/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>
 <#  if(property.HasDescription){#>
@@ -42,7 +25,7 @@ export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    this[property] = data[property];
+                    (<any>this)[property] = data[property];
             }
         }
 <#    }#>
@@ -125,3 +108,21 @@ export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
     }
 <#}#>
 }
+<#if(Model.GenerateConstructorInterface){#>
+
+<#  if(Model.HasDescription){#>
+/** <#=Model.Description#> */
+<#  }#>
+export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
+<#  foreach(var property in Model.Properties){#>
+<#      if(property.HasDescription){#>
+    /** <#=property.Description#> */
+<#      }#>
+    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#>;
+<#  }#>
+<#  if(Model.HasIndexerProperty){#>
+
+    [key: string]: <#=Model.IndexerPropertyValueType#>; 
+<#  }#>
+}
+<#}#>
