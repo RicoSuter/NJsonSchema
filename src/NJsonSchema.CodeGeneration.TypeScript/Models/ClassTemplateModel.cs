@@ -77,6 +77,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance => HasInheritance ? " extends " + BaseClass : string.Empty;
 
+        /// <summary>Gets the constructor interface inheritance code.</summary>
+        public string InterfaceInheritance => HasInheritance ? " extends I" + BaseClass : string.Empty;
+
         /// <summary>Gets the base class name.</summary>
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
@@ -85,6 +88,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
+
+        /// <summary>Gets or sets a value indicating whether to generate an class interface which is used in the constructor to initialize the class (default: true).</summary>
+        public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
 
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
