@@ -24,6 +24,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
             TypeScriptVersion = 1.8m;
+            GenerateConstructorInterface = true;
 
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
@@ -64,6 +65,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate an class interface which is used in the constructor to initialize the class (default: true).</summary>
+        public bool GenerateConstructorInterface { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

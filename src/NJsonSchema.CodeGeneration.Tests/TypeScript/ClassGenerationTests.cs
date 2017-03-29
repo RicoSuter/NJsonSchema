@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         [TestMethod]
         public async Task When_generating_TypeScript_classes_then_output_is_correct()
         {
-            var code = await PrepareAsync(TypeScriptTypeStyle.Class);
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
             Assert.IsTrue(code.Contains("init(data?: any) {"));
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         [TestMethod]
         public async Task When_default_value_is_available_then_variable_is_initialized()
         {
-            var code = await PrepareAsync(TypeScriptTypeStyle.Class);
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
             Assert.IsTrue(code.Contains("name: string = \"foo\";"));
@@ -65,20 +65,16 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         [TestMethod]
         public async Task When_generating_TypeScript_knockout_classes_then_output_is_correct()
         {
-            var code = await PrepareAsync(TypeScriptTypeStyle.KnockoutClass);
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass });
 
             //// Assert
             Assert.IsTrue(code.Contains("dateOfBirth = ko.observable<Date>();"));
         }
 
-        private static async Task<string> PrepareAsync(TypeScriptTypeStyle style)
+        private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
             var schema = await JsonSchema4.FromTypeAsync<MyClassTest>();
             var data = schema.ToJson();
-            var settings = new TypeScriptGeneratorSettings
-            {
-                TypeStyle = style
-            };
 
             //// Act
             var generator = new TypeScriptGenerator(schema, settings);
@@ -227,6 +223,27 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             Assert.IsTrue(code.Contains("b: B;"));
             Assert.IsTrue(code.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : undefined;"));
+        }
+
+        [TestMethod]
+        public async Task When_class_is_generated_then_constructor_interfaces_are_correctly_generated()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+
+            //// Assert
+            Assert.IsTrue(code.Contains("class Student extends Person {"));
+            Assert.IsTrue(code.Contains("interface IStudent extends IPerson {"));
+            Assert.IsTrue(code.Contains("interface IPerson {"));
+        }
+
+        [TestMethod]
+        public async Task When_GenerateConstructorInterface_then_no_interfaces_are_generated()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, GenerateConstructorInterface = false });
+
+            //// Assert
+            Assert.IsFalse(code.Contains("interface IStudent extends IPerson {"));
+            Assert.IsFalse(code.Contains("interface IPerson {"));
         }
     }
 }

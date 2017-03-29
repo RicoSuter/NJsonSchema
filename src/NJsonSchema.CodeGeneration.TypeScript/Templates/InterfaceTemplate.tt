@@ -1,5 +1,6 @@
 ﻿<#@ template visibility="internal" #>
-<#if(Model.HasDescription){#>/** <#=Model.Description#> */
+<#if(Model.HasDescription){#>
+/** <#=Model.Description#> */
 <#}#>export interface <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>
 <#  if(property.HasDescription){#>
@@ -10,4 +11,5 @@
 <#if(Model.HasIndexerProperty){#>
 
     [key: string]: <#=Model.IndexerPropertyValueType#>; 
-<#}#>}
+<#}#>
+}

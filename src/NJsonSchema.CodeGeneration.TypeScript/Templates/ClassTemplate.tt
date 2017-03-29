@@ -1,5 +1,6 @@
 ﻿<#@ template visibility="internal" #>
-<#if(Model.HasDescription){#>/** <#=Model.Description#> */
+<#if(Model.HasDescription){#>
+/** <#=Model.Description#> */
 <#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>
 <#  if(property.HasDescription){#>
@@ -16,12 +17,21 @@
     protected _discriminator: string;
 <#}#>
 
-<#if(Model.HasBaseDiscriminator){#>
-    constructor() {
-<#if(Model.HasInheritance){#>
-        super();
-<#}#>
+<#if(Model.GenerateConstructorInterface || Model.HasBaseDiscriminator){#>
+    constructor(<#if(Model.GenerateConstructorInterface){#>data?: I<#=Model.Class#><#}#>) {
+<#    if(Model.HasInheritance){#>
+        super(<#if(Model.GenerateConstructorInterface){#>data<#}#>);
+<#    }else if(Model.GenerateConstructorInterface){#>
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+<#    }#>
+<#    if(Model.HasBaseDiscriminator){#>
         this._discriminator = "<#=Model.DiscriminatorName#>";
+<#    }#>
     }
 <#}#>
 
@@ -29,7 +39,7 @@
 <#if(Model.HasInheritance){#>
         super.init(data);
 <#}#>
-        if (data !== undefined) {
+        if (data) {
 <#if(Model.HasIndexerProperty){#>
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -98,3 +108,21 @@
     }
 <#}#>
 }
+<#if(Model.GenerateConstructorInterface){#>
+
+<#  if(Model.HasDescription){#>
+/** <#=Model.Description#> */
+<#  }#>
+export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
+<#  foreach(var property in Model.Properties){#>
+<#      if(property.HasDescription){#>
+    /** <#=property.Description#> */
+<#      }#>
+    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#>;
+<#  }#>
+<#  if(Model.HasIndexerProperty){#>
+
+    [key: string]: <#=Model.IndexerPropertyValueType#>; 
+<#  }#>
+}
+<#}#>
