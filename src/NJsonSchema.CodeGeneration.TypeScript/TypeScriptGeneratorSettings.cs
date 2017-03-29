@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
         public bool MarkOptionalProperties { get; set; }
 
-        /// <summary>Gets or sets the type style (experimental, default: Class).</summary>
+        /// <summary>Gets or sets the type style (default: Class).</summary>
         public TypeScriptTypeStyle TypeStyle { get; set; }
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
