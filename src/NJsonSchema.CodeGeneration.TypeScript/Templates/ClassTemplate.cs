@@ -127,27 +127,7 @@ if(property.IsOptional){
             #line hidden
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-if(Model.SupportsStrictNullChecks){
-            
-            #line default
-            #line hidden
-            
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-if(property.IsNullable){
-            
-            #line default
-            #line hidden
-            this.Write(" | null");
-            
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-}
-            
-            #line default
-            #line hidden
-            this.Write(" | undefined");
-            
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-}
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
             
             #line default
             #line hidden
@@ -735,27 +715,7 @@ if(property.IsOptional){
             #line hidden
             
             #line 121 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-if(Model.SupportsStrictNullChecks){
-            
-            #line default
-            #line hidden
-            
-            #line 121 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-if(property.IsNullable){
-            
-            #line default
-            #line hidden
-            this.Write(" | null");
-            
-            #line 121 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-}
-            
-            #line default
-            #line hidden
-            this.Write(" | undefined");
-            
-            #line 121 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-}
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
             
             #line default
             #line hidden

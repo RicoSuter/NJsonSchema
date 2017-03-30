@@ -33,6 +33,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
         public decimal TypeScriptVersion { get; set; }
 
+        /// <summary>Gets a value indicating whether the target TypeScript version supports strict null checks.</summary>
+        public bool SupportsStrictNullChecks => TypeScriptVersion >= 2.0m;
+
         /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
         public bool MarkOptionalProperties { get; set; }
 

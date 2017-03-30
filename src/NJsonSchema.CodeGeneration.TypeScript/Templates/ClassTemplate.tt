@@ -6,7 +6,7 @@
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#  }#>
-    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
+    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#=property.TypePostfix#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
 <#}#>
 <#if(Model.HasIndexerProperty){#>
 
@@ -118,7 +118,7 @@ export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
 <#      if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#      }#>
-    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#>;
+    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#=property.TypePostfix#>;
 <#  }#>
 <#  if(Model.HasIndexerProperty){#>
 

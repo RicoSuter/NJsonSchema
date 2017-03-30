@@ -52,6 +52,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, PropertyName) ?? "any";
 
+        /// <summary>Gets the type postfix (e.g. ' | null | undefined')</summary>
+        public string TypePostfix
+        {
+            get
+            {
+                if (_settings.SupportsStrictNullChecks)
+                {
+                    if (_settings.NullValue == TypeScriptNullValue.Null)
+                        return "| null | undefined";
+                    else
+                        return (IsNullable ? " | null" : string.Empty) + " | undefined";
+                }
+                else
+                    return string.Empty;
+            }
+        }
+
         /// <summary>Gets a value indicating whether the property is read only.</summary>
         public bool IsReadOnly => _property.IsReadOnly && _settings.TypeScriptVersion >= 2.0m;
 

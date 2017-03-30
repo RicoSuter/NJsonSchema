@@ -120,6 +120,12 @@ if(property.IsArray){
             
             #line default
             #line hidden
+            
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
+            
+            #line default
+            #line hidden
             this.Write(">(");
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
@@ -150,6 +156,12 @@ if(property.HasDefaultValue){
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
+            
+            #line default
+            #line hidden
+            
+            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
             
             #line default
             #line hidden
@@ -284,7 +296,14 @@ foreach(var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write(" = null; \r\n            ");
+            this.Write(" | ");
+            
+            #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
+            
+            #line default
+            #line hidden
+            this.Write("; \r\n            ");
             
             #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(property.ConvertToClassCode, 3)));
@@ -523,7 +542,7 @@ foreach (var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write("        var ");
+            this.Write("        let ");
             
             #line 73 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
