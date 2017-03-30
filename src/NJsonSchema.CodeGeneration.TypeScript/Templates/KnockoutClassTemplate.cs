@@ -120,12 +120,6 @@ if(property.IsArray){
             
             #line default
             #line hidden
-            
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
-            
-            #line default
-            #line hidden
             this.Write(">(");
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"

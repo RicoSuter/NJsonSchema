@@ -6,7 +6,7 @@
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#  }#>
-    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}else{#>ko.observable<<#=property.Type#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
+    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}else{#>ko.observable<<#=property.Type#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
 <#}#>
 
 <#if(Model.HasDiscriminator){#>
