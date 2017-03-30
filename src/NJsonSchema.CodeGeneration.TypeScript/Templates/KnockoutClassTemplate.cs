@@ -120,12 +120,6 @@ if(property.IsArray){
             
             #line default
             #line hidden
-            
-            #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.TypePostfix));
-            
-            #line default
-            #line hidden
             this.Write(">(");
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
@@ -317,7 +311,7 @@ foreach(var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write("(");
+            this.Write("(<any>");
             
             #line 34 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
@@ -549,7 +543,7 @@ foreach (var property in Model.Properties){
             
             #line default
             #line hidden
-            this.Write("_ = this.");
+            this.Write("_: any = this.");
             
             #line 73 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));

@@ -6,7 +6,7 @@
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#  }#>
-    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}else{#>ko.observable<<#=property.Type#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
+    <#if(property.IsReadOnly){#>readonly <#}#><#=property.PropertyName#> = <#if(property.IsArray){#>ko.observableArray<<#=property.ArrayItemType#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}else{#>ko.observable<<#=property.Type#><#=property.TypePostfix#>>(<#if(property.HasDefaultValue){#><#=property.DefaultValue#><#}#>)<#}#>;
 <#}#>
 
 <#if(Model.HasDiscriminator){#>
@@ -31,7 +31,7 @@
 <#foreach(var property in Model.Properties){#>
             var <#=property.PropertyName#>_: <#=property.Type#> | <#=Model.NullValue#>; 
             <#=ConversionUtilities.Tab(property.ConvertToClassCode, 3)#>
-            this.<#=property.PropertyName#>(<#=property.PropertyName#>_);
+            this.<#=property.PropertyName#>(<any><#=property.PropertyName#>_);
 
 <#}#>
         }
@@ -70,7 +70,7 @@
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
 <#}#>
 <#foreach (var property in Model.Properties){#>
-        let <#=property.PropertyName#>_ = this.<#=property.PropertyName#>(); 
+        let <#=property.PropertyName#>_: any = this.<#=property.PropertyName#>(); 
         <#=ConversionUtilities.Tab(property.ConvertToJavaScriptCode, 2)#>
 
 <#} if(Model.HasInheritance){#>
