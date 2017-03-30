@@ -71,9 +71,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
-        /// <summary>Gets a value indicating whether the target TypeScript version supports strict null checks.</summary>
-        public bool SupportsStrictNullChecks => _settings.TypeScriptVersion >= 2.0m;
-
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance => HasInheritance ? " extends " + BaseClass : string.Empty;
 
@@ -91,6 +88,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets or sets a value indicating whether to generate an class interface which is used in the constructor to initialize the class (default: true).</summary>
         public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
+
+        /// <summary>Gets the null value.</summary>
+        public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
 
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType

@@ -6,7 +6,7 @@
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#  }#>
-    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#if(Model.SupportsStrictNullChecks){#><#if(property.IsNullable){#> | null<#}#> | undefined<#}#>;
+    <#if(property.IsReadOnly){#>readonly <#}#><#=property.InterfaceName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#=property.TypePostfix#>;
 <#}#>
 <#if(Model.HasIndexerProperty){#>
 

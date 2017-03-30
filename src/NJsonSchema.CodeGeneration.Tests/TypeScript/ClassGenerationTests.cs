@@ -245,5 +245,19 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             Assert.IsFalse(code.Contains("interface IStudent extends IPerson {"));
             Assert.IsFalse(code.Contains("interface IPerson {"));
         }
+
+        [TestMethod]
+        public async Task When_Knockout_class_is_generated_then_initializers_are_correct()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.KnockoutClass,
+                GenerateConstructorInterface = false, 
+                TypeScriptVersion = 2.0m
+            });
+
+            //// Assert
+            Assert.IsFalse(code.Contains("let firstName_ = data[\"FirstName\"];"));
+        }
     }
 }
