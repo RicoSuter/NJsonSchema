@@ -65,7 +65,7 @@
     }
 
     toJSON(data?: any) {
-        data = data === undefined ? {} : data;
+        data = data ? data : {};
 <#if(Model.HasDiscriminator){#>
         data["<#=Model.BaseDiscriminator#>"] = this._discriminator; 
 <#}#>
