@@ -379,7 +379,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("\")\r\n            return ci<");
+            this.Write("\")\r\n            return createInstance<");
             
             #line 45 "C:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
@@ -400,7 +400,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("        return ci<");
+            this.Write("        return createInstance<");
             
             #line 47 "C:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
@@ -421,7 +421,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("        return ci<");
+            this.Write("        return createInstance<");
             
             #line 49 "C:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
