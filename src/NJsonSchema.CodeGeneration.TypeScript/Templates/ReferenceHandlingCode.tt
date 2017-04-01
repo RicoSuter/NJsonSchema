@@ -1,5 +1,5 @@
 ﻿<#@ template visibility="internal" #>
-function jp(json: any, reviver?: any) {
+function jsonParse(json: any, reviver?: any) {
     json = JSON.parse(json, reviver);
 
     var byid: any = {};
@@ -42,7 +42,7 @@ function jp(json: any, reviver?: any) {
     return json;
 }
 
-function ci<T>(data: any, mappings: any, type: any): T {
+function createInstance<T>(data: any, mappings: any, type: any): T {
     if (!mappings)
         mappings = [];
     else {

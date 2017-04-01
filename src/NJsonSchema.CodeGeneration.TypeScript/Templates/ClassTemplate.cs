@@ -419,7 +419,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("\")\r\n            return ci<");
+            this.Write("\")\r\n            return createInstance<");
             
             #line 60 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
@@ -440,7 +440,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("        return ci<");
+            this.Write("        return createInstance<");
             
             #line 62 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
@@ -461,7 +461,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("        return ci<");
+            this.Write("        return createInstance<");
             
             #line 64 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));

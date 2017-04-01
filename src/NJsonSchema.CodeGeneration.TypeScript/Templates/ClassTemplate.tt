@@ -57,11 +57,11 @@
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-            return ci<<#=derivedClass#>>(data, mappings, <#=derivedClass#>);
+            return createInstance<<#=derivedClass#>>(data, mappings, <#=derivedClass#>);
 <#      }#>
-        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
 <#  }else{#>
-        return ci<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>
