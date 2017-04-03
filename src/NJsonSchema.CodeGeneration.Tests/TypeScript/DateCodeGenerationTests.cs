@@ -49,8 +49,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: moment.Moment"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? moment(data[\"MyDateTime\"].toString()) : undefined;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? moment(data[\"MyDateTime\"].toString()) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;"));
         }
 
         [TestMethod]
@@ -69,8 +69,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             //// Assert
             Assert.IsTrue(code.Contains("myDateTime: Date"));
-            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? new Date(data[\"MyDateTime\"].toString()) : undefined;"));
-            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined;"));
+            Assert.IsTrue(code.Contains("this.myDateTime = data[\"MyDateTime\"] ? new Date(data[\"MyDateTime\"].toString()) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;"));
         }
 
         [TestMethod]

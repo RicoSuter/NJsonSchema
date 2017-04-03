@@ -51,7 +51,7 @@ if(Model.IsNewableObject){
             
             #line default
             #line hidden
-            this.Write(".toJSON() : ");
+            this.Write(".toJSON() : <any>");
             
             #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -230,7 +230,7 @@ if(Model.IsDictionaryValueNewableObject){
             
             #line default
             #line hidden
-            this.Write("[key].toJSON() : ");
+            this.Write("[key].toJSON() : <any>");
             
             #line 25 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -278,7 +278,7 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write(" : ");
+            this.Write(" : <any>");
             
             #line 28 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -319,7 +319,7 @@ if(Model.IsDictionaryValueDate){
             
             #line default
             #line hidden
-            this.Write("[key] : ");
+            this.Write("[key] : <any>");
             
             #line 31 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -419,6 +419,7 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
+            this.Write("<any>");
             
             #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
@@ -464,7 +465,7 @@ if(Model.HasDefaultValue){
             
             #line default
             #line hidden
-            this.Write(" : ");
+            this.Write(" : <any>");
             
             #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.NullValue));
