@@ -72,7 +72,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
         /// <summary>Gets the inheritance code.</summary>
-        public string Inheritance => HasInheritance ? " extends " + BaseClass : string.Empty;
+        public string Inheritance
+        {
+            get
+            {
+                if (HasInheritance)
+                    return " extends " + BaseClass + (GenerateConstructorInterface ? ", I" + BaseClass : string.Empty);
+
+                return GenerateConstructorInterface ? " extends I" + BaseClass : string.Empty;
+            }
+        }
 
         /// <summary>Gets the constructor interface inheritance code.</summary>
         public string InterfaceInheritance => HasInheritance ? " extends I" + BaseClass : string.Empty;
