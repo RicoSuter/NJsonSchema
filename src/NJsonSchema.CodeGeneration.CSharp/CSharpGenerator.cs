@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The generator settings.</param>
         public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings)
-            : this(schema, settings, new CSharpTypeResolver(settings))
+            : this(schema, settings, new CSharpTypeResolver(settings, schema), null)
         {
         }
 
@@ -37,8 +37,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver) 
-            : base(schema)
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
+        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, object rootObject) 
+            : base(schema, rootObject)
         {
             _schema = schema;
             _resolver = resolver;
@@ -80,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private TypeGeneratorResult GenerateClass(string typeName)
         {
-            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema);
+            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, RootObject);
 
             RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 

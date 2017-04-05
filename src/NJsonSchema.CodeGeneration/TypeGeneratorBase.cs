@@ -18,8 +18,13 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Initializes a new instance of the <see cref="TypeGeneratorBase"/> class.</summary>
         /// <param name="schema">The schema.</param>
-        protected TypeGeneratorBase(JsonSchema4 schema) : base(schema)
+        /// <param name="rootObject">The root object.</param>
+        protected TypeGeneratorBase(JsonSchema4 schema, object rootObject) : base(schema)
         {
+            RootObject = rootObject ?? schema;
         }
+
+        /// <summary>Gets the root object.</summary>
+        protected object RootObject { get; }
     }
 }

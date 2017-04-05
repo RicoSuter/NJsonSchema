@@ -24,7 +24,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="settings">The settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
-        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, JsonSchema4 schema)
+        /// <param name="rootObject">The root object.</param>
+        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, 
+            CSharpTypeResolver resolver, JsonSchema4 schema, object rootObject)
+            : base(resolver, schema, rootObject)
         {
             _resolver = resolver;
             _schema = schema;
