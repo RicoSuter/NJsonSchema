@@ -72,9 +72,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (HasInheritance)
-                    return " extends " + BaseClass + (GenerateConstructorInterface ? ", I" + BaseClass : string.Empty);
+                    return " extends " + BaseClass + (GenerateConstructorInterface ? " implements I" + Class : string.Empty);
 
-                return GenerateConstructorInterface ? " extends I" + BaseClass : string.Empty;
+                return GenerateConstructorInterface ? " implements I" + Class : string.Empty;
             }
         }
 
