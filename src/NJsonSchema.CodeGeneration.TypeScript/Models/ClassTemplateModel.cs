@@ -26,8 +26,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, string discriminatorName, 
-            TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, 
+        public ClassTemplateModel(string typeName, string discriminatorName,
+            TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver,
             JsonSchema4 schema, object rootObject)
             : base(resolver, schema, rootObject)
         {
@@ -72,9 +72,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (HasInheritance)
-                    return " extends " + BaseClass + (GenerateConstructorInterface ? " implements I" + Class : string.Empty);
+                {
+                    return " extends " + BaseClass + (GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
+                        " implements I" + Class : string.Empty);
+                }
 
-                return GenerateConstructorInterface ? " implements I" + Class : string.Empty;
+                return GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
+                    " implements I" + Class : string.Empty;
             }
         }
 
