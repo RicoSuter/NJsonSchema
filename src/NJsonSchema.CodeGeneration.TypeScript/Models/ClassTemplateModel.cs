@@ -17,7 +17,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     {
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonSchema4 _schema;
-        private readonly object _rootObject;
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
@@ -27,11 +26,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, string discriminatorName, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, JsonSchema4 schema, object rootObject)
+        public ClassTemplateModel(string typeName, string discriminatorName, 
+            TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, 
+            JsonSchema4 schema, object rootObject)
+            : base(resolver, schema, rootObject)
         {
             _settings = settings;
             _schema = schema;
-            _rootObject = rootObject;
             _resolver = resolver;
 
             Class = typeName;
@@ -40,12 +41,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the class name.</summary>
         public override string Class { get; }
-
-        /// <summary>Gets the derived class names.</summary>
-        public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
-            .Where(s => s.Value.Inherits(_schema))
-            .Select(s => s.Key)
-            .ToList();
 
         /// <summary>Gets the name for the discriminator check.</summary>
         public string DiscriminatorName { get; }
@@ -72,7 +67,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
         /// <summary>Gets the inheritance code.</summary>
-        public string Inheritance => HasInheritance ? " extends " + BaseClass : string.Empty;
+        public string Inheritance
+        {
+            get
+            {
+                if (HasInheritance)
+                    return " extends " + BaseClass + (GenerateConstructorInterface ? ", I" + BaseClass : string.Empty);
+
+                return GenerateConstructorInterface ? " extends I" + BaseClass : string.Empty;
+            }
+        }
 
         /// <summary>Gets the constructor interface inheritance code.</summary>
         public string InterfaceInheritance => HasInheritance ? " extends I" + BaseClass : string.Empty;

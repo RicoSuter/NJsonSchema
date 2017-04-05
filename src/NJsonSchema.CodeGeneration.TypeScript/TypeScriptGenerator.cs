@@ -37,16 +37,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="resolver">The resolver.</param>
         /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject) 
-            : base(schema)
+            : base(schema, rootObject)
         {
             _schema = schema;
             _resolver = resolver;
-            RootObject = rootObject ?? schema;
             Settings = settings;
         }
-
-        /// <summary>Gets or sets the root object.</summary>
-        public object RootObject { get; set; }
 
         /// <summary>Gets the generator settings.</summary>
         public TypeScriptGeneratorSettings Settings { get; }

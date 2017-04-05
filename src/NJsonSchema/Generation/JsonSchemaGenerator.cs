@@ -348,7 +348,7 @@ namespace NJsonSchema.Generation
                     if (RequiresSchemaReference(baseType, null))
                     {
                         if (schemaResolver.RootObject != baseSchema.ActualSchema)
-                            schemaResolver.AppendSchema(baseSchema.ActualSchema, baseType.Name);
+                            schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
 
                         schema.AllOf.Add(new JsonSchema4
                         {

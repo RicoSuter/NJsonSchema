@@ -15,12 +15,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
     public class CSharpTypeResolver : TypeResolverBase<CSharpGenerator>
     {
+        private readonly object _rootObject;
+
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings)
+        /// <param name="rootObject">The root object to search for JSON Schemas.</param>
+        public CSharpTypeResolver(CSharpGeneratorSettings settings, object rootObject)
             : base(settings)
         {
-            Settings = settings;
+            _rootObject = rootObject;
+            Settings = settings;            
         }
 
         /// <summary>Gets the generator settings.</summary>
@@ -105,7 +109,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The generator.</returns>
         protected override CSharpGenerator CreateTypeGenerator(JsonSchema4 schema)
         {
-            return new CSharpGenerator(schema, Settings, this);
+            return new CSharpGenerator(schema, Settings, this, _rootObject);
         }
 
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)

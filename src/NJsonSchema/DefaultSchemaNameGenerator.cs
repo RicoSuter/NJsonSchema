@@ -8,6 +8,8 @@
 
 using System;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 
@@ -21,9 +23,13 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(Type type)
         {
-            var attribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
-            if (!string.IsNullOrEmpty(attribute?.Name))
-                return attribute.Name; 
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
+                return jsonSchemaAttribute.Name;
+
+            //var jsonObjectAttribute = type.GetTypeInfo().GetCustomAttribute<JsonObjectAttribute>();
+            //if (!string.IsNullOrEmpty(jsonObjectAttribute.Title) && Regex.IsMatch(jsonObjectAttribute.Title, "^[a-zA-Z0-9_]*$"))
+            //    return jsonObjectAttribute.Title;
 
             return ReflectionExtensions.GetSafeTypeName(type);
         }
