@@ -1,6 +1,6 @@
 ﻿<#@ template visibility="internal" #>
 <#if(Model.IsNewableObject){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.toJSON() : <#=Model.NullValue#>;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.toJSON() : <any><#=Model.NullValue#>;
 <#}else{#>
 <#if(Model.IsArray){#>
 if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
@@ -22,13 +22,13 @@ if (<#=Model.Value#>) {
     for (let key in <#=Model.Value#>) {
         if (<#=Model.Value#>.hasOwnProperty(key))
 <#if(Model.IsDictionaryValueNewableObject){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJSON() : <#=Model.NullValue#>;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJSON() : <any><#=Model.NullValue#>;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : <#=Model.NullValue#>;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : <any><#=Model.NullValue#>;
 <#}else{#>
 <#  if(Model.NullValue != "undefined"){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : <#=Model.NullValue#>;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] !== undefined ? <#=Model.Value#>[key] : <any><#=Model.NullValue#>;
 <#  }else{#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key];
 <#  }#>
@@ -37,10 +37,10 @@ if (<#=Model.Value#>) {
 }
 <#}else{#>
 <#  if(Model.IsDate){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><#=Model.NullValue#><#}#>;
+<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
 <#  }else{#>
 <#      if(Model.NullValue != "undefined"){#>
-<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <#=Model.NullValue#>;
+<#=Model.Variable#> = <#=Model.Value#> !== undefined ? <#=Model.Value#> : <any><#=Model.NullValue#>;
 <#      }else{#>
 <#=Model.Variable#> = <#=Model.Value#>;
 <#      }#>

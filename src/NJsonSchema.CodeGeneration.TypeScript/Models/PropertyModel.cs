@@ -57,13 +57,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                if (_settings.SupportsStrictNullChecks)
-                {
-                    if (_settings.NullValue == TypeScriptNullValue.Null)
-                        return "| null | undefined";
-                    else
-                        return (IsNullable ? " | null" : string.Empty) + " | undefined";
-                }
+                if (IsNullable && _settings.SupportsStrictNullChecks)
+                    return " | " + _settings.NullValue.ToString().ToLowerInvariant();
                 else
                     return string.Empty;
             }

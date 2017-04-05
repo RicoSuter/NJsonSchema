@@ -25,27 +25,27 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("function jp(json: any, reviver?: any) {\r\n    json = JSON.parse(json, reviver);\r\n\r" +
-                    "\n    var byid: any = {};\r\n    var refs: any = [];\r\n    json = (function recurse(" +
-                    "obj: any, prop?: any, parent?: any) {\r\n        if (typeof obj !== \'object\' || !o" +
-                    "bj)\r\n            return obj;\r\n        \r\n        if (\"$ref\" in obj) {\r\n          " +
-                    "  let ref = obj.$ref;\r\n            if (ref in byid)\r\n                return byid" +
-                    "[ref];\r\n            refs.push([parent, prop, ref]);\r\n            return undefine" +
-                    "d;\r\n        } else if (\"$id\" in obj) {\r\n            let id = obj.$id;\r\n         " +
-                    "   delete obj.$id;\r\n            if (\"$values\" in obj)\r\n                obj = obj" +
-                    ".$values;\r\n            byid[id] = obj;\r\n        }\r\n        \r\n        if (Array.i" +
-                    "sArray(obj)) {\r\n            obj = obj.map((v, i) => recurse(v, i, obj));\r\n      " +
-                    "  } else {\r\n            for (var p in obj) {\r\n                if (obj.hasOwnProp" +
-                    "erty(p) && obj[p] && typeof obj[p] === \'object\')\r\n                    obj[p] = r" +
-                    "ecurse(obj[p], p, obj);\r\n            }\r\n        }\r\n\r\n        return obj;\r\n    })" +
-                    "(json);\r\n\r\n    for (let i = 0; i < refs.length; i++) {\r\n        const ref = refs" +
-                    "[i];\r\n        ref[0][ref[1]] = byid[ref[2]];\r\n    }\r\n\r\n    return json;\r\n}\r\n\r\nfu" +
-                    "nction ci<T>(data: any, mappings: any, type: any): T {\r\n    if (!mappings)\r\n    " +
-                    "    mappings = [];\r\n    else {\r\n        let mapping = mappings.filter((m: any) =" +
-                    "> m.source === data);\r\n        if (mapping.length === 1)\r\n            return <T>" +
-                    "mapping[0].target;\r\n    }\r\n\r\n    let result: any = new type();\r\n    mappings.pus" +
-                    "h({ source: data, target: result });\r\n    result.init(data, mappings);\r\n    retu" +
-                    "rn result;\r\n}");
+            this.Write("function jsonParse(json: any, reviver?: any) {\r\n    json = JSON.parse(json, reviv" +
+                    "er);\r\n\r\n    var byid: any = {};\r\n    var refs: any = [];\r\n    json = (function r" +
+                    "ecurse(obj: any, prop?: any, parent?: any) {\r\n        if (typeof obj !== \'object" +
+                    "\' || !obj)\r\n            return obj;\r\n        \r\n        if (\"$ref\" in obj) {\r\n   " +
+                    "         let ref = obj.$ref;\r\n            if (ref in byid)\r\n                retu" +
+                    "rn byid[ref];\r\n            refs.push([parent, prop, ref]);\r\n            return u" +
+                    "ndefined;\r\n        } else if (\"$id\" in obj) {\r\n            let id = obj.$id;\r\n  " +
+                    "          delete obj.$id;\r\n            if (\"$values\" in obj)\r\n                ob" +
+                    "j = obj.$values;\r\n            byid[id] = obj;\r\n        }\r\n        \r\n        if (" +
+                    "Array.isArray(obj)) {\r\n            obj = obj.map((v, i) => recurse(v, i, obj));\r" +
+                    "\n        } else {\r\n            for (var p in obj) {\r\n                if (obj.has" +
+                    "OwnProperty(p) && obj[p] && typeof obj[p] === \'object\')\r\n                    obj" +
+                    "[p] = recurse(obj[p], p, obj);\r\n            }\r\n        }\r\n\r\n        return obj;\r" +
+                    "\n    })(json);\r\n\r\n    for (let i = 0; i < refs.length; i++) {\r\n        const ref" +
+                    " = refs[i];\r\n        ref[0][ref[1]] = byid[ref[2]];\r\n    }\r\n\r\n    return json;\r\n" +
+                    "}\r\n\r\nfunction createInstance<T>(data: any, mappings: any, type: any): T {\r\n    i" +
+                    "f (!mappings)\r\n        mappings = [];\r\n    else {\r\n        let mapping = mapping" +
+                    "s.filter((m: any) => m.source === data);\r\n        if (mapping.length === 1)\r\n   " +
+                    "         return <T>mapping[0].target;\r\n    }\r\n\r\n    let result: any = new type()" +
+                    ";\r\n    mappings.push({ source: data, target: result });\r\n    result.init(data, m" +
+                    "appings);\r\n    return result;\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
