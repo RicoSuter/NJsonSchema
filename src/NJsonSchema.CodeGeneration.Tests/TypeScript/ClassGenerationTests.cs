@@ -231,7 +231,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.IsTrue(code.Contains("class Student extends Person, IPerson {"));
+            Assert.IsTrue(code.Contains("class Student extends Person implements IStudent {"));
             Assert.IsTrue(code.Contains("interface IStudent extends IPerson {"));
             Assert.IsTrue(code.Contains("interface IPerson {"));
         }
