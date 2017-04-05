@@ -25,7 +25,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ExtensionCode = string.Empty;
             TypeScriptVersion = 1.8m;
             GenerateConstructorInterface = true;
-            MarkOptionalProperties = true;
 
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
