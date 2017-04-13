@@ -1315,5 +1315,26 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(code.Contains("public byte? Cell { get; set; }"));
         }
+
+        public class MyRequiredNullableTest
+        {
+            [Required]
+            public int? Foo { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_nullable_property_is_required_then_it_is_not_nullable_in_generated_csharp_code()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<MyRequiredNullableTest>();
+            var json = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("public int Foo { get; set; }"));
+        }
     }
 }
