@@ -1,136 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="./Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40' Or '$(TargetFramework)' == 'net45'" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7B7A2E32-E808-4A19-98B1-37E766580F8C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NJsonSchema</RootNamespace>
-    <AssemblyName>NJsonSchema</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>12.0</OldToolsVersion>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworks>netstandard1.0;net40;net45</TargetFrameworks>
+    <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
+    <Version>9.0.0</Version>
+    <PackageTags>json schema validation generator .net</PackageTags>
+    <Copyright>Copyright © Rico Suter, 2017</Copyright>
+    <PackageLicenseUrl>https://github.com/NJsonSchema/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>NJsonSchema.snk</AssemblyOriginatorKeyFile>
+    <Authors>Rico Suter</Authors>
+    <Company />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\NJsonSchema.XML</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\NJsonSchema.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
+    <DefineConstants>LEGACY</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility">
+      <Version>1.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+    <PackageReference Include="Microsoft.Bcl.Async">
+      <Version>1.0.168</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40' Or '$(TargetFramework)' == 'net45'">
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ConversionUtilities.cs" />
-    <Compile Include="DefaultSchemaNameGenerator.cs" />
-    <Compile Include="DefaultTypeNameGenerator.cs" />
-    <Compile Include="Generation\DataToJsonSchemaGenerator.cs" />
-    <Compile Include="Generation\JsonReflectionUtilities.cs" />
-    <Compile Include="Generation\TypeMappers\ITypeMapper.cs" />
-    <Compile Include="Generation\TypeMappers\ObjectTypeMapper.cs" />
-    <Compile Include="Generation\TypeMappers\PrimitiveTypeMapper.cs" />
-    <Compile Include="IDocumentPathProvider.cs" />
-    <Compile Include="Infrastructure\ReflectionExtensions.cs" />
-    <Compile Include="Infrastructure\TypeNameStyle.cs" />
-    <Compile Include="Annotations\JsonSchemaAttribute.cs" />
-    <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
-    <Compile Include="Annotations\MultipleOfAttribute.cs" />
-    <Compile Include="Collections\ObservableDictionary.cs" />
-    <Compile Include="Converters\JsonInheritanceConverter.cs" />
-    <Compile Include="Infrastructure\XmlObjectExtension.cs" />
-    <Compile Include="ISchemaNameGenerator.cs" />
-    <Compile Include="JsonReferenceResolver.cs" />
-    <Compile Include="JsonXmlObject.cs" />
-    <Compile Include="PropertyNameHandling.cs" />
-    <Compile Include="EnumHandling.cs" />
-    <Compile Include="Infrastructure\DynamicApis.cs" />
-    <Compile Include="Infrastructure\XmlDocumentationExtensions.cs" />
-    <Compile Include="ITypeNameGenerator.cs" />
-    <Compile Include="JsonFormatStrings.cs" />
-    <Compile Include="JsonPathUtilities.cs" />
-    <Compile Include="JsonProperty.cs" />
-    <Compile Include="Generation\JsonSchemaGeneratorSettings.cs" />
-    <Compile Include="JsonSchemaReferenceUtilities.cs" />
-    <Compile Include="JsonSchema4.Serialization.cs" />
-    <Compile Include="JsonSchema4.cs" />
-    <Compile Include="Infrastructure\ReflectionCache.cs" />
-    <Compile Include="NullHandling.cs" />
-    <Compile Include="Validation\JsonSchemaValidator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Generation\JsonSchemaGenerator.cs" />
-    <Compile Include="JsonObjectType.cs" />
-    <Compile Include="Generation\JsonObjectTypeDescription.cs" />
-    <Compile Include="JsonSchemaResolver.cs" />
-    <Compile Include="Validation\ChildSchemaValidationError.cs" />
-    <Compile Include="Validation\ValidationError.cs" />
-    <Compile Include="Validation\ValidationErrorKind.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NJsonSchema.nuspec" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

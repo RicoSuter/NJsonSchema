@@ -60,7 +60,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static Task<string> GetXmlDocumentationTagAsync(this Type type, string tagName)
         {
-            return GetXmlDocumentationTagAsync(type.GetTypeInfo(), tagName);
+            return GetXmlDocumentationTagAsync((MemberInfo)type.GetTypeInfo(), tagName);
         }
 
 #endif
