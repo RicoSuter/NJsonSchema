@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
@@ -55,8 +56,34 @@ namespace NJsonSchema.Generation
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
 
+        /// <summary>Gets or sets the contract resolver.</summary>
+        public IContractResolver ContractResolver { get; set; }
+
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
         public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+
+        /// <summary>Gets the contract resolver.</summary>
+        /// <returns>The contract resolver.</returns>
+        /// <exception cref="InvalidOperationException">The settings DefaultPropertyNameHandling and ContractResolver cannot be used at the same time.</exception>
+        public IContractResolver ActualContractResolver
+        {
+            get
+            {
+                if (DefaultPropertyNameHandling != PropertyNameHandling.Default && ContractResolver != null)
+                    throw new InvalidOperationException("The settingsDefaultPropertyNameHandling and ContractResolver cannot be used at the same time.");
+
+                if (ContractResolver != null)
+                    return ContractResolver;
+
+                if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
+                    return new CamelCasePropertyNamesContractResolver();
+
+                if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
+                    return new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+
+                return new DefaultContractResolver();
+            }
+        }
     }
 }
