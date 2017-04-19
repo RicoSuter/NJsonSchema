@@ -288,7 +288,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(", mappings?: any");
+            this.Write(", _mappings?: any");
             
             #line 38 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 }
@@ -352,7 +352,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(", mappings?: any");
+            this.Write(", _mappings?: any");
             
             #line 55 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 }
@@ -406,7 +406,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, ");
+            this.Write(">(data, _mappings, ");
             
             #line 60 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
@@ -427,7 +427,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, ");
+            this.Write(">(data, _mappings, ");
             
             #line 62 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
@@ -448,7 +448,7 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write(">(data, mappings, ");
+            this.Write(">(data, _mappings, ");
             
             #line 64 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));

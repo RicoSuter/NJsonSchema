@@ -35,7 +35,7 @@
     }
 <#}#>
 
-    init(data?: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>) {
+    init(data?: any<#if(Model.HandleReferences){#>, _mappings?: any<#}#>) {
 <#if(Model.HasInheritance){#>
         super.init(data);
 <#}#>
@@ -52,16 +52,16 @@
         }
     }
 
-    static fromJS(data: any<#if(Model.HandleReferences){#>, mappings?: any<#}#>): <#=Model.Class#> {
+    static fromJS(data: any<#if(Model.HandleReferences){#>, _mappings?: any<#}#>): <#=Model.Class#> {
 <#if(Model.HandleReferences){#>
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClassNames){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-            return createInstance<<#=derivedClass#>>(data, mappings, <#=derivedClass#>);
+            return createInstance<<#=derivedClass#>>(data, _mappings, <#=derivedClass#>);
 <#      }#>
-        return createInstance<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
 <#  }else{#>
-        return createInstance<<#=Model.Class#>>(data, mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>
