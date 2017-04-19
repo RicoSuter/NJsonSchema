@@ -75,7 +75,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets a value indicating whether the property is read only.</summary>
         [DefaultValue(false)]
-        [JsonProperty("readonly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("readOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsReadOnly { get; set; }
 
         /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
