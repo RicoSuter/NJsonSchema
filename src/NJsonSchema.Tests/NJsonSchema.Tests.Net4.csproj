@@ -95,6 +95,7 @@
     <Compile Include="Generation\XmlDocTests.cs" />
     <Compile Include="Generation\XmlObjectTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
+    <Compile Include="Serialization\PostProcessTests.cs" />
     <Compile Include="Validation\EnumValidationTests.cs" />
     <Compile Include="Validation\LineInformationTest.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />

@@ -177,6 +177,41 @@ namespace NJsonSchema.Generation
             }
             else
                 typeDescription.ApplyType(schema);
+
+            TryPostProcessSchema(type, parentAttributes, schema, schemaResolver);
+        }
+
+        private void TryPostProcessSchema<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
+            where TSchemaType : JsonSchema4
+        {
+            JsonSchemaPostProcessAttribute[] postProcessAttributes;
+            if (parentAttributes == null)
+            {
+                // class
+                postProcessAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaPostProcessAttribute>().ToArray();
+            }
+            else
+            {
+                // property or parameter
+                postProcessAttributes = parentAttributes.OfType<JsonSchemaPostProcessAttribute>().ToArray();
+            }
+
+            if (postProcessAttributes.Any())
+            {
+                foreach (var attribute in postProcessAttributes)
+                {
+#if !LEGACY
+                    var methodInfo =
+                        attribute.Type.GetTypeInfo().GetDeclaredMethod(attribute.MethodName);
+#else
+
+                    var methodInfo = attribute.Type.GetMethod(
+                        attribute.MethodName,
+                        BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Static);
+#endif
+                    methodInfo.Invoke(null, new object[] { schema });
+                }
+            }
         }
 
         private async Task<JsonSchema4> GenerateWithReferenceAsync(JsonSchemaResolver schemaResolver, Type itemType)
@@ -195,19 +230,50 @@ namespace NJsonSchema.Generation
         private void ApplyExtensionDataAttributes<TSchemaType>(Type type, TSchemaType schema, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
+            JsonSchemaExtensionDataAttribute[] extensionDataAttributes;
             if (parentAttributes == null)
             {
                 // class
-                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
-                if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
             }
             else
             {
                 // property or parameter
-                var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
-                if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
+            }
+
+            if (extensionDataAttributes.Any())
+            {
+                schema.ExtensionData = new Dictionary<string, object>();
+                foreach (var attribute in extensionDataAttributes)
+                {
+                    TryAddExtensionData(schema.ExtensionData, attribute);
+                }
+            }
+        }
+
+        private void TryAddExtensionData(IDictionary<string, object> extensionData, JsonSchemaExtensionDataAttribute attribute)
+        {
+            // Let malformed attribute and value source property exception raise in runtime.
+            // We do not mute any developer error.
+            if (!attribute.IsValueSourceSpecified)
+            {
+                extensionData.Add(attribute.Property, attribute.Value);
+            }
+            else
+            {
+#if !LEGACY
+                var propertyInfo =
+                    attribute.ValueSourceType.GetTypeInfo().GetDeclaredProperty(attribute.ValueSourceProperty);
+#else
+
+                var propertyInfo = attribute.ValueSourceType.GetProperty(
+                    attribute.ValueSourceProperty,
+                    BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Static);
+#endif
+
+                var value = propertyInfo.GetValue(null);
+                extensionData.Add(attribute.Property, value);
             }
         }
 

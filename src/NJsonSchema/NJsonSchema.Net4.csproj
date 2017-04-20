@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Annotations\JsonSchemaAttribute.cs" />
     <Compile Include="Annotations\JsonSchemaExtensionDataAttribute.cs" />
+    <Compile Include="Annotations\JsonSchemaPostProcessAttribute.cs" />
     <Compile Include="Annotations\MultipleOfAttribute.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="ConversionUtilities.cs" />
