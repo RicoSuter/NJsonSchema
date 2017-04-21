@@ -106,6 +106,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 },
                 'allOf': [
                     {
+                        'type': 'object', 
+                        'properties': { 
+                            'baseProperty' : { 'type' : 'string' } 
+                        }
+                    },
+                    {
                         'properties': { 
                             'prop2' : { 'type' : 'string' } 
                         }
@@ -116,13 +122,20 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile("Foo");
+            var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
-            Assert.IsTrue(code.Contains("class Foo"));
-            Assert.IsTrue(code.Contains("public string Prop1 { get; set; }"));
-            Assert.IsTrue(code.Contains("public string Prop2 { get; set; }"));
-            Assert.IsFalse(code.Contains("class Anonymous")); // only one class is generated with both properties
+            Assert.IsTrue(code.Contains(
+@"  public partial class Foo : Anonymous
+    {
+        [Newtonsoft.Json.JsonProperty(""prop1"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Prop1 { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty(""prop2"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Prop2 { get; set; }
+".Replace("\r", string.Empty)));
+
+            Assert.IsTrue(code.Contains("class Anonymous"));
         }
 
         [TestMethod]
