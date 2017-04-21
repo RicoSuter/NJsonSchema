@@ -80,7 +80,7 @@
     }
 
     toJSON(data?: any) {
-        data = data ? data : {};
+        data = typeof data === 'object' ? data : {};
 <#if(Model.HasIndexerProperty){#>
         for (var property in this) {
             if (this.hasOwnProperty(property))
