@@ -749,6 +749,16 @@ namespace NJsonSchema
             return json;
         }
 
+        /// <summary>Gets a value indicating whether this schema inherits from the given parent schema.</summary>
+        /// <param name="parentSchema">The parent schema.</param>
+        /// <returns>true or false.</returns>
+        public bool InheritsSchema(JsonSchema4 parentSchema)
+        {
+            return parentSchema != null && ActualSchema
+                .AllInheritedSchemas.Concat(new List<JsonSchema4> { this })
+                .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
+        }
+
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <returns>The collection of validation errors. </returns>
