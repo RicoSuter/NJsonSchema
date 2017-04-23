@@ -494,7 +494,8 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = data ? data : {};\r\n");
+            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = typeof data === \'object\' ? data" +
+                    " : {};\r\n");
             
             #line 69 "C:\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
 if(Model.HasDiscriminator){

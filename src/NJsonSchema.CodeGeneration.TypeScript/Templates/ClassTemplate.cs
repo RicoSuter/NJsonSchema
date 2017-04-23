@@ -528,7 +528,8 @@ if(Model.HandleReferences){
             
             #line default
             #line hidden
-            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = data ? data : {};\r\n");
+            this.Write("    }\r\n\r\n    toJSON(data?: any) {\r\n        data = typeof data === \'object\' ? data" +
+                    " : {};\r\n");
             
             #line 84 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
 if(Model.HasIndexerProperty){

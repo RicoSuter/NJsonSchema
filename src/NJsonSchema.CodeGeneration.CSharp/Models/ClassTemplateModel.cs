@@ -75,10 +75,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Discriminator => _schema.Discriminator;
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
-        public bool HasInheritance => _schema.InheritedSchemas.Count >= 1;
+        public bool HasInheritance => _schema.InheritedSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchemas.First(), false, string.Empty) : null;
+        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(

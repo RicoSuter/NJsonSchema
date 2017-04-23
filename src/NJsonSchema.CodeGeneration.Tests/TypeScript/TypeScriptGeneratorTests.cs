@@ -21,6 +21,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 },
                 'allOf': [
                     {
+                        'type': 'object', 
+                        'properties': { 
+                            'baseProperty' : { 'type' : 'string' } 
+                        }
+                    },
+                    {
                         'properties': { 
                             'prop2' : { 'type' : 'string' } 
                         }
@@ -31,13 +37,15 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
-            var code = generator.GenerateFile("Foo");
+            var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
-            Assert.IsTrue(code.Contains("class Foo"));
-            Assert.IsTrue(code.Contains("prop1: string;"));
-            Assert.IsTrue(code.Contains("prop2: string;"));
-            Assert.IsFalse(code.Contains("class Anonymous"));
+            Assert.IsTrue(code.Contains(
+@"export class Foo extends Anonymous implements IFoo {
+    prop1: string;
+    prop2: string;
+".Replace("\r", string.Empty)));
+            Assert.IsTrue(code.Contains("class Anonymous"));
         }
 
         [TestMethod]
