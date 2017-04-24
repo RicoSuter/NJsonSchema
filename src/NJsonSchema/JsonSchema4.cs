@@ -212,21 +212,30 @@ namespace NJsonSchema
             return schema;
         }
 
-        /// <summary>Gets the list of directly inherited/parent schemas (i.e. all schemas in allOf with a type of 'Object').</summary>
+        /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
 #if !LEGACY
-        public IReadOnlyCollection<JsonSchema4> InheritedSchemas
+        public JsonSchema4 InheritedSchema
 #else
-        public ICollection<JsonSchema4> InheritedSchemas
+        public JsonSchema4 InheritedSchema
 #endif
         {
             get
             {
-                return new ReadOnlyCollection<JsonSchema4>(AllOf
-                    .Where(s => s.ActualSchema.Type == JsonObjectType.Object)
-                    .Select(s => s.ActualSchema)
-                    .ToList());
+                if (AllOf == null || AllOf.Count == 0)
+                    return null;
+
+                if (AllOf.Count == 1)
+                    return AllOf.First().ActualSchema;
+
+                if (AllOf.Any(s => s.HasSchemaReference && !s.ActualSchema.IsAnyType))
+                    return AllOf.First(s => s.HasSchemaReference && !s.ActualSchema.IsAnyType).ActualSchema;
+
+                if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
+                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
+
+                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
             }
         }
 
@@ -241,8 +250,11 @@ namespace NJsonSchema
         {
             get
             {
-                var inheritedSchemas = InheritedSchemas;
-                return inheritedSchemas.Concat(inheritedSchemas.SelectMany(s => s.AllInheritedSchemas)).ToList();
+                var InheritedSchema = this.InheritedSchema != null ?
+                    new List<JsonSchema4> { this.InheritedSchema } :
+                    new List<JsonSchema4>();
+
+                return InheritedSchema.Concat(InheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
             }
         }
 
@@ -252,7 +264,7 @@ namespace NJsonSchema
         public bool Inherits(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
-            return InheritedSchemas.Any(s => s.ActualSchema == schema || s.Inherits(schema));
+            return InheritedSchema?.ActualSchema == schema || InheritedSchema?.Inherits(schema) == true;
         }
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
@@ -264,12 +276,9 @@ namespace NJsonSchema
                 if (!string.IsNullOrEmpty(Discriminator))
                     return Discriminator;
 
-                foreach (var inheritedSchema in InheritedSchemas)
-                {
-                    var baseDiscriminator = inheritedSchema.ActualSchema.BaseDiscriminator;
-                    if (!string.IsNullOrEmpty(baseDiscriminator))
-                        return baseDiscriminator;
-                }
+                var baseDiscriminator = InheritedSchema?.ActualSchema.BaseDiscriminator;
+                if (!string.IsNullOrEmpty(baseDiscriminator))
+                    return baseDiscriminator;
 
                 return null;
             }
@@ -291,7 +300,7 @@ namespace NJsonSchema
             {
                 return new Dictionary<string, JsonProperty>(Properties
 #endif
-                    .Union(AllOf.Where(s => s.ActualSchema.Type == JsonObjectType.None)
+                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema)
                     .SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToDictionary(p => p.Key, p => p.Value));
             }
@@ -738,6 +747,16 @@ namespace NJsonSchema
             var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
             SchemaVersion = oldSchema;
             return json;
+        }
+
+        /// <summary>Gets a value indicating whether this schema inherits from the given parent schema.</summary>
+        /// <param name="parentSchema">The parent schema.</param>
+        /// <returns>true or false.</returns>
+        public bool InheritsSchema(JsonSchema4 parentSchema)
+        {
+            return parentSchema != null && ActualSchema
+                .AllInheritedSchemas.Concat(new List<JsonSchema4> { this })
+                .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>

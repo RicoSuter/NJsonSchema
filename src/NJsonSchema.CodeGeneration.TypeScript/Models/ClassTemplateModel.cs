@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
         /// <summary>Gets the inherited schema.</summary>
-        public JsonSchema4 InheritedSchema => _schema.InheritedSchemas.FirstOrDefault()?.ActualSchema;
+        public JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
 
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
-        public bool HasIndexerProperty => _schema.InheritedSchemas.Any(s => s.IsDictionary);
+        public bool HasIndexerProperty => _schema.InheritedSchema?.IsDictionary == true;
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;

@@ -24,6 +24,12 @@ namespace NJsonSchema.Tests.Generation
                 },
                 'allOf': [
                     {
+                        'type': 'object', 
+                        'properties': { 
+                            'baseProperty' : { 'type' : 'string' } 
+                        }
+                    },
+                    {
                         'properties': { 
                             'prop2' : { 'type' : 'string' } 
                         }
@@ -35,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.AreEqual(0, schema.InheritedSchemas.Count);
+            Assert.IsNotNull(schema.InheritedSchema);
             Assert.AreEqual(2, schema.ActualProperties.Count);
             Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
             Assert.IsTrue(schema.ActualProperties.ContainsKey("prop2"));
@@ -67,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.AreEqual(1, schema.InheritedSchemas.Count);
+            Assert.IsNotNull(schema.InheritedSchema);
             Assert.AreEqual(1, schema.ActualProperties.Count);
             Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
         }
