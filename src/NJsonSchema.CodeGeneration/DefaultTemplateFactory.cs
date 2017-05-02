@@ -7,7 +7,9 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Reflection;
+using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -23,15 +25,26 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
         public virtual ITemplate CreateTemplate(string package, string template, object model)
         {
-            var typeName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + "Template";
-            var type = Type.GetType(typeName);
-            if (type == null)
-                type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + package))?.GetType(typeName);
+            var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + package));
+            var resourceName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + ".liquid";
+            var resource = assembly.GetManifestResourceStream(resourceName);
+            if (resource != null)
+            {
+                using (var reader = new StreamReader(resource))
+                    return new LiquidTemplate(reader.ReadToEnd(), model);
+            }
+            else
+            {
+                var typeName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + "Template";
+                var type = Type.GetType(typeName);
+                if (type == null)
+                    type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + package))?.GetType(typeName);
 
-            if (type != null)
-                return (ITemplate)Activator.CreateInstance(type, model);
+                if (type != null)
+                    return (ITemplate)Activator.CreateInstance(type, model);
 
-            throw new InvalidOperationException("Could not load template '" + template + "'.");
+                throw new InvalidOperationException("Could not load template '" + template + "'.");
+            }
         }
     }
 }
