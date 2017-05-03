@@ -42,16 +42,6 @@ namespace NJsonSchema.Validation
             Schema = schema;
         }
 
-      /// <summary>Initializes a new instance of the <see cref="ValidationError"/> class. </summary>
-      /// <param name="errorKind">The error kind. </param>
-      /// <param name="propertyName">The property name. </param>
-      /// <param name="propertyPath">The property path. </param>
-      /// <param name="token">The token that failed to validate. </param>
-      public ValidationError(ValidationErrorKind errorKind, string propertyName, string propertyPath, JToken token)
-          : this(errorKind, propertyName, propertyPath, token, null)
-      {
-      }
-
         /// <summary>Gets the error kind. </summary>
         public ValidationErrorKind Kind { get; private set; }
 

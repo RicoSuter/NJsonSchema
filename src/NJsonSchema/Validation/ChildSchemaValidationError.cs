@@ -31,21 +31,6 @@ namespace NJsonSchema.Validation
             Errors = errors;
         }
 
-      /// <summary>Initializes a new instance of the <see cref="ValidationError"/> class. </summary>
-      /// <param name="kind">The error kind. </param>
-      /// <param name="property">The property name. </param>
-      /// <param name="path">The property path. </param>
-      /// <param name="errors">The error list. </param>
-      /// <param name="token">The token that failed to validate. </param>
-#if !LEGACY
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
-#else
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
-#endif
-            : this(kind, property, path, errors, token, null)
-        {
-        }
-
         /// <summary>Gets the errors for each validated subschema. </summary>
 #if !LEGACY
         public IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
@@ -69,6 +54,6 @@ namespace NJsonSchema.Validation
                 output += "}\n";
             }
             return output;
-        }        
+        }
     }
 }
