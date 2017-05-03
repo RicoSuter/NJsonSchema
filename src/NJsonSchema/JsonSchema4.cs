@@ -223,7 +223,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (AllOf == null || AllOf.Count == 0)
+                if (AllOf == null || AllOf.Count == 0 || HasSchemaReference)
                     return null;
 
                 if (AllOf.Count == 1)
@@ -356,10 +356,6 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets a value indicating whether this is a type reference.</summary>
-        [JsonIgnore]
-        public bool HasSchemaReference => SchemaReference != null;
-
         /// <summary>Gets the actual schema, either this or the reference schema.</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
@@ -379,6 +375,10 @@ namespace NJsonSchema
             if (HasSchemaReference)
             {
                 checkedSchemas.Add(this);
+
+                if (HasAllOfSchemaReference)
+                    return AllOf.First().GetActualSchema(checkedSchemas);
+
                 return SchemaReference.GetActualSchema(checkedSchemas);
             }
 
@@ -699,23 +699,39 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
-        public bool IsDictionary =>
-            Type.HasFlag(JsonObjectType.Object) &&
-            Properties.Count == 0 &&
-            (AllowAdditionalProperties || PatternProperties.Any());
+        public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
+                                    Properties.Count == 0 &&
+                                    (AllowAdditionalProperties || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+                                 AllOf.Count == 0 &&
+                                 AnyOf.Count == 0 &&
+                                 OneOf.Count == 0 &&
                                  Properties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
-                                 AnyOf.Count == 0 &&
-                                 AllOf.Count == 0 &&
-                                 OneOf.Count == 0 &&
                                  AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
                                  IsEnumeration == false;
+
+        /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
+        [JsonIgnore]
+        public bool HasSchemaReference => SchemaReference != null || HasAllOfSchemaReference;
+
+        /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
+        [JsonIgnore]
+        public bool HasAllOfSchemaReference => Type == JsonObjectType.None &&
+                                               AllOf.Count == 1 &&
+                                               AnyOf.Count == 0 &&
+                                               OneOf.Count == 0 &&
+                                               Properties.Count == 0 &&
+                                               PatternProperties.Count == 0 &&
+                                               AllowAdditionalProperties &&
+                                               AdditionalPropertiesSchema == null &&
+                                               MultipleOf == null &&
+                                               IsEnumeration == false;
 
         #endregion
 
