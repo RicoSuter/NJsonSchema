@@ -53,7 +53,9 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             var error = (ChildSchemaValidationError)errors.First();
             Assert.AreEqual(ValidationErrorKind.NotAnyOf, error.Kind);
+            Assert.AreSame(schema, error.Schema);
             Assert.AreEqual(ValidationErrorKind.StringExpected, error.Errors.First().Value.First().Kind);
+            Assert.AreSame(schema.AnyOf.First(), error.Errors.First().Value.First().Schema);
         }
         
         [TestMethod]
@@ -100,6 +102,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NotAllOf, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -146,6 +149,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NotOneOf, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -173,6 +177,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NotOneOf, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -192,6 +197,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.ExcludedSchemaValidates, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
