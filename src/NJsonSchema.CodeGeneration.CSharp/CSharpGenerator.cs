@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return new TypeGeneratorResult
             {
                 TypeName = typeName,
-                BaseTypeName = model.BaseClass,
+                BaseTypeName = model.BaseClassName,
                 Code = template.Render()
             };
         }

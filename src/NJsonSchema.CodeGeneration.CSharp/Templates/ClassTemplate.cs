@@ -75,21 +75,21 @@ if(Model.HasDiscriminator){
             this.Write("\")]\r\npublic partial class ");
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
             this.Write(" ");
             
             #line 9 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Inheritance));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.InheritanceCode));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
             #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-if(Model.Inpc){
+if(Model.RenderInpc){
             
             #line default
             #line hidden
@@ -182,7 +182,7 @@ foreach(var property in Model.Properties){
             this.Write("\", Required = ");
             
             #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.JsonPropertyRequired));
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.JsonPropertyRequiredCode));
             
             #line default
             #line hidden
@@ -329,7 +329,7 @@ if(property.IsStringEnum){
             #line hidden
             
             #line 37 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-  if(!Model.Inpc){
+  if(!Model.RenderInpc){
             
             #line default
             #line hidden
@@ -462,7 +462,7 @@ if(Model.HasAdditionalPropertiesType){
             #line hidden
             
             #line 68 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-if(Model.Inpc){
+if(Model.RenderInpc){
             
             #line default
             #line hidden
@@ -485,7 +485,7 @@ if(Model.Inpc){
             this.Write(");\r\n    }\r\n    \r\n    public static ");
             
             #line 77 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -493,7 +493,7 @@ if(Model.Inpc){
                     "lizeObject<");
             
             #line 79 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -507,7 +507,7 @@ if(Model.Inpc){
             this.Write(");\r\n    }\r\n");
             
             #line 81 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
-if(Model.Inpc){
+if(Model.RenderInpc){
             
             #line default
             #line hidden

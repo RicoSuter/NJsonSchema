@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Diagnostics;
 using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration
@@ -24,8 +25,22 @@ namespace NJsonSchema.CodeGeneration
         public string Render()
         {
             var tpl = Template.Parse(_template);
-            var hash = Hash.FromAnonymousObject(new { Model = Hash.FromAnonymousObject(_model) });
-            return tpl.Render(hash);
+            var hash = Hash.FromAnonymousObject(_model);
+            // TODO: Check models here
+            return tpl.Render(new RenderParameters
+            {
+                LocalVariables = hash,
+                Filters = new[] { typeof(LiquidFilters) }
+            });
+        }
+    }
+
+    public static class LiquidFilters
+    {
+        public static string CSharpDocs(string input)
+        {
+            // TODO: Check if this is really called!
+            return ConversionUtilities.ConvertCSharpDocBreaks(input, 0);
         }
     }
 }

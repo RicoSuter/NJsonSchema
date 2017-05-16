@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings, 
+        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings,
             CSharpTypeResolver resolver, JsonSchema4 schema, object rootObject)
             : base(resolver, schema, rootObject)
         {
@@ -33,15 +33,18 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _schema = schema;
             _settings = settings;
 
-            Class = typeName;
+            ClassName = typeName;
             Properties = _schema.ActualProperties.Values
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToList();
         }
 
+        /// <summary>Gets the NJsonSchema toolchain version.</summary>
+        public string ToolchainVersion => JsonSchema4.ToolchainVersion;
+
         /// <summary>Gets or sets the class name.</summary>
-        public override string Class { get; }
+        public override string ClassName { get; }
 
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
@@ -50,10 +53,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasAdditionalPropertiesType => _schema.AdditionalPropertiesSchema != null;
 
         /// <summary>Gets the type of the additional properties.</summary>
-        public string AdditionalPropertiesType => _resolver.Resolve(
+        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
             _schema.AdditionalPropertiesSchema,
             _schema.AdditionalPropertiesSchema.IsNullable(_settings.NullHandling),
-            string.Empty);
+            string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
         public IEnumerable<PropertyModel> Properties { get; }
@@ -66,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class style is INPC.</summary>
         /// <value><c>true</c> if inpc; otherwise, <c>false</c>.</value>
-        public bool Inpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
+        public bool RenderInpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
 
         /// <summary>Gets a value indicating whether the class has discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
@@ -78,19 +81,19 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasInheritance => _schema.InheritedSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
+        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(
             _settings.HandleReferences, _settings.JsonConverters);
 
         /// <summary>Gets the inheritance code.</summary>
-        public string Inheritance
+        public string InheritanceCode
         {
             get
             {
                 if (HasInheritance)
-                    return ": " + BaseClass + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", System.ComponentModel.INotifyPropertyChanged" : "");
+                    return ": " + BaseClassName + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", System.ComponentModel.INotifyPropertyChanged" : "");
                 else
                     return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": System.ComponentModel.INotifyPropertyChanged" : "";
             }

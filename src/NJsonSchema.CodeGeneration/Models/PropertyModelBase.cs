@@ -7,11 +7,12 @@
 //-----------------------------------------------------------------------
 
 using System;
+using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>The property template model base class.</summary>
-    public abstract class PropertyModelBase
+    public abstract class PropertyModelBase : TemplateModelBase
     {
         private readonly ClassTemplateModelBase _classTemplateModel;
         private readonly JsonProperty _property;
@@ -64,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.Models
             if (_property.IsEnumeration == false)
                 return propertyName;
 
-            var className = _classTemplateModel.Class;
+            var className = _classTemplateModel.ClassName;
             if (className.Contains("Anonymous"))
                 return propertyName;
 
@@ -72,6 +73,12 @@ namespace NJsonSchema.CodeGeneration.Models
                 return propertyName;
 
             return className + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
+        }
+
+        public object ToLiquid()
+        {
+            var x = Hash.FromAnonymousObject(this);
+            return x;
         }
     }
 }

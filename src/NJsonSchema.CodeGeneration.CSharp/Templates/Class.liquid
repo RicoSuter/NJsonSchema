@@ -1,83 +1,80 @@
-﻿{% if Model.HasDescription %}
-/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
+﻿{% if HasDescription %}
+/// <summary>{{Description | CSharpDocs}}</summary>
 {% endif %}
-{% if Model.HasDiscriminator %}
-[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Model.Discriminator }}")]
+{% if HasDiscriminator %}
+[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{Discriminator}}")]
 {% endif %}
-[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ JsonSchema4.ToolchainVersion }}")]
-public partial class {{Model.Class}} {{Model.Inheritance}}
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
+public partial class {{ClassName}} {{InheritanceCode}}
 {
-{% if Model.Inpc -%}
-{% for property in Model.Properties %}
+{%- if RenderInpc -%}
+{%- for property in Properties -%}
     private {{property.Type}} {{property.FieldName}}{% if property.HasDefaultValue %} = {{property.DefaultValue}}{% endif -%};
-{% endfor %}
+{%- endfor -%}
 
-{% endif %}
-<#foreach(var property in Model.Properties){#>
-<#  if(property.HasDescription){#>
-    /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
-<#  }#>
-    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#><#if(property.IsStringEnumArray){#>, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)<#}#>)]
-<#  if(property.RenderRequiredAttribute){#>
+{%- endif -%}
+{%- for property in Properties -%}
+{%-   if property.HasDescription -%}
+    /// <summary>{{property.Description | CSharpDocs}}</summary>
+{%-   endif -%}
+    [Newtonsoft.Json.JsonProperty("{{property.Name}}", Required = {{property.JsonPropertyRequiredCode}}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
+{%-   if property.RenderRequiredAttribute -%}
     [System.ComponentModel.DataAnnotations.Required]
-<#  }#>
-<#  if(property.RenderRangeAttribute){#>
-    [System.ComponentModel.DataAnnotations.Range(<#=property.RangeMinimumValue #>, <#=property.RangeMaximumValue #>)]
-<#  }#>
-<#  if(property.RenderStringLengthAttribute){#>
-    [System.ComponentModel.DataAnnotations.StringLength(<#=property.StringLengthMaximumValue #><#  if(property.StringLengthMinimumValue > 0){ #>, MinimumLength = <#=property.StringLengthMinimumValue #><# } #>)]
-<#  }#>
-<#  if(property.RenderRegularExpressionAttribute){#>
-    [System.ComponentModel.DataAnnotations.RegularExpression(@"<#=property.RegularExpressionValue#>")]
-<#  }#>
-<#if(property.IsStringEnum){#>
+{%-   endif -%}
+{%-   if property.RenderRangeAttribute -%}
+    [System.ComponentModel.DataAnnotations.Range({{property.RangeMinimumValue}}, {{property.RangeMaximumValue}})]
+{%-   endif -%}
+{%-   if property.RenderStringLengthAttribute -%}
+    [System.ComponentModel.DataAnnotations.StringLength({{property.StringLengthMaximumValue}}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{property.StringLengthMinimumValue}}{% endif %})]
+{%-   endif -%}
+{%-   if property.RenderRegularExpressionAttribute -%}
+    [System.ComponentModel.DataAnnotations.RegularExpression(@"{{property.RegularExpressionValue}}")]
+{%-   endif -%}
+{%-   if(property.IsStringEnum -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-<#  }#>
-    public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.Inpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
-
-<#  }else{#>
-
+{%-   endif -%}
+    public {{property.Type}} {{property.property_name}}{% if RenderInpc == false %}{ get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{property.DefaultValue}};{% endif %}{% else %}
     {
-        get { return <#=property.FieldName#>; }
-<#if(property.HasSetter){#>
+        get { return {{property.FieldName}}; }
+{%-     if property.HasSetter -%}
         set 
         {
-            if (<#=property.FieldName#> != value)
+            if ({{property.FieldName}} != value)
             {
-                <#=property.FieldName#> = value; 
+                {{property.FieldName}} = value; 
                 RaisePropertyChanged();
             }
         }
-<#}#>
+{%-     endif -%}
     }
-<#}#>
+{%-   endif -%}
 
-<#}#>
-<#if(Model.HasAdditionalPropertiesType){#>
-    private System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> _additionalProperties = new System.Collections.Generic.Dictionary<string, <#=Model.AdditionalPropertiesType#>>();
+{%- endfor -%}
+{%- if HasAdditionalPropertiesType -%}
+    private System.Collections.Generic.IDictionary<string, {{AdditionalPropertiesType}}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{AdditionalPropertiesType}}>();
 
     [Newtonsoft.Json.JsonExtensionData]
-    public System.Collections.Generic.IDictionary<string, <#=Model.AdditionalPropertiesType#>> AdditionalProperties
+    public System.Collections.Generic.IDictionary<string, {{AdditionalPropertiesType}}> AdditionalProperties
     {
         get { return _additionalProperties; }
         set { _additionalProperties = value; }
     }
 
-<#}#>
-<#if(Model.Inpc){#>
+{%- endif -%}
+{%- if RenderInpc -%}
     public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
-<#}#>
+{%- endif -%}
     public string ToJson() 
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonSerializerParameterCode#>);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this{{JsonSerializerParameterCode}});
     }
     
-    public static <#=Model.Class#> FromJson(string data)
+    public static {{ClassName}} FromJson(string data)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonSerializerParameterCode#>);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ClassName}}>(data{{JsonSerializerParameterCode}});
     }
-<#if(Model.Inpc){#>
+{%- if RenderInpc -%}
 
     protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
     {
@@ -85,5 +82,5 @@ public partial class {{Model.Class}} {{Model.Inheritance}}
         if (handler != null) 
             handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
     }
-<#}#>
+{%- endif -%}
 }
