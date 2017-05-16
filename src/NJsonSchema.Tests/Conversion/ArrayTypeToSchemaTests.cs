@@ -9,6 +9,16 @@ namespace NJsonSchema.Tests.Conversion
     [TestClass]
     public class ArrayTypeToSchemaTests
     {
+        public class DictionarySubType : DictionaryType
+        {
+
+        }
+
+        public class DictionaryType : Dictionary<string, IList<string>>
+        {
+            public string Foo { get; set; }
+        }
+
         [TestMethod]
         public async Task When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
         {
@@ -51,31 +61,6 @@ namespace NJsonSchema.Tests.Conversion
             await When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
         }
 
-        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
-        {
-            //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyType>();
-            var schemaData = schema.ToJson();
-
-            //// Assert
-            var property = schema.Properties[propertyName];
-
-            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
-            Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
-        }
-
-        public class DictionarySubType : DictionaryType
-        {
-
-        }
-
-        public class DictionaryType : Dictionary<string, IList<string>>
-        {
-            public string Foo { get; set; }
-        }
-
         public class MyType
         {
             public MySubtype Reference { get; set; }
@@ -94,6 +79,21 @@ namespace NJsonSchema.Tests.Conversion
         public class MySubtype
         {
             public string Id { get; set; }
+        }
+
+        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        {
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
+            var schemaData = schema.ToJson();
+
+            //// Assert
+            var property = schema.Properties[propertyName];
+
+            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
+            Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
+            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
+            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
     }
 }
