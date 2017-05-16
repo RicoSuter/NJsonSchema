@@ -60,10 +60,16 @@ namespace NJsonSchema.CodeGeneration
                     {
                         var classCode = p.Code;
 
-                        var index = classCode.IndexOf("class");
-                        index = classCode.IndexOf("{", index);
+                        var index = classCode.IndexOf("constructor(");
+                        if (index != -1)
+                            return classCode.Insert(index, extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n\n    ");
+                        else
+                        {
+                            index = classCode.IndexOf("class");
+                            index = classCode.IndexOf("{", index) + 1;
 
-                        return classCode.Insert(index + 1, extensionCode.GetExtensionClassBody(p.TypeName));
+                            return classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n");
+                        }
                     }
 
                     return p.Code;

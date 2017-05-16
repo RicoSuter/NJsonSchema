@@ -115,7 +115,7 @@ namespace NJsonSchema.Generation
         public virtual async Task GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver))
+            if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes))
                 return;
 
             if (schemaResolver.RootObject == schema)
@@ -215,13 +215,14 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
+        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema, 
+            JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
             {
-                await typeMapper.GenerateSchemaAsync(schema, this, schemaResolver);
+                await typeMapper.GenerateSchemaAsync(schema, this, schemaResolver, parentAttributes);
                 return true;
             }
 

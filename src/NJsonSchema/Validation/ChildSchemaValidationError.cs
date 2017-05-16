@@ -20,12 +20,13 @@ namespace NJsonSchema.Validation
         /// <param name="path">The property path. </param>
         /// <param name="errors">The error list. </param>
         /// <param name="token">The token that failed to validate. </param>
+        /// <param name="schema">The schema that contains the validation rule.</param>
 #if !LEGACY
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
 #else
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
 #endif
-            : base(kind, property, path, token)
+            : base(kind, property, path, token, schema)
         {
             Errors = errors;
         }
@@ -53,6 +54,6 @@ namespace NJsonSchema.Validation
                 output += "}\n";
             }
             return output;
-        }        
+        }
     }
 }
