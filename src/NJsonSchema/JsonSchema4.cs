@@ -289,20 +289,30 @@ namespace NJsonSchema
         [JsonIgnore]
 #if !LEGACY
         public IReadOnlyDictionary<string, JsonProperty> ActualProperties
-        {
-            get
-            {
-                return new ReadOnlyDictionary<string, JsonProperty>(Properties
 #else
         public IDictionary<string, JsonProperty> ActualProperties
+#endif
         {
             get
             {
-                return new Dictionary<string, JsonProperty>(Properties
-#endif
+                var properties = Properties
                     .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema)
                     .SelectMany(s => s.ActualSchema.ActualProperties))
-                    .ToDictionary(p => p.Key, p => p.Value));
+                    .ToList();
+
+                var duplicatedProperties = properties
+                    .GroupBy(p => p.Key)
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                if (duplicatedProperties.Any())
+                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => g.Key) + " are defined multiple times."));
+
+#if !LEGACY
+                return new ReadOnlyDictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+#else
+                return new Dictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+#endif
             }
         }
 
