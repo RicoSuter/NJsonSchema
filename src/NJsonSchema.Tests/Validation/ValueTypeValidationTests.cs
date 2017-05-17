@@ -38,6 +38,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -70,6 +71,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberExpected, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -102,6 +104,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.IntegerExpected, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -134,6 +137,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.BooleanExpected, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -151,6 +155,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.PatternMismatch, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -168,6 +173,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.StringTooShort, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -185,6 +191,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.StringTooLong, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -202,6 +209,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -219,6 +227,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -236,6 +245,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -253,6 +263,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -272,6 +283,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.NotInEnumeration, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
         
         [TestMethod]

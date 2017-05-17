@@ -12,7 +12,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
@@ -112,7 +114,7 @@ namespace NJsonSchema.Generation
         public virtual async Task GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver))
+            if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes))
                 return;
 
             if (schemaResolver.RootObject == schema)
@@ -120,7 +122,8 @@ namespace NJsonSchema.Generation
 
             ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
-            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+            var contract = ResolveContract(type);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, contract, parentAttributes, Settings.DefaultEnumHandling);
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
             {
                 if (typeDescription.IsDictionary)
@@ -135,8 +138,8 @@ namespace NJsonSchema.Generation
                     else if (schema.GetType() == typeof(JsonSchema4))
                     {
                         typeDescription.ApplyType(schema);
-                        schema.Description = await GetDescriptionAsync(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-                        await GenerateObjectAsync(type, schema, schemaResolver).ConfigureAwait(false);
+                        schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+                        await GenerateObjectAsync(type, contract as JsonObjectContract, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
                         schema.SchemaReference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
@@ -211,13 +214,14 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
+        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema, 
+            JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
             {
-                await typeMapper.GenerateSchemaAsync(schema, this, schemaResolver);
+                await typeMapper.GenerateSchemaAsync(schema, this, schemaResolver, parentAttributes);
                 return true;
             }
 
@@ -256,16 +260,18 @@ namespace NJsonSchema.Generation
         /// <summary>Generates the properties for the given type and schema.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
+        /// <param name="objectContract">The JSON object contract.</param>
         /// <param name="schema">The properties</param>
         /// <param name="schemaResolver">The schema resolver.</param>
-        protected virtual async Task GenerateObjectAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
+        /// <returns></returns>
+        protected virtual async Task GenerateObjectAsync<TSchemaType>(Type type, JsonObjectContract objectContract, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             schemaResolver.AddSchema(type, false, schema);
 
             schema.AllowAdditionalProperties = false;
 
-            await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            await GeneratePropertiesAndInheritanceAsync(type, objectContract, schema, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -274,30 +280,46 @@ namespace NJsonSchema.Generation
                 schema.GenerateXmlObjectForType(type);
         }
 
-        private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonObjectContract objectContract, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var properties = GetTypeProperties(type);
+            //var properties = GetTypeProperties(type);
 
 #if !LEGACY
-            var declaredFields = type.GetTypeInfo().DeclaredFields
-                .Where(f => f.IsPublic);
-
-            var declaredProperties = type.GetTypeInfo().DeclaredProperties
-                .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true);
+            var propertiesAndFields = type.GetTypeInfo()
+                .DeclaredFields
+                .Where(f => f.IsPublic)
+                .OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo().DeclaredProperties
+                    .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true)
+                )
+                .ToList();
 #else
-            var declaredFields = type.GetTypeInfo()
-                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
-
-            var declaredProperties = type.GetTypeInfo()
-                .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetGetMethod()?.IsPublic == true || p.GetSetMethod()?.IsPublic == true);
+            var propertiesAndFields = type.GetTypeInfo()
+                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+                .OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo()
+                    .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.GetGetMethod()?.IsPublic == true || p.GetSetMethod()?.IsPublic == true)
+                )
+                .ToList();
 #endif
 
-            foreach (var property in declaredProperties.Where(p => properties == null || properties.Contains(p.Name)))
-                await LoadPropertyOrFieldAsync(property, property.PropertyType, type, schema, schemaResolver).ConfigureAwait(false);
-
-            foreach (var field in declaredFields.Where(p => properties == null || properties.Contains(p.Name)))
-                await LoadPropertyOrFieldAsync(field, field.FieldType, type, schema, schemaResolver).ConfigureAwait(false);
+            if (objectContract != null)
+            {
+                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
+                {
+                    var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
+                    var propertyInfo = info as PropertyInfo;
+#if !LEGACY
+                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
+#else
+                    if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
+#endif
+                        await LoadPropertyOrFieldAsync(property, info, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+                }
+            }
 
             await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
         }
@@ -326,7 +348,7 @@ namespace NJsonSchema.Generation
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var typeDescription = JsonObjectTypeDescription.FromType(type, null, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, ResolveContract(type), null, Settings.DefaultEnumHandling);
             var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
             if (!schemaResolver.HasSchema(type, isIntegerEnum))
@@ -341,7 +363,9 @@ namespace NJsonSchema.Generation
             if (baseType != null && baseType != typeof(object))
             {
                 if (Settings.FlattenInheritanceHierarchy)
-                    await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                {
+                    await GeneratePropertiesAndInheritanceAsync(baseType, (JsonObjectContract)ResolveContract(baseType), schema, schemaResolver).ConfigureAwait(false);
+                }
                 else
                 {
                     var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
@@ -435,12 +459,12 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task LoadPropertyOrFieldAsync(MemberInfo property, Type propertyType, Type parentType, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
+        private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo propertyInfo, Type parentType, JsonObjectContract parentContract, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
         {
-            var attributes = property.GetCustomAttributes(inherit: true).OfType<Attribute>().ToArray();
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, attributes, Settings.DefaultEnumHandling);
-
-            if (IsPropertyIgnored(parentType, attributes) == false)
+            var propertyType = property.PropertyType;
+            var attributes = property.AttributeProvider.GetAttributes(true).ToArray();
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, ResolveContract(propertyType), null, Settings.DefaultEnumHandling);
+            if (property.Ignored == false)
             {
                 JsonProperty jsonProperty;
 
@@ -476,7 +500,11 @@ namespace NJsonSchema.Generation
                 else
                     jsonProperty = await GenerateAsync<JsonProperty>(propertyType, attributes, schemaResolver).ConfigureAwait(false);
 
-                var propertyName = JsonReflectionUtilities.GetPropertyName(property, Settings.DefaultPropertyNameHandling);
+                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
+                var propertyName = contractResolver != null ?
+                    contractResolver.GetResolvedPropertyName(property.PropertyName) :
+                    property.PropertyName;
+
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
 
@@ -486,21 +514,19 @@ namespace NJsonSchema.Generation
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
                 var requiredAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RequiredAttribute");
-                var jsonPropertyAttribute = attributes.OfType<JsonPropertyAttribute>().SingleOrDefault();
 
-                var hasJsonNetAttributeRequired = jsonPropertyAttribute != null && (
-                    jsonPropertyAttribute.Required == Required.Always ||
-                    jsonPropertyAttribute.Required == Required.AllowNull);
-
+                var hasJsonNetAttributeRequired = property.Required == Required.Always || property.Required == Required.AllowNull;
                 var isDataContractMemberRequired = GetDataMemberAttribute(parentType, attributes)?.IsRequired == true;
 
                 var hasRequiredAttribute = requiredAttribute != null;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
                     parentSchema.RequiredProperties.Add(propertyName);
 
-                var isJsonNetAttributeNullable = jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.AllowNull;
+                var isNullable = propertyTypeDescription.IsNullable &&
+                    hasRequiredAttribute == false &&
+                    isDataContractMemberRequired == false &&
+                    (property.Required == Required.Default || property.Required == Required.AllowNull);
 
-                var isNullable = !hasRequiredAttribute && !isDataContractMemberRequired && (propertyTypeDescription.IsNullable || isJsonNetAttributeNullable);
                 if (isNullable)
                 {
                     if (Settings.NullHandling == NullHandling.JsonSchema)
@@ -526,15 +552,15 @@ namespace NJsonSchema.Generation
                 if (readOnlyAttribute != null)
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
-                jsonProperty.Description = await GetDescriptionAsync(property, attributes).ConfigureAwait(false);
+                jsonProperty.Description = await propertyInfo.GetDescriptionAsync(attributes).ConfigureAwait(false);
 
-                ApplyPropertyAnnotations(jsonProperty, parentType, attributes, propertyTypeDescription);
+                ApplyPropertyAnnotations(jsonProperty, property, parentType, attributes, propertyTypeDescription);
             }
         }
 
         private bool RequiresSchemaReference(Type type, IEnumerable<Attribute> parentAttributes)
         {
-            var typeDescription = JsonObjectTypeDescription.FromType(type, parentAttributes, Settings.DefaultEnumHandling);
+            var typeDescription = JsonObjectTypeDescription.FromType(type, ResolveContract(type), parentAttributes, Settings.DefaultEnumHandling);
 
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
             if (typeMapper != null)
@@ -542,6 +568,8 @@ namespace NJsonSchema.Generation
 
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
+
+        private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
 
         private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
         {
@@ -569,11 +597,11 @@ namespace NJsonSchema.Generation
 
         /// <summary>Applies the property annotations to the JSON property.</summary>
         /// <param name="jsonProperty">The JSON property.</param>
+        /// <param name="property"></param>
         /// <param name="parentType">The type of the parent.</param>
         /// <param name="attributes">The attributes.</param>
         /// <param name="propertyTypeDescription">The property type description.</param>
-        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, Type parentType, IList<Attribute> attributes,
-            JsonObjectTypeDescription propertyTypeDescription)
+        public void ApplyPropertyAnnotations(JsonSchema4 jsonProperty, Newtonsoft.Json.Serialization.JsonProperty property, Type parentType, IEnumerable<Attribute> attributes, JsonObjectTypeDescription propertyTypeDescription)
         {
             // TODO: Refactor out
 
@@ -583,7 +611,7 @@ namespace NJsonSchema.Generation
 
             dynamic defaultValueAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
-                jsonProperty.Default = ConvertDefaultValue(parentType, attributes, defaultValueAttribute);
+                jsonProperty.Default = ConvertDefaultValue(property);
 
             dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
@@ -643,38 +671,18 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private object ConvertDefaultValue(Type parentType, IEnumerable<Attribute> propertyAttributes, dynamic defaultValueAttribute)
+        private object ConvertDefaultValue(Newtonsoft.Json.Serialization.JsonProperty property)
         {
-            if (((Type)defaultValueAttribute.Value.GetType()).GetTypeInfo().IsEnum)
+            if (property.DefaultValue.GetType().GetTypeInfo().IsEnum)
             {
-                if (JsonObjectTypeDescription.IsStringEnum(parentType, propertyAttributes, Settings.DefaultEnumHandling))
-                    return defaultValueAttribute.Value.ToString();
+                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(property.Converter?.GetType().GetTypeInfo());
+                if (hasStringEnumConverter)
+                    return property.DefaultValue.ToString();
                 else
-                    return (int)defaultValueAttribute.Value;
+                    return (int)property.DefaultValue;
             }
             else
-                return defaultValueAttribute.Value;
-        }
-
-        private async Task<string> GetDescriptionAsync(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
-        {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute", TypeNameStyle.FullName);
-            if (descriptionAttribute != null && descriptionAttribute.Description != null)
-                return descriptionAttribute.Description;
-            else
-            {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute", TypeNameStyle.FullName);
-                if (displayAttribute != null && displayAttribute.Description != null)
-                    return displayAttribute.Description;
-                else
-                {
-                    var summary = await memberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
-                    if (summary != string.Empty)
-                        return summary;
-                }
-            }
-
-            return null;
+                return property.DefaultValue;
         }
     }
 }

@@ -56,6 +56,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.AreEqual(ValidationErrorKind.ArrayExpected, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -99,6 +100,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.TooManyItemsInTuple, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -145,6 +147,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.AreEqual(ValidationErrorKind.StringExpected, firstItemError.Kind);
             Assert.AreEqual("[1]", errors.First().Property);
             Assert.AreEqual("#/[1]", errors.First().Path);
+            Assert.AreSame(schema.Item, errors.First().Schema);
         }
 
         [TestMethod]
@@ -167,6 +170,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.TooManyItems, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -188,6 +192,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.TooFewItems, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]
@@ -210,6 +215,7 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.AreEqual(1, errors.Count());
             Assert.AreEqual(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
+            Assert.AreSame(schema, errors.First().Schema);
         }
 
         [TestMethod]

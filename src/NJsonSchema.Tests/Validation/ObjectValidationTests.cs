@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
@@ -133,6 +134,30 @@ namespace NJsonSchema.Tests.Validation
             Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
             Assert.AreEqual("Foo", errors.First().Property);
             Assert.AreEqual("#/Foo", errors.First().Path);
+        }
+        
+        [TestMethod]
+        public async Task When_type_property_has_integer_type_then_it_is_validated_correctly()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromJsonAsync(
+                @"{
+              ""$schema"": ""http://json-schema.org/draft-06/schema#"",
+              ""type"": ""object"",
+              ""additionalProperties"": false,
+              ""properties"": {
+                ""type"" : {""type"" : ""integer""}
+              }
+            }");
+
+            //// Act
+            var errors = schema.Validate(
+                @"{
+              ""type"": 1
+            }");
+
+            //// Assert
+            Assert.AreEqual(0, errors.Count);
         }
     }
 }

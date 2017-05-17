@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -109,6 +110,30 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
+        }
+
+        public enum SomeEnum { Thing1, Thing2 }
+
+        public class SomeClass
+        {
+            public int SomeProperty { get; set; }
+            public SomeEnum[] SomeEnums { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<SomeClass>(new JsonSchemaGeneratorSettings());
+            var json = schema.ToJson();
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("SomeEnum"));
+            Assert.IsFalse(code.Contains("Anonymous"));
         }
     }
 }
