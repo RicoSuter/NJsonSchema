@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -139,7 +138,7 @@ namespace NJsonSchema.Generation
                     else if (schema.GetType() == typeof(JsonSchema4))
                     {
                         typeDescription.ApplyType(schema);
-                        schema.Description = await GetDescriptionAsync(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+                        schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
                         await GenerateObjectAsync(type, contract as JsonObjectContract, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
@@ -553,7 +552,7 @@ namespace NJsonSchema.Generation
                 if (readOnlyAttribute != null)
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
-                jsonProperty.Description = await GetDescriptionAsync(propertyInfo, attributes).ConfigureAwait(false);
+                jsonProperty.Description = await propertyInfo.GetDescriptionAsync(attributes).ConfigureAwait(false);
 
                 ApplyPropertyAnnotations(jsonProperty, property, parentType, attributes, propertyTypeDescription);
             }
@@ -684,28 +683,6 @@ namespace NJsonSchema.Generation
             }
             else
                 return property.DefaultValue;
-        }
-
-        private async Task<string> GetDescriptionAsync(MemberInfo memberInfo, IEnumerable<Attribute> attributes)
-        {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute", TypeNameStyle.FullName);
-            if (descriptionAttribute != null && descriptionAttribute.Description != null)
-                return descriptionAttribute.Description;
-            else
-            {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute", TypeNameStyle.FullName);
-                if (displayAttribute != null && displayAttribute.Description != null)
-                    return displayAttribute.Description;
-
-                if (memberInfo != null)
-                {
-                    var summary = await memberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
-                    if (summary != string.Empty)
-                        return summary;
-                }
-            }
-
-            return null;
         }
     }
 }
