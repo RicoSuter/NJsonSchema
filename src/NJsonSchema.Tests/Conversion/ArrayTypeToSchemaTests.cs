@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace NJsonSchema.Tests.Conversion
 {
@@ -23,12 +24,18 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
         {
             //// Act
+            var dict = new DictionarySubType();
+            dict.Foo = "abc";
+            dict.Add("bar", new List<string> { "a", "b" });
+            var json = JsonConvert.SerializeObject(dict);
+
             var schema = await JsonSchema4.FromTypeAsync<DictionarySubType>();
             var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Object, schema.Type);
-            Assert.IsNotNull(schema.AllOf.First().ActualSchema.Properties["Foo"]);
+            Assert.IsFalse(json.Contains("Foo"));
+            Assert.IsFalse(json.Contains("foo"));
         }
 
         [TestMethod]

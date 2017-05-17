@@ -60,7 +60,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static Task<string> GetXmlDocumentationTagAsync(this Type type, string tagName)
         {
-            return GetXmlDocumentationTagAsync(type.GetTypeInfo(), tagName);
+            return GetXmlDocumentationTagAsync((MemberInfo)type.GetTypeInfo(), tagName);
         }
 
 #endif
@@ -268,6 +268,32 @@ namespace NJsonSchema.Infrastructure
             {
                 return null;
             }
+        }
+
+        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
+        /// <param name="memberInfo">The member info</param>
+        /// <param name="attributes">The attributes.</param>
+        /// <returns>The description or null if no description is available.</returns>
+        public static async Task<string> GetDescriptionAsync(this MemberInfo memberInfo, IEnumerable<Attribute> attributes)
+        {
+            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute");
+            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+                return descriptionAttribute.Description;
+            else
+            {
+                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
+                    return displayAttribute.Description;
+
+                if (memberInfo != null)
+                {
+                    var summary = await memberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
+                    if (summary != string.Empty)
+                        return summary;
+                }
+            }
+
+            return null;
         }
 
         private static XElement GetXmlDocumentation(this MemberInfo member, XDocument xml)

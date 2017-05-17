@@ -13,3 +13,4 @@ src/packages/Newtonsoft.Json**
 
 [Bb]in/
 [Oo]bj/
+/src/packages
