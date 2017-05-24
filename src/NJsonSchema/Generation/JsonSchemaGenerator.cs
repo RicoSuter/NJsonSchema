@@ -139,7 +139,7 @@ namespace NJsonSchema.Generation
                     {
                         typeDescription.ApplyType(schema);
                         schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-                        await GenerateObjectAsync(type, contract as JsonObjectContract, schema, schemaResolver).ConfigureAwait(false);
+                        await GenerateObjectAsync(type, contract, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
                         schema.SchemaReference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
@@ -214,7 +214,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema, 
+        private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(Type type, TSchemaType schema,
             JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes)
             where TSchemaType : JsonSchema4, new()
         {
@@ -235,7 +235,7 @@ namespace NJsonSchema.Generation
         private async Task GenerateDictionaryAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            var genericTypeArguments = ReflectionExtensions.GetGenericTypeArguments(type);
+            var genericTypeArguments = type.GetGenericTypeArguments();
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
             if (valueType == typeof(object))
@@ -260,18 +260,18 @@ namespace NJsonSchema.Generation
         /// <summary>Generates the properties for the given type and schema.</summary>
         /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
-        /// <param name="objectContract">The JSON object contract.</param>
+        /// <param name="contract">The JSON object contract.</param>
         /// <param name="schema">The properties</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns></returns>
-        protected virtual async Task GenerateObjectAsync<TSchemaType>(Type type, JsonObjectContract objectContract, TSchemaType schema, JsonSchemaResolver schemaResolver)
+        protected virtual async Task GenerateObjectAsync<TSchemaType>(Type type, JsonContract contract, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             schemaResolver.AddSchema(type, false, schema);
 
             schema.AllowAdditionalProperties = false;
 
-            await GeneratePropertiesAndInheritanceAsync(type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+            await GeneratePropertiesAndInheritanceAsync(type, contract, schema, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -280,10 +280,8 @@ namespace NJsonSchema.Generation
                 schema.GenerateXmlObjectForType(type);
         }
 
-        private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonObjectContract objectContract, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonContract contract, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            //var properties = GetTypeProperties(type);
-
 #if !LEGACY
             var propertiesAndFields = type.GetTypeInfo()
                 .DeclaredFields
@@ -306,22 +304,70 @@ namespace NJsonSchema.Generation
                 .ToList();
 #endif
 
+            var objectContract = contract as JsonObjectContract;
             if (objectContract != null)
             {
-                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
+                foreach (var property in objectContract.Properties.Where(
+                    p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
                 {
                     var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                     var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
+                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && 
+                                                 propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                    if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
+                    if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true &&
+                                                 propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
-                        await LoadPropertyOrFieldAsync(property, info, type, objectContract, schema, schemaResolver).ConfigureAwait(false);
+                    {
+                        await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);
+                    }
+                }
+            }
+            else
+            {
+                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
+
+                var allowedProperties = GetTypeProperties(type);
+                foreach (var info in propertiesAndFields.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
+                {
+                    var attribute = info.GetCustomAttributes(true).OfType<JsonPropertyAttribute>().SingleOrDefault();
+                    var property = new Newtonsoft.Json.Serialization.JsonProperty
+                    {
+                        AttributeProvider = new ReflectionAttributeProvider(info),
+                        PropertyType = (info as PropertyInfo)?.PropertyType ?? ((FieldInfo)info).FieldType
+                    };
+
+                    if (attribute != null)
+                    {
+                        property.PropertyName = attribute.PropertyName;
+                        property.Required = attribute.Required;
+                        property.DefaultValueHandling = attribute.DefaultValueHandling;
+                        property.TypeNameHandling = attribute.TypeNameHandling;
+                        property.NullValueHandling = attribute.NullValueHandling;
+                        property.TypeNameHandling = attribute.TypeNameHandling;
+                    }
+                    else
+                    {
+                        property.PropertyName = info.Name;
+                    }
+
+                    await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
 
             await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+        }
+
+        /// <summary>Gets the properties of the given type or null to take all properties.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The property names or null for all.</returns>
+        protected virtual string[] GetTypeProperties(Type type)
+        {
+            if (type == typeof(Exception))
+                return new[] { "InnerException", "Message", "Source", "StackTrace" };
+
+            return null;
         }
 
         private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
@@ -421,17 +467,6 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        /// <summary>Gets the properties of the given type or null to take all properties.</summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The property names or null for all.</returns>
-        protected virtual string[] GetTypeProperties(Type type)
-        {
-            if (type == typeof(Exception))
-                return new[] { "InnerException", "Message", "Source", "StackTrace" };
-
-            return null;
-        }
-
         private void LoadEnumerations(Type type, JsonSchema4 schema, JsonObjectTypeDescription typeDescription)
         {
             schema.Type = typeDescription.Type;
@@ -459,7 +494,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo propertyInfo, Type parentType, JsonObjectContract parentContract, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
+        private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo propertyInfo, Type parentType, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
         {
             var propertyType = property.PropertyType;
             var attributes = property.AttributeProvider.GetAttributes(true).ToArray();
