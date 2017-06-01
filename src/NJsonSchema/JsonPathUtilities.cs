@@ -25,26 +25,48 @@ namespace NJsonSchema
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static string GetJsonPath(object rootObject, object searchedObject)
         {
+            return GetJsonPaths(rootObject, new List<object> { searchedObject })[searchedObject];
+        }
+
+        /// <summary>Gets the JSON path of the given object.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="searchedObjects">The objects to search.</param>
+        /// <returns>The path or <c>null</c> when the object could not be found.</returns>
+        /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
+#if !LEGACY
+        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+#else
+        public static IDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+#endif
+        {
             if (rootObject == null)
                 throw new ArgumentNullException(nameof(rootObject));
 
-            var path = GetJsonPath(rootObject, searchedObject, "#", new HashSet<object>());
-            if (path == null)
+            var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
+            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>());
+
+            if (mappings.Any(p => p.Value == null))
             {
                 throw new InvalidOperationException("Could not find the JSON path of a referenced schema: " +
                                                     "Manually referenced schemas must be added to the " +
                                                     "'Definitions' of a parent schema.");
             }
-            return path;
+
+            return mappings;
         }
 
-        private static string GetJsonPath(object obj, object searchedObject, string basePath, HashSet<object> checkedObjects)
+        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects, string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
-                return null;
+                return false;
 
-            if (obj == searchedObject)
-                return basePath;
+            if (searchedObjects.ContainsKey(obj))
+            {
+                searchedObjects[obj] = basePath;
+                if (searchedObjects.All(p => p.Value != null))
+                    return true;
+            }
 
             checkedObjects.Add(obj);
 
@@ -52,9 +74,8 @@ namespace NJsonSchema
             {
                 foreach (var key in ((IDictionary)obj).Keys)
                 {
-                    var path = GetJsonPath(((IDictionary)obj)[key], searchedObject, basePath + "/" + key, checkedObjects);
-                    if (path != null)
-                        return path;
+                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects))
+                        return true;
                 }
             }
             else if (obj is IEnumerable)
@@ -62,9 +83,9 @@ namespace NJsonSchema
                 var i = 0;
                 foreach (var item in (IEnumerable)obj)
                 {
-                    var path = GetJsonPath(item, searchedObject, basePath + "/" + i, checkedObjects);
-                    if (path != null)
-                        return path;
+                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects))
+                        return true;
+
                     i++;
                 }
             }
@@ -76,14 +97,13 @@ namespace NJsonSchema
                     if (value != null)
                     {
                         var pathSegment = member.GetName();
-                        var path = GetJsonPath(value, searchedObject, basePath + "/" + pathSegment, checkedObjects);
-                        if (path != null)
-                            return path;
+                        if (FindJsonPaths(value, searchedObjects, basePath + "/" + pathSegment, checkedObjects))
+                            return true;
                     }
                 }
             }
 
-            return null;
+            return false;
         }
     }
 }

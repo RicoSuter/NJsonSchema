@@ -86,7 +86,7 @@ namespace NJsonSchema
         /// <param name="jsonPath">The JSON path to resolve.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
-        protected virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath)
+        public virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
             var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>());
@@ -99,7 +99,7 @@ namespace NJsonSchema
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        protected virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
+        public virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
         {
             return await JsonSchema4.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
         }
@@ -107,7 +107,7 @@ namespace NJsonSchema
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        protected virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
+        public virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
         {
             return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
