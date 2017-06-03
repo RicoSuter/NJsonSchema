@@ -708,7 +708,7 @@ namespace NJsonSchema.Generation
 
         private object ConvertDefaultValue(Newtonsoft.Json.Serialization.JsonProperty property)
         {
-            if (property.DefaultValue.GetType().GetTypeInfo().IsEnum)
+            if (property.DefaultValue != null && property.DefaultValue.GetType().GetTypeInfo().IsEnum)
             {
                 var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(property.Converter?.GetType().GetTypeInfo());
                 if (hasStringEnumConverter)
