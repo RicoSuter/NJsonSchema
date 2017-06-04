@@ -307,20 +307,32 @@ namespace NJsonSchema.Generation
             var objectContract = contract as JsonObjectContract;
             if (objectContract != null)
             {
-                foreach (var property in objectContract.Properties.Where(
-                    p => p.DeclaringType == type && p.ShouldSerialize?.Invoke(null) != false))
+                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
                 {
-                    var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
-                    var propertyInfo = info as PropertyInfo;
-#if !LEGACY
-                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true &&
-                                                 propertyInfo.SetMethod?.IsAbstract != true))
-#else
-                    if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true &&
-                                                 propertyInfo.GetSetMethod()?.IsAbstract != true))
-#endif
+                    bool shouldSerialize;
+                    try
                     {
-                        await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);
+                        shouldSerialize = property.ShouldSerialize?.Invoke(null) != false;
+                    }
+                    catch
+                    {
+                        shouldSerialize = true;
+                    }
+
+                    if (shouldSerialize)
+                    {
+                        var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
+                        var propertyInfo = info as PropertyInfo;
+#if !LEGACY
+                        if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true &&
+                                                     propertyInfo.SetMethod?.IsAbstract != true))
+#else
+                        if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true &&
+                                                     propertyInfo.GetSetMethod()?.IsAbstract != true))
+#endif
+                        {
+                            await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);
+                        }
                     }
                 }
             }
