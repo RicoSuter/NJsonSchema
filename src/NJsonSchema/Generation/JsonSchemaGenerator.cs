@@ -313,7 +313,7 @@ namespace NJsonSchema.Generation
                     var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                     var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true && 
+                    if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true &&
                                                  propertyInfo.SetMethod?.IsAbstract != true))
 #else
                     if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true &&
@@ -644,11 +644,14 @@ namespace NJsonSchema.Generation
             if (displayAttribute != null && displayAttribute.Name != null)
                 jsonProperty.Title = displayAttribute.Name;
 
-            dynamic defaultValueAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
-            if (defaultValueAttribute != null)
-                jsonProperty.Default = defaultValueAttribute.Value;
-            else if (property != null)
+            if (property != null)
                 jsonProperty.Default = ConvertDefaultValue(property);
+            else
+            {
+                dynamic defaultValueAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
+                if (defaultValueAttribute != null)
+                    jsonProperty.Default = defaultValueAttribute.Value;
+            }
 
             dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
