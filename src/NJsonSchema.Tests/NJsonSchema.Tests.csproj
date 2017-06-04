@@ -81,6 +81,7 @@
     <Compile Include="Generation\PropertyNamesGenerationTests.cs" />
     <Compile Include="Generation\FlattenInheritanceHierarchyTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
+    <Compile Include="Generation\ShouldSerializeTests.cs" />
     <Compile Include="Generation\TypeMappingsTests.cs" />
     <Compile Include="Generation\XmlDocTests.cs" />
     <Compile Include="Generation\XmlObjectTests.cs" />
