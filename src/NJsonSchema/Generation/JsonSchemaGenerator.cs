@@ -645,7 +645,9 @@ namespace NJsonSchema.Generation
                 jsonProperty.Title = displayAttribute.Name;
 
             dynamic defaultValueAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
-            if (defaultValueAttribute != null && defaultValueAttribute.Value != null)
+            if (defaultValueAttribute != null)
+                jsonProperty.Default = defaultValueAttribute.Value;
+            else if (property != null)
                 jsonProperty.Default = ConvertDefaultValue(property);
 
             dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
