@@ -748,6 +748,9 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
         public virtual bool IsNullable(NullHandling nullHandling)
         {
+            if (IsEnumeration && Enumeration.Contains(null))
+                return true;
+
             if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
                 return true;
 

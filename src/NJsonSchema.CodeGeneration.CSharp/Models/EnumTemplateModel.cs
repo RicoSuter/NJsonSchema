@@ -55,12 +55,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         _schema.EnumerationNames.ElementAt(i) :
                         _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
-                    entries.Add(new EnumerationItemModel
+                    if (value != null)
                     {
-                        Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                        Value = value.ToString(),
-                        InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
-                    });
+                        entries.Add(new EnumerationItemModel
+                        {
+                            Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
+                            Value = value.ToString(),
+                            InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
+                        });
+                    }
                 }
                 return entries;
             }

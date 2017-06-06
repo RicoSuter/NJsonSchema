@@ -51,11 +51,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         _schema.EnumerationNames.ElementAt(i) :
                         _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
 
-                    entries.Add(new EnumerationItemModel
+                    if (value != null)
                     {
-                        Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                        Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
-                    });
+                        entries.Add(new EnumerationItemModel
+                        {
+                            Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
+                            Value = _schema.Type == JsonObjectType.Integer ? value.ToString() : "<any>\"" + value + "\"",
+                        });
+                    }
                 }
                 return entries;
             }
