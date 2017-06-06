@@ -97,6 +97,9 @@ namespace NJsonSchema
         /// <returns></returns>
         public override bool IsNullable(NullHandling nullHandling)
         {
+            if (IsEnumeration && Enumeration.Contains(null))
+                return true;
+
             if (nullHandling == NullHandling.Swagger)
                 return IsRequired == false;
 

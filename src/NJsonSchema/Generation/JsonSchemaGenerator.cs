@@ -352,7 +352,7 @@ namespace NJsonSchema.Generation
 
                     if (attribute != null)
                     {
-                        property.PropertyName = attribute.PropertyName;
+                        property.PropertyName = attribute.PropertyName ?? info.Name;
                         property.Required = attribute.Required;
                         property.DefaultValueHandling = attribute.DefaultValueHandling;
                         property.TypeNameHandling = attribute.TypeNameHandling;
