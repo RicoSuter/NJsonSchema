@@ -107,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             schema = schema.ActualSchema;
             return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None) 
-                && !schema.IsAnyType && !schema.IsDictionary;
+                && !schema.IsAnyType && !schema.IsDictionary && !schema.IsEnumeration;
         }
     }
 }
