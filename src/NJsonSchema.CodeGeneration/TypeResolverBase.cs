@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -110,7 +109,10 @@ namespace NJsonSchema.CodeGeneration
             schema = schema.ActualSchema;
 
             if (!_generatedTypeNames.ContainsKey(schema))
-                _generatedTypeNames[schema] = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _generatedTypeNames.Values);
+            {
+                var reservedTypeNames = _generatedTypeNames.Values.Distinct().ToList();
+                _generatedTypeNames[schema] = _settings.TypeNameGenerator.Generate(schema, typeNameHint, reservedTypeNames);
+            }
 
             return _generatedTypeNames[schema];
         }
