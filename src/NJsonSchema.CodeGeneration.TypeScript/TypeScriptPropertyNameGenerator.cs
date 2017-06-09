@@ -17,9 +17,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public virtual string Generate(JsonProperty property)
         {
             return ConversionUtilities.ConvertToLowerCamelCase(property.Name
+                    .Replace("\"", string.Empty)
                     .Replace("@", "")
                     .Replace(".", "-")
-                    .Replace("\"", "-")
                     .Replace("+", "plus"), true)
                 .Replace("-", "_");
         }

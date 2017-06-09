@@ -17,9 +17,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public virtual string Generate(JsonProperty property)
         {
             return ConversionUtilities.ConvertToUpperCamelCase(property.Name
+                    .Replace("\"", string.Empty)
                     .Replace("@", "")
                     .Replace(".", "-")
-                    .Replace("\"", "-")
                     .Replace("+", "plus"), true)
                 .Replace("-", "_");
         }
