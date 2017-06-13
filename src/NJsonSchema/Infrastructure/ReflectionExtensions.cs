@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NJsonSchema.Annotations;
 
 namespace NJsonSchema.Infrastructure
 {
@@ -39,7 +40,7 @@ namespace NJsonSchema.Infrastructure
 
                 baseType = baseType.GetTypeInfo().BaseType;
             }
-            return typeof(object); 
+            return typeof(object);
         }
 
         /// <summary>Tries to get the first object which is assignable to the given type name.</summary>
@@ -91,6 +92,10 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Gets the type of the array item.</summary>
         public static Type GetEnumerableItemType(this Type type)
         {
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            if (jsonSchemaAttribute?.ArrayItem != null)
+                return jsonSchemaAttribute.ArrayItem;
+
             var genericTypeArguments = GetGenericTypeArguments(type);
             var itemType = genericTypeArguments.Length == 0 ? type.GetElementType() : genericTypeArguments[0];
             if (itemType == null)
