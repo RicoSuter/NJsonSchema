@@ -167,16 +167,10 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
 
                 var itemType = type.GetEnumerableItemType();
-                if (itemType == null)
-                {
-                    var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
-                    if (jsonSchemaAttribute?.ArrayItem != null)
-                        schema.Item = await GenerateWithReferenceAsync(schemaResolver, itemType).ConfigureAwait(false);
-                    else
-                        schema.Item = JsonSchema4.CreateAnySchema();
-                }
-                else
+                if (itemType != null)
                     schema.Item = await GenerateWithReferenceAsync(schemaResolver, itemType).ConfigureAwait(false);
+                else
+                    schema.Item = JsonSchema4.CreateAnySchema();
             }
             else
                 typeDescription.ApplyType(schema);
