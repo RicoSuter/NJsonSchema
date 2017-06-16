@@ -8,7 +8,7 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
-    /// <summary></summary>
+    /// <summary>Generates the property name for a given CSharp <see cref="JsonProperty"/>.</summary>
     public class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
         /// <summary>Generates the property name.</summary>
@@ -21,6 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace("@", string.Empty)
                     .Replace(".", "-")
                     .Replace("+", "plus"), true)
+                .Replace(":", "_")
                 .Replace("-", "_");
         }
     }
