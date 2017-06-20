@@ -31,6 +31,8 @@ namespace NJsonSchema.Tests.Schema
         {
             [DataMember(Name = "bar")]
             public string Bar { get; set; }
+
+            public string Foo { get; set; }
         }
 
         [TestMethod]
@@ -41,6 +43,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Assert
             Assert.IsTrue(schema.Properties.ContainsKey("bar"));
+            Assert.IsFalse(schema.Properties.ContainsKey("Foo"));
         }
 
 
