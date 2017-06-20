@@ -22,7 +22,7 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    public partial class JsonSchema4 : IDocumentPathProvider
+    public partial class JsonSchema4 : JsonExtensionObject, IDocumentPathProvider
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _patternProperties;

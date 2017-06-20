@@ -96,9 +96,19 @@ namespace NJsonSchema
                     var value = member.GetValue(obj);
                     if (value != null)
                     {
-                        var pathSegment = member.GetName();
-                        if (FindJsonPaths(value, searchedObjects, basePath + "/" + pathSegment, checkedObjects))
-                            return true;
+                        var propertyName = member.GetName();
+
+                        var isExtensionDataProperty = obj is JsonExtensionObject && propertyName == nameof(JsonExtensionObject.ExtensionData);
+                        if (isExtensionDataProperty)
+                        {
+                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects))
+                                return true;
+                        }
+                        else
+                        {
+                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects))
+                                return true;
+                        }
                     }
                 }
             }

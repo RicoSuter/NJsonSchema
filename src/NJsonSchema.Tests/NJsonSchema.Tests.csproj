@@ -85,6 +85,7 @@
     <Compile Include="Generation\TypeMappingsTests.cs" />
     <Compile Include="Generation\XmlDocTests.cs" />
     <Compile Include="Generation\XmlObjectTests.cs" />
+    <Compile Include="Schema\ReferenceTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\EnumValidationTests.cs" />
     <Compile Include="Validation\LineInformationTest.cs" />
