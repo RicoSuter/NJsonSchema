@@ -36,7 +36,7 @@ namespace NJsonSchema
         {
             _resolvedSchemas[documentPath] = schema;
         }
-        
+
         /// <summary>Gets the object from the given JSON path.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path.</param>
@@ -182,6 +182,12 @@ namespace NJsonSchema
             }
             else
             {
+                var extensionObj = obj as JsonExtensionObject;
+                if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
+                {
+                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                }
+
                 foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var pathSegment = member.GetName();
