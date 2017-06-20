@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NJsonSchema.Tests.Schema
 {
     [TestClass]
-    public class ReferenceTests
+    public class ExtensionDataTests
     {
         [TestMethod]
         public async Task When_reference_references_schema_in_custom_properties_then_the_references_are_resolved()

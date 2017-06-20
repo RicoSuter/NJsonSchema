@@ -51,16 +51,20 @@ namespace NJsonSchema
                     }
                 }
 
-                var dicationary = new Dictionary<string, object>();
+                var dictionary = new Dictionary<string, object>();
                 foreach (var property in obj.Properties())
-                    dicationary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);
+                    dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);
 
-                return dicationary;
+                return dictionary;
             }
 
             var array = value as JArray;
             if (array != null)
                 return array.Select(i => TryDeserializeValueSchemas(i, serializer)).ToArray();
+
+            var token = value as JValue;
+            if (token != null)
+                return token.Value;
 
             return value;
         }
