@@ -586,14 +586,6 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets or sets the resource definitions (not in the standard, needed in some JSON Schemas).</summary>
-        [JsonProperty("resourceDefinitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> ResourceDefinitions { get; set; }
-
-        /// <summary>Gets or sets the constraint definitions (not in the standard, needed in some JSON Schemas).</summary>
-        [JsonProperty("constraints", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> ConstraintsDefinitions { get; set; }
-
         /// <summary>Gets the collection of schemas where each schema must be valid. </summary>
         [JsonIgnore]
         public ICollection<JsonSchema4> AllOf
