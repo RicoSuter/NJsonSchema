@@ -8,7 +8,7 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
-    /// <summary></summary>
+    /// <summary>Generates the property name for a given CSharp <see cref="JsonProperty"/>.</summary>
     public class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
         /// <summary>Generates the property name.</summary>
@@ -17,8 +17,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public virtual string Generate(JsonProperty property)
         {
             return ConversionUtilities.ConvertToUpperCamelCase(property.Name
-                .Replace("@", "")
-                .Replace(".", "-"), true)
+                    .Replace("\"", string.Empty)
+                    .Replace("@", string.Empty)
+                    .Replace(".", "-")
+                    .Replace("+", "plus"), true)
+                .Replace(":", "_")
                 .Replace("-", "_");
         }
     }
