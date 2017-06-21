@@ -320,13 +320,13 @@ if(Model.HandleReferences){
             this.Write(") : ");
             
             #line 25 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.HasDefaultValue){
+if(Model.HasDictionaryValueDefaultValue){
             
             #line default
             #line hidden
             
             #line 25 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DictionaryValueDefaultValue));
             
             #line default
             #line hidden
@@ -401,13 +401,13 @@ if(Model.HandleReferences){
             this.Write(")) : ");
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.HasDefaultValue){
+if(Model.HasDictionaryValueDefaultValue){
             
             #line default
             #line hidden
             
             #line 27 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DictionaryValueDefaultValue));
             
             #line default
             #line hidden
@@ -474,13 +474,13 @@ if(Model.HasDefaultValue){
             this.Write("[key].toString()) : ");
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.HasDefaultValue){
+if(Model.HasDictionaryValueDefaultValue){
             
             #line default
             #line hidden
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DictionaryValueDefaultValue));
             
             #line default
             #line hidden
@@ -512,7 +512,7 @@ if(Model.HasDefaultValue){
             #line hidden
             
             #line 32 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-      if(Model.HasDefaultValue || Model.NullValue != "undefined"){
+      if(Model.HasDictionaryValueDefaultValue || Model.NullValue != "undefined"){
             
             #line default
             #line hidden
@@ -540,13 +540,13 @@ if(Model.HasDefaultValue){
             this.Write("[key] : ");
             
             #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.HasDefaultValue){
+if(Model.HasDictionaryValueDefaultValue){
             
             #line default
             #line hidden
             
             #line 33 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DefaultValue));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DictionaryValueDefaultValue));
             
             #line default
             #line hidden
