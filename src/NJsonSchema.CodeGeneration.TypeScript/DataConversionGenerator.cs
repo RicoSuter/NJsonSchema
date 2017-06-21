@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
             var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
                 ? defaultValueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
-                    parameters.IsPropertyNullable, dictionaryValueType, parameters.TypeNameHint,
+                    parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.NullHandling), dictionaryValueType, parameters.TypeNameHint,
                     parameters.Settings.GenerateDefaultValues)
                 : null;
 
