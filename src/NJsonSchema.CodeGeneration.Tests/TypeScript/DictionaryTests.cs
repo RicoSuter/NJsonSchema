@@ -103,5 +103,74 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             Assert.IsFalse(code.Contains("super()"));
             Assert.IsTrue(code.Contains("[key: string]: string | any; "));
         }
+
+        [TestMethod]
+        public async Task When_property_is_dto_dictionary_then_assignment_may_create_new_instance()
+        {
+            //// Arrange
+            var json = @"{
+    ""properties"": {
+        ""resource"": {
+            ""type"": ""object"",
+            ""additionalProperties"": {
+                ""$ref"": ""#/definitions/myItem""
+            }
+        }
+    },
+    ""definitions"": {
+        ""myItem"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""x"": { ""type"": ""number"" }
+            }
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullValue = TypeScriptNullValue.Null
+            });
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("this.resource[key] = data[\"resource\"][key] ? MyItem.fromJS(data[\"resource\"][key]) : new MyItem();"));
+        }
+
+        [TestMethod]
+        public async Task When_property_is_string_dictionary_then_assignment_is_correct()
+        {
+            //// Arrange
+            var json = @"{
+    ""properties"": {
+        ""resource"": {
+            ""type"": ""object"",
+            ""additionalProperties"": {
+                ""$ref"": ""#/definitions/myItem""
+            }
+        }
+    },
+    ""definitions"": {
+        ""myItem"": {
+            ""type"": ""string""
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullValue = TypeScriptNullValue.Undefined
+            });
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            Assert.IsTrue(code.Contains("this.resource[key] = data[\"resource\"][key];"));
+        }
     }
 }
