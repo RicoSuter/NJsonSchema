@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
@@ -113,7 +114,7 @@ namespace NJsonSchema.Converters
 
             if (subtype == null)
             {
-                var typeInfo = jObject.GetValue("$type").Dump("$type");
+                var typeInfo = jObject.GetValue("$type");
                 if (typeInfo != null)
                 {
                     subtype = Type.GetType(typeInfo.Value<string>());
