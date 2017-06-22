@@ -73,7 +73,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
     {
         var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JObject>(reader);
         var discriminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValue(_discriminator));
-        var subtype = GetObjectSubtype(jObject, objectType, discriminator);
+        var subtype = GetObjectSubtype(objectType, discriminator);
 
         try
         {
@@ -86,7 +86,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         }
     }
 
-    private System.Type GetObjectSubtype(Newtonsoft.Json.Linq.JObject jObject, System.Type objectType, string discriminator)
+    private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
     {
         var objectTypeInfo = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType);
         var customAttributes = System.Reflection.CustomAttributeExtensions.GetCustomAttributes(objectTypeInfo);
@@ -95,17 +95,9 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         dynamic knownTypeAttribute = System.Linq.Enumerable.SingleOrDefault(knownTypeAttributes, a => IsKnwonTypeTargetType(a, discriminator));
         if (knownTypeAttribute != null)
             return knownTypeAttribute.Type;
-
+        
         var typeName = objectType.Namespace + "." + discriminator;
-        var subtype = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
-        if (subtype != null)
-            return subtype;
-
-        var typeInfo = jObject.GetValue("$type");
-        if (typeInfo != null)
-            return System.Type.GetType(Newtonsoft.Json.Linq.Extensions.Value<string>(typeInfo));
-
-        throw new System.InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminator + "'.");
+        return System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
     }
 
     private bool IsKnwonTypeTargetType(dynamic attribute, string discriminator)
