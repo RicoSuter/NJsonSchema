@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
@@ -111,6 +112,19 @@ namespace NJsonSchema.Converters
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
             var subtype = GetObjectSubtype(objectType, discriminator);
 
+            if (subtype == null)
+            {
+                var typeInfo = jObject.GetValue("$type");
+                if (typeInfo != null)
+                {
+                    subtype = Type.GetType(typeInfo.Value<string>());
+                }
+                else
+                {
+                    subtype = objectType.GetTypeInfo().Assembly.GetType(objectType.Namespace + "." + discriminator);
+                }
+            }
+
             try
             {
                 _isReading = true;
@@ -123,19 +137,11 @@ namespace NJsonSchema.Converters
         }
 
         private Type GetObjectSubtype(Type objectType, string discriminator)
-        {
-            var knownTypeAttributes = objectType.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute");
-            dynamic knownTypeAttribute = knownTypeAttributes.SingleOrDefault(a => IsKnownTypeTargetType(a, discriminator));
-            if (knownTypeAttribute != null)
-                return knownTypeAttribute.Type;
-
-            var typeName = objectType.Namespace + "." + discriminator;
-            return objectType.GetTypeInfo().Assembly.GetType(typeName);
-        }
-
-        private bool IsKnownTypeTargetType(dynamic attribute, string discriminator)
-        {
-            return attribute?.Type.Name == discriminator;
-        }
+            => objectType
+                .GetTypeInfo()
+                .GetCustomAttributes()
+                .OfType<KnownTypeAttribute>()
+                .SingleOrDefault(a => a.Type.Name == discriminator)
+                ?.Type;
     }
 }
