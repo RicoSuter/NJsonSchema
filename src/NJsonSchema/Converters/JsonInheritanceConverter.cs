@@ -23,7 +23,7 @@ namespace NJsonSchema.Converters
         internal static readonly string DefaultDiscriminatorName = "discriminator";
 
         private readonly string _discriminator;
-        
+
         [ThreadStatic]
         private static bool _isReading;
 
@@ -71,7 +71,7 @@ namespace NJsonSchema.Converters
                 if (_isWriting)
                 {
                     _isWriting = false;
-                    return false; 
+                    return false;
                 }
                 return true;
             }
