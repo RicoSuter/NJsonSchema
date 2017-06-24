@@ -1349,5 +1349,35 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(code.Contains("public int Foo { get; set; }"));
         }
+
+        [TestMethod]
+        public async Task When_oneOf_is_used_as_singleton()
+        {
+            //// Arrange
+            var json =
+@"{
+    '$schema': 'http://json-schema.org/draft-04/schema#',
+	'type': 'object', 
+	'properties': { 
+        'only_one': {
+            'type': 'object',
+            'oneOf': [
+                    {
+                        'type': 'object'
+                    }
+            ],
+            'additionalProperties': false
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains(@"public object Only_one { get; set; } = new object()"));
+        }
     }
 }
