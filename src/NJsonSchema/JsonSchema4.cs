@@ -699,6 +699,13 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating wether the schema represents a singleton type (a single oneOf statement without allowing extra properties).</summary>
+        [JsonIgnore]
+        public bool IsSingleton => Type.HasFlag(JsonObjectType.Object) &&
+                                   Properties.Count == 0 &&
+                                   AllowAdditionalProperties == false &&
+                                   OneOf.Count > 0;
+
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
