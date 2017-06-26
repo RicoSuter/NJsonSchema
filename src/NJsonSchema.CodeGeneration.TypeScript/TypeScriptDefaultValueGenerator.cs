@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Converts the default value to a TypeScript number literal. </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>TypeScript number literal.</returns>
+        /// <returns>The TypeScript number literal.</returns>
         protected override string ConvertNumericValue(object value)
         {
             if (value is byte) return ((byte)value).ToString(CultureInfo.InvariantCulture);

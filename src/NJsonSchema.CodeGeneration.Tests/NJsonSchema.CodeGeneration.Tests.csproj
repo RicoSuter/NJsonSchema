@@ -72,7 +72,7 @@
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
     <Compile Include="CSharp\InheritanceInterfaceTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
-    <Compile Include="DefaultValueGenerator.cs" />
+    <Compile Include="DefaultValueGeneratorTests.cs" />
     <Compile Include="InheritanceSerializationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="TypeScript\ClassGenerationTests.cs" />

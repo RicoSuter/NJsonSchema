@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Converts the default value to a C# number literal. </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>C# number literal.</returns>
+        /// <returns>The C# number literal.</returns>
         protected override string ConvertNumericValue(object value)
         {
             if (value is byte) return "(byte)" + ((byte)value).ToString(CultureInfo.InvariantCulture);

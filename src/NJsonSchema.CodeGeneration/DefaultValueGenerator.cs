@@ -44,12 +44,15 @@ namespace NJsonSchema.CodeGeneration
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
-                    schema.Type.HasFlag(JsonObjectType.Number))
+                schema.Type.HasFlag(JsonObjectType.Number))
                 return ConvertNumericValue(schema.Default);
 
             return null;
         }
 
+        /// <summary>Converts the default value to a number literal. </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The number literal.</returns>
         protected abstract string ConvertNumericValue(object value); 
 
         /// <summary>Gets the enum default value.</summary>
