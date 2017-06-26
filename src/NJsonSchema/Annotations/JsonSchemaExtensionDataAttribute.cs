@@ -26,14 +26,13 @@ namespace NJsonSchema.Annotations
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaExtensionDataAttribute"/> class.</summary>
         /// <param name="property">The property.</param>
-        /// <param name="valueSourceType">The type to get value from.</param>
-        /// <param name="valueSourceProperty">The property of the type to get value from.</param>
+        /// <param name="valueSourceType">The type to get the value from.</param>
+        /// <param name="valueSourceProperty">The property of the type to get the value from.</param>
         public JsonSchemaExtensionDataAttribute(string property, Type valueSourceType, string valueSourceProperty)
         {
             Property = property;
             ValueSourceType = valueSourceType;
             ValueSourceProperty = valueSourceProperty;
-            IsValueSourceSpecified = true;
         }
 
         /// <summary>Gets the property name.</summary>
@@ -48,7 +47,7 @@ namespace NJsonSchema.Annotations
         /// <summary>The type to get value from.</summary>
         public Type ValueSourceType { get; private set; }
         
-        /// <summary>Shows that attribute constructed with value source pair.</summary>
-        public bool IsValueSourceSpecified { get; private set; }
+        /// <summary>Gets a value indicating whether the value is read by reflection.</summary>
+        public bool IsValueSourceSpecified => !string.IsNullOrEmpty(ValueSourceProperty);
     }
 }
