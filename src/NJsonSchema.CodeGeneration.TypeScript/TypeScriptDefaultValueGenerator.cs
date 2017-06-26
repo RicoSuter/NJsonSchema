@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
+
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
@@ -43,6 +45,25 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
             }
             return value;
+        }
+
+        /// <summary>Converts the default value to a TypeScript number literal. </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>TypeScript number literal.</returns>
+        protected override string ConvertNumericValue(object value)
+        {
+            if (value is byte) return ((byte)value).ToString(CultureInfo.InvariantCulture);
+            if (value is sbyte) return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
+            if (value is short) return ((short)value).ToString(CultureInfo.InvariantCulture);
+            if (value is ushort) return ((ushort)value).ToString(CultureInfo.InvariantCulture);
+            if (value is int) return ((int)value).ToString(CultureInfo.InvariantCulture);
+            if (value is uint) return ((uint)value).ToString(CultureInfo.InvariantCulture);
+            if (value is long) return ((long)value).ToString(CultureInfo.InvariantCulture);
+            if (value is ulong) return ((ulong)value).ToString(CultureInfo.InvariantCulture);
+            if (value is float) return ((float)value).ToString("r", CultureInfo.InvariantCulture);
+            if (value is double) return ((double)value).ToString("r", CultureInfo.InvariantCulture);
+            if (value is decimal) return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+            return null;
         }
     }
 }
