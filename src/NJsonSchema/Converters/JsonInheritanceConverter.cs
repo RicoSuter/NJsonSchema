@@ -23,7 +23,7 @@ namespace NJsonSchema.Converters
         internal static readonly string DefaultDiscriminatorName = "discriminator";
 
         private readonly string _discriminator;
-        
+
         [ThreadStatic]
         private static bool _isReading;
 
@@ -71,7 +71,7 @@ namespace NJsonSchema.Converters
                 if (_isWriting)
                 {
                     _isWriting = false;
-                    return false; 
+                    return false;
                 }
                 return true;
             }
@@ -109,7 +109,7 @@ namespace NJsonSchema.Converters
         {
             var jObject = serializer.Deserialize<JObject>(reader);
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
-            var subtype = GetObjectSubtype(objectType, discriminator);
+            var subtype = GetObjectSubtype(jObject, objectType, discriminator);
 
             try
             {
@@ -122,18 +122,29 @@ namespace NJsonSchema.Converters
             }
         }
 
-        private Type GetObjectSubtype(Type objectType, string discriminator)
+        private Type GetObjectSubtype(JObject jObject, Type objectType, string discriminator)
         {
-            var knownTypeAttributes = objectType.GetTypeInfo().GetCustomAttributes().Where(a => a.GetType().Name == "KnownTypeAttribute");
-            dynamic knownTypeAttribute = knownTypeAttributes.SingleOrDefault(a => IsKnownTypeTargetType(a, discriminator));
+            var objectTypeInfo = objectType.GetTypeInfo();
+            var customAttributes = objectTypeInfo.GetCustomAttributes();
+
+            var knownTypeAttributes = customAttributes.Where(a => a.GetType().Name == "KnownTypeAttribute");
+            dynamic knownTypeAttribute = knownTypeAttributes.SingleOrDefault(a => IsKnwonTypeTargetType(a, discriminator));
             if (knownTypeAttribute != null)
                 return knownTypeAttribute.Type;
 
             var typeName = objectType.Namespace + "." + discriminator;
-            return objectType.GetTypeInfo().Assembly.GetType(typeName);
+            var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+            if (subtype != null)
+                return subtype;
+
+            var typeInfo = jObject.GetValue("$type");
+            if (typeInfo != null)
+                return Type.GetType(typeInfo.Value<string>());
+
+            throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminator + "'.");
         }
 
-        private bool IsKnownTypeTargetType(dynamic attribute, string discriminator)
+        private bool IsKnwonTypeTargetType(dynamic attribute, string discriminator)
         {
             return attribute?.Type.Name == discriminator;
         }
