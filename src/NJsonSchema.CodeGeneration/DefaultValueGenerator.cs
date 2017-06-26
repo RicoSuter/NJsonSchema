@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration
@@ -39,16 +40,17 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint);
 
             if (schema.Type.HasFlag(JsonObjectType.String))
-                return "\"" + schema.Default + "\"";
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
-                    schema.Type.HasFlag(JsonObjectType.Number) ||
-                    schema.Type.HasFlag(JsonObjectType.Integer))
-                return schema.Default.ToString();
+                    schema.Type.HasFlag(JsonObjectType.Number))
+                return ConvertNumericValue(schema.Default);
 
             return null;
         }
+
+        protected abstract string ConvertNumericValue(object value); 
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
