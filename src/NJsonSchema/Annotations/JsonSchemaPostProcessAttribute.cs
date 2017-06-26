@@ -1,5 +1,5 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="JsonSchemaAttribute.cs" company="NJsonSchema">
+//-----------------------------------------------------------------------
+// <copyright file="JsonSchemaPostProcessAttribute.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>0
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -9,15 +9,11 @@ namespace NJsonSchema.Annotations
 {
     using System;
 
-    /// <summary>
-    /// Allows to post process schema.
-    /// </summary>
+    /// <summary>Allows to post process schema.</summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
     public class JsonSchemaPostProcessAttribute : Attribute
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JsonSchemaPostProcessAttribute"/> class. 
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaPostProcessAttribute"/> class.</summary>
         /// <param name="type">Type to get post-process method from.</param>
         /// <param name="methodName">Name of post-process method.</param>
         public JsonSchemaPostProcessAttribute(Type type, string methodName)
