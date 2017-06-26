@@ -58,22 +58,28 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
                     "r)\r\n    {\r\n        var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JOb" +
                     "ject>(reader);\r\n        var discriminator = Newtonsoft.Json.Linq.Extensions.Valu" +
                     "e<string>(jObject.GetValue(_discriminator));\r\n        var subtype = GetObjectSub" +
-                    "type(objectType, discriminator);\r\n\r\n        try\r\n        {\r\n            _isReadi" +
-                    "ng = true;\r\n            return serializer.Deserialize(jObject.CreateReader(), su" +
-                    "btype);\r\n        }\r\n        finally\r\n        {\r\n            _isReading = false;\r" +
-                    "\n        }\r\n    }\r\n\r\n    private System.Type GetObjectSubtype(System.Type object" +
-                    "Type, string discriminator)\r\n    {\r\n        var objectTypeInfo = System.Reflecti" +
-                    "on.IntrospectionExtensions.GetTypeInfo(objectType);\r\n        var customAttribute" +
-                    "s = System.Reflection.CustomAttributeExtensions.GetCustomAttributes(objectTypeIn" +
-                    "fo);\r\n\r\n        var knownTypeAttributes = System.Linq.Enumerable.Where(customAtt" +
-                    "ributes, a => a.GetType().Name == \"KnownTypeAttribute\");\r\n        dynamic knownT" +
-                    "ypeAttribute = System.Linq.Enumerable.SingleOrDefault(knownTypeAttributes, a => " +
-                    "IsKnwonTypeTargetType(a, discriminator));\r\n        if (knownTypeAttribute != nul" +
-                    "l)\r\n            return knownTypeAttribute.Type;\r\n        \r\n        var typeName " +
-                    "= objectType.Namespace + \".\" + discriminator;\r\n        return System.Reflection." +
-                    "IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);\r\n   " +
-                    " }\r\n\r\n    private bool IsKnwonTypeTargetType(dynamic attribute, string discrimin" +
-                    "ator)\r\n    {\r\n        return attribute?.Type.Name == discriminator;\r\n    }\r\n}");
+                    "type(jObject, objectType, discriminator);\r\n\r\n        try\r\n        {\r\n           " +
+                    " _isReading = true;\r\n            return serializer.Deserialize(jObject.CreateRea" +
+                    "der(), subtype);\r\n        }\r\n        finally\r\n        {\r\n            _isReading " +
+                    "= false;\r\n        }\r\n    }\r\n\r\n    private System.Type GetObjectSubtype(Newtonsof" +
+                    "t.Json.Linq.JObject jObject, System.Type objectType, string discriminator)\r\n    " +
+                    "{\r\n        var objectTypeInfo = System.Reflection.IntrospectionExtensions.GetTyp" +
+                    "eInfo(objectType);\r\n        var customAttributes = System.Reflection.CustomAttri" +
+                    "buteExtensions.GetCustomAttributes(objectTypeInfo);\r\n\r\n        var knownTypeAttr" +
+                    "ibutes = System.Linq.Enumerable.Where(customAttributes, a => a.GetType().Name ==" +
+                    " \"KnownTypeAttribute\");\r\n        dynamic knownTypeAttribute = System.Linq.Enumer" +
+                    "able.SingleOrDefault(knownTypeAttributes, a => IsKnwonTypeTargetType(a, discrimi" +
+                    "nator));\r\n        if (knownTypeAttribute != null)\r\n            return knownTypeA" +
+                    "ttribute.Type;\r\n\r\n        var typeName = objectType.Namespace + \".\" + discrimina" +
+                    "tor;\r\n        var subtype = System.Reflection.IntrospectionExtensions.GetTypeInf" +
+                    "o(objectType).Assembly.GetType(typeName);\r\n        if (subtype != null)\r\n       " +
+                    "     return subtype;\r\n\r\n        var typeInfo = jObject.GetValue(\"$type\");\r\n     " +
+                    "   if (typeInfo != null)\r\n            return System.Type.GetType(Newtonsoft.Json" +
+                    ".Linq.Extensions.Value<string>(typeInfo));\r\n\r\n        throw new System.InvalidOp" +
+                    "erationException(\"Could not find subtype of \'\" + objectType.Name + \"\' with discr" +
+                    "iminator \'\" + discriminator + \"\'.\");\r\n    }\r\n\r\n    private bool IsKnwonTypeTarge" +
+                    "tType(dynamic attribute, string discriminator)\r\n    {\r\n        return attribute?" +
+                    ".Type.Name == discriminator;\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
