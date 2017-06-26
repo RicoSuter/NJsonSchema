@@ -36,6 +36,9 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to generate abstract properties (i.e. interface and abstract properties. Properties may defined multiple times in a inheritance hierarchy, default: false).</summary>
+        public bool GenerateAbstractProperties { get; set; }
+
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
 
@@ -44,7 +47,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
         public bool GenerateXmlObjects { get; set; } = false;
-
+        
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }
 

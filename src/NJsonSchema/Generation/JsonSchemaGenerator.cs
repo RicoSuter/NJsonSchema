@@ -318,11 +318,11 @@ namespace NJsonSchema.Generation
                         var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                         var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                        if (propertyInfo == null || (propertyInfo.GetMethod?.IsAbstract != true &&
-                                                     propertyInfo.SetMethod?.IsAbstract != true))
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || 
+                            (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                        if (propertyInfo == null || (propertyInfo.GetGetMethod()?.IsAbstract != true &&
-                                                     propertyInfo.GetSetMethod()?.IsAbstract != true))
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || 
+                            (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
                         {
                             await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);

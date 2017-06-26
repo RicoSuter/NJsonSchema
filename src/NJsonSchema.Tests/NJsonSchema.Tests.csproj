@@ -78,6 +78,7 @@
     <Compile Include="Generation\FindCommonBaseTypeTests.cs" />
     <Compile Include="Generation\GenericTests.cs" />
     <Compile Include="Generation\IgnoredPropertyTests.cs" />
+    <Compile Include="Generation\InterfaceTests.cs" />
     <Compile Include="Generation\PropertyNamesGenerationTests.cs" />
     <Compile Include="Generation\FlattenInheritanceHierarchyTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
