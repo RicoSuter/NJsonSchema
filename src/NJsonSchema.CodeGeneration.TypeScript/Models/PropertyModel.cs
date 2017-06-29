@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     /// <seealso cref="PropertyModelBase" />
     public class PropertyModel : PropertyModelBase
     {
-        private static readonly char[] _invalidChars = "-@".ToCharArray();
+        private static readonly string _validPropertyNameRegex = "^[a-zA-Z_$][0-9a-zA-Z_$]*$";
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonProperty _property;
@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
-        public string InterfaceName => _property.Name.IndexOfAny(_invalidChars) >= 0 ? $"\"{_property.Name}\"" : _property.Name;
+        public string InterfaceName => !Regex.IsMatch(_property.Name, _validPropertyNameRegex) ? $"\"{_property.Name}\"" : _property.Name;
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);
