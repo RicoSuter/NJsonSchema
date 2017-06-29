@@ -51,6 +51,9 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }
 
+        /// <summary>Gets or sets the contract resolver.</summary>
+        public IContractResolver ContractResolver { get; set; }
+
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]
         public ITypeNameGenerator TypeNameGenerator { get; set; }
@@ -59,12 +62,13 @@ namespace NJsonSchema.Generation
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
 
-        /// <summary>Gets or sets the contract resolver.</summary>
-        public IContractResolver ContractResolver { get; set; }
-
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
         public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+
+        /// <summary>Gets or sets the schema processors.</summary>
+        [JsonIgnore]
+        public IList<ISchemaProcessor> SchemaProcessors { get; } = new List<ISchemaProcessor>();
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>

@@ -115,7 +115,10 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes))
+            {
+                await ApplySchemaProcessorsAsync(schema, schemaResolver);
                 return;
+            }
 
             if (schemaResolver.RootObject == schema)
                 schema.Title = Settings.SchemaNameGenerator.Generate(type);
@@ -174,6 +177,15 @@ namespace NJsonSchema.Generation
             }
             else
                 typeDescription.ApplyType(schema);
+
+            await ApplySchemaProcessorsAsync(schema, schemaResolver);
+        }
+
+        private async Task ApplySchemaProcessorsAsync(JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        {
+            var context = new SchemaProcessorContext(schema, schemaResolver, this); 
+            foreach (var processor in Settings.SchemaProcessors)
+                await processor.ProcessAsync(context);
         }
 
         private async Task<JsonSchema4> GenerateWithReferenceAsync(JsonSchemaResolver schemaResolver, Type itemType)
