@@ -71,6 +71,9 @@ namespace NJsonSchema.Validation
         /// <summary>A date is expected. </summary>
         DateExpected,
 
+        /// <summary>A time is expected. </summary>
+        TimeExpected,
+
         /// <summary>An URI is expected. </summary>
         UriExpected,
 

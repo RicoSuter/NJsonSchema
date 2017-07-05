@@ -83,6 +83,7 @@
     <Compile Include="Generation\XmlObjectTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\EnumValidationTests.cs" />
+    <Compile Include="Validation\FormatTimeTests.cs" />
     <Compile Include="Validation\FormatDateTests.cs" />
     <Compile Include="Validation\LineInformationTest.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />

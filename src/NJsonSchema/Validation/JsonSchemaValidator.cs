@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
@@ -189,9 +190,17 @@ namespace NJsonSchema.Validation
                         if (schema.Format == JsonFormatStrings.Date)
                         {
                             DateTime dateTimeResult;
-                            if (token.Type != JTokenType.Date && (DateTime.TryParse(value, out dateTimeResult) == false || dateTimeResult.Date != dateTimeResult))
+                            if (token.Type != JTokenType.Date && (DateTime.TryParseExact(value, "yyyy-MM-dd", null, DateTimeStyles.None, out dateTimeResult) == false || dateTimeResult.Date != dateTimeResult))
                                 errors.Add(new ValidationError(ValidationErrorKind.DateExpected, propertyName, propertyPath, token));
                         }
+
+                        if (schema.Format == JsonFormatStrings.Time)
+                        {
+                            DateTime dateTimeResult;
+                            if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFF zzz", null, DateTimeStyles.None, out dateTimeResult) == false)
+                                errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token));
+                        }
+
 
                         if (schema.Format == JsonFormatStrings.Uri)
                         {
