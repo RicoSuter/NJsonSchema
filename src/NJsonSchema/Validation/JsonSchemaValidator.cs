@@ -171,7 +171,6 @@ namespace NJsonSchema.Validation
                         if (!Regex.IsMatch(value, schema.Pattern))
                             errors.Add(new ValidationError(ValidationErrorKind.PatternMismatch, propertyName, propertyPath, token));
                     }
-
                     if (schema.MinLength.HasValue && value.Length < schema.MinLength)
                         errors.Add(new ValidationError(ValidationErrorKind.StringTooShort, propertyName, propertyPath, token));
 
@@ -200,7 +199,6 @@ namespace NJsonSchema.Validation
                             if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFF zzz", null, DateTimeStyles.None, out dateTimeResult) == false)
                                 errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token));
                         }
-
 
                         if (schema.Format == JsonFormatStrings.Uri)
                         {
