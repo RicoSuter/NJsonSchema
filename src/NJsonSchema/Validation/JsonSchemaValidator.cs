@@ -190,14 +190,14 @@ namespace NJsonSchema.Validation
                         {
                             DateTime dateTimeResult;
                             if (token.Type != JTokenType.Date && (DateTime.TryParseExact(value, "yyyy-MM-dd", null, DateTimeStyles.None, out dateTimeResult) == false || dateTimeResult.Date != dateTimeResult))
-                                errors.Add(new ValidationError(ValidationErrorKind.DateExpected, propertyName, propertyPath, token));
+                                errors.Add(new ValidationError(ValidationErrorKind.DateExpected, propertyName, propertyPath, token, schema));
                         }
 
                         if (schema.Format == JsonFormatStrings.Time)
                         {
                             DateTime dateTimeResult;
                             if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFF zzz", null, DateTimeStyles.None, out dateTimeResult) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token));
+                                errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token, schema));
                         }
 
                         if (schema.Format == JsonFormatStrings.Uri)
