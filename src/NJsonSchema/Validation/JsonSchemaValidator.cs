@@ -186,6 +186,13 @@ namespace NJsonSchema.Validation
                                 errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath, token));
                         }
 
+                        if (schema.Format == JsonFormatStrings.Date)
+                        {
+                            DateTime dateTimeResult;
+                            if (token.Type != JTokenType.Date && (DateTime.TryParse(value, out dateTimeResult) == false || dateTimeResult.Date != dateTimeResult))
+                                errors.Add(new ValidationError(ValidationErrorKind.DateExpected, propertyName, propertyPath, token));
+                        }
+
                         if (schema.Format == JsonFormatStrings.Uri)
                         {
                             Uri uriResult;
