@@ -624,12 +624,15 @@ namespace NJsonSchema.Generation
 
         private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
 
-        private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
+        private bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
         {
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
                 return true;
 
             if (HasDataContractAttribute(parentType) && GetDataMemberAttribute(parentType, propertyAttributes) == null && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+                return true;
+
+            if (Settings.IgnoreDeprecatedProperties && propertyAttributes.Any(x => x is ObsoleteAttribute))
                 return true;
 
             return false;
