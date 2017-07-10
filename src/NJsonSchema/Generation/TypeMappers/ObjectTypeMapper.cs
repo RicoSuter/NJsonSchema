@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
@@ -41,20 +40,14 @@ namespace NJsonSchema.Generation.TypeMappers
         public bool UseReference { get; } = true;
 
         /// <summary>Gets the schema for the mapped type.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="schema">The schema.</param>
-        /// <param name="schemaGenerator">The schema generator.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. the property attributes)</param>
-#pragma warning disable 1998
-        public async Task GenerateSchemaAsync<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator,
-            JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes) where TSchemaType : JsonSchema4, new()
-#pragma warning restore 1998
+        /// <param name="context">The context.</param>
+        public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
         {
-            if (!schemaResolver.HasSchema(MappedType, false))
-                schemaResolver.AddSchema(MappedType, false, _schemaFactory(schemaGenerator, schemaResolver));
+            if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
+                context.JsonSchemaResolver.AddSchema(MappedType, false, _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
 
-            schema.SchemaReference = schemaResolver.GetSchema(MappedType, false);
+            schema.SchemaReference = context.JsonSchemaResolver.GetSchema(MappedType, false);
         }
     }
 }
