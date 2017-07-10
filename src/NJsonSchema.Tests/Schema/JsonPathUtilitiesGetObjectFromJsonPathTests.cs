@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Schema
 {
@@ -23,7 +24,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2");
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2", new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -49,7 +50,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2");
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2", new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -75,7 +76,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3");
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3", new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);
@@ -89,7 +90,7 @@ namespace NJsonSchema.Tests.Schema
 
             //// Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#");
+            var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#", new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual(foundObject, objectToSearch);

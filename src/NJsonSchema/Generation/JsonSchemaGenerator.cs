@@ -313,7 +313,7 @@ namespace NJsonSchema.Generation
             var objectContract = contract as JsonObjectContract;
             if (objectContract != null)
             {
-                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
+                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && !schemaResolver.PropertyIsIgnored(p)))
                 {
                     bool shouldSerialize;
                     try

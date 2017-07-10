@@ -8,6 +8,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 
 namespace NJsonSchema
@@ -17,7 +19,7 @@ namespace NJsonSchema
     {
         private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
         private readonly JsonSchemaGeneratorSettings _settings;
-
+        
         private JsonSchema4 RootSchema => (JsonSchema4)RootObject;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaResolver" /> class.</summary>
@@ -94,6 +96,13 @@ namespace NJsonSchema
         private string GetKey(Type type, bool isIntegerEnum)
         {
             return type.FullName + (isIntegerEnum ? ":Integer" : string.Empty);
+        }
+
+        internal bool PropertyIsIgnored(Newtonsoft.Json.Serialization.JsonProperty p)
+        {
+            var propertyAttributes = p.AttributeProvider.GetAttributes(true);
+            var propertyAttributeTypes = propertyAttributes.Select(x => x.GetType());
+            return _settings.IgnoredPropertyAttributes.IgnoredAttributeTypes.Intersect(propertyAttributeTypes).Any();
         }
     }
 }

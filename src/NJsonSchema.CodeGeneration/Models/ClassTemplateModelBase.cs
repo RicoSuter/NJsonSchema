@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string Class { get; }
 
         /// <summary>Gets the derived class names.</summary>
-        public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
+        public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver, null)
             .Where(s => s.Value.Inherits(_schema))
             .Select(s => s.Key)
             .ToList();

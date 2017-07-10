@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -43,7 +44,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<JsonSchema4> ResolveReferenceAsync(object rootObject, string jsonPath)
+        public async Task<JsonSchema4> ResolveReferenceAsync(object rootObject, string jsonPath, IgnoredPropertyAttributes ignoredAttributes)
         {
             if (jsonPath == "#")
             {
@@ -54,10 +55,10 @@ namespace NJsonSchema
             }
             else if (jsonPath.StartsWith("#/"))
             {
-                return ResolveDocumentReference(rootObject, jsonPath);
+                return ResolveDocumentReference(rootObject, jsonPath, ignoredAttributes);
             }
             else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
-                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath).ConfigureAwait(false);
+                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, ignoredAttributes).ConfigureAwait(false);
             else
             {
                 var documentPathProvider = rootObject as IDocumentPathProvider;
@@ -68,12 +69,12 @@ namespace NJsonSchema
                     if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
                     {
                         var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath).ConfigureAwait(false);
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, ignoredAttributes).ConfigureAwait(false);
                     }
                     else
                     {
                         var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), jsonPath);
-                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath).ConfigureAwait(false);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath, ignoredAttributes).ConfigureAwait(false);
                     }
                 }
                 else
@@ -86,10 +87,10 @@ namespace NJsonSchema
         /// <param name="jsonPath">The JSON path to resolve.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
-        public virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath)
+        public virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath, IgnoredPropertyAttributes ignoredAttributes)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
-            var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>());
+            var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>(), ignoredAttributes);
             if (schema == null)
                 throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
             return schema;
@@ -112,7 +113,7 @@ namespace NJsonSchema
             return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
 
-        private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, IgnoredPropertyAttributes ignoredAttributes)
         {
             try
             {
@@ -125,7 +126,7 @@ namespace NJsonSchema
                 }
 
                 var result = _resolvedSchemas[arr[0]];
-                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1]).ConfigureAwait(false);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1], ignoredAttributes).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -133,7 +134,7 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<JsonSchema4> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<JsonSchema4> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, IgnoredPropertyAttributes ignoredAttributes)
         {
             try
             {
@@ -146,7 +147,7 @@ namespace NJsonSchema
                 }
 
                 var result = _resolvedSchemas[arr[0]];
-                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1]).ConfigureAwait(false);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1], ignoredAttributes).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -154,7 +155,7 @@ namespace NJsonSchema
             }
         }
 
-        private JsonSchema4 ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects)
+        private JsonSchema4 ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects, IgnoredPropertyAttributes ignoredAttributes)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
@@ -168,7 +169,7 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 if (((IDictionary)obj).Contains(firstSegment))
-                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects, ignoredAttributes);
             }
             else if (obj is IEnumerable)
             {
@@ -177,7 +178,7 @@ namespace NJsonSchema
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
-                        return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), checkedObjects);
+                        return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), checkedObjects, ignoredAttributes);
                 }
             }
             else
@@ -185,16 +186,16 @@ namespace NJsonSchema
                 var extensionObj = obj as JsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
-                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), checkedObjects, ignoredAttributes);
                 }
 
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => !AttributeUtilities.PropertyIsIgnored(p.CustomAttributes, ignoredAttributes)))
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)
                     {
                         var value = member.GetValue(obj);
-                        return ResolveDocumentReference(value, segments.Skip(1).ToList(), checkedObjects);
+                        return ResolveDocumentReference(value, segments.Skip(1).ToList(), checkedObjects, ignoredAttributes);
                     }
                 }
             }
