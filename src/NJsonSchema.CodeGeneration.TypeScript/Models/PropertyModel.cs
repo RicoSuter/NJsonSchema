@@ -16,6 +16,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     public class PropertyModel : PropertyModelBase
     {
         private static readonly string _validPropertyNameRegex = "^[a-zA-Z_$][0-9a-zA-Z_$]*$";
+
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonProperty _property;
@@ -28,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, classTemplateModel, new TypeScriptDefaultValueGenerator(resolver), settings)
+            : base(property, classTemplateModel, new TypeScriptDefaultValueGenerator(resolver, settings), settings)
         {
             _property = property;
             _resolver = resolver;
@@ -37,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
-        public string InterfaceName => !Regex.IsMatch(_property.Name, _validPropertyNameRegex) ? $"\"{_property.Name}\"" : _property.Name;
+        public string InterfaceName => Regex.IsMatch(_property.Name, _validPropertyNameRegex) ? _property.Name : $"\"{_property.Name}\"";
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);

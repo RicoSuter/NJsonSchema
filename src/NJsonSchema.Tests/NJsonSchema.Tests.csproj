@@ -71,6 +71,7 @@
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
     <Compile Include="Generation\ContractResolverTests.cs" />
     <Compile Include="Generation\DataToJsonSchemaGeneratorTests.cs" />
+    <Compile Include="Generation\DefaultTypeNameGeneratorTests.cs" />
     <Compile Include="Generation\EnumListTests.cs" />
     <Compile Include="Generation\ExceptionTypeTests.cs" />
     <Compile Include="Generation\ExcplicitInterfacePropertyTests.cs" />
@@ -83,11 +84,13 @@
     <Compile Include="Generation\FlattenInheritanceHierarchyTests.cs" />
     <Compile Include="Generation\KnownTypeGenerationTests.cs" />
     <Compile Include="Generation\ShouldSerializeTests.cs" />
-    <Compile Include="Generation\TypeMappingsTests.cs" />
+    <Compile Include="Generation\TypeMapperTests.cs" />
     <Compile Include="Generation\XmlDocTests.cs" />
     <Compile Include="Generation\XmlObjectTests.cs" />
     <Compile Include="Serialization\ExtensionDataTests.cs" />
     <Compile Include="Validation\EnumValidationTests.cs" />
+    <Compile Include="Validation\FormatTimeTests.cs" />
+    <Compile Include="Validation\FormatDateTests.cs" />
     <Compile Include="Validation\LineInformationTest.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />
     <Compile Include="Validation\PatternPropertyValidationTests.cs" />

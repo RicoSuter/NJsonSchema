@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
@@ -22,14 +21,8 @@ namespace NJsonSchema.Generation.TypeMappers
         bool UseReference { get; }
 
         /// <summary>Gets the schema for the mapped type.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="schema">The schema.</param>
-        /// <param name="schemaGenerator">The schema generator.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. the property attributes)</param>
-        /// <returns>The schema.</returns>
-        Task GenerateSchemaAsync<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, 
-            JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes)
-            where TSchemaType : JsonSchema4, new();
+        /// <param name="context">The context.</param>
+        Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context);
     }
 }

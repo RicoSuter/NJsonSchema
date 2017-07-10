@@ -12,10 +12,10 @@ NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
 
 **NuGet packages:** 
--   [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0 and .NET 4.0): JSON Schema 4 validation and parsing classes
--   [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (.NET Standard 1.3): Base classes to generate code from a JSON Schema 4
--   [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (.NET Standard 1.3): Generates CSharp classes
--   [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (.NET Standard 1.3): Generates TypeScript interfaces or classes
+- [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0 and .NET 4.0): JSON Schema 4 parsing, validation and generation classes
+- [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (.NET Standard 1.3): Base classes to generate code from a JSON Schema 4
+- [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (.NET Standard 1.3): Generates CSharp classes
+- [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (.NET Standard 1.3): Generates TypeScript interfaces or classes
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
 
