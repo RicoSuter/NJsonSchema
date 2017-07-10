@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver, parameters.Settings);
+            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver);
 
             var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
             var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
