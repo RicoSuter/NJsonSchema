@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration
@@ -15,12 +14,15 @@ namespace NJsonSchema.CodeGeneration
     public abstract class DefaultValueGenerator
     {
         private readonly ITypeResolver _typeResolver;
+        private readonly IEnumNameGenerator _enumNameGenerator;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultValueGenerator" /> class.</summary>
         /// <param name="typeResolver">The type typeResolver.</param>
-        protected DefaultValueGenerator(ITypeResolver typeResolver)
+        /// <param name="enumNameGenerator">The enum name generator.</param>
+        protected DefaultValueGenerator(ITypeResolver typeResolver, IEnumNameGenerator enumNameGenerator)
         {
             _typeResolver = typeResolver;
+            _enumNameGenerator = enumNameGenerator;
         }
 
         /// <summary>Gets the default value code.</summary>
@@ -64,11 +66,12 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
 
+            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default); 
             var enumName = schema.Default is string
                 ? schema.Default.ToString()
-                : actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
+                : actualSchema.EnumerationNames[index];
 
-            return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
+            return typeName + "." + _enumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }
     }
 }

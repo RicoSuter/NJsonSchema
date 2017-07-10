@@ -18,7 +18,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpDefaultValueGenerator" /> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
-        public CSharpDefaultValueGenerator(ITypeResolver typeResolver, CSharpGeneratorSettings settings) : base(typeResolver)
+        public CSharpDefaultValueGenerator(ITypeResolver typeResolver, CSharpGeneratorSettings settings) 
+            : base(typeResolver, settings.EnumNameGenerator)
         {
             _settings = settings;
         }
