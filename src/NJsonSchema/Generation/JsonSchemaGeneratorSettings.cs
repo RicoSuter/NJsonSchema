@@ -17,39 +17,6 @@ using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
 {
-    public class IgnoredPropertyAttributes
-    {
-        public IList<Type> IgnoredAttributeTypes { get; set; }
-
-        public IgnoredPropertyAttributes()
-        {
-            IgnoredAttributeTypes = new List<Type>(){typeof(JsonIgnoreAttribute)};
-        }
-
-        public IgnoredPropertyAttributes(IEnumerable<Type> ignoreAttributeTypes)
-        {
-            IgnoredAttributeTypes = new List<Type>(ignoreAttributeTypes);
-
-            if(!IgnoredAttributeTypes.Contains(typeof(JsonIgnoreAttribute)))
-                IgnoredAttributeTypes.Add(typeof(JsonIgnoreAttribute));
-        }
-        
-        public void AddAttribute(Attribute ignoreAttribute)
-        {
-            if (!ContainsType(ignoreAttribute))
-                IgnoredAttributeTypes.Add(ignoreAttribute.GetType());
-        }
-
-        /// <summary>
-        /// Will check to see if the type of the argument attribute is in the list of ignored attributes
-        /// </summary>
-        public bool ContainsType(Attribute attributeType)
-        {
-            var type = attributeType.GetType();
-            return IgnoredAttributeTypes.Contains(type);
-        }
-    }
-
     /// <summary>The JSON Schema generator settings.</summary>
     public class JsonSchemaGeneratorSettings
     {
