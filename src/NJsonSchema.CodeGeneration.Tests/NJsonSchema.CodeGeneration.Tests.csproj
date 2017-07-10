@@ -64,7 +64,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Address.cs" />
-    <Compile Include="AttributeIgnoreTests.cs" />
     <Compile Include="CSharp\AllOfTests.cs" />
     <Compile Include="CSharp\AdditionalPropertiesTests.cs" />
     <Compile Include="CSharp\AnnotationsTests.cs" />
