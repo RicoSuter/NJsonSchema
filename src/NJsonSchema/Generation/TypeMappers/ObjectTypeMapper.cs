@@ -37,7 +37,7 @@ namespace NJsonSchema.Generation.TypeMappers
         public Type MappedType { get; }
 
         /// <summary>Gets a value indicating whether to use a JSON Schema reference for the type.</summary>
-        public bool UseReference { get; } = true;
+        public bool UseReference => true;
 
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
