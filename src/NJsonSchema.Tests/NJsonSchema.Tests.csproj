@@ -71,6 +71,7 @@
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
     <Compile Include="Generation\ContractResolverTests.cs" />
     <Compile Include="Generation\DataToJsonSchemaGeneratorTests.cs" />
+    <Compile Include="Generation\DefaultTypeNameGeneratorTests.cs" />
     <Compile Include="Generation\EnumListTests.cs" />
     <Compile Include="Generation\ExceptionTypeTests.cs" />
     <Compile Include="Generation\ExcplicitInterfacePropertyTests.cs" />
