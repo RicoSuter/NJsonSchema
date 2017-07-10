@@ -17,14 +17,14 @@ namespace NJsonSchema.CodeGeneration.Tests
             _csharpGenerator = new CSharpDefaultValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
 
             var typescriptSettings = new TypeScriptGeneratorSettings();
-            _typescriptGenerator = new TypeScriptDefaultValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()));
+            _typescriptGenerator = new TypeScriptDefaultValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
         }
 
         [TestMethod]
         public void When_schema_has_default_value_of_int_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
-            
+
             //// Act
             var schema = new JsonSchema4()
             {
@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.AreEqual("6000000000L", csharpValue);
             Assert.AreEqual("6000000000", typescriptValue);
         }
-        
+
         [TestMethod]
         public void When_schema_has_default_value_of_float_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.AreEqual("1234.567F", csharpValue);
             Assert.AreEqual("1234.567", typescriptValue);
         }
-        
+
         [TestMethod]
         public void When_schema_has_default_value_of_bool_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
@@ -113,6 +113,43 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Assert
             Assert.AreEqual("\"test\\\\test\\\"test\\r\\ntest\"", csharpValue);
             Assert.AreEqual("\"test\\\\test\\\"test\\r\\ntest\"", typescriptValue);
+        }
+
+        public class MyEnumNameGenerator : IEnumNameGenerator
+        {
+            public string Generate(int index, string name, object value, JsonSchema4 schema)
+            {
+                return name.ToLowerInvariant();
+            }
+        }
+
+        [TestMethod]
+        public void When_schema_has_default_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+            var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator(), Namespace = "Ns" };
+            var csharpGenerator = new CSharpDefaultValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
+
+            var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator() };
+            var typescriptGenerator = new TypeScriptDefaultValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.String,
+                Enumeration =
+                {
+                    "Foo",
+                    "Bar"
+                },
+                Default = "Bar"
+            };
+            var csharpValue = csharpGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true);
+            var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true);
+
+            //// Assert
+            Assert.AreEqual("Ns.MyEnum.bar", csharpValue);
+            Assert.AreEqual("MyEnum.bar", typescriptValue);
         }
     }
 }
