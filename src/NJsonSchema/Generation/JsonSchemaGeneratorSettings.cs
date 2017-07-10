@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -29,7 +30,7 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
         }
-
+        
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
 
@@ -47,6 +48,29 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
         public bool GenerateXmlObjects { get; set; } = false;
+        
+        public readonly IgnoredPropertyAttributes IgnoredPropertyAttributes = new IgnoredPropertyAttributes(new List<Type> { typeof(JsonIgnoreAttribute) });
+
+        /// <summary>
+        /// Properties marked with <see cref="ObsoleteAttribute"/> are ignored in schema generation
+        /// </summary>
+        public bool IgnoreDeprecatedProperties
+        {
+            get => IgnoredPropertyAttributes.IgnoredAttributeTypes.Contains(typeof(ObsoleteAttribute));
+            set
+            {
+                if (value)
+                {
+                    if (!IgnoredPropertyAttributes.IgnoredAttributeTypes.Contains(typeof(ObsoleteAttribute)))
+                        IgnoredPropertyAttributes.IgnoredAttributeTypes.Add(typeof(ObsoleteAttribute));
+                }
+                else
+                {
+                    if (IgnoredPropertyAttributes.IgnoredAttributeTypes.Contains(typeof(ObsoleteAttribute)))
+                        IgnoredPropertyAttributes.IgnoredAttributeTypes.Remove(typeof(ObsoleteAttribute));
+                }
+            }
+        }
         
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }
