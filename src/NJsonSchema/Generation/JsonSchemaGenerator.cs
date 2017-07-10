@@ -117,7 +117,7 @@ namespace NJsonSchema.Generation
         {
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes))
             {
-                await ApplySchemaProcessorsAsync(schema, schemaResolver);
+                await ApplySchemaProcessorsAsync(type, schema, schemaResolver);
                 return;
             }
 
@@ -179,12 +179,12 @@ namespace NJsonSchema.Generation
             else
                 typeDescription.ApplyType(schema);
 
-            await ApplySchemaProcessorsAsync(schema, schemaResolver);
+            await ApplySchemaProcessorsAsync(type, schema, schemaResolver);
         }
 
-        private async Task ApplySchemaProcessorsAsync(JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(schema, schemaResolver, this); 
+            var context = new SchemaProcessorContext(type, schema, schemaResolver, this); 
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context);
         }
