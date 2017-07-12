@@ -361,7 +361,7 @@ namespace NJsonSchema.Generation
                     var property = new Newtonsoft.Json.Serialization.JsonProperty
                     {
                         AttributeProvider = new ReflectionAttributeProvider(info),
-                        PropertyType = (info as PropertyInfo)?.PropertyType ?? ((FieldInfo)info).FieldType,
+                        PropertyType = propertyType,
                         Ignored = IsPropertyIgnored(propertyType, type, info.GetCustomAttributes(true).OfType<Attribute>().ToArray())
                     };
 
