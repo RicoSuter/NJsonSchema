@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
@@ -37,17 +38,23 @@ namespace NJsonSchema.Generation.TypeMappers
         public Type MappedType { get; }
 
         /// <summary>Gets a value indicating whether to use a JSON Schema reference for the type.</summary>
-        public bool UseReference => true;
+        public bool UseReference { get; } = true;
 
         /// <summary>Gets the schema for the mapped type.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="schema">The schema.</param>
-        /// <param name="context">The context.</param>
-        public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
+        /// <param name="schemaGenerator">The schema generator.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <param name="parentAttributes">The parent attributes (e.g. the property attributes)</param>
+#pragma warning disable 1998
+        public async Task GenerateSchemaAsync<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator,
+            JsonSchemaResolver schemaResolver, IEnumerable<Attribute> parentAttributes) where TSchemaType : JsonSchema4, new()
+#pragma warning restore 1998
         {
-            if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
-                context.JsonSchemaResolver.AddSchema(MappedType, false, _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
+            if (!schemaResolver.HasSchema(MappedType, false))
+                schemaResolver.AddSchema(MappedType, false, _schemaFactory(schemaGenerator, schemaResolver));
 
-            schema.SchemaReference = context.JsonSchemaResolver.GetSchema(MappedType, false);
+            schema.SchemaReference = schemaResolver.GetSchema(MappedType, false);
         }
     }
 }

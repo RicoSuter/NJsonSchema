@@ -19,7 +19,6 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;
-using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
 {
@@ -117,7 +116,7 @@ namespace NJsonSchema.Generation
         {
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes))
             {
-                await ApplySchemaProcessorsAsync(type, schema, schemaResolver);
+                await ApplySchemaProcessorsAsync(schema, schemaResolver);
                 return;
             }
 
@@ -179,12 +178,12 @@ namespace NJsonSchema.Generation
             else
                 typeDescription.ApplyType(schema);
 
-            await ApplySchemaProcessorsAsync(type, schema, schemaResolver);
+            await ApplySchemaProcessorsAsync(schema, schemaResolver);
         }
 
-        private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task ApplySchemaProcessorsAsync(JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(type, schema, schemaResolver, this); 
+            var context = new SchemaProcessorContext(schema, schemaResolver, this); 
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context);
         }
@@ -226,15 +225,9 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == type);
-            if (typeMapper == null && type.GetTypeInfo().IsGenericType)
-            {
-                var genericType = type.GetGenericTypeDefinition();
-                typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == genericType);
-            }
-
             if (typeMapper != null)
             {
-                await typeMapper.GenerateSchemaAsync(schema, new TypeMapperContext(type, this, schemaResolver, parentAttributes));
+                await typeMapper.GenerateSchemaAsync(schema, this, schemaResolver, parentAttributes);
                 return true;
             }
 
