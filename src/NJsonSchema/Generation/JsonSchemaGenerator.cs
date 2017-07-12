@@ -184,7 +184,7 @@ namespace NJsonSchema.Generation
 
         private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(type, schema, schemaResolver, this); 
+            var context = new SchemaProcessorContext(type, schema, schemaResolver, this);
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context);
         }
@@ -340,7 +340,7 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateAbstractProperties || propertyInfo == null || 
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null || 
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
                             (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
                         {
@@ -357,10 +357,12 @@ namespace NJsonSchema.Generation
                 foreach (var info in propertiesAndFields.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = info.GetCustomAttributes(true).OfType<JsonPropertyAttribute>().SingleOrDefault();
+                    var propertyType = (info as PropertyInfo)?.PropertyType ?? ((FieldInfo)info).FieldType;
                     var property = new Newtonsoft.Json.Serialization.JsonProperty
                     {
                         AttributeProvider = new ReflectionAttributeProvider(info),
-                        PropertyType = (info as PropertyInfo)?.PropertyType ?? ((FieldInfo)info).FieldType
+                        PropertyType = (info as PropertyInfo)?.PropertyType ?? ((FieldInfo)info).FieldType,
+                        Ignored = IsPropertyIgnored(propertyType, type, info.GetCustomAttributes(true).OfType<Attribute>().ToArray())
                     };
 
                     if (attribute != null)
@@ -522,9 +524,9 @@ namespace NJsonSchema.Generation
         private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo propertyInfo, Type parentType, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
         {
             var propertyType = property.PropertyType;
-            var attributes = property.AttributeProvider.GetAttributes(true).ToArray();
+            var propertyAttributes = property.AttributeProvider.GetAttributes(true).ToArray();
             var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, ResolveContract(propertyType), null, Settings.DefaultEnumHandling);
-            if (property.Ignored == false)
+            if (property.Ignored == false && IsPropertyIgnoredBySettings(propertyType, parentType, propertyAttributes) == false)
             {
                 JsonProperty jsonProperty;
 
@@ -535,10 +537,10 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
-                var requiresSchemaReference = RequiresSchemaReference(propertyType, attributes);
+                var requiresSchemaReference = RequiresSchemaReference(propertyType, propertyAttributes);
                 if (requiresSchemaReference)
                 {
-                    var propertySchema = await GenerateAsync(propertyType, attributes, schemaResolver).ConfigureAwait(false);
+                    var propertySchema = await GenerateAsync(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
 
                     // The schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
                     if (Settings.NullHandling == NullHandling.JsonSchema)
@@ -558,7 +560,7 @@ namespace NJsonSchema.Generation
                     }
                 }
                 else
-                    jsonProperty = await GenerateAsync<JsonProperty>(propertyType, attributes, schemaResolver).ConfigureAwait(false);
+                    jsonProperty = await GenerateAsync<JsonProperty>(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
 
                 var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
                 var propertyName = contractResolver != null ?
@@ -569,14 +571,14 @@ namespace NJsonSchema.Generation
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
 
                 if (Settings.GenerateXmlObjects)
-                    jsonProperty.GenerateXmlObjectForProperty(parentType, propertyName, attributes);
+                    jsonProperty.GenerateXmlObjectForProperty(parentType, propertyName, propertyAttributes);
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
 
-                var requiredAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                var requiredAttribute = propertyAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                 var hasJsonNetAttributeRequired = property.Required == Required.Always || property.Required == Required.AllowNull;
-                var isDataContractMemberRequired = GetDataMemberAttribute(parentType, attributes)?.IsRequired == true;
+                var isDataContractMemberRequired = GetDataMemberAttribute(parentType, propertyAttributes)?.IsRequired == true;
 
                 var hasRequiredAttribute = requiredAttribute != null;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
@@ -608,13 +610,13 @@ namespace NJsonSchema.Generation
                         parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                dynamic readOnlyAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.ReadOnlyAttribute");
+                dynamic readOnlyAttribute = propertyAttributes.TryGetIfAssignableTo("System.ComponentModel.ReadOnlyAttribute");
                 if (readOnlyAttribute != null)
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
-                jsonProperty.Description = await propertyInfo.GetDescriptionAsync(attributes).ConfigureAwait(false);
+                jsonProperty.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
 
-                ApplyPropertyAnnotations(jsonProperty, property, parentType, attributes, propertyTypeDescription);
+                ApplyPropertyAnnotations(jsonProperty, property, parentType, propertyAttributes, propertyTypeDescription);
             }
         }
 
@@ -631,12 +633,20 @@ namespace NJsonSchema.Generation
 
         private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
 
-        private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
+        private bool IsPropertyIgnored(Type propertyType, Type parentType, Attribute[] propertyAttributes)
         {
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
                 return true;
 
             if (HasDataContractAttribute(parentType) && GetDataMemberAttribute(parentType, propertyAttributes) == null && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+                return true;
+
+            return IsPropertyIgnoredBySettings(propertyType, parentType, propertyAttributes);
+        }
+
+        private bool IsPropertyIgnoredBySettings(Type propertyType, Type parentType, Attribute[] propertyAttributes)
+        {
+            if (Settings.IgnoreObsoleteProperties && propertyAttributes.Any(a => a is ObsoleteAttribute))
                 return true;
 
             return false;

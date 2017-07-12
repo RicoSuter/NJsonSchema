@@ -47,7 +47,10 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
         public bool GenerateXmlObjects { get; set; } = false;
-        
+
+        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
+        public bool IgnoreObsoleteProperties { get; set; }
+
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }
 
