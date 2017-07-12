@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -84,6 +85,30 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(2, schema.Properties.Count);
+        }
+
+        public class PartiallyDeprecated
+        {
+            public string IncludeMe;
+
+            [Obsolete]
+            public string IgnoreMe;
+        }
+
+        [TestMethod]
+        public async Task When_field_has_ObsoleteAttribute_and_setting_IgnoreDeprecatedProperties_set_then_it_is_ignored()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<PartiallyDeprecated>(new JsonSchemaGeneratorSettings()
+            {
+                IgnoreDeprecatedProperties = true
+            });
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsFalse(json.Contains("IgnoreMe"));
         }
     }
 }

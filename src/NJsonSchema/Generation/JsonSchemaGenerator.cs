@@ -184,7 +184,7 @@ namespace NJsonSchema.Generation
 
         private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(type, schema, schemaResolver, this); 
+            var context = new SchemaProcessorContext(type, schema, schemaResolver, this);
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context);
         }
@@ -302,7 +302,7 @@ namespace NJsonSchema.Generation
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
-                    .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true)
+                        .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true)
                 )
                 .ToList();
 #else
@@ -320,7 +320,7 @@ namespace NJsonSchema.Generation
             var objectContract = contract as JsonObjectContract;
             if (objectContract != null)
             {
-                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
+                foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type && !schemaResolver.PropertyIsIgnored(p)))
                 {
                     bool shouldSerialize;
                     try
@@ -631,12 +631,15 @@ namespace NJsonSchema.Generation
 
         private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
 
-        private static bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
+        private bool IsPropertyIgnored(Type parentType, Attribute[] propertyAttributes)
         {
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
                 return true;
 
             if (HasDataContractAttribute(parentType) && GetDataMemberAttribute(parentType, propertyAttributes) == null && !propertyAttributes.Any(a => a is JsonPropertyAttribute))
+                return true;
+
+            if (Settings.IgnoreDeprecatedProperties && propertyAttributes.Any(x => x is ObsoleteAttribute))
                 return true;
 
             return false;

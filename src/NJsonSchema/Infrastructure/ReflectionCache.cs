@@ -55,6 +55,7 @@ namespace NJsonSchema.Infrastructure
             JsonIgnoreAttribute jsonIgnoreAttribute = null;
             JsonPropertyAttribute jsonPropertyAttribute = null;
             Attribute dataMemberAttribute = null;
+            ObsoleteAttribute obsoleteAttribute = null;
 
             foreach (var attribute in property.GetCustomAttributes(true).OfType<Attribute>())
             {
@@ -64,9 +65,11 @@ namespace NJsonSchema.Infrastructure
                     jsonPropertyAttribute = attribute as JsonPropertyAttribute;
                 else if (attribute.GetType().Name == "DataMemberAttribute")
                     dataMemberAttribute = attribute;
+                else if (attribute is ObsoleteAttribute)
+                    obsoleteAttribute = attribute as ObsoleteAttribute;
             }
 
-            return new CustomAttributes(jsonIgnoreAttribute, jsonPropertyAttribute, GetDataContractAttribute(property.DeclaringType), dataMemberAttribute);
+            return new CustomAttributes(jsonIgnoreAttribute, jsonPropertyAttribute, GetDataContractAttribute(property.DeclaringType), dataMemberAttribute, obsoleteAttribute);
         }
 
         /// <summary>Gets the data contract attribute of a given type.</summary>
@@ -145,16 +148,19 @@ namespace NJsonSchema.Infrastructure
             /// <param name="jsonPropertyAttribute">The json property attribute.</param>
             /// <param name="dataContractAttribute">The data contract attribute.</param>
             /// <param name="dataMemberAttribute">The data member attribute.</param>
+            /// <param name="obsoleteAttribute">The obsolete attribute.</param>
             public CustomAttributes(
                 JsonIgnoreAttribute jsonIgnoreAttribute,
                 JsonPropertyAttribute jsonPropertyAttribute,
                 Attribute dataContractAttribute,
-                Attribute dataMemberAttribute)
+                Attribute dataMemberAttribute,
+                ObsoleteAttribute obsoleteAttribute)
             {
                 JsonIgnoreAttribute = jsonIgnoreAttribute;
                 JsonPropertyAttribute = jsonPropertyAttribute;
                 DataContractAttribute = dataContractAttribute;
                 DataMemberAttribute = dataMemberAttribute;
+                ObsoleteAttribute = obsoleteAttribute;
             }
 
             /// <summary>Gets the json ignore attribute.</summary>
@@ -168,6 +174,9 @@ namespace NJsonSchema.Infrastructure
 
             /// <summary>Gets the data member attribute.</summary>
             public dynamic DataMemberAttribute { get; }
+
+            /// <summary> Gets the obsolete attribute. </summary>
+            public ObsoleteAttribute ObsoleteAttribute { get; }
         }
     }
 }

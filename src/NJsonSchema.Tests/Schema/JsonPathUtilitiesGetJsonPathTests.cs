@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Schema
 {
@@ -21,7 +22,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual("#/Property/Property2", path);
@@ -46,7 +47,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual("#/Property/List/2", path);
@@ -71,7 +72,7 @@ namespace NJsonSchema.Tests.Schema
             };
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
+            var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch, new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual("#/Property/List/Test3", path);
@@ -84,7 +85,7 @@ namespace NJsonSchema.Tests.Schema
             var objectToSearch = new JsonSchema4();
 
             //// Act
-            var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch);
+            var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch, new IgnoredPropertyAttributes());
 
             //// Assert
             Assert.AreEqual("#", path);

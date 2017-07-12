@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -23,9 +24,9 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-        public static string GetJsonPath(object rootObject, object searchedObject)
+        public static string GetJsonPath(object rootObject, object searchedObject, IgnoredPropertyAttributes ignoredAttributes)
         {
-            return GetJsonPaths(rootObject, new List<object> { searchedObject })[searchedObject];
+            return GetJsonPaths(rootObject, new List<object> { searchedObject }, ignoredAttributes)[searchedObject];
         }
 
         /// <summary>Gets the JSON path of the given object.</summary>
@@ -35,16 +36,16 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
 #if !LEGACY
-        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects, IgnoredPropertyAttributes ignoredAttributes)
 #else
-        public static IDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+        public static IDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects, IgnoredPropertyAttributes ignoredAttributes)
 #endif
         {
             if (rootObject == null)
                 throw new ArgumentNullException(nameof(rootObject));
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
-            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>());
+            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), ignoredAttributes);
 
             if (mappings.Any(p => p.Value == null))
             {
@@ -56,7 +57,7 @@ namespace NJsonSchema
             return mappings;
         }
 
-        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects, string basePath, HashSet<object> checkedObjects)
+        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects, string basePath, HashSet<object> checkedObjects, IgnoredPropertyAttributes ignoredAttributes)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return false;
@@ -74,7 +75,7 @@ namespace NJsonSchema
             {
                 foreach (var key in ((IDictionary)obj).Keys)
                 {
-                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects))
+                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects, ignoredAttributes))
                         return true;
                 }
             }
@@ -83,7 +84,7 @@ namespace NJsonSchema
                 var i = 0;
                 foreach (var item in (IEnumerable)obj)
                 {
-                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects))
+                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects, ignoredAttributes))
                         return true;
 
                     i++;
@@ -91,7 +92,7 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => !AttributeUtilities.PropertyIsIgnored(p.CustomAttributes, ignoredAttributes)))
                 {
                     var value = member.GetValue(obj);
                     if (value != null)
@@ -101,12 +102,12 @@ namespace NJsonSchema
                         var isExtensionDataProperty = obj is JsonExtensionObject && propertyName == nameof(JsonExtensionObject.ExtensionData);
                         if (isExtensionDataProperty)
                         {
-                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects))
+                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, ignoredAttributes))
                                 return true;
                         }
                         else
                         {
-                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects))
+                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, ignoredAttributes))
                                 return true;
                         }
                     }
