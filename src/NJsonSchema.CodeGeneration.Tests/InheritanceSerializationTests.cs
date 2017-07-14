@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -40,14 +41,37 @@ namespace NJsonSchema.CodeGeneration.Tests
         public string Prop1 { get; set; }
     }
 
+    [KnownType("GetTypes")]
     public class SubClass2 : SubClass
     {
         public string Prop2 { get; set; }
+
+        public static Type[] GetTypes()
+        {
+            return new Type[] { typeof(SubClass3) };
+        }
+    }
+
+    public class SubClass3 : SubClass2
+    {
+        public string Prop3 { get; set; }
     }
 
     [TestClass]
     public class InheritanceSerializationTests
     {
+        [TestMethod]
+        public void When_JsonInheritanceConverter_is_passed_null_it_deserializes_to_null()
+        {
+            //// Arrange
+
+            //// Act
+            var result = JsonConvert.DeserializeObject<SubClass>("null");
+
+            //// Assert
+            Assert.IsNull(result);
+        }
+
         [TestMethod]
         public async Task When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized()
         {
@@ -58,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 {
                     Foo = "foo",
                     Bar = "bar",
-                    SubElements = new List<SubClass> { new SubClass1 { Prop1 = "x" }, new SubClass2 { Prop2 = "x" } }
+                    SubElements = new List<SubClass> { new SubClass1 { Prop1 = "x" }, new SubClass3 { Prop2 = "x", Prop3 = "y"} }
                 }
             };
 
@@ -73,6 +97,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Assert
             Assert.IsTrue(deserializedContainer.Animal is Dog);
             Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
+            Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements[1] is SubClass3);
         }
 
         [TestMethod]

@@ -397,26 +397,34 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
+        private async Task GenerateKnownTypesAsync(Type objectType, JsonSchemaResolver schemaResolver)
         {
-            foreach (dynamic knownTypeAttribute in type.GetTypeInfo().GetCustomAttributes(false).Where(a => a.GetType().Name == nameof(KnownTypeAttribute)))
+            var type = objectType;
+            do
             {
-                if (knownTypeAttribute.Type != null)
-                    await AddKnownTypeAsync(knownTypeAttribute.Type, schemaResolver);
-                else if (!string.IsNullOrWhiteSpace(knownTypeAttribute.MethodName))
+                var knownTypeAttributes = type.GetTypeInfo().GetCustomAttributes(false).Where(a => a.GetType().Name == "KnownTypeAttribute").OfType<Attribute>();
+                foreach (dynamic attribute in knownTypeAttributes)
                 {
-                    var methodInfo = type.GetRuntimeMethod((string)knownTypeAttribute.MethodName, new Type[0]);
-
-                    var knownTypes = methodInfo.Invoke(null, null) as Type[];
-                    if (knownTypes != null)
+                    if (attribute.Type != null)
+                        await AddKnownTypeAsync(attribute.Type, schemaResolver);
+                    else if (attribute.MethodName != null)
                     {
-                        foreach (var knownType in knownTypes)
-                            await AddKnownTypeAsync(knownType, schemaResolver);
+                        var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        if (methodInfo != null)
+                        {
+                            var knownTypes = methodInfo.Invoke(null, null) as Type[];
+                            if (knownTypes != null)
+                            {
+                                foreach (var knownType in knownTypes)
+                                    await AddKnownTypeAsync(knownType, schemaResolver);
+                            }
+                        }
                     }
+                    else
+                        throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
                 }
-                else
-                    throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
-            }
+                type = type.GetTypeInfo().BaseType;
+            } while (type != null);
         }
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
