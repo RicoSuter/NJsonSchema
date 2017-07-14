@@ -77,8 +77,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
                     "h discriminator \'\" + discriminator + \"\'.\");\r\n    }\r\n\r\n    private System.Type Ge" +
                     "tSubtypeFromKnownTypeAttributes(System.Type objectType, string discriminator)\r\n " +
                     "   {\r\n        var type = objectType;\r\n        do\r\n        {\r\n            var kno" +
-                    "wnTypeAttributes = System.Reflection.IntrospectionExtensions.GetTypeInfo(type).G" +
-                    "etCustomAttributes(false)\r\n\t\t\t\t.Where(a => a.GetType().Name == \"KnownTypeAttribu" +
+                    "wnTypeAttributes = System.Linq.Enumerable.Where(System.Reflection.CustomAttribut" +
+                    "eExtensions.GetCustomAttributes(System.Reflection.IntrospectionExtensions.GetTyp" +
+                    "eInfo(type), false),\r\n                a => a.GetType().Name == \"KnownTypeAttribu" +
                     "te\");\r\n            foreach (dynamic attribute in knownTypeAttributes)\r\n         " +
                     "   {\r\n                if (attribute.Type != null && attribute.Type.Name == discr" +
                     "iminator)\r\n                    return attribute.Type;\r\n                else if (" +

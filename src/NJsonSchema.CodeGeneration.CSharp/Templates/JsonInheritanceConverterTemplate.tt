@@ -115,8 +115,8 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         var type = objectType;
         do
         {
-            var knownTypeAttributes = System.Reflection.IntrospectionExtensions.GetTypeInfo(type).GetCustomAttributes(false)
-				.Where(a => a.GetType().Name == "KnownTypeAttribute");
+            var knownTypeAttributes = System.Linq.Enumerable.Where(System.Reflection.CustomAttributeExtensions.GetCustomAttributes(System.Reflection.IntrospectionExtensions.GetTypeInfo(type), false),
+                a => a.GetType().Name == "KnownTypeAttribute");
             foreach (dynamic attribute in knownTypeAttributes)
             {
                 if (attribute.Type != null && attribute.Type.Name == discriminator)
