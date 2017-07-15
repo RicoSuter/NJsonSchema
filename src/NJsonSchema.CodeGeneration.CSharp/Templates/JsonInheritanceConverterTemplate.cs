@@ -33,6 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             #line default
             #line hidden
             this.Write(@""")]
+[System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
 internal class JsonInheritanceAttribute : System.Attribute
 {
     public JsonInheritanceAttribute(string key, System.Type type)
