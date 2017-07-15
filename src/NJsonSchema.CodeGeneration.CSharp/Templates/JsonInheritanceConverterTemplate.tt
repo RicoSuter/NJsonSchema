@@ -1,12 +1,25 @@
 ﻿<#@ template visibility="internal" #>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+internal class JsonInheritanceAttribute : System.Attribute
+{
+    public JsonInheritanceAttribute(string key, System.Type type)
+    {
+        Key = key;
+        Type = type;
+    }
+
+    public string Key { get; }
+
+    public System.Type Type { get; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
     private readonly string _discriminator;
-	private readonly System.Collections.Generic.Dictionary<string, Type> _types;
-        
+
     [System.ThreadStatic]
     private static bool _isReading;
 
@@ -18,10 +31,9 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         _discriminator = DefaultDiscriminatorName;
     }
 
-    public JsonInheritanceConverter(string discriminator, System.Collections.Generic.Dictionary<string, Type> types)
+    public JsonInheritanceConverter(string discriminator)
     {
         _discriminator = discriminator;
-		_types = types;
     }
 
     public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
@@ -47,7 +59,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             if (_isWriting)
             {
                 _isWriting = false;
-                return false; 
+                return false;
             }
             return true;
         }
@@ -93,12 +105,12 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 
     private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
     {
-		foreach (var type in _types)
-		{
-			if (type.Key == discriminator)
-				return type.Value;
-		}
+        foreach (var type in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), false))
+        {
+            if (type.Key == discriminator)
+                return type.Type;
+        }
 
-		return objectType;
+        return objectType;
     }
 }
