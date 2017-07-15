@@ -57,9 +57,20 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var schema = await JsonSchema4.FromTypeAsync<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
-            var generator = new TypeScriptGenerator(schema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m });
             var code = generator.GenerateFile();
         }
+
+        [TestMethod]
+        public async Task Demo2()
+        {
+            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schemaJsonData = schema.ToJson();
+            var errors = schema.Validate("{}");
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });
+            var code = generator.GenerateFile();
+        }
+
 
         [TestMethod]
         public async Task When_JSON_contains_DateTime_is_available_then_string_validator_validates_correctly()
@@ -84,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var dataJson = @"{
                 ""SimpleDate"":""2012-05-18T00:00:00Z"",
                 ""PatternDate"":""2012-11-07T00:00:00Z""
-            }"; 
+            }";
 
             //// Act
             var errors = schema.Validate(dataJson);
