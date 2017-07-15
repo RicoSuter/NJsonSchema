@@ -32,10 +32,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the class.</summary>
         public abstract string Class { get; }
 
-        /// <summary>Gets the derived class names.</summary>
-        public List<string> DerivedClassNames => _schema.GetDerivedSchemas(_rootObject, _resolver)
+        /// <summary>Gets the derived class names (discriminator key/type name).</summary>
+        public IDictionary<string, string> DerivedClasses => _schema.GetDerivedSchemas(_rootObject, _resolver)
             .Where(s => s.Value.Inherits(_schema))
-            .Select(s => s.Key)
-            .ToList();
+            .ToDictionary(s => s.Key, s => _resolver.GetOrGenerateTypeName(s.Value, s.Key));
     }
 }

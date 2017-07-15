@@ -3,7 +3,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Converters;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -21,6 +23,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [DataContract]
+        [JsonConverter(typeof(JsonInheritanceConverter))]
         public class Fruit : ITour
         {
             [DataMember]
@@ -53,6 +56,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(json.Properties["Item"].ActualPropertySchema.AllOf.First().HasSchemaReference);
+            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]"));
+            Assert.IsTrue(code.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]"));
         }
     }
 }

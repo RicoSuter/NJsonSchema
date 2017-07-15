@@ -1,11 +1,25 @@
 ﻿<#@ template visibility="internal" #>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+internal class JsonInheritanceAttribute : System.Attribute
+{
+    public JsonInheritanceAttribute(string key, System.Type type)
+    {
+        Key = key;
+        Type = type;
+    }
+
+    public string Key { get; }
+
+    public System.Type Type { get; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
     private readonly string _discriminator;
-        
+
     [System.ThreadStatic]
     private static bool _isReading;
 
@@ -45,7 +59,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             if (_isWriting)
             {
                 _isWriting = false;
-                return false; 
+                return false;
             }
             return true;
         }
@@ -76,7 +90,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             return null;
 
         var discriminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValue(_discriminator));
-        var subtype = GetObjectSubtype(jObject, objectType, discriminator);
+        var subtype = GetObjectSubtype(objectType, discriminator);
 
         try
         {
@@ -89,55 +103,14 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         }
     }
 
-    private System.Type GetObjectSubtype(Newtonsoft.Json.Linq.JObject jObject, System.Type objectType, string discriminator)
+    private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
     {
-        if (objectType.Name == discriminator)
-            return objectType;
-
-        var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminator);
-        if (knownTypeAttributesSubtype != null)
-            return knownTypeAttributesSubtype;
-
-        var typeName = objectType.Namespace + "." + discriminator;
-        var subtype = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
-        if (subtype != null)
-            return subtype;
-
-        var typeInfo = jObject.GetValue("$type");
-        if (typeInfo != null)
-            return System.Type.GetType(Newtonsoft.Json.Linq.Extensions.Value<string>(typeInfo));
-
-        throw new System.InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminator + "'.");
-    }
-
-    private System.Type GetSubtypeFromKnownTypeAttributes(System.Type objectType, string discriminator)
-    {
-        var type = objectType;
-        do
+        foreach (var type in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), false))
         {
-            var knownTypeAttributes = System.Linq.Enumerable.Where(System.Reflection.CustomAttributeExtensions.GetCustomAttributes(System.Reflection.IntrospectionExtensions.GetTypeInfo(type), false),
-                a => a.GetType().Name == "KnownTypeAttribute");
-            foreach (dynamic attribute in knownTypeAttributes)
-            {
-                if (attribute.Type != null && attribute.Type.Name == discriminator)
-                    return attribute.Type;
-                else if (attribute.MethodName != null)
-                {
-                    var method = System.Reflection.RuntimeReflectionExtensions.GetRuntimeMethod(type, (string)attribute.MethodName, new System.Type[0]);
-                    if (method != null)
-                    {
-                        var types = (System.Collections.Generic.IEnumerable<System.Type>)method.Invoke(null, new object[0]);
-                        foreach (var knownType in types)
-                        {
-                            if (knownType.Name == discriminator)
-                                return knownType;
-                        }
-                        return null;
-                    }
-                }
-            }
-            type = System.Reflection.IntrospectionExtensions.GetTypeInfo(type).BaseType;
-        } while (type != null);
-        return null;
+            if (type.Key == discriminator)
+                return type.Type;
+        }
+
+        return objectType;
     }
 }
