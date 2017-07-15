@@ -381,7 +381,7 @@ if(Model.HandleReferences){
             #line hidden
             
             #line 58 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-      foreach (var derivedClass in Model.DerivedClassNames){
+      foreach (var derivedClass in Model.DerivedClasses){
             
             #line default
             #line hidden
@@ -395,7 +395,7 @@ if(Model.HandleReferences){
             this.Write("\"] === \"");
             
             #line 59 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Key));
             
             #line default
             #line hidden
@@ -409,7 +409,7 @@ if(Model.HandleReferences){
             this.Write(">(data, _mappings, ");
             
             #line 60 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
             
             #line default
             #line hidden
@@ -476,7 +476,7 @@ if(Model.HandleReferences){
             #line hidden
             
             #line 68 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-      foreach (var derivedClass in Model.DerivedClassNames){
+      foreach (var derivedClass in Model.DerivedClasses){
             
             #line default
             #line hidden
@@ -490,14 +490,14 @@ if(Model.HandleReferences){
             this.Write("\"] === \"");
             
             #line 69 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Key));
             
             #line default
             #line hidden
             this.Write("\") {\r\n            let result = new ");
             
             #line 70 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
             
             #line default
             #line hidden

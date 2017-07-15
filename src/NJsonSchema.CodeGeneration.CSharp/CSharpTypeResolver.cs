@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             : base(settings)
         {
             _rootObject = rootObject;
-            Settings = settings;            
+            Settings = settings;
         }
 
         /// <summary>Gets the generator settings.</summary>

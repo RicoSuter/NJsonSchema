@@ -58,7 +58,35 @@ if(Model.HasDiscriminator){
             
             #line default
             #line hidden
-            this.Write("\")]\r\n");
+            this.Write("\", new System.Collections.Generic.Dictionary<string, System.Type> { ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+foreach (var derivedClass in Model.DerivedClasses){
+            
+            #line default
+            #line hidden
+            this.Write("{ \"");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Key));
+            
+            #line default
+            #line hidden
+            this.Write("\", typeof(");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
+            
+            #line default
+            #line hidden
+            this.Write(") }, ");
+            
+            #line 6 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write(" })]\r\n");
             
             #line 7 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
 }

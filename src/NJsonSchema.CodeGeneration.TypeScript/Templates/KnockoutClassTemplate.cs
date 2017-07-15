@@ -347,7 +347,7 @@ if(Model.HandleReferences){
             #line hidden
             
             #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-      foreach (var derivedClass in Model.DerivedClassNames){
+      foreach (var derivedClass in Model.DerivedClasses){
             
             #line default
             #line hidden
@@ -361,7 +361,7 @@ if(Model.HandleReferences){
             this.Write("\"] === \"");
             
             #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Key));
             
             #line default
             #line hidden
@@ -375,7 +375,7 @@ if(Model.HandleReferences){
             this.Write(">(data, _mappings, ");
             
             #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
             
             #line default
             #line hidden
@@ -442,7 +442,7 @@ if(Model.HandleReferences){
             #line hidden
             
             #line 53 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-      foreach (var derivedClass in Model.DerivedClassNames){
+      foreach (var derivedClass in Model.DerivedClasses){
             
             #line default
             #line hidden
@@ -456,14 +456,14 @@ if(Model.HandleReferences){
             this.Write("\"] === \"");
             
             #line 54 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Key));
             
             #line default
             #line hidden
             this.Write("\") {\r\n            let result = new ");
             
             #line 55 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
             
             #line default
             #line hidden

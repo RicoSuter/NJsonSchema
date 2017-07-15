@@ -34,66 +34,39 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             #line hidden
             this.Write("\")]\r\ninternal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter\r\n{\r\n" +
                     "    internal static readonly string DefaultDiscriminatorName = \"discriminator\";\r" +
-                    "\n\r\n    private readonly string _discriminator;\r\n        \r\n    [System.ThreadStat" +
-                    "ic]\r\n    private static bool _isReading;\r\n\r\n    [System.ThreadStatic]\r\n    priva" +
-                    "te static bool _isWriting;\r\n\r\n    public JsonInheritanceConverter()\r\n    {\r\n    " +
-                    "    _discriminator = DefaultDiscriminatorName;\r\n    }\r\n\r\n    public JsonInherita" +
-                    "nceConverter(string discriminator)\r\n    {\r\n        _discriminator = discriminato" +
-                    "r;\r\n    }\r\n\r\n    public override void WriteJson(Newtonsoft.Json.JsonWriter write" +
-                    "r, object value, Newtonsoft.Json.JsonSerializer serializer)\r\n    {\r\n        try\r" +
-                    "\n        {\r\n            _isWriting = true;\r\n\r\n            var jObject = Newtonso" +
-                    "ft.Json.Linq.JObject.FromObject(value, serializer);\r\n            jObject.AddFirs" +
-                    "t(new Newtonsoft.Json.Linq.JProperty(_discriminator, value.GetType().Name));\r\n  " +
-                    "          writer.WriteToken(jObject.CreateReader());\r\n        }\r\n        finally" +
-                    "\r\n        {\r\n            _isWriting = false;\r\n        }\r\n    }\r\n\r\n    public ove" +
-                    "rride bool CanWrite\r\n    {\r\n        get\r\n        {\r\n            if (_isWriting)\r" +
-                    "\n            {\r\n                _isWriting = false;\r\n                return fals" +
-                    "e; \r\n            }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public ove" +
-                    "rride bool CanRead\r\n    {\r\n        get\r\n        {\r\n            if (_isReading)\r\n" +
-                    "            {\r\n                _isReading = false;\r\n                return false" +
-                    ";\r\n            }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public overr" +
-                    "ide bool CanConvert(System.Type objectType)\r\n    {\r\n        return true;\r\n    }\r" +
-                    "\n\r\n    public override object ReadJson(Newtonsoft.Json.JsonReader reader, System" +
-                    ".Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serialize" +
-                    "r)\r\n    {\r\n        var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JOb" +
-                    "ject>(reader);\r\n        if (jObject == null)\r\n            return null;\r\n\r\n      " +
-                    "  var discriminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetV" +
-                    "alue(_discriminator));\r\n        var subtype = GetObjectSubtype(jObject, objectTy" +
-                    "pe, discriminator);\r\n\r\n        try\r\n        {\r\n            _isReading = true;\r\n " +
-                    "           return serializer.Deserialize(jObject.CreateReader(), subtype);\r\n    " +
-                    "    }\r\n        finally\r\n        {\r\n            _isReading = false;\r\n        }\r\n " +
-                    "   }\r\n\r\n    private System.Type GetObjectSubtype(Newtonsoft.Json.Linq.JObject jO" +
-                    "bject, System.Type objectType, string discriminator)\r\n    {\r\n        if (objectT" +
-                    "ype.Name == discriminator)\r\n            return objectType;\r\n\r\n        var knownT" +
-                    "ypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminat" +
-                    "or);\r\n        if (knownTypeAttributesSubtype != null)\r\n            return knownT" +
-                    "ypeAttributesSubtype;\r\n\r\n        var typeName = objectType.Namespace + \".\" + dis" +
-                    "criminator;\r\n        var subtype = System.Reflection.IntrospectionExtensions.Get" +
-                    "TypeInfo(objectType).Assembly.GetType(typeName);\r\n        if (subtype != null)\r\n" +
-                    "            return subtype;\r\n\r\n        var typeInfo = jObject.GetValue(\"$type\");" +
-                    "\r\n        if (typeInfo != null)\r\n            return System.Type.GetType(Newtonso" +
-                    "ft.Json.Linq.Extensions.Value<string>(typeInfo));\r\n\r\n        throw new System.In" +
-                    "validOperationException(\"Could not find subtype of \'\" + objectType.Name + \"\' wit" +
-                    "h discriminator \'\" + discriminator + \"\'.\");\r\n    }\r\n\r\n    private System.Type Ge" +
-                    "tSubtypeFromKnownTypeAttributes(System.Type objectType, string discriminator)\r\n " +
-                    "   {\r\n        var type = objectType;\r\n        do\r\n        {\r\n            var kno" +
-                    "wnTypeAttributes = System.Linq.Enumerable.Where(System.Reflection.CustomAttribut" +
-                    "eExtensions.GetCustomAttributes(System.Reflection.IntrospectionExtensions.GetTyp" +
-                    "eInfo(type), false),\r\n                a => a.GetType().Name == \"KnownTypeAttribu" +
-                    "te\");\r\n            foreach (dynamic attribute in knownTypeAttributes)\r\n         " +
-                    "   {\r\n                if (attribute.Type != null && attribute.Type.Name == discr" +
-                    "iminator)\r\n                    return attribute.Type;\r\n                else if (" +
-                    "attribute.MethodName != null)\r\n                {\r\n                    var method" +
-                    " = System.Reflection.RuntimeReflectionExtensions.GetRuntimeMethod(type, (string)" +
-                    "attribute.MethodName, new System.Type[0]);\r\n                    if (method != nu" +
-                    "ll)\r\n                    {\r\n                        var types = (System.Collecti" +
-                    "ons.Generic.IEnumerable<System.Type>)method.Invoke(null, new object[0]);\r\n      " +
-                    "                  foreach (var knownType in types)\r\n                        {\r\n " +
-                    "                           if (knownType.Name == discriminator)\r\n               " +
-                    "                 return knownType;\r\n                        }\r\n                 " +
-                    "       return null;\r\n                    }\r\n                }\r\n            }\r\n  " +
-                    "          type = System.Reflection.IntrospectionExtensions.GetTypeInfo(type).Bas" +
-                    "eType;\r\n        } while (type != null);\r\n        return null;\r\n    }\r\n}");
+                    "\n\r\n    private readonly string _discriminator;\r\n\tprivate readonly System.Collect" +
+                    "ions.Generic.Dictionary<string, Type> _types;\r\n        \r\n    [System.ThreadStati" +
+                    "c]\r\n    private static bool _isReading;\r\n\r\n    [System.ThreadStatic]\r\n    privat" +
+                    "e static bool _isWriting;\r\n\r\n    public JsonInheritanceConverter()\r\n    {\r\n     " +
+                    "   _discriminator = DefaultDiscriminatorName;\r\n    }\r\n\r\n    public JsonInheritan" +
+                    "ceConverter(string discriminator, System.Collections.Generic.Dictionary<string, " +
+                    "Type> types)\r\n    {\r\n        _discriminator = discriminator;\r\n\t\t_types = types;\r" +
+                    "\n    }\r\n\r\n    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, " +
+                    "object value, Newtonsoft.Json.JsonSerializer serializer)\r\n    {\r\n        try\r\n  " +
+                    "      {\r\n            _isWriting = true;\r\n\r\n            var jObject = Newtonsoft." +
+                    "Json.Linq.JObject.FromObject(value, serializer);\r\n            jObject.AddFirst(n" +
+                    "ew Newtonsoft.Json.Linq.JProperty(_discriminator, value.GetType().Name));\r\n     " +
+                    "       writer.WriteToken(jObject.CreateReader());\r\n        }\r\n        finally\r\n " +
+                    "       {\r\n            _isWriting = false;\r\n        }\r\n    }\r\n\r\n    public overri" +
+                    "de bool CanWrite\r\n    {\r\n        get\r\n        {\r\n            if (_isWriting)\r\n  " +
+                    "          {\r\n                _isWriting = false;\r\n                return false; " +
+                    "\r\n            }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public overri" +
+                    "de bool CanRead\r\n    {\r\n        get\r\n        {\r\n            if (_isReading)\r\n   " +
+                    "         {\r\n                _isReading = false;\r\n                return false;\r\n" +
+                    "            }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public override" +
+                    " bool CanConvert(System.Type objectType)\r\n    {\r\n        return true;\r\n    }\r\n\r\n" +
+                    "    public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Ty" +
+                    "pe objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)\r" +
+                    "\n    {\r\n        var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JObjec" +
+                    "t>(reader);\r\n        if (jObject == null)\r\n            return null;\r\n\r\n        v" +
+                    "ar discriminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValu" +
+                    "e(_discriminator));\r\n        var subtype = GetObjectSubtype(objectType, discrimi" +
+                    "nator);\r\n\r\n        try\r\n        {\r\n            _isReading = true;\r\n            r" +
+                    "eturn serializer.Deserialize(jObject.CreateReader(), subtype);\r\n        }\r\n     " +
+                    "   finally\r\n        {\r\n            _isReading = false;\r\n        }\r\n    }\r\n\r\n    " +
+                    "private System.Type GetObjectSubtype(System.Type objectType, string discriminato" +
+                    "r)\r\n    {\r\n\t\tforeach (var type in _types)\r\n\t\t{\r\n\t\t\tif (type.Key == discriminator" +
+                    ")\r\n\t\t\t\treturn type.Value;\r\n\t\t}\r\n\r\n\t\treturn objectType;\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

@@ -15,7 +15,7 @@ using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Converters
 {
-    // IMPORTANT: Always sync with JsonInheritanceConverterTemplate.tt
+    // TODO: Add caching
 
     /// <summary>Defines the class as inheritance base class and adds a discriminator property to the serialized object.</summary>
     public class JsonInheritanceConverter : JsonConverter
@@ -23,6 +23,7 @@ namespace NJsonSchema.Converters
         internal static readonly string DefaultDiscriminatorName = "discriminator";
 
         private readonly string _discriminator;
+        private readonly bool _readTypeProperty;
 
         [ThreadStatic]
         private static bool _isReading;
@@ -32,15 +33,24 @@ namespace NJsonSchema.Converters
 
         /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
         public JsonInheritanceConverter()
+            : this(DefaultDiscriminatorName, false)
         {
-            _discriminator = DefaultDiscriminatorName;
         }
 
         /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
         /// <param name="discriminator">The discriminator.</param>
         public JsonInheritanceConverter(string discriminator)
+            : this(discriminator, false)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
+        /// <param name="discriminator">The discriminator.</param>
+        /// <param name="readTypeProperty">Read the $type property to determine the type (fallback).</param>
+        public JsonInheritanceConverter(string discriminator, bool readTypeProperty)
         {
             _discriminator = discriminator;
+            _readTypeProperty = readTypeProperty;
         }
 
         /// <summary>Writes the JSON representation of the object.</summary>
@@ -139,9 +149,12 @@ namespace NJsonSchema.Converters
             if (subtype != null)
                 return subtype;
 
-            var typeInfo = jObject.GetValue("$type");
-            if (typeInfo != null)
-                return Type.GetType(typeInfo.Value<string>());
+            if (_readTypeProperty)
+            {
+                var typeInfo = jObject.GetValue("$type");
+                if (typeInfo != null)
+                    return Type.GetType(typeInfo.Value<string>());
+            }
 
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminator + "'.");
         }
