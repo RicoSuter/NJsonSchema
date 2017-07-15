@@ -217,11 +217,13 @@ var file = generator.GenerateFile();
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
 
-The previously generated JSON Schema would generate the following TypeScript interfaces:
+The previously generated JSON Schema would generate the following TypeScript interfaces. 
 
-    new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });
+**Settings:** 
+
+    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m }
     
-Output: 
+**Output:** 
 
 ```typescript
 export enum Gender {
@@ -250,11 +252,13 @@ export interface Person {
 }
 ```
 
-... and these TypeScript classes ():
+... and the following TypeScript classes. 
+
+**Settings:** 
 
     new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m }
 
-Output: 
+**Output:**
 
 ```typescript
 export enum Gender {
