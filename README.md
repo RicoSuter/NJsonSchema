@@ -217,6 +217,8 @@ var file = generator.GenerateFile();
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
 
+### TypeScript
+
 The previously generated JSON Schema would generate the following TypeScript interfaces. 
 
 **Settings:** 
