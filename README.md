@@ -98,8 +98,8 @@ The generated JSON schema data stored in the `schemaData` variable:
 ```json
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
   "title": "Person",
+  "type": "object",
   "additionalProperties": false,
   "required": [
     "FirstName",
@@ -127,6 +127,7 @@ The generated JSON schema data stored in the `schemaData` variable:
     },
     "NumberWithRange": {
       "type": "integer",
+      "format": "int32",
       "maximum": 5.0,
       "minimum": 2.0
     },
@@ -157,6 +158,7 @@ The generated JSON schema data stored in the `schemaData` variable:
   "definitions": {
     "Gender": {
       "type": "integer",
+      "description": "",
       "x-enumNames": [
         "Male",
         "Female"
@@ -164,8 +166,7 @@ The generated JSON schema data stored in the `schemaData` variable:
       "enum": [
         0,
         1
-      ],
-      "description": ""
+      ]
     },
     "Company": {
       "type": "object",
@@ -216,33 +217,200 @@ var file = generator.GenerateFile();
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
 
-The previously generated JSON Schema would generate the following TypeScript code: 
+### TypeScript
+
+The previously generated JSON Schema would generate the following TypeScript interfaces. 
+
+**Settings:** 
+
+    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m }
+    
+**Output:** 
 
 ```typescript
-export interface Person {
-    FirstName: string;
-    MiddleName?: string;
-    LastName: string;
-    Gender?: GenderAsInteger;
-    NumberWithRange?: number;
-    Birthday?: Date;
-    Company?: Company;
-    Cars?: Car[];
-}
-
-export enum GenderAsInteger
-{
+export enum Gender {
     Male = 0, 
     Female = 1, 
 }
 
 export interface Company {
-    Name?: string;
+    Name: string | undefined;
 }
 
 export interface Car {
-    Name?: string;
-    Manufacturer?: Company;
+    Name: string | undefined;
+    Manufacturer: Company | undefined;
+}
+
+export interface Person {
+    FirstName: string;
+    MiddleName: string | undefined;
+    LastName: string;
+    Gender: Gender;
+    NumberWithRange: number;
+    Birthday: Date;
+    Company: Company | undefined;
+    Cars: Car[] | undefined;
+}
+```
+
+... and the following TypeScript classes. 
+
+**Settings:** 
+
+    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m }
+
+**Output:**
+
+```typescript
+export enum Gender {
+    Male = 0, 
+    Female = 1, 
+}
+
+export class Company implements ICompany {
+    name: string | undefined;
+
+    constructor(data?: ICompany) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["Name"];
+        }
+    }
+
+    static fromJS(data: any): Company {
+        let result = new Company();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["Name"] = this.name;
+        return data; 
+    }
+}
+
+export interface ICompany {
+    name: string | undefined;
+}
+
+export class Car implements ICar {
+    name: string | undefined;
+    manufacturer: Company | undefined;
+
+    constructor(data?: ICar) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["Name"];
+            this.manufacturer = data["Manufacturer"] ? Company.fromJS(data["Manufacturer"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Car {
+        let result = new Car();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["Name"] = this.name;
+        data["Manufacturer"] = this.manufacturer ? this.manufacturer.toJSON() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface ICar {
+    name: string | undefined;
+    manufacturer: Company | undefined;
+}
+
+export class Person implements IPerson {
+    firstName: string;
+    middleName: string | undefined;
+    lastName: string;
+    gender: Gender;
+    numberWithRange: number;
+    birthday: Date;
+    company: Company | undefined;
+    cars: Car[] | undefined;
+
+    constructor(data?: IPerson) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.firstName = data["FirstName"];
+            this.middleName = data["MiddleName"];
+            this.lastName = data["LastName"];
+            this.gender = data["Gender"];
+            this.numberWithRange = data["NumberWithRange"];
+            this.birthday = data["Birthday"] ? new Date(data["Birthday"].toString()) : <any>undefined;
+            this.company = data["Company"] ? Company.fromJS(data["Company"]) : <any>undefined;
+            if (data["Cars"] && data["Cars"].constructor === Array) {
+                this.cars = [];
+                for (let item of data["Cars"])
+                    this.cars.push(Car.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Person {
+        let result = new Person();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["FirstName"] = this.firstName;
+        data["MiddleName"] = this.middleName;
+        data["LastName"] = this.lastName;
+        data["Gender"] = this.gender;
+        data["NumberWithRange"] = this.numberWithRange;
+        data["Birthday"] = this.birthday ? this.birthday.toISOString() : <any>undefined;
+        data["Company"] = this.company ? this.company.toJSON() : <any>undefined;
+        if (this.cars && this.cars.constructor === Array) {
+            data["Cars"] = [];
+            for (let item of this.cars)
+                data["Cars"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IPerson {
+    firstName: string;
+    middleName: string | undefined;
+    lastName: string;
+    gender: Gender;
+    numberWithRange: number;
+    birthday: Date;
+    company: Company | undefined;
+    cars: Car[] | undefined;
 }
 ```
 
