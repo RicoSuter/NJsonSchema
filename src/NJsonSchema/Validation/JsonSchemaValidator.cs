@@ -196,7 +196,7 @@ namespace NJsonSchema.Validation
                         if (schema.Format == JsonFormatStrings.Time)
                         {
                             DateTime dateTimeResult;
-                            if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFF zzz", null, DateTimeStyles.None, out dateTimeResult) == false)
+                            if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFFK", null, DateTimeStyles.None, out dateTimeResult) == false)
                                 errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token, schema));
                         }
 
