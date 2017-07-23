@@ -200,6 +200,13 @@ namespace NJsonSchema.Validation
                                 errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token, schema));
                         }
 
+                        if (schema.Format == JsonFormatStrings.TimeSpan)
+                        {
+                            TimeSpan timeSpanResult;
+                            if (token.Type != JTokenType.TimeSpan && TimeSpan.TryParse(value, out timeSpanResult) == false)
+                                errors.Add(new ValidationError(ValidationErrorKind.TimeSpanExpected, propertyName, propertyPath, token, schema));
+                        }
+
                         if (schema.Format == JsonFormatStrings.Uri)
                         {
                             Uri uriResult;
