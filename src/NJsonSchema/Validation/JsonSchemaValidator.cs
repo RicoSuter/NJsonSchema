@@ -151,7 +151,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateEnum(JToken token, JsonSchema4 schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.Enumeration.Count > 0 && schema.Enumeration.All(v => v.ToString() != token.ToString()))
+            if (schema.Enumeration.Count > 0 && schema.Enumeration.All(v => v?.ToString() != token?.ToString()))
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath, token, schema));
         }
 

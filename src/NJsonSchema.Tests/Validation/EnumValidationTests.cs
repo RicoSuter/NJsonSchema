@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_enum_is_defined_without_type_then_validation_succeeds_for_correct_value()
         {
             //// Arrange
-            var json = 
+            var json =
             @"{
                 ""enum"": [
                     ""commercial"",
@@ -41,6 +41,39 @@ namespace NJsonSchema.Tests.Validation
 
             //// Act
             var errors = schema.Validate(@"""wrong""");
+
+            //// Assert
+            Assert.AreEqual(1, errors.Count);
+        }
+
+        [TestMethod]
+        public async Task When_enumeration_has_null_then_validation_works()
+        {
+            //// Arrange
+            var json = @"
+            {
+                ""properties"": {
+                    ""SalutationType"": {
+                        ""type"": [
+                            ""string"",
+                            ""null""
+                        ],
+                        ""enum"": [
+                            ""Mr"",
+                            ""Mrs"",
+                            ""Dr"",
+                            ""Ms"",
+                            null
+                        ]
+                    }
+                }
+            }";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var errors = schema.Validate(@"{ ""SalutationType"": ""Prof"" }");
 
             //// Assert
             Assert.AreEqual(1, errors.Count);
