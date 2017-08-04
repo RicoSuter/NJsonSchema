@@ -698,7 +698,12 @@ namespace NJsonSchema.Generation
 
             dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
-                jsonProperty.Pattern = regexAttribute.Pattern;
+            {
+                if (propertyTypeDescription.IsDictionary)
+                    jsonProperty.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
+                else
+                    jsonProperty.Pattern = regexAttribute.Pattern;
+            }
 
             if (propertyTypeDescription.Type == JsonObjectType.Number ||
                 propertyTypeDescription.Type == JsonObjectType.Integer)
