@@ -36,6 +36,9 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to generate abstract properties (i.e. interface and abstract properties. Properties may defined multiple times in a inheritance hierarchy, default: false).</summary>
+        public bool GenerateAbstractProperties { get; set; }
+
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
 
@@ -45,8 +48,14 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
         public bool GenerateXmlObjects { get; set; } = false;
 
+        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
+        public bool IgnoreObsoleteProperties { get; set; }
+
         /// <summary>Gets or sets the property nullability handling.</summary>
         public NullHandling NullHandling { get; set; }
+
+        /// <summary>Gets or sets the contract resolver.</summary>
+        public IContractResolver ContractResolver { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]
@@ -56,12 +65,13 @@ namespace NJsonSchema.Generation
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
 
-        /// <summary>Gets or sets the contract resolver.</summary>
-        public IContractResolver ContractResolver { get; set; }
-
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
         public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+
+        /// <summary>Gets or sets the schema processors.</summary>
+        [JsonIgnore]
+        public IList<ISchemaProcessor> SchemaProcessors { get; } = new List<ISchemaProcessor>();
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>

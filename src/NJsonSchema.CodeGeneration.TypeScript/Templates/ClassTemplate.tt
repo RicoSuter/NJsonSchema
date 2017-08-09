@@ -55,9 +55,9 @@
     static fromJS(data: any<#if(Model.HandleReferences){#>, _mappings?: any<#}#>): <#=Model.Class#> {
 <#if(Model.HandleReferences){#>
 <#  if(Model.HasBaseDiscriminator){#>
-<#      foreach (var derivedClass in Model.DerivedClassNames){#>
-        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>")
-            return createInstance<<#=derivedClass#>>(data, _mappings, <#=derivedClass#>);
+<#      foreach (var derivedClass in Model.DerivedClasses){#>
+        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass.Key#>")
+            return createInstance<<#=derivedClass.Value#>>(data, _mappings, <#=derivedClass.Value#>);
 <#      }#>
         return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
 <#  }else{#>
@@ -65,9 +65,9 @@
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>
-<#      foreach (var derivedClass in Model.DerivedClassNames){#>
-        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass#>") {
-            let result = new <#=derivedClass#>();
+<#      foreach (var derivedClass in Model.DerivedClasses){#>
+        if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass.Key#>") {
+            let result = new <#=derivedClass.Value#>();
             result.init(data);
             return result;
         }

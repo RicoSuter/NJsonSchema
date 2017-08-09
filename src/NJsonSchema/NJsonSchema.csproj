@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;net40;net45</TargetFrameworks>
     <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
-    <Version>9.0.0</Version>
+    <Version>9.4.5</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -20,13 +20,11 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
     <DefineConstants>LEGACY</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility">
-      <Version>1.0.1</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
     <PackageReference Include="Microsoft.Bcl.Async">

@@ -28,14 +28,6 @@ namespace NJsonSchema
             await UpdateSchemaReferencesAsync(rootObject, rootObject, new HashSet<object>(), referenceResolver).ConfigureAwait(false);
         }
 
-        /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
-        /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
-        /// <param name="rootObject">The root object.</param>
-        public static void UpdateSchemaReferencePaths(object rootObject)
-        {
-            UpdateSchemaReferencePaths(rootObject, rootObject, new HashSet<object>());
-        }
-
         /// <summary>Converts JSON references ($ref) to property references.</summary>
         /// <param name="data">The data.</param>
         /// <returns>The data.</returns>
@@ -52,7 +44,22 @@ namespace NJsonSchema
             return data.Replace("schemaReferencePath", "$ref");
         }
 
-        private static void UpdateSchemaReferencePaths(object rootObject, object obj, HashSet<object> checkedObjects)
+        /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
+        /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
+        /// <param name="rootObject">The root object.</param>
+        public static void UpdateSchemaReferencePaths(object rootObject)
+        {
+            var schemaReferences = new Dictionary<JsonSchema4, JsonSchema4>();
+            UpdateSchemaReferencePaths(rootObject, new HashSet<object>(), schemaReferences);
+
+            var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
+            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
+
+            foreach (var p in schemaReferences)
+                p.Key.SchemaReferencePath = result[p.Value];
+        }
+
+        private static void UpdateSchemaReferencePaths(object obj, HashSet<object> checkedObjects, Dictionary<JsonSchema4, JsonSchema4> schemaReferences)
         {
             if (obj == null || obj is string)
                 return;
@@ -61,9 +68,10 @@ namespace NJsonSchema
             if (schema != null && schema.SchemaReference != null)
             {
                 if (schema.SchemaReference.DocumentPath == null)
-                    schema.SchemaReferencePath = JsonPathUtilities.GetJsonPath(rootObject, schema.SchemaReference.ActualSchema);
+                    schemaReferences[schema] = schema.SchemaReference.ActualSchema;
                 else
                 {
+                    // TODO: Improve performance here (like the rest)
                     var externalReference = schema.SchemaReference;
                     var externalReferenceRoot = externalReference.FindRootParent();
                     schema.SchemaReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference);
@@ -73,12 +81,12 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 foreach (var item in ((IDictionary)obj).Values.OfType<object>().ToList())
-                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects);
+                    UpdateSchemaReferencePaths(item, checkedObjects, schemaReferences);
             }
             else if (obj is IEnumerable)
             {
                 foreach (var item in ((IEnumerable)obj).OfType<object>().ToArray())
-                    UpdateSchemaReferencePaths(rootObject, item, checkedObjects);
+                    UpdateSchemaReferencePaths(item, checkedObjects, schemaReferences);
             }
 
             if (!(obj is JToken))
@@ -93,7 +101,7 @@ namespace NJsonSchema
                         if (!checkedObjects.Contains(value))
                         {
                             checkedObjects.Add(value);
-                            UpdateSchemaReferencePaths(rootObject, value, checkedObjects);
+                            UpdateSchemaReferencePaths(value, checkedObjects, schemaReferences);
                         }
                     }
                 }

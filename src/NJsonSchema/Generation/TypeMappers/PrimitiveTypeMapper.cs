@@ -32,15 +32,9 @@ namespace NJsonSchema.Generation.TypeMappers
         public bool UseReference { get; } = false;
 
         /// <summary>Gets the schema for the mapped type.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="schema">The schema.</param>
-        /// <param name="schemaGenerator">The schema generator.</param>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        /// <returns>The schema.</returns>
-#pragma warning disable 1998
-        public async Task GenerateSchemaAsync<TSchemaType>(TSchemaType schema, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver) 
-#pragma warning restore 1998
-            where TSchemaType : JsonSchema4, new()
+        /// <param name="context">The context.</param>
+        public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
         {
             _transformer(schema);
         }

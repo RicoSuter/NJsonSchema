@@ -4,6 +4,9 @@
 <#}#>
 <#if(Model.HasDiscriminator){#>
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "<#=Model.Discriminator#>")]
+<#  foreach (var derivedClass in Model.DerivedClasses){#>
+[JsonInheritanceAttribute("<#=derivedClass.Key#>", typeof(<#=derivedClass.Value#>))]
+<#  }#>
 <#}#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 public partial class <#=Model.Class#> <#=Model.Inheritance#>

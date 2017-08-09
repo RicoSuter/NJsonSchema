@@ -29,7 +29,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                            " }";
                 else
                     return
-                        ", new Newtonsoft.Json.JsonSerializerSettings { Newtonsoft.Json.PreserveReferencesHandling.All }";
+                        ", new Newtonsoft.Json.JsonSerializerSettings { " +
+                        "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All }";
             }
             else
             {

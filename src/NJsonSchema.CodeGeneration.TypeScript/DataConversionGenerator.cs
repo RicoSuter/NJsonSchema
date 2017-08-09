@@ -30,7 +30,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver);
+            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver, parameters.Settings);
+
+            var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
+            var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
+                ? defaultValueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
+                    parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.NullHandling), dictionaryValueType, parameters.TypeNameHint,
+                    parameters.Settings.GenerateDefaultValues)
+                : null;
+
             return new
             {
                 NullValue = parameters.NullValue.ToString().ToLowerInvariant(),
@@ -49,7 +57,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDate = IsDate(parameters.Schema.Format, parameters.Settings.DateTimeType),
 
                 IsDictionary = parameters.Schema.IsDictionary,
-                DictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any",
+                DictionaryValueType = dictionaryValueType,
+                DictionaryValueDefaultValue = dictionaryValueDefaultValue,
+                HasDictionaryValueDefaultValue = dictionaryValueDefaultValue != null,
+
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
                 IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Type.HasFlag(JsonObjectType.Array) == true &&
@@ -107,7 +118,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             schema = schema.ActualSchema;
             return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None) 
-                && !schema.IsAnyType && !schema.IsDictionary;
+                && !schema.IsAnyType && !schema.IsDictionary && !schema.IsEnumeration;
         }
     }
 }

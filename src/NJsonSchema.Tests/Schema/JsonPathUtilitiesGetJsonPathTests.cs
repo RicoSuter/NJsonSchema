@@ -82,7 +82,7 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var objectToSearch = new JsonSchema4();
-            
+
             //// Act
             var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch);
 

@@ -14,12 +14,15 @@ namespace NJsonSchema.CodeGeneration
     public abstract class DefaultValueGenerator
     {
         private readonly ITypeResolver _typeResolver;
+        private readonly IEnumNameGenerator _enumNameGenerator;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultValueGenerator" /> class.</summary>
         /// <param name="typeResolver">The type typeResolver.</param>
-        protected DefaultValueGenerator(ITypeResolver typeResolver)
+        /// <param name="enumNameGenerator">The enum name generator.</param>
+        protected DefaultValueGenerator(ITypeResolver typeResolver, IEnumNameGenerator enumNameGenerator)
         {
             _typeResolver = typeResolver;
+            _enumNameGenerator = enumNameGenerator;
         }
 
         /// <summary>Gets the default value code.</summary>
@@ -39,16 +42,20 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint);
 
             if (schema.Type.HasFlag(JsonObjectType.String))
-                return "\"" + schema.Default + "\"";
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
-                    schema.Type.HasFlag(JsonObjectType.Number) ||
-                    schema.Type.HasFlag(JsonObjectType.Integer))
-                return schema.Default.ToString();
+                schema.Type.HasFlag(JsonObjectType.Number))
+                return ConvertNumericValue(schema.Default);
 
             return null;
         }
+
+        /// <summary>Converts the default value to a number literal. </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The number literal.</returns>
+        protected abstract string ConvertNumericValue(object value);
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
@@ -59,11 +66,12 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
 
-            var enumName = schema.Default is string
-                ? schema.Default.ToString()
-                : actualSchema.EnumerationNames[actualSchema.Enumeration.ToList().IndexOf(schema.Default)];
+            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
+            var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
+                ? actualSchema.EnumerationNames.ElementAt(index)
+                : schema.Default.ToString();
 
-            return typeName + "." + ConversionUtilities.ConvertToUpperCamelCase(enumName, true);
+            return typeName + "." + _enumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }
     }
 }

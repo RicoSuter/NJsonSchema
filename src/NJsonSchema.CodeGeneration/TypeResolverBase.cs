@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -60,10 +59,16 @@ namespace NJsonSchema.CodeGeneration
                     {
                         var classCode = p.Code;
 
-                        var index = classCode.IndexOf("class");
-                        index = classCode.IndexOf("{", index);
+                        var index = classCode.IndexOf("constructor(");
+                        if (index != -1)
+                            return classCode.Insert(index, extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n\n    ");
+                        else
+                        {
+                            index = classCode.IndexOf("class");
+                            index = classCode.IndexOf("{", index) + 1;
 
-                        return classCode.Insert(index + 1, extensionCode.GetExtensionClassBody(p.TypeName));
+                            return classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n");
+                        }
                     }
 
                     return p.Code;
@@ -104,7 +109,10 @@ namespace NJsonSchema.CodeGeneration
             schema = schema.ActualSchema;
 
             if (!_generatedTypeNames.ContainsKey(schema))
-                _generatedTypeNames[schema] = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _generatedTypeNames.Values);
+            {
+                var reservedTypeNames = _generatedTypeNames.Values.Distinct().ToList();
+                _generatedTypeNames[schema] = _settings.TypeNameGenerator.Generate(schema, typeNameHint, reservedTypeNames);
+            }
 
             return _generatedTypeNames[schema];
         }
