@@ -18,6 +18,21 @@
                 "description": "non-present required property is invalid",
                 "data": {"bar": 1},
                 "valid": false
+            },
+            {
+                "description": "ignores arrays",
+                "data": [],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
+                "data": 12,
+                "valid": true
             }
         ]
     },
@@ -31,6 +46,22 @@
         "tests": [
             {
                 "description": "not required by default",
+                "data": {},
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "required with empty array",
+        "schema": {
+            "properties": {
+                "foo": {}
+            },
+            "required": []
+        },
+        "tests": [
+            {
+                "description": "property not required",
                 "data": {},
                 "valid": true
             }

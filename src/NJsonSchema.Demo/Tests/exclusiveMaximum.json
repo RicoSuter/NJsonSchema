@@ -1,20 +1,22 @@
 [
     {
-        "description": "maximum validation",
-        "schema": {"maximum": 3.0},
+        "description": "exclusiveMaximum validation",
+        "schema": {
+            "exclusiveMaximum": 3.0
+        },
         "tests": [
             {
-                "description": "below the maximum is valid",
-                "data": 2.6,
+                "description": "below the exclusiveMaximum is valid",
+                "data": 2.2,
                 "valid": true
             },
             {
-                "description": "boundary point is valid",
+                "description": "boundary point is invalid",
                 "data": 3.0,
-                "valid": true
+                "valid": false
             },
             {
-                "description": "above the maximum is invalid",
+                "description": "above the exclusiveMaximum is invalid",
                 "data": 3.5,
                 "valid": false
             },

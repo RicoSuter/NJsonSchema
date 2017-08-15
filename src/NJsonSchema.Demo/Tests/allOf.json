@@ -108,5 +108,38 @@
                 "valid": false
             }
         ]
+    },
+    {
+        "description": "allOf with boolean schemas, all true",
+        "schema": {"allOf": [true, true]},
+        "tests": [
+            {
+                "description": "any value is valid",
+                "data": "foo",
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "allOf with boolean schemas, some false",
+        "schema": {"allOf": [true, false]},
+        "tests": [
+            {
+                "description": "any value is invalid",
+                "data": "foo",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "allOf with boolean schemas, all false",
+        "schema": {"allOf": [false, false]},
+        "tests": [
+            {
+                "description": "any value is invalid",
+                "data": "foo",
+                "valid": false
+            }
+        ]
     }
 ]

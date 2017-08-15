@@ -29,7 +29,17 @@
                 "valid": false
             },
             {
-                "description": "ignores non-objects",
+                "description": "ignores arrays",
+                "data": ["foo"],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "foo",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
                 "data": 12,
                 "valid": true
             }
@@ -104,6 +114,37 @@
                 "description": "regexes are case sensitive, 2",
                 "data": { "a_X_3": 3 },
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "patternProperties with boolean schemas",
+        "schema": {
+            "patternProperties": {
+                "f.*": true,
+                "b.*": false
+            }
+        },
+        "tests": [
+            {
+                "description": "object with property matching schema true is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "object with property matching schema false is invalid",
+                "data": {"bar": 2},
+                "valid": false
+            },
+            {
+                "description": "object with both properties is invalid",
+                "data": {"foo": 1, "bar": 2},
+                "valid": false
+            },
+            {
+                "description": "empty object is valid",
+                "data": {},
+                "valid": true
             }
         ]
     }

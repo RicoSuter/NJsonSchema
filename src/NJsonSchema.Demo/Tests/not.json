@@ -91,6 +91,27 @@
                 "valid": true
             }
         ]
+    },
+    {
+        "description": "not with boolean schema true",
+        "schema": {"not": true},
+        "tests": [
+            {
+                "description": "any value is invalid",
+                "data": "foo",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "not with boolean schema false",
+        "schema": {"not": false},
+        "tests": [
+            {
+                "description": "any value is valid",
+                "data": "foo",
+                "valid": true
+            }
+        ]
     }
-
 ]

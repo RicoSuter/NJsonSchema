@@ -26,8 +26,36 @@
                 "valid": false
             },
             {
-                "description": "ignores non-objects",
-                "data": "foo",
+                "description": "ignores arrays",
+                "data": ["bar"],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "foobar",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
+                "data": 12,
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "dependencies with empty array",
+        "schema": {
+            "dependencies": {"bar": []}
+        },
+        "tests": [
+            {
+                "description": "empty object",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "object with one property",
+                "data": {"bar": 2},
                 "valid": true
             }
         ]
@@ -107,6 +135,37 @@
                 "description": "wrong type both",
                 "data": {"foo": "quux", "bar": "quux"},
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "dependencies with boolean subschemas",
+        "schema": {
+            "dependencies": {
+                "foo": true,
+                "bar": false
+            }
+        },
+        "tests": [
+            {
+                "description": "object with property having schema true is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "object with property having schema false is invalid",
+                "data": {"bar": 2},
+                "valid": false
+            },
+            {
+                "description": "object with both properties is invalid",
+                "data": {"foo": 1, "bar": 2},
+                "valid": false
+            },
+            {
+                "description": "empty object is valid",
+                "data": {},
+                "valid": true
             }
         ]
     }

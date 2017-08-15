@@ -6,9 +6,9 @@
         },
         "tests": [
             {
-                "description": "a float is not an integer even without fractional part",
+                "description": "a float without fractional part is an integer",
                 "data": 1.0,
-                "valid": false
+                "valid": true
             }
         ]
     }

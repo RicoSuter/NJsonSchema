@@ -74,7 +74,7 @@ namespace NJsonSchema.Demo
         {
             try
             {
-                var schema = JsonSchema4.FromJsonAsync(suite["schema"].ToString(), Path.GetDirectoryName(file)).GetAwaiter().GetResult();
+                var schema = JsonSchema4.FromJsonAsync(suite["schema"].ToString(), "remotes/" + Path.GetFileName(file)).GetAwaiter().GetResult();
                 var errors = schema.Validate(value);
                 var success = expectedResult ? errors.Count == 0 : errors.Count > 0;
 

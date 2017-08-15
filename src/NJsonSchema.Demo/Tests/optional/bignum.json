@@ -68,8 +68,7 @@
     {
         "description": "float comparison with high precision",
         "schema": {
-            "maximum": 972783798187987123879878123.18878137,
-            "exclusiveMaximum": true
+            "exclusiveMaximum": 972783798187987123879878123.18878137
         },
         "tests": [
             {
@@ -93,8 +92,7 @@
     {
         "description": "float comparison with high precision on negative numbers",
         "schema": {
-            "minimum": -972783798187987123879878123.18878137,
-            "exclusiveMinimum": true
+            "exclusiveMinimum": -972783798187987123879878123.18878137
         },
         "tests": [
             {

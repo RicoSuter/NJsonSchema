@@ -29,8 +29,13 @@
                 "valid": true
             },
             {
-                "description": "ignores non-objects",
+                "description": "ignores arrays",
                 "data": [],
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
+                "data": 12,
                 "valid": true
             }
         ]
@@ -85,6 +90,37 @@
             {
                 "description": "additionalProperty invalidates others",
                 "data": {"quux": "foo"},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "properties with boolean schema",
+        "schema": {
+            "properties": {
+                "foo": true,
+                "bar": false
+            }
+        },
+        "tests": [
+            {
+                "description": "no property present is valid",
+                "data": {},
+                "valid": true
+            },
+            {
+                "description": "only 'true' property present is valid",
+                "data": {"foo": 1},
+                "valid": true
+            },
+            {
+                "description": "only 'false' property present is invalid",
+                "data": {"bar": 2},
+                "valid": false
+            },
+            {
+                "description": "both properties present is invalid",
+                "data": {"foo": 1, "bar": 2},
                 "valid": false
             }
         ]
