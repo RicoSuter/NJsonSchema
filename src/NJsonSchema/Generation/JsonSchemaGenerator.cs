@@ -337,7 +337,7 @@ namespace NJsonSchema.Generation
                         var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                         var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null || 
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
                         if (Settings.GenerateAbstractProperties || propertyInfo == null ||
@@ -639,7 +639,12 @@ namespace NJsonSchema.Generation
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
 
-        private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
+        private JsonContract ResolveContract(Type type)
+        {
+            return !type.GetTypeInfo().IsGenericTypeDefinition ?
+                Settings.ActualContractResolver.ResolveContract(type) :
+                null;
+        }
 
         private bool IsPropertyIgnored(Type propertyType, Type parentType, Attribute[] propertyAttributes)
         {

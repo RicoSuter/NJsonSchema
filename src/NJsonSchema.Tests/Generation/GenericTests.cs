@@ -35,5 +35,23 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(JsonObjectType.Array, schema.Type);
             Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
         }
+
+        public class A<T>
+        {
+            public T B { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_open_generic_type_is_generated_then_no_exception_is_thrown()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync(typeof(A<>));
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsNotNull(json);
+        }
     }
 }
