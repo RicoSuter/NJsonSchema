@@ -187,15 +187,6 @@ namespace NJsonSchema.Generation
         private static bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Move all file handling to NSwag. How?
-
-            var attributes = parentAttributes != null
-                ? type.GetTypeInfo().GetCustomAttributes().Concat(parentAttributes)
-                : type.GetTypeInfo().GetCustomAttributes();
-
-            if (attributes.Any(a => a.GetType().IsAssignableTo("SwaggerFileAttribute", TypeNameStyle.Name)))
-            {
-                return true;
-            }
             
             var parameterTypeName = type.Name;
             return parameterTypeName == "IFormFile" ||
