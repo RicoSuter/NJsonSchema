@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     /// <summary>The JsonInheritanceConverterTemplateModel.</summary>
@@ -20,9 +22,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets or sets a value indicating whether to generate the JsonInheritanceAttribute class.</summary>
-        public bool GenerateJsonInheritanceAttributeClass => _settings.GenerateJsonInheritanceAttributeClass;
+        public bool GenerateJsonInheritanceAttributeClass => _settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true;
 
         /// <summary>Gets or sets a value indicating whether to generate the GenerateJsonInheritanceConverterClass class.</summary>
-        public bool GenerateJsonInheritanceConverterClass => _settings.GenerateJsonInheritanceConverterClass;
+        public bool GenerateJsonInheritanceConverterClass => _settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true;
     }
 }
