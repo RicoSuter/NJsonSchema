@@ -28,9 +28,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory();
-
-            GenerateJsonInheritanceAttributeClass = true;
-            GenerateJsonInheritanceConverterClass = true;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types.</summary>
@@ -75,11 +72,5 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).</summary>
         public bool HandleReferences { get; set; }
-
-        /// <summary>Gets or sets a value indicating whether to generate the JsonInheritanceAttribute class.</summary>
-        public bool GenerateJsonInheritanceAttributeClass { get; set; }
-
-        /// <summary>Gets or sets a value indicating whether to generate the GenerateJsonInheritanceConverterClass class.</summary>
-        public bool GenerateJsonInheritanceConverterClass { get; set; }
     }
 }
