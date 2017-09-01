@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NJsonSchema.Annotations;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -32,6 +33,28 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsFalse(schema.Properties["Id"].Type.HasFlag(JsonObjectType.Null));
             Assert.IsTrue(schema.Properties["Name"].Type.HasFlag(JsonObjectType.Null));
             Assert.IsTrue(schema.Properties["Size"].Type.HasFlag(JsonObjectType.Null));
+        }
+
+        public class NotNullAttributeClass
+        {
+            public string Foo { get; set; }
+
+            [NotNull]
+            public string Bar { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_NotNullAttribute_is_available_then_property_is_not_nullable()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<NotNullAttributeClass>();
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsTrue(schema.Properties["Foo"].IsNullable(NullHandling.JsonSchema));
+            Assert.IsFalse(schema.Properties["Bar"].IsNullable(NullHandling.JsonSchema));
         }
     }
 }

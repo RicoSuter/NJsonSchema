@@ -37,6 +37,9 @@ namespace NJsonSchema.Generation
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
                 allowsNull = false;
 
+            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
+                allowsNull = false;
+
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);

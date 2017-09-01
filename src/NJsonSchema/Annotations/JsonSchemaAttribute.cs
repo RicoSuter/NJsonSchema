@@ -24,7 +24,7 @@ namespace NJsonSchema.Annotations
         /// <param name="name">The identifier of the schema which is used as key in the 'definitions' list.</param>
         public JsonSchemaAttribute(string name) : this()
         {
-            Name = name; 
+            Name = name;
         }
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAttribute"/> class.</summary>
