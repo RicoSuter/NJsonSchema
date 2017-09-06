@@ -49,21 +49,40 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Converts the default value to a C# number literal. </summary>
         /// <param name="value">The value to convert.</param>
+        /// <param name="format">Optional schema format</param>
         /// <returns>The C# number literal.</returns>
-        protected override string ConvertNumericValue(object value)
+        protected override string ConvertNumericValue(object value, string format)
         {
-            if (value is byte) return "(byte)" + ((byte)value).ToString(CultureInfo.InvariantCulture);
-            if (value is sbyte) return "(sbyte)" + ((sbyte)value).ToString(CultureInfo.InvariantCulture);
-            if (value is short) return "(short)" + ((short)value).ToString(CultureInfo.InvariantCulture);
-            if (value is ushort) return "(ushort)" + ((ushort)value).ToString(CultureInfo.InvariantCulture);
-            if (value is int) return ((int)value).ToString(CultureInfo.InvariantCulture);
-            if (value is uint) return ((uint)value).ToString(CultureInfo.InvariantCulture) + "U";
-            if (value is long) return ((long)value).ToString(CultureInfo.InvariantCulture) + "L";
-            if (value is ulong) return ((ulong)value).ToString(CultureInfo.InvariantCulture) + "UL";
-            if (value is float) return ((float)value).ToString("r", CultureInfo.InvariantCulture) + "F";
-            if (value is double) return ((double)value).ToString("r", CultureInfo.InvariantCulture) + "D";
-            if (value is decimal) return ((decimal)value).ToString(CultureInfo.InvariantCulture) + "M";
-            return null;
+            if (string.IsNullOrEmpty(format))
+            {
+                if (value is byte) return "(byte)" + ((byte) value).ToString(CultureInfo.InvariantCulture);
+                if (value is sbyte) return "(sbyte)" + ((sbyte) value).ToString(CultureInfo.InvariantCulture);
+                if (value is short) return "(short)" + ((short) value).ToString(CultureInfo.InvariantCulture);
+                if (value is ushort) return "(ushort)" + ((ushort) value).ToString(CultureInfo.InvariantCulture);
+                if (value is int) return ((int) value).ToString(CultureInfo.InvariantCulture);
+                if (value is uint) return ((uint) value).ToString(CultureInfo.InvariantCulture) + "U";
+                if (value is long) return ((long) value).ToString(CultureInfo.InvariantCulture) + "L";
+                if (value is ulong) return ((ulong) value).ToString(CultureInfo.InvariantCulture) + "UL";
+                if (value is float) return ((float) value).ToString("r", CultureInfo.InvariantCulture) + "F";
+                if (value is double) return ((double) value).ToString("r", CultureInfo.InvariantCulture) + "D";
+                if (value is decimal) return ((decimal) value).ToString(CultureInfo.InvariantCulture) + "M";
+                return null;
+            }
+            switch (format)
+            {
+                case JsonFormatStrings.Byte:
+                    return "(byte)" + ((byte)value).ToString(CultureInfo.InvariantCulture);
+                case JsonFormatStrings.Integer:
+                    return ((long)value).ToString(CultureInfo.InvariantCulture);
+                case JsonFormatStrings.Long:
+                    return ((long)value).ToString(CultureInfo.InvariantCulture) + "L";
+                case JsonFormatStrings.Double:
+                    return ((double)value).ToString("r", CultureInfo.InvariantCulture) + "D";
+                case JsonFormatStrings.Decimal:
+                    return ((decimal)value).ToString(CultureInfo.InvariantCulture) + "M";
+                default:
+                    return null;
+            }
         }
 
         /// <summary>Gets the enum default value.</summary>
