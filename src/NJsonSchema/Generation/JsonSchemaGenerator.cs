@@ -561,10 +561,11 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
-                        jsonProperty = new JsonProperty
+                        jsonProperty = new JsonProperty();
+                        jsonProperty.AllOf.Add(new JsonSchema4
                         {
                             SchemaReference = propertySchema.ActualSchema
-                        };
+                        });
                     }
                 }
                 else
