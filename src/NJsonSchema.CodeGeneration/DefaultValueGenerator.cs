@@ -47,15 +47,16 @@ namespace NJsonSchema.CodeGeneration
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                 schema.Type.HasFlag(JsonObjectType.Number))
-                return ConvertNumericValue(schema.Default);
+                return ConvertNumericValue(schema.Default, schema.Format);
 
             return null;
         }
 
         /// <summary>Converts the default value to a number literal. </summary>
         /// <param name="value">The value to convert.</param>
+        /// <param name="format">Optional schema format</param>
         /// <returns>The number literal.</returns>
-        protected abstract string ConvertNumericValue(object value); 
+        protected abstract string ConvertNumericValue(object value, string format);
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
@@ -66,10 +67,10 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
 
-            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default); 
-            var enumName = schema.Default is string
-                ? schema.Default.ToString()
-                : actualSchema.EnumerationNames[index];
+            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
+            var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
+                ? actualSchema.EnumerationNames.ElementAt(index)
+                : schema.Default.ToString();
 
             return typeName + "." + _enumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }

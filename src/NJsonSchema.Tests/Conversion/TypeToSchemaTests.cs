@@ -88,6 +88,24 @@ namespace NJsonSchema.Tests.Conversion
             Assert.AreEqual("regex", schema.Properties["RegexString"].Pattern);
         }
 
+        public class ClassWithRegexDictionaryProperty
+        {
+            [RegularExpression("^\\d+\\.\\d+\\.\\d+\\.\\d+$")]
+            public Dictionary<string, string> Versions { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
+        {
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithRegexDictionaryProperty>();
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.IsNull(schema.Properties["Versions"].Pattern);
+            Assert.IsNotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
+        }
+
         [TestMethod]
         public async Task When_converting_range_property_then_it_should_be_set_as_min_max()
         {

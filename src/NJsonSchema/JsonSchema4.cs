@@ -286,6 +286,7 @@ namespace NJsonSchema
 
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
+        /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
         [JsonIgnore]
 #if !LEGACY
         public IReadOnlyDictionary<string, JsonProperty> ActualProperties
@@ -702,7 +703,7 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
-                                    Properties.Count == 0 &&
+                                    ActualProperties.Count == 0 &&
                                     (AllowAdditionalProperties || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
@@ -711,7 +712,7 @@ namespace NJsonSchema
                                  AllOf.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  OneOf.Count == 0 &&
-                                 Properties.Count == 0 &&
+                                 ActualProperties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
                                  AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&

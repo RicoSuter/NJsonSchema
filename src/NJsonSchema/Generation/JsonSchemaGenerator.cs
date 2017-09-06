@@ -337,7 +337,7 @@ namespace NJsonSchema.Generation
                         var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                         var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null || 
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
                         if (Settings.GenerateAbstractProperties || propertyInfo == null ||
@@ -533,7 +533,7 @@ namespace NJsonSchema.Generation
         {
             var propertyType = property.PropertyType;
             var propertyAttributes = property.AttributeProvider.GetAttributes(true).ToArray();
-            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, ResolveContract(propertyType), null, Settings.DefaultEnumHandling);
+            var propertyTypeDescription = JsonObjectTypeDescription.FromType(propertyType, ResolveContract(propertyType), propertyAttributes, Settings.DefaultEnumHandling);
             if (property.Ignored == false && IsPropertyIgnoredBySettings(propertyType, parentType, propertyAttributes) == false)
             {
                 JsonProperty jsonProperty;
@@ -640,7 +640,12 @@ namespace NJsonSchema.Generation
             return !typeDescription.IsDictionary && (typeDescription.Type.HasFlag(JsonObjectType.Object) || typeDescription.IsEnum);
         }
 
-        private JsonContract ResolveContract(Type type) => Settings.ActualContractResolver.ResolveContract(type);
+        private JsonContract ResolveContract(Type type)
+        {
+            return !type.GetTypeInfo().IsGenericTypeDefinition ?
+                Settings.ActualContractResolver.ResolveContract(type) :
+                null;
+        }
 
         private bool IsPropertyIgnored(Type propertyType, Type parentType, Attribute[] propertyAttributes)
         {
@@ -699,7 +704,12 @@ namespace NJsonSchema.Generation
 
             dynamic regexAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
-                jsonProperty.Pattern = regexAttribute.Pattern;
+            {
+                if (propertyTypeDescription.IsDictionary)
+                    jsonProperty.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
+                else
+                    jsonProperty.Pattern = regexAttribute.Pattern;
+            }
 
             if (propertyTypeDescription.Type == JsonObjectType.Number ||
                 propertyTypeDescription.Type == JsonObjectType.Integer)

@@ -50,8 +50,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Converts the default value to a TypeScript number literal. </summary>
         /// <param name="value">The value to convert.</param>
+        /// <param name="format">Optional schema format</param>
         /// <returns>The TypeScript number literal.</returns>
-        protected override string ConvertNumericValue(object value)
+        protected override string ConvertNumericValue(object value, string format)
         {
             if (value is byte) return ((byte)value).ToString(CultureInfo.InvariantCulture);
             if (value is sbyte) return ((sbyte)value).ToString(CultureInfo.InvariantCulture);

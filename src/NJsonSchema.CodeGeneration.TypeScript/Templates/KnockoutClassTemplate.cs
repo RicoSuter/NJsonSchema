@@ -368,7 +368,7 @@ if(Model.HandleReferences){
             this.Write("\")\r\n            return createInstance<");
             
             #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\KnockoutClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass));
+            this.Write(this.ToStringHelper.ToStringWithCulture(derivedClass.Value));
             
             #line default
             #line hidden

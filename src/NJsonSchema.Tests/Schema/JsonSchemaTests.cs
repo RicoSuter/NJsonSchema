@@ -148,6 +148,23 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
+        public async Task When_deserializing_schema_it_should_not_stackoverflow()
+        {
+            //// Arrange
+            var data =
+@"{
+    ""x-dateTime"": ""2016-07-28T14:39:37.937Z""
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(data);
+            var x = schema.ToJson();
+
+            //// Assert
+            Assert.IsInstanceOfType(schema.ExtensionData.First().Value, typeof(DateTime));
+        }
+
+        [TestMethod]
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange

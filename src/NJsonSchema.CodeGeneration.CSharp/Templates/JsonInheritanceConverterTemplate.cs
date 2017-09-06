@@ -25,14 +25,21 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
             
             #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+if(Model.GenerateJsonInheritanceAttributeClass){
+            
+            #line default
+            #line hidden
+            this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
+            
+            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
             #line hidden
             this.Write(@""")]
+[System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
 internal class JsonInheritanceAttribute : System.Attribute
 {
     public JsonInheritanceAttribute(string key, System.Type type)
@@ -46,9 +53,22 @@ internal class JsonInheritanceAttribute : System.Attribute
     public System.Type Type { get; }
 }
 
-[System.CodeDom.Compiler.GeneratedCode(""NJsonSchema"", """);
+");
             
-            #line 16 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+            #line 18 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            
+            #line 19 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+if(Model.GenerateJsonInheritanceConverterClass){
+            
+            #line default
+            #line hidden
+            this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
+            
+            #line 20 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
@@ -88,7 +108,13 @@ internal class JsonInheritanceAttribute : System.Attribute
                     "tCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExten" +
                     "sions.GetTypeInfo(objectType), false))\r\n        {\r\n            if (type.Key == d" +
                     "iscriminator)\r\n                return type.Type;\r\n        }\r\n\r\n        return ob" +
-                    "jectType;\r\n    }\r\n}");
+                    "jectType;\r\n    }\r\n}\r\n");
+            
+            #line 121 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+}
+            
+            #line default
+            #line hidden
             return this.GenerationEnvironment.ToString();
         }
     }

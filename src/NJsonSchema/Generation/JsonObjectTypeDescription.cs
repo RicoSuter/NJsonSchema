@@ -37,6 +37,9 @@ namespace NJsonSchema.Generation
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
                 allowsNull = false;
 
+            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
+                allowsNull = false;
+
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);
@@ -91,7 +94,7 @@ namespace NJsonSchema.Generation
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
                 return new JsonObjectTypeDescription(JsonObjectType.None, allowsNull);
 
-            if (IsFileType(type))
+            if (IsFileType(type, parentAttributes))
                 return new JsonObjectTypeDescription(JsonObjectType.File, allowsNull);
 
             if (IsDictionaryType(type) && contract is JsonDictionaryContract)
@@ -184,6 +187,21 @@ namespace NJsonSchema.Generation
         /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
         public bool IsAny => Type == JsonObjectType.None;
 
+        private static bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
+        {
+            // TODO: Move all file handling to NSwag. How?
+            
+            var parameterTypeName = type.Name;
+            return parameterTypeName == "IFormFile" ||
+                   type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
+                   type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
+#if !LEGACY
+                   type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+#else
+                   type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
+#endif
+        }
+
 #if !LEGACY
 
         private static bool IsArrayType(Type type)
@@ -198,15 +216,6 @@ namespace NJsonSchema.Generation
             return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
                 (type.GetTypeInfo().BaseType == null ||
                 !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
-        }
-
-        private static bool IsFileType(Type type)
-        {
-            var parameterTypeName = type.Name;
-            return parameterTypeName == "IFormFile" ||
-                   type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
-                   type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
-                   type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
         }
 
         private static bool IsDictionaryType(Type type)
@@ -233,14 +242,6 @@ namespace NJsonSchema.Generation
             return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
                 (type.GetTypeInfo().BaseType == null ||
                 !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
-        }
-
-        private static bool IsFileType(Type type)
-        {
-            var parameterTypeName = type.Name;
-            return parameterTypeName == "IFormFile" ||
-                   parameterTypeName == "HttpPostedFileBase" ||
-                   type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
         }
 
         private static bool IsDictionaryType(Type type)

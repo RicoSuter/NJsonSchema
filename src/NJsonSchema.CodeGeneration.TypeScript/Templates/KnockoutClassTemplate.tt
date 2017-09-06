@@ -42,7 +42,7 @@
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClasses){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass.Key#>")
-            return createInstance<<#=derivedClass#>>(data, _mappings, <#=derivedClass.Value#>);
+            return createInstance<<#=derivedClass.Value#>>(data, _mappings, <#=derivedClass.Value#>);
 <#      }#>
         return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
 <#  }else{#>

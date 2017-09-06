@@ -1,5 +1,7 @@
 ﻿<#@ template visibility="internal" #>
+<#if(Model.GenerateJsonInheritanceAttributeClass){#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
+[System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
 internal class JsonInheritanceAttribute : System.Attribute
 {
     public JsonInheritanceAttribute(string key, System.Type type)
@@ -13,6 +15,8 @@ internal class JsonInheritanceAttribute : System.Attribute
     public System.Type Type { get; }
 }
 
+<#}#>
+<#if(Model.GenerateJsonInheritanceConverterClass){#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
@@ -114,3 +118,4 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         return objectType;
     }
 }
+<#}#>
