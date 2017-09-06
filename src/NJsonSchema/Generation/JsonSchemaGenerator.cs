@@ -580,7 +580,7 @@ namespace NJsonSchema.Generation
 
                 if (isNullable)
                 {
-                    if (Settings.NullHandling == NullHandling.JsonSchema)
+                    if (Settings.NullHandling != NullHandling.Swagger)
                     {
                         if (requiresSchemaReference)
                             jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
@@ -616,7 +616,7 @@ namespace NJsonSchema.Generation
                     {
                         jsonProperty.SchemaReference = propertySchema.ActualSchema;
                     }
-                    else if (Settings.NullHandling == NullHandling.JsonSchema)
+                    else if (Settings.NullHandling != NullHandling.Swagger)
                     {
                         jsonProperty.OneOf.Add(new JsonSchema4
                         {
