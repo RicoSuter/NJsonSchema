@@ -547,7 +547,7 @@ namespace NJsonSchema.Generation
 
                 var requiresSchemaReference = RequiresSchemaReference(propertyType, propertyAttributes);
                 if (requiresSchemaReference)
-                    jsonProperty = new JsonProperty()
+                    jsonProperty = new JsonProperty();
                 else
                     jsonProperty = await GenerateAsync<JsonProperty>(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
 
