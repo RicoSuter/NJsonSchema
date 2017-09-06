@@ -547,27 +547,7 @@ namespace NJsonSchema.Generation
 
                 var requiresSchemaReference = RequiresSchemaReference(propertyType, propertyAttributes);
                 if (requiresSchemaReference)
-                {
-                    var propertySchema = await GenerateAsync(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
-
-                    // The schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
-                    if (Settings.NullHandling == NullHandling.JsonSchema)
-                    {
-                        jsonProperty = new JsonProperty();
-                        jsonProperty.OneOf.Add(new JsonSchema4
-                        {
-                            SchemaReference = propertySchema.ActualSchema
-                        });
-                    }
-                    else
-                    {
-                        jsonProperty = new JsonProperty();
-                        jsonProperty.AllOf.Add(new JsonSchema4
-                        {
-                            SchemaReference = propertySchema.ActualSchema
-                        });
-                    }
-                }
+                    jsonProperty = new JsonProperty()
                 else
                     jsonProperty = await GenerateAsync<JsonProperty>(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
 
@@ -600,7 +580,7 @@ namespace NJsonSchema.Generation
 
                 if (isNullable)
                 {
-                    if (Settings.NullHandling == NullHandling.JsonSchema)
+                    if (Settings.NullHandling != NullHandling.Swagger)
                     {
                         if (requiresSchemaReference)
                             jsonProperty.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
@@ -624,8 +604,33 @@ namespace NJsonSchema.Generation
                     jsonProperty.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
                 jsonProperty.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
-
                 ApplyPropertyAnnotations(jsonProperty, property, parentType, propertyAttributes, propertyTypeDescription);
+
+                if (requiresSchemaReference)
+                {
+                    // The referenced schema is automatically added to Definitions if it is missing in JsonPathUtilities.GetJsonPath()
+                    var propertySchema = await GenerateAsync(propertyType, propertyAttributes, schemaResolver).ConfigureAwait(false);
+
+                    var hasNoProperties = !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(jsonProperty)).Properties().Any(); // TODO: Improve performance
+                    if (hasNoProperties && jsonProperty.OneOf.Count == 0)
+                    {
+                        jsonProperty.SchemaReference = propertySchema.ActualSchema;
+                    }
+                    else if (Settings.NullHandling != NullHandling.Swagger)
+                    {
+                        jsonProperty.OneOf.Add(new JsonSchema4
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        });
+                    }
+                    else
+                    {
+                        jsonProperty.AllOf.Add(new JsonSchema4
+                        {
+                            SchemaReference = propertySchema.ActualSchema
+                        });
+                    }
+                }
             }
         }
 
