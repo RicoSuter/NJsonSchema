@@ -7,7 +7,7 @@ using NJsonSchema.Generation;
 namespace NJsonSchema.Tests.Generation
 {
     [TestClass]
-    public class EnumListTests
+    public class EnumTests
     {
         public enum MetadataSchemaType
         {
@@ -49,6 +49,27 @@ namespace NJsonSchema.Tests.Generation
             // Assert
             Assert.IsTrue(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once
             Assert.IsTrue(json.Split(new[] { "\"$ref\": \"#/definitions/MetadataSchemaType\"" }, StringSplitOptions.None).Length == 3); // both classes reference the enum
+        }
+
+        public class ContainerWithEnumDictionary
+        {
+            public Dictionary<string, MetadataSchemaType> Dictionary { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_property_is_dictionary_with_enum_value_then_it_is_referenced()
+        {
+            // Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ContainerWithEnumDictionary>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.Integer
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.IsTrue(schema.Properties["Dictionary"].AdditionalPropertiesSchema.HasSchemaReference); 
         }
     }
 }
