@@ -76,11 +76,14 @@ namespace NJsonSchema.Generation
             if (type == typeof(Guid))
                 return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) || type.FullName == "NodaTime.OffsetDateTime" || type.FullName == "NodaTime.ZonedDateTime")
                 return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.DateTime);
 
-            if (type == typeof(TimeSpan))
+            if (type == typeof(TimeSpan) || type.FullName == "NodaTime.Duration")
                 return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.TimeSpan);
+
+            if (type.FullName == "NodaTime.LocalDate")
+                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Date);
 
             if (type == typeof(Uri))
                 return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull, false, JsonFormatStrings.Uri);
