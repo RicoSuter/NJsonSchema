@@ -133,7 +133,7 @@ namespace NJsonSchema.Generation
                 if (typeDescription.IsDictionary)
                 {
                     typeDescription.ApplyType(schema);
-                    await GenerateDictionaryAsync(type, typeDescription, schema, schemaResolver).ConfigureAwait(false);
+                    await GenerateDictionaryAsync(type, schema, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -248,7 +248,7 @@ namespace NJsonSchema.Generation
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        private async Task GenerateDictionaryAsync<TSchemaType>(Type type, JsonObjectTypeDescription typeDescription, TSchemaType schema, JsonSchemaResolver schemaResolver)
+        private async Task GenerateDictionaryAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var genericTypeArguments = type.GetGenericTypeArguments();
@@ -259,7 +259,8 @@ namespace NJsonSchema.Generation
             else
             {
                 var additionalPropertiesSchema = await GenerateAsync(valueType, schemaResolver).ConfigureAwait(false);
-                if (typeDescription.RequiresSchemaReference(Settings.TypeMappers))
+                var valueTypeDescription = JsonObjectTypeDescription.FromType(valueType, ResolveContract(valueType), null, Settings.DefaultEnumHandling);
+                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
                 {
                     schema.AdditionalPropertiesSchema = new JsonSchema4
                     {
