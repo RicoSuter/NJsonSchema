@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
+using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
@@ -22,6 +23,8 @@ namespace NJsonSchema.Generation
     /// <summary>Gets JSON information about a .NET type. </summary>
     public class JsonObjectTypeDescription
     {
+        private readonly Type _type;
+
         /// <summary>Creates a <see cref="JsonObjectTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="type">The type. </param>
         /// <param name="contract">The contract as per Json.NET serialization</param>
@@ -43,65 +46,68 @@ namespace NJsonSchema.Generation
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);
-                return new JsonObjectTypeDescription(isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false)
+                return new JsonObjectTypeDescription(type, isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false)
                 {
                     IsEnum = true
                 };
             }
 
             if (type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, false);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Integer, false);
 
             if (type == typeof(int))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Integer);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Integer, false, false, JsonFormatStrings.Integer);
 
             if ((type == typeof(long)) || (type == typeof(ulong)))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Long);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Integer, false, false, JsonFormatStrings.Long);
 
             if (type == typeof(double) || type == typeof(float))
-                return new JsonObjectTypeDescription(JsonObjectType.Number, false, false, JsonFormatStrings.Double);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Number, false, false, JsonFormatStrings.Double);
 
             if (type == typeof(decimal))
-                return new JsonObjectTypeDescription(JsonObjectType.Number, false, false, JsonFormatStrings.Decimal);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Number, false, false, JsonFormatStrings.Decimal);
 
             if (type == typeof(bool))
-                return new JsonObjectTypeDescription(JsonObjectType.Boolean, false);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Boolean, false);
 
             if (type == typeof(string) || type == typeof(Type))
-                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull);
 
             if (type == typeof(char))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, false);
 
             if (type == typeof(Guid))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.Guid);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, false, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.DateTime);
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) || type.FullName == "NodaTime.OffsetDateTime" || type.FullName == "NodaTime.ZonedDateTime")
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, false, false, JsonFormatStrings.DateTime);
 
-            if (type == typeof(TimeSpan))
-                return new JsonObjectTypeDescription(JsonObjectType.String, false, false, JsonFormatStrings.TimeSpan);
+            if (type == typeof(TimeSpan) || type.FullName == "NodaTime.Duration")
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, false, false, JsonFormatStrings.TimeSpan);
+
+            if (type.FullName == "NodaTime.LocalDate")
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, false, false, JsonFormatStrings.Date);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull, false, JsonFormatStrings.Uri);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull, false, JsonFormatStrings.Uri);
 
             if (type == typeof(byte))
-                return new JsonObjectTypeDescription(JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
 
             if (type == typeof(byte[]))
-                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull, false, JsonFormatStrings.Byte);
 
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return new JsonObjectTypeDescription(JsonObjectType.None, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.None, allowsNull);
 
             if (IsFileType(type, parentAttributes))
-                return new JsonObjectTypeDescription(JsonObjectType.File, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.File, allowsNull);
 
             if (IsDictionaryType(type) && contract is JsonDictionaryContract)
-                return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull, true);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Object, allowsNull, true);
 
             if (IsArrayType(type) && contract is JsonArrayContract)
-                return new JsonObjectTypeDescription(JsonObjectType.Array, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Array, allowsNull);
 
             if (type.Name == "Nullable`1")
             {
@@ -120,13 +126,13 @@ namespace NJsonSchema.Generation
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return new JsonObjectTypeDescription(classType, allowsNull, false, format);
+                return new JsonObjectTypeDescription(type, classType, allowsNull, false, format);
             }
 
             if (contract is JsonStringContract)
-                return new JsonObjectTypeDescription(JsonObjectType.String, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull);
 
-            return new JsonObjectTypeDescription(JsonObjectType.Object, allowsNull);
+            return new JsonObjectTypeDescription(type, JsonObjectType.Object, allowsNull);
         }
 
         /// <summary>Determines whether the an enum property serializes to a string.</summary>
@@ -143,9 +149,10 @@ namespace NJsonSchema.Generation
                 (propertyAttributes != null && HasStringEnumConverter(propertyAttributes));
         }
 
-        private JsonObjectTypeDescription(JsonObjectType type, bool isNullable, bool isDictionary = false, string format = null)
+        private JsonObjectTypeDescription(Type type, JsonObjectType jsonType, bool isNullable, bool isDictionary = false, string format = null)
         {
-            Type = type;
+            _type = type;
+            Type = jsonType;
             IsNullable = isNullable;
             Format = format;
             IsDictionary = isDictionary;
@@ -187,10 +194,22 @@ namespace NJsonSchema.Generation
         /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
         public bool IsAny => Type == JsonObjectType.None;
 
+        /// <summary>Specifices whether the type requires a reference.</summary>
+        /// <param name="typeMappers">The type mappers.</param>
+        /// <returns>true or false.</returns>
+        public bool RequiresSchemaReference(IEnumerable<ITypeMapper> typeMappers)
+        {
+            var typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == _type);
+            if (typeMapper != null)
+                return typeMapper.UseReference;
+
+            return !IsDictionary && (Type.HasFlag(JsonObjectType.Object) || IsEnum);
+        }
+
         private static bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Move all file handling to NSwag. How?
-            
+
             var parameterTypeName = type.Name;
             return parameterTypeName == "IFormFile" ||
                    type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
@@ -236,7 +255,7 @@ namespace NJsonSchema.Generation
                 return false;
 
             // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1") 
+            if (type.Name == "ObservableCollection`1")
                 return true;
 
             return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
