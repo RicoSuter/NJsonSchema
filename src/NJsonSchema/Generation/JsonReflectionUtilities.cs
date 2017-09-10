@@ -7,8 +7,10 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
@@ -42,6 +44,29 @@ namespace NJsonSchema.Generation
                 default:
                     throw new NotSupportedException($"The PropertyNameHandling '{propertyNameHandling}' is not supported.");
             }
+        }
+
+        /// <summary>Checks whether a type is nullable.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
+        /// <param name="settings">The settings</param>
+        /// <returns>true if the type can be null.</returns>
+        public static bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        {
+            var isStruct = type.Name != "Nullable`1" && type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive;
+            var allowsNull = isStruct == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
+
+            var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
+            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
+                allowsNull = false;
+
+            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
+                allowsNull = false;
+
+            if (parentAttributes?.Any(a => a.GetType().Name == "CanBeNullAttribute") == true)
+                allowsNull = true;
+
+            return allowsNull;
         }
     }
 }

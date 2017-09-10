@@ -117,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -161,7 +161,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -213,7 +213,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger
             });
             var code = generator.GenerateFile("MyClass");
 

@@ -33,16 +33,6 @@ namespace NJsonSchema.Generation
         public static JsonObjectTypeDescription FromType(
             Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
-            var isStruct = type.Name != "Nullable`1" && type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive;
-            var allowsNull = isStruct == false;
-
-            var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
-            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
-                allowsNull = false;
-
-            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
-                allowsNull = false;
-
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
@@ -70,8 +60,9 @@ namespace NJsonSchema.Generation
             if (type == typeof(bool))
                 return new JsonObjectTypeDescription(type, JsonObjectType.Boolean, false);
 
+            var isNullable = JsonReflectionUtilities.IsNullable(type, parentAttributes, settings);
             if (type == typeof(string) || type == typeof(Type))
-                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, isNullable);
 
             if (type == typeof(char))
                 return new JsonObjectTypeDescription(type, JsonObjectType.String, false);
@@ -89,26 +80,26 @@ namespace NJsonSchema.Generation
                 return new JsonObjectTypeDescription(type, JsonObjectType.String, false, false, JsonFormatStrings.Date);
 
             if (type == typeof(Uri))
-                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull, false, JsonFormatStrings.Uri);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, isNullable, false, JsonFormatStrings.Uri);
 
             if (type == typeof(byte))
                 return new JsonObjectTypeDescription(type, JsonObjectType.Integer, false, false, JsonFormatStrings.Byte);
 
             if (type == typeof(byte[]))
-                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull, false, JsonFormatStrings.Byte);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, isNullable, false, JsonFormatStrings.Byte);
 
             if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
-                return new JsonObjectTypeDescription(type, JsonObjectType.None, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.None, isNullable);
 
             if (IsFileType(type, parentAttributes))
-                return new JsonObjectTypeDescription(type, JsonObjectType.File, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.File, isNullable);
 
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(type) && contract is JsonDictionaryContract)
-                return new JsonObjectTypeDescription(type, JsonObjectType.Object, allowsNull, true);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Object, isNullable, true);
 
             if (IsArrayType(type) && contract is JsonArrayContract)
-                return new JsonObjectTypeDescription(type, JsonObjectType.Array, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.Array, isNullable);
 
             if (type.Name == "Nullable`1")
             {
@@ -117,7 +108,7 @@ namespace NJsonSchema.Generation
 #else
                 var typeDescription = FromType(type.GetGenericArguments()[0], parentAttributes, settings);
 #endif
-                typeDescription.IsNullable = allowsNull;
+                typeDescription.IsNullable = isNullable;
                 return typeDescription;
             }
 
@@ -127,13 +118,13 @@ namespace NJsonSchema.Generation
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return new JsonObjectTypeDescription(type, classType, allowsNull, false, format);
+                return new JsonObjectTypeDescription(type, classType, isNullable, false, format);
             }
 
             if (contract is JsonStringContract)
-                return new JsonObjectTypeDescription(type, JsonObjectType.String, allowsNull);
+                return new JsonObjectTypeDescription(type, JsonObjectType.String, isNullable);
 
-            return new JsonObjectTypeDescription(type, JsonObjectType.Object, allowsNull);
+            return new JsonObjectTypeDescription(type, JsonObjectType.Object, isNullable);
         }
 
         /// <summary>Determines whether the an enum property serializes to a string.</summary>
@@ -186,11 +177,11 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the format string. </summary>
         public string Format { get; private set; }
 
-        /// <summary>Gets a value indicating whether this is a complex type (i.e. object, dictionary or array).</summary>
-        public bool IsComplexType => IsDictionary || Type.HasFlag(JsonObjectType.Object) || Type.HasFlag(JsonObjectType.Array);
-
         /// <summary>Gets a value indicating whether the type is nullable.</summary>
         public bool IsNullable { get; private set; }
+
+        /// <summary>Gets a value indicating whether this is a complex type (i.e. object, dictionary or array).</summary>
+        public bool IsComplexType => IsDictionary || Type.HasFlag(JsonObjectType.Object) || Type.HasFlag(JsonObjectType.Array);
 
         /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
         public bool IsAny => Type == JsonObjectType.None;

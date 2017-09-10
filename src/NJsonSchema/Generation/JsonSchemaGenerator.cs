@@ -218,7 +218,7 @@ namespace NJsonSchema.Generation
 
                 if (isNullable)
                 {
-                    if (Settings.NullHandling != NullHandling.Swagger)
+                    if (Settings.SchemaType != SchemaType.Swagger)
                         referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                 }
 
@@ -235,7 +235,7 @@ namespace NJsonSchema.Generation
                 {
                     referencingSchema.SchemaReference = schema.ActualSchema;
                 }
-                else if (Settings.NullHandling != NullHandling.Swagger)
+                else if (Settings.SchemaType != SchemaType.Swagger)
                 {
                     referencingSchema.OneOf.Add(new JsonSchema4
                     {
@@ -261,7 +261,7 @@ namespace NJsonSchema.Generation
 
                 if (isNullable)
                 {
-                    if (Settings.NullHandling != NullHandling.Swagger)
+                    if (Settings.SchemaType != SchemaType.Swagger)
                     {
                         if (schema.Type == JsonObjectType.None)
                         {
@@ -695,7 +695,7 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateXmlObjects)
                             p.GenerateXmlObjectForProperty(parentType, propertyName, propertyAttributes);
 
-                        if (!isNullable && Settings.NullHandling == NullHandling.Swagger)
+                        if (!isNullable && Settings.SchemaType == SchemaType.Swagger)
                         {
                             if (!parentSchema.RequiredProperties.Contains(propertyName))
                                 parentSchema.RequiredProperties.Add(propertyName);

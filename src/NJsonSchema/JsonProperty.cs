@@ -84,7 +84,7 @@ namespace NJsonSchema
         {
             get
             {
-                return OneOf.FirstOrDefault(o => !o.IsNullable(NullHandling.JsonSchema))?.ActualSchema ?? ActualSchema;
+                return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
             }
         }
 
@@ -93,17 +93,17 @@ namespace NJsonSchema
         public bool IsInheritanceDiscriminator => ParentSchema.Discriminator == Name;
 
         /// <summary>Determines whether the specified property null handling is nullable.</summary>
-        /// <param name="nullHandling">The property null handling.</param>
-        /// <returns></returns>
-        public override bool IsNullable(NullHandling nullHandling)
+        /// <param name="schemaType">The schema type.</param>
+        /// <returns>true if the type can be null.</returns>
+        public override bool IsNullable(SchemaType schemaType)
         {
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
 
-            if (nullHandling == NullHandling.Swagger)
+            if (schemaType == SchemaType.Swagger)
                 return IsRequired == false;
 
-            return base.IsNullable(nullHandling);
+            return base.IsNullable(schemaType);
         }
     }
 }

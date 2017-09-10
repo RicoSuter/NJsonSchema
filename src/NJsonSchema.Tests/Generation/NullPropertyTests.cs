@@ -53,8 +53,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["Foo"].IsNullable(NullHandling.JsonSchema));
-            Assert.IsFalse(schema.Properties["Bar"].IsNullable(NullHandling.JsonSchema));
+            Assert.IsTrue(schema.Properties["Foo"].IsNullable(SchemaType.JsonSchema));
+            Assert.IsFalse(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
         }
     }
 }
