@@ -40,12 +40,22 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsTrue(schema.Properties.ContainsKey("Class"));
         }
 
-        public interface IFoo : IBar
+        public interface IFoo : IBar, IBaz
         {
             string Foo { get; set; }
         }
 
         public interface IBar
+        {
+            string Bar { get; set; }
+        }
+
+        public interface IBaz
+        {
+            string Baz { get; set; }
+        }
+
+        public interface ISame
         {
             string Bar { get; set; }
         }
@@ -66,7 +76,10 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(2, schema.Properties.Count);
+            Assert.AreEqual(3, schema.Properties.Count);
+            Assert.IsTrue(schema.Properties.ContainsKey("Foo"));
+            Assert.IsTrue(schema.Properties.ContainsKey("Bar"));
+            Assert.IsTrue(schema.Properties.ContainsKey("Baz"));
         }
     }
 }
