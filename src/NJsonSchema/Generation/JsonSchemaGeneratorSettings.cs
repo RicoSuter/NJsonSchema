@@ -9,10 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
 {
@@ -94,6 +96,16 @@ namespace NJsonSchema.Generation
 
                 return new DefaultContractResolver();
             }
+        }
+
+        /// <summary>Gets the contract for the given type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The contract.</returns>
+        public JsonContract ResolveContract(Type type)
+        {
+            return !type.GetTypeInfo().IsGenericTypeDefinition ?
+                ActualContractResolver.ResolveContract(type) :
+                null;
         }
     }
 }

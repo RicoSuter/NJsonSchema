@@ -126,7 +126,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual((int)Bar.C, schema.Properties["Bar"].Default);
+            Assert.AreEqual(Bar.C, schema.Properties["Bar"].Default);
             Assert.IsTrue(schema.Properties["Bar"].HasSchemaReference);
         }
     }

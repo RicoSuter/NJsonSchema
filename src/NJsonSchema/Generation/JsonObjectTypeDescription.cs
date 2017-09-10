@@ -27,11 +27,11 @@ namespace NJsonSchema.Generation
 
         /// <summary>Creates a <see cref="JsonObjectTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="type">The type. </param>
-        /// <param name="contract">The contract as per Json.NET serialization</param>
         /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
-        /// <param name="defaultEnumHandling">The default enum handling.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonObjectTypeDescription"/>. </returns>
-        public static JsonObjectTypeDescription FromType(Type type, JsonContract contract, IEnumerable<Attribute> parentAttributes, EnumHandling defaultEnumHandling)
+        public static JsonObjectTypeDescription FromType(
+            Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
             var isStruct = type.Name != "Nullable`1" && type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive;
             var allowsNull = isStruct == false;
@@ -45,7 +45,7 @@ namespace NJsonSchema.Generation
 
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(type, parentAttributes, defaultEnumHandling);
+                var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
                 return new JsonObjectTypeDescription(type, isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false)
                 {
                     IsEnum = true
@@ -103,6 +103,7 @@ namespace NJsonSchema.Generation
             if (IsFileType(type, parentAttributes))
                 return new JsonObjectTypeDescription(type, JsonObjectType.File, allowsNull);
 
+            var contract = settings.ResolveContract(type);
             if (IsDictionaryType(type) && contract is JsonDictionaryContract)
                 return new JsonObjectTypeDescription(type, JsonObjectType.Object, allowsNull, true);
 
@@ -112,9 +113,9 @@ namespace NJsonSchema.Generation
             if (type.Name == "Nullable`1")
             {
 #if !LEGACY
-                var typeDescription = FromType(type.GenericTypeArguments[0], contract, parentAttributes, defaultEnumHandling);
+                var typeDescription = FromType(type.GenericTypeArguments[0], parentAttributes, settings);
 #else
-                var typeDescription = FromType(type.GetGenericArguments()[0], contract, parentAttributes, defaultEnumHandling);
+                var typeDescription = FromType(type.GetGenericArguments()[0], parentAttributes, settings);
 #endif
                 typeDescription.IsNullable = allowsNull;
                 return typeDescription;
