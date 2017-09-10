@@ -31,6 +31,7 @@ namespace NJsonSchema.Generation
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
+            ReflectionService = new DefaultReflectionService();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -70,6 +71,10 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema name generator.</summary>
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the reflection service.</summary>
+        [JsonIgnore]
+        public IReflectionService ReflectionService { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
