@@ -601,6 +601,16 @@ namespace NJsonSchema.Generation
                         schema.AllOf.Add(baseSchema);
                 }
             }
+
+            if (Settings.FlattenInheritanceHierarchy && Settings.GenerateAbstractProperties)
+            {
+#if !LEGACY
+                foreach (var i in type.GetTypeInfo().ImplementedInterfaces)
+#else
+                foreach (var i in type.GetTypeInfo().GetInterfaces())
+#endif
+                    await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+            }
         }
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
