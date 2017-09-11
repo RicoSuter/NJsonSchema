@@ -100,7 +100,7 @@ namespace NJsonSchema
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
 
-            if (schemaType == SchemaType.Swagger)
+            if (schemaType == SchemaType.Swagger2)
                 return IsRequired == false;
 
             return base.IsNullable(schemaType);

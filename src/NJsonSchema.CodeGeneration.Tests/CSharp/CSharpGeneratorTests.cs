@@ -810,7 +810,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -854,7 +854,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -907,7 +907,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -941,7 +941,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1030,7 +1030,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1058,7 +1058,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1087,7 +1087,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1115,7 +1115,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1143,7 +1143,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1171,7 +1171,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1200,7 +1200,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1229,7 +1229,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1257,7 +1257,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1285,7 +1285,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -1323,7 +1323,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger,
+                SchemaType = SchemaType.Swagger2,
                 // define that no data annotations should be included
                 GenerateDataAnnotations = false
             });

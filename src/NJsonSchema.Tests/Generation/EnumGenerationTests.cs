@@ -120,7 +120,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<EnumProperty>(new JsonSchemaGeneratorSettings
             {
-                SchemaType = SchemaType.Swagger,
+                SchemaType = SchemaType.Swagger2,
                 DefaultEnumHandling = EnumHandling.Integer
             });
             var json = schema.ToJson();

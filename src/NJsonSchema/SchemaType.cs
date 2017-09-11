@@ -15,7 +15,7 @@ namespace NJsonSchema
         JsonSchema,
 
         /// <summary>Uses required to express the nullability of a property (not valid in JSON Schema draft v4).</summary>
-        Swagger,
+        Swagger2,
 
         /// <summary>Uses null handling of Open API 3.</summary>
         OpenApi3
