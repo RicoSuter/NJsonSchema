@@ -17,6 +17,26 @@ namespace NJsonSchema.Infrastructure
     /// <summary>Provides extension methods for reflection.</summary>
     public static class ReflectionExtensions
     {
+        /// <summary>Determines whether the specified property name exists.</summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
+        public static bool HasProperty(this object obj, string propertyName)
+        {
+            return obj?.GetType().GetRuntimeProperty(propertyName) != null;
+        }
+
+        /// <summary>Determines whether the specified property name exists.</summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="defaultValue">Default value if the property does not exist.</param>
+        /// <returns><c>true</c> if the property exists; otherwise, <c>false</c>.</returns>
+        public static T TryGetPropertyValue<T>(this object obj, string propertyName, T defaultValue = default(T))
+        {
+            var property = obj?.GetType().GetRuntimeProperty(propertyName);
+            return property == null ? defaultValue : (T)property.GetValue(obj);
+        }
+
         /// <summary>Tries to get the first object of the given type name.</summary>
         /// <param name="attributes">The attributes.</param>
         /// <param name="typeName">Type of the attribute.</param>
