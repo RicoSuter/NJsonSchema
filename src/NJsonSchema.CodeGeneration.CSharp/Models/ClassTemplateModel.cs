@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => _resolver.Resolve(
             _schema.AdditionalPropertiesSchema,
-            _schema.AdditionalPropertiesSchema.IsNullable(_settings.NullHandling),
+            _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
             string.Empty);
 
         /// <summary>Gets the property models.</summary>

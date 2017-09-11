@@ -20,8 +20,8 @@ namespace NJsonSchema.CodeGeneration
             ExcludedTypeNames = new string[] { };
         }
 
-        /// <summary>Gets or sets the property nullability handling.</summary>
-        public NullHandling NullHandling { get; set; } = NullHandling.JsonSchema;
+        /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>
+        public SchemaType SchemaType { get; set; } = SchemaType.JsonSchema;
 
         /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
         public bool GenerateDefaultValues { get; set; }
