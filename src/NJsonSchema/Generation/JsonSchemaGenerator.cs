@@ -247,11 +247,8 @@ namespace NJsonSchema.Generation
             if (transformation != null)
                 await transformation(referencingSchema, referencedSchema).ConfigureAwait(false);
 
-            if (isNullable)
-            {
-                if (Settings.SchemaType != SchemaType.Swagger2)
-                    referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-            }
+            if (isNullable && Settings.SchemaType != SchemaType.Swagger2)
+                referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
 
             var hasNoProperties = !JsonConvert.DeserializeObject<JObject>(
                 JsonConvert.SerializeObject(referencingSchema))
@@ -643,7 +640,7 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminator(IEnumerable<Attribute> typeAttributes)
         {
-            dynamic jsonConverterAttribute = typeAttributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo("JsonConverterAttribute", TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
@@ -766,12 +763,13 @@ namespace NJsonSchema.Generation
             if (!HasDataContractAttribute(parentType))
                 return null;
 
-            return propertyAttributes.FirstOrDefault(a => a.GetType().Name == "DataMemberAttribute");
+            return propertyAttributes.TryGetIfAssignableTo("DataMemberAttribute", TypeNameStyle.Name);
         }
 
         private static bool HasDataContractAttribute(Type parentType)
         {
-            return parentType.GetTypeInfo().GetCustomAttributes().Any(a => a.GetType().Name == "DataContractAttribute");
+            return parentType.GetTypeInfo().GetCustomAttributes()
+                .TryGetIfAssignableTo("DataContractAttribute", TypeNameStyle.Name) != null;
         }
 
         /// <summary>Applies the property annotations to the JSON property.</summary>

@@ -50,7 +50,9 @@ namespace NJsonSchema.Infrastructure
         /// <returns>May return null (not found).</returns>
         public static T TryGetIfAssignableTo<T>(this IEnumerable<T> attributes, string typeName, TypeNameStyle typeNameStyle = TypeNameStyle.FullName)
         {
-            return attributes.FirstOrDefault(a => a.GetType().IsAssignableTo(typeName, typeNameStyle));
+            return attributes != null ?
+                attributes.FirstOrDefault(a => a.GetType().IsAssignableTo(typeName, typeNameStyle)) :
+                default(T);
         }
 
         /// <summary>Checks whether the given type is assignable to the given type name.</summary>
