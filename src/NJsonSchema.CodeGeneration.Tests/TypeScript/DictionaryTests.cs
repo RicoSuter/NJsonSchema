@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
             {
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
             var json = schema.ToJson();
@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
             {
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
             var json = schema.ToJson();
@@ -69,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
             {
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
             var json = schema.ToJson();
@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
             {
-                NullHandling = NullHandling.Swagger
+                SchemaType = SchemaType.Swagger2
             });
             var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
             var json = schema.ToJson();

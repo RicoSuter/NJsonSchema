@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool IsOptional => !_property.IsRequired && _settings.MarkOptionalProperties;
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
-        public bool IsNullable => _property.IsNullable(_settings.NullHandling);
+        public bool IsNullable => _property.IsNullable(_settings.SchemaType);
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
@@ -93,7 +93,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
+                        IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         NullValue = _settings.NullValue,
@@ -117,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
                         Schema = _property.ActualPropertySchema,
-                        IsPropertyNullable = _property.IsNullable(_settings.NullHandling),
+                        IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         NullValue = _settings.NullValue,

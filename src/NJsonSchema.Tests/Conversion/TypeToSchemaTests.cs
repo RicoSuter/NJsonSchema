@@ -170,7 +170,7 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             var property = schema.Properties["Reference"];
-            Assert.IsTrue(property.IsNullable(NullHandling.JsonSchema));
+            Assert.IsTrue(property.IsNullable(SchemaType.JsonSchema));
             Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
         }
         
@@ -205,7 +205,7 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Property"];
 
             //// Assert
-            Assert.IsTrue(property.IsNullable(NullHandling.JsonSchema));
+            Assert.IsTrue(property.IsNullable(SchemaType.JsonSchema));
             Assert.IsTrue(property.ActualPropertySchema.IsAnyType);
             Assert.IsTrue(property.ActualPropertySchema.AllowAdditionalItems);
             Assert.AreEqual(0, property.Properties.Count);

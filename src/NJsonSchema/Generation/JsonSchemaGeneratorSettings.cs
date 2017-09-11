@@ -9,10 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
 {
@@ -23,15 +25,20 @@ namespace NJsonSchema.Generation
         public JsonSchemaGeneratorSettings()
         {
             DefaultEnumHandling = EnumHandling.Integer;
-            NullHandling = NullHandling.JsonSchema;
+            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
             DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            SchemaType = SchemaType.JsonSchema;
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
+            ReflectionService = new DefaultReflectionService();
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         public EnumHandling DefaultEnumHandling { get; set; }
+
+        /// <summary>Gets or sets the default null handling (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
+        public ReferenceTypeNullHandling DefaultReferenceTypeNullHandling { get; set; }
 
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
@@ -51,8 +58,8 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
-        /// <summary>Gets or sets the property nullability handling.</summary>
-        public NullHandling NullHandling { get; set; }
+        /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
+        public SchemaType SchemaType { get; set; }
 
         /// <summary>Gets or sets the contract resolver.</summary>
         public IContractResolver ContractResolver { get; set; }
@@ -64,6 +71,10 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema name generator.</summary>
         [JsonIgnore]
         public ISchemaNameGenerator SchemaNameGenerator { get; set; }
+
+        /// <summary>Gets or sets the reflection service.</summary>
+        [JsonIgnore]
+        public IReflectionService ReflectionService { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
@@ -94,6 +105,16 @@ namespace NJsonSchema.Generation
 
                 return new DefaultContractResolver();
             }
+        }
+
+        /// <summary>Gets the contract for the given type.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The contract.</returns>
+        public JsonContract ResolveContract(Type type)
+        {
+            return !type.GetTypeInfo().IsGenericTypeDefinition ?
+                ActualContractResolver.ResolveContract(type) :
+                null;
         }
     }
 }
