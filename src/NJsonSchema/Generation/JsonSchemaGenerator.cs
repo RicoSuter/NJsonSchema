@@ -735,7 +735,7 @@ namespace NJsonSchema.Generation
                         p.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
                         p.Default = ConvertDefaultValue(property);
 
-                        ApplyPropertyAnnotations(p, propertyTypeDescription, propertyAttributes);
+                        ApplyDataAnnotations(p, propertyTypeDescription, propertyAttributes);
                     }).ConfigureAwait(false);
 
                 parentSchema.Properties.Add(propertyName, jsonProperty);
@@ -779,7 +779,7 @@ namespace NJsonSchema.Generation
         /// <param name="schema">The schema.</param>
         /// <param name="typeDescription">The property type description.</param>
         /// <param name="parentAttributes">The attributes.</param>
-        public void ApplyPropertyAnnotations(JsonSchema4 schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
+        public void ApplyDataAnnotations(JsonSchema4 schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Refactor out
 
