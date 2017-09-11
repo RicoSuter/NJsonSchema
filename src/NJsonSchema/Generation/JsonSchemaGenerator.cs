@@ -277,10 +277,13 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>Gets the converted property name.</summary>
-        /// <param name="propertyName">The property name.</param>
+        /// <param name="property">The property.</param>
         /// <returns>The property name.</returns>
-        public virtual string GetPropertyName(string propertyName)
+        public virtual string GetPropertyName(MemberInfo property)
         {
+            var propertyName = ReflectionCache.GetPropertiesAndFields(property.DeclaringType)
+                .First(p => p.MemberInfo.Name == property.Name).GetName();
+
             var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
             return contractResolver != null
                 ? contractResolver.GetResolvedPropertyName(propertyName)
@@ -695,7 +698,7 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
-                var propertyName = GetPropertyName(property.PropertyName);
+                var propertyName = GetPropertyName(propertyInfo);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
 
