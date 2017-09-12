@@ -135,10 +135,10 @@ namespace NJsonSchema.Generation
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
                 allowsNull = false;
 
-            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
+            if (parentAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
                 allowsNull = false;
 
-            if (parentAttributes?.Any(a => a.GetType().Name == "CanBeNullAttribute") == true)
+            if (parentAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
                 allowsNull = true;
 
             return allowsNull;
