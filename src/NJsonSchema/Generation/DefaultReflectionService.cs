@@ -102,7 +102,7 @@ namespace NJsonSchema.Generation
 #else
                 var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes, settings);
 #endif
-                typeDescription.IsNullable = isNullable;
+                typeDescription.IsNullable = true;
                 return typeDescription;
             }
 
