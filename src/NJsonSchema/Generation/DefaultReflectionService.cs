@@ -32,7 +32,7 @@ namespace NJsonSchema.Generation
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
-                return JsonTypeDescription.CreateForEnumeration(type, 
+                return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
@@ -102,7 +102,7 @@ namespace NJsonSchema.Generation
 #else
                 var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes, settings);
 #endif
-                typeDescription.IsNullable = isNullable;
+                typeDescription.IsNullable = true;
                 return typeDescription;
             }
 
@@ -128,20 +128,21 @@ namespace NJsonSchema.Generation
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
-            var isStruct = type.Name != "Nullable`1" && type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive;
-            var allowsNull = isStruct == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
-
             var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
-                allowsNull = false;
+                return false;
 
-            if (parentAttributes?.Any(a => a.GetType().Name == "NotNullAttribute") == true)
-                allowsNull = false;
+            if (parentAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
+                return false;
 
-            if (parentAttributes?.Any(a => a.GetType().Name == "CanBeNullAttribute") == true)
-                allowsNull = true;
+            if (parentAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
+                return true;
 
-            return allowsNull;
+            if (type.Name == "Nullable`1")
+                return true;
+
+            var isValueType = type != typeof(string) && type.GetTypeInfo().IsValueType;
+            return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
         /// <summary>Checks whether the given type is a file type.</summary>
