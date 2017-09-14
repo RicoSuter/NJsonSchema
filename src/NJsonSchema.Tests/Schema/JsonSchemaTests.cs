@@ -393,5 +393,20 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.IsNotNull(json);
         }
+
+        [TestMethod]
+        public async Task When_schema_has_metadata_properties_it_can_still_be_read()
+        {
+            //// Arrange
+            var json = @"{ ""type"": ""object"", ""additionalProperties"": false, ""properties"": { ""$type"": 
+                { ""type"": ""string"", ""enum"": [ ""file"" ] }, ""Id"": { ""type"": ""string"", 
+                ""format"": ""guid"" }, ""Name"": { ""type"": ""string"" } }, ""required"": [ ""$type"", ""Id"", ""Name"" ] }";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Assert
+
+        }
     }
 }
