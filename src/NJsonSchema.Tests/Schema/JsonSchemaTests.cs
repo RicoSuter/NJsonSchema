@@ -406,7 +406,7 @@ namespace NJsonSchema.Tests.Schema
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-
+            // No exception
         }
     }
 }
