@@ -12,6 +12,8 @@ using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
+    // TODO: Add base class for CSharp.EnumTemplateModel and TypeScript.EnumTemplateModel
+
     /// <summary>The CSharp enum template model.</summary>
     public class EnumTemplateModel
     {
@@ -26,7 +28,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             _schema = schema;
             _settings = settings;
-
             Name = typeName;
         }
 
@@ -51,17 +52,17 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 for (int i = 0; i < _schema.Enumeration.Count; i++)
                 {
                     var value = _schema.Enumeration.ElementAt(i);
-                    var name = _schema.EnumerationNames.Count > i ?
-                        _schema.EnumerationNames.ElementAt(i) :
-                        _schema.Type == JsonObjectType.Integer ? "_" + value : value.ToString();
-
                     if (value != null)
                     {
+                        var name = _schema.EnumerationNames.Count > i ?
+                            _schema.EnumerationNames.ElementAt(i) :
+                            _schema.Type.HasFlag(JsonObjectType.Integer) ? "_" + value : value.ToString();
+
                         entries.Add(new EnumerationItemModel
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             Value = value.ToString(),
-                            InternalValue = _schema.Type == JsonObjectType.Integer ? value.ToString() : i.ToString()
+                            InternalValue = _schema.Type.HasFlag(JsonObjectType.Integer) ? value.ToString() : i.ToString()
                         });
                     }
                 }
