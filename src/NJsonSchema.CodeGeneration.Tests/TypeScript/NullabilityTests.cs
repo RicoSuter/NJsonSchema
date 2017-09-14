@@ -27,12 +27,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             Assert.IsTrue(output.Contains("timeSpan: string;"));
-            Assert.IsTrue(output.Contains("gender: string;"));
-            Assert.IsTrue(output.Contains("address: string;"));
+            Assert.IsTrue(output.Contains("gender: Gender;"));
+            Assert.IsTrue(output.Contains("address: Address;"));
 
             Assert.IsTrue(output.Contains("timeSpanOrNull: string | undefined;"));
-            Assert.IsTrue(output.Contains("genderOrNull: string | undefined;"));
-            Assert.IsTrue(output.Contains("addressOrNull: string | undefined;"));
+            Assert.IsTrue(output.Contains("genderOrNull: Gender | undefined;"));
+            Assert.IsTrue(output.Contains("addressOrNull: Address | undefined;"));
         }
     }
 }
