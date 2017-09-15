@@ -46,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets the default value as string.</summary>
         public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property, 
-            _property.IsNullable(_settings.NullHandling), Type, _property.Name, _settings.GenerateDefaultValues);
+            _property.IsNullable(_settings.SchemaType), Type, _property.Name, _settings.GenerateDefaultValues);
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }

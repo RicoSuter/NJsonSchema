@@ -31,8 +31,8 @@ namespace NJsonSchema.Infrastructure
                 if (!PropertyCacheByType.ContainsKey(type))
                 {
 #if !LEGACY
-                    var declaredProperties = type.GetRuntimeProperties();
-                    var declaredFields = type.GetRuntimeFields().Where(f => f.IsPublic);
+                    var declaredProperties = type.GetRuntimeProperties().Where(p => p.GetMethod?.IsStatic != true);
+                    var declaredFields = type.GetRuntimeFields().Where(f => f.IsPublic && !f.IsStatic);
 #else
                     var declaredProperties = type.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                         .Where(p => p.GetGetMethod(true)?.IsAssembly == true || p.GetGetMethod(true)?.IsPublic == true ||

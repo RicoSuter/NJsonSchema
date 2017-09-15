@@ -88,6 +88,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public class MyStringEnumListTest
         {
             public List<MyStringEnum> Enums { get; set; }
+
+            public MyStringEnum? NullableEnum { get; set; }
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -110,6 +112,21 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.IsTrue(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
+        }
+
+        [TestMethod]
+        public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<MyStringEnumListTest>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"));
         }
 
         public enum SomeEnum { Thing1, Thing2 }

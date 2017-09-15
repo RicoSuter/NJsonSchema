@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,9 +21,9 @@ namespace NJsonSchema.Tests.Generation
 
         public enum Bar
         {
-            A = 0, 
-            B = 5, 
-            C = 6, 
+            A = 0,
+            B = 5,
+            C = 6,
         }
 
         [TestMethod]
@@ -36,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
-            var data = schema.ToJson(); 
+            var data = schema.ToJson();
 
             //// Assert
             Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].ActualPropertySchema.Type);
@@ -102,6 +103,31 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual("A", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(0));
             Assert.AreEqual("B", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(1));
             Assert.AreEqual("C", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(2));
+        }
+
+        public class EnumProperty
+        {
+            [DefaultValue(Bar.C)]
+            public Bar Bar { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_enum_property_is_generated_then_enum_is_referenced()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumProperty>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.Swagger2,
+                DefaultEnumHandling = EnumHandling.Integer
+            });
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(Bar.C, schema.Properties["Bar"].Default);
+            Assert.IsTrue(schema.Properties["Bar"].HasSchemaReference);
         }
     }
 }

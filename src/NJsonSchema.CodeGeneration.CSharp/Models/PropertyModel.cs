@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name => _property.Name;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.NullHandling), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
         public bool HasSetter => 
-            (_property.IsNullable(_settings.NullHandling) == false && (
+            (_property.IsNullable(_settings.SchemaType) == false && (
                 (_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
@@ -60,14 +60,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
-                    if (!_property.IsNullable(_settings.NullHandling))
+                    if (!_property.IsNullable(_settings.SchemaType))
                         return "Newtonsoft.Json.Required.Always";
                     else
                         return "Newtonsoft.Json.Required.AllowNull";
                 }
                 else
                 {
-                    if (!_property.IsNullable(_settings.NullHandling))
+                    if (!_property.IsNullable(_settings.SchemaType))
                         return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
                     else
                         return "Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.NullHandling))
+                if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.SchemaType))
                     return false;
 
                 return _property.ActualPropertySchema.IsAnyType ||

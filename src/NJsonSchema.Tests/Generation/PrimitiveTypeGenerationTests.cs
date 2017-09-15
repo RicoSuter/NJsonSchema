@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -20,6 +21,14 @@ namespace NJsonSchema.Tests.Generation
 
             [Required]
             public Type Type { get; set; }
+
+            public LocalDate Date { get; set; }
+
+            public ZonedDateTime ZonedDateTime { get; set; }
+
+            public OffsetDateTime OffsetDateTime { get; set; }
+
+            public Duration Duration { get; set; }
         }
 
         [TestMethod]
@@ -76,6 +85,62 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(JsonObjectType.String, schema.Properties["Type"].Type);
+        }
+
+        [TestMethod]
+        public async Task When_property_is_localdate_then_schema_type_is_string()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Date"].Type);
+            Assert.AreEqual(JsonFormatStrings.Date, schema.Properties["Date"].Format);
+        }
+
+        [TestMethod]
+        public async Task When_property_is_zoneddatetime_then_schema_type_is_string()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["ZonedDateTime"].Type);
+            Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["ZonedDateTime"].Format);
+        }
+
+        [TestMethod]
+        public async Task When_property_is_offsetdatetime_then_schema_type_is_string()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["OffsetDateTime"].Type);
+            Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["OffsetDateTime"].Format);
+        }
+
+        [TestMethod]
+        public async Task When_property_is_duration_then_schema_type_is_string()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+
+            //// Assert
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Duration"].Type);
+            Assert.AreEqual(JsonFormatStrings.TimeSpan, schema.Properties["Duration"].Format);
         }
     }
 }

@@ -108,7 +108,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual(typeof(int).Name, intArrayProperty.Item.Xml.Name);
             Assert.AreEqual(typeof(double).Name, doubleArrayProperty.Item.Xml.Name);
             Assert.AreEqual(typeof(decimal).Name, decimalArrayProperty.Item.Xml.Name);
-            Assert.IsNull(internalItemProperty.Item.Xml);
+            Assert.IsNotNull(internalItemProperty.Item.Xml);
         }
 
         [TestMethod]

@@ -148,6 +148,23 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [TestMethod]
+        public async Task When_deserializing_schema_it_should_not_stackoverflow()
+        {
+            //// Arrange
+            var data =
+@"{
+    ""x-dateTime"": ""2016-07-28T14:39:37.937Z""
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(data);
+            var x = schema.ToJson();
+
+            //// Assert
+            Assert.IsInstanceOfType(schema.ExtensionData.First().Value, typeof(DateTime));
+        }
+
+        [TestMethod]
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
@@ -375,6 +392,21 @@ namespace NJsonSchema.Tests.Schema
 
             //// Assert
             Assert.IsNotNull(json);
+        }
+
+        [TestMethod]
+        public async Task When_schema_has_metadata_properties_it_can_still_be_read()
+        {
+            //// Arrange
+            var json = @"{ ""type"": ""object"", ""additionalProperties"": false, ""properties"": { ""$type"": 
+                { ""type"": ""string"", ""enum"": [ ""file"" ] }, ""Id"": { ""type"": ""string"", 
+                ""format"": ""guid"" }, ""Name"": { ""type"": ""string"" } }, ""required"": [ ""$type"", ""Id"", ""Name"" ] }";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Assert
+            // No exception
         }
     }
 }

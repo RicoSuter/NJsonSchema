@@ -420,7 +420,7 @@ namespace NJsonSchema.Infrastructure
                 if (string.IsNullOrEmpty(assemblyName.Name))
                     return null;
 
-                var path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
+                string path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
                 if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
                     return path;
 

@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Linq;
+using NJsonSchema.CodeGeneration.CSharp.Models;
 using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -70,7 +70,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
             {
-                var valueType = ResolveDictionaryValueType(schema, "object", Settings.NullHandling);
+                var valueType = ResolveDictionaryValueType(schema, "object", Settings.SchemaType);
                 return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
             }
 
@@ -83,7 +83,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var classes = GenerateTypes(null);
             if (classes.Contains("JsonInheritanceConverter"))
-                classes += "\n\n" + new JsonInheritanceConverterTemplate().TransformText();
+            {
+                var templateModel = new JsonInheritanceConverterTemplateModel(Settings);
+                var template = new JsonInheritanceConverterTemplate(templateModel);
+                classes += "\n\n" + template.Render();
+            }
             return classes;
         }
 

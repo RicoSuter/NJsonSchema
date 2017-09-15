@@ -39,5 +39,47 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsTrue(schema.Properties.ContainsKey("Name"));
             Assert.IsTrue(schema.Properties.ContainsKey("Class"));
         }
+
+        public interface IFoo : IBar, IBaz
+        {
+            string Foo { get; set; }
+        }
+
+        public interface IBar
+        {
+            string Bar { get; set; }
+        }
+
+        public interface IBaz
+        {
+            string Baz { get; set; }
+        }
+
+        public interface ISame
+        {
+            string Bar { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_interface_properties_are_in_one_schema()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.String,
+                GenerateAbstractProperties = true,
+                FlattenInheritanceHierarchy = true
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<IFoo>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(3, schema.Properties.Count);
+            Assert.IsTrue(schema.Properties.ContainsKey("Foo"));
+            Assert.IsTrue(schema.Properties.ContainsKey("Bar"));
+            Assert.IsTrue(schema.Properties.ContainsKey("Baz"));
+        }
     }
 }

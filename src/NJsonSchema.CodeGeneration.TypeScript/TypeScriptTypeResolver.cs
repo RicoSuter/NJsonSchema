@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (schema.IsDictionary)
             {
-                var valueType = ResolveDictionaryValueType(schema, "any", Settings.NullHandling);
+                var valueType = ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
                 return $"{{ [key: string] : {valueType}; }}";
             }
 

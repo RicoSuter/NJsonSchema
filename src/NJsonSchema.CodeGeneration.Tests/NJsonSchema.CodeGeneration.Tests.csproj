@@ -83,6 +83,7 @@
     <Compile Include="TypeScript\DateCodeGenerationTests.cs" />
     <Compile Include="TypeScript\DictionaryTests.cs" />
     <Compile Include="TypeScript\ExtensionCodeTests.cs" />
+    <Compile Include="TypeScript\NullabilityTests.cs" />
     <Compile Include="TypeScript\TypeScriptObjectTests.cs" />
     <Compile Include="TypeScript\TypeScriptDictionaryTests.cs" />
     <Compile Include="EnumGenerationTests.cs" />

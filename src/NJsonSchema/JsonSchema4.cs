@@ -186,6 +186,7 @@ namespace NJsonSchema
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
             {
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
                 ConstructorHandling = ConstructorHandling.Default,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
@@ -739,7 +740,9 @@ namespace NJsonSchema
         #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
-        public virtual bool IsNullable(NullHandling nullHandling)
+        /// <param name="schemaType">The schema type.</param>
+        /// <returns>true if the type can be null.</returns>
+        public virtual bool IsNullable(SchemaType schemaType)
         {
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
@@ -747,7 +750,7 @@ namespace NJsonSchema
             if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
                 return true;
 
-            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(nullHandling));
+            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType));
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>

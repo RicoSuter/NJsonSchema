@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using NJsonSchema.Annotations;
 
 namespace NJsonSchema.CodeGeneration.Tests.Models
 {
@@ -19,12 +20,19 @@ namespace NJsonSchema.CodeGeneration.Tests.Models
 
         public TimeSpan TimeSpan { get; set; }
 
+        public TimeSpan? TimeSpanOrNull { get; set; }
+
         public Gender Gender { get; set; }
-        
+
+        public Gender? GenderOrNull { get; set; }
+
         public Address Address { get; set; }
+
+        [CanBeNull]
+        public Address AddressOrNull { get; set; }
 
         public List<string> Array { get; set; } 
 
-        public Dictionary<string, int> Dictionary { get; set; } 
+        public Dictionary<string, int> Dictionary { get; set; }
     }
 }
