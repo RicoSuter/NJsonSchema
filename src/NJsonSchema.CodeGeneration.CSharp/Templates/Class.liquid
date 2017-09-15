@@ -33,7 +33,7 @@ public partial class {{ClassName}} {{InheritanceCode}}
 {%-   if(property.IsStringEnum -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%-   endif -%}
-    public {{property.Type}} {{property.property_name}}{% if RenderInpc == false %}{ get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{property.DefaultValue}};{% endif %}{% else %}
+    public {{property.Type}} {{property.PropertyName}}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{property.DefaultValue}};{% endif %}{% else %}
     {
         get { return {{property.FieldName}}; }
 {%-     if property.HasSetter -%}
@@ -47,7 +47,7 @@ public partial class {{ClassName}} {{InheritanceCode}}
         }
 {%-     endif -%}
     }
-{%-   endif -%}
+{%-   endif %}
 
 {%- endfor -%}
 {%- if HasAdditionalPropertiesType -%}

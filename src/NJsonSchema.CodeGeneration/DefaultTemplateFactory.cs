@@ -9,13 +9,14 @@
 using System;
 using System.IO;
 using System.Reflection;
-using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The default template factory which loads templates from embedded resources.</summary>
     public class DefaultTemplateFactory : ITemplateFactory
     {
+        public static bool UseLiquid { get; set; } = true;
+
         /// <summary>Creates a template for the given language, template name and template model.</summary>
         /// <remarks>Supports NJsonSchema and NSwag embedded templates.</remarks>
         /// <param name="package">The package name (i.e. language).</param>
@@ -28,7 +29,7 @@ namespace NJsonSchema.CodeGeneration
             var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + package));
             var resourceName = "NJsonSchema.CodeGeneration." + package + ".Templates." + template + ".liquid";
             var resource = assembly.GetManifestResourceStream(resourceName);
-            if (resource != null)
+            if (resource != null && UseLiquid)
             {
                 using (var reader = new StreamReader(resource))
                     return new LiquidTemplate(reader.ReadToEnd(), model);

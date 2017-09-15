@@ -9,9 +9,9 @@
 <#  }#>
 <#}#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
-public partial class <#=Model.Class#> <#=Model.Inheritance#>
+public partial class <#=Model.ClassName#> <#=Model.InheritanceCode#>
 {
-<#if(Model.Inpc){#>
+<#if(Model.RenderInpc){#>
 <#foreach(var property in Model.Properties){#>
     private <#=property.Type#> <#=property.FieldName#><#if(property.HasDefaultValue){#> = <#=property.DefaultValue#><#}#>;
 <#}#>
@@ -21,7 +21,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#  if(property.HasDescription){#>
     /// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(property.Description, 1)#></summary>
 <#  }#>
-    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequired#><#if(property.IsStringEnumArray){#>, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)<#}#>)]
+    [Newtonsoft.Json.JsonProperty("<#=property.Name#>", Required = <#=property.JsonPropertyRequiredCode#><#if(property.IsStringEnumArray){#>, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)<#}#>)]
 <#  if(property.RenderRequiredAttribute){#>
     [System.ComponentModel.DataAnnotations.Required]
 <#  }#>
@@ -37,7 +37,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#if(property.IsStringEnum){#>
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 <#  }#>
-    public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.Inpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
+    public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.RenderInpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
 
 <#  }else{#>
 
@@ -68,7 +68,7 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
     }
 
 <#}#>
-<#if(Model.Inpc){#>
+<#if(Model.RenderInpc){#>
     public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
 <#}#>
@@ -77,11 +77,11 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
         return Newtonsoft.Json.JsonConvert.SerializeObject(this<#=Model.JsonSerializerParameterCode#>);
     }
     
-    public static <#=Model.Class#> FromJson(string data)
+    public static <#=Model.ClassName#> FromJson(string data)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.Class#>>(data<#=Model.JsonSerializerParameterCode#>);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<<#=Model.ClassName#>>(data<#=Model.JsonSerializerParameterCode#>);
     }
-<#if(Model.Inpc){#>
+<#if(Model.RenderInpc){#>
 
     protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
     {

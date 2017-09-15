@@ -25,13 +25,13 @@ namespace NJsonSchema.CodeGeneration
         public string Render()
         {
             var tpl = Template.Parse(_template);
-            var hash = Hash.FromAnonymousObject(_model);
+            var hash = LiquidHash.FromObject(_model);
             // TODO: Check models here
             return tpl.Render(new RenderParameters
             {
                 LocalVariables = hash,
                 Filters = new[] { typeof(LiquidFilters) }
-            });
+            }).Trim('\r', '\n', ' ');
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace NJsonSchema.CodeGeneration.Models
 {
-    public class TemplateModelBase : Drop
+    public class TemplateModelBase
     {
     }
 }
