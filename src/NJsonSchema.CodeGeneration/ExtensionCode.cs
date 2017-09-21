@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -26,11 +27,15 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the extension code which is appended at the end of the generated code.</summary>
         public string BottomCode { get; protected set; }
 
-        /// <summary>Gets the body of the extension class.</summary>
-        /// <param name="className">The class name.</param>
-        /// <returns>The body code</returns>
-        public string GetExtensionClassBody(string className)
+		/// <summary>Gets the body of the extension class.</summary>
+		/// <param name="className">The class name.</param>
+		/// <returns>The body code</returns>
+		/// <exception cref="InvalidOperationException">The extension class is not defined.</exception>
+		public string GetExtensionClassBody(string className)
         {
+			if (!ExtensionClasses.ContainsKey(className))
+				throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
+
             var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
             return match.Groups[3].Value;
         }
