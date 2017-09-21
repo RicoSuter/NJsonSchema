@@ -19,14 +19,14 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         protected GeneratorBase(JsonSchema4 schema)
         {
-            _schema = schema; 
+            _schema = schema;
         }
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <returns>The code</returns>
         public string GenerateFile()
         {
-            return GenerateFile(Regex.IsMatch(_schema.Title, "^[a-zA-Z0-9_]*$") ? _schema.Title : null);
+            return GenerateFile(_schema.Title != null && Regex.IsMatch(_schema.Title, "^[a-zA-Z0-9_]*$") ? _schema.Title : null);
         }
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
