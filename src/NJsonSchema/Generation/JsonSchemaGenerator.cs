@@ -462,8 +462,10 @@ namespace NJsonSchema.Generation
 #endif
 
             var contract = Settings.ResolveContract(type);
+
+            var allowedProperties = GetTypeProperties(type);
             var objectContract = contract as JsonObjectContract;
-            if (objectContract != null)
+            if (objectContract != null && allowedProperties == null)
             {
                 foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
                 {
@@ -497,8 +499,6 @@ namespace NJsonSchema.Generation
             else
             {
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-
-                var allowedProperties = GetTypeProperties(type);
                 foreach (var info in propertiesAndFields.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = info.GetCustomAttributes(true).OfType<JsonPropertyAttribute>().SingleOrDefault();
