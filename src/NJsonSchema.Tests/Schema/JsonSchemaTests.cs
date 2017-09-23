@@ -12,6 +12,12 @@ namespace NJsonSchema.Tests.Schema
     public class JsonSchemaTests
     {
         [TestMethod]
+        public async Task Ensure_NJS_does_not_run_in_legacy_mode()
+        { 
+            Assert.IsFalse(JsonSchema4.ToolchainVersion.Contains("NET40"));
+        }
+
+        [TestMethod]
         public void When_creating_schema_without_setting_properties_then_it_is_empty()
         {
             //// Arrange
