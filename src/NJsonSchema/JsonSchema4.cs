@@ -65,12 +65,13 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString() +
+        public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version +
 #if LEGACY
-                                                 " NET40";
+                                                 " NET40" +
 #else
-                                                 "";
+                                                 "" +
 #endif
+                                                 " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
