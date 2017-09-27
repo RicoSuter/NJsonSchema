@@ -314,7 +314,7 @@ namespace NJsonSchema
                     .ToList();
 
                 if (duplicatedProperties.Any())
-                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => g.Key) + " are defined multiple times."));
+                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
 
 #if !LEGACY
                 return new ReadOnlyDictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
