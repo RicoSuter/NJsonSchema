@@ -188,7 +188,7 @@ if(Model.HandleReferences){
             #line hidden
             
             #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.IsArrayItemDate){
+if(Model.IsArrayItemDate || Model.IsArrayItemDateTime){
             
             #line default
             #line hidden
@@ -439,7 +439,7 @@ if(Model.HasDictionaryValueDefaultValue){
             #line hidden
             
             #line 29 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-  if(Model.IsDictionaryValueDate){
+  if(Model.IsDictionaryValueDate || Model.IsDictionaryValueDateTime){
             
             #line default
             #line hidden
@@ -619,7 +619,7 @@ if(Model.HasDictionaryValueDefaultValue){
             this.Write("    ");
             
             #line 42 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToClassTemplate.tt"
-if(Model.IsDate){
+if(Model.IsDate || Model.IsDateTime){
             
             #line default
             #line hidden
