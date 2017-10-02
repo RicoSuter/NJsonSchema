@@ -9,7 +9,7 @@ if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
 <#if(Model.IsArrayItemNewableObject){#>
         <#=Model.Variable#>.push(<#=Model.ArrayItemType#>.fromJS(item<#if(Model.HandleReferences){#>, _mappings<#}#>));
 <#}else{#>
-<#if(Model.IsArrayItemDate){#>
+<#if(Model.IsArrayItemDate || Model.IsArrayItemDateTime){#>
         <#=Model.Variable#>.push(<#=Model.StringToDateCode#>(item));
 <#}else{#>
         <#=Model.Variable#>.push(item);
@@ -26,7 +26,7 @@ if (<#=Model.Value#>) {
 <#}else if(Model.IsDictionaryValueNewableArray){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].map((i: any) => <#=Model.DictionaryValueArrayItemType#>.fromJS(i<#if(Model.HandleReferences){#>, _mappings<#}#>)) : <#if(Model.HasDictionaryValueDefaultValue){#><#=Model.DictionaryValueDefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
 <#}else{#>
-<#  if(Model.IsDictionaryValueDate){#>
+<#  if(Model.IsDictionaryValueDate || Model.IsDictionaryValueDateTime){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.StringToDateCode#>(<#=Model.Value#>[key].toString()) : <#if(Model.HasDictionaryValueDefaultValue){#><#=Model.DictionaryValueDefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
 <#  }else{#>
 <#      if(Model.HasDictionaryValueDefaultValue || Model.NullValue != "undefined"){#>
@@ -39,7 +39,7 @@ if (<#=Model.Value#>) {
     }
 }
 <#}else{#>
-    <#if(Model.IsDate){#>
+    <#if(Model.IsDate || Model.IsDateTime){#>
 <#=Model.Variable#> = <#=Model.Value#> ? <#=Model.StringToDateCode#>(<#=Model.Value#>.toString()) : <#if(Model.HasDefaultValue){#><#=Model.StringToDateCode#>(<#=Model.DefaultValue#>)<#}else{#><any><#=Model.NullValue#><#}#>;
     <#}else{#>
 <#      if(Model.HasDefaultValue || Model.NullValue != "undefined"){#>
