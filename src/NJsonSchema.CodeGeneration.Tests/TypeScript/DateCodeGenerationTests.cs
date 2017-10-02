@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
@@ -8,17 +9,18 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     {
         private const string Json =
 @"{
-	""type"": ""object"", 
-	""properties"": {
-		""myDate"": ""2017-01-01""
+    '$schema': 'http://json-schema.org/draft-04/schema#',
+	'type': 'object', 
+	'properties': {
+		'myDate': { 'type': 'string', 'format': 'date' }
 	}
 }";
 
         [TestMethod]
-        public void When_date_handling_is_string_then_string_property_are_generated_in_class()
+        public async Task When_date_handling_is_string_then_string_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -35,10 +37,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_date_handling_is_moment_then_moment_property_are_generated_in_class()
+        public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -55,10 +57,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_date_handling_is_date_then_date_property_are_generated_in_class()
+        public async Task When_date_handling_is_date_then_date_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -75,10 +77,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_date_handling_is_date_then_date_property_are_generated_in_interface()
+        public async Task When_date_handling_is_date_then_date_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -93,10 +95,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public void When_date_handling_is_moment_then_moment_property_are_generated_in_interface()
+        public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -112,10 +114,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
 
         [TestMethod]
-        public void When_date_handling_is_string_then_string_property_are_generated_in_interface()
+        public async Task When_date_handling_is_string_then_string_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchema4.FromData(Json);
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
