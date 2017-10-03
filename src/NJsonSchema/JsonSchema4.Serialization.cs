@@ -18,8 +18,13 @@ using NJsonSchema.Collections;
 
 namespace NJsonSchema
 {
-    public partial class JsonSchema4
+    [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
+    public partial class JsonSchema4 : IJsonExtensionObject
     {
+        /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
+        [JsonExtensionData]
+        public IDictionary<string, object> ExtensionData { get; set; }
+
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext ctx)
         {
@@ -263,20 +268,20 @@ namespace NJsonSchema
                 foreach (var property in properties)
                 {
                     property.Value.Name = property.Key;
-                    property.Value.ParentSchema = this;
+                    property.Value.Parent = this;
                 }
             }
             else if (sender is ObservableCollection<JsonSchema4>)
             {
                 var collection = (ObservableCollection<JsonSchema4>)sender;
                 foreach (var item in collection)
-                    item.ParentSchema = this;
+                    item.Parent = this;
             }
             else if (sender is ObservableDictionary<string, JsonSchema4>)
             {
                 var collection = (ObservableDictionary<string, JsonSchema4>)sender;
                 foreach (var item in collection.Values)
-                    item.ParentSchema = this;
+                    item.Parent = this;
             }
         }
     }
