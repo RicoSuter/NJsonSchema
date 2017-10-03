@@ -16,38 +16,41 @@ namespace NJsonSchema.CodeGeneration.CSharp
     {
         /// <summary>Generates the JSON converter code.</summary>
         /// <param name="settings">The settings.</param>
+        /// <param name="additionalJsonConverters">The additional JSON converters.</param>
         /// <returns>The code.</returns>
-        public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings)
+        public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
         {
+            var jsonConverters = (settings.JsonConverters ?? new string[0]).Concat(additionalJsonConverters ?? new string[0]).ToList();
+            var hasJsonConverters = jsonConverters.Any();
+
             var useSettingsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsTransformationMethod);
             if (settings.HandleReferences || useSettingsTransformationMethod)
             {
-                var hasCustomConverters = settings.JsonConverters != null && settings.JsonConverters.Any();
                 return ", " +
                        (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                        "new Newtonsoft.Json.JsonSerializerSettings { " +
                        (settings.HandleReferences
                            ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, "
                            : string.Empty) +
-                       (hasCustomConverters
-                           ? "Converters = " + GenerateConverters(settings.JsonConverters) + ", "
+                       (hasJsonConverters
+                           ? "Converters = " + GenerateConverters(jsonConverters) + ", "
                            : string.Empty) +
                        " }" +
                        (useSettingsTransformationMethod ? ")" : string.Empty);
             }
             else
             {
-                if (settings.JsonConverters != null && settings.JsonConverters.Any())
-                    return ", " + GenerateConverters(settings.JsonConverters);
+                if (hasJsonConverters)
+                    return ", " + GenerateConverters(jsonConverters);
                 else
                     return string.Empty;
             }
         }
 
-        private static string GenerateConverters(ICollection<string> jsonConverterTypes)
+        private static string GenerateConverters(List<string> jsonConverters)
         {
-            if (jsonConverterTypes != null && jsonConverterTypes.Any())
-                return "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverterTypes.Select(c => "new " + c + "()")) + " }";
+            if (jsonConverters.Any())
+                return "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
             else
                 return string.Empty;
         }
