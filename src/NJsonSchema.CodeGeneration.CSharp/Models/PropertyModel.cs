@@ -150,6 +150,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
-        public bool IsDate => _property.Format == "date";
+        public bool IsDate => _property.Format == JsonFormatStrings.Date;
     }
 }
