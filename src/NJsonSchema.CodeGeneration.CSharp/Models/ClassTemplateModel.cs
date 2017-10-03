@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(
-            _settings.HandleReferences, _settings.JsonConverters);
+            _settings.HandleReferences, _settings.JsonConverters, _settings.JsonSerializerSettings);
 
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance
