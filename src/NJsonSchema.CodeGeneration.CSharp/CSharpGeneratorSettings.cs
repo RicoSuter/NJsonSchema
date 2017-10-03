@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).</summary>
         public bool HandleReferences { get; set; }
 
-        /// <summary>Gets or sets the json serializer settings</summary>
+        /// <summary>Gets or sets the JSON serializer settings.</summary>
         public JsonSerializerSettings JsonSerializerSettings { get; set; }
     }
 }
