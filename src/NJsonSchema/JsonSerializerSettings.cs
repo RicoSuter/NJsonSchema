@@ -14,7 +14,7 @@
             
             settingsString += string.IsNullOrEmpty(DateFormatString) ? 
                                     string.Empty : 
-                                    $"DateFormatString = {DateFormatString}";
+                                    $"DateFormatString = \"{DateFormatString}\"";
 
             return settingsString;
         }
