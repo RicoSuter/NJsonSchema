@@ -26,11 +26,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return string.Empty;
             }, RegexOptions.Multiline);
 
-            code = Regex.Replace(code, "(@.*\r?\n)?(export )?class (.*?) ([\\s\\S]*?)\\n}", match =>
+            code = Regex.Replace(code, "(@.*\n)?(export )?[^\n]*?class (.*?) ([\\s\\S]*?)\\n}", match =>
             {
                 var hasExport = match.Groups[2].Success;
                 var className = match.Groups[3].Value;
-                var classCode = hasExport ? match.Groups[0].Value : match.Groups[0].Value.Replace("class ", "export class ");
+                var classCode = hasExport ? match.Groups[0].Value : match.Groups[0].Value.Replace("class " + className, "export class " + className);
 
                 if (extendedClasses?.Contains(className) == true)
                 {
