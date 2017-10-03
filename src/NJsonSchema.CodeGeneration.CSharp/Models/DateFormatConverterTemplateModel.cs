@@ -10,7 +10,8 @@ using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
-    class DateFormatConverterTemplateModel
+    /// <summary>The DateFormatConverterTemplateModel.</summary>
+    public class DateFormatConverterTemplateModel
     {
         private readonly CSharpGeneratorSettings _settings;
 
