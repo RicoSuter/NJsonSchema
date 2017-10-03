@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Generates all necessary classes.</summary>
         /// <returns>The code.</returns>
         public string GenerateClasses()
-        {        
+        {
             var classes = GenerateTypes(null);
 
             // TODO: Move utility classes to FileTemplate.tt
