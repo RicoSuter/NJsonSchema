@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
+using NJsonSchema.References;
 
 namespace NJsonSchema
 {
@@ -20,7 +21,7 @@ namespace NJsonSchema
     public class JsonReferenceResolver
     {
         private readonly JsonSchemaResolver _schemaResolver;
-        private readonly Dictionary<string, JsonSchema4> _resolvedSchemas = new Dictionary<string, JsonSchema4>();
+        private readonly Dictionary<string, IJsonReference> _resolvedObjects = new Dictionary<string, IJsonReference>();
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
         /// <param name="schemaResolver">The schema resolver.</param>
@@ -32,9 +33,9 @@ namespace NJsonSchema
         /// <summary>Adds a document reference.</summary>
         /// <param name="documentPath">The document path.</param>
         /// <param name="schema">The referenced schema.</param>
-        public void AddDocumentReference(string documentPath, JsonSchema4 schema)
+        public void AddDocumentReference(string documentPath, IJsonReference schema)
         {
-            _resolvedSchemas[documentPath] = schema;
+            _resolvedObjects[documentPath] = schema;
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -43,12 +44,12 @@ namespace NJsonSchema
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<JsonSchema4> ResolveReferenceAsync(object rootObject, string jsonPath)
+        public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath)
         {
             if (jsonPath == "#")
             {
-                if (rootObject is JsonSchema4)
-                    return (JsonSchema4)rootObject;
+                if (rootObject is IJsonReference)
+                    return (IJsonReference)rootObject;
 
                 throw new InvalidOperationException("Could not resolve the JSON path '#' because the root object is not a JsonSchema4.");
             }
@@ -86,7 +87,7 @@ namespace NJsonSchema
         /// <param name="jsonPath">The JSON path to resolve.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
-        public virtual JsonSchema4 ResolveDocumentReference(object rootObject, string jsonPath)
+        public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
             var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>());
@@ -99,7 +100,7 @@ namespace NJsonSchema
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public virtual async Task<JsonSchema4> ResolveFileReferenceAsync(string filePath)
+        public virtual async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
         {
             return await JsonSchema4.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
         }
@@ -107,24 +108,26 @@ namespace NJsonSchema
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public virtual async Task<JsonSchema4> ResolveUrlReferenceAsync(string url)
+        public virtual async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
         {
             return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
 
-        private async Task<JsonSchema4> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
         {
             try
             {
                 var arr = Regex.Split(fullJsonPath, @"(?=#)");
-                if (!_resolvedSchemas.ContainsKey(arr[0]))
+                if (!_resolvedObjects.ContainsKey(arr[0]))
                 {
                     var schema = await ResolveFileReferenceAsync(arr[0]).ConfigureAwait(false);
-                    _schemaResolver.AppendSchema(schema, null);
-                    _resolvedSchemas[arr[0]] = schema;
+                    if (schema is JsonSchema4)
+                        _schemaResolver.AppendSchema((JsonSchema4)schema, null);
+
+                    _resolvedObjects[arr[0]] = schema;
                 }
 
-                var result = _resolvedSchemas[arr[0]];
+                var result = _resolvedObjects[arr[0]];
                 return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1]).ConfigureAwait(false);
             }
             catch (Exception exception)
@@ -133,19 +136,21 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<JsonSchema4> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
         {
             try
             {
                 var arr = fullJsonPath.Split('#');
-                if (!_resolvedSchemas.ContainsKey(arr[0]))
+                if (!_resolvedObjects.ContainsKey(arr[0]))
                 {
                     var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
-                    _schemaResolver.AppendSchema(schema, null);
-                    _resolvedSchemas[arr[0]] = schema;
+                    if (schema is JsonSchema4)
+                        _schemaResolver.AppendSchema((JsonSchema4)schema, null);
+
+                    _resolvedObjects[arr[0]] = schema;
                 }
 
-                var result = _resolvedSchemas[arr[0]];
+                var result = _resolvedObjects[arr[0]];
                 return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1]).ConfigureAwait(false);
             }
             catch (Exception exception)
@@ -154,13 +159,13 @@ namespace NJsonSchema
             }
         }
 
-        private JsonSchema4 ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects)
+        private IJsonReference ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
 
             if (segments.Count == 0)
-                return obj as JsonSchema4;
+                return obj as IJsonReference;
 
             checkedObjects.Add(obj);
             var firstSegment = segments[0];

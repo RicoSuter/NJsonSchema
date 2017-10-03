@@ -16,7 +16,7 @@ namespace NJsonSchema
 {
     public partial class JsonSchema4 : JsonReferenceBase<JsonSchema4>, IJsonReference
     {
-        /// <summary>Gets the actual schema, either this or the reference schema.</summary>
+        /// <summary>Gets the actual schema, either this or the referenced schema.</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
@@ -84,10 +84,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent object of this object. </summary>
         [JsonIgnore]
-        object IJsonReference.ParentObject
-        {
-            get => ParentSchema;
-        }
+        object IJsonReference.PossibleRoot => Parent;
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]

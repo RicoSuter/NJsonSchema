@@ -346,7 +346,11 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
-        public virtual JsonSchema4 ParentSchema { get; internal set; }
+        public JsonSchema4 ParentSchema => Parent as JsonSchema4;
+
+        /// <summary>Gets the parent schema of this schema. </summary>
+        [JsonIgnore]
+        public virtual object Parent { get; set; }
 
         /// <summary>Gets or sets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -482,7 +486,7 @@ namespace NJsonSchema
                     _item = value;
                     if (_item != null)
                     {
-                        _item.ParentSchema = this;
+                        _item.Parent = this;
                         Items.Clear();
                     }
                 }
@@ -516,7 +520,7 @@ namespace NJsonSchema
             {
                 _not = value;
                 if (_not != null)
-                    _not.ParentSchema = this;
+                    _not.Parent = this;
             }
         }
 

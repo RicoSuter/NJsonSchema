@@ -15,12 +15,12 @@ namespace NJsonSchema.References
         /// <returns>The parent schema or this when this is the root.</returns>
         public static object FindRootParent(this IJsonReference obj)
         {
-            var parent = obj.ParentObject;
+            var parent = obj.PossibleRoot;
             if (parent == null)
                 return obj;
 
-            while ((parent as IJsonReference)?.ParentObject != null)
-                parent = ((IJsonReference)parent).ParentObject;
+            while ((parent as IJsonReference)?.PossibleRoot != null)
+                parent = ((IJsonReference)parent).PossibleRoot;
 
             return parent;
         }
