@@ -78,6 +78,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool HandleReferences { get; set; }
 
         /// <summary>Gets or sets the JSON serializer settings.</summary>
-        public JsonSerializerSettings JsonSerializerSettings { get; set; }
+        public JsonSerializerSettings JsonSerializerSettings { get; }
     }
 }
