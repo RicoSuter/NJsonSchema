@@ -81,8 +81,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
-        public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(
-            _settings.HandleReferences, _settings.JsonConverters);
+        public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings);
 
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance
