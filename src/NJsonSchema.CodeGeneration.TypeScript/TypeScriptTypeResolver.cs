@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             schema = schema.ActualSchema;
 
-            if (schema.IsAnyType)
+            if (schema.IsAnyType || schema.IsSingleton)
                 return "any";
 
             var type = schema.Type;

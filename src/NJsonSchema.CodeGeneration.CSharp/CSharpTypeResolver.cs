@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             schema = schema.ActualSchema;
 
-            if (schema.IsAnyType)
+            if (schema.IsAnyType || schema.IsSingleton)
                 return "object";
 
             var type = schema.Type;
