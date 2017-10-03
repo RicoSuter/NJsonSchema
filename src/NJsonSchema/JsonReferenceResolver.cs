@@ -182,7 +182,7 @@ namespace NJsonSchema
             }
             else
             {
-                var extensionObj = obj as JsonExtensionObject;
+                var extensionObj = obj as IJsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
                     return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), checkedObjects);

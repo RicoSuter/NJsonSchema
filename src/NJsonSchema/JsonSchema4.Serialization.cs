@@ -18,8 +18,13 @@ using NJsonSchema.Collections;
 
 namespace NJsonSchema
 {
-    public partial class JsonSchema4
+    [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
+    public partial class JsonSchema4 : IJsonExtensionObject
     {
+        /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
+        [JsonExtensionData]
+        public IDictionary<string, object> ExtensionData { get; set; }
+
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext ctx)
         {

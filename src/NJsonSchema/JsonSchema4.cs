@@ -22,7 +22,7 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    public partial class JsonSchema4 : JsonExtensionObject, IDocumentPathProvider
+    public partial class JsonSchema4 : IDocumentPathProvider
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _patternProperties;
@@ -343,65 +343,6 @@ namespace NJsonSchema
         /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
-
-        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
-        [JsonIgnore]
-        public string DocumentPath { get; set; }
-
-        /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty("schemaReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal string SchemaReferencePath { get; set; }
-
-        /// <summary>Gets or sets the type reference.</summary>
-        [JsonIgnore]
-        public JsonSchema4 SchemaReference
-        {
-            get { return _schemaReference; }
-            set
-            {
-                if (_schemaReference != value)
-                {
-                    _schemaReference = value;
-                    SchemaReferencePath = null;
-
-                    if (value != null)
-                    {
-                        // only $ref property is allowed when schema is a reference
-                        // TODO: Fix all SchemaReference assignments so that this code is not needed 
-                        Type = JsonObjectType.None;
-                    }
-                }
-            }
-        }
-
-        /// <summary>Gets the actual schema, either this or the reference schema.</summary>
-        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
-        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        [JsonIgnore]
-        public virtual JsonSchema4 ActualSchema => GetActualSchema(new List<JsonSchema4>());
-
-        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
-        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        private JsonSchema4 GetActualSchema(IList<JsonSchema4> checkedSchemas)
-        {
-            if (checkedSchemas.Contains(this))
-                throw new InvalidOperationException("Cyclic references detected.");
-
-            if (SchemaReferencePath != null && SchemaReference == null)
-                throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
-
-            if (HasSchemaReference)
-            {
-                checkedSchemas.Add(this);
-
-                if (HasAllOfSchemaReference)
-                    return AllOf.First().GetActualSchema(checkedSchemas);
-
-                return SchemaReference.GetActualSchema(checkedSchemas);
-            }
-
-            return this;
-        }
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
@@ -726,23 +667,6 @@ namespace NJsonSchema
                                  MultipleOf == null &&
                                  IsEnumeration == false;
 
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
-        [JsonIgnore]
-        public bool HasSchemaReference => SchemaReference != null || HasAllOfSchemaReference;
-
-        /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
-        [JsonIgnore]
-        public bool HasAllOfSchemaReference => Type == JsonObjectType.None &&
-                                               AllOf.Count == 1 &&
-                                               AnyOf.Count == 0 &&
-                                               OneOf.Count == 0 &&
-                                               Properties.Count == 0 &&
-                                               PatternProperties.Count == 0 &&
-                                               AllowAdditionalProperties &&
-                                               AdditionalPropertiesSchema == null &&
-                                               MultipleOf == null &&
-                                               IsEnumeration == false;
-
 #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
@@ -806,20 +730,6 @@ namespace NJsonSchema
         {
             var validator = new JsonSchemaValidator();
             return validator.Validate(token, ActualSchema);
-        }
-
-        /// <summary>Finds the root parent of this schema.</summary>
-        /// <returns>The parent schema or this when this is the root.</returns>
-        public JsonSchema4 FindRootParent()
-        {
-            var parent = ParentSchema;
-            if (parent == null)
-                return this;
-
-            while (parent.ParentSchema != null)
-                parent = parent.ParentSchema;
-
-            return parent;
         }
 
         private static JsonObjectType ConvertStringToJsonObjectType(string value)

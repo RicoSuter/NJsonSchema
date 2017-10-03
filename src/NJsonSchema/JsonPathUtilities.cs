@@ -17,6 +17,8 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
+        internal const string ReferenceReplaceString = "__referencePath";
+
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="searchedObject">The object to search.</param>
@@ -98,7 +100,7 @@ namespace NJsonSchema
                     {
                         var propertyName = member.GetName();
 
-                        var isExtensionDataProperty = obj is JsonExtensionObject && propertyName == nameof(JsonExtensionObject.ExtensionData);
+                        var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
                         if (isExtensionDataProperty)
                         {
                             if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects))
