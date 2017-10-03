@@ -82,10 +82,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string GenerateClasses()
         {
             var classes = GenerateTypes(null);
+
+            // TODO: Move utility classes to FileTemplate.tt
             if (classes.Contains("JsonInheritanceConverter"))
             {
                 var templateModel = new JsonInheritanceConverterTemplateModel(Settings);
                 var template = new JsonInheritanceConverterTemplate(templateModel);
+                classes += "\n\n" + template.Render();
+            }
+            if (classes.Contains("DateFormatConverter"))
+            {
+                var templateModel = new DateFormatConverterTemplateModel(Settings);
+                var template = new DateFormatConverterTemplate(templateModel);
                 classes += "\n\n" + template.Render();
             }
             return classes;
