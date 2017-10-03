@@ -10,7 +10,7 @@
         public string ToString() {
             var settingsString = DateParseHandling == null ? 
                                     string.Empty : 
-                                    $"DateParseHandling = {DateParseHandling.ToString()}";
+                                    $"DateParseHandling = Newtonsoft.Json.DateParseHandling.{DateParseHandling.ToString()}";
             
             settingsString += string.IsNullOrEmpty(DateFormatString) ? 
                                     string.Empty : 
