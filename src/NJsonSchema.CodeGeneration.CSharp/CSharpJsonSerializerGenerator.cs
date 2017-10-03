@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Generates the JSON converter code.</summary>
         /// <param name="handleReferences">if set to <c>true</c> uses preserve references handling.</param>
         /// <param name="jsonConverterTypes">The Json.NET converter types.</param>
-        /// <param name="jsonSerializerSettings">The jsonSerializer settings </param>
+        /// <param name="jsonSerializerSettings">The JSON serializer settings.</param>
         /// <returns>The code.</returns>
         public static string GenerateJsonSerializerParameterCode(bool handleReferences, ICollection<string> jsonConverterTypes, JsonSerializerSettings jsonSerializerSettings)
         {
@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (jsonConverterTypes != null && jsonConverterTypes.Any())
                     return ", new Newtonsoft.Json.JsonSerializerSettings { " +
                            "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, " +
-                            serializerSettings +
+                           serializerSettings +
                            "Converters = " + GenerateConverters(jsonConverterTypes) +
                            " }";
                 else
