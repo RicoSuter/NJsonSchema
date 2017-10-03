@@ -37,6 +37,9 @@ public partial class <#=Model.Class#> <#=Model.Inheritance#>
 <#if(property.IsStringEnum){#>
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 <#  }#>
+<#  if(property.IsDate){#>
+    [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+<#  }#>
     public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.Inpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
 
 <#  }else{#>

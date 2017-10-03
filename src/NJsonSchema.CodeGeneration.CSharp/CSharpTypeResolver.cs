@@ -88,6 +88,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 var template = new JsonInheritanceConverterTemplate(templateModel);
                 classes += "\n\n" + template.Render();
             }
+            if (classes.Contains("DateFormatConverter"))
+            {
+                var templateModel = new DateFormatConverterTemplateModel(Settings);
+                var template = new DateFormatConverterTemplate(templateModel);
+                classes += "\n\n" + template.Render();
+            }
             return classes;
         }
 
