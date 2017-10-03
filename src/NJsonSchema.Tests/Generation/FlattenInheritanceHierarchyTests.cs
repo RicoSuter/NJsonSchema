@@ -81,5 +81,47 @@ namespace NJsonSchema.Tests.Generation
             Assert.IsTrue(schema.Properties.ContainsKey("Bar"));
             Assert.IsTrue(schema.Properties.ContainsKey("Baz"));
         }
+
+        public class Test
+        {
+            public int? Id { get; set; }
+
+            public Metadata Info { get; set; }
+        }
+
+        public class Metadata : Dictionary<string, string> { }
+
+        [TestMethod]
+        public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_and_generate_abstract_properties_works()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                GenerateAbstractProperties = true,
+                FlattenInheritanceHierarchy = true
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Test>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+        }
+
+        [TestMethod]
+        public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_works()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Test>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+        }
     }
 }

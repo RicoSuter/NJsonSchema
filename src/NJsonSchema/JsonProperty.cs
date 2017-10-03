@@ -15,7 +15,7 @@ namespace NJsonSchema
     /// <summary>A description of a JSON property of a JSON object. </summary>
     public class JsonProperty : JsonSchema4
     {
-        private JsonSchema4 _parentSchema;
+        private object _parent;
 
         internal static JsonProperty FromJsonSchema(string name, JsonSchema4 type)
         {
@@ -31,13 +31,13 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent schema of this property schema. </summary>
         [JsonIgnore]
-        public override JsonSchema4 ParentSchema
+        public override object Parent
         {
-            get { return _parentSchema; }
-            internal set
+            get { return _parent; }
+            set
             {
-                var initialize = _parentSchema == null;
-                _parentSchema = value;
+                var initialize = _parent == null;
+                _parent = value;
 
                 if (initialize && InitialIsRequired)
                     IsRequired = InitialIsRequired;

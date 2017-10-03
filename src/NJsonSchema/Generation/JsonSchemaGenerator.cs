@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -590,7 +591,9 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.FlattenInheritanceHierarchy)
                 {
-                    await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                    var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
+                    if (!typeDescription.IsDictionary && !type.IsArray)
+                        await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -618,7 +621,11 @@ namespace NJsonSchema.Generation
 #else
                 foreach (var i in type.GetTypeInfo().GetInterfaces())
 #endif
-                    await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                {
+                    var typeDescription = Settings.ReflectionService.GetDescription(i, null, Settings);
+                    if (!typeDescription.IsDictionary && !type.IsArray && !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
+                        await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                }
             }
         }
 

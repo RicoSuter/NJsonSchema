@@ -1373,5 +1373,95 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.IsTrue(code.Contains("public int Foo { get; set; }"));
         }
+
+        [TestMethod]
+        public async Task When_definition_contains_date_converter_should_be_added_for_datetime()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime"
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains(@"class DateFormatConverter"));
+            Assert.IsTrue(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+	    }
+
+        [TestMethod]
+        public async Task When_definition_contains_date_converter_should_be_added_for_datetimeoffset()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"", 
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTimeOffset"
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsTrue(code.Contains(@"class DateFormatConverter"));
+            Assert.IsTrue(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+        }
+
+        [TestMethod]
+        public async Task When_definition_contains_datetime_converter_should_not_be_added()
+        {
+            //// Arrange
+            var json =
+                @"{
+	""type"": ""object"", 
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date-time""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime"
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.IsFalse(code.Contains(@"class DateFormatConverter"));
+            Assert.IsFalse(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+        }
     }
 }

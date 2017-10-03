@@ -15,27 +15,30 @@ namespace NJsonSchema.CodeGeneration.CSharp
     public static class CSharpJsonSerializerGenerator
     {
         /// <summary>Generates the JSON converter code.</summary>
-        /// <param name="handleReferences">if set to <c>true</c> uses preserve references handling.</param>
-        /// <param name="jsonConverterTypes">The Json.NET converter types.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The code.</returns>
-        public static string GenerateJsonSerializerParameterCode(bool handleReferences, ICollection<string> jsonConverterTypes)
+        public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings)
         {
-            if (handleReferences)
+            var useSettingsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsTransformationMethod);
+            if (settings.HandleReferences || useSettingsTransformationMethod)
             {
-                if (jsonConverterTypes != null && jsonConverterTypes.Any())
-                    return ", new Newtonsoft.Json.JsonSerializerSettings { " +
-                           "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, " +
-                           "Converters = " + GenerateConverters(jsonConverterTypes) +
-                           " }";
-                else
-                    return
-                        ", new Newtonsoft.Json.JsonSerializerSettings { " +
-                        "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All }";
+                var hasCustomConverters = settings.JsonConverters != null && settings.JsonConverters.Any();
+                return ", " +
+                       (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
+                       "new Newtonsoft.Json.JsonSerializerSettings { " +
+                       (settings.HandleReferences
+                           ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, "
+                           : string.Empty) +
+                       (hasCustomConverters
+                           ? "Converters = " + GenerateConverters(settings.JsonConverters) + ", "
+                           : string.Empty) +
+                       " }" +
+                       (useSettingsTransformationMethod ? ")" : string.Empty);
             }
             else
             {
-                if (jsonConverterTypes != null && jsonConverterTypes.Any())
-                    return ", " + GenerateConverters(jsonConverterTypes);
+                if (settings.JsonConverters != null && settings.JsonConverters.Any())
+                    return ", " + GenerateConverters(settings.JsonConverters);
                 else
                     return string.Empty;
             }
