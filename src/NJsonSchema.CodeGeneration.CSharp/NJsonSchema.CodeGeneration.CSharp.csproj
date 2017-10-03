@@ -28,6 +28,10 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClassTemplate.cs</LastGenOutput>
     </None>
+    <None Update="Templates\DateFormatConverterTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DateFormatConverterTemplate.cs</LastGenOutput>
+    </None>
     <None Update="Templates\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
@@ -49,6 +53,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\DateFormatConverterTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DateFormatConverterTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\EnumTemplate.cs">
       <DesignTime>True</DesignTime>
