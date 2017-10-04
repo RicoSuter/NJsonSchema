@@ -49,8 +49,37 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the type of the property.</summary>
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
+        public string TypeForInterface
+        {
+            get
+            {
+                var schema = _property.ActualPropertySchema.ActualSchema;
+                if (schema.IsDictionary)
+                {
+                    //TODO
+                    return Type + "/*TODO: Dictionary values are not handled*/";
+                }
+                if (IsArray)
+                {
+                    if (schema.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object))
+                    {
+                        return "I" + Type;
+                    }
+                }
+                if (schema.Type.HasFlag(JsonObjectType.Object))
+                {
+                    return "I" + Type;
+                }
+
+                return Type;
+            }
+        }
+
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
         public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+
+        /// <summary>Gets a value indicating whether the property type is a dictionary.</summary>
+        public bool IsDictionary => _property.ActualPropertySchema.ActualSchema.IsDictionary;
 
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, PropertyName) ?? "any";
