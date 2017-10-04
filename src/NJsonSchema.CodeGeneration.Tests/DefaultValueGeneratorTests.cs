@@ -7,17 +7,17 @@ namespace NJsonSchema.CodeGeneration.Tests
     [TestClass]
     public class DefaultValueGeneratorTests
     {
-        private CSharpDefaultValueGenerator _csharpGenerator;
-        private TypeScriptDefaultValueGenerator _typescriptGenerator;
+        private CSharpValueGenerator _csharpGenerator;
+        private TypeScriptValueGenerator _typescriptGenerator;
 
         [TestInitialize]
         public void Init()
         {
             var csharpSettings = new CSharpGeneratorSettings();
-            _csharpGenerator = new CSharpDefaultValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
+            _csharpGenerator = new CSharpValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
 
             var typescriptSettings = new TypeScriptGeneratorSettings();
-            _typescriptGenerator = new TypeScriptDefaultValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
+            _typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
         }
 
         [TestMethod]
@@ -128,10 +128,10 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator(), Namespace = "Ns" };
-            var csharpGenerator = new CSharpDefaultValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
+            var csharpGenerator = new CSharpValueGenerator(new CSharpTypeResolver(csharpSettings, new object()), csharpSettings);
 
             var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator() };
-            var typescriptGenerator = new TypeScriptDefaultValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
+            var typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(typescriptSettings, new object()), typescriptSettings);
 
             //// Act
             var schema = new JsonSchema4()

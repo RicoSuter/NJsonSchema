@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="TypeScriptDefaultValueGenerator.cs" company="NJsonSchema">
+// <copyright file="TypeScriptValueGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -11,11 +11,12 @@ using System.Globalization;
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
-    public class TypeScriptDefaultValueGenerator : DefaultValueGenerator
+    public class TypeScriptValueGenerator : ValueGeneratorBase
     {
-        /// <summary>Initializes a new instance of the <see cref="TypeScriptDefaultValueGenerator"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
-        public TypeScriptDefaultValueGenerator(ITypeResolver typeResolver, TypeScriptGeneratorSettings settings) 
+        /// <param name="settings">The settings</param>
+        public TypeScriptValueGenerator(ITypeResolver typeResolver, TypeScriptGeneratorSettings settings) 
             : base(typeResolver, settings.EnumNameGenerator)
         {
         }
@@ -52,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The TypeScript number literal.</returns>
-        protected override string ConvertNumericValue(object value, string format)
+        public override string GetNumericValue(object value, string format)
         {
             if (value is byte) return ((byte)value).ToString(CultureInfo.InvariantCulture);
             if (value is sbyte) return ((sbyte)value).ToString(CultureInfo.InvariantCulture);

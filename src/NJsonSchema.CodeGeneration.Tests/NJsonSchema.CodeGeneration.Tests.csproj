@@ -71,6 +71,7 @@
     <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
     <Compile Include="CSharp\InheritanceInterfaceTests.cs" />
+    <Compile Include="CSharp\ValueGeneratorTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
     <Compile Include="DefaultValueGeneratorTests.cs" />
     <Compile Include="InheritanceSerializationTests.cs" />
