@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
         public bool HasSetter => 
             (_property.IsNullable(_settings.SchemaType) == false && (
-                (_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) && _settings.GenerateImmutableArrayProperties) ||
+                (_property.ActualPropertySchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
 

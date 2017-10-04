@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
         public bool IsStringEnumArray =>
-            _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) &&
+            _property.ActualPropertySchema.IsArray &&
             _property.ActualPropertySchema.Item != null &&
             _property.ActualPropertySchema.Item.ActualSchema.IsEnumeration &&
             _property.ActualPropertySchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);

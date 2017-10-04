@@ -49,11 +49,38 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the type of the property.</summary>
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
+        /// <summary>Gets the type of the property in the initializer interface.</summary>
+        public string InterfaceType => _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+
+        /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
+        public bool SupportsConstructorConversion
+        {
+            get
+            {
+                if (Type == InterfaceType)
+                    return false;
+
+                if (IsArray)
+                    return _property.ActualPropertySchema?.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+
+                if (IsDictionary)
+                    return _property.ActualPropertySchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+
+                return !_property.ActualPropertySchema.IsTuple;
+            }
+        }
+
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
-        public bool IsArray => _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+        public bool IsArray => _property.ActualPropertySchema.IsArray;
+
+        /// <summary>Gets a value indicating whether the property type is a dictionary.</summary>
+        public bool IsDictionary => _property.ActualPropertySchema.IsDictionary;
 
         /// <summary>Gets the type of the array item.</summary>
-        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema.Item, PropertyName) ?? "any";
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema?.Item, PropertyName) ?? "any";
+
+        /// <summary>Gets the type of the dictionary item.</summary>
+        public string DictionaryItemType => _resolver.TryResolve(_property.ActualPropertySchema?.AdditionalPropertiesSchema, PropertyName) ?? "any";
 
         /// <summary>Gets the type postfix (e.g. ' | null | undefined')</summary>
         public string TypePostfix

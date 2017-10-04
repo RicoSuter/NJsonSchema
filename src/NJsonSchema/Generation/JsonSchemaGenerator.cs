@@ -19,7 +19,6 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
-using System.Runtime.Serialization;
 using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
@@ -151,7 +150,7 @@ namespace NJsonSchema.Generation
             }
             else if (typeDescription.IsEnum)
                 await GenerateEnum(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
-            else if (typeDescription.Type.HasFlag(JsonObjectType.Array))
+            else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
                 await GenerateArray(schema, type, typeDescription, schemaResolver).ConfigureAwait(false);
             else
                 typeDescription.ApplyType(schema);
