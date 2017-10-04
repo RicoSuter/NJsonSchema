@@ -52,7 +52,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
                 GenerateConstructorInterface = true
             });
 
-            var output = generator.GenerateFile("MyClass");
+            var output = generator.GenerateFile("MyClass")
+                .Replace("\r", "").Replace("\n", "");
 
             //// Assert
             Assert.IsTrue(output.Contains(@"export interface IMyClass {
@@ -61,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     skills: { [key: string] : ISkill; };
     foo: Car[][];
     bar: { [key: string] : Skill[]; };
-}"));
+}".Replace("\r", "").Replace("\n", "")));
         }
     }
 }
