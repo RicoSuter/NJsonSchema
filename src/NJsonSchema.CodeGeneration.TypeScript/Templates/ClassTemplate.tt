@@ -27,26 +27,28 @@
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
-<#        foreach(var property in Model.Properties){#>
-<#            if(property.SupportsConstructorConversion) {#>
-<#                if(property.IsArray) {#>
+<#        if(Model.ConvertConstructorInterfaceData){#>
+<#            foreach(var property in Model.Properties){#>
+<#                if(property.SupportsConstructorConversion) {#>
+<#                    if(property.IsArray) {#>
             if (data.<#=property.PropertyName#>) {
                 for (let i = 0; i < data.<#=property.PropertyName#>.length; i++) {
                     let item = data.<#=property.PropertyName#>[i];
-                    this.<#=property.PropertyName#>[i] = item && !(item instanceof <#=property.ArrayItemType#>) ? new <#=property.ArrayItemType#>(item) : item;
+                    this.<#=property.PropertyName#>[i] = item && !(<any>item).toJSON ? new <#=property.ArrayItemType#>(item) : item;
                 }
             }
-<#                } else if (property.IsDictionary) {#>
+<#                    } else if (property.IsDictionary) {#>
             if (data.<#=property.PropertyName#>) {
                 for (var key in data.<#=property.PropertyName#>) {
                     if (data.<#=property.PropertyName#>.hasOwnProperty(key)) {
                         let item = data.<#=property.PropertyName#>[key];
-                        this.<#=property.PropertyName#>[key] = item && !(item instanceof <#=property.DictionaryItemType#>) ? new <#=property.DictionaryItemType#>(item) : item;
+                        this.<#=property.PropertyName#>[key] = item && !(<any>item).toJSON ? new <#=property.DictionaryItemType#>(item) : item;
                     }
                 }
             }
-<#                } else {#>
-            this.<#=property.PropertyName#> = data.<#=property.PropertyName#> && !(data.<#=property.PropertyName#> instanceof <#=property.Type#>) ? new <#=property.Type#>(data.<#=property.PropertyName#>) : this.<#=property.PropertyName#>; 
+<#                    } else {#>
+            this.<#=property.PropertyName#> = data.<#=property.PropertyName#> && !(<any>data.<#=property.PropertyName#>).toJSON ? new <#=property.Type#>(data.<#=property.PropertyName#>) : this.<#=property.PropertyName#>; 
+<#                    }#>
 <#                }#>
 <#            }#>
 <#        }#>
@@ -141,7 +143,7 @@ export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
 <#      if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#      }#>
-    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.InterfaceType#><#=property.TypePostfix#>;
+    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.ConstructorInterfaceType#><#=property.TypePostfix#>;
 <#  }#>
 <#  if(Model.HasIndexerProperty){#>
 

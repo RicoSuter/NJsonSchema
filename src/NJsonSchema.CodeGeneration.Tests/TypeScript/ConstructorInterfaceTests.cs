@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         }
 
         [TestMethod]
-        public async Task When_()
+        public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
@@ -49,14 +49,24 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                GenerateConstructorInterface = true
+                GenerateConstructorInterface = true,
+                ConvertConstructorInterfaceData = true
+
             });
 
-            var output = generator.GenerateFile("MyClass")
-                .Replace("\r", "").Replace("\n", "");
+            var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"export interface IMyClass {
+
+            // address property is converted:
+            Assert.IsTrue(output.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : this.address;"));
+            // cars items are converted:
+            Assert.IsTrue(output.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : item;"));
+            // skills values are converted:
+            Assert.IsTrue(output.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : item;"));
+
+            // interface is correct
+            Assert.IsTrue(output.Replace("\r", "").Replace("\n", "").Contains(@"export interface IMyClass {
     address: IAddress;
     cars: ICar[];
     skills: { [key: string] : ISkill; };

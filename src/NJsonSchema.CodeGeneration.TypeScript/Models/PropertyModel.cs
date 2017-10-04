@@ -50,14 +50,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
-        public string InterfaceType => _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
+            _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
+            Type;
 
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
         public bool SupportsConstructorConversion
         {
             get
             {
-                if (Type == InterfaceType)
+                if (Type == ConstructorInterfaceType)
                     return false;
 
                 if (IsArray)
@@ -116,7 +118,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 {
                     return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
                     {
-                        Variable = typeStyle == TypeScriptTypeStyle.Class ? 
+                        Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
                         Schema = _property.ActualPropertySchema,
