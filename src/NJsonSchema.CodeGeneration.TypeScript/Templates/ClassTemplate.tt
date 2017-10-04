@@ -28,6 +28,22 @@
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+<#		foreach(var property in Model.Properties){#>
+<#			if(property.Type != property.TypeForInterface) {#>
+<#				if(property.IsArray) {#>
+		if (data.<#=property.PropertyName#>) {
+			for (let i = 0; i < data.<#=property.PropertyName#>.length; i++) {
+				let source = data.<#=property.PropertyName#>[i];
+				this.<#=property.PropertyName#>[i] = source && !(source instanceof <#=property.Type.Replace("[]","")#>) ? new <#=property.Type.Replace("[]","")#>(source) : source;
+			}
+		}
+<#				} else if (property.IsDictionary) {#>
+		//TODO: Dictionary needs special handling for <#=property.PropertyName#>
+<#				} else {#>
+		this.<#=property.PropertyName#> = data.<#=property.PropertyName#> && !(data.<#=property.PropertyName#> instanceof <#=property.Type#>) ? new <#=property.Type#>(data.<#=property.PropertyName#>) : this.<#=property.PropertyName#>; 
+<#				}#>
+<#			}#>
+<#		}#>
 <#    }#>
 <#    if(Model.HasBaseDiscriminator){#>
         this._discriminator = "<#=Model.DiscriminatorName#>";
@@ -118,7 +134,7 @@ export interface I<#=Model.Class#><#=Model.InterfaceInheritance#> {
 <#      if(property.HasDescription){#>
     /** <#=property.Description#> */
 <#      }#>
-    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.Type#><#=property.TypePostfix#>;
+    <#=property.PropertyName#><#if(property.IsOptional){#>?<#}#>: <#=property.TypeForInterface#><#=property.TypePostfix#>;
 <#  }#>
 <#  if(Model.HasIndexerProperty){#>
 
