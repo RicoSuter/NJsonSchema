@@ -59,11 +59,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
 
             // address property is converted:
-            Assert.IsTrue(output.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : this.address;"));
+            Assert.IsTrue(output.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;"));
             // cars items are converted:
-            Assert.IsTrue(output.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : item;"));
+            Assert.IsTrue(output.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;"));
             // skills values are converted:
-            Assert.IsTrue(output.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : item;"));
+            Assert.IsTrue(output.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;"));
 
             // interface is correct
             Assert.IsTrue(output.Replace("\r", "").Replace("\n", "").Contains(@"export interface IMyClass {
