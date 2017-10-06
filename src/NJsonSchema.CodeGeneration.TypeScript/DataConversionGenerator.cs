@@ -65,12 +65,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
                 IsDictionaryValueDateTime = IsDateTime(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
-                IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Type.HasFlag(JsonObjectType.Array) == true &&
+                IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
                     IsNewableObject(parameters.Schema.AdditionalPropertiesSchema.Item),
-                DictionaryValueArrayItemType = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Type.HasFlag(JsonObjectType.Array) == true ?
+                DictionaryValueArrayItemType = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
                     parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : "any",
 
-                IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
+                IsArray = parameters.Schema.IsArray,
                 ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
                 IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
                 IsArrayItemDate = IsDate(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),

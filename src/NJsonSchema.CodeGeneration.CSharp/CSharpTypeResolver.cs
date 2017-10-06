@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArray(schema);
+                return ResolveArrayOrTuple(schema);
 
             if (type.HasFlag(JsonObjectType.Number))
                 return ResolveNumber(schema, isNullable);
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "double?" : "double";
         }
 
-        private string ResolveArray(JsonSchema4 schema)
+        private string ResolveArrayOrTuple(JsonSchema4 schema)
         {
             var property = schema;
             if (property.Item != null)

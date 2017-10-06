@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false)
                 {
-                    if (schema.Type.HasFlag(JsonObjectType.Array))
+                    if (schema.IsArray)
                         return "[]";
 
                     if (schema.IsDictionary)
