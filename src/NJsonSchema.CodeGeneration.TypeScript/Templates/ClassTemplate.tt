@@ -32,7 +32,7 @@
 <#                if(property.SupportsConstructorConversion) {#>
 <#                    if(property.IsArray) {#>
             if (data.<#=property.PropertyName#>) {
-			    this.<#=property.PropertyName#> = [];
+                this.<#=property.PropertyName#> = [];
                 for (let i = 0; i < data.<#=property.PropertyName#>.length; i++) {
                     let item = data.<#=property.PropertyName#>[i];
                     this.<#=property.PropertyName#>[i] = item && !(<any>item).toJSON ? new <#=property.ArrayItemType#>(item) : <<#=property.ArrayItemType#>>item;
@@ -40,7 +40,7 @@
             }
 <#                    } else if (property.IsDictionary) {#>
             if (data.<#=property.PropertyName#>) {
-			    this.<#=property.PropertyName#> = {};
+                this.<#=property.PropertyName#> = {};
                 for (let key in data.<#=property.PropertyName#>) {
                     if (data.<#=property.PropertyName#>.hasOwnProperty(key)) {
                         let item = data.<#=property.PropertyName#>[key];

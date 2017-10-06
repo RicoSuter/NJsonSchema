@@ -279,7 +279,7 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write(") {\r\n\t\t\t    this.");
+            this.Write(") {\r\n                this.");
             
             #line 35 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
@@ -335,7 +335,7 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write(") {\r\n\t\t\t    this.");
+            this.Write(") {\r\n                this.");
             
             #line 43 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
