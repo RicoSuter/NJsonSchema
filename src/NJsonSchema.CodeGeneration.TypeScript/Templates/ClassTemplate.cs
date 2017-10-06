@@ -307,7 +307,14 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write("(item) : item;\r\n                }\r\n            }\r\n");
+            this.Write("(item) : <");
+            
+            #line 37 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.ArrayItemType));
+            
+            #line default
+            #line hidden
+            this.Write(">item;\r\n                }\r\n            }\r\n");
             
             #line 40 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
                     } else if (property.IsDictionary) {
@@ -321,7 +328,7 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write(") {\r\n                for (var key in data.");
+            this.Write(") {\r\n                for (let key in data.");
             
             #line 42 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
@@ -356,7 +363,14 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write("(item) : item;\r\n                    }\r\n                }\r\n            }\r\n");
+            this.Write("(item) : <");
+            
+            #line 45 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.DictionaryItemType));
+            
+            #line default
+            #line hidden
+            this.Write(">item;\r\n                    }\r\n                }\r\n            }\r\n");
             
             #line 49 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
                     } else {
@@ -398,7 +412,14 @@ if(Model.GenerateConstructorInterface){
             
             #line default
             #line hidden
-            this.Write(") : this.");
+            this.Write(") : <");
+            
+            #line 50 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Type));
+            
+            #line default
+            #line hidden
+            this.Write(">this.");
             
             #line 50 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.PropertyName));
