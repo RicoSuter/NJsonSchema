@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Converters;
@@ -82,7 +83,11 @@ namespace NJsonSchema.CodeGeneration.Tests
                 {
                     Foo = "foo",
                     Bar = "bar",
-                    SubElements = new List<SubClass> { new SubClass1 { Prop1 = "x" }, new SubClass3 { Prop2 = "x", Prop3 = "y"} }
+                    SubElements = new List<SubClass>
+                    {
+                        new SubClass1 { Prop1 = "x" },
+                        new SubClass3 { Prop2 = "x", Prop3 = "y"}
+                    }
                 }
             };
 
@@ -98,6 +103,34 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsTrue(deserializedContainer.Animal is Dog);
             Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
             Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements[1] is SubClass3);
+        }
+
+        [TestMethod]
+        public async Task When_serializer_setting_is_changed_then_converter_uses_correct_settings()
+        {
+            //// Arrange
+            var container = new Container
+            {
+                Animal = new Dog
+                {
+                    Foo = "foo",
+                    Bar = "bar",
+                    SubElements = new List<SubClass>
+                    {
+                        new SubClass1 { Prop1 = "x" },
+                        new SubClass3 { Prop2 = "x", Prop3 = "y"}
+                    }
+                }
+            };
+
+            //// Act
+            var settings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+            var json = JsonConvert.SerializeObject(container, Formatting.Indented, settings);
+            var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
+
+            //// Assert
+            Assert.IsTrue(json.Contains("prop3"));
+            Assert.IsFalse(json.Contains("Prop3"));
         }
 
         [TestMethod]
