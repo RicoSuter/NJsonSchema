@@ -652,6 +652,14 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating whether the schema represents an array type (an array where each item has the same type).</summary>
+        [JsonIgnore]
+        public bool IsArray => Type.HasFlag(JsonObjectType.Array) && (Items == null || Items.Count == 0);
+
+        /// <summary>Gets a value indicating whether the schema represents an tuple type (an array where each item may have a different type).</summary>
+        [JsonIgnore]
+        public bool IsTuple => Type.HasFlag(JsonObjectType.Array) && Items?.Any() == true;
+
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&

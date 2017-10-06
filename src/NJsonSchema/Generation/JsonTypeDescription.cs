@@ -78,9 +78,6 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the format string. </summary>
         public string Format { get; private set; }
 
-        /// <summary>Gets a value indicating whether the type is an array.</summary>
-        public bool IsArray => Type.HasFlag(JsonObjectType.Array);
-
         /// <summary>Gets or sets a value indicating whether the type is nullable.</summary>
         public bool IsNullable { get; set; }
 

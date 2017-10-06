@@ -1035,7 +1035,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1.0, double.MaxValue)]"));
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]"));
         }
 
         [TestMethod]
@@ -1063,7 +1063,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(double.MinValue, 10.0)]"));
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(int.MinValue, 10)]"));
         }
 
         [TestMethod]
@@ -1092,7 +1092,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1.0, 10.0)]"));
+            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, 10)]"));
         }
 
         [TestMethod]

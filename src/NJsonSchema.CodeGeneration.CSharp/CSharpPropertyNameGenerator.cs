@@ -20,6 +20,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace("\"", string.Empty)
                     .Replace("@", string.Empty)
                     .Replace(".", "-")
+                    .Replace("=", "-")
                     .Replace("+", "plus"), true)
                 .Replace(":", "_")
                 .Replace("-", "_");

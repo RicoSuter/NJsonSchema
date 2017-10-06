@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------
-// <copyright file="DefaultValueGenerator.cs" company="NJsonSchema">
+// <copyright file="ValueGeneratorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -11,15 +11,15 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>Converts the default value to a language specific identifier.</summary>
-    public abstract class DefaultValueGenerator
+    public abstract class ValueGeneratorBase
     {
         private readonly ITypeResolver _typeResolver;
         private readonly IEnumNameGenerator _enumNameGenerator;
 
-        /// <summary>Initializes a new instance of the <see cref="DefaultValueGenerator" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="typeResolver">The type typeResolver.</param>
         /// <param name="enumNameGenerator">The enum name generator.</param>
-        protected DefaultValueGenerator(ITypeResolver typeResolver, IEnumNameGenerator enumNameGenerator)
+        protected ValueGeneratorBase(ITypeResolver typeResolver, IEnumNameGenerator enumNameGenerator)
         {
             _typeResolver = typeResolver;
             _enumNameGenerator = enumNameGenerator;
@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                 schema.Type.HasFlag(JsonObjectType.Number))
-                return ConvertNumericValue(schema.Default, schema.Format);
+                return GetNumericValue(schema.Default, schema.Format);
 
             return null;
         }
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The number literal.</returns>
-        protected abstract string ConvertNumericValue(object value, string format);
+        public abstract string GetNumericValue(object value, string format);
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
