@@ -1,47 +1,53 @@
 ﻿{% if HasDescription %}
-/// <summary>{{Description | CSharpDocs}}</summary>
+/// <summary>{{ Description | CSharpDocs }}</summary>
 {% endif %}
 {% if HasDiscriminator %}
-[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{Discriminator}}")]
+[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
+{%- for derivedClass in DerivedClasses -%}
+[JsonInheritanceAttribute("{{ derivedClass.Key }}", typeof({{ derivedClass.Value }}))]
+{%- endfor -%}
 {% endif %}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
 public partial class {{ClassName}} {{InheritanceCode}}
 {
 {%- if RenderInpc -%}
 {%- for property in Properties -%}
-    private {{property.Type}} {{property.FieldName}}{% if property.HasDefaultValue %} = {{property.DefaultValue}}{% endif -%};
+    private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
 {%- endfor -%}
 
 {%- endif -%}
 {%- for property in Properties -%}
 {%-   if property.HasDescription -%}
-    /// <summary>{{property.Description | CSharpDocs}}</summary>
+    /// <summary>{{ property.Description | CSharpDocs }}</summary>
 {%-   endif -%}
-    [Newtonsoft.Json.JsonProperty("{{property.Name}}", Required = {{property.JsonPropertyRequiredCode}}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
+    [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
 {%-   if property.RenderRequiredAttribute -%}
     [System.ComponentModel.DataAnnotations.Required]
 {%-   endif -%}
 {%-   if property.RenderRangeAttribute -%}
-    [System.ComponentModel.DataAnnotations.Range({{property.RangeMinimumValue}}, {{property.RangeMaximumValue}})]
+    [System.ComponentModel.DataAnnotations.Range({{ property.RangeMinimumValue }}, {{ property.RangeMaximumValue }})]
 {%-   endif -%}
 {%-   if property.RenderStringLengthAttribute -%}
-    [System.ComponentModel.DataAnnotations.StringLength({{property.StringLengthMaximumValue}}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{property.StringLengthMinimumValue}}{% endif %})]
+    [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
 {%-   endif -%}
 {%-   if property.RenderRegularExpressionAttribute -%}
-    [System.ComponentModel.DataAnnotations.RegularExpression(@"{{property.RegularExpressionValue}}")]
+    [System.ComponentModel.DataAnnotations.RegularExpression(@"{{ property.RegularExpressionValue }}")]
 {%-   endif -%}
 {%-   if(property.IsStringEnum -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%-   endif -%}
-    public {{property.Type}} {{property.PropertyName}}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{property.DefaultValue}};{% endif %}{% else %}
+{%-   if(property.IsDate -%}
+    [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+{%-   endif -%}
+    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}{% else %}
     {
-        get { return {{property.FieldName}}; }
+        get { return {{ property.FieldName }}; }
 {%-     if property.HasSetter -%}
         set 
         {
-            if ({{property.FieldName}} != value)
+            if ({{ property.FieldName }} != value)
             {
-                {{property.FieldName}} = value; 
+                {{ property.FieldName }} = value; 
                 RaisePropertyChanged();
             }
         }
@@ -51,10 +57,10 @@ public partial class {{ClassName}} {{InheritanceCode}}
 
 {%- endfor -%}
 {%- if HasAdditionalPropertiesType -%}
-    private System.Collections.Generic.IDictionary<string, {{AdditionalPropertiesType}}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{AdditionalPropertiesType}}>();
+    private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
 
     [Newtonsoft.Json.JsonExtensionData]
-    public System.Collections.Generic.IDictionary<string, {{AdditionalPropertiesType}}> AdditionalProperties
+    public System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> AdditionalProperties
     {
         get { return _additionalProperties; }
         set { _additionalProperties = value; }
@@ -67,12 +73,12 @@ public partial class {{ClassName}} {{InheritanceCode}}
 {%- endif -%}
     public string ToJson() 
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this{{JsonSerializerParameterCode}});
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this{{ JsonSerializerParameterCode }});
     }
     
-    public static {{ClassName}} FromJson(string data)
+    public static {{ ClassName }} FromJson(string data)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ClassName}}>(data{{JsonSerializerParameterCode}});
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ ClassName }}>(data{{ JsonSerializerParameterCode }});
     }
 {%- if RenderInpc -%}
 

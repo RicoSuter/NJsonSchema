@@ -85,13 +85,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema4.FromJsonAsync(json);
             var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
             var generator = new CSharpGenerator(schema, settings);
-
-            DefaultTemplateFactory.UseLiquid = false;
             var output = generator.GenerateFile("Foo");
-            DefaultTemplateFactory.UseLiquid = true;
-
-            var output2 = generator.GenerateFile("Foo");
-            Assert.AreEqual(output, output2);
 
             //// Assert
             Assert.IsTrue(output.Contains("public partial class TAgg"));

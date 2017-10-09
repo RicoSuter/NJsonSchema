@@ -48,7 +48,7 @@ if(Model.HasDescription){
             this.Write("export interface ");
             
             #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\InterfaceTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden

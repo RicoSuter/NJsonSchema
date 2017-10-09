@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ConvertConstructorInterfaceData = false;
 
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory();
+            TemplateFactory = new DefaultTemplateFactory(this);
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>

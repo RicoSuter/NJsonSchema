@@ -40,7 +40,7 @@ public partial class <#=Model.ClassName#> <#=Model.InheritanceCode#>
 <#  if(property.IsDate){#>
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 <#  }#>
-    public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.Inpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
+    public <#=property.Type#> <#=property.PropertyName#><#  if(!Model.RenderInpc){#> { get; <#if(property.HasSetter){#>set; <#}#>}<#if(property.HasDefaultValue){#> = <#=property.DefaultValue#>;<#}#>
 
 <#  }else{#>
 

@@ -48,7 +48,7 @@ if(Model.HasDescription){
             this.Write("export class ");
             
             #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -207,7 +207,7 @@ if(Model.GenerateConstructorInterface){
             this.Write("data?: I");
             
             #line 21 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -580,7 +580,7 @@ if(Model.HandleReferences){
             this.Write("): ");
             
             #line 82 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -641,14 +641,14 @@ if(Model.HandleReferences){
             this.Write("        return createInstance<");
             
             #line 89 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
             this.Write(">(data, _mappings, ");
             
             #line 89 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -662,14 +662,14 @@ if(Model.HandleReferences){
             this.Write("        return createInstance<");
             
             #line 91 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
             this.Write(">(data, _mappings, ");
             
             #line 91 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -735,7 +735,7 @@ if(Model.HandleReferences){
             this.Write("        let result = new ");
             
             #line 103 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -825,7 +825,7 @@ if(Model.GenerateCloneMethod){
             this.Write("\r\n    clone() {\r\n        const json = this.toJSON();\r\n        let result = new ");
             
             #line 132 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
@@ -867,7 +867,7 @@ if(Model.GenerateConstructorInterface){
             this.Write("export interface I");
             
             #line 143 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.ClassName));
             
             #line default
             #line hidden
