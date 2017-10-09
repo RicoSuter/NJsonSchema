@@ -30,11 +30,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var defaultValueGenerator = new TypeScriptDefaultValueGenerator(parameters.Resolver, parameters.Settings);
+            var valueGenerator = new TypeScriptValueGenerator(parameters.Resolver, parameters.Settings);
 
             var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
             var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
-                ? defaultValueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
+                ? valueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
                     parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.SchemaType), dictionaryValueType, parameters.TypeNameHint,
                     parameters.Settings.GenerateDefaultValues)
                 : null;
@@ -46,15 +46,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, 
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues) != null,
-                DefaultValue = defaultValueGenerator.GetDefaultValue(parameters.Schema, 
+                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues),
 
                 Type = type,
 
                 IsNewableObject = IsNewableObject(parameters.Schema),
                 IsDate = IsDate(parameters.Schema.Format, parameters.Settings.DateTimeType),
+                IsDateTime = IsDateTime(parameters.Schema.Format, parameters.Settings.DateTimeType),
 
                 IsDictionary = parameters.Schema.IsDictionary,
                 DictionaryValueType = dictionaryValueType,
@@ -63,31 +64,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
                 IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
-                IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Type.HasFlag(JsonObjectType.Array) == true &&
+                IsDictionaryValueDateTime = IsDateTime(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
+                IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
                     IsNewableObject(parameters.Schema.AdditionalPropertiesSchema.Item),
-                DictionaryValueArrayItemType = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Type.HasFlag(JsonObjectType.Array) == true ?
+                DictionaryValueArrayItemType = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
                     parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : "any",
 
-                IsArray = parameters.Schema.Type.HasFlag(JsonObjectType.Array),
+                IsArray = parameters.Schema.IsArray,
                 ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
                 IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
                 IsArrayItemDate = IsDate(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),
+                IsArrayItemDateTime = IsDateTime(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),
 
+                //StringToDateCode is used for date and date-time formats
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" : "moment",
-                DateToStringCode = "toISOString()", 
+                DateToStringCode = "toISOString().slice(0, 10)",
+                DateTimeToStringCode = "toISOString()", 
 
                 HandleReferences = parameters.Settings.HandleReferences
             };
         }
 
-        private static bool IsDate(string format, TypeScriptDateTimeType type)
+        private static bool IsDateTime(string format, TypeScriptDateTimeType type)
         {
             // TODO: Make this more generic (see TypeScriptTypeResolver.ResolveString)
             if (type == TypeScriptDateTimeType.Date)
             {
-                if (format == JsonFormatStrings.Date)
-                    return true;
-
                 if (format == JsonFormatStrings.DateTime)
                     return true;
 
@@ -99,9 +101,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else if (type == TypeScriptDateTimeType.MomentJS)
             {
-                if (format == JsonFormatStrings.Date)
-                    return true;
-
                 if (format == JsonFormatStrings.DateTime)
                     return true;
 
@@ -109,6 +108,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
 
                 if (format == JsonFormatStrings.TimeSpan)
+                    return true;
+            }
+            return false;
+        }
+
+
+        private static bool IsDate(string format, TypeScriptDateTimeType type)
+        {
+            // TODO: Make this more generic (see TypeScriptTypeResolver.ResolveString)
+            if (type == TypeScriptDateTimeType.Date)
+            {
+                if (format == JsonFormatStrings.Date)
+                    return true;
+            }
+            else if (type == TypeScriptDateTimeType.MomentJS)
+            {
+                if (format == JsonFormatStrings.Date)
                     return true;
             }
             return false;

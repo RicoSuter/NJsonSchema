@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArray(schema);
+                return ResolveArrayOrTuple(schema);
 
             if (type.HasFlag(JsonObjectType.Number))
                 return ResolveNumber(schema, isNullable);
@@ -82,10 +82,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string GenerateClasses()
         {
             var classes = GenerateTypes(null);
+
+            // TODO: Move utility classes to FileTemplate.tt
             if (classes.Contains("JsonInheritanceConverter"))
             {
                 var templateModel = new JsonInheritanceConverterTemplateModel(Settings);
                 var template = new JsonInheritanceConverterTemplate(templateModel);
+                classes += "\n\n" + template.Render();
+            }
+            if (classes.Contains("DateFormatConverter"))
+            {
+                var templateModel = new DateFormatConverterTemplateModel(Settings);
+                var template = new DateFormatConverterTemplate(templateModel);
                 classes += "\n\n" + template.Render();
             }
             return classes;
@@ -173,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "double?" : "double";
         }
 
-        private string ResolveArray(JsonSchema4 schema)
+        private string ResolveArrayOrTuple(JsonSchema4 schema)
         {
             var property = schema;
             if (property.Item != null)

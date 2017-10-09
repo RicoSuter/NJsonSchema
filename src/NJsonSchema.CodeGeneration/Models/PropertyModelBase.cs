@@ -16,23 +16,22 @@ namespace NJsonSchema.CodeGeneration.Models
     {
         private readonly ClassTemplateModelBase _classTemplateModel;
         private readonly JsonProperty _property;
-        private readonly DefaultValueGenerator _defaultValueGenerator;
         private readonly CodeGeneratorSettingsBase _settings;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModelBase"/> class.</summary>
         /// <param name="property">The property.</param>
         /// <param name="classTemplateModel">The class template model.</param>
-        /// <param name="defaultValueGenerator">The default value generator.</param>
+        /// <param name="valueGenerator">The default value generator.</param>
         /// <param name="settings">The settings.</param>
         protected PropertyModelBase(
             JsonProperty property,
             ClassTemplateModelBase classTemplateModel,
-            DefaultValueGenerator defaultValueGenerator,
+            ValueGeneratorBase valueGenerator,
             CodeGeneratorSettingsBase settings)
         {
             _classTemplateModel = classTemplateModel;
             _property = property;
-            _defaultValueGenerator = defaultValueGenerator;
+            ValueGenerator = valueGenerator;
             _settings = settings;
 
             PropertyName = _settings.PropertyNameGenerator.Generate(_property);
@@ -44,8 +43,11 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the type of the property.</summary>
         public abstract string Type { get; }
 
+        /// <summary>Gets the default value generator.</summary>
+        public ValueGeneratorBase ValueGenerator { get; }
+
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => _defaultValueGenerator.GetDefaultValue(_property, 
+        public string DefaultValue => ValueGenerator.GetDefaultValue(_property, 
             _property.IsNullable(_settings.SchemaType), Type, _property.Name, _settings.GenerateDefaultValues);
 
         /// <summary>Gets the name of the property.</summary>
@@ -53,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
         public bool IsStringEnumArray =>
-            _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) &&
+            _property.ActualPropertySchema.IsArray &&
             _property.ActualPropertySchema.Item != null &&
             _property.ActualPropertySchema.Item.ActualSchema.IsEnumeration &&
             _property.ActualPropertySchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);

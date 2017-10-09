@@ -22,7 +22,7 @@ using NJsonSchema.Validation;
 namespace NJsonSchema
 {
     /// <summary>A base class for describing a JSON schema. </summary>
-    public partial class JsonSchema4 : JsonExtensionObject, IDocumentPathProvider
+    public partial class JsonSchema4 : IDocumentPathProvider
     {
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _patternProperties;
@@ -65,7 +65,13 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version.ToString();
+        public static string ToolchainVersion => typeof(JsonSchema4).GetTypeInfo().Assembly.GetName().Version +
+#if LEGACY
+                                                 " NET40" +
+#else
+                                                 "" +
+#endif
+                                                 " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
@@ -308,7 +314,7 @@ namespace NJsonSchema
                     .ToList();
 
                 if (duplicatedProperties.Any())
-                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => g.Key) + " are defined multiple times."));
+                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
 
 #if !LEGACY
                 return new ReadOnlyDictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
@@ -338,68 +344,13 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type { get; set; }
 
-        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
+        /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
-        public string DocumentPath { get; set; }
-
-        /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty("schemaReferencePath", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal string SchemaReferencePath { get; set; }
-
-        /// <summary>Gets or sets the type reference.</summary>
-        [JsonIgnore]
-        public JsonSchema4 SchemaReference
-        {
-            get { return _schemaReference; }
-            set
-            {
-                if (_schemaReference != value)
-                {
-                    _schemaReference = value;
-                    SchemaReferencePath = null;
-
-                    if (value != null)
-                    {
-                        // only $ref property is allowed when schema is a reference
-                        // TODO: Fix all SchemaReference assignments so that this code is not needed 
-                        Type = JsonObjectType.None;
-                    }
-                }
-            }
-        }
-
-        /// <summary>Gets the actual schema, either this or the reference schema.</summary>
-        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
-        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        [JsonIgnore]
-        public virtual JsonSchema4 ActualSchema => GetActualSchema(new List<JsonSchema4>());
-
-        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
-        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        private JsonSchema4 GetActualSchema(IList<JsonSchema4> checkedSchemas)
-        {
-            if (checkedSchemas.Contains(this))
-                throw new InvalidOperationException("Cyclic references detected.");
-
-            if (SchemaReferencePath != null && SchemaReference == null)
-                throw new InvalidOperationException("The schema reference path '" + SchemaReferencePath + "' has not been resolved.");
-
-            if (HasSchemaReference)
-            {
-                checkedSchemas.Add(this);
-
-                if (HasAllOfSchemaReference)
-                    return AllOf.First().GetActualSchema(checkedSchemas);
-
-                return SchemaReference.GetActualSchema(checkedSchemas);
-            }
-
-            return this;
-        }
+        public JsonSchema4 ParentSchema => Parent as JsonSchema4;
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
-        public virtual JsonSchema4 ParentSchema { get; internal set; }
+        public virtual object Parent { get; set; }
 
         /// <summary>Gets or sets the format string. </summary>
         [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -474,7 +425,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
 
-        #region Child JSON schemas
+#region Child JSON schemas
 
         /// <summary>Gets the properties of the type. </summary>
         [JsonIgnore]
@@ -535,7 +486,7 @@ namespace NJsonSchema
                     _item = value;
                     if (_item != null)
                     {
-                        _item.ParentSchema = this;
+                        _item.Parent = this;
                         Items.Clear();
                     }
                 }
@@ -569,7 +520,7 @@ namespace NJsonSchema
             {
                 _not = value;
                 if (_not != null)
-                    _not.ParentSchema = this;
+                    _not.Parent = this;
             }
         }
 
@@ -701,6 +652,14 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating whether the schema represents an array type (an array where each item has the same type).</summary>
+        [JsonIgnore]
+        public bool IsArray => Type.HasFlag(JsonObjectType.Array) && (Items == null || Items.Count == 0);
+
+        /// <summary>Gets a value indicating whether the schema represents an tuple type (an array where each item may have a different type).</summary>
+        [JsonIgnore]
+        public bool IsTuple => Type.HasFlag(JsonObjectType.Array) && Items?.Any() == true;
+
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
@@ -720,24 +679,7 @@ namespace NJsonSchema
                                  MultipleOf == null &&
                                  IsEnumeration == false;
 
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
-        [JsonIgnore]
-        public bool HasSchemaReference => SchemaReference != null || HasAllOfSchemaReference;
-
-        /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
-        [JsonIgnore]
-        public bool HasAllOfSchemaReference => Type == JsonObjectType.None &&
-                                               AllOf.Count == 1 &&
-                                               AnyOf.Count == 0 &&
-                                               OneOf.Count == 0 &&
-                                               Properties.Count == 0 &&
-                                               PatternProperties.Count == 0 &&
-                                               AllowAdditionalProperties &&
-                                               AdditionalPropertiesSchema == null &&
-                                               MultipleOf == null &&
-                                               IsEnumeration == false;
-
-        #endregion
+#endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
         /// <param name="schemaType">The schema type.</param>
@@ -800,20 +742,6 @@ namespace NJsonSchema
         {
             var validator = new JsonSchemaValidator();
             return validator.Validate(token, ActualSchema);
-        }
-
-        /// <summary>Finds the root parent of this schema.</summary>
-        /// <returns>The parent schema or this when this is the root.</returns>
-        public JsonSchema4 FindRootParent()
-        {
-            var parent = ParentSchema;
-            if (parent == null)
-                return this;
-
-            while (parent.ParentSchema != null)
-                parent = parent.ParentSchema;
-
-            return parent;
         }
 
         private static JsonObjectType ConvertStringToJsonObjectType(string value)

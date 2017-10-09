@@ -13,14 +13,15 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
+using NJsonSchema.References;
 
 namespace NJsonSchema
 {
     /// <summary>Provides utilities to resolve and set JSON schema references.</summary>
     public static class JsonSchemaReferenceUtilities
     {
-        /// <summary>Updates all <see cref="JsonSchema4.SchemaReference"/> properties from the 
-        /// available <see cref="JsonSchema4.SchemaReferencePath"/> properties.</summary>
+        /// <summary>Updates all <see cref="IJsonReference.Reference"/> properties from the 
+        /// available <see cref="IJsonReference.Reference"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
         public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver)
@@ -33,7 +34,7 @@ namespace NJsonSchema
         /// <returns>The data.</returns>
         public static string ConvertJsonReferences(string data)
         {
-            return data.Replace("$ref", "schemaReferencePath");
+            return data.Replace("$ref", JsonPathUtilities.ReferenceReplaceString);
         }
 
         /// <summary>Converts property references to JSON references ($ref).</summary>
@@ -41,40 +42,40 @@ namespace NJsonSchema
         /// <returns></returns>
         public static string ConvertPropertyReferences(string data)
         {
-            return data.Replace("schemaReferencePath", "$ref");
+            return data.Replace(JsonPathUtilities.ReferenceReplaceString, "$ref");
         }
 
-        /// <summary>Updates the <see cref="JsonSchema4.SchemaReferencePath" /> properties
-        /// from the available <see cref="JsonSchema4.SchemaReference" /> properties.</summary>
+        /// <summary>Updates the <see cref="IJsonReference.Reference" /> properties
+        /// from the available <see cref="IJsonReference.Reference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
         public static void UpdateSchemaReferencePaths(object rootObject)
         {
-            var schemaReferences = new Dictionary<JsonSchema4, JsonSchema4>();
+            var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
             UpdateSchemaReferencePaths(rootObject, new HashSet<object>(), schemaReferences);
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
             var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
 
             foreach (var p in schemaReferences)
-                p.Key.SchemaReferencePath = result[p.Value];
+                p.Key.ReferencePath = result[p.Value];
         }
 
-        private static void UpdateSchemaReferencePaths(object obj, HashSet<object> checkedObjects, Dictionary<JsonSchema4, JsonSchema4> schemaReferences)
+        private static void UpdateSchemaReferencePaths(object obj, HashSet<object> checkedObjects, Dictionary<IJsonReference, IJsonReference> schemaReferences)
         {
             if (obj == null || obj is string)
                 return;
 
-            var schema = obj as JsonSchema4;
-            if (schema != null && schema.SchemaReference != null)
+            var schema = obj as IJsonReference;
+            if (schema != null && schema.Reference != null)
             {
-                if (schema.SchemaReference.DocumentPath == null)
-                    schemaReferences[schema] = schema.SchemaReference.ActualSchema;
+                if (schema.Reference.DocumentPath == null)
+                    schemaReferences[schema] = schema.Reference.ActualObject;
                 else
                 {
                     // TODO: Improve performance here (like the rest)
-                    var externalReference = schema.SchemaReference;
+                    var externalReference = schema.Reference;
                     var externalReferenceRoot = externalReference.FindRootParent();
-                    schema.SchemaReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference);
+                    schema.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference);
                 }
             }
 
@@ -113,9 +114,9 @@ namespace NJsonSchema
             if (obj == null || obj is string)
                 return;
 
-            var schema = obj as JsonSchema4;
-            if (schema != null && schema.SchemaReferencePath != null)
-                schema.SchemaReference = await jsonReferenceResolver.ResolveReferenceAsync(rootObject, schema.SchemaReferencePath).ConfigureAwait(false);
+            var schema = obj as IJsonReference;
+            if (schema != null && schema.ReferencePath != null)
+                schema.Reference = await jsonReferenceResolver.ResolveReferenceAsync(rootObject, schema.ReferencePath).ConfigureAwait(false);
 
             if (obj is IDictionary)
             {

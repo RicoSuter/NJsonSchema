@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
-    <Version>9.6.2</Version>
+    <Version>9.7.4</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -31,6 +31,10 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClassTemplate.cs</LastGenOutput>
     </None>
+    <None Update="Templates\DateFormatConverterTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DateFormatConverterTemplate.cs</LastGenOutput>
+    </None>
     <None Update="Templates\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
@@ -52,6 +56,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ClassTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\DateFormatConverterTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DateFormatConverterTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\EnumTemplate.cs">
       <DesignTime>True</DesignTime>

@@ -74,12 +74,15 @@
     <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
     <Compile Include="CSharp\InheritanceInterfaceTests.cs" />
+    <Compile Include="CSharp\ValueGeneratorTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
     <Compile Include="DefaultValueGeneratorTests.cs" />
     <Compile Include="InheritanceSerializationTests.cs" />
     <Compile Include="Samples\SampleTests.cs" />
     <Compile Include="TypeScript\ClassGenerationTests.cs" />
     <Compile Include="TypeScript\ClassOrderTests.cs" />
+    <Compile Include="TypeScript\ConstructorInterfaceTests.cs" />
+    <Compile Include="TypeScript\DateTimeCodeGenerationTests.cs" />
     <Compile Include="TypeScript\DateCodeGenerationTests.cs" />
     <Compile Include="TypeScript\DictionaryTests.cs" />
     <Compile Include="TypeScript\ExtensionCodeTests.cs" />

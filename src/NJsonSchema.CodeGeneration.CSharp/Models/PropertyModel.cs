@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
         public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(property, classTemplateModel, new CSharpDefaultValueGenerator(resolver, settings), settings)
+            : base(property, classTemplateModel, new CSharpValueGenerator(resolver, settings), settings)
         {
             _property = property;
             _settings = settings;
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
         public bool HasSetter => 
             (_property.IsNullable(_settings.SchemaType) == false && (
-                (_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array) && _settings.GenerateImmutableArrayProperties) ||
+                (_property.ActualPropertySchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
 
@@ -106,10 +106,44 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets the minimum value of the range attribute.</summary>
-        public string RangeMinimumValue => _property.Minimum.HasValue ? _property.Minimum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MinValue)}";
+        public string RangeMinimumValue
+        {
+            get
+            {
+                var format =
+                    _property.Format == JsonFormatStrings.Double ||
+                    _property.Format == JsonFormatStrings.Decimal ?
+                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
+                var type =
+                    _property.Format == JsonFormatStrings.Double ||
+                    _property.Format == JsonFormatStrings.Decimal ?
+                        "double" : "int";
+
+                return _property.Minimum.HasValue
+                    ? ValueGenerator.GetNumericValue(_property.Minimum.Value, format)
+                    : type + "." + nameof(double.MinValue);
+            }
+        }
 
         /// <summary>Gets the maximum value of the range attribute.</summary>
-        public string RangeMaximumValue => _property.Maximum.HasValue ? _property.Maximum.Value.ToString(CultureInfo.InvariantCulture) : $"double.{nameof(double.MaxValue)}";
+        public string RangeMaximumValue
+        {
+            get
+            {
+                var format =
+                    _property.Format == JsonFormatStrings.Double ||
+                    _property.Format == JsonFormatStrings.Decimal ?
+                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
+                var type =
+                    _property.Format == JsonFormatStrings.Double ||
+                    _property.Format == JsonFormatStrings.Decimal ?
+                        "double" : "int";
+
+                return _property.Maximum.HasValue
+                    ? ValueGenerator.GetNumericValue(_property.Maximum.Value, format)
+                    : type + "." + nameof(double.MaxValue);
+            }
+        }
 
         /// <summary>Gets a value indicating whether to render a string length attribute.</summary>
         public bool RenderStringLengthAttribute
@@ -148,5 +182,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
+
+        /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
+        public bool IsDate => _property.Format == JsonFormatStrings.Date;
     }
 }

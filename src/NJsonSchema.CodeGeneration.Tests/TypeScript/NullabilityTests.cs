@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             Assert.IsTrue(output.Contains("timeSpan: string;"));
             Assert.IsTrue(output.Contains("gender: Gender;"));
-            Assert.IsTrue(output.Contains("address: Address;"));
+            Assert.IsTrue(output.Contains("address: Address = new Address();"));
 
             Assert.IsTrue(output.Contains("timeSpanOrNull: string | undefined;"));
             Assert.IsTrue(output.Contains("genderOrNull: Gender | undefined;"));

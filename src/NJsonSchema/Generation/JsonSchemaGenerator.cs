@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,6 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
-using System.Runtime.Serialization;
 using NJsonSchema.Generation.TypeMappers;
 
 namespace NJsonSchema.Generation
@@ -150,7 +150,7 @@ namespace NJsonSchema.Generation
             }
             else if (typeDescription.IsEnum)
                 await GenerateEnum(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
-            else if (typeDescription.Type.HasFlag(JsonObjectType.Array))
+            else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
                 await GenerateArray(schema, type, typeDescription, schemaResolver).ConfigureAwait(false);
             else
                 typeDescription.ApplyType(schema);
@@ -278,11 +278,12 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets the converted property name.</summary>
         /// <param name="property">The property.</param>
+        /// <param name="memberInfo">The member info.</param>
         /// <returns>The property name.</returns>
-        public virtual string GetPropertyName(MemberInfo property)
+        public virtual string GetPropertyName(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo memberInfo)
         {
-            var propertyName = ReflectionCache.GetPropertiesAndFields(property.DeclaringType)
-                .First(p => p.MemberInfo.Name == property.Name).GetName();
+            var propertyName = memberInfo != null ? ReflectionCache.GetPropertiesAndFields(memberInfo.DeclaringType)
+                .First(p => p.MemberInfo.Name == memberInfo.Name).GetName() : property.PropertyName;
 
             var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
             return contractResolver != null
@@ -461,8 +462,10 @@ namespace NJsonSchema.Generation
 #endif
 
             var contract = Settings.ResolveContract(type);
+
+            var allowedProperties = GetTypeProperties(type);
             var objectContract = contract as JsonObjectContract;
-            if (objectContract != null)
+            if (objectContract != null && allowedProperties == null)
             {
                 foreach (var property in objectContract.Properties.Where(p => p.DeclaringType == type))
                 {
@@ -496,8 +499,6 @@ namespace NJsonSchema.Generation
             else
             {
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-
-                var allowedProperties = GetTypeProperties(type);
                 foreach (var info in propertiesAndFields.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = info.GetCustomAttributes(true).OfType<JsonPropertyAttribute>().SingleOrDefault();
@@ -589,7 +590,9 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.FlattenInheritanceHierarchy)
                 {
-                    await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                    var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
+                    if (!typeDescription.IsDictionary && !type.IsArray)
+                        await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -617,7 +620,11 @@ namespace NJsonSchema.Generation
 #else
                 foreach (var i in type.GetTypeInfo().GetInterfaces())
 #endif
-                    await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                {
+                    var typeDescription = Settings.ReflectionService.GetDescription(i, null, Settings);
+                    if (!typeDescription.IsDictionary && !type.IsArray && !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
+                        await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                }
             }
         }
 
@@ -698,7 +705,7 @@ namespace NJsonSchema.Generation
                     propertyType = propertyType.GetGenericArguments()[0];
 #endif
 
-                var propertyName = GetPropertyName(propertyInfo);
+                var propertyName = GetPropertyName(property, propertyInfo);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
 

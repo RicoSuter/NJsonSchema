@@ -420,11 +420,12 @@ namespace NJsonSchema.Infrastructure
                 if (string.IsNullOrEmpty(assemblyName.Name))
                     return null;
 
-                string path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.Location), assemblyName.Name + ".xml");
+                var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                var path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
                 if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
                     return path;
 
-                if (((object)assembly).GetType().GetRuntimeProperty("CodeBase") != null)
+                if (ReflectionExtensions.HasProperty(assembly, "CodeBase"))
                 {
                     path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.CodeBase
                         .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
@@ -434,12 +435,18 @@ namespace NJsonSchema.Infrastructure
                         return path;
                 }
 
-                dynamic currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-                path = DynamicApis.PathCombine(currentDomain.BaseDirectory, assemblyName.Name + ".xml");
-                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
-                    return path;
+                var currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
+                if (currentDomain.HasProperty("BaseDirectory"))
+                {
+                    var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
+                    path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                    if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                        return path;
 
-                return DynamicApis.PathCombine(currentDomain.BaseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                    return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                }
+
+                return null;
             }
             catch
             {

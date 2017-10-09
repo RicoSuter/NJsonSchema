@@ -97,6 +97,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets or sets a value indicating whether to generate an class interface which is used in the constructor to initialize the class (default: true).</summary>
         public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
 
+        /// <summary>Gets or sets a value indicating whether POJO objects in the constructor data are converted to DTO instances (default: true).</summary>
+        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData;
+
         /// <summary>Gets the null value.</summary>
         public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
 
