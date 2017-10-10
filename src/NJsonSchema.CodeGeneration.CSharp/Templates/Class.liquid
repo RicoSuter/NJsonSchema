@@ -1,12 +1,12 @@
-﻿{% if HasDescription %}
+﻿{%- if HasDescription -%}
 /// <summary>{{ Description | CSharpDocs }}</summary>
-{% endif %}
-{% if HasDiscriminator %}
+{%- endif -%}
+{%- if HasDiscriminator -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {%- for derivedClass in DerivedClasses -%}
 [JsonInheritanceAttribute("{{ derivedClass.Key }}", typeof({{ derivedClass.Value }}))]
 {%- endfor -%}
-{% endif %}
+{%- endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
 public partial class {{ClassName}} {{InheritanceCode}}
 {
