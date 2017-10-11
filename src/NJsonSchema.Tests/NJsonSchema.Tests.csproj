@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net46;net45</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,8 +15,9 @@
     <PackageReference Include="NodaTime" Version="2.2.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net45'" Include="System.ComponentModel.DataAnnotations"></Reference>
     <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
+    <Reference Condition="'$(TargetFramework)' == 'net45'" Include="System.ComponentModel.DataAnnotations"></Reference>
+    <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations"></Reference>
   </ItemGroup>
 
   <ItemGroup>

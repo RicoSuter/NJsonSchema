@@ -13,7 +13,9 @@ namespace NJsonSchema.Tests.Generation
 {
     public class ContractResolverTests
     {
+#if !NET45
         [Fact]
+#endif
         public async Task Properties_should_match_custom_resolver()
         {
             var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings
@@ -67,7 +69,7 @@ namespace NJsonSchema.Tests.Generation
 
             public static bool CanNonSystemTypeDescriptorConvertString(Type type)
             {
-                var typeConverter = TypeDescriptor.GetConverter(type);
+                var typeConverter = TypeDescriptor.GetConverter(type); // somehow this does not work in NET45
                 // use the objectType's TypeConverter if it has one and can convert to a string
                 if (typeConverter != null)
                 {
