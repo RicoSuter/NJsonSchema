@@ -1,7 +1,7 @@
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
@@ -9,10 +9,9 @@ namespace NJsonSchema.Tests.Validation
     /// Time format tests according to rfc 3339 full-time
     /// https://tools.ietf.org/html/rfc3339#section-5.6
     /// </summary>
-    [TestClass]
     public class FormatTimeTests
     {
-        [TestMethod]
+        [Fact]
         public void When_format_time_incorrect_then_validation_fails()
         {
             //// Arrange
@@ -26,10 +25,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.TimeExpected, errors.First().Kind);
+            Assert.Equal(ValidationErrorKind.TimeExpected, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_time_positive_offset_then_validation_succeeds()
         {
             //// Arrange
@@ -43,10 +42,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_time_has_negative_offset_succeeds()
         {
             //// Arrange
@@ -60,10 +59,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_time_is_utc_then_validation_succeeds()
         {
             //// Arrange
@@ -77,10 +76,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_time_secfrac_correct_then_validation_succeeds()
         {
             //// Arrange
@@ -94,14 +93,14 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
         /// <summary>
         /// This allows time without a specified timezone. It represents just the 
         /// partial-time component in the RFC
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void When_format_time_is_not_utc_or_offset_then_validation_succeeds()
         {
             //// Arrange
@@ -115,7 +114,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
     }
 }

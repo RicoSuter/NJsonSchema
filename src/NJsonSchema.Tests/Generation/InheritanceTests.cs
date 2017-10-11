@@ -1,18 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class InheritanceTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties()
         {
             //// Arrange
@@ -42,13 +40,13 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.IsNotNull(schema.InheritedSchema);
-            Assert.AreEqual(2, schema.ActualProperties.Count);
-            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
-            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop2"));
+            Assert.NotNull(schema.InheritedSchema);
+            Assert.Equal(2, schema.ActualProperties.Count);
+            Assert.True(schema.ActualProperties.ContainsKey("prop1"));
+            Assert.True(schema.ActualProperties.ContainsKey("prop2"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_schema()
         {
             //// Arrange
@@ -74,12 +72,12 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.IsNotNull(schema.InheritedSchema);
-            Assert.AreEqual(1, schema.ActualProperties.Count);
-            Assert.IsTrue(schema.ActualProperties.ContainsKey("prop1"));
+            Assert.NotNull(schema.InheritedSchema);
+            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.True(schema.ActualProperties.ContainsKey("prop1"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_type_with_inheritance_then_allOf_has_one_item()
         {
             //// Arrange
@@ -88,11 +86,11 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
 
             //// Assert
-            Assert.IsNotNull(schema.Properties["Class"]);
+            Assert.NotNull(schema.Properties["Class"]);
 
-            Assert.AreEqual(1, schema.AllOf.Count);
-            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "Person"));
-            Assert.IsNotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
+            Assert.Equal(1, schema.AllOf.Count);
+            Assert.True(schema.Definitions.Any(d => d.Key == "Person"));
+            Assert.NotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
 
         public class Teacher : Person
@@ -105,7 +103,7 @@ namespace NJsonSchema.Tests.Generation
             public string Name { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_type_with_inheritance_and_flattening_then_schema_has_all_properties_of_inherited_classes()
         {
             //// Arrange
@@ -118,7 +116,7 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(4, schema.Properties.Count);
+            Assert.Equal(4, schema.Properties.Count);
         }
 
         public abstract class AA
@@ -156,7 +154,7 @@ namespace NJsonSchema.Tests.Generation
             public string Baz { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_root_schema_is_inherited_then_schema_is_generated()
         {
             //// Arrange
@@ -167,7 +165,7 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(data);
+            Assert.NotNull(data);
         }
     }
 }

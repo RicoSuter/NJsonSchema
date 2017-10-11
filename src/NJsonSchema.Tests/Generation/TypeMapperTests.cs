@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class TypeMapperTests
     {
         public class Foo
@@ -22,7 +20,7 @@ namespace NJsonSchema.Tests.Generation
 
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_primitive_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
@@ -38,11 +36,11 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
             var property = schema.Properties["Bar1"].ActualPropertySchema;
 
-            Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
-            Assert.IsFalse(json.Contains("$ref"));
+            Assert.True(property.Type.HasFlag(JsonObjectType.String));
+            Assert.False(json.Contains("$ref"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_object_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
@@ -75,10 +73,10 @@ namespace NJsonSchema.Tests.Generation
             var property1 = schema.Properties["Bar1"];
             var property2 = schema.Properties["Bar2"];
 
-            Assert.IsTrue(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
-            Assert.IsTrue(property1.ActualPropertySchema == property2.ActualPropertySchema);
+            Assert.True(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
+            Assert.True(property1.ActualPropertySchema == property2.ActualPropertySchema);
 
-            Assert.IsTrue(json.Contains("$ref"));
+            Assert.True(json.Contains("$ref"));
         }
 
 
@@ -110,7 +108,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generic_type_mapper_is_defined_then_it_is_called_and_the_refs_are_correct()
         {
             //// Act
@@ -124,8 +122,8 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             var json = schema.ToJson();
-            Assert.IsTrue(schema.Definitions.ContainsKey("MyBar"));
-            Assert.IsFalse(schema.Definitions.ContainsKey("MyWrapperOfMyBar"));
+            Assert.True(schema.Definitions.ContainsKey("MyBar"));
+            Assert.False(schema.Definitions.ContainsKey("MyWrapperOfMyBar"));
         }
 
     }

@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Xml.Serialization;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class XmlObjectTests
     {
         private const string StringArray = "StringArray";
@@ -75,14 +74,14 @@ namespace NJsonSchema.Tests.Generation
             */
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes()
         {
             var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
             
             //// Assert
-            Assert.IsNull(schema.Xml);
+            Assert.Null(schema.Xml);
             var fooProperty = schema.Properties[Foo];
             var stringArrayProperty = schema.Properties[StringArray];
             var intArrayProperty = schema.Properties[IntArray];
@@ -90,28 +89,28 @@ namespace NJsonSchema.Tests.Generation
             var decimalArrayProperty = schema.Properties[DecimalArray];
             var internalItemProperty = schema.Properties[InternalItemArray];
 
-            Assert.IsNull(internalItemProperty.Xml.Name);
-            Assert.IsNull(stringArrayProperty.Xml.Name);
-            Assert.IsNull(intArrayProperty.Xml.Name);
-            Assert.IsNull(doubleArrayProperty.Xml.Name);
-            Assert.IsNull(decimalArrayProperty.Xml.Name);
-            Assert.IsNull(fooProperty.Xml);
+            Assert.Null(internalItemProperty.Xml.Name);
+            Assert.Null(stringArrayProperty.Xml.Name);
+            Assert.Null(intArrayProperty.Xml.Name);
+            Assert.Null(doubleArrayProperty.Xml.Name);
+            Assert.Null(decimalArrayProperty.Xml.Name);
+            Assert.Null(fooProperty.Xml);
 
             //https://github.com/swagger-api/swagger-ui/issues/2601
-            Assert.AreEqual(true, stringArrayProperty.Xml.Wrapped);
-            Assert.AreEqual(true, intArrayProperty.Xml.Wrapped);
-            Assert.AreEqual(true, doubleArrayProperty.Xml.Wrapped);
-            Assert.AreEqual(true, decimalArrayProperty.Xml.Wrapped);
-            Assert.AreEqual(true, internalItemProperty.Xml.Wrapped);
+            Assert.Equal(true, stringArrayProperty.Xml.Wrapped);
+            Assert.Equal(true, intArrayProperty.Xml.Wrapped);
+            Assert.Equal(true, doubleArrayProperty.Xml.Wrapped);
+            Assert.Equal(true, decimalArrayProperty.Xml.Wrapped);
+            Assert.Equal(true, internalItemProperty.Xml.Wrapped);
 
-            Assert.AreEqual(typeof(string).Name, stringArrayProperty.Item.Xml.Name);
-            Assert.AreEqual(typeof(int).Name, intArrayProperty.Item.Xml.Name);
-            Assert.AreEqual(typeof(double).Name, doubleArrayProperty.Item.Xml.Name);
-            Assert.AreEqual(typeof(decimal).Name, decimalArrayProperty.Item.Xml.Name);
-            Assert.IsNotNull(internalItemProperty.Item.Xml);
+            Assert.Equal(typeof(string).Name, stringArrayProperty.Item.Xml.Name);
+            Assert.Equal(typeof(int).Name, intArrayProperty.Item.Xml.Name);
+            Assert.Equal(typeof(double).Name, doubleArrayProperty.Item.Xml.Name);
+            Assert.Equal(typeof(decimal).Name, decimalArrayProperty.Item.Xml.Name);
+            Assert.NotNull(internalItemProperty.Item.Xml);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes_and_serialized()
         {
             var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
@@ -120,17 +119,17 @@ namespace NJsonSchema.Tests.Generation
             var schemaObject = JObject.Parse(schemaData);
 
             var definitionXML = schemaObject["xml"];
-            Assert.IsNull(definitionXML);
+            Assert.Null(definitionXML);
 
             var fooPropertyXml = schemaObject["properties"]["Foo"]["xml"];
-            Assert.IsNull(fooPropertyXml);
+            Assert.Null(fooPropertyXml);
 
             var arrayStringPropertyOuterXml = schemaObject["properties"][StringArray]["xml"];
-            Assert.AreEqual(true, arrayStringPropertyOuterXml["wrapped"].Value<bool>());
-            Assert.IsNull(arrayStringPropertyOuterXml["name"]);
+            Assert.Equal(true, arrayStringPropertyOuterXml["wrapped"].Value<bool>());
+            Assert.Null(arrayStringPropertyOuterXml["name"]);
 
             var arrayStringPropertyItemXml = schemaObject["properties"][StringArray]["items"]["xml"];
-            Assert.AreEqual(typeof(string).Name, arrayStringPropertyItemXml["name"]);
+            Assert.Equal(typeof(string).Name, arrayStringPropertyItemXml["name"]);
         }
 
         [XmlType(TypeName = "NotTheSameName", Namespace = "http://test.shema.org/type")]
@@ -222,7 +221,7 @@ namespace NJsonSchema.Tests.Generation
              */
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes()
         {
             var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
@@ -232,8 +231,8 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual("NotTheSameName", schema.Xml.Name);
-            Assert.AreEqual("http://test.shema.org/type", schema.Xml.Namespace);
+            Assert.Equal("NotTheSameName", schema.Xml.Name);
+            Assert.Equal("http://test.shema.org/type", schema.Xml.Namespace);
 
             var stringArrayProperty = schema.Properties[StringArray];
             var intArrayProperty = schema.Properties["TheInts"];
@@ -245,31 +244,31 @@ namespace NJsonSchema.Tests.Generation
             var attributeProperty = schema.Properties["MightBeAAttribute"];
             var referenceProperty = schema.Properties["ReferenceProperty"];
 
-            Assert.AreEqual("Bar", fooProperty.Xml.Name);
+            Assert.Equal("Bar", fooProperty.Xml.Name);
 
-            Assert.AreEqual("TheStrings", stringArrayProperty.Xml.Name);
-            Assert.IsNull(intArrayProperty.Xml.Name);
+            Assert.Equal("TheStrings", stringArrayProperty.Xml.Name);
+            Assert.Null(intArrayProperty.Xml.Name);
             //https://github.com/swagger-api/swagger-ui/issues/2601
-            Assert.AreEqual(true, stringArrayProperty.Xml.Wrapped);
+            Assert.Equal(true, stringArrayProperty.Xml.Wrapped);
 
-            Assert.AreEqual("TheString", stringArrayProperty.Item.Xml.Name);
+            Assert.Equal("TheString", stringArrayProperty.Item.Xml.Name);
 
-            Assert.IsTrue(attributeProperty.Xml.Attribute);
+            Assert.True(attributeProperty.Xml.Attribute);
 
-            Assert.IsTrue(externalItemsProperty.Xml.Wrapped);
-            Assert.AreEqual("ExternalItems", externalItemsProperty.Xml.Name);
-            Assert.AreEqual("ExternalItem", externalItemType.Xml.Name);
+            Assert.True(externalItemsProperty.Xml.Wrapped);
+            Assert.Equal("ExternalItems", externalItemsProperty.Xml.Name);
+            Assert.Equal("ExternalItem", externalItemType.Xml.Name);
 
-            Assert.IsNull(externalItems2Property.Xml.Name);
-            Assert.IsTrue(externalItems2Property.Xml.Wrapped);
-            Assert.AreEqual("ExternalItem2", externalItem2Type.Xml.Name);
+            Assert.Null(externalItems2Property.Xml.Name);
+            Assert.True(externalItems2Property.Xml.Wrapped);
+            Assert.Equal("ExternalItem2", externalItem2Type.Xml.Name);
 
             //https://github.com/swagger-api/swagger-ui/issues/2610
-            Assert.IsNotNull(referenceProperty.Xml, "Make sure that type reference properties have an xml object");
-            Assert.AreEqual(referenceProperty.Name, referenceProperty.Xml.Name, "Make sure that the property name and the xml name is the same");
+            Assert.NotNull(referenceProperty.Xml); // Make sure that type reference properties have an xml object
+            Assert.Equal(referenceProperty.Name, referenceProperty.Xml.Name); // Make sure that the property name and the xml name is the same
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_and_serialized()
         {
             var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
@@ -281,19 +280,19 @@ namespace NJsonSchema.Tests.Generation
             var schemaObject = JObject.Parse(schemaData);
 
             var definitionXml = schemaObject["xml"];
-            Assert.AreEqual("NotTheSameName", definitionXml["name"]);
+            Assert.Equal("NotTheSameName", definitionXml["name"]);
 
             var fooPropertyXml = schemaObject["properties"]["Foo"]["xml"];
-            Assert.AreEqual("Bar", fooPropertyXml["name"]);
+            Assert.Equal("Bar", fooPropertyXml["name"]);
 
             var arrayStringPropertyOuterXml = schemaObject["properties"][StringArray]["xml"];
-            Assert.AreEqual("TheStrings", arrayStringPropertyOuterXml["name"]);
+            Assert.Equal("TheStrings", arrayStringPropertyOuterXml["name"]);
 
             var arrayStringPropertyItemXml = schemaObject["properties"][StringArray]["items"]["xml"];
-            Assert.AreEqual("TheString", arrayStringPropertyItemXml["name"]);
+            Assert.Equal("TheString", arrayStringPropertyItemXml["name"]);
 
             var referencePropertyXml = schemaObject["properties"]["ReferenceProperty"]["xml"];
-            Assert.AreEqual("ReferenceProperty", referencePropertyXml["name"]);
+            Assert.Equal("ReferenceProperty", referencePropertyXml["name"]);
         }
 
         public class WithXmlIncorrectAttributesDefined
@@ -303,7 +302,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_that_are_incorrect()
         {
             var schema = await JsonSchema4.FromTypeAsync<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
@@ -315,10 +314,10 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             var fooProperty = schema.Properties["Foo"];
 
-            Assert.IsNull(fooProperty.Xml);
+            Assert.Null(fooProperty.Xml);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_model_objects_are_created_with_the_example_model_make_sure_that_they_are_serializable()
         {
             WithXmlAttributesDefined.CreateTestXML();

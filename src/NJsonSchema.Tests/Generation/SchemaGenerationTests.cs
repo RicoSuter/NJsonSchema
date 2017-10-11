@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class SchemaGenerationTests
     {
         public class Foo
@@ -23,7 +22,7 @@ namespace NJsonSchema.Tests.Generation
             public string Name { get; set; }
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
         {
             //// Arrange
@@ -33,10 +32,10 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
+            Assert.Equal(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_DateTimeOffset_property_then_format_datetime_must_be_set()
         {
             //// Arrange
@@ -46,11 +45,11 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Time"].Type);
-            Assert.AreEqual(JsonFormatStrings.DateTime, schema.Properties["Time"].Format);
+            Assert.Equal(JsonObjectType.String, schema.Properties["Time"].Type);
+            Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["Time"].Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_schema_with_dictionary_property_then_it_must_allow_additional_properties()
         {
             //// Arrange
@@ -60,12 +59,12 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.ActualSchema.Type);
+            Assert.Equal(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
+            Assert.Equal(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.ActualSchema.Type);
             // "#/definitions/ref_7de8187d_d860_41fa_a17b_3f395c053cae"
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
         {
             //// Arrange
@@ -75,7 +74,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schemaData.Contains("#/definitions/Bar"));
+            Assert.True(schemaData.Contains("#/definitions/Bar"));
         }
 
         public class DefaultTests
@@ -84,7 +83,7 @@ namespace NJsonSchema.Tests.Generation
             public int Number { get; set; }
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_default_value_is_set_on_property_then_default_is_set_in_schema()
         {
             //// Arrange
@@ -94,7 +93,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Number"];
 
             //// Assert
-            Assert.AreEqual(10, property.Default);
+            Assert.Equal(10, property.Default);
         }
 
         public class DictTest
@@ -102,7 +101,7 @@ namespace NJsonSchema.Tests.Generation
             public Dictionary<string, object> values { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_dictionary_value_is_null_then_string_values_are_allowed()
         {
             //// Arrange
@@ -119,10 +118,10 @@ namespace NJsonSchema.Tests.Generation
             var errors = schema.Validate(data);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
             //// Generate JSON
@@ -130,7 +129,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Should be reached and not StackOverflowed
-            Assert.IsTrue(!string.IsNullOrEmpty(json));
+            Assert.True(!string.IsNullOrEmpty(json));
         }
 
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
@@ -148,7 +147,7 @@ namespace NJsonSchema.Tests.Generation
         //    public string Test { get; set; }
         //}
 
-        //[TestMethod]
+        //[Fact]
         //public void Demo()
         //{
         //    var schema = await JsonSchema4.FromTypeAsync<TestClass>();

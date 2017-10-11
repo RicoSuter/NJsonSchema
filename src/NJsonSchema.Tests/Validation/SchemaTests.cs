@@ -1,14 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class SchemaTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_json_schem_is_loaded_via_url_then_it_works()
         {
             //// Arrange
@@ -18,10 +17,10 @@ namespace NJsonSchema.Tests.Validation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(json);
+            Assert.NotNull(json);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_no_additional_properties_are_allowed_then_this_error_is_returned()
         {
             //// Arrange
@@ -337,9 +336,9 @@ namespace NJsonSchema.Tests.Validation
             var error = errors.SingleOrDefault(e => e.Kind == ValidationErrorKind.NoAdditionalPropertiesAllowed);
 
             //// Assert
-            Assert.IsNotNull(error);
-            Assert.AreEqual("#/Key", error.Path);
-            Assert.AreSame(schema, error.Schema);
+            Assert.NotNull(error);
+            Assert.Equal("#/Key", error.Path);
+            Assert.Same(schema, error.Schema);
         }
     }
 }

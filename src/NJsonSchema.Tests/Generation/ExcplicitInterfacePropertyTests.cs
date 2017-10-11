@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class ExcplicitInterfacePropertyTests
     {
         public interface IFoo
@@ -19,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             public string MyProp { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public void When_a_property_is_explicit_interface_then_it_is_not_serialized()
         {
             //// Arrange
@@ -30,10 +29,10 @@ namespace NJsonSchema.Tests.Generation
             var json = JsonConvert.SerializeObject(foo);
 
             //// Assert
-            Assert.AreEqual(@"{""MyProp"":null}", json);
+            Assert.Equal(@"{""MyProp"":null}", json);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_a_property_is_explicit_interface_then_it_is_not_added_to_schema()
         {
             //// Arrange
@@ -42,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Foo>();
 
             //// Assert
-            Assert.AreEqual(1, schema.Properties.Count);
+            Assert.Equal(1, schema.Properties.Count);
         }
     }
 }

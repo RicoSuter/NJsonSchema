@@ -1,11 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Suite
 {
-    [TestClass]
     internal class TestSuiteTests
     {
-        [TestMethod]
+        [Fact]
         public void RunAllTests()
         {
 

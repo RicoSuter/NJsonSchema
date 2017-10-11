@@ -1,14 +1,13 @@
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class FormatHostnameTests
     {
-        [TestMethod]
+        [Fact]
         public void When_format_hostname_incorrect_then_validation_succeeds()
         {
             //// Arrange
@@ -22,10 +21,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.HostnameExpected, errors.First().Kind);
+            Assert.Equal(ValidationErrorKind.HostnameExpected, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_hostname_is_ip_then_validation_succeeds()
         {
             //// Arrange
@@ -39,7 +38,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
     }
 }

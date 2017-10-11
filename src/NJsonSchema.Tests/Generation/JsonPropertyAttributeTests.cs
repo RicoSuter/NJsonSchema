@@ -1,13 +1,12 @@
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class JsonPropertyAttributeTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
         {
             //// Arrange
@@ -17,10 +16,10 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["NewName"];
 
             //// Assert
-            Assert.AreEqual("NewName", property.Name);
+            Assert.Equal("NewName", property.Name);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
             //// Arrange
@@ -30,7 +29,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Required"];
 
             //// Assert
-            Assert.IsTrue(property.IsRequired);
+            Assert.True(property.IsRequired);
         }
 
         public class MyJsonPropertyTestClass

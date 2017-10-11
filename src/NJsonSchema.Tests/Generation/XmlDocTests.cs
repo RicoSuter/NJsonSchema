@@ -1,11 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Infrastructure;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class XmlDocTests
     {
         public class WithComplexXmlDoc
@@ -24,7 +23,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xml_doc_with_multiple_breaks_is_read_then_they_are_not_stripped_away()
         {
             //// Arrange
@@ -34,9 +33,9 @@ namespace NJsonSchema.Tests.Generation
             var summary = await typeof(WithComplexXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
 
             //// Assert
-            Assert.IsTrue(summary.Contains("\n\n"));
-            Assert.IsTrue(summary.Contains("    * Users"));
-            Assert.AreEqual(summary.Trim(), summary);
+            Assert.True(summary.Contains("\n\n"));
+            Assert.True(summary.Contains("    * Users"));
+            Assert.Equal(summary.Trim(), summary);
         }
 
         public class WithTagsInXmlDoc
@@ -47,7 +46,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_xml_doc_contains_xml_then_it_is_fully_read()
         {
             //// Arrange
@@ -58,13 +57,13 @@ namespace NJsonSchema.Tests.Generation
             var responses = element.Elements("response");
 
             //// Assert
-            Assert.AreEqual(2, responses.Count());
+            Assert.Equal(2, responses.Count());
 
-            Assert.AreEqual("Account created", responses.First().Value);
-            Assert.AreEqual("201", responses.First().Attribute("code").Value);
+            Assert.Equal("Account created", responses.First().Value);
+            Assert.Equal("201", responses.First().Attribute("code").Value);
 
-            Assert.AreEqual("Username already in use", responses.Last().Value);
-            Assert.AreEqual("400", responses.Last().Attribute("code").Value);
+            Assert.Equal("Username already in use", responses.Last().Value);
+            Assert.Equal("400", responses.Last().Attribute("code").Value);
         }
     }
 }

@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Conversion
 {
-    [TestClass]
     public class SchemaReferenceTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_converting_a_circular_referencing_person_type_then_references_are_set()
         {
             //// Arrange
@@ -16,10 +15,10 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Car"].ActualPropertySchema.Properties["Person"].ActualPropertySchema);
+            Assert.Equal(schema, schema.Properties["Car"].ActualPropertySchema.Properties["Person"].ActualPropertySchema);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_a_circular_referencing_car_type_then_references_are_set()
         {
             //// Arrange
@@ -28,10 +27,10 @@ namespace NJsonSchema.Tests.Conversion
             var schema = await JsonSchema4.FromTypeAsync<Car>();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Person"].ActualPropertySchema.Properties["Car"].ActualPropertySchema);
+            Assert.Equal(schema, schema.Properties["Person"].ActualPropertySchema.Properties["Car"].ActualPropertySchema);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_a_referencing_type_then_path_is_in_json()
         {
             //// Arrange
@@ -41,10 +40,10 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(json.Contains(@"""$ref"": ""#"""));
+            Assert.True(json.Contains(@"""$ref"": ""#"""));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
             //// Arrange
@@ -54,7 +53,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(json.Contains(@"""$ref"": ""#/definitions/Person"));
+            Assert.True(json.Contains(@"""$ref"": ""#/definitions/Person"));
         }
     }
 

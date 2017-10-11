@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class EnumValidationTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_enum_is_defined_without_type_then_validation_succeeds_for_correct_value()
         {
             //// Arrange
@@ -23,10 +22,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(@"""commercial""");
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_is_defined_without_type_then_validation_fails_for_wrong_value()
         {
             //// Arrange
@@ -43,10 +42,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(@"""wrong""");
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
+            Assert.Equal(1, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enumeration_has_null_then_validation_works()
         {
             //// Arrange
@@ -76,7 +75,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(@"{ ""SalutationType"": ""Prof"" }");
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
+            Assert.Equal(1, errors.Count);
         }
     }
 }

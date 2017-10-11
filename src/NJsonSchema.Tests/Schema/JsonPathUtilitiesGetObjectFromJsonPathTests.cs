@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Schema
 {
-    [TestClass]
     public class JsonPathUtilitiesGetObjectFromJsonPathTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_object_is_in_property_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -26,10 +25,10 @@ namespace NJsonSchema.Tests.Schema
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2");
 
             //// Assert
-            Assert.AreEqual(foundObject, objectToSearch);
+            Assert.Equal(foundObject, objectToSearch);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_object_is_in_list_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -52,10 +51,10 @@ namespace NJsonSchema.Tests.Schema
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2");
 
             //// Assert
-            Assert.AreEqual(foundObject, objectToSearch);
+            Assert.Equal(foundObject, objectToSearch);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_object_is_in_dictionary_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -78,10 +77,10 @@ namespace NJsonSchema.Tests.Schema
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3");
 
             //// Assert
-            Assert.AreEqual(foundObject, objectToSearch);
+            Assert.Equal(foundObject, objectToSearch);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_object_is_root_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -92,10 +91,10 @@ namespace NJsonSchema.Tests.Schema
             var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#");
 
             //// Assert
-            Assert.AreEqual(foundObject, objectToSearch);
+            Assert.Equal(foundObject, objectToSearch);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_object_is_in_external_file_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -110,7 +109,7 @@ namespace NJsonSchema.Tests.Schema
             var result = referencingSchema.ToJson();
 
             //// Assert
-            Assert.IsTrue(result.Contains("some_schema.json#"));
+            Assert.True(result.Contains("some_schema.json#"));
         }
     }
 }

@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class LineInformationTest
     {
         private JsonSchema4 Schema { get; set; }
@@ -72,7 +71,7 @@ namespace NJsonSchema.Tests.Validation
             }";
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_validating_from_string_parse_line_information()
         {
             //// Arrange
@@ -82,13 +81,13 @@ namespace NJsonSchema.Tests.Validation
             var errors = Schema.Validate(Json);
 
             //// Assert
-            Assert.AreEqual(7, errors.Count, "Seven validation errors expected.");
-            Assert.AreEqual(3, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotOneOf).Errors.Count, "Three NotOneOf clause violations expected");
-            Assert.AreEqual(2, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotAllOf).Errors.Count, "Two NotAllOf clause violations expected");
+            Assert.Equal(7, errors.Count); // Seven validation errors expected.
+            Assert.Equal(3, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotOneOf).Errors.Count); // Three NotOneOf clause violations expected
+            Assert.Equal(2, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotAllOf).Errors.Count); // Two NotAllOf clause violations expected
             ValidateErrors(errors, true);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_validating_from_jtoken_parse_line_information_if_exists()
         {
             //// Arrange
@@ -112,7 +111,7 @@ namespace NJsonSchema.Tests.Validation
         {
             foreach (var error in errors)
             {
-                Assert.AreEqual(hasLineInfo, error.HasLineInfo, "HasLineInfo incorrect.");
+                Assert.Equal(hasLineInfo, error.HasLineInfo); // HasLineInfo incorrect
 
                 if (hasLineInfo)
                 {
@@ -160,8 +159,8 @@ namespace NJsonSchema.Tests.Validation
                 }
                 else
                 {
-                    Assert.AreEqual(0, error.LineNumber, "Line number not zero with no error info.");
-                    Assert.AreEqual(0, error.LinePosition, "Line position not zero with no error info.");
+                    Assert.Equal(0, error.LineNumber); // Line number not zero with no error info
+                    Assert.Equal(0, error.LinePosition); // Line position not zero with no error info
                 }
 
                 var childSchemaError = error as ChildSchemaValidationError;
@@ -174,8 +173,8 @@ namespace NJsonSchema.Tests.Validation
 
         private static void AssertLineNumber(int lineNumber, int linePosition, ValidationError error)
         {
-            Assert.AreEqual(lineNumber, error.LineNumber, string.Format("Line number unexpected for {0} error.", error.Kind));
-            Assert.AreEqual(linePosition, error.LinePosition, string.Format("Line position unexpected for {0} error.", error.Kind));
+            Assert.Equal(lineNumber, error.LineNumber);
+            Assert.Equal(linePosition, error.LinePosition);
         }
     }
 }

@@ -1,10 +1,9 @@
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Infrastructure;
+using Xunit;
 
 namespace NJsonSchema.Tests.Infrastructure
 {
-    [TestClass]
     public class ReflectionCacheTests
     {
         public class TestClass
@@ -18,17 +17,17 @@ namespace NJsonSchema.Tests.Infrastructure
             public static string staticProperty { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public void Static_members_are_not_returned_from_ReflectionCache()
         {
             //// Act
             var propertiesAndFields = ReflectionCache.GetPropertiesAndFields(typeof(TestClass));
 
             //// Assert
-            Assert.IsTrue(propertiesAndFields.Any(p => p.MemberInfo.Name == "field"));
-            Assert.IsFalse(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticField"));
-            Assert.IsTrue(propertiesAndFields.Any(p => p.MemberInfo.Name == "property"));
-            Assert.IsFalse(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticProperty"));
+            Assert.True(propertiesAndFields.Any(p => p.MemberInfo.Name == "field"));
+            Assert.False(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticField"));
+            Assert.True(propertiesAndFields.Any(p => p.MemberInfo.Name == "property"));
+            Assert.False(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticProperty"));
         }
    }
 }
