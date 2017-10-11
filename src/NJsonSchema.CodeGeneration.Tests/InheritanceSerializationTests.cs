@@ -133,6 +133,50 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.IsFalse(json.Contains("Prop3"));
         }
 
+        public class A
+        {
+            // not processed by JsonInheritanceConverter
+            public DateTimeOffset created { get; set; }
+
+            public C subclass { get; set; }
+        }
+
+        [JsonConverter(typeof(JsonInheritanceConverter), "discriminator")]
+        [KnownType(typeof(C))]
+        public class B
+        {
+            // processed by JsonInheritanceConverter
+            public DateTimeOffset created { get; set; }
+        }
+
+        public class C : B
+        {
+        }
+        
+        [TestMethod]
+        public async Task When_dates_are_converted_then_JsonInheritanceConverter_should_inherit_settings()
+        {
+            //// Arrange
+            var offset = new TimeSpan(10, 0, 0);
+            var x = new A
+            {
+                created = DateTimeOffset.Now.ToOffset(offset),
+                subclass = new C
+                {
+                    created = DateTimeOffset.Now.ToOffset(offset),
+                }
+            };
+
+            //// Act
+            var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.DateTimeOffset };
+            var json = JsonConvert.SerializeObject(x, Formatting.Indented, settings);
+            var deserialized = JsonConvert.DeserializeObject<A>(json, settings);
+
+            //// Assert
+            Assert.AreEqual(deserialized.created.Offset, offset);
+            Assert.AreEqual(deserialized.subclass.created.Offset, offset);
+        }
+
         [TestMethod]
         public void JsonInheritanceConverter_is_thread_safe()
         {
