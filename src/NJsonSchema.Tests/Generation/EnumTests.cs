@@ -69,7 +69,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.IsTrue(schema.Properties["Dictionary"].AdditionalPropertiesSchema.HasSchemaReference); 
+            Assert.IsTrue(schema.Properties["Dictionary"].AdditionalPropertiesSchema.HasReference); 
         }
     }
 }

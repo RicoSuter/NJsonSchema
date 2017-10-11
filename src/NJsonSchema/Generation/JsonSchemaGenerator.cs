@@ -137,7 +137,7 @@ namespace NJsonSchema.Generation
                 else
                 {
                     if (schemaResolver.HasSchema(type, false))
-                        schema.SchemaReference = schemaResolver.GetSchema(type, false);
+                        schema.Reference = schemaResolver.GetSchema(type, false);
                     else if (schema.GetType() == typeof(JsonSchema4))
                     {
                         typeDescription.ApplyType(schema);
@@ -145,7 +145,7 @@ namespace NJsonSchema.Generation
                         await GenerateObjectAsync(type, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
-                        schema.SchemaReference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
+                        schema.Reference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
                 }
             }
             else if (typeDescription.IsEnum)
@@ -256,20 +256,20 @@ namespace NJsonSchema.Generation
 
             if (hasNoProperties && referencingSchema.OneOf.Count == 0)
             {
-                referencingSchema.SchemaReference = referencedSchema.ActualSchema;
+                referencingSchema.Reference = referencedSchema.ActualSchema;
             }
             else if (Settings.SchemaType != SchemaType.Swagger2)
             {
                 referencingSchema.OneOf.Add(new JsonSchema4
                 {
-                    SchemaReference = referencedSchema.ActualSchema
+                    Reference = referencedSchema.ActualSchema
                 });
             }
             else
             {
                 referencingSchema.AllOf.Add(new JsonSchema4
                 {
-                    SchemaReference = referencedSchema.ActualSchema
+                    Reference = referencedSchema.ActualSchema
                 });
             }
 
@@ -405,7 +405,7 @@ namespace NJsonSchema.Generation
 
             var isIntegerEnumeration = typeDescription.Type == JsonObjectType.Integer;
             if (schemaResolver.HasSchema(type, isIntegerEnumeration))
-                schema.SchemaReference = schemaResolver.GetSchema(type, isIntegerEnumeration);
+                schema.Reference = schemaResolver.GetSchema(type, isIntegerEnumeration);
             else if (schema.GetType() == typeof(JsonSchema4))
             {
                 LoadEnumerations(type, schema, typeDescription);
@@ -416,7 +416,7 @@ namespace NJsonSchema.Generation
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
             else
-                schema.SchemaReference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
+                schema.Reference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
@@ -436,7 +436,7 @@ namespace NJsonSchema.Generation
                 {
                     schema.AdditionalPropertiesSchema = new JsonSchema4
                     {
-                        SchemaReference = additionalPropertiesSchema
+                        Reference = additionalPropertiesSchema
                     };
                 }
                 else
@@ -614,7 +614,7 @@ namespace NJsonSchema.Generation
 
                         schema.AllOf.Add(new JsonSchema4
                         {
-                            SchemaReference = baseSchema.ActualSchema
+                            Reference = baseSchema.ActualSchema
                         });
                     }
                     else

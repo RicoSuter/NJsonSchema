@@ -47,7 +47,7 @@ namespace NJsonSchema.Generation.TypeMappers
             if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
                 context.JsonSchemaResolver.AddSchema(MappedType, false, _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
 
-            schema.SchemaReference = context.JsonSchemaResolver.GetSchema(MappedType, false);
+            schema.Reference = context.JsonSchemaResolver.GetSchema(MappedType, false);
         }
     }
 }

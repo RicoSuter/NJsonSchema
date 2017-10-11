@@ -381,7 +381,7 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(schema.AllOf.First().SchemaReference);
+            Assert.IsNotNull(schema.AllOf.First().Reference);
         }
 
         [TestMethod]
