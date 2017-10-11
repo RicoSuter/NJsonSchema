@@ -49,6 +49,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Transforms the extension data so that contained schemas are correctly deserialized.</summary>
+        /// <param name="extensionObject">The extension object.</param>
         /// <param name="serializer">The serializer.</param>
         internal void DeserializeExtensionDataSchemas(IJsonExtensionObject extensionObject, JsonSerializer serializer)
         {
@@ -61,8 +62,7 @@ namespace NJsonSchema
 
         private object TryDeserializeValueSchemas(object value, JsonSerializer serializer)
         {
-            var obj = value as JObject;
-            if (obj != null)
+            if (value is JObject obj)
             {
                 var isSchema = obj.Property("type") != null || obj.Property("properties") != null;
                 if (isSchema)
@@ -84,12 +84,10 @@ namespace NJsonSchema
                 return dictionary;
             }
 
-            var array = value as JArray;
-            if (array != null)
+            if (value is JArray array)
                 return array.Select(i => TryDeserializeValueSchemas(i, serializer)).ToArray();
 
-            var token = value as JValue;
-            if (token != null)
+            if (value is JValue token)
                 return token.Value;
 
             return value;

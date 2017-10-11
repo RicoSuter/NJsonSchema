@@ -127,7 +127,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.AreEqual(Bar.C, schema.Properties["Bar"].Default);
-            Assert.IsTrue(schema.Properties["Bar"].HasSchemaReference);
+            Assert.IsTrue(schema.Properties["Bar"].HasReference);
         }
     }
 }

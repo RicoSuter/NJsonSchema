@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
-        public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
+        public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData && SupportsConstructorConversion ?
             _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
             Type;
 

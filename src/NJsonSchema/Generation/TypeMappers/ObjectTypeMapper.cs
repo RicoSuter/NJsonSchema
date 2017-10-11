@@ -42,12 +42,14 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
+#pragma warning disable 1998
         public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
+#pragma warning restore 1998
         {
             if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
                 context.JsonSchemaResolver.AddSchema(MappedType, false, _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
 
-            schema.SchemaReference = context.JsonSchemaResolver.GetSchema(MappedType, false);
+            schema.Reference = context.JsonSchemaResolver.GetSchema(MappedType, false);
         }
     }
 }

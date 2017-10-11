@@ -20,8 +20,8 @@ namespace NJsonSchema
     /// <summary>Provides utilities to resolve and set JSON schema references.</summary>
     public static class JsonSchemaReferenceUtilities
     {
-        /// <summary>Updates all <see cref="IJsonReference.Reference"/> properties from the 
-        /// available <see cref="IJsonReference.Reference"/> properties.</summary>
+        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the 
+        /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
         public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver)
@@ -45,8 +45,8 @@ namespace NJsonSchema
             return data.Replace(JsonPathUtilities.ReferenceReplaceString, "$ref");
         }
 
-        /// <summary>Updates the <see cref="IJsonReference.Reference" /> properties
-        /// from the available <see cref="IJsonReference.Reference" /> properties.</summary>
+        /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
+        /// from the available <see cref="IJsonReferenceBase.Reference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
         public static void UpdateSchemaReferencePaths(object rootObject)
         {

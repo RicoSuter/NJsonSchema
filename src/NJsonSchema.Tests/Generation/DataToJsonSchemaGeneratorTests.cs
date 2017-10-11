@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
                 datetime: ""2012-07-19 10:11:11"", 
                 timespan: ""10:11:11""
             }";
-            var generator = new DataToJsonSchemaGenerator();
+            var generator = new SampleJsonSchemaGenerator();
 
             //// Act
             var schema = generator.Generate(data);
@@ -57,7 +57,7 @@ namespace NJsonSchema.Tests.Generation
             }";
 
             //// Act
-            var schema = JsonSchema4.FromData(data);
+            var schema = JsonSchema4.FromSampleJson(data);
             var json = schema.ToJson();
             var property = schema.Properties["array"].ActualPropertySchema;
 
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             var data = @"{
                 array: [ 1, true ]
             }";
-            var generator = new DataToJsonSchemaGenerator();
+            var generator = new SampleJsonSchemaGenerator();
 
             //// Act
             var schema = generator.Generate(data);
