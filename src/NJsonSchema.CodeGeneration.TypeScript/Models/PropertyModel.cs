@@ -59,7 +59,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                if (Type == ConstructorInterfaceType)
+                var interfaceType = _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema,
+                    _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+
+                if (Type == interfaceType)
                     return false;
 
                 if (IsArray)
