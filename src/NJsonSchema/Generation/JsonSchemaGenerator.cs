@@ -282,13 +282,22 @@ namespace NJsonSchema.Generation
         /// <returns>The property name.</returns>
         public virtual string GetPropertyName(Newtonsoft.Json.Serialization.JsonProperty property, MemberInfo memberInfo)
         {
-            var propertyName = memberInfo != null ? ReflectionCache.GetPropertiesAndFields(memberInfo.DeclaringType)
-                .First(p => p.MemberInfo.Name == memberInfo.Name).GetName() : property.PropertyName;
+            try
+            {
+                var propertyName = memberInfo != null ? ReflectionCache.GetPropertiesAndFields(memberInfo.DeclaringType)
+                    .First(p => p.MemberInfo.Name == memberInfo.Name).GetName() : property.PropertyName;
 
-            var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
-            return contractResolver != null
-                ? contractResolver.GetResolvedPropertyName(propertyName)
-                : propertyName;
+                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
+                return contractResolver != null
+                    ? contractResolver.GetResolvedPropertyName(propertyName)
+                    : propertyName;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Could not get JSON property name of property '" +
+                    (memberInfo != null ? memberInfo.Name : "n/a") + "' and type '" +
+                    (memberInfo?.DeclaringType != null ? memberInfo.DeclaringType.FullName : "n/a") + "'.", e);
+            }
         }
 
         /// <summary>Generates the properties for the given type and schema.</summary>
