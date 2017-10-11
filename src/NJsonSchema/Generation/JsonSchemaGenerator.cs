@@ -216,7 +216,7 @@ namespace NJsonSchema.Generation
             if (!requiresSchemaReference)
             {
                 var schema = await GenerateAsync<TSchemaType>(type, parentAttributes, schemaResolver).ConfigureAwait(false);
-                if (!schema.HasSchemaReference)
+                if (!schema.HasReference)
                 {
                     if (transformation != null)
                         await transformation(schema, schema).ConfigureAwait(false);
@@ -382,7 +382,9 @@ namespace NJsonSchema.Generation
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullability<JsonSchema4>(
+#pragma warning disable 1998
                     itemType, null, false, schemaResolver, async (s, r) =>
+#pragma warning restore 1998
                     {
                         if (Settings.GenerateXmlObjects)
                             s.GenerateXmlObjectForItemType(itemType);
