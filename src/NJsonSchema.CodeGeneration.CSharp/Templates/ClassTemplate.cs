@@ -99,7 +99,14 @@ if(Model.HasDiscriminator){
             
             #line default
             #line hidden
-            this.Write("\")]\r\npublic partial class ");
+            this.Write("\")]\r\n");
+            
+            #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.TypeAccessModifier));
+            
+            #line default
+            #line hidden
+            this.Write(" partial class ");
             
             #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\ClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Class));

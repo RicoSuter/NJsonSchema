@@ -80,6 +80,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the base class name.</summary>
         public string BaseClass => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
 
+        /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
+        public string TypeAccessModifier => _settings.TypeAccessModifier;
+
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
 
