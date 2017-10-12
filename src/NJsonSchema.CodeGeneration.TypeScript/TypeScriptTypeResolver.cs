@@ -158,7 +158,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Item != null)
             {
-                var prefix = addInterfacePrefix && schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
+                var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
+                var prefix = addInterfacePrefix && isObject && !isDictionary ? "I" : "";
                 return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
             }
 

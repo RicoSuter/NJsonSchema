@@ -43,6 +43,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the enum is of type string.</summary>
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
 
+        /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
+        public string TypeAccessModifier => _settings.TypeAccessModifier;
+
         /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationItemModel> Enums
         {

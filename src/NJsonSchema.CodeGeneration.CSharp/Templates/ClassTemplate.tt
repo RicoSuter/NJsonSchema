@@ -9,7 +9,7 @@
 <#  }#>
 <#}#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
-public partial class <#=Model.Class#> <#=Model.Inheritance#>
+<#=Model.TypeAccessModifier#> partial class <#=Model.Class#> <#=Model.Inheritance#>
 {
 <#if(Model.Inpc){#>
 <#foreach(var property in Model.Properties){#>

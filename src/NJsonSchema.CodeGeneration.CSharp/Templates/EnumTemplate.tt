@@ -1,7 +1,7 @@
 ﻿<#@ template visibility="internal" #>
 <# if(Model.HasDescription){ #>/// <summary><#=ConversionUtilities.ConvertCSharpDocBreaks(Model.Description, 0)#></summary>
 <# } #>[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
-public enum <#=Model.Name#>
+<#=Model.TypeAccessModifier#> enum <#=Model.Name#>
 {
 <# foreach(var pair in Model.Enums){ 
    if(Model.IsStringEnum){#>    [System.Runtime.Serialization.EnumMember(Value = "<#=pair.Value#>")]

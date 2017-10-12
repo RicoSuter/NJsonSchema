@@ -74,5 +74,40 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
     bar: { [key: string] : Skill[]; };
 }".Replace("\r", "").Replace("\n", "")));
         }
+
+        [TestMethod]
+        public async Task When_array_of_string_dictionary_is_used_with_ConvertConstructorInterfaceData_then_it_should_be_ignored()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""custom4"": {
+            ""type"": ""array"",
+            ""items"": {
+                ""type"": ""object"",
+                ""additionalProperties"": {
+                    ""type"": ""string""
+                }
+            }
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                GenerateConstructorInterface = true,
+                ConvertConstructorInterfaceData = true
+
+            });
+
+            var output = generator.GenerateFile("MyClass");
+            
+            //// Assert
+            Assert.IsTrue(output.Contains("custom4: { [key: string] : string; }[];"));
+        }
     }
 }

@@ -52,7 +52,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             
             #line default
             #line hidden
-            this.Write("\")]\r\npublic enum ");
+            this.Write("\")]\r\n");
+            
+            #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.TypeAccessModifier));
+            
+            #line default
+            #line hidden
+            this.Write(" enum ");
             
             #line 4 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Name));
