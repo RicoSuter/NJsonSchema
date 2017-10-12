@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Generation
 
             public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
             {
-                schema.SchemaReference = await context.JsonSchemaGenerator.GenerateAsync(context.Type.GenericTypeArguments[0], context.JsonSchemaResolver);
+                schema.Reference = await context.JsonSchemaGenerator.GenerateAsync(context.Type.GenericTypeArguments[0], context.JsonSchemaResolver);
             }
         }
 

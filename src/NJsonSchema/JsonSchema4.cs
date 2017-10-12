@@ -41,7 +41,6 @@ namespace NJsonSchema
 
         private bool _allowAdditionalProperties = true;
         private JsonSchema4 _additionalPropertiesSchema = null;
-        private JsonSchema4 _schemaReference;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema4"/> class. </summary>
         public JsonSchema4()
@@ -111,9 +110,9 @@ namespace NJsonSchema
 
         /// <summary>Creates a <see cref="JsonSchema4" /> from sample JSON data.</summary>
         /// <returns>The JSON Schema.</returns>
-        public static JsonSchema4 FromData(string data)
+        public static JsonSchema4 FromSampleJson(string data)
         {
-            var generator = new DataToJsonSchemaGenerator();
+            var generator = new SampleJsonSchemaGenerator();
             return generator.Generate(data);
         }
 
@@ -230,14 +229,14 @@ namespace NJsonSchema
         {
             get
             {
-                if (AllOf == null || AllOf.Count == 0 || HasSchemaReference)
+                if (AllOf == null || AllOf.Count == 0 || HasReference)
                     return null;
 
                 if (AllOf.Count == 1)
                     return AllOf.First().ActualSchema;
 
-                if (AllOf.Any(s => s.HasSchemaReference && !s.ActualSchema.IsAnyType))
-                    return AllOf.First(s => s.HasSchemaReference && !s.ActualSchema.IsAnyType).ActualSchema;
+                if (AllOf.Any(s => s.HasReference && !s.ActualSchema.IsAnyType))
+                    return AllOf.First(s => s.HasReference && !s.ActualSchema.IsAnyType).ActualSchema;
 
                 if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
@@ -257,11 +256,11 @@ namespace NJsonSchema
         {
             get
             {
-                var InheritedSchema = this.InheritedSchema != null ?
+                var inheritedSchema = this.InheritedSchema != null ?
                     new List<JsonSchema4> { this.InheritedSchema } :
                     new List<JsonSchema4>();
 
-                return InheritedSchema.Concat(InheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
+                return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
             }
         }
 

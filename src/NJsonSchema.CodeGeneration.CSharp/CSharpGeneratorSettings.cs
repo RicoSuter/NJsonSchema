@@ -25,6 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
+            TypeAccessModifier = "public";
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory((CodeGeneratorSettingsBase)this);
@@ -60,6 +61,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
+
+        /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
+        public string TypeAccessModifier { get; set; }
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
         public string[] JsonConverters { get; set; }

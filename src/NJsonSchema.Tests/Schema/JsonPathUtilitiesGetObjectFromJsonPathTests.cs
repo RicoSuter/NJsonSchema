@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Schema
             var referencingSchema = new JsonSchema4
             {
                 DocumentPath = "other_schema.json",
-                SchemaReference = schemaToReference
+                Reference = schemaToReference
             };
 
             //// Act
