@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Diagnostics;
 using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration
@@ -35,7 +34,7 @@ namespace NJsonSchema.CodeGeneration
         }
     }
 
-    public static class LiquidFilters
+    internal static class LiquidFilters
     {
         public static string CSharpDocs(string input)
         {

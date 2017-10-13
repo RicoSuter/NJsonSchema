@@ -9,7 +9,7 @@
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>Describes an enumeration entry.</summary>
-    public class EnumerationItemModel : TemplateModelBase
+    public class EnumerationItemModel
     {
         /// <summary>Gets or sets the name.</summary>
         public string Name { get; set; }
