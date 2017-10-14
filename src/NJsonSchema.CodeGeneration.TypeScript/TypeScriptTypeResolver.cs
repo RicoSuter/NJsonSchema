@@ -62,6 +62,34 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return new TypeScriptGenerator(schema, Settings, this, _rootObject);
         }
 
+        /// <inheritdoc />
+        public override CodeArtifactCollection GenerateTypes()
+        {
+            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+
+            var collection = base.GenerateTypes();
+            foreach (var artifact in collection.Artifacts)
+            {
+                if (extensionCode.ExtensionClasses.ContainsKey(artifact.TypeName) == true)
+                {
+                    var classCode = artifact.Code;
+
+                    var index = classCode.IndexOf("constructor(", StringComparison.Ordinal);
+                    if (index != -1)
+                        artifact.Code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
+                    else
+                    {
+                        index = classCode.IndexOf("class", StringComparison.Ordinal);
+                        index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
+
+                        artifact.Code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
+                    }
+                }
+            }
+
+            return collection;
+        }
+
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)

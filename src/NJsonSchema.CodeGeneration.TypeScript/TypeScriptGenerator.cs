@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject) 
+        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject)
             : base(schema, rootObject)
         {
             _schema = schema;
@@ -54,10 +54,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
 
-            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses); 
+            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
             var model = new FileTemplateModel(Settings)
             {
-                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes(extensionCode)),
+                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate()),
                 ExtensionCode = extensionCode
             };
 
@@ -68,7 +68,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Generates the type.</summary>
         /// <param name="typeNameHint">The fallback type name.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string typeNameHint)
+        public override CodeArtifact GenerateType(string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
 
@@ -76,8 +76,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var model = new EnumTemplateModel(typeName, _schema, Settings);
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
-                return new TypeGeneratorResult
+                return new CodeArtifact
                 {
+                    Type = CodeArtifactType.Enum,
+                    Language = CodeArtifactLanguage.TypeScript,
+
                     TypeName = typeName,
                     Code = template.Render()
                 };
@@ -86,10 +89,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var model = new ClassTemplateModel(typeName, typeNameHint, Settings, _resolver, _schema, RootObject);
                 var template = Settings.CreateTemplate(typeName, model);
-                return new TypeGeneratorResult
+                return new CodeArtifact
                 {
+                    Type = Settings.TypeStyle == TypeScriptTypeStyle.Interface ? 
+                        CodeArtifactType.Interface : CodeArtifactType.Class,
+                    Language = CodeArtifactLanguage.TypeScript,
+
                     TypeName = typeName,
                     BaseTypeName = model.BaseClass,
+
                     Code = template.Render()
                 };
             }

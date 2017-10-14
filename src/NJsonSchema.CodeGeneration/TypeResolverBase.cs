@@ -37,10 +37,10 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
-        public string GenerateTypes(ExtensionCode extensionCode)
+        public virtual CodeArtifactCollection GenerateTypes()
         {
             var processedTypes = new List<string>();
-            var types = new Dictionary<string, TypeGeneratorResult>();
+            var types = new Dictionary<string, CodeArtifact>();
             while (_types.Any(t => !processedTypes.Contains(t.Key)))
             {
                 foreach (var pair in _types.ToList())
@@ -51,28 +51,10 @@ namespace NJsonSchema.CodeGeneration
                 }
             }
 
-            return string.Join("\n\n", ClassOrderUtilities.Order(types.Values)
-                .Where(p => !_settings.ExcludedTypeNames.Contains(p.TypeName))
-                .Select(p =>
-                {
-                    if (extensionCode?.ExtensionClasses.ContainsKey(p.TypeName) == true)
-                    {
-                        var classCode = p.Code;
+            var artifacts = types.Values.Where(p => 
+                !_settings.ExcludedTypeNames.Contains(p.TypeName));
 
-                        var index = classCode.IndexOf("constructor(");
-                        if (index != -1)
-                            return classCode.Insert(index, extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n\n    ");
-                        else
-                        {
-                            index = classCode.IndexOf("class");
-                            index = classCode.IndexOf("{", index) + 1;
-
-                            return classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(p.TypeName).Trim() + "\n");
-                        }
-                    }
-
-                    return p.Code;
-                }));
+            return new CodeArtifactCollection(artifacts);
         }
 
         /// <summary>Resolves and possibly generates the specified schema.</summary>
