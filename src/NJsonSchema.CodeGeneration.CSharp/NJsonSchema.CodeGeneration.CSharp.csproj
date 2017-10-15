@@ -22,12 +22,22 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Templates\Class.ToJson.liquid" />
+    <None Remove="Templates\Liquid\Class.FromJson.liquid" />
+    <None Remove="Templates\Liquid\Class.Inpc.liquid" />
+    <None Remove="Templates\Liquid\DateFormatConverter.liquid" />
     <None Remove="Templates\Liquid\Enum.liquid" />
+    <None Remove="Templates\Liquid\File.liquid" />
+    <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />

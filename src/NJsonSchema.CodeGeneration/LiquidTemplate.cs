@@ -59,6 +59,11 @@ namespace NJsonSchema.CodeGeneration
         {
             return ConversionUtilities.ConvertCSharpDocBreaks(input, 0);
         }
+
+        public static string Tab(Context context, string input, int tabCount)
+        {
+            return ConversionUtilities.Tab(input, tabCount);
+        }
     }
 
     internal class TemplateTag : Tag
