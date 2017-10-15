@@ -21,7 +21,11 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Templates\Class.ToJson.liquid" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Templates\Class.liquid" />
+    <EmbeddedResource Include="Templates\Class.ToJson.liquid" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />

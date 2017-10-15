@@ -71,10 +71,7 @@
     public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
 {%- endif -%}
-    public string ToJson() 
-    {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this{{ JsonSerializerParameterCode }});
-    }
+    {% template ToJson %}
     
     public static {{ ClassName }} FromJson(string data)
     {
