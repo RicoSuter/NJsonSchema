@@ -10,7 +10,7 @@ using NJsonSchema.CodeGeneration.CSharp.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    internal partial class DateFormatConverterTemplate
+    internal partial class DateFormatConverterTemplate : ITemplate
     {
         public DateFormatConverterTemplate(DateFormatConverterTemplateModel model)
         {

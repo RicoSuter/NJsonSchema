@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets or sets the namespace.</summary>
         public string Namespace { get; set; }
 
-        /// <summary>Gets or sets the classes code.</summary>
-        public string Classes { get; set; }
+        /// <summary>Gets or sets the types code.</summary>
+        public string TypesCode { get; set; }
     }
 }

@@ -1,0 +1,4 @@
+﻿public static {{ ClassName }} FromJson(string data)
+{
+    return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ ClassName }}>(data{{ JsonSerializerParameterCode }});
+}

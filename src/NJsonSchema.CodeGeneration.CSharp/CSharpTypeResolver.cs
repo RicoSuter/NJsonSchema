@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
-using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -93,7 +92,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     Language = CodeArtifactLanguage.CSharp,
 
                     TypeName = "JsonInheritanceConverter",
-                    Code = new JsonInheritanceConverterTemplate(new JsonInheritanceConverterTemplateModel(Settings)).Render()
+                    Code = Settings.TemplateFactory.CreateTemplate(
+                        "CSharp", "JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings)).Render()
                 });
             }
 
@@ -105,7 +105,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     Language = CodeArtifactLanguage.CSharp,
 
                     TypeName = "DateFormatConverter",
-                    Code = new DateFormatConverterTemplate(new DateFormatConverterTemplateModel(Settings)).Render()
+                    Code = Settings.TemplateFactory.CreateTemplate(
+                        "CSharp", "DateFormatConverter", new DateFormatConverterTemplateModel(Settings)).Render()
                 });
             }
 

@@ -40,9 +40,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .ToList();
         }
 
-        /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public string ToolchainVersion => JsonSchema4.ToolchainVersion;
-
         /// <summary>Gets or sets the class name.</summary>
         public override string ClassName { get; }
 
@@ -95,9 +92,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (HasInheritance)
-                    return ": " + BaseClassName + (_settings.ClassStyle == CSharpClassStyle.Inpc ? ", System.ComponentModel.INotifyPropertyChanged" : "");
+                {
+                    return ": " + BaseClassName + (_settings.ClassStyle == CSharpClassStyle.Inpc ?
+                        ", System.ComponentModel.INotifyPropertyChanged" : "");
+                }
                 else
-                    return _settings.ClassStyle == CSharpClassStyle.Inpc ? ": System.ComponentModel.INotifyPropertyChanged" : "";
+                {
+                    return _settings.ClassStyle == CSharpClassStyle.Inpc ?
+                        ": System.ComponentModel.INotifyPropertyChanged" : "";
+                }
             }
         }
     }
