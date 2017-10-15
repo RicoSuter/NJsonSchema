@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
             this.Write("\r\n{\r\n    #pragma warning disable // Disable all warnings\r\n\r\n    ");
             
             #line 12 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\FileTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(Model.Classes, 1)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(ConversionUtilities.Tab(Model.TypesCode, 1)));
             
             #line default
             #line hidden

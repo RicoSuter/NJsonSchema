@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate())
+                TypesCode = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate())
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);

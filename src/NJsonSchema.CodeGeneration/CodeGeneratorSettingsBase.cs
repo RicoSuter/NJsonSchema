@@ -18,6 +18,10 @@ namespace NJsonSchema.CodeGeneration
         {
             GenerateDefaultValues = true;
             ExcludedTypeNames = new string[] { };
+
+#if DEBUG
+            UseLiquidTemplates = true;
+#endif
         }
 
         /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>
@@ -46,7 +50,7 @@ namespace NJsonSchema.CodeGeneration
         public ITemplateFactory TemplateFactory { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to use DotLiquid templates (experimental).</summary>
-        public bool UseLiquidTemplates { get; set; } = true;
+        public bool UseLiquidTemplates { get; set; }
 
         /// <summary>Gets or sets the template directory path.</summary>
         public string TemplateDirectory { get; set; }

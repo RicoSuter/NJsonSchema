@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration
         protected virtual string TryLoadEmbeddedLiquidTemplate(string language, string template)
         {
             var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
-            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
+            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
 
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
