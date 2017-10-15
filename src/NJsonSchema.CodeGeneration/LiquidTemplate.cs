@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -34,8 +35,8 @@ namespace NJsonSchema.CodeGeneration
         {
             Template.RegisterTag<TemplateTag>("template");
 
-            var data = Regex.Replace(_data, "(\n(( )*?)\\{% template .*?) %}", m => 
-                m.Groups[1].Value + " " + m.Groups[2].Value.Length / 4 + " %}", 
+            var data = Regex.Replace(_data, "(\n(( )*?)\\{% template .*?) %}", m =>
+                m.Groups[1].Value + " " + m.Groups[2].Value.Length / 4 + " %}",
                 RegexOptions.Singleline);
 
             var template = Template.Parse(data);
@@ -85,17 +86,23 @@ namespace NJsonSchema.CodeGeneration
 
         public override void Render(Context context, TextWriter result)
         {
-            var hash = new Hash();
-            foreach (var environment in context.Environments)
-                hash.Merge(environment);
+            try
+            {
+                var hash = new Hash();
+                foreach (var environment in context.Environments)
+                    hash.Merge(environment);
 
-            var settings = (CodeGeneratorSettingsBase)hash[SettingsKey];
-            var template = settings.TemplateFactory.CreateTemplate(
-                (string)hash[LanguageKey],
-                !string.IsNullOrEmpty(_template) ? (string)hash[TemplateKey] + "." + _template : (string)hash[TemplateKey] + "!",
-                hash);
+                var settings = (CodeGeneratorSettingsBase)hash[SettingsKey];
+                var template = settings.TemplateFactory.CreateTemplate(
+                    (string)hash[LanguageKey],
+                    !string.IsNullOrEmpty(_template) ? (string)hash[TemplateKey] + "." + _template : (string)hash[TemplateKey] + "!",
+                    hash);
 
-            result.Write(ConversionUtilities.Tab(template.Render(), _tab));
+                result.Write(ConversionUtilities.Tab(template.Render(), _tab));
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
     }
 }

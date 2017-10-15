@@ -8,6 +8,7 @@
 {%- endfor -%}
 {%- endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
+{% template Annotations -%}
 {{ TypeAccessModifier }} partial class {{ClassName}} {{InheritanceCode}}
 {
 {%- if RenderInpc -%}
