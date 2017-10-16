@@ -77,11 +77,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return AddGenerator(schema, typeNameHint);
         }
 
-        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
-        /// <returns>The code.</returns>
+        /// <inheritdoc />
         public override CodeArtifactCollection GenerateTypes()
         {
-            var collection = base.GenerateTypes();
+            return GenerateTypes(null);
+        }
+
+        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
+        /// <returns>The code.</returns>
+        public override CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
+        {
+            var collection = base.GenerateTypes(extensionCode);
             var results = new List<CodeArtifact>();
 
             if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))

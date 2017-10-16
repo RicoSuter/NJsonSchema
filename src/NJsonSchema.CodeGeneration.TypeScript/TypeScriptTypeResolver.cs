@@ -66,8 +66,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public override CodeArtifactCollection GenerateTypes()
         {
             var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+            return GenerateTypes(extensionCode);
+        }
 
-            var collection = base.GenerateTypes();
+        /// <inheritdoc />
+        public override CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
+        {
+            var collection = base.GenerateTypes(extensionCode);
             foreach (var artifact in collection.Artifacts)
             {
                 if (extensionCode.ExtensionClasses.ContainsKey(artifact.TypeName) == true)
