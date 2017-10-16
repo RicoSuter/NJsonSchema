@@ -47,10 +47,10 @@ namespace NJsonSchema
                 await VisitSchemaAsync(schema, path, typeNameHint);
 
                 if (schema.AdditionalItemsSchema != null)
-                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalProperties", null, checkedObjects);
+                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects);
 
                 if (schema.AdditionalPropertiesSchema != null)
-                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalProperties", null, checkedObjects);
+                    await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects);
 
                 if (schema.Item != null)
                     await VisitAsync(schema.Item, path + "/items", null, checkedObjects);
