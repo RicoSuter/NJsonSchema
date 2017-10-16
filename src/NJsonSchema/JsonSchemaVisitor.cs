@@ -11,7 +11,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
@@ -20,6 +22,8 @@ namespace NJsonSchema
     /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
     public abstract class JsonSchemaVisitor
     {
+        private readonly string[] _jsonSchemaProperties = typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name).ToArray();
+
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
         /// <returns>The task.</returns>
@@ -48,13 +52,6 @@ namespace NJsonSchema
                 {
                     replacer(newSchema);
                     schema = newSchema;
-                }
-
-                var newReference = await VisitJsonReferenceAsync(schema, path, typeNameHint);
-                if (newReference != schema)
-                {
-                    replacer(newReference);
-                    schema = (JsonSchema4)newReference;
                 }
 
                 if (schema == null)
@@ -113,62 +110,65 @@ namespace NJsonSchema
                 foreach (var p in schema.PatternProperties.ToArray())
                     await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonProperty)o);
             }
-            else
+
+            if (!(obj is string) && !(obj is JToken))
             {
-                if (obj is IJsonReference reference)
+                // Reflection fallback
+                if (obj is IDictionary dictionary)
                 {
-                    var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint);
-                    if (newReference != reference)
+                    foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
-                        replacer(newReference);
-                        obj = newReference;
-                    }
-
-                    if (obj == null)
-                        return;
-                }
-
-                if (!(obj is string))
-                {
-                    // Reflection fallback
-                    if (obj is IDictionary dictionary)
-                    {
-                        foreach (var key in dictionary.Keys.OfType<object>().ToArray())
+                        await VisitAsync(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
                         {
-                            await VisitAsync(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
-                            {
-                                if (o != null)
-                                    dictionary[key] = (JsonSchema4)o;
-                                else
-                                    dictionary.Remove(key);
-                            });
-                        }
-                    }
-                    else if (obj is IList list)
-                    {
-                        var items = list.OfType<object>().ToArray();
-                        for (var i = 0; i < items.Length; i++)
-                        {
-                            var index = i;
-                            await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
-                        }
-                    }
-                    else if (obj is IEnumerable enumerable)
-                    {
-                        var items = enumerable.OfType<object>().ToArray();
-                        for (var i = 0; i < items.Length; i++)
-                            await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
-                    }
-                    else
-                    {
-                        foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()))
-                        {
-                            var value = member.GetValue(obj);
-                            if (value != null)
-                                await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
-                        }
+                            if (o != null)
+                                dictionary[key] = (JsonSchema4)o;
+                            else
+                                dictionary.Remove(key);
+                        });
                     }
                 }
+                else if (obj is IList list)
+                {
+                    var items = list.OfType<object>().ToArray();
+                    for (var i = 0; i < items.Length; i++)
+                    {
+                        var index = i;
+                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
+                    }
+                }
+                else if (obj is IEnumerable enumerable)
+                {
+                    var items = enumerable.OfType<object>().ToArray();
+                    for (var i = 0; i < items.Length; i++)
+                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
+                }
+                else
+                {
+                    foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
+                        p.MemberInfo is PropertyInfo &&
+                        (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
+                        p.CanRead &&
+                        p.IsIndexer == false &&
+                        p.CustomAttributes.JsonIgnoreAttribute == null))
+                    {
+                        var value = member.GetValue(obj);
+                        if (value != null)
+                            await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
+                    }
+                }
+            }
+
+            if (obj is IJsonReference reference)
+            {
+                var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint);
+                if (newReference != reference)
+                {
+                    replacer(newReference);
+                    obj = newReference;
+                }
+
+                if (obj == null)
+                    return;
             }
         }
 
