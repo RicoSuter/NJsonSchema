@@ -20,6 +20,7 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Generation.TypeMappers;
+using System.Resources;
 
 namespace NJsonSchema.Generation
 {
@@ -803,7 +804,15 @@ namespace NJsonSchema.Generation
 
             dynamic displayAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null && displayAttribute.Name != null)
-                schema.Title = displayAttribute.Name;
+            {
+                if (displayAttribute.ResourceType != null)
+                {
+                    ResourceManager rm = new ResourceManager(displayAttribute.ResourceType);
+                    schema.Title = rm.GetString(displayAttribute.Name);
+                }
+                else
+                    schema.Title = displayAttribute.Name;
+            }
 
             dynamic defaultValueAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
