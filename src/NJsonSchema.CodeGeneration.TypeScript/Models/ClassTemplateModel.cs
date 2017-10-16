@@ -35,12 +35,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _schema = schema;
             _resolver = resolver;
 
-            Class = typeName;
+            ClassName = typeName;
             DiscriminatorName = discriminatorName;
         }
 
         /// <summary>Gets the class name.</summary>
-        public override string Class { get; }
+        public override string ClassName { get; }
 
         /// <summary>Gets the name for the discriminator check.</summary>
         public string DiscriminatorName { get; }
@@ -74,11 +74,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 if (HasInheritance)
                 {
                     return " extends " + BaseClass + (GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
-                        " implements I" + Class : string.Empty);
+                        " implements I" + ClassName : string.Empty);
                 }
 
                 return GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
-                    " implements I" + Class : string.Empty;
+                    " implements I" + ClassName : string.Empty;
             }
         }
 
@@ -123,6 +123,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
             .Where(v => v.IsInheritanceDiscriminator == false)
-            .Select(property => new PropertyModel(this, property, Class, _resolver, _settings)).ToList();
+            .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings)).ToList();
     }
 }

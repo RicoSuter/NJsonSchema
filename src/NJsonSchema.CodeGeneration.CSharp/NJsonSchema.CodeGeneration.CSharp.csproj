@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
-    <Version>9.7.7</Version>
+    <Version>9.8.0</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -20,6 +20,25 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Templates\Class.ToJson.liquid" />
+    <None Remove="Templates\Liquid\Class.FromJson.liquid" />
+    <None Remove="Templates\Liquid\Class.Inpc.liquid" />
+    <None Remove="Templates\Liquid\DateFormatConverter.liquid" />
+    <None Remove="Templates\Liquid\Enum.liquid" />
+    <None Remove="Templates\Liquid\File.liquid" />
+    <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>

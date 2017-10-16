@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             TypeAccessModifier = "public";
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory();
+            TemplateFactory = new DefaultTemplateFactory((CodeGeneratorSettingsBase)this);
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types.</summary>

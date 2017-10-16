@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                Classes = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateClasses())
+                TypesCode = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate())
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
@@ -69,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Generates the type.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override TypeGeneratorResult GenerateType(string typeNameHint)
+        public override CodeArtifact GenerateType(string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
 
@@ -79,17 +79,21 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return GenerateClass(typeName);
         }
 
-        private TypeGeneratorResult GenerateClass(string typeName)
+        private CodeArtifact GenerateClass(string typeName)
         {
             var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, RootObject);
 
             RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
-            return new TypeGeneratorResult
+            return new CodeArtifact
             {
+                Type = CodeArtifactType.Class,
+                Language = CodeArtifactLanguage.CSharp,
+
                 TypeName = typeName,
-                BaseTypeName = model.BaseClass,
+                BaseTypeName = model.BaseClassName,
+
                 Code = template.Render()
             };
         }
@@ -107,12 +111,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
         }
 
-        private TypeGeneratorResult GenerateEnum(string typeName)
+        private CodeArtifact GenerateEnum(string typeName)
         {
             var model = new EnumTemplateModel(typeName, _schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
-            return new TypeGeneratorResult
+            return new CodeArtifact
             {
+                Type = CodeArtifactType.Enum,
+                Language = CodeArtifactLanguage.CSharp,
+
                 TypeName = typeName,
                 Code = template.Render()
             };

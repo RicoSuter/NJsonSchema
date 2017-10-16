@@ -10,7 +10,7 @@ using NJsonSchema.CodeGeneration.CSharp.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    internal partial class JsonInheritanceConverterTemplate
+    internal partial class JsonInheritanceConverterTemplate : ITemplate
     {
         public JsonInheritanceConverterTemplate(JsonInheritanceConverterTemplateModel model)
         {

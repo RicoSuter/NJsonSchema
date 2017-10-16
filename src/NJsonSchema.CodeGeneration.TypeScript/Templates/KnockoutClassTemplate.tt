@@ -1,7 +1,7 @@
 ﻿<#@ template visibility="internal" #>
 <#@ import namespace="NJsonSchema" #>
 <#if(Model.HasDescription){#>/** <#=Model.Description#> */
-<#}#>export class <#=Model.Class#><#=Model.Inheritance#> {
+<#}#>export class <#=Model.ClassName#><#=Model.Inheritance#> {
 <#foreach (var property in Model.Properties){#>
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */
@@ -37,16 +37,16 @@
         }
     }
 
-    static fromJS(data: any<#if(Model.HandleReferences){#>, _mappings?: any<#}#>): <#=Model.Class#> {
+    static fromJS(data: any<#if(Model.HandleReferences){#>, _mappings?: any<#}#>): <#=Model.ClassName#> {
 <#if(Model.HandleReferences){#>
 <#  if(Model.HasBaseDiscriminator){#>
 <#      foreach (var derivedClass in Model.DerivedClasses){#>
         if (data["<#=Model.BaseDiscriminator#>"] === "<#=derivedClass.Key#>")
             return createInstance<<#=derivedClass.Value#>>(data, _mappings, <#=derivedClass.Value#>);
 <#      }#>
-        return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.ClassName#>>(data, _mappings, <#=Model.ClassName#>);
 <#  }else{#>
-        return createInstance<<#=Model.Class#>>(data, _mappings, <#=Model.Class#>);
+        return createInstance<<#=Model.ClassName#>>(data, _mappings, <#=Model.ClassName#>);
 <#  }#>
 <#}else{#>
 <#  if(Model.HasBaseDiscriminator){#>
@@ -58,7 +58,7 @@
         }
 <#      }#>
 <#  }#>
-        let result = new <#=Model.Class#>();
+        let result = new <#=Model.ClassName#>();
         result.init(data);
         return result;
 <#}#>
@@ -82,7 +82,7 @@
 
     clone() {
         const json = this.toJSON();
-        let result = new <#=Model.Class#>();
+        let result = new <#=Model.ClassName#>();
         result.init(json);
         return result;
     }

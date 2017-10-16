@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Generates the type.</summary>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public abstract TypeGeneratorResult GenerateType(string typeNameHint);
+        public abstract CodeArtifact GenerateType(string typeNameHint);
 
         /// <summary>Initializes a new instance of the <see cref="TypeGeneratorBase"/> class.</summary>
         /// <param name="schema">The schema.</param>

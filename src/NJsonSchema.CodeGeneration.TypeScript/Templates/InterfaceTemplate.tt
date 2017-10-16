@@ -1,7 +1,7 @@
 ﻿<#@ template visibility="internal" #>
 <#if(Model.HasDescription){#>
 /** <#=Model.Description#> */
-<#}#>export interface <#=Model.Class#><#=Model.Inheritance#> {
+<#}#>export interface <#=Model.ClassName#><#=Model.Inheritance#> {
 <#foreach(var property in Model.Properties){#>
 <#  if(property.HasDescription){#>
     /** <#=property.Description#> */

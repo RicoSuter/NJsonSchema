@@ -14,7 +14,7 @@ namespace NJsonSchema.Generation.TypeMappers
     /// <summary>Maps .NET type to a generated JSON Schema describing an object.</summary>
     public class ObjectTypeMapper : ITypeMapper
     {
-        private readonly Func<JsonSchemaGenerator, JsonSchemaResolver, JsonSchema4> _schemaFactory;
+        private readonly Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema4>> _schemaFactory;
 
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
@@ -24,10 +24,21 @@ namespace NJsonSchema.Generation.TypeMappers
         {
         }
 
+
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schemaFactory">The schema factory.</param>
         public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, JsonSchema4> schemaFactory)
+#pragma warning disable 1998
+            : this(mappedType, async (schemaGenerator, schemaResolver) => schemaFactory(schemaGenerator, schemaResolver))
+#pragma warning restore 1998
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
+        /// <param name="mappedType">Type of the mapped.</param>
+        /// <param name="schemaFactory">The schema factory.</param>
+        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema4>> schemaFactory)
         {
             _schemaFactory = schemaFactory;
             MappedType = mappedType;
@@ -47,7 +58,7 @@ namespace NJsonSchema.Generation.TypeMappers
 #pragma warning restore 1998
         {
             if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
-                context.JsonSchemaResolver.AddSchema(MappedType, false, _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
+                context.JsonSchemaResolver.AddSchema(MappedType, false, await _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
 
             schema.Reference = context.JsonSchemaResolver.GetSchema(MappedType, false);
         }

@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.Models
             if (_property.IsEnumeration == false)
                 return propertyName;
 
-            var className = _classTemplateModel.Class;
+            var className = _classTemplateModel.ClassName;
             if (className.Contains("Anonymous"))
                 return propertyName;
 

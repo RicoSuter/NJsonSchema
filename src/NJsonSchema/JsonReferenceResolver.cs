@@ -46,40 +46,18 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
         public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath)
         {
-            if (jsonPath == "#")
-            {
-                if (rootObject is IJsonReference)
-                    return (IJsonReference)rootObject;
+            return await ResolveReferenceAsync(rootObject, jsonPath, true);
+        }
 
-                throw new InvalidOperationException("Could not resolve the JSON path '#' because the root object is not a JsonSchema4.");
-            }
-            else if (jsonPath.StartsWith("#/"))
-            {
-                return ResolveDocumentReference(rootObject, jsonPath);
-            }
-            else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
-                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath).ConfigureAwait(false);
-            else
-            {
-                var documentPathProvider = rootObject as IDocumentPathProvider;
-
-                var documentPath = documentPathProvider?.DocumentPath;
-                if (documentPath != null)
-                {
-                    if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
-                    {
-                        var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), jsonPath);
-                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath).ConfigureAwait(false);
-                    }
-                }
-                else
-                    throw new NotSupportedException("Could not resolve the JSON path '" + jsonPath + "' because no document path is available.");
-            }
+        /// <summary>Gets the object from the given JSON path.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="jsonPath">The JSON path.</param>
+        /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
+        public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath)
+        {
+            return await ResolveReferenceAsync(rootObject, jsonPath, false);
         }
 
         /// <summary>Resolves a document reference.</summary>
@@ -113,21 +91,61 @@ namespace NJsonSchema
             return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
 
-        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, bool append)
+        {
+            if (jsonPath == "#")
+            {
+                if (rootObject is IJsonReference)
+                    return (IJsonReference)rootObject;
+
+                throw new InvalidOperationException("Could not resolve the JSON path '#' because the root object is not a JsonSchema4.");
+            }
+            else if (jsonPath.StartsWith("#/"))
+            {
+                return ResolveDocumentReference(rootObject, jsonPath);
+            }
+            else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
+                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, append).ConfigureAwait(false);
+            else
+            {
+                var documentPathProvider = rootObject as IDocumentPathProvider;
+
+                var documentPath = documentPathProvider?.DocumentPath;
+                if (documentPath != null)
+                {
+                    if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
+                    {
+                        var url = new Uri(new Uri(documentPath), jsonPath).ToString();
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, append).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), jsonPath);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath, append).ConfigureAwait(false);
+                    }
+                }
+                else
+                    throw new NotSupportedException("Could not resolve the JSON path '" + jsonPath + "' because no document path is available.");
+            }
+        }
+
+        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, bool append)
         {
             try
             {
                 var arr = Regex.Split(fullJsonPath, @"(?=#)");
-                if (!_resolvedObjects.ContainsKey(arr[0]))
+                var filePath = arr[0];
+                if (!_resolvedObjects.ContainsKey(filePath))
                 {
-                    var schema = await ResolveFileReferenceAsync(arr[0]).ConfigureAwait(false);
-                    if (schema is JsonSchema4)
-                        _schemaResolver.AppendSchema((JsonSchema4)schema, null);
+                    var schema = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);
+                    schema.DocumentPath = jsonPath;
+                    if (schema is JsonSchema4 && append)
+                        _schemaResolver.AppendSchema((JsonSchema4)schema, filePath.Split('/', '\\').Last().Split('.').First());
 
-                    _resolvedObjects[arr[0]] = schema;
+                    _resolvedObjects[filePath] = schema;
                 }
 
-                var result = _resolvedObjects[arr[0]];
+                var result = _resolvedObjects[filePath];
                 return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1]).ConfigureAwait(false);
             }
             catch (Exception exception)
@@ -136,7 +154,7 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath)
+        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, bool append)
         {
             try
             {
@@ -144,7 +162,8 @@ namespace NJsonSchema
                 if (!_resolvedObjects.ContainsKey(arr[0]))
                 {
                     var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
-                    if (schema is JsonSchema4)
+                    schema.DocumentPath = jsonPath;
+                    if (schema is JsonSchema4 && append)
                         _schemaResolver.AppendSchema((JsonSchema4)schema, null);
 
                     _resolvedObjects[arr[0]] = schema;
@@ -163,6 +182,9 @@ namespace NJsonSchema
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return null;
+
+            if (obj is IJsonReference reference && reference.Reference != null)
+                obj = reference.Reference;
 
             if (segments.Count == 0)
                 return obj as IJsonReference;

@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     // TODO: Add base class for CSharp.EnumTemplateModel and TypeScript.EnumTemplateModel
 
     /// <summary>The CSharp enum template model.</summary>
-    public class EnumTemplateModel
+    public class EnumTemplateModel : TemplateModelBase
     {
         private readonly JsonSchema4 _schema;
         private readonly CSharpGeneratorSettings _settings;
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 var entries = new List<EnumerationItemModel>();
-                for (int i = 0; i < _schema.Enumeration.Count; i++)
+                for (var i = 0; i < _schema.Enumeration.Count; i++)
                 {
                     var value = _schema.Enumeration.ElementAt(i);
                     if (value != null)
@@ -69,6 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         });
                     }
                 }
+
                 return entries;
             }
         }

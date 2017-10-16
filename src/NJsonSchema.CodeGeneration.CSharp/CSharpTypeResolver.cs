@@ -6,9 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
-using NJsonSchema.CodeGeneration.CSharp.Templates;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -77,26 +77,40 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return AddGenerator(schema, typeNameHint);
         }
 
-        /// <summary>Generates all necessary classes.</summary>
+        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
-        public string GenerateClasses()
+        public override CodeArtifactCollection GenerateTypes()
         {
-            var classes = GenerateTypes(null);
+            var collection = base.GenerateTypes();
+            var results = new List<CodeArtifact>();
 
-            // TODO: Move utility classes to FileTemplate.tt
-            if (classes.Contains("JsonInheritanceConverter"))
+            if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
             {
-                var templateModel = new JsonInheritanceConverterTemplateModel(Settings);
-                var template = new JsonInheritanceConverterTemplate(templateModel);
-                classes += "\n\n" + template.Render();
+                results.Add(new CodeArtifact
+                {
+                    Type = CodeArtifactType.Class,
+                    Language = CodeArtifactLanguage.CSharp,
+
+                    TypeName = "JsonInheritanceConverter",
+                    Code = Settings.TemplateFactory.CreateTemplate(
+                        "CSharp", "JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings)).Render()
+                });
             }
-            if (classes.Contains("DateFormatConverter"))
+
+            if (collection.Artifacts.Any(r => r.Code.Contains("DateFormatConverter")))
             {
-                var templateModel = new DateFormatConverterTemplateModel(Settings);
-                var template = new DateFormatConverterTemplate(templateModel);
-                classes += "\n\n" + template.Render();
+                results.Add(new CodeArtifact
+                {
+                    Type = CodeArtifactType.Class,
+                    Language = CodeArtifactLanguage.CSharp,
+
+                    TypeName = "DateFormatConverter",
+                    Code = Settings.TemplateFactory.CreateTemplate(
+                        "CSharp", "DateFormatConverter", new DateFormatConverterTemplateModel(Settings)).Render()
+                });
             }
-            return classes;
+
+            return new CodeArtifactCollection(collection.Artifacts.Concat(results));
         }
 
         /// <summary>Adds a generator for the given schema if necessary.</summary>

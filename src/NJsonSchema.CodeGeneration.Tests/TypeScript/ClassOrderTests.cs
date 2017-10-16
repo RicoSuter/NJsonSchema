@@ -11,39 +11,39 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         public void When_class_order_is_wrong_then_classes_are_correctly_reordered()
         {
             //// Arrange
-            var classes = new List<TypeGeneratorResult>
+            var classes = new List<CodeArtifact>
             {
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Car"
                 },
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Apple",
                     BaseTypeName = "Fruit"
                 },
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Professor",
                     BaseTypeName = "Teacher"
                 },
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Teacher",
                     BaseTypeName = "Person"
                 },
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Fruit"
                 },
-                new TypeGeneratorResult
+                new CodeArtifact
                 {
                     TypeName = "Person"
                 }
             };
 
             //// Act
-            classes = ClassOrderUtilities.Order(classes).ToList();
+            classes = CodeArtifactCollection.OrderByBaseDependency(classes).ToList();
             var order = string.Join(", ", classes.Select(c => c.TypeName));
 
             //// Assert
