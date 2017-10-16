@@ -37,7 +37,11 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
         /// <returns>The code.</returns>
-        public virtual CodeArtifactCollection GenerateTypes()
+        public abstract CodeArtifactCollection GenerateTypes();
+
+        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
+        /// <returns>The code.</returns>
+        public virtual CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
         {
             var processedTypes = new List<string>();
             var types = new Dictionary<string, CodeArtifact>();
