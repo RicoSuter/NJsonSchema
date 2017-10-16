@@ -70,7 +70,6 @@ namespace NJsonSchema
 
         private class JsonReferenceUpdater : JsonSchemaVisitor
         {
-            private bool _inlineDefinitionsRound;
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
 
@@ -80,28 +79,16 @@ namespace NJsonSchema
                 _referenceResolver = referenceResolver;
             }
 
-            public override async Task VisitAsync(object obj)
-            {
-                _inlineDefinitionsRound = true;
-                await base.VisitAsync(obj);
-
-                _inlineDefinitionsRound = false;
-                await base.VisitAsync(obj);
-            }
-
             protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
             {
                 if (reference.ReferencePath != null && reference.Reference == null)
                 {
-                    if (_inlineDefinitionsRound)
+                    if (path.EndsWith("/definitions/" + typeNameHint))
                     {
                         // inline $refs in "definitions"
-                        if (path.EndsWith("/definitions/" + typeNameHint))
-                        {
-                            return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
-                                .ConfigureAwait(false);
-                        }
+                        return await _referenceResolver
+                            .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
+                            .ConfigureAwait(false);
                     }
                     else
                     {
