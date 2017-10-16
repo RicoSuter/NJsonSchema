@@ -797,7 +797,7 @@ namespace NJsonSchema.Generation
         /// <param name="schema">The schema.</param>
         /// <param name="typeDescription">The property type description.</param>
         /// <param name="parentAttributes">The attributes.</param>
-        public void ApplyDataAnnotations(JsonSchema4 schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
+        public virtual void ApplyDataAnnotations(JsonSchema4 schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Refactor out
 
