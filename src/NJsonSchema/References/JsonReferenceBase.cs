@@ -23,7 +23,7 @@ namespace NJsonSchema.References
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
         [JsonProperty(JsonPathUtilities.ReferenceReplaceString, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string ReferencePath { get; set; }
+        string IJsonReferenceBase.ReferencePath { get; set; }
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]
@@ -35,7 +35,7 @@ namespace NJsonSchema.References
                 if (_reference != value)
                 {
                     _reference = value;
-                    ReferencePath = null;
+                    ((IJsonReferenceBase)this).ReferencePath = null;
                 }
             }
         }

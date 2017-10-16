@@ -117,7 +117,20 @@ namespace NJsonSchema.Infrastructure
             {
                 if (MemberInfo is PropertyInfo)
                     return ((PropertyInfo)MemberInfo).GetValue(obj);
-                return ((FieldInfo)MemberInfo).GetValue(obj);
+                else
+                    return ((FieldInfo)MemberInfo).GetValue(obj);
+            }
+
+            /// <summary>Gets the value of the property or field.</summary>
+            /// <param name="obj">The object.</param>
+            /// <param name="value">The value.</param>
+            /// <returns>The value.</returns>
+            public void SetValue(object obj, object value)
+            {
+                if (MemberInfo is PropertyInfo)
+                    ((PropertyInfo)MemberInfo).SetValue(obj, value);
+                else
+                    ((FieldInfo)MemberInfo).SetValue(obj, value);
             }
 
             /// <summary>Gets the name of the property for JSON serialization.</summary>

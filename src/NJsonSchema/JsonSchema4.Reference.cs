@@ -60,8 +60,8 @@ namespace NJsonSchema
             if (checkedSchemas.Contains(this))
                 throw new InvalidOperationException("Cyclic references detected.");
 
-            if (ReferencePath != null && Reference == null)
-                throw new InvalidOperationException("The schema reference path '" + ReferencePath + "' has not been resolved.");
+            if (((IJsonReferenceBase)this).ReferencePath != null && Reference == null)
+                throw new InvalidOperationException("The schema reference path '" + ((IJsonReferenceBase)this).ReferencePath + "' has not been resolved.");
 
             if (HasReference)
             {

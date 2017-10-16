@@ -99,18 +99,20 @@ namespace NJsonSchema.Tests.Schema
         public async Task When_object_is_in_external_file_then_path_should_be_built_correctly()
         {
             //// Arrange
-            var schemaToReference = new JsonSchema4 {DocumentPath = "some_schema.json"};
             var referencingSchema = new JsonSchema4
             {
                 DocumentPath = "other_schema.json",
-                Reference = schemaToReference
+                Reference = new JsonSchema4
+                {
+                    DocumentPath = "some_schema.json"
+                }
             };
 
             //// Act
-            var result = referencingSchema.ToJson();
+            var result = referencingSchema.ToJsonWithExternalReferences();
 
             //// Assert
-            Assert.IsTrue(result.Contains("some_schema.json#"));
+            Assert.IsTrue(result.Contains("some_schema.json"));
         }
     }
 }
