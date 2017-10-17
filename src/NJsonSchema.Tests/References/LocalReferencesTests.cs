@@ -65,18 +65,32 @@ namespace NJsonSchema.Tests.References
             Assert.IsTrue(json.Contains("\"$ref\": \"#/definitions/Animal\""));
         }
 
+        //[TestMethod]
+        //public async Task When_schema_references_external_schema_then_it_is_removed_with_ToJsonWithExternalReferences()
+        //{
+        //    //// Arrange
+        //    var path = "References/LocalReferencesTests/schema_with_reference.json";
+
+        //    //// Act
+        //    var schema = await JsonSchema4.FromFileAsync(path);
+        //    var json = schema.ToJsonWithExternalReferences();
+
+        //    //// Assert
+        //    Assert.AreEqual(0, schema.Definitions.Count);
+        //}
+
         [TestMethod]
-        public async Task When_schema_references_external_schema_then_it_is_removed_with_ToJsonWithExternalReferences()
+        public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
         {
             //// Arrange
-            var path = "References/LocalReferencesTests/schema_with_reference.json";
+            var path = "References/LocalReferencesTests/schema_with_indirect_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
-            var json = schema.ToJsonWithExternalReferences();
+            var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(0, schema.Definitions.Count);
+            Assert.AreEqual(1, schema.Definitions.Count);
         }
     }
 }

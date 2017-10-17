@@ -706,19 +706,19 @@ namespace NJsonSchema
             return json;
         }
 
-        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>
-        /// <returns>The JSON string.</returns>
-        [Obsolete("Not ready yet as it has side-effects on the schema.")]
-        public string ToJsonWithExternalReferences()
-        {
-            // TODO: Copy "this" schema first (high-prio)
-            var oldSchema = SchemaVersion;
-            SchemaVersion = "http://json-schema.org/draft-04/schema#";
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, true);
-            var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
-            SchemaVersion = oldSchema;
-            return json;
-        }
+        ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>
+        ///// <returns>The JSON string.</returns>
+        //[Obsolete("Not ready yet as it has side-effects on the schema.")]
+        //public string ToJsonWithExternalReferences()
+        //{
+        //    // TODO: Copy "this" schema first (high-prio)
+        //    var oldSchema = SchemaVersion;
+        //    SchemaVersion = "http://json-schema.org/draft-04/schema#";
+        //    JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, true);
+        //    var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
+        //    SchemaVersion = oldSchema;
+        //    return json;
+        //}
 
         /// <summary>Gets a value indicating whether this schema inherits from the given parent schema.</summary>
         /// <param name="parentSchema">The parent schema.</param>
