@@ -78,5 +78,19 @@ namespace NJsonSchema.Tests.References
             //// Assert
             Assert.AreEqual(0, schema.Definitions.Count);
         }
+
+        [TestMethod]
+        public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
+        {
+            //// Arrange
+            var path = "References/LocalReferencesTests/schema_with_indirect_reference.json";
+
+            //// Act
+            var schema = await JsonSchema4.FromFileAsync(path);
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.AreEqual(1, schema.Definitions.Count);
+        }
     }
 }
