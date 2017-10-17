@@ -57,16 +57,8 @@ namespace NJsonSchema
                 if (schema == null)
                     return;
 
-                foreach (var p in schema.Definitions.ToArray())
-                {
-                    await VisitAsync(p.Value, path + "/definitions/" + p.Key, p.Key, checkedObjects, o =>
-                    {
-                        if (o != null)
-                            schema.Definitions[p.Key] = (JsonSchema4)o;
-                        else
-                            schema.Definitions.Remove(p.Key);
-                    });
-                }
+                if (schema.Reference != null)
+                    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema4)o);
 
                 if (schema.AdditionalItemsSchema != null)
                     await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema4)o);
@@ -109,6 +101,17 @@ namespace NJsonSchema
 
                 foreach (var p in schema.PatternProperties.ToArray())
                     await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonProperty)o);
+
+                foreach (var p in schema.Definitions.ToArray())
+                {
+                    await VisitAsync(p.Value, path + "/definitions/" + p.Key, p.Key, checkedObjects, o =>
+                    {
+                        if (o != null)
+                            schema.Definitions[p.Key] = (JsonSchema4)o;
+                        else
+                            schema.Definitions.Remove(p.Key);
+                    });
+                }
             }
 
             if (!(obj is string) && !(obj is JToken))

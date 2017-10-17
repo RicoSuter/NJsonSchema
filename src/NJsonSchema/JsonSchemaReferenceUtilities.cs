@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -72,6 +73,7 @@ namespace NJsonSchema
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
+            private bool _replaceRefsRound;
 
             public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver)
             {
@@ -79,16 +81,27 @@ namespace NJsonSchema
                 _referenceResolver = referenceResolver;
             }
 
+            public override async Task VisitAsync(object obj)
+            {
+                _replaceRefsRound = true;
+                await base.VisitAsync(obj);
+                _replaceRefsRound = false;
+                await base.VisitAsync(obj);
+            }
+
             protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
             {
                 if (reference.ReferencePath != null && reference.Reference == null)
                 {
-                    if (path.EndsWith("/definitions/" + typeNameHint))
+                    if (_replaceRefsRound)
                     {
-                        // inline $refs in "definitions"
-                        return await _referenceResolver
-                            .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
-                            .ConfigureAwait(false);
+                        if (path.EndsWith("/definitions/" + typeNameHint))
+                        {
+                            // inline $refs in "definitions"
+                            return await _referenceResolver
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
+                                .ConfigureAwait(false);
+                        }
                     }
                     else
                     {
@@ -133,7 +146,8 @@ namespace NJsonSchema
                 }
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)
                 {
-                    return null;
+                    throw new NotSupportedException("removeExternalReferences not supported");
+                    //return new JsonSchema4 { ReferencePath = reference.DocumentPath };
                 }
 
                 return reference;
