@@ -31,6 +31,7 @@
     <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid" />
