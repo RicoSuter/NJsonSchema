@@ -40,11 +40,30 @@ namespace NJsonSchema.CodeGeneration
                 return CreateT4Template(language, template, model);
         }
 
-        /// <summary>Tries to load a Liquid template from an embedded resource.</summary>
+        /// <summary>Tries to load a Liquid template.</summary>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
-        protected virtual string TryLoadEmbeddedLiquidTemplate(string language, string template)
+        protected virtual string TryGetLiquidTemplate(string language, string template)
+        {
+            if (_settings.UseLiquidTemplates)
+            {
+                if (!template.EndsWith("!") &&
+                    !string.IsNullOrEmpty(_settings.TemplateDirectory) &&
+                    Directory.Exists(_settings.TemplateDirectory))
+                {
+                    var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
+                    if (File.Exists(templateFilePath))
+                        return File.ReadAllText(templateFilePath);
+                }
+
+                return TryLoadEmbeddedLiquidTemplate(language, template.TrimEnd('!'));
+            }
+
+            return null;
+        }
+        
+        private string TryLoadEmbeddedLiquidTemplate(string language, string template)
         {
             var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
@@ -54,25 +73,6 @@ namespace NJsonSchema.CodeGeneration
             {
                 using (var reader = new StreamReader(resource))
                     return reader.ReadToEnd();
-            }
-
-            return null;
-        }
-
-        private string TryGetLiquidTemplate(string language, string template)
-        {
-            if (_settings.UseLiquidTemplates)
-            {
-                if (!template.EndsWith("!") &&
-                    !string.IsNullOrEmpty(_settings.TemplateDirectory) &&
-                    Directory.Exists(_settings.TemplateDirectory))
-                {
-                    var templateFilePath = Path.Combine(_settings.TemplateDirectory, language, template + ".liquid");
-                    if (File.Exists(templateFilePath))
-                        return File.ReadAllText(templateFilePath);
-                }
-
-                return TryLoadEmbeddedLiquidTemplate(language, template.TrimEnd('!'));
             }
 
             return null;
