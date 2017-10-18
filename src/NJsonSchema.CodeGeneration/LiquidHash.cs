@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration
                 return cache[obj];
 
             var hash = new Hash();
-            foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead))
+            foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetMethod.IsPublic))
             {
                 var value = property.GetValue(obj, null);
                 if (value is IEnumerable && !(value is string))

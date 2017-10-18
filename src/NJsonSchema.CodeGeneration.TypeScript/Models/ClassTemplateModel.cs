@@ -60,9 +60,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the description.</summary>
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
-        /// <summary>Gets the inherited schema.</summary>
-        public JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
-
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
@@ -124,5 +121,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public List<PropertyModel> Properties => _schema.ActualProperties.Values
             .Where(v => v.IsInheritanceDiscriminator == false)
             .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings)).ToList();
+
+        /// <summary>Gets the inherited schema.</summary>
+        private JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
 }

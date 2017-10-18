@@ -1,0 +1,47 @@
+﻿{%- if IsNewableObject -%}
+{{ Variable }} = {{ Value }} ? {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %}) : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%- elseif IsArray -%}
+if ({{ Value }} && {{ Value }}.constructor === Array) {
+    {{ Variable }} = [];
+    for (let item of {{ Value }})
+{%-   if IsArrayItemNewableObject -%}
+        {{ Variable }}.push({{ ArrayItemType }}.fromJS(item{% if HandleReferences %}, _mappings{% endif %}));
+{%-   else -%}
+{%-     if IsArrayItemDate or IsArrayItemDateTime -%}
+        {{ Variable }}.push({{ StringToDateCode }}(item));
+{%-     else -%}
+        {{ Variable }}.push(item);
+{%-     endif -%}
+{%-   endif -%}
+}
+{%- elseif IsDictionary -%}
+if ({{ Value }}) {
+    {{ Variable }} = {};
+    for (let key in {{ Value }}) {
+        if ({{ Value }}.hasOwnProperty(key))
+{%-     if IsDictionaryValueNewableObject -%}
+            {{ Variable }}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%-     elseif IsDictionaryValueNewableArray -%}
+            {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%-     elseif IsDictionaryValueDate or Model.IsDictionaryValueDateTime -%}
+            {{ Variable }}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%-     else -%}
+{%-         if(Model.HasDictionaryValueDefaultValue || Model.NullValue != "undefined"){ -%}
+            {{ Variable }}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%-         else -%}
+            {{ Variable }}[key] = {{ Value }}[key];
+{%-         endif -%}
+{%-	    endif -%}
+    }
+}
+{%- else -%}
+    {%- if IsDate or IsDateTime -%}
+{{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
+    {%- else -%}
+{%-       if HasDefaultValue or NullValue != "undefined" -%}
+{{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%-       else -%}
+{{ Variable }} = {{ Value }};
+{%-       endif -%}
+    {%- endif -%}
+{%- endif -%}

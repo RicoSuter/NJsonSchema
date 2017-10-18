@@ -22,6 +22,20 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Templates\Liquid\Class.liquid" />
+    <None Remove="Templates\Liquid\ConvertToClass.Liquid" />
+    <None Remove="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
+    <None Remove="Templates\Liquid\Enum.liquid" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Liquid\Class.liquid">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\ConvertToClass.Liquid" />
+    <EmbeddedResource Include="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
