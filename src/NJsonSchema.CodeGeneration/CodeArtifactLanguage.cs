@@ -14,10 +14,13 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Undefined.</summary>
         Undefined,
 
-        /// <summary>A class.</summary>
+        /// <summary>C#.</summary>
         CSharp,
 
-        /// <summary>A class.</summary>
-        TypeScript
+        /// <summary>TypeScript.</summary>
+        TypeScript,
+
+        /// <summary>Html.</summary>
+        Html
     }
 }

@@ -46,6 +46,9 @@ namespace NJsonSchema.CodeGeneration
             hash[TemplateTag.TemplateKey] = _template;
             hash[TemplateTag.SettingsKey] = _settings;
 
+            if (!hash.ContainsKey("ToolchainVersion"))
+                hash["ToolchainVersion"] = JsonSchema4.ToolchainVersion;
+
             return template.Render(new RenderParameters
             {
                 LocalVariables = hash,

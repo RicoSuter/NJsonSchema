@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration
     {
         public static Hash FromObject(object obj)
         {
-            return FromObject(obj, new Dictionary<object, Hash>());
+            return obj != null ? FromObject(obj, new Dictionary<object, Hash>()) : new Hash();
         }
 
         private static Hash FromObject(object obj, Dictionary<object, Hash> cache)

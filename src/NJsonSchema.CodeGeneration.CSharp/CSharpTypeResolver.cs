@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NJsonSchema.CodeGeneration.CSharp.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -92,28 +91,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
             {
-                results.Add(new CodeArtifact
+                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
                 {
-                    Type = CodeArtifactType.Class,
-                    Language = CodeArtifactLanguage.CSharp,
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", null);
+                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
 
-                    TypeName = "JsonInheritanceConverter",
-                    Code = Settings.TemplateFactory.CreateTemplate(
-                        "CSharp", "JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings)).Render()
-                });
+                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
+                {
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", null);
+                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
             }
 
             if (collection.Artifacts.Any(r => r.Code.Contains("DateFormatConverter")))
             {
-                results.Add(new CodeArtifact
+                if (Settings.ExcludedTypeNames?.Contains("DateFormatConverter") != true)
                 {
-                    Type = CodeArtifactType.Class,
-                    Language = CodeArtifactLanguage.CSharp,
-
-                    TypeName = "DateFormatConverter",
-                    Code = Settings.TemplateFactory.CreateTemplate(
-                        "CSharp", "DateFormatConverter", new DateFormatConverterTemplateModel(Settings)).Render()
-                });
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", null);
+                    results.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
             }
 
             return new CodeArtifactCollection(collection.Artifacts.Concat(results));

@@ -15,9 +15,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+    #line 1 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceAttributeTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
-    internal partial class JsonInheritanceConverterTemplate : JsonInheritanceConverterTemplateBase
+    internal partial class JsonInheritanceAttributeTemplate : JsonInheritanceAttributeTemplateBase
     {
 #line hidden
         /// <summary>
@@ -27,47 +27,25 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
         {
             this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
             
-            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceConverterTemplate.tt"
+            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\JsonInheritanceAttributeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
             #line hidden
-            this.Write("\")]\r\ninternal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter\r\n{\r\n" +
-                    "    internal static readonly string DefaultDiscriminatorName = \"discriminator\";\r" +
-                    "\n\r\n    private readonly string _discriminator;\r\n\r\n    [System.ThreadStatic]\r\n   " +
-                    " private static bool _isReading;\r\n\r\n    [System.ThreadStatic]\r\n    private stati" +
-                    "c bool _isWriting;\r\n\r\n    public JsonInheritanceConverter()\r\n    {\r\n        _dis" +
-                    "criminator = DefaultDiscriminatorName;\r\n    }\r\n\r\n    public JsonInheritanceConve" +
-                    "rter(string discriminator)\r\n    {\r\n        _discriminator = discriminator;\r\n    " +
-                    "}\r\n\r\n    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, objec" +
-                    "t value, Newtonsoft.Json.JsonSerializer serializer)\r\n    {\r\n        try\r\n       " +
-                    " {\r\n            _isWriting = true;\r\n\r\n            var jObject = Newtonsoft.Json." +
-                    "Linq.JObject.FromObject(value, serializer);\r\n            jObject.AddFirst(new Ne" +
-                    "wtonsoft.Json.Linq.JProperty(_discriminator, value.GetType().Name));\r\n          " +
-                    "  writer.WriteToken(jObject.CreateReader());\r\n        }\r\n        finally\r\n      " +
-                    "  {\r\n            _isWriting = false;\r\n        }\r\n    }\r\n\r\n    public override bo" +
-                    "ol CanWrite\r\n    {\r\n        get\r\n        {\r\n            if (_isWriting)\r\n       " +
-                    "     {\r\n                _isWriting = false;\r\n                return false;\r\n    " +
-                    "        }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public override boo" +
-                    "l CanRead\r\n    {\r\n        get\r\n        {\r\n            if (_isReading)\r\n         " +
-                    "   {\r\n                _isReading = false;\r\n                return false;\r\n      " +
-                    "      }\r\n            return true;\r\n        }\r\n    }\r\n\r\n    public override bool " +
-                    "CanConvert(System.Type objectType)\r\n    {\r\n        return true;\r\n    }\r\n\r\n    pu" +
-                    "blic override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type obj" +
-                    "ectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)\r\n    {" +
-                    "\r\n        var jObject = serializer.Deserialize<Newtonsoft.Json.Linq.JObject>(rea" +
-                    "der);\r\n        if (jObject == null)\r\n            return null;\r\n\r\n        var dis" +
-                    "criminator = Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValue(_dis" +
-                    "criminator));\r\n        var subtype = GetObjectSubtype(objectType, discriminator)" +
-                    ";\r\n\r\n        try\r\n        {\r\n            _isReading = true;\r\n            return " +
-                    "serializer.Deserialize(jObject.CreateReader(), subtype);\r\n        }\r\n        fin" +
-                    "ally\r\n        {\r\n            _isReading = false;\r\n        }\r\n    }\r\n\r\n    privat" +
-                    "e System.Type GetObjectSubtype(System.Type objectType, string discriminator)\r\n  " +
-                    "  {\r\n        foreach (var type in System.Reflection.CustomAttributeExtensions.Ge" +
-                    "tCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExten" +
-                    "sions.GetTypeInfo(objectType), false))\r\n        {\r\n            if (type.Key == d" +
-                    "iscriminator)\r\n                return type.Type;\r\n        }\r\n\r\n        return ob" +
-                    "jectType;\r\n    }\r\n}");
+            this.Write(@""")]
+[System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
+internal class JsonInheritanceAttribute : System.Attribute
+{
+    public JsonInheritanceAttribute(string key, System.Type type)
+    {
+        Key = key;
+        Type = type;
+    }
+
+    public string Key { get; }
+
+    public System.Type Type { get; }
+}");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -79,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
-    internal class JsonInheritanceConverterTemplateBase
+    internal class JsonInheritanceAttributeTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

@@ -39,6 +39,7 @@
     <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
     <EmbeddedResource Include="Templates\Liquid\File.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceAttribute.liquid" />
     <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +65,10 @@
     <None Update="Templates\FileTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>FileTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\JsonInheritanceAttributeTemplate.tt">
+      <LastGenOutput>JsonInheritanceAttributeTemplate.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
     </None>
     <None Update="Templates\JsonInheritanceConverterTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
@@ -93,6 +98,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>FileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\JsonInheritanceAttributeTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>JsonInheritanceAttributeTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\JsonInheritanceConverterTemplate.cs">
       <DesignTime>True</DesignTime>
