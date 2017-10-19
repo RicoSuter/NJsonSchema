@@ -99,7 +99,7 @@ namespace NJsonSchema.CodeGeneration
                 var settings = (CodeGeneratorSettingsBase)hash[SettingsKey];
                 var template = settings.TemplateFactory.CreateTemplate(
                     (string)hash[LanguageKey],
-                    !string.IsNullOrEmpty(_template) ? (string)hash[TemplateKey] + "." + _template : (string)hash[TemplateKey] + "!",
+                    !string.IsNullOrEmpty(_template) ? _template : (string)hash[TemplateKey] + "!",
                     hash);
 
                 var output = template.Render();

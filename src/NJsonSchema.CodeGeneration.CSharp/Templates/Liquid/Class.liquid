@@ -8,7 +8,7 @@
 {%- endfor -%}
 {%- endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
-{% template Annotations %}
+{% template Class.Annotations %}
 {{ TypeAccessModifier }} partial class {{ClassName}} {{InheritanceCode}}
 {
 {%- if RenderInpc -%}
@@ -40,7 +40,7 @@
 {%-   if(property.IsDate -%}
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%-   endif -%}
-    {% template Property.Annotations %}
+    {% template Class.Property.Annotations %}
     public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}{% else %}
     {
         get { return {{ property.FieldName }}; }
@@ -69,11 +69,11 @@
     }
 
 {%- endif -%}
-    {% template ToJson %}
+    {% template Class.ToJson %}
     
-    {% template FromJson %}
+    {% template Class.FromJson %}
 {%- if RenderInpc -%}
 
-    {% template Inpc %}
+    {% template Class.Inpc %}
 {%- endif -%}
 }

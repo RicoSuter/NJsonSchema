@@ -42,6 +42,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HandleReferences => _settings.HandleReferences;
 
         /// <summary>Gets the reference handling code.</summary>
-        public string ReferenceHandlingCode => TypeScriptReferenceHandlingCodeGenerator.Generate();
+        public string ReferenceHandlingCode => TypeScriptReferenceHandlingCodeGenerator.Generate(); // TODO: Remove after T4 has been removed
     }
 }

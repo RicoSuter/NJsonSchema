@@ -26,6 +26,7 @@
     <None Remove="Templates\Liquid\ConvertToClass.Liquid" />
     <None Remove="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
     <None Remove="Templates\Liquid\Enum.liquid" />
+    <None Remove="Templates\Liquid\File.liquid" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\Liquid\Class.liquid">
@@ -34,6 +35,19 @@
     <EmbeddedResource Include="Templates\Liquid\ConvertToClass.Liquid" />
     <EmbeddedResource Include="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Interface.liquid">
+      <Generator></Generator>
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\KnockoutClass.liquid">
+      <Generator></Generator>
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\File.ReferenceHandling.liquid">
+      <Generator></Generator>
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
