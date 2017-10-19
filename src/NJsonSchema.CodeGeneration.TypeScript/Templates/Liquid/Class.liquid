@@ -79,7 +79,7 @@ export class {{ ClassName }}{{ Inheritance }} {
         }
     }
 
-    static fromJS(data: any{% if HandleReference %}, _mappings?: any{% endif %}): {{ ClassName }} {
+    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
 {%- if HandleReferences -%}
 {%-   if HasBaseDiscriminator -%}
 {%-       for derivedClass in DerivedClasses -%}

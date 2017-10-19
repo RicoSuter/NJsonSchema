@@ -31,7 +31,7 @@ namespace NJsonSchema.Visitors
             if (reference is JsonSchema4 schema)
                 return await VisitSchemaAsync(schema, path, typeNameHint);
 
-            return await VisitJsonReferenceAsync(reference, path, typeNameHint);
+            return reference;
         }
     }
 }
