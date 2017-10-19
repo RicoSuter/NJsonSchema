@@ -1,14 +1,14 @@
-﻿{%- if HasDescription -%}
+﻿{% if HasDescription -%}
 /// <summary>{{ Description | CSharpDocs }}</summary>
-{%- endif -%}
+{% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {{ TypeAccessModifier }} enum {{ Name }}
 {
-{%- for enum in Enums -%}
-{%-   if IsStringEnum -%}
+{% for enum in Enums -%}
+{%   if IsStringEnum -%}
     [System.Runtime.Serialization.EnumMember(Value = "{{ enum.Value }}")]
-{%-   endif -%}
+{%   endif -%}
     {{ enum.Name }} = {{ enum.InternalValue }},
 
-{%- endfor -%}
+{% endfor -%}
 }
