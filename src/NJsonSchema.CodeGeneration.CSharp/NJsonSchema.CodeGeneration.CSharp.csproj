@@ -31,17 +31,39 @@
     <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceAttribute.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Enum.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\File.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceAttribute.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
