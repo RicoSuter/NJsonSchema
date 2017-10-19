@@ -6,24 +6,24 @@
 
 {{ ExtensionCode.ImportCode }}
 
-{%- if HasModuleName -%}
+{% if HasModuleName -%}
 module {{ ModuleName }} {
-{%- endif -%}
-{%- if HasNamespace -%}
+{% endif -%}
+{% if HasNamespace -%}
 namespace <#=Model.Namespace#> {
-{%- endif -%}
+{% endif -%}
 {{ ExtensionCode.TopCode }}
 
 {{ Types }}
 
 {{ ExtensionCode.BottomCode }}
-{%- if HandleReferences -%}
+{% if HandleReferences -%}
 {% template File.ReferenceHandlingCode %}
-{%- endif -%}
+{% endif -%}
 
-{%- if HasNamespace -%}
+{% if HasNamespace -%}
 }
-{%- endif -%}
-{%- if HasModuleName -%}
+{% endif -%}
+{% if HasModuleName -%}
 }
-{%- endif -%}
+{% endif -%}

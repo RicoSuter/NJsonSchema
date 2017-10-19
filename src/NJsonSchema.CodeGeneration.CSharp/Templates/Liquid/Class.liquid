@@ -1,50 +1,50 @@
-﻿{%- if HasDescription -%}
+﻿{% if HasDescription -%}
 /// <summary>{{ Description | CSharpDocs }}</summary>
-{%- endif -%}
-{%- if HasDiscriminator -%}
+{% endif -%}
+{% if HasDiscriminator -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
-{%- for derivedClass in DerivedClasses -%}
+{% for derivedClass in DerivedClasses -%}
 [JsonInheritanceAttribute("{{ derivedClass.Key }}", typeof({{ derivedClass.Value }}))]
-{%- endfor -%}
-{%- endif -%}
+{% endfor -%}
+{% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} partial class {{ClassName}} {{InheritanceCode}}
 {
-{%- if RenderInpc -%}
-{%- for property in Properties -%}
+{% if RenderInpc -%}
+{% for property in Properties -%}
     private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
-{%- endfor -%}
+{% endfor -%}
 
-{%- endif -%}
-{%- for property in Properties -%}
-{%-   if property.HasDescription -%}
+{% endif -%}
+{% for property in Properties -%}
+{%   if property.HasDescription -%}
     /// <summary>{{ property.Description | CSharpDocs }}</summary>
-{%-   endif -%}
+{%   endif -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
-{%-   if property.RenderRequiredAttribute -%}
+{%   if property.RenderRequiredAttribute -%}
     [System.ComponentModel.DataAnnotations.Required]
-{%-   endif -%}
-{%-   if property.RenderRangeAttribute -%}
+{%   endif -%}
+{%   if property.RenderRangeAttribute -%}
     [System.ComponentModel.DataAnnotations.Range({{ property.RangeMinimumValue }}, {{ property.RangeMaximumValue }})]
-{%-   endif -%}
-{%-   if property.RenderStringLengthAttribute -%}
+{%   endif -%}
+{%   if property.RenderStringLengthAttribute -%}
     [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
-{%-   endif -%}
-{%-   if property.RenderRegularExpressionAttribute -%}
+{%   endif -%}
+{%   if property.RenderRegularExpressionAttribute -%}
     [System.ComponentModel.DataAnnotations.RegularExpression(@"{{ property.RegularExpressionValue }}")]
-{%-   endif -%}
-{%-   if(property.IsStringEnum -%}
+{%   endif -%}
+{%   if(property.IsStringEnum -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-{%-   endif -%}
-{%-   if(property.IsDate -%}
+{%   endif -%}
+{%   if(property.IsDate -%}
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-{%-   endif -%}
+{%   endif -%}
     {% template Class.Property.Annotations %}
     public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}{% else %}
     {
         get { return {{ property.FieldName }}; }
-{%-     if property.HasSetter -%}
+{%     if property.HasSetter -%}
         set 
         {
             if ({{ property.FieldName }} != value)
@@ -53,12 +53,13 @@
                 RaisePropertyChanged();
             }
         }
-{%-     endif -%}
+{%     endif -%}
     }
-{%-   endif -%}
+{%   endif -%}
 
-{%- endfor -%}
-{%- if HasAdditionalPropertiesType -%}
+
+{% endfor -%}
+{% if HasAdditionalPropertiesType -%}
     private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
 
     [Newtonsoft.Json.JsonExtensionData]
@@ -68,12 +69,12 @@
         set { _additionalProperties = value; }
     }
 
-{%- endif -%}
+{% endif -%}
     {% template Class.ToJson %}
     
     {% template Class.FromJson %}
-{%- if RenderInpc -%}
+{% if RenderInpc -%}
 
     {% template Class.Inpc %}
-{%- endif -%}
+{% endif -%}
 }
