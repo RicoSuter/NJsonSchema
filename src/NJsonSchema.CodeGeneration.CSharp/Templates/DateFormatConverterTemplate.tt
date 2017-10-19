@@ -1,5 +1,4 @@
 ﻿<#@ template visibility="internal" #>
-<#if(Model.GenerateDateFormatConverterClass){#>
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "<#=JsonSchema4.ToolchainVersion#>")]
 internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConverter
 {
@@ -8,4 +7,3 @@ internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConve
         DateTimeFormat = "yyyy-MM-dd";
     }
 }
-<#}#>

@@ -8,9 +8,9 @@
 
 namespace NJsonSchema.CodeGeneration.CSharp.Templates
 {
-    internal partial class JsonInheritanceConverterTemplate : ITemplate
+    internal partial class JsonInheritanceAttributeTemplate : ITemplate
     {
-        public JsonInheritanceConverterTemplate(object model)
+        public JsonInheritanceAttributeTemplate(object model)
         {
             Model = model;
         }

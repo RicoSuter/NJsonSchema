@@ -13,33 +13,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Arrange
             var classes = new List<CodeArtifact>
             {
-                new CodeArtifact
-                {
-                    TypeName = "Car"
-                },
-                new CodeArtifact
-                {
-                    TypeName = "Apple",
-                    BaseTypeName = "Fruit"
-                },
-                new CodeArtifact
-                {
-                    TypeName = "Professor",
-                    BaseTypeName = "Teacher"
-                },
-                new CodeArtifact
-                {
-                    TypeName = "Teacher",
-                    BaseTypeName = "Person"
-                },
-                new CodeArtifact
-                {
-                    TypeName = "Fruit"
-                },
-                new CodeArtifact
-                {
-                    TypeName = "Person"
-                }
+                new CodeArtifact("Car", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Apple", "Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Professor", "Teacher", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Teacher", "Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp)
             };
 
             //// Act

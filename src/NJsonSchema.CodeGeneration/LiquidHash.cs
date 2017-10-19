@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration
     {
         public static Hash FromObject(object obj)
         {
-            return FromObject(obj, new Dictionary<object, Hash>());
+            return obj != null ? FromObject(obj, new Dictionary<object, Hash>()) : new Hash();
         }
 
         private static Hash FromObject(object obj, Dictionary<object, Hash> cache)
@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration
                 return cache[obj];
 
             var hash = new Hash();
-            foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead))
+            foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetMethod.IsPublic))
             {
                 var value = property.GetValue(obj, null);
                 if (value is IEnumerable && !(value is string))

@@ -25,28 +25,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            
-            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\DateFormatConverterTemplate.tt"
-if(Model.GenerateDateFormatConverterClass){
-            
-            #line default
-            #line hidden
             this.Write("[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\", \"");
             
-            #line 3 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\DateFormatConverterTemplate.tt"
+            #line 2 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\DateFormatConverterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(JsonSchema4.ToolchainVersion));
             
             #line default
             #line hidden
             this.Write("\")]\r\ninternal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeC" +
                     "onverter\r\n{\r\n    public DateFormatConverter()\r\n    {\r\n        DateTimeFormat = \"" +
-                    "yyyy-MM-dd\";\r\n    }\r\n}\r\n");
-            
-            #line 11 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.CSharp\Templates\DateFormatConverterTemplate.tt"
-}
-            
-            #line default
-            #line hidden
+                    "yyyy-MM-dd\";\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

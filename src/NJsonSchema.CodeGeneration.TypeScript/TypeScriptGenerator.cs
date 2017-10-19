@@ -6,14 +6,14 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>The TypeScript interface and enum code generator. </summary>
-    public class TypeScriptGenerator : TypeGeneratorBase
+    public class TypeScriptGenerator : GeneratorBase
     {
-        private readonly JsonSchema4 _schema;
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
@@ -24,22 +24,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         /// <param name="settings">The generator settings.</param>
-        /// <param name="schema">The schema.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings)
-            : this(schema, settings, new TypeScriptTypeResolver(settings, schema), null)
+        public TypeScriptGenerator(object rootObject, TypeScriptGeneratorSettings settings)
+            : this(rootObject, settings, new TypeScriptTypeResolver(settings))
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator" /> class.</summary>
-        /// <param name="schema">The schema.</param>
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
-        public TypeScriptGenerator(JsonSchema4 schema, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver, object rootObject)
-            : base(schema, rootObject)
+        public TypeScriptGenerator(object rootObject, TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver)
+            : base(rootObject, resolver, settings)
         {
-            _schema = schema;
             _resolver = resolver;
             Settings = settings;
         }
@@ -47,18 +45,49 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets the generator settings.</summary>
         public TypeScriptGeneratorSettings Settings { get; }
 
-        /// <summary>Generates the file.</summary>
-        /// <param name="rootTypeNameHint">The root type name hint.</param>
-        /// <returns>The file contents.</returns>
-        public override string GenerateFile(string rootTypeNameHint)
+        /// <summary>Generates all types from the resolver with extension code from the settings.</summary>
+        /// <returns>The code.</returns>
+        public override CodeArtifactCollection GenerateTypes()
         {
-            _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
+            return GenerateTypes(new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses));
+        }
 
-            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+        /// <summary>Generates all types from the resolver with the given extension code.</summary>
+        /// <returns>The code.</returns>
+        public CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
+        {
+            var collection = base.GenerateTypes();
+
+            foreach (var artifact in collection.Artifacts)
+            {
+                if (extensionCode?.ExtensionClasses.ContainsKey(artifact.TypeName) == true)
+                {
+                    var classCode = artifact.Code;
+
+                    var index = classCode.IndexOf("constructor(", StringComparison.Ordinal);
+                    if (index != -1)
+                        artifact.Code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
+                    else
+                    {
+                        index = classCode.IndexOf("class", StringComparison.Ordinal);
+                        index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
+
+                        artifact.Code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
+                    }
+                }
+            }
+
+            return new CodeArtifactCollection(collection.Artifacts, extensionCode);
+        }
+        
+        /// <summary>Generates the file.</summary>
+        /// <returns>The file contents.</returns>
+        protected override string GenerateFile(CodeArtifactCollection artifactCollection)
+        {
             var model = new FileTemplateModel(Settings)
             {
-                Types = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate()),
-                ExtensionCode = extensionCode
+                Types = artifactCollection.Concatenate(),
+                ExtensionCode = (TypeScriptExtensionCode)artifactCollection.ExtensionCode
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File", model);
@@ -66,40 +95,29 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         }
 
         /// <summary>Generates the type.</summary>
+        /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The fallback type name.</param>
         /// <returns>The code.</returns>
-        public override CodeArtifact GenerateType(string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
         {
-            var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
+            var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
-            if (_schema.IsEnumeration)
+            if (schema.IsEnumeration)
             {
-                var model = new EnumTemplateModel(typeName, _schema, Settings);
+                var model = new EnumTemplateModel(typeName, schema, Settings);
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
-                return new CodeArtifact
-                {
-                    Type = CodeArtifactType.Enum,
-                    Language = CodeArtifactLanguage.TypeScript,
-
-                    TypeName = typeName,
-                    Code = template.Render()
-                };
+                return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, template);
             }
             else
             {
-                var model = new ClassTemplateModel(typeName, typeNameHint, Settings, _resolver, _schema, RootObject);
+                var model = new ClassTemplateModel(typeName, typeNameHint, Settings, _resolver, schema, RootObject);
                 var template = Settings.CreateTemplate(typeName, model);
-                return new CodeArtifact
-                {
-                    Type = Settings.TypeStyle == TypeScriptTypeStyle.Interface ? 
-                        CodeArtifactType.Interface : CodeArtifactType.Class,
-                    Language = CodeArtifactLanguage.TypeScript,
 
-                    TypeName = typeName,
-                    BaseTypeName = model.BaseClass,
+                var type = Settings.TypeStyle == TypeScriptTypeStyle.Interface
+                    ? CodeArtifactType.Interface
+                    : CodeArtifactType.Class;
 
-                    Code = template.Render()
-                };
+                return new CodeArtifact(typeName, model.BaseClass, type, CodeArtifactLanguage.TypeScript, template);
             }
         }
     }

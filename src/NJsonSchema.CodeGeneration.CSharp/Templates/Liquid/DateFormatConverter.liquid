@@ -1,5 +1,4 @@
-﻿{%- if GenerateDateFormatConverterClass -%}
-[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConverter
 {
     public DateFormatConverter()
@@ -7,4 +6,3 @@ internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConve
         DateTimeFormat = "yyyy-MM-dd";
     }
 }
-{%- endif -%}

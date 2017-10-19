@@ -6,10 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using NJsonSchema.Infrastructure;
+using System.Threading.Tasks;
+using NJsonSchema.Visitors;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -19,63 +18,33 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the derived schemas.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        /// <param name="typeResolver">The type resolver.</param>
         /// <returns></returns>
-        public static IDictionary<string, JsonSchema4> GetDerivedSchemas(this JsonSchema4 schema, object rootObject, ITypeResolver typeResolver)
+        public static IDictionary<JsonSchema4, string> GetDerivedSchemas(this JsonSchema4 schema, object rootObject)
         {
-            return FindAllSchemas(rootObject, typeResolver)
-                .Where(p => p.Value.Inherits(schema))
-                .ToDictionary(p => p.Key, p => p.Value);
+            var visitor = new DerivedSchemaVisitor(schema);
+            visitor.VisitAsync(rootObject).GetAwaiter().GetResult();
+            return visitor.DerivedSchemas;
         }
 
-        /// <summary>Finds all schema object in the given object.</summary>
-        /// <param name="root">The root object.</param>
-        /// <param name="typeResolver">The type resolver.</param>
-        /// <returns>The schemas.</returns>
-        public static IDictionary<string, JsonSchema4> FindAllSchemas(object root, ITypeResolver typeResolver)
+        private class DerivedSchemaVisitor : JsonSchemaVisitorBase
         {
-            var schemas = new Dictionary<string, JsonSchema4>();
-            FindAllSchemas(root, new HashSet<object>(), schemas, typeResolver, null);
-            return schemas;
-        }
+            private readonly JsonSchema4 _baseSchema;
 
-        private static void FindAllSchemas(object obj, HashSet<object> checkedObjects, Dictionary<string, JsonSchema4> schemas, ITypeResolver typeResolver, string typeNameHint)
-        {
-            if (obj == null || obj is string || checkedObjects.Contains(obj))
-                return;
+            public Dictionary<JsonSchema4, string> DerivedSchemas { get; } = new Dictionary<JsonSchema4, string>();
 
-            var schema = obj as JsonSchema4;
-            if (schema != null)
+            public DerivedSchemaVisitor(JsonSchema4 baseSchema)
             {
-                schema = schema.ActualSchema;
-
-                if (schema.Type.HasFlag(JsonObjectType.Object) && schemas.Values.All(s => s != schema))
-                {
-                    var typeName = typeResolver.GetOrGenerateTypeName(schema, typeNameHint);
-                    schemas.Add(typeName, schema);
-                }
+                _baseSchema = baseSchema;
             }
 
-            checkedObjects.Add(obj);
+#pragma warning disable 1998
+            protected override async Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint)
+#pragma warning restore 1998
+            {
+                if (schema.Inherits(_baseSchema) && _baseSchema != schema)
+                    DerivedSchemas.Add(schema, typeNameHint);
 
-            if (obj is IDictionary)
-            {
-                foreach (var key in ((IDictionary)obj).Keys)
-                    FindAllSchemas(((IDictionary)obj)[key], checkedObjects, schemas, typeResolver, key as string);
-            }
-            else if (obj is IEnumerable)
-            {
-                foreach (var item in (IEnumerable)obj)
-                    FindAllSchemas(item, checkedObjects, schemas, typeResolver, null);
-            }
-            else
-            {
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
-                {
-                    var value = member.GetValue(obj);
-                    if (value != null)
-                        FindAllSchemas(value, checkedObjects, schemas, typeResolver, member.MemberInfo.Name);
-                }
+                return schema;
             }
         }
     }

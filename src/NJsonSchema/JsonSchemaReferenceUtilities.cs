@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NJsonSchema.References;
+using NJsonSchema.Visitors;
 
 namespace NJsonSchema
 {
@@ -69,7 +70,7 @@ namespace NJsonSchema
                 p.Key.ReferencePath = result[p.Value];
         }
 
-        private class JsonReferenceUpdater : JsonSchemaVisitor
+        private class JsonReferenceUpdater : JsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
@@ -116,7 +117,7 @@ namespace NJsonSchema
             }
         }
 
-        private class JsonReferencePathUpdater : JsonSchemaVisitor
+        private class JsonReferencePathUpdater : JsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;

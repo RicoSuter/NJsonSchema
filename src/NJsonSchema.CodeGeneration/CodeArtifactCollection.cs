@@ -14,21 +14,26 @@ namespace NJsonSchema.CodeGeneration
     /// <summary></summary>
     public class CodeArtifactCollection
     {
-        /// <summary>Initializes a new instance of the <see cref="TypeResolverBase{TGenerator}" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
         /// <param name="artifacts">The artifacts.</param>
-        public CodeArtifactCollection(IEnumerable<CodeArtifact> artifacts)
+        /// <param name="extensionCode">The extension code.</param>
+        public CodeArtifactCollection(IEnumerable<CodeArtifact> artifacts, ExtensionCode extensionCode)
         {
             Artifacts = OrderByBaseDependency(artifacts);
+            ExtensionCode = extensionCode;
         }
-       
+
         /// <summary>Gets the artifacts.</summary>
         public IEnumerable<CodeArtifact> Artifacts { get; }
-     
+
+        /// <summary> Gets the extension code.</summary>
+        public ExtensionCode ExtensionCode { get; }
+
         /// <summary>Concatenates the results.</summary>
         /// <returns>The result.</returns>
         public string Concatenate()
         {
-            return string.Join("\n\n", Artifacts.Select(p => p.Code));
+            return ConversionUtilities.TrimWhiteSpaces(string.Join("\n\n", Artifacts.Select(p => p.Code)));
         }
 
         /// <summary>Reorders the results so that base classes are always before child classes.</summary>

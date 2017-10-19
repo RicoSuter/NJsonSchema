@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using DotLiquid;
 
@@ -35,8 +36,8 @@ namespace NJsonSchema.CodeGeneration
         {
             Template.RegisterTag<TemplateTag>("template");
 
-            var data = Regex.Replace(_data, "(\n(( )*?)\\{% template .*?) %}", m =>
-                m.Groups[1].Value + " " + m.Groups[2].Value.Length / 4 + " %}",
+            var data = Regex.Replace(_data, "(\n( )*?)\\{% (template .*?) %}", m =>
+                "\n{%- " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
                 RegexOptions.Singleline);
 
             var template = Template.Parse(data);
@@ -45,6 +46,9 @@ namespace NJsonSchema.CodeGeneration
             hash[TemplateTag.LanguageKey] = _language;
             hash[TemplateTag.TemplateKey] = _template;
             hash[TemplateTag.SettingsKey] = _settings;
+
+            if (!hash.ContainsKey("ToolchainVersion"))
+                hash["ToolchainVersion"] = JsonSchema4.ToolchainVersion;
 
             return template.Render(new RenderParameters
             {
@@ -74,13 +78,13 @@ namespace NJsonSchema.CodeGeneration
         public static string SettingsKey = "__settings";
 
         private string _template;
-        private int _tab;
+        private int _tabCount;
 
         public override void Initialize(string tagName, string markup, List<string> tokens)
         {
             var parts = markup.Trim().Split(' ');
             _template = parts[0];
-            _tab = parts.Length == 2 ? int.Parse(parts[1]) : 0;
+            _tabCount = parts.Length >= 2 ? int.Parse(parts[1]) : 0;
             base.Initialize(tagName, markup, tokens);
         }
 
@@ -98,7 +102,15 @@ namespace NJsonSchema.CodeGeneration
                     !string.IsNullOrEmpty(_template) ? (string)hash[TemplateKey] + "." + _template : (string)hash[TemplateKey] + "!",
                     hash);
 
-                result.Write(ConversionUtilities.Tab(template.Render(), _tab));
+                var output = template.Render();
+
+                if (string.IsNullOrEmpty(output))
+                    result.Write("");
+                else
+                {
+                    result.Write(string.Join("", Enumerable.Repeat("    ", _tabCount)) + 
+                        ConversionUtilities.Tab(output, _tabCount) + "\r\n");
+                }
             }
             catch (InvalidOperationException)
             {

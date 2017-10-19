@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
-    <Version>9.8.3</Version>
+    <Version>9.9.0</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -31,15 +31,39 @@
     <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid" />
+    <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\Enum.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\File.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceAttribute.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid">
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
@@ -64,6 +88,10 @@
     <None Update="Templates\FileTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>FileTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\JsonInheritanceAttributeTemplate.tt">
+      <LastGenOutput>JsonInheritanceAttributeTemplate.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
     </None>
     <None Update="Templates\JsonInheritanceConverterTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
@@ -93,6 +121,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>FileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\JsonInheritanceAttributeTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>JsonInheritanceAttributeTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\JsonInheritanceConverterTemplate.cs">
       <DesignTime>True</DesignTime>

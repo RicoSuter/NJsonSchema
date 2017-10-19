@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="JsonSchemaVisitor.cs" company="NJsonSchema">
+// <copyright file="JsonReferenceVisitorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -17,10 +17,10 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
-namespace NJsonSchema
+namespace NJsonSchema.Visitors
 {
     /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
-    public abstract class JsonSchemaVisitor
+    public abstract class JsonReferenceVisitorBase
     {
         private readonly string[] _jsonSchemaProperties = typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name).ToArray();
 
@@ -45,18 +45,18 @@ namespace NJsonSchema
                 return;
             checkedObjects.Add(obj);
 
+            if (obj is IJsonReference reference)
+            {
+                var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint);
+                if (newReference != reference)
+                {
+                    replacer(newReference);
+                    return;
+                }
+            }
+
             if (obj is JsonSchema4 schema)
             {
-                var newSchema = await VisitSchemaAsync(schema, path, typeNameHint);
-                if (newSchema != schema)
-                {
-                    replacer(newSchema);
-                    schema = newSchema;
-                }
-
-                if (schema == null)
-                    return;
-
                 if (schema.Reference != null)
                     await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema4)o);
 
@@ -160,31 +160,6 @@ namespace NJsonSchema
                     }
                 }
             }
-
-            if (obj is IJsonReference reference)
-            {
-                var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint);
-                if (newReference != reference)
-                {
-                    replacer(newReference);
-                    obj = newReference;
-                }
-
-                if (obj == null)
-                    return;
-            }
-        }
-
-        /// <summary>Called when a <see cref="JsonSchema4"/> is visited.</summary>
-        /// <param name="schema">The visited schema.</param>
-        /// <param name="path">The path.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The task.</returns>
-#pragma warning disable 1998
-        protected virtual async Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint)
-#pragma warning restore 1998
-        {
-            return schema;
         }
 
         /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
@@ -192,12 +167,7 @@ namespace NJsonSchema
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-#pragma warning disable 1998
-        protected virtual async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
-#pragma warning restore 1998
-        {
-            return reference;
-        }
+        protected abstract Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint);
 
         private void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
         {
