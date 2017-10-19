@@ -13,13 +13,13 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>Converts the default value to a language specific identifier.</summary>
     public abstract class ValueGeneratorBase
     {
-        private readonly ITypeResolver _typeResolver;
+        private readonly TypeResolverBase _typeResolver;
         private readonly IEnumNameGenerator _enumNameGenerator;
 
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="typeResolver">The type typeResolver.</param>
         /// <param name="enumNameGenerator">The enum name generator.</param>
-        protected ValueGeneratorBase(ITypeResolver typeResolver, IEnumNameGenerator enumNameGenerator)
+        protected ValueGeneratorBase(TypeResolverBase typeResolver, IEnumNameGenerator enumNameGenerator)
         {
             _typeResolver = typeResolver;
             _enumNameGenerator = enumNameGenerator;

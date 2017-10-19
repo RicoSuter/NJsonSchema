@@ -13,35 +13,32 @@ using NJsonSchema.CodeGeneration.CSharp.Models;
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The CSharp code generator.</summary>
-    public class CSharpGenerator : TypeGeneratorBase
+    public class CSharpGenerator : GeneratorBase
     {
-        private readonly JsonSchema4 _schema;
         private readonly CSharpTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
-        /// <param name="schema">The schema.</param>
-        public CSharpGenerator(JsonSchema4 schema)
-            : this(schema, new CSharpGeneratorSettings())
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
+        public CSharpGenerator(object rootObject)
+            : this(rootObject, new CSharpGeneratorSettings())
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
-        /// <param name="schema">The schema.</param>
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         /// <param name="settings">The generator settings.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings)
-            : this(schema, settings, new CSharpTypeResolver(settings, schema), null)
+        public CSharpGenerator(object rootObject, CSharpGeneratorSettings settings)
+            : this(rootObject, settings, new CSharpTypeResolver(settings))
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="CSharpGenerator"/> class.</summary>
-        /// <param name="schema">The schema.</param>
+        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
-        public CSharpGenerator(JsonSchema4 schema, CSharpGeneratorSettings settings, CSharpTypeResolver resolver, object rootObject) 
-            : base(schema, rootObject)
+        public CSharpGenerator(object rootObject, CSharpGeneratorSettings settings, CSharpTypeResolver resolver) 
+            : base(rootObject, resolver, settings)
         {
-            _schema = schema;
             _resolver = resolver;
             Settings = settings;
         }
@@ -49,17 +46,46 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets the generator settings.</summary>
         public CSharpGeneratorSettings Settings { get; }
 
-        /// <summary>Generates the file.</summary>
-        /// <param name="rootTypeNameHint">The root type name hint.</param>
-        /// <returns>The file contents.</returns>
-        public override string GenerateFile(string rootTypeNameHint)
+        /// <inheritdoc />
+        public override CodeArtifactCollection GenerateTypes()
         {
-            _resolver.Resolve(_schema, false, rootTypeNameHint); // register root type
+            var collection = base.GenerateTypes();
+            var results = new List<CodeArtifact>();
 
+            if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
+            {
+                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
+                {
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", null);
+                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
+
+                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
+                {
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", null);
+                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
+            }
+
+            if (collection.Artifacts.Any(r => r.Code.Contains("DateFormatConverter")))
+            {
+                if (Settings.ExcludedTypeNames?.Contains("DateFormatConverter") != true)
+                {
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", null);
+                    results.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                }
+            }
+
+            return new CodeArtifactCollection(collection.Artifacts.Concat(results), collection.ExtensionCode);
+        }
+
+        /// <inheritdoc />
+        protected override string GenerateFile(CodeArtifactCollection artifactCollection)
+        {
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                TypesCode = ConversionUtilities.TrimWhiteSpaces(_resolver.GenerateTypes().Concatenate())
+                TypesCode = artifactCollection.Concatenate()
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
@@ -67,21 +93,22 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <summary>Generates the type.</summary>
+        /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public override CodeArtifact GenerateType(string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
         {
-            var typeName = _resolver.GetOrGenerateTypeName(_schema, typeNameHint);
+            var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
-            if (_schema.IsEnumeration)
-                return GenerateEnum(typeName);
+            if (schema.IsEnumeration)
+                return GenerateEnum(schema, typeName);
             else
-                return GenerateClass(typeName);
+                return GenerateClass(schema, typeName);
         }
 
-        private CodeArtifact GenerateClass(string typeName)
+        private CodeArtifact GenerateClass(JsonSchema4 schema, string typeName)
         {
-            var model = new ClassTemplateModel(typeName, Settings, _resolver, _schema, RootObject);
+            var model = new ClassTemplateModel(typeName, Settings, _resolver, schema, RootObject);
 
             RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 
@@ -102,9 +129,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
         }
 
-        private CodeArtifact GenerateEnum(string typeName)
+        private CodeArtifact GenerateEnum(JsonSchema4 schema, string typeName)
         {
-            var model = new EnumTemplateModel(typeName, _schema, Settings);
+            var model = new EnumTemplateModel(typeName, schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
             return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, template);
         }

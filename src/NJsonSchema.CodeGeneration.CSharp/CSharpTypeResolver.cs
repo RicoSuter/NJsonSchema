@@ -6,23 +6,18 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
-    public class CSharpTypeResolver : TypeResolverBase<CSharpGenerator>
+    public class CSharpTypeResolver : TypeResolverBase
     {
-        private readonly object _rootObject;
-
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
-        /// <param name="rootObject">The root object to search for JSON Schemas.</param>
-        public CSharpTypeResolver(CSharpGeneratorSettings settings, object rootObject)
+        public CSharpTypeResolver(CSharpGeneratorSettings settings)
             : base(settings)
         {
-            _rootObject = rootObject;
             Settings = settings;
         }
 
@@ -73,74 +68,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
             }
 
-            return AddGenerator(schema, typeNameHint);
+            return GetOrGenerateTypeName(schema, typeNameHint);
         }
-
-        /// <inheritdoc />
-        public override CodeArtifactCollection GenerateTypes()
-        {
-            return GenerateTypes(null);
-        }
-
-        /// <summary>Generates the code for all described types (e.g. interfaces, classes, enums, etc).</summary>
-        /// <returns>The code.</returns>
-        public override CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
-        {
-            var collection = base.GenerateTypes(extensionCode);
-            var results = new List<CodeArtifact>();
-
-            if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
-            {
-                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
-                {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", null);
-                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
-                }
-
-                if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
-                {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", null);
-                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
-                }
-            }
-
-            if (collection.Artifacts.Any(r => r.Code.Contains("DateFormatConverter")))
-            {
-                if (Settings.ExcludedTypeNames?.Contains("DateFormatConverter") != true)
-                {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", null);
-                    results.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
-                }
-            }
-
-            return new CodeArtifactCollection(collection.Artifacts.Concat(results));
-        }
-
-        /// <summary>Adds a generator for the given schema if necessary.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The type name of the created generator.</returns>
-        protected override string AddGenerator(JsonSchema4 schema, string typeNameHint)
-        {
-            if (schema.IsEnumeration && schema.Type == JsonObjectType.Integer)
-            {
-                // Regenerate generator because it is be better than the current one (defined enum values)
-                var typeName = GetOrGenerateTypeName(schema, typeNameHint);
-                var generator = CreateTypeGenerator(schema);
-                AddOrReplaceTypeGenerator(typeName, generator);
-            }
-
-            return base.AddGenerator(schema, typeNameHint);
-        }
-
-        /// <summary>Creates a type generator.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <returns>The generator.</returns>
-        protected override CSharpGenerator CreateTypeGenerator(JsonSchema4 schema)
-        {
-            return new CSharpGenerator(schema, Settings, this, _rootObject);
-        }
-
+        
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Date)
@@ -166,7 +96,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 #pragma warning restore 618
 
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
+                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             return "string";
         }
@@ -179,7 +109,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         private string ResolveInteger(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
+                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             if (schema.Format == JsonFormatStrings.Byte)
                 return isNullable ? "byte?" : "byte";

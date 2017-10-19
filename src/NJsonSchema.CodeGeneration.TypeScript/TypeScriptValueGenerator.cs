@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings</param>
-        public TypeScriptValueGenerator(ITypeResolver typeResolver, TypeScriptGeneratorSettings settings) 
+        public TypeScriptValueGenerator(TypeResolverBase typeResolver, TypeScriptGeneratorSettings settings) 
             : base(typeResolver, settings.EnumNameGenerator)
         {
         }

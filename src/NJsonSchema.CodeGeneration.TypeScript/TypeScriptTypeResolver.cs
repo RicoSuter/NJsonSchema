@@ -12,22 +12,18 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>
-    public class TypeScriptTypeResolver : TypeResolverBase<TypeScriptGenerator>
+    public class TypeScriptTypeResolver : TypeResolverBase
     {
-        private readonly object _rootObject;
-
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="settings">The settings.</param>
-        /// <param name="rootObject">The root object to search for JSON Schemas.</param>
-        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings, object rootObject)
+        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
             : base(settings)
         {
-            _rootObject = rootObject;
             Settings = settings;
         }
 
         /// <summary>Gets the generator settings.</summary>
-        public TypeScriptGeneratorSettings Settings { get; private set; }
+        public TypeScriptGeneratorSettings Settings { get; }
 
         /// <summary>Gets or sets the namespace of the generated classes.</summary>
         public string Namespace { get; set; }
@@ -52,47 +48,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, false);
-        }
-
-        /// <summary>Creates a type generator.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <returns>The generator.</returns>
-        protected override TypeScriptGenerator CreateTypeGenerator(JsonSchema4 schema)
-        {
-            return new TypeScriptGenerator(schema, Settings, this, _rootObject);
-        }
-
-        /// <inheritdoc />
-        public override CodeArtifactCollection GenerateTypes()
-        {
-            var extensionCode = new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
-            return GenerateTypes(extensionCode);
-        }
-
-        /// <inheritdoc />
-        public override CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
-        {
-            var collection = base.GenerateTypes(extensionCode);
-            foreach (var artifact in collection.Artifacts)
-            {
-                if (extensionCode.ExtensionClasses.ContainsKey(artifact.TypeName) == true)
-                {
-                    var classCode = artifact.Code;
-
-                    var index = classCode.IndexOf("constructor(", StringComparison.Ordinal);
-                    if (index != -1)
-                        artifact.Code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
-                    else
-                    {
-                        index = classCode.IndexOf("class", StringComparison.Ordinal);
-                        index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
-
-                        artifact.Code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
-                    }
-                }
-            }
-
-            return collection;
         }
 
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
@@ -138,7 +93,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            return (addInterfacePrefix ? "I" : "") + AddGenerator(schema, typeNameHint);
+            return (addInterfacePrefix ? "I" : "") + GetOrGenerateTypeName(schema, typeNameHint);
         }
 
         private string ResolveString(JsonSchema4 schema, string typeNameHint)
@@ -174,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
 
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint);
+                return GetOrGenerateTypeName(schema, typeNameHint);
 
             return "string";
         }
@@ -182,7 +137,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
         {
             if (schema.IsEnumeration)
-                return AddGenerator(schema, typeNameHint);
+                return GetOrGenerateTypeName(schema, typeNameHint);
 
             return "number";
         }
