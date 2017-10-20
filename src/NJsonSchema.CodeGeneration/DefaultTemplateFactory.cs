@@ -30,13 +30,12 @@ namespace NJsonSchema.CodeGeneration
         }
 
         /// <summary>Creates a template for the given language, template name and template model.</summary>
-        /// <remarks>Supports NJsonSchema and NSwag embedded templates.</remarks>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <param name="model">The template model.</param>
         /// <returns>The template.</returns>
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
-        public virtual ITemplate CreateTemplate(string language, string template, object model)
+        public ITemplate CreateTemplate(string language, string template, object model)
         {
             var liquidTemplate = TryGetLiquidTemplate(language, template);
             if (liquidTemplate != null)
@@ -45,28 +44,11 @@ namespace NJsonSchema.CodeGeneration
                 return CreateT4Template(language, template, model);
         }
 
-        /// <summary>Tries to load a Liquid template.</summary>
+        /// <summary>Tries to load an embedded Liquid template.</summary>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
-        protected virtual string TryGetLiquidTemplate(string language, string template)
-        {
-            if (_settings.UseLiquidTemplates)
-            {
-                if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
-                {
-                    var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
-                    if (File.Exists(templateFilePath))
-                        return File.ReadAllText(templateFilePath);
-                }
-
-                return TryLoadEmbeddedLiquidTemplate(language, template.TrimEnd('!'));
-            }
-
-            return null;
-        }
-        
-        private string TryLoadEmbeddedLiquidTemplate(string language, string template)
+        protected virtual string TryLoadEmbeddedLiquidTemplate(string language, string template)
         {
             var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
@@ -81,8 +63,13 @@ namespace NJsonSchema.CodeGeneration
             return null;
         }
 
+        /// <summary>Creates a T4 template.</summary>
+        /// <param name="language">The language.</param>
+        /// <param name="template">The template name.</param>
+        /// <param name="model">The template model.</param>
+        /// <returns>The template.</returns>
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
-        private ITemplate CreateT4Template(string language, string template, object model)
+        protected virtual ITemplate CreateT4Template(string language, string template, object model)
         {
             var typeName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + "Template";
             var type = Type.GetType(typeName);
@@ -93,6 +80,23 @@ namespace NJsonSchema.CodeGeneration
                 return (ITemplate)Activator.CreateInstance(type, model);
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
+        }
+
+        private string TryGetLiquidTemplate(string language, string template)
+        {
+            if (_settings.UseLiquidTemplates)
+            {
+                if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
+                {
+                    var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
+                    if (File.Exists(templateFilePath))
+                        return File.ReadAllText(templateFilePath);
+                }
+
+                return TryLoadEmbeddedLiquidTemplate(language, template.TrimEnd('!'));
+            }
+
+            return null;
         }
 
         internal class LiquidTemplate : ITemplate
