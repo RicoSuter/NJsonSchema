@@ -8,8 +8,6 @@
 
 using System;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 
