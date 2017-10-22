@@ -535,7 +535,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.AreEqual(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}".Replace("\r", string.Empty), schema.Properties["Foo"].ActualPropertySchema.ToJson().Replace("\r", string.Empty));
+}".Replace("\r", string.Empty), schema.Properties["Foo"].ActualTypeSchema.ToJson().Replace("\r", string.Empty));
         }
 
         [TestMethod]

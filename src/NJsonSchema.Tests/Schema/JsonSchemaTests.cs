@@ -346,7 +346,7 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            var propertySchema = schema.Properties["topProp"].ActualPropertySchema;
+            var propertySchema = schema.Properties["topProp"].ActualTypeSchema;
         }
 
         [TestMethod]

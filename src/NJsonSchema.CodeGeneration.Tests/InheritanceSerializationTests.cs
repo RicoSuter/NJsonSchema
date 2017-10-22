@@ -204,7 +204,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schema = await JsonSchema4.FromTypeAsync<Container>();
 
             //// Act
-            var baseSchema = schema.Properties["Animal"].ActualPropertySchema.ActualSchema;
+            var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
             var discriminator = baseSchema.Discriminator;
             var property = baseSchema.Properties["discriminator"];
 

@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration
             if (schema.Default == null || !useSchemaDefault)
                 return null;
 
-            var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualPropertySchema : schema.ActualSchema;
+            var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint);
 

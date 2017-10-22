@@ -16,7 +16,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Car"].ActualPropertySchema.Properties["Person"].ActualPropertySchema);
+            Assert.AreEqual(schema, schema.Properties["Car"].ActualTypeSchema.Properties["Person"].ActualTypeSchema);
         }
 
         [TestMethod]
@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = await JsonSchema4.FromTypeAsync<Car>();
 
             //// Assert
-            Assert.AreEqual(schema, schema.Properties["Person"].ActualPropertySchema.Properties["Car"].ActualPropertySchema);
+            Assert.AreEqual(schema, schema.Properties["Person"].ActualTypeSchema.Properties["Car"].ActualTypeSchema);
         }
 
         [TestMethod]
