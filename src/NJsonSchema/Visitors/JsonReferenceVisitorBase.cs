@@ -32,6 +32,13 @@ namespace NJsonSchema.Visitors
             await VisitAsync(obj, "#", null, new HashSet<object>(), o => throw new NotSupportedException("Cannot replace the root."));
         }
 
+        /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
+        /// <param name="reference">The visited schema.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <returns>The task.</returns>
+        protected abstract Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint);
+
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
         /// <param name="path">The path</param>
@@ -119,6 +126,7 @@ namespace NJsonSchema.Visitors
                 // Reflection fallback
                 if (obj is IDictionary dictionary)
                 {
+                    await VisitPropertiesAsync(obj, path, checkedObjects);
                     foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
                         await VisitAsync(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
@@ -147,27 +155,26 @@ namespace NJsonSchema.Visitors
                 }
                 else
                 {
-                    foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
-                        p.MemberInfo is PropertyInfo &&
-                        (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
-                        p.CanRead &&
-                        p.IsIndexer == false &&
-                        p.CustomAttributes.JsonIgnoreAttribute == null))
-                    {
-                        var value = member.GetValue(obj);
-                        if (value != null)
-                            await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
-                    }
+                    await VisitPropertiesAsync(obj, path, checkedObjects);
                 }
             }
         }
 
-        /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
-        /// <param name="reference">The visited schema.</param>
-        /// <param name="path">The path.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <returns>The task.</returns>
-        protected abstract Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint);
+        private async Task VisitPropertiesAsync(object obj, string path, ISet<object> checkedObjects)
+        {
+            foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
+                p.MemberInfo is PropertyInfo &&
+                (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
+                (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
+                p.CanRead &&
+                p.IsIndexer == false &&
+                p.CustomAttributes.JsonIgnoreAttribute == null))
+            {
+                var value = member.GetValue(obj);
+                if (value != null)
+                    await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
+            }
+        }
 
         private void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
         {
