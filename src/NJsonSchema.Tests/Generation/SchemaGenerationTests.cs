@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(false, schema.Properties["Bar"].ActualPropertySchema.AllowAdditionalProperties);
+            Assert.AreEqual(false, schema.Properties["Bar"].ActualTypeSchema.AllowAdditionalProperties);
         }
 
         [TestMethod]

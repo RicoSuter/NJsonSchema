@@ -185,10 +185,10 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Color"];
 
             //// Assert
-            Assert.AreEqual(3, property.ActualPropertySchema.Enumeration.Count); // Color property has StringEnumConverter
-            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Red"));
-            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Green"));
-            Assert.IsTrue(property.ActualPropertySchema.Enumeration.Contains("Blue"));
+            Assert.AreEqual(3, property.ActualTypeSchema.Enumeration.Count); // Color property has StringEnumConverter
+            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Red"));
+            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Green"));
+            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Blue"));
         }
 
         public class ClassWithJObjectProperty
@@ -206,8 +206,8 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             Assert.IsTrue(property.IsNullable(SchemaType.JsonSchema));
-            Assert.IsTrue(property.ActualPropertySchema.IsAnyType);
-            Assert.IsTrue(property.ActualPropertySchema.AllowAdditionalItems);
+            Assert.IsTrue(property.ActualTypeSchema.IsAnyType);
+            Assert.IsTrue(property.ActualTypeSchema.AllowAdditionalItems);
             Assert.AreEqual(0, property.Properties.Count);
         }
 

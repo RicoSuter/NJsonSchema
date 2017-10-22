@@ -10,6 +10,7 @@ using DotLiquid;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -144,7 +145,7 @@ namespace NJsonSchema.CodeGeneration
                 }
 
                 var template = _templates[_data];
-                return template.Render(new RenderParameters
+                return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
                 {
                     LocalVariables = hash,
                     Filters = new[] { typeof(LiquidFilters) }
@@ -154,9 +155,9 @@ namespace NJsonSchema.CodeGeneration
 
         internal static class LiquidFilters
         {
-            public static string CSharpDocs(string input)
+            public static string CSharpDocs(string input, int tabCount)
             {
-                return ConversionUtilities.ConvertCSharpDocBreaks(input, 0);
+                return ConversionUtilities.ConvertCSharpDocBreaks(input, tabCount);
             }
 
             public static string Tab(Context context, string input, int tabCount)

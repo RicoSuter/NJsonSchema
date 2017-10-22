@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(json.Properties["Item"].ActualPropertySchema.AllOf.First().HasReference);
+            Assert.IsTrue(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
             Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]"));
             Assert.IsTrue(code.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]"));
         }
