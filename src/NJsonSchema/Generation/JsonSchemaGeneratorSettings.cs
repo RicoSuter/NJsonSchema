@@ -58,6 +58,10 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are 
+        /// defined on the object (otherwise allOf/oneOf with $ref is used, default: false).</summary>
+        public bool AllowReferencesWithProperties { get; set; }
+
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
 

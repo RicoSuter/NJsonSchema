@@ -250,11 +250,11 @@ namespace NJsonSchema.Generation
             if (isNullable && Settings.SchemaType != SchemaType.Swagger2)
                 referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
 
-            var hasNoProperties = !JsonConvert.DeserializeObject<JObject>(
-                JsonConvert.SerializeObject(referencingSchema))
-                .Properties().Any(); // TODO: Improve performance
+            // See https://github.com/RSuter/NJsonSchema/issues/531
+            var useDirectReference = Settings.AllowReferencesWithProperties || 
+                !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema)).Properties().Any(); // TODO: Improve performance
 
-            if (hasNoProperties && referencingSchema.OneOf.Count == 0)
+            if (useDirectReference && referencingSchema.OneOf.Count == 0)
             {
                 referencingSchema.Reference = referencedSchema.ActualSchema;
             }
