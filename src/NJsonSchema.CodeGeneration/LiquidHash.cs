@@ -22,8 +22,8 @@ namespace NJsonSchema.CodeGeneration
         public LiquidProxyHash(object obj)
         {
             _obj = obj;
-            _properties = obj.GetType().GetRuntimeProperties()
-                .ToDictionary(p => p.Name, p => p);
+            _properties = obj?.GetType().GetRuntimeProperties()
+                .ToDictionary(p => p.Name, p => p) ?? new Dictionary<string, PropertyInfo>();
         }
 
         public override bool Contains(object key)
