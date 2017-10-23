@@ -24,32 +24,68 @@ namespace NJsonSchema.CodeGeneration
         private static Hash FromObject(object obj, Dictionary<object, Hash> cache)
         {
             if (cache == null)
+            {
                 cache = new Dictionary<object, Hash>();
+            }
 
             if (cache.ContainsKey(obj))
+            {
                 return cache[obj];
+            }
 
             var hash = new Hash();
             foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetMethod.IsPublic))
             {
                 var value = property.GetValue(obj, null);
-                if (value is IEnumerable && !(value is string))
+                if (IsObject(value))
                 {
-                    var list = new List<Hash>();
-                    foreach (var item in (IEnumerable)value)
+                    if (value is IDictionary dictionary)
                     {
-                        list.Add(FromObject(item, cache));
+                        var list = new List<Hash>();
+                        foreach (var key in dictionary.Keys)
+                        {
+                            var pair = new Hash();
+                            pair["Key"] = key;
+                            pair["Value"] = dictionary[key];
+                            list.Add(pair);
+                        }
+
+                        hash[property.Name] = list;
                     }
-                    hash[property.Name] = list;
+                    else if (value is IEnumerable enumerable)
+                    {
+                        if (enumerable.OfType<object>().Any(i => !IsObject(i)))
+                        {
+                            hash[property.Name] = enumerable;
+                        }
+                        else
+                        {
+                            var list = new List<Hash>();
+                            foreach (var item in enumerable)
+                            {
+                                list.Add(FromObject(item, cache));
+                            }
+                            hash[property.Name] = list;
+                        }
+                    }
+                    else
+                    {
+                        hash[property.Name] = FromObject(value, cache);
+                    }
                 }
-                else if (value != null && property.PropertyType.GetTypeInfo().IsClass && !(value is string))
-                    hash[property.Name] = FromObject(value, cache);
                 else
+                {
                     hash[property.Name] = value;
+                }
             }
 
             cache[obj] = hash;
             return hash;
+        }
+
+        private static bool IsObject(object value)
+        {
+            return value != null && value.GetType().GetTypeInfo().IsClass && !(value is string);
         }
     }
 }
