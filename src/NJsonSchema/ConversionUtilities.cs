@@ -130,7 +130,7 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string Tab(string input, int tabCount)
         {
-            return input.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)));
+            return input?.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount))) ?? string.Empty;
         }
 
         /// <summary>Converts all line breaks in a string into '\n' and removes white spaces.</summary>
@@ -139,7 +139,7 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string ConvertCSharpDocBreaks(string input, int tabCount)
         {
-            return input.Replace("\r", string.Empty).Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ");
+            return input?.Replace("\r", string.Empty).Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ") ?? string.Empty;
         }
 
         private static string ConvertDashesToCamelCase(string input)
