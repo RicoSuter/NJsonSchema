@@ -14,73 +14,66 @@ using DotLiquid;
 
 namespace NJsonSchema.CodeGeneration
 {
-    internal class LiquidHash
+    internal class LiquidProxyHash : Hash
     {
-        public static Hash FromObject(object obj)
+        private readonly object _obj;
+        private readonly IDictionary<string, PropertyInfo> _properties;
+
+        public LiquidProxyHash(object obj)
         {
-            return obj != null ? FromObject(obj, new Dictionary<object, Hash>()) : new Hash();
+            _obj = obj;
+            _properties = obj?.GetType().GetRuntimeProperties()
+                .ToDictionary(p => p.Name, p => p) ?? new Dictionary<string, PropertyInfo>();
         }
 
-        private static Hash FromObject(object obj, Dictionary<object, Hash> cache)
+        public override bool Contains(object key)
         {
-            if (cache == null)
-            {
-                cache = new Dictionary<object, Hash>();
-            }
+            return _properties.ContainsKey(key.ToString()) || base.Contains(key);
+        }
 
-            if (cache.ContainsKey(obj))
+        protected override object GetValue(string key)
+        {
+            if (_properties.ContainsKey(key))
             {
-                return cache[obj];
-            }
-
-            var hash = new Hash();
-            foreach (var property in obj.GetType().GetRuntimeProperties().Where(p => p.CanRead && p.GetMethod.IsPublic))
-            {
-                var value = property.GetValue(obj, null);
+                var value = _properties[key].GetValue(_obj);
                 if (IsObject(value))
                 {
                     if (value is IDictionary dictionary)
                     {
                         var list = new List<Hash>();
-                        foreach (var key in dictionary.Keys)
+                        foreach (var k in dictionary.Keys)
                         {
+                            var v = dictionary[k];
                             var pair = new Hash();
-                            pair["Key"] = key;
-                            pair["Value"] = dictionary[key];
+                            pair["Key"] = k;
+                            pair["Value"] = IsObject(v) ? new LiquidProxyHash(v) : v;
                             list.Add(pair);
                         }
-
-                        hash[property.Name] = list;
+                        return list;
                     }
                     else if (value is IEnumerable enumerable)
                     {
                         if (enumerable.OfType<object>().Any(i => !IsObject(i)))
                         {
-                            hash[property.Name] = enumerable;
+                            var list = new List<object>();
+                            foreach (var item in enumerable)
+                                list.Add(item);
+                            return list;
                         }
                         else
                         {
-                            var list = new List<Hash>();
+                            var list = new List<LiquidProxyHash>();
                             foreach (var item in enumerable)
-                            {
-                                list.Add(FromObject(item, cache));
-                            }
-                            hash[property.Name] = list;
+                                list.Add(new LiquidProxyHash(item));
+                            return list;
                         }
                     }
                     else
-                    {
-                        hash[property.Name] = FromObject(value, cache);
-                    }
+                        return new LiquidProxyHash(value);
                 }
-                else
-                {
-                    hash[property.Name] = value;
-                }
+                return value;
             }
-
-            cache[obj] = hash;
-            return hash;
+            return base.GetValue(key);
         }
 
         private static bool IsObject(object value)

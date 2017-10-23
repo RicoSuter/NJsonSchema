@@ -137,7 +137,7 @@ namespace NJsonSchema.CodeGeneration
             public string Render()
             {
 
-                var hash = _model is Hash ? (Hash)_model : LiquidHash.FromObject(_model);
+                var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
                 hash[TemplateTag.LanguageKey] = _language;
                 hash[TemplateTag.TemplateKey] = _template;
                 hash[TemplateTag.SettingsKey] = _settings;
