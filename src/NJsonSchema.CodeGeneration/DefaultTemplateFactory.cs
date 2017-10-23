@@ -40,9 +40,16 @@ namespace NJsonSchema.CodeGeneration
         {
             var liquidTemplate = TryGetLiquidTemplate(language, template);
             if (liquidTemplate != null)
-                return new LiquidTemplate(language, template, liquidTemplate, model, _settings);
+                return new LiquidTemplate(language, template, liquidTemplate, model, GetToolchainVersion(), _settings);
             else
                 return CreateT4Template(language, template, model);
+        }
+
+        /// <summary>Gets the current toolchain version.</summary>
+        /// <returns>The toolchain version.</returns>
+        protected virtual string GetToolchainVersion()
+        {
+            return JsonSchema4.ToolchainVersion;
         }
 
         /// <summary>Tries to load an embedded Liquid template.</summary>
@@ -102,25 +109,28 @@ namespace NJsonSchema.CodeGeneration
 
         internal class LiquidTemplate : ITemplate
         {
+            private const string TemplateTagName = "__njs_template";
             private readonly static ConcurrentDictionary<string, Template> _templates = new ConcurrentDictionary<string, Template>();
 
             static LiquidTemplate()
             {
-                Template.RegisterTag<TemplateTag>("__njs_template");
+                Template.RegisterTag<TemplateTag>(TemplateTagName);
             }
 
             private readonly string _language;
             private readonly string _template;
             private readonly string _data;
             private readonly object _model;
+            private readonly string _toolchainVersion;
             private readonly CodeGeneratorSettingsBase _settings;
 
-            public LiquidTemplate(string language, string template, string data, object model, CodeGeneratorSettingsBase settings)
+            public LiquidTemplate(string language, string template, string data, object model, string toolchainVersion, CodeGeneratorSettingsBase settings)
             {
                 _language = language;
                 _template = template;
                 _data = data;
                 _model = model;
+                _toolchainVersion = toolchainVersion;
                 _settings = settings;
             }
 
@@ -131,14 +141,12 @@ namespace NJsonSchema.CodeGeneration
                 hash[TemplateTag.LanguageKey] = _language;
                 hash[TemplateTag.TemplateKey] = _template;
                 hash[TemplateTag.SettingsKey] = _settings;
-
-                if (!hash.ContainsKey("ToolchainVersion"))
-                    hash["ToolchainVersion"] = JsonSchema4.ToolchainVersion;
+                hash["ToolchainVersion"] = _toolchainVersion;
 
                 if (!_templates.ContainsKey(_data))
                 {
                     var data = Regex.Replace(_data, "(\n( )*?)\\{% template (.*?) %}", m =>
-                        "\n{%- __njs_template " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                        "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
                         RegexOptions.Singleline);
 
                     _templates[_data] = Template.Parse(data);
