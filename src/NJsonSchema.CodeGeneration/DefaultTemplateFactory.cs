@@ -202,7 +202,7 @@ namespace NJsonSchema.CodeGeneration
                     var templateName = !string.IsNullOrEmpty(_template) ? _template : (string)rootContext[TemplateKey] + "!";
 
                     var template = settings.TemplateFactory.CreateTemplate(language, templateName, model);
-                    var output = template.Render();
+                    var output = template.Render().Trim();
 
                     if (string.IsNullOrEmpty(output))
                         result.Write("");
