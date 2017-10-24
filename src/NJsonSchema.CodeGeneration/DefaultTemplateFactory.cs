@@ -194,14 +194,12 @@ namespace NJsonSchema.CodeGeneration
             {
                 try
                 {
-                    var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
-                    foreach (var environment in context.Environments.Skip(1))
-                        model.Merge(environment);
-                    
-                    var root = context.Environments[0];
-                    var settings = (CodeGeneratorSettingsBase)root[SettingsKey];
-                    var language = (string)root[LanguageKey];
-                    var templateName = !string.IsNullOrEmpty(_template) ? _template : (string)root[TemplateKey] + "!";
+                    var model = CreateModelWithParentContext(context);
+
+                    var rootContext = context.Environments[0];
+                    var settings = (CodeGeneratorSettingsBase)rootContext[SettingsKey];
+                    var language = (string)rootContext[LanguageKey];
+                    var templateName = !string.IsNullOrEmpty(_template) ? _template : (string)rootContext[TemplateKey] + "!";
 
                     var template = settings.TemplateFactory.CreateTemplate(language, templateName, model);
                     var output = template.Render();
@@ -217,6 +215,17 @@ namespace NJsonSchema.CodeGeneration
                 catch (InvalidOperationException)
                 {
                 }
+            }
+
+            private LiquidProxyHash CreateModelWithParentContext(Context context)
+            {
+                var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
+                model.Merge(context.Registers);
+                foreach (var environment in context.Environments.Skip(1))
+                    model.Merge(environment);
+                foreach (var scope in context.Scopes)
+                    model.Merge(scope);
+                return model;
             }
         }
     }
