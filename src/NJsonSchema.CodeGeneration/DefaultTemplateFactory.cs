@@ -136,7 +136,6 @@ namespace NJsonSchema.CodeGeneration
 
             public string Render()
             {
-
                 var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
                 hash[TemplateTag.LanguageKey] = _language;
                 hash[TemplateTag.TemplateKey] = _template;
@@ -195,16 +194,14 @@ namespace NJsonSchema.CodeGeneration
             {
                 try
                 {
-                    var hash = new Hash();
-                    foreach (var environment in context.Environments)
-                        hash.Merge(environment);
+                    var model = CreateModelWithParentContext(context);
 
-                    var settings = (CodeGeneratorSettingsBase)hash[SettingsKey];
-                    var template = settings.TemplateFactory.CreateTemplate(
-                        (string)hash[LanguageKey],
-                        !string.IsNullOrEmpty(_template) ? _template : (string)hash[TemplateKey] + "!",
-                        hash);
+                    var rootContext = context.Environments[0];
+                    var settings = (CodeGeneratorSettingsBase)rootContext[SettingsKey];
+                    var language = (string)rootContext[LanguageKey];
+                    var templateName = !string.IsNullOrEmpty(_template) ? _template : (string)rootContext[TemplateKey] + "!";
 
+                    var template = settings.TemplateFactory.CreateTemplate(language, templateName, model);
                     var output = template.Render();
 
                     if (string.IsNullOrEmpty(output))
@@ -218,6 +215,17 @@ namespace NJsonSchema.CodeGeneration
                 catch (InvalidOperationException)
                 {
                 }
+            }
+
+            private LiquidProxyHash CreateModelWithParentContext(Context context)
+            {
+                var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
+                model.Merge(context.Registers);
+                foreach (var environment in context.Environments.Skip(1))
+                    model.Merge(environment);
+                foreach (var scope in context.Scopes)
+                    model.Merge(scope);
+                return model;
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="LiquidHash.cs" company="NJsonSchema">
+// <copyright file="LiquidProxyHash.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -16,15 +16,17 @@ namespace NJsonSchema.CodeGeneration
 {
     internal class LiquidProxyHash : Hash
     {
-        private readonly object _obj;
         private readonly IDictionary<string, PropertyInfo> _properties;
 
         public LiquidProxyHash(object obj)
         {
-            _obj = obj;
+            Object = obj;
             _properties = obj?.GetType().GetRuntimeProperties()
-                .ToDictionary(p => p.Name, p => p) ?? new Dictionary<string, PropertyInfo>();
+                .ToDictionary(p => p.Name, p => p) ?? 
+                    new Dictionary<string, PropertyInfo>();
         }
+
+        public object Object { get; }
 
         public override bool Contains(object key)
         {
@@ -35,7 +37,7 @@ namespace NJsonSchema.CodeGeneration
         {
             if (_properties.ContainsKey(key))
             {
-                var value = _properties[key].GetValue(_obj);
+                var value = _properties[key].GetValue(Object);
                 if (IsObject(value))
                 {
                     if (value is IDictionary dictionary)
@@ -73,7 +75,8 @@ namespace NJsonSchema.CodeGeneration
                 }
                 return value;
             }
-            return base.GetValue(key);
+            else
+                return base.GetValue(key);
         }
 
         private static bool IsObject(object value)
