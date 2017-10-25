@@ -144,9 +144,9 @@ namespace NJsonSchema.CodeGeneration
 
                 if (!_templates.ContainsKey(_data))
                 {
-                    var data = Regex.Replace(_data, "(\n( )*?)\\{% template (.*?) %}", m =>
+                    var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
                         "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
-                        RegexOptions.Singleline);
+                        RegexOptions.Singleline).Trim();
 
                     _templates[_data] = Template.Parse(data);
                 }
