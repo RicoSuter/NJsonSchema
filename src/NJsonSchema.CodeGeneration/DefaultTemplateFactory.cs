@@ -144,7 +144,7 @@ namespace NJsonSchema.CodeGeneration
                 {
                     LocalVariables = hash,
                     Filters = new[] { typeof(LiquidFilters) }
-                });
+                }).Replace("\r", "").Trim();
             }
         }
 
