@@ -54,10 +54,10 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
         public bool IsStringEnumArray =>
-            _property.ActualPropertySchema.IsArray &&
-            _property.ActualPropertySchema.Item != null &&
-            _property.ActualPropertySchema.Item.ActualSchema.IsEnumeration &&
-            _property.ActualPropertySchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
+            _property.ActualTypeSchema.IsArray &&
+            _property.ActualTypeSchema.Item != null &&
+            _property.ActualTypeSchema.Item.ActualSchema.IsEnumeration &&
+            _property.ActualTypeSchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()

@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name => _property.Name;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
@@ -49,8 +49,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
         public bool HasSetter => 
             (_property.IsNullable(_settings.SchemaType) == false && (
-                (_property.ActualPropertySchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
-                (_property.ActualPropertySchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
+                (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
+                (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
 
         /// <summary>Gets the json property required.</summary>
@@ -83,10 +83,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.SchemaType))
                     return false;
 
-                return _property.ActualPropertySchema.IsAnyType ||
-                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Object) ||
-                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) ||
-                       _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Array);
+                return _property.ActualTypeSchema.IsAnyType ||
+                       _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Object) ||
+                       _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) ||
+                       _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array);
             }
         }
 
@@ -98,7 +98,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (!_settings.GenerateDataAnnotations)
                     return false;
 
-                if (!_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualPropertySchema.Type.HasFlag(JsonObjectType.Integer))
+                if (!_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer))
                     return false;
 
                 return _property.Maximum.HasValue || _property.Minimum.HasValue;
@@ -153,7 +153,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (!_settings.GenerateDataAnnotations)
                     return false;
 
-                return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
                        (_property.MinLength.HasValue || _property.MaxLength.HasValue);
             }
         }
@@ -172,7 +172,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (!_settings.GenerateDataAnnotations)
                     return false;
 
-                return _property.ActualPropertySchema.Type.HasFlag(JsonObjectType.String) &&
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
                        !string.IsNullOrEmpty(_property.Pattern);
             }
         }
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string RegularExpressionValue => _property.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
-        public bool IsStringEnum => _property.ActualPropertySchema.IsEnumeration && _property.ActualPropertySchema.Type == JsonObjectType.String;
+        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type == JsonObjectType.String;
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.Format == JsonFormatStrings.Date;

@@ -10,6 +10,7 @@ using DotLiquid;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,26 +31,66 @@ namespace NJsonSchema.CodeGeneration
         }
 
         /// <summary>Creates a template for the given language, template name and template model.</summary>
-        /// <remarks>Supports NJsonSchema and NSwag embedded templates.</remarks>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <param name="model">The template model.</param>
         /// <returns>The template.</returns>
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
-        public virtual ITemplate CreateTemplate(string language, string template, object model)
+        public ITemplate CreateTemplate(string language, string template, object model)
         {
             var liquidTemplate = TryGetLiquidTemplate(language, template);
             if (liquidTemplate != null)
-                return new LiquidTemplate(language, template, liquidTemplate, model, _settings);
+                return new LiquidTemplate(language, template, liquidTemplate, model, GetToolchainVersion(), _settings);
             else
                 return CreateT4Template(language, template, model);
         }
 
-        /// <summary>Tries to load a Liquid template.</summary>
+        /// <summary>Gets the current toolchain version.</summary>
+        /// <returns>The toolchain version.</returns>
+        protected virtual string GetToolchainVersion()
+        {
+            return JsonSchema4.ToolchainVersion;
+        }
+
+        /// <summary>Tries to load an embedded Liquid template.</summary>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
-        protected virtual string TryGetLiquidTemplate(string language, string template)
+        protected virtual string TryLoadEmbeddedLiquidTemplate(string language, string template)
+        {
+            var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
+            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
+
+            var resource = assembly.GetManifestResourceStream(resourceName);
+            if (resource != null)
+            {
+                using (var reader = new StreamReader(resource))
+                    return reader.ReadToEnd();
+            }
+
+            return null;
+        }
+
+        /// <summary>Creates a T4 template.</summary>
+        /// <param name="language">The language.</param>
+        /// <param name="template">The template name.</param>
+        /// <param name="model">The template model.</param>
+        /// <returns>The template.</returns>
+        /// <exception cref="InvalidOperationException">Could not load template..</exception>
+        protected virtual ITemplate CreateT4Template(string language, string template, object model)
+        {
+            var typeName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + "Template";
+            var type = Type.GetType(typeName);
+            if (type == null)
+                type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language))?.GetType(typeName);
+
+            if (type != null)
+                return (ITemplate)Activator.CreateInstance(type, model);
+
+            throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
+        }
+
+        private string TryGetLiquidTemplate(string language, string template)
         {
             if (_settings.UseLiquidTemplates)
             {
@@ -65,82 +106,53 @@ namespace NJsonSchema.CodeGeneration
 
             return null;
         }
-        
-        private string TryLoadEmbeddedLiquidTemplate(string language, string template)
-        {
-            var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
-            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
-
-            var resource = assembly.GetManifestResourceStream(resourceName);
-            if (resource != null)
-            {
-                using (var reader = new StreamReader(resource))
-                    return reader.ReadToEnd();
-            }
-
-            return null;
-        }
-
-        /// <exception cref="InvalidOperationException">Could not load template..</exception>
-        private ITemplate CreateT4Template(string language, string template, object model)
-        {
-            var typeName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + "Template";
-            var type = Type.GetType(typeName);
-            if (type == null)
-                type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language))?.GetType(typeName);
-
-            if (type != null)
-                return (ITemplate)Activator.CreateInstance(type, model);
-
-            throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
-        }
 
         internal class LiquidTemplate : ITemplate
         {
+            private const string TemplateTagName = "__njs_template";
             private readonly static ConcurrentDictionary<string, Template> _templates = new ConcurrentDictionary<string, Template>();
 
             static LiquidTemplate()
             {
-                Template.RegisterTag<TemplateTag>("__njs_template");
+                Template.RegisterTag<TemplateTag>(TemplateTagName);
             }
 
             private readonly string _language;
             private readonly string _template;
             private readonly string _data;
             private readonly object _model;
+            private readonly string _toolchainVersion;
             private readonly CodeGeneratorSettingsBase _settings;
 
-            public LiquidTemplate(string language, string template, string data, object model, CodeGeneratorSettingsBase settings)
+            public LiquidTemplate(string language, string template, string data, object model, string toolchainVersion, CodeGeneratorSettingsBase settings)
             {
                 _language = language;
                 _template = template;
                 _data = data;
                 _model = model;
+                _toolchainVersion = toolchainVersion;
                 _settings = settings;
             }
 
             public string Render()
             {
-
-                var hash = _model is Hash ? (Hash)_model : LiquidHash.FromObject(_model);
+                var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
                 hash[TemplateTag.LanguageKey] = _language;
                 hash[TemplateTag.TemplateKey] = _template;
                 hash[TemplateTag.SettingsKey] = _settings;
-
-                if (!hash.ContainsKey("ToolchainVersion"))
-                    hash["ToolchainVersion"] = JsonSchema4.ToolchainVersion;
+                hash["ToolchainVersion"] = _toolchainVersion;
 
                 if (!_templates.ContainsKey(_data))
                 {
                     var data = Regex.Replace(_data, "(\n( )*?)\\{% template (.*?) %}", m =>
-                        "\n{%- __njs_template " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                        "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
                         RegexOptions.Singleline);
 
                     _templates[_data] = Template.Parse(data);
                 }
 
                 var template = _templates[_data];
-                return template.Render(new RenderParameters
+                return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
                 {
                     LocalVariables = hash,
                     Filters = new[] { typeof(LiquidFilters) }
@@ -150,9 +162,9 @@ namespace NJsonSchema.CodeGeneration
 
         internal static class LiquidFilters
         {
-            public static string CSharpDocs(string input)
+            public static string CSharpDocs(string input, int tabCount)
             {
-                return ConversionUtilities.ConvertCSharpDocBreaks(input, 0);
+                return ConversionUtilities.ConvertCSharpDocBreaks(input, tabCount);
             }
 
             public static string Tab(Context context, string input, int tabCount)
@@ -182,17 +194,15 @@ namespace NJsonSchema.CodeGeneration
             {
                 try
                 {
-                    var hash = new Hash();
-                    foreach (var environment in context.Environments)
-                        hash.Merge(environment);
+                    var model = CreateModelWithParentContext(context);
 
-                    var settings = (CodeGeneratorSettingsBase)hash[SettingsKey];
-                    var template = settings.TemplateFactory.CreateTemplate(
-                        (string)hash[LanguageKey],
-                        !string.IsNullOrEmpty(_template) ? _template : (string)hash[TemplateKey] + "!",
-                        hash);
+                    var rootContext = context.Environments[0];
+                    var settings = (CodeGeneratorSettingsBase)rootContext[SettingsKey];
+                    var language = (string)rootContext[LanguageKey];
+                    var templateName = !string.IsNullOrEmpty(_template) ? _template : (string)rootContext[TemplateKey] + "!";
 
-                    var output = template.Render();
+                    var template = settings.TemplateFactory.CreateTemplate(language, templateName, model);
+                    var output = template.Render().Trim();
 
                     if (string.IsNullOrEmpty(output))
                         result.Write("");
@@ -205,6 +215,17 @@ namespace NJsonSchema.CodeGeneration
                 catch (InvalidOperationException)
                 {
                 }
+            }
+
+            private LiquidProxyHash CreateModelWithParentContext(Context context)
+            {
+                var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
+                model.Merge(context.Registers);
+                foreach (var environment in context.Environments.Skip(1))
+                    model.Merge(environment);
+                foreach (var scope in context.Scopes)
+                    model.Merge(scope);
+                return model;
             }
         }
     }

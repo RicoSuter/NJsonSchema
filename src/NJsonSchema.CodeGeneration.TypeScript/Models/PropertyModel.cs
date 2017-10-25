@@ -47,11 +47,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
-            _resolver.ResolveConstructorInterfaceName(_property.ActualPropertySchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
+            _resolver.ResolveConstructorInterfaceName(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
             Type;
 
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
@@ -63,26 +63,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     return false;
 
                 if (IsArray)
-                    return _property.ActualPropertySchema?.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                    return _property.ActualTypeSchema?.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
 
                 if (IsDictionary)
-                    return _property.ActualPropertySchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                    return _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
 
-                return !_property.ActualPropertySchema.IsTuple;
+                return !_property.ActualTypeSchema.IsTuple;
             }
         }
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
-        public bool IsArray => _property.ActualPropertySchema.IsArray;
+        public bool IsArray => _property.ActualTypeSchema.IsArray;
 
         /// <summary>Gets a value indicating whether the property type is a dictionary.</summary>
-        public bool IsDictionary => _property.ActualPropertySchema.IsDictionary;
+        public bool IsDictionary => _property.ActualTypeSchema.IsDictionary;
 
         /// <summary>Gets the type of the array item.</summary>
-        public string ArrayItemType => _resolver.TryResolve(_property.ActualPropertySchema?.Item, PropertyName) ?? "any";
+        public string ArrayItemType => _resolver.TryResolve(_property.ActualTypeSchema?.Item, PropertyName) ?? "any";
 
         /// <summary>Gets the type of the dictionary item.</summary>
-        public string DictionaryItemType => _resolver.TryResolve(_property.ActualPropertySchema?.AdditionalPropertiesSchema, PropertyName) ?? "any";
+        public string DictionaryItemType => _resolver.TryResolve(_property.ActualTypeSchema?.AdditionalPropertiesSchema, PropertyName) ?? "any";
 
         /// <summary>Gets the type postfix (e.g. ' | null | undefined')</summary>
         public string TypePostfix
@@ -121,7 +121,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
-                        Schema = _property.ActualPropertySchema,
+                        Schema = _property.ActualTypeSchema,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
@@ -145,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
-                        Schema = _property.ActualPropertySchema,
+                        Schema = _property.ActualTypeSchema,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,

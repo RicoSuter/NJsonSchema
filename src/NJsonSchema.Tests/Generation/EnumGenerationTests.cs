@@ -40,11 +40,11 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].ActualPropertySchema.Type);
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.Enumeration.Count);
-            Assert.AreEqual(0, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(0));
-            Assert.AreEqual(5, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(1));
-            Assert.AreEqual(6, schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(2));
+            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Bar"].ActualTypeSchema.Type);
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualTypeSchema.Enumeration.Count);
+            Assert.AreEqual(0, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(0));
+            Assert.AreEqual(5, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(1));
+            Assert.AreEqual(6, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(2));
         }
 
         [TestMethod]
@@ -61,9 +61,9 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(schema.Properties["Bar"].ActualPropertySchema);
-            Assert.IsNotNull(schema.Properties["Bar2"].ActualPropertySchema); // must not be a reference but second enum declaration
-            Assert.AreNotEqual(schema.Properties["Bar"].ActualPropertySchema, schema.Properties["Bar2"].ActualPropertySchema);
+            Assert.IsNotNull(schema.Properties["Bar"].ActualTypeSchema);
+            Assert.IsNotNull(schema.Properties["Bar2"].ActualTypeSchema); // must not be a reference but second enum declaration
+            Assert.AreNotEqual(schema.Properties["Bar"].ActualTypeSchema, schema.Properties["Bar2"].ActualTypeSchema);
         }
 
         [TestMethod]
@@ -79,11 +79,11 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Bar"].ActualPropertySchema.Type);
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.Enumeration.Count);
-            Assert.AreEqual("A", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(0));
-            Assert.AreEqual("B", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(1));
-            Assert.AreEqual("C", schema.Properties["Bar"].ActualPropertySchema.Enumeration.ElementAt(2));
+            Assert.AreEqual(JsonObjectType.String, schema.Properties["Bar"].ActualTypeSchema.Type);
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualTypeSchema.Enumeration.Count);
+            Assert.AreEqual("A", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(0));
+            Assert.AreEqual("B", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(1));
+            Assert.AreEqual("C", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(2));
         }
 
         [TestMethod]
@@ -99,10 +99,10 @@ namespace NJsonSchema.Tests.Generation
             });
 
             //// Assert
-            Assert.AreEqual(3, schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.Count);
-            Assert.AreEqual("A", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(0));
-            Assert.AreEqual("B", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(1));
-            Assert.AreEqual("C", schema.Properties["Bar"].ActualPropertySchema.EnumerationNames.ElementAt(2));
+            Assert.AreEqual(3, schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.Count);
+            Assert.AreEqual("A", schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.ElementAt(0));
+            Assert.AreEqual("B", schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.ElementAt(1));
+            Assert.AreEqual("C", schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.ElementAt(2));
         }
 
         public class EnumProperty

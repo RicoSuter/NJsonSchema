@@ -9,6 +9,7 @@
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 namespace NJsonSchema
 {
@@ -80,13 +81,8 @@ namespace NJsonSchema
 
         /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
         [JsonIgnore]
-        public JsonSchema4 ActualPropertySchema
-        {
-            get
-            {
-                return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
-            }
-        }
+        [Obsolete("Use ActualTypeSchema instead.")]
+        public JsonSchema4 ActualPropertySchema => ActualTypeSchema;
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         [JsonIgnore]

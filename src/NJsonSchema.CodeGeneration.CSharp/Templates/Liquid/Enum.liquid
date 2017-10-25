@@ -1,5 +1,5 @@
 ﻿{% if HasDescription -%}
-/// <summary>{{ Description | CSharpDocs }}</summary>
+/// <summary>{{ Description | CSharpDocs: 0 }}</summary>
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {{ TypeAccessModifier }} enum {{ Name }}

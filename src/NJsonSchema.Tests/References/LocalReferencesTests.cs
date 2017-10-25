@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.References
             var j = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualPropertySchema.Type);
+            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.References
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualPropertySchema.Type);
+            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
             Assert.AreEqual(1, schema.Definitions.Count);
             Assert.AreEqual("./collection.json", schema.Definitions["collection"].DocumentPath);
         }

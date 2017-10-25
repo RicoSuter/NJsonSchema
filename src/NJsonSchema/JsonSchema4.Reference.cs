@@ -22,14 +22,21 @@ namespace NJsonSchema
         [JsonIgnore]
         public virtual JsonSchema4 ActualSchema => GetActualSchema(new List<JsonSchema4>());
 
+        /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
+        /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
+        /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
+        [JsonIgnore]
+        public virtual JsonSchema4 ActualTypeSchema => OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+
         /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
         [JsonIgnore]
         public bool HasReference => Reference != null || HasAllOfSchemaReference;
 
         /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasAllOfSchemaReference => Type == JsonObjectType.None &&
-                                               AllOf.Count == 1 &&
+        public bool HasAllOfSchemaReference => AllOf.Count == 1 &&
+                                               AllOf.Any(s => s.HasReference) &&
+                                               Type == JsonObjectType.None &&
                                                AnyOf.Count == 0 &&
                                                OneOf.Count == 0 &&
                                                Properties.Count == 0 &&
