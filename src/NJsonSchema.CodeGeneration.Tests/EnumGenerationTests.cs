@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var generator = new CSharpGenerator(schema);
-            var code = generator.GenerateFile("MyClass");
+            var code = generator.GenerateFile("MyClass").Replace("\r", "");
 
             //// Assert
             Assert.IsFalse(code.Contains("Ref_"));
