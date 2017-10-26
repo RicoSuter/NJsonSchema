@@ -144,9 +144,9 @@ namespace NJsonSchema.CodeGeneration
 
                 if (!_templates.ContainsKey(_data))
                 {
-                    var data = Regex.Replace(_data, "(\n( )*?)\\{% template (.*?) %}", m =>
+                    var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
                         "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
-                        RegexOptions.Singleline);
+                        RegexOptions.Singleline).Trim();
 
                     _templates[_data] = Template.Parse(data);
                 }
@@ -221,7 +221,7 @@ namespace NJsonSchema.CodeGeneration
             {
                 var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
                 model.Merge(context.Registers);
-                foreach (var environment in context.Environments.Skip(1))
+                foreach (var environment in context.Environments)
                     model.Merge(environment);
                 foreach (var scope in context.Scopes)
                     model.Merge(scope);
