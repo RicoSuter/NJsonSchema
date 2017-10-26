@@ -23,6 +23,7 @@
   <ItemGroup>
     <None Remove="Templates\Class.ToJson.liquid" />
     <None Remove="Templates\Liquid\Class.Annotations.liquid" />
+    <None Remove="Templates\Liquid\Class.Constructor.liquid" />
     <None Remove="Templates\Liquid\Class.FromJson.liquid" />
     <None Remove="Templates\Liquid\Class.Inpc.liquid" />
     <None Remove="Templates\Liquid\DateFormatConverter.liquid" />
@@ -31,6 +32,7 @@
     <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Templates\Liquid\Class.Constructor.liquid" />
     <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>

@@ -17,6 +17,7 @@
 {% endfor -%}
 
 {% endif -%}
+    {% template Class.Constructor %}
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
     /// <summary>{{ property.Description | CSharpDocs: 1 }}</summary>
