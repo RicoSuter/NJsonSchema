@@ -221,10 +221,10 @@ namespace NJsonSchema.CodeGeneration
             {
                 var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
                 model.Merge(context.Registers);
-                foreach (var environment in context.Environments)
-                    model.Merge(environment);
-                foreach (var scope in context.Scopes)
+                foreach (var scope in Enumerable.Reverse(context.Scopes))
                     model.Merge(scope);
+                foreach (var environment in Enumerable.Reverse(context.Environments))
+                    model.Merge(environment);
                 return model;
             }
         }
