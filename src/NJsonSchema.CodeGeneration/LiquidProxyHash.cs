@@ -79,6 +79,19 @@ namespace NJsonSchema.CodeGeneration
                 return base.GetValue(key);
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is LiquidProxyHash hash && hash.Object != Object)
+                return false;
+
+            return base.Equals(obj);
+        }
+
         private static bool IsObject(object value)
         {
             return value != null && value.GetType().GetTypeInfo().IsClass && !(value is string);
