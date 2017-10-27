@@ -14,9 +14,9 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var classes = new List<CodeArtifact>
             {
                 new CodeArtifact("Car", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Apple", "Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Apple", "List<Fruit>", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
                 new CodeArtifact("Professor", "Teacher", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Teacher", "Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
+                new CodeArtifact("Teacher", "Person[]", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
                 new CodeArtifact("Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
                 new CodeArtifact("Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp)
             };
