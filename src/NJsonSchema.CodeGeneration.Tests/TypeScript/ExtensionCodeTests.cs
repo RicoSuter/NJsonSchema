@@ -13,6 +13,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 import generated = require(""foo/bar"");
 import foo = require(""foo/bar"");
 import bar = require(""foo/bar"");
+import 'rxjs/add/operator/map';
 
 export class Bar extends generated.Bar {
     get title() {
