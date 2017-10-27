@@ -20,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             code = Regex.Replace(code, "import generated (=|from) (.*?)\\n", string.Empty, RegexOptions.Multiline);
             code = Regex.Replace(code, "import \\* as generated from (.*?)\\n", string.Empty, RegexOptions.Multiline);
-            code = Regex.Replace(code, "(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
+            code = Regex.Replace(code, "(import '.*?'.*?\\n)|(import ((.|\\n)*?) (=|from) (.*?)\\n)|(/// <reference path(.*?)\\n)", match =>
             {
                 ImportCode += ConversionUtilities.TrimWhiteSpaces(match.Groups[0].Value) + "\n";
                 return string.Empty;
