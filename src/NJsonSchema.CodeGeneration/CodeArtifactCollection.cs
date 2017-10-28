@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -44,13 +45,13 @@ namespace NJsonSchema.CodeGeneration
             var newResults = new List<CodeArtifact>(results);
             foreach (var result in newResults.ToArray())
             {
-                if (!string.IsNullOrEmpty(result.BaseTypeName))
+                if (!string.IsNullOrEmpty(GetActualBaseName(result.BaseTypeName)))
                 {
                     var index = newResults.IndexOf(result);
                     var baseResult = result;
                     do
                     {
-                        baseResult = newResults.SingleOrDefault(r => r.TypeName == baseResult.BaseTypeName);
+                        baseResult = newResults.SingleOrDefault(r => r.TypeName == GetActualBaseName(baseResult.BaseTypeName));
                         if (baseResult != null)
                         {
                             var baseIndex = newResults.IndexOf(baseResult);
@@ -64,6 +65,19 @@ namespace NJsonSchema.CodeGeneration
                 }
             }
             return newResults;
+        }
+
+        private static string GetActualBaseName(string baseTypeName)
+        {
+            if (baseTypeName == null)
+                return null;
+
+            // resolve arrays
+            if (baseTypeName.EndsWith("[]"))
+                return baseTypeName.Substring(0, baseTypeName.Length - 2);
+
+            // resolve lists
+            return Regex.Replace(baseTypeName, ".*\\<(.*)\\>", m => m.Groups[1].Value);
         }
     }
 }
