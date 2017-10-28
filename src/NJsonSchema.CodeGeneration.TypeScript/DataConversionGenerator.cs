@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.CodeGeneration.TypeScript.Templates;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Generates data conversion code.</summary>
@@ -17,14 +15,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The generated code.</returns>
         public static string RenderConvertToJavaScriptCode(DataConversionParameters parameters)
         {
-            return new ConvertToJavaScriptTemplate(CreateModel(parameters)).Render();
+            var model = CreateModel(parameters);
+            var template = parameters.Settings.TemplateFactory.CreateTemplate("TypeScript", "ConvertToJavaScript", model);
+            return template.Render();
         }
 
         /// <summary>Generates the code to convert a data object to the target class instances.</summary>
         /// <returns>The generated code.</returns>
         public static string RenderConvertToClassCode(DataConversionParameters parameters)
         {
-            return new ConvertToClassTemplate(CreateModel(parameters)).Render();
+            var model = CreateModel(parameters);
+            var template = parameters.Settings.TemplateFactory.CreateTemplate("TypeScript", "ConvertToClass", model);
+            return template.Render();
         }
 
         private static object CreateModel(DataConversionParameters parameters)
