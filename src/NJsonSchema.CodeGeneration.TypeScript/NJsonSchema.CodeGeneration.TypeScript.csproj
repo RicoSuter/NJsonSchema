@@ -22,29 +22,23 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Templates\Liquid\Class.liquid" />
-    <None Remove="Templates\Liquid\ConvertToClass.Liquid" />
-    <None Remove="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
-    <None Remove="Templates\Liquid\Enum.liquid" />
-    <None Remove="Templates\Liquid\File.liquid" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\Liquid\Class.liquid">
+    <EmbeddedResource Include="Templates\Class.liquid">
       <Generator></Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\ConvertToClass.Liquid" />
-    <EmbeddedResource Include="Templates\Liquid\ConvertToJavaScriptTemplate.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Enum.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\File.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Interface.liquid">
+    <EmbeddedResource Include="Templates\ConvertToClass.liquid" />
+    <EmbeddedResource Include="Templates\ConvertToJavaScript.liquid" />
+    <EmbeddedResource Include="Templates\Enum.liquid" />
+    <EmbeddedResource Include="Templates\File.FormatDate.liquid" />
+    <EmbeddedResource Include="Templates\File.liquid" />
+    <EmbeddedResource Include="Templates\Interface.liquid">
       <Generator></Generator>
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\KnockoutClass.liquid">
+    <EmbeddedResource Include="Templates\KnockoutClass.liquid">
       <Generator></Generator>
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\File.ReferenceHandling.liquid">
+    <EmbeddedResource Include="Templates\File.ReferenceHandling.liquid">
       <Generator></Generator>
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
@@ -58,82 +52,6 @@
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Templates\ClassTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\ConvertToClassTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ConvertToClassTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\ConvertToJavaScriptTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ConvertToJavaScriptTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\EnumTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\FileTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>FileTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\InterfaceTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>InterfaceTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\KnockoutClassTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>KnockoutClassTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\ReferenceHandlingCode.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ReferenceHandlingCode.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Templates\ClassTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ClassTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\ConvertToClassTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConvertToClassTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\ConvertToJavaScriptTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConvertToJavaScriptTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\EnumTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>EnumTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\FileTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>FileTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\InterfaceTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>InterfaceTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\KnockoutClassTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>KnockoutClassTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\ReferenceHandlingCode.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ReferenceHandlingCode.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

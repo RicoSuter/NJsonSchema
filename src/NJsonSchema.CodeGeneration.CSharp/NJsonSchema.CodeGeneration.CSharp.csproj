@@ -22,52 +22,40 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Templates\Class.ToJson.liquid" />
-    <None Remove="Templates\Liquid\Class.Annotations.liquid" />
-    <None Remove="Templates\Liquid\Class.Constructor.liquid" />
-    <None Remove="Templates\Liquid\Class.FromJson.liquid" />
-    <None Remove="Templates\Liquid\Class.Inpc.liquid" />
-    <None Remove="Templates\Liquid\Class.liquid" />
-    <None Remove="Templates\Liquid\Class.Property.Annotations.liquid" />
-    <None Remove="Templates\Liquid\Class.ToJson.liquid" />
-    <None Remove="Templates\Liquid\DateFormatConverter.liquid" />
-    <None Remove="Templates\Liquid\Enum.liquid" />
-    <None Remove="Templates\Liquid\File.liquid" />
-    <None Remove="Templates\Liquid\JsonInheritanceAttribute.liquid" />
-    <None Remove="Templates\Liquid\JsonInheritanceConverter.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Liquid\Class.Annotations.liquid">
+    <EmbeddedResource Include="Templates\Class.Annotations.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Class.Constructor.liquid" />
-    <EmbeddedResource Include="Templates\Liquid\Class.FromJson.liquid">
+    <EmbeddedResource Include="Templates\Class.Constructor.liquid" />
+    <EmbeddedResource Include="Templates\Class.FromJson.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Class.Inpc.liquid">
+    <EmbeddedResource Include="Templates\Class.Inpc.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Class.liquid">
+    <EmbeddedResource Include="Templates\Class.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Class.Property.Annotations.liquid">
+    <EmbeddedResource Include="Templates\Class.Property.Annotations.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Class.ToJson.liquid">
+    <EmbeddedResource Include="Templates\Class.ToJson.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\DateFormatConverter.liquid">
+    <EmbeddedResource Include="Templates\DateFormatConverter.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\Enum.liquid">
+    <EmbeddedResource Include="Templates\Enum.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\File.liquid">
+    <EmbeddedResource Include="Templates\File.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceAttribute.liquid">
+    <EmbeddedResource Include="Templates\JsonInheritanceAttribute.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Liquid\JsonInheritanceConverter.liquid">
+    <EmbeddedResource Include="Templates\JsonInheritanceConverter.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
@@ -85,64 +73,8 @@
     <None Update="NJsonSchema.snk">
       <Generator></Generator>
     </None>
-    <None Update="Templates\ClassTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ClassTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\DateFormatConverterTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>DateFormatConverterTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\EnumTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\FileTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>FileTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\JsonInheritanceAttributeTemplate.tt">
-      <LastGenOutput>JsonInheritanceAttributeTemplate.cs</LastGenOutput>
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-    </None>
-    <None Update="Templates\JsonInheritanceConverterTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>JsonInheritanceConverterTemplate.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Templates\ClassTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ClassTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\DateFormatConverterTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DateFormatConverterTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\EnumTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>EnumTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\FileTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>FileTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\JsonInheritanceAttributeTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>JsonInheritanceAttributeTemplate.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\JsonInheritanceConverterTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>JsonInheritanceConverterTemplate.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

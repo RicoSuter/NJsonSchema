@@ -8,6 +8,7 @@
 
 using System;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -57,6 +58,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
         {
             var collection = base.GenerateTypes();
+            var artifacts = collection.Artifacts.ToList();
 
             foreach (var artifact in collection.Artifacts)
             {
@@ -77,9 +79,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
             }
 
-            return new CodeArtifactCollection(collection.Artifacts, extensionCode);
+            if (artifacts.Any(r => r.Code.Contains("formatDate(")))
+            {
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", null);
+                artifacts.Add(new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
+            }
+
+            if (Settings.HandleReferences)
+            {
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", null);
+                artifacts.Add(new CodeArtifact("jsonParse", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
+            }
+
+            return new CodeArtifactCollection(artifacts, extensionCode);
         }
-        
+
         /// <summary>Generates the file.</summary>
         /// <returns>The file contents.</returns>
         protected override string GenerateFile(CodeArtifactCollection artifactCollection)

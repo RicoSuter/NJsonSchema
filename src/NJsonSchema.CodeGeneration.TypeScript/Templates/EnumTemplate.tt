@@ -1,5 +1,0 @@
-﻿<#@ template visibility="internal" #>
-<#if(Model.HasDescription){#>/** <#=Model.Description#> */
-<#}#>export enum <#=Model.Name#> {
-<#foreach(var enumeration in Model.Enums){#>    <#=enumeration.Name#> = <#=enumeration.Value#>, 
-<#}#>}

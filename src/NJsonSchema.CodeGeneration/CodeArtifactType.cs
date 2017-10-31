@@ -21,6 +21,9 @@ namespace NJsonSchema.CodeGeneration
         Interface,
 
         /// <summary>An enum (e.g. C# or TypeScript interface).</summary>
-        Enum
+        Enum,
+
+        /// <summary>An internal function.</summary>
+        Function
     }
 }
