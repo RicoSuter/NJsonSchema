@@ -10,7 +10,7 @@ if (<#=Model.Value#> && <#=Model.Value#>.constructor === Array) {
         <#=Model.Variable#>.push(item.toJSON());
 <#}else{#>
 <#if(Model.IsArrayItemDate){#>
-        <#=Model.Variable#>.push(item.<#=Model.DateToStringCode#>);
+        <#=Model.Variable#>.push(<#if(Model.UseJsDate){#>formatDate(item)<#}else{#>item.format('YYYY-MM-DD')<#}#>);
 <#}else if(Model.IsArrayItemDateTime){#>
         <#=Model.Variable#>.push(item.<#=Model.DateTimeToStringCode#>);
 <#}else{#>
@@ -27,7 +27,7 @@ if (<#=Model.Value#>) {
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].toJSON() : <any><#=Model.NullValue#>;
 <#}else{#>
 <#if(Model.IsDictionaryValueDate){#>
-            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateToStringCode#> : <any><#=Model.NullValue#>;
+            <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#if(Model.UseJsDate){#>formatDate(<#=Model.Value#>[key])<#}else{#><#=Model.Value#>[key].format('YYYY-MM-DD')<#}#> : <any><#=Model.NullValue#>;
 <#} else if(Model.IsDictionaryValueDateTime){#>
             <#=Model.Variable#>[key] = <#=Model.Value#>[key] ? <#=Model.Value#>[key].<#=Model.DateTimeToStringCode#> : <any><#=Model.NullValue#>;
 <#}else{#>
@@ -41,7 +41,7 @@ if (<#=Model.Value#>) {
 }
 <#}else{#>
 <#  if(Model.IsDate){#>
-<#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
+<#=Model.Variable#> = <#=Model.Value#> ? <#if(Model.UseJsDate){#>formatDate(<#=Model.Value#>)<#}else{#><#=Model.Value#>.format('YYYY-MM-DD')<#}#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
 <#  } else if(Model.IsDateTime){#>
 <#=Model.Variable#> = <#=Model.Value#> ? <#=Model.Value#>.<#=Model.DateTimeToStringCode#> : <#if(Model.HasDefaultValue){#><#=Model.DefaultValue#><#}else{#><any><#=Model.NullValue#><#}#>;
 <#  }else{#>
