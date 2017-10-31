@@ -79,9 +79,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemDateTime = IsDateTime(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),
 
                 //StringToDateCode is used for date and date-time formats
+                UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" : "moment",
-                DateToStringCode = "toISOString().slice(0, 10)",
-                DateTimeToStringCode = "toISOString()", 
+                DateTimeToStringCode = "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
             };

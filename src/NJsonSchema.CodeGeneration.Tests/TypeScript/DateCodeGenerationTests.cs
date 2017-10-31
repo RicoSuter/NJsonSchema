@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
             Assert.IsTrue(code.Contains("myDate: moment.Moment"));
             Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"] ? moment(data[\"myDate\"].toString()) : <any>undefined;"));
-            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? this.myDate.toISOString().slice(0, 10) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;"));
         }
 
         [TestMethod]
@@ -73,7 +73,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
             Assert.IsTrue(code.Contains("myDate: Date"));
             Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;"));
-            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? this.myDate.toISOString().slice(0, 10) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("function formatDate("));
         }
 
         [TestMethod]

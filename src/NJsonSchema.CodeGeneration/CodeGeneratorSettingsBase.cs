@@ -18,10 +18,6 @@ namespace NJsonSchema.CodeGeneration
         {
             GenerateDefaultValues = true;
             ExcludedTypeNames = new string[] { };
-
-#if DEBUG
-            UseLiquidTemplates = true;
-#endif
         }
 
         /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>

@@ -38,11 +38,8 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template..</exception>
         public ITemplate CreateTemplate(string language, string template, object model)
         {
-            var liquidTemplate = TryGetLiquidTemplate(language, template);
-            if (liquidTemplate != null)
-                return new LiquidTemplate(language, template, liquidTemplate, model, GetToolchainVersion(), _settings);
-            else
-                return CreateT4Template(language, template, model);
+            var liquidTemplate = GetLiquidTemplate(language, template);
+            return new LiquidTemplate(language, template, liquidTemplate, model, GetToolchainVersion(), _settings);
         }
 
         /// <summary>Gets the current toolchain version.</summary>
@@ -56,10 +53,10 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
-        protected virtual string TryLoadEmbeddedLiquidTemplate(string language, string template)
+        protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
             var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
-            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates.Liquid." + template + ".liquid";
+            var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
@@ -68,43 +65,19 @@ namespace NJsonSchema.CodeGeneration
                     return reader.ReadToEnd();
             }
 
-            return null;
-        }
-
-        /// <summary>Creates a T4 template.</summary>
-        /// <param name="language">The language.</param>
-        /// <param name="template">The template name.</param>
-        /// <param name="model">The template model.</param>
-        /// <returns>The template.</returns>
-        /// <exception cref="InvalidOperationException">Could not load template..</exception>
-        protected virtual ITemplate CreateT4Template(string language, string template, object model)
-        {
-            var typeName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + "Template";
-            var type = Type.GetType(typeName);
-            if (type == null)
-                type = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language))?.GetType(typeName);
-
-            if (type != null)
-                return (ITemplate)Activator.CreateInstance(type, model);
-
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
         }
 
-        private string TryGetLiquidTemplate(string language, string template)
+        private string GetLiquidTemplate(string language, string template)
         {
-            if (_settings.UseLiquidTemplates)
+            if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
             {
-                if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
-                {
-                    var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
-                    if (File.Exists(templateFilePath))
-                        return File.ReadAllText(templateFilePath);
-                }
-
-                return TryLoadEmbeddedLiquidTemplate(language, template.TrimEnd('!'));
+                var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
+                if (File.Exists(templateFilePath))
+                    return File.ReadAllText(templateFilePath);
             }
 
-            return null;
+            return GetEmbeddedLiquidTemplate(language, template);
         }
 
         internal class LiquidTemplate : ITemplate
