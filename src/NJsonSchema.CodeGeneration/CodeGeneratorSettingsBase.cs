@@ -45,9 +45,6 @@ namespace NJsonSchema.CodeGeneration
         [JsonIgnore]
         public ITemplateFactory TemplateFactory { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to use DotLiquid templates (experimental).</summary>
-        public bool UseLiquidTemplates { get; set; }
-
         /// <summary>Gets or sets the template directory path.</summary>
         public string TemplateDirectory { get; set; }
     }
