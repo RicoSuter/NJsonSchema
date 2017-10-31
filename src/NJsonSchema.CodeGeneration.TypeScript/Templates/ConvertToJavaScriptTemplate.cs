@@ -133,10 +133,24 @@ if(Model.IsArrayItemDate){
             
             #line default
             #line hidden
-            this.Write(".push(item.");
+            this.Write(".push(");
             
             #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DateToStringCode));
+if(Model.UseJsDate){
+            
+            #line default
+            #line hidden
+            this.Write("formatDate(item)");
+            
+            #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+}else{
+            
+            #line default
+            #line hidden
+            this.Write("item.format(\'YYYY-MM-DD\')");
+            
+            #line 13 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+}
             
             #line default
             #line hidden
@@ -288,14 +302,34 @@ if(Model.IsDictionaryValueDate){
             this.Write("[key] ? ");
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+if(Model.UseJsDate){
+            
+            #line default
+            #line hidden
+            this.Write("formatDate(");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
             
             #line default
             #line hidden
-            this.Write("[key].");
+            this.Write("[key])");
             
             #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DateToStringCode));
+}else{
+            
+            #line default
+            #line hidden
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
+            
+            #line default
+            #line hidden
+            this.Write("[key].format(\'YYYY-MM-DD\')");
+            
+            #line 30 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+}
             
             #line default
             #line hidden
@@ -452,14 +486,34 @@ if(Model.IsDictionaryValueDate){
             this.Write(" ? ");
             
             #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+if(Model.UseJsDate){
+            
+            #line default
+            #line hidden
+            this.Write("formatDate(");
+            
+            #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
             
             #line default
             #line hidden
-            this.Write(".");
+            this.Write(")");
             
             #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Model.DateToStringCode));
+}else{
+            
+            #line default
+            #line hidden
+            
+            #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Model.Value));
+            
+            #line default
+            #line hidden
+            this.Write(".format(\'YYYY-MM-DD\')");
+            
+            #line 44 "C:\Data\Projects\NJsonSchema\src\NJsonSchema.CodeGeneration.TypeScript\Templates\ConvertToJavaScriptTemplate.tt"
+}
             
             #line default
             #line hidden
