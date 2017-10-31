@@ -74,6 +74,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             Assert.IsTrue(code.Contains("myDate: Date"));
             Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;"));
             Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;"));
+            Assert.IsTrue(code.Contains("function formatDate("));
         }
 
         [TestMethod]
