@@ -73,6 +73,7 @@
     <Compile Include="CSharp\CSharpEnumGeneratorTests.cs" />
     <Compile Include="CSharp\CSharpObjectPropertyRequiredTests.cs" />
     <Compile Include="CSharp\CSharpStringPropertyRequiredTests.cs" />
+    <Compile Include="CSharp\EnumTests.cs" />
     <Compile Include="CSharp\InheritanceInterfaceTests.cs" />
     <Compile Include="CSharp\ValueGeneratorTests.cs" />
     <Compile Include="DefaultGenerationTests.cs" />
