@@ -117,6 +117,8 @@ namespace NJsonSchema.Generation
         {
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes).ConfigureAwait(false))
             {
+                ApplyExtensionDataAttributes(type, schema, parentAttributes);
+
                 await ApplySchemaProcessorsAsync(type, schema, schemaResolver).ConfigureAwait(false);
                 return;
             }
