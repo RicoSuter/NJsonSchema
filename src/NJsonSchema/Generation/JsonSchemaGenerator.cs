@@ -115,6 +115,8 @@ namespace NJsonSchema.Generation
         public virtual async Task GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+            ApplyExtensionDataAttributes(type, schema, parentAttributes);
+
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes).ConfigureAwait(false))
             {
                 await ApplySchemaProcessorsAsync(type, schema, schemaResolver).ConfigureAwait(false);
@@ -123,8 +125,6 @@ namespace NJsonSchema.Generation
 
             if (schemaResolver.RootObject == schema)
                 schema.Title = Settings.SchemaNameGenerator.Generate(type);
-
-            ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
             var typeDescription = Settings.ReflectionService.GetDescription(type, parentAttributes, Settings);
             if (typeDescription.Type.HasFlag(JsonObjectType.Object))
@@ -750,7 +750,9 @@ namespace NJsonSchema.Generation
                         if (readOnlyAttribute != null)
                             p.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
-                        p.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
+                        if (p.Description == null)
+                            p.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
+
                         p.Default = ConvertDefaultValue(property);
 
                         ApplyDataAnnotations(p, propertyTypeDescription, propertyAttributes);

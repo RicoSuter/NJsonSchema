@@ -35,6 +35,8 @@ namespace NJsonSchema
             typeNameHint = (typeNameHint ?? "")
                 .Replace("[", " Of ")
                 .Replace("]", " ")
+                .Replace("<", " Of ")
+                .Replace(">", " ")
                 .Replace(",", " And ")
                 .Replace("  ", " ");
 
