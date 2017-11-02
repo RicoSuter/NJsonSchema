@@ -751,7 +751,7 @@ namespace NJsonSchema.Generation
                         dynamic readOnlyAttribute = propertyAttributes.TryGetIfAssignableTo("System.ComponentModel.ReadOnlyAttribute");
                         if (readOnlyAttribute != null)
                             p.IsReadOnly = readOnlyAttribute.IsReadOnly;
-                        if (p.Description != null)
+                        if (p.Description == null)
                             p.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
                         p.Default = ConvertDefaultValue(property);
 
