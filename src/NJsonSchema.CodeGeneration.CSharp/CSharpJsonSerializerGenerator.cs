@@ -30,10 +30,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                        (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                        "new Newtonsoft.Json.JsonSerializerSettings { " +
                        (settings.HandleReferences
-                           ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, "
+                           ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All"
                            : string.Empty) +
                        (hasJsonConverters
-                           ? "Converters = " + GenerateConverters(jsonConverters) + ", "
+                           ? (settings.HandleReferences ? ", " : string.Empty) + "Converters = " + GenerateConverters(jsonConverters)
                            : string.Empty) +
                        " }" +
                        (useSettingsTransformationMethod ? ")" : string.Empty);
