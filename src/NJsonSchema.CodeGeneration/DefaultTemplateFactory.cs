@@ -121,6 +121,14 @@ namespace NJsonSchema.CodeGeneration
                         "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
                         RegexOptions.Singleline).Trim();
 
+                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
+                        m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
+                        RegexOptions.Singleline);
+
+                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
+                        m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
+                        RegexOptions.Singleline);
+
                     _templates[_data] = Template.Parse(data);
                 }
 
@@ -135,7 +143,7 @@ namespace NJsonSchema.CodeGeneration
 
         internal static class LiquidFilters
         {
-            public static string CSharpDocs(string input, int tabCount)
+            public static string Csharpdocs(string input, int tabCount)
             {
                 return ConversionUtilities.ConvertCSharpDocBreaks(input, tabCount);
             }
