@@ -30,7 +30,7 @@ export class {{ ClassName }}{{ Inheritance }} {
         if (data !== undefined) {
 {% for property in Properties -%}
             var {{ property.PropertyName }}_: any; 
-            {{ property.ConvertToClassCode | tab: 3 }}
+            {{ property.ConvertToClassCode | tab }}
             this.{{ property.PropertyName }}({{ property.PropertyName }}_);
 
 {% endfor -%}
@@ -71,7 +71,7 @@ export class {{ ClassName }}{{ Inheritance }} {
 {% endif -%}
 {% for property in Properties -%}
         let {{ property.PropertyName }}_: any = this.{{ property.PropertyName }}(); 
-        {{ property.ConvertToJavaScriptCode | tab: 2 }}
+        {{ property.ConvertToJavaScriptCode | tab }}
 
 {% endfor -%}
 {% if HasInheritance -%}

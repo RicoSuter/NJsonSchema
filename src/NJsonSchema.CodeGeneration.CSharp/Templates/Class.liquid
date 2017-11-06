@@ -1,5 +1,5 @@
 ﻿{% if HasDescription -%}
-/// <summary>{{ Description | CSharpDocs: 0 }}</summary>
+/// <summary>{{ Description | csharpdocs }}</summary>
 {% endif -%}
 {% if HasDiscriminator -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
@@ -20,7 +20,7 @@
     {% template Class.Constructor %}
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
-    /// <summary>{{ property.Description | CSharpDocs: 1 }}</summary>
+    /// <summary>{{ property.Description | csharpdocs }}</summary>
 {%   endif -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
 {%   if property.RenderRequiredAttribute -%}

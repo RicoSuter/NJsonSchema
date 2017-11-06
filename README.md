@@ -7,15 +7,17 @@ NJsonSchema for .NET
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 
+<img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
+
 NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v4 schemas. The library can read a schema from a file or string and validate JSON data against it. A schema can also be generated from an existing .NET class. With the code generation APIs you can generate C# and TypeScript classes or interfaces from a schema. 
 
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
 
 **NuGet packages:** 
-- [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0 and .NET 4.0): JSON Schema 4 parsing, validation and generation classes
-- [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (.NET Standard 1.3): Base classes to generate code from a JSON Schema 4
-- [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (.NET Standard 1.3): Generates CSharp classes
-- [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (.NET Standard 1.3): Generates TypeScript interfaces or classes
+- [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0/.NET 4.5/.NET 4.0): JSON Schema 4 parsing, validation and generation classes
+- [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (.NET Standard 1.3/.NET 4.5.1): Base classes to generate code from a JSON Schema 4
+- [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (.NET Standard 1.3/.NET 4.5.1): Generates CSharp classes
+- [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (.NET Standard 1.3/.NET 4.5.1): Generates TypeScript interfaces or classes
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
 

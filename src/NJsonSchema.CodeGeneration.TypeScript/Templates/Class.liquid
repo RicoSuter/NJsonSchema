@@ -74,7 +74,7 @@ export class {{ ClassName }}{{ Inheritance }} {
             }
 {% endif -%}
 {% for property in Properties -%}
-            {{ property.ConvertToClassCode | tab: 3 }}
+            {{ property.ConvertToClassCode | tab }}
 {% endfor -%}
         }
     }
@@ -118,7 +118,7 @@ export class {{ ClassName }}{{ Inheritance }} {
         data["{{ BaseDiscriminator }}"] = this._discriminator; 
 {% endif -%}
 {% for property in Properties -%}
-        {{ property.ConvertToJavaScriptCode | tab: 2 }}
+        {{ property.ConvertToJavaScriptCode | tab }}
 {% endfor -%}
 {% if HasInheritance -%}
         super.toJSON(data);
