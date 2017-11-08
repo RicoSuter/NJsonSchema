@@ -66,5 +66,24 @@ namespace NJsonSchema.Tests.Generation
             Assert.AreEqual("Username already in use", responses.Last().Value);
             Assert.AreEqual("400", responses.Last().Attribute("code").Value);
         }
+
+        public class WithSeeTagInXmlDoc
+        {
+            /// <summary><see langword="null"/> for the default <see cref="Record"/>.</summary>
+            public string Foo { get; set; }
+        }
+
+        [TestMethod]
+        public async Task When_summary_has_see_tag_then_it_is_converted()
+        {
+            //// Arrange
+
+
+            //// Act
+            var summary = await typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
+
+            //// Assert
+            Assert.AreEqual("null for the default Record.", summary);
+        }
     }
 }
