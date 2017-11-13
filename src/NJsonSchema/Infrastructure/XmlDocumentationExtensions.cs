@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -138,7 +139,7 @@ namespace NJsonSchema.Infrastructure
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
             var element = await GetXmlDocumentationAsync(member, documentationPath).ConfigureAwait(false);
-            return RemoveLineBreakWhiteSpaces(element?.Element(tagName)?.Value);
+            return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element?.Element(tagName)));
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -168,7 +169,7 @@ namespace NJsonSchema.Infrastructure
 
             var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
             var element = await GetXmlDocumentationAsync(parameter, documentationPath).ConfigureAwait(false);
-            return RemoveLineBreakWhiteSpaces(element?.Value);
+            return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element));
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
@@ -317,6 +318,43 @@ namespace NJsonSchema.Infrastructure
                     if (summary != string.Empty)
                         return summary;
                 }
+            }
+
+            return null;
+        }
+
+        /// <summary>Converts the given XML documentation <see cref="XElement"/> to text.</summary>
+        /// <param name="element">The XML element.</param>
+        /// <returns>The text</returns>
+        public static string GetXmlDocumentationText(this XElement element)
+        {
+            if (element != null)
+            {
+                var value = new StringBuilder();
+                foreach (var node in element.Nodes())
+                {
+                    if (node is XElement e)
+                    {
+                        if (e.Name == "see")
+                        {
+                            var attribute = e.Attribute("langword");
+                            if (attribute != null)
+                                value.Append(attribute.Value);
+                            else
+                            {
+                                attribute = e.Attribute("cref");
+                                if (attribute != null)
+                                    value.Append(attribute.Value.Trim('!', ':').Trim());
+                            }
+                        }
+                        else
+                            value.Append(e.Value);
+                    }
+                    else
+                        value.Append(node);
+                }
+
+                return value.ToString();
             }
 
             return null;
