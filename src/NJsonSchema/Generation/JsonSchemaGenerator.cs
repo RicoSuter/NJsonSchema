@@ -453,21 +453,24 @@ namespace NJsonSchema.Generation
 #if !LEGACY
             var propertiesAndFields = type.GetTypeInfo()
                 .DeclaredFields
-                .Where(f => f.IsPublic)
+                .Where(f => f.IsPublic && !f.IsStatic)
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
-                    .Where(p => p.GetMethod?.IsPublic == true || p.SetMethod?.IsPublic == true)
+                    .Where(p => (p.GetMethod?.IsPublic == true && p.GetMethod?.IsStatic == false) || 
+                                (p.SetMethod?.IsPublic == true && p.SetMethod?.IsStatic == false))
                 )
                 .ToList();
 #else
             var propertiesAndFields = type.GetTypeInfo()
                 .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+                .Where(f => f.IsPublic && !f.IsStatic)
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo()
                     .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.GetGetMethod()?.IsPublic == true || p.GetSetMethod()?.IsPublic == true)
+                    .Where(p => (p.GetGetMethod()?.IsPublic == true && p.GetGetMethod()?.IsStatic == false) ||
+                                (p.GetSetMethod()?.IsPublic == true && p.GetSetMethod()?.IsStatic == false))
                 )
                 .ToList();
 #endif
