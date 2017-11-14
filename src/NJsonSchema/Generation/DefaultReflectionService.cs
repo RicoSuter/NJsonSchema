@@ -36,16 +36,20 @@ namespace NJsonSchema.Generation
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
-            if (type == typeof(short) || type == typeof(uint) || type == typeof(ushort))
+            if (type == typeof(short) || 
+                type == typeof(uint) || 
+                type == typeof(ushort))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
 
             if (type == typeof(int))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
 
-            if ((type == typeof(long)) || (type == typeof(ulong)))
+            if (type == typeof(long) || 
+                type == typeof(ulong))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
 
-            if (type == typeof(double) || type == typeof(float))
+            if (type == typeof(double) ||
+                type == typeof(float))
                 return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Double);
 
             if (type == typeof(decimal))
@@ -64,14 +68,21 @@ namespace NJsonSchema.Generation
             if (type == typeof(Guid))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime) || type == typeof(DateTimeOffset) || type.FullName == "NodaTime.OffsetDateTime" || type.FullName == "NodaTime.ZonedDateTime")
+            if (type == typeof(DateTime) || 
+                type == typeof(DateTimeOffset) || 
+                type.FullName == "NodaTime.OffsetDateTime" || 
+                type.FullName == "NodaTime.ZonedDateTime")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
-            if (type == typeof(TimeSpan) || type.FullName == "NodaTime.Duration")
+            if (type == typeof(TimeSpan) || 
+                type.FullName == "NodaTime.Duration")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
 
             if (type.FullName == "NodaTime.LocalDate")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Date);
+
+            if (type.FullName == "NodaTime.LocalTime")
+                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Time);
 
             if (type == typeof(Uri))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
@@ -82,7 +93,9 @@ namespace NJsonSchema.Generation
             if (type == typeof(byte[]))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
 
-            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+            if (type == typeof(JObject) || 
+                type == typeof(JToken) || 
+                type == typeof(object))
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
 
             if (IsFileType(type, parentAttributes))
