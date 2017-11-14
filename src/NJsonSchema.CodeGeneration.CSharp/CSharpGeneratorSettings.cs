@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Reflection;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The generator settings.</summary>
@@ -28,7 +30,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             TypeAccessModifier = "public";
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this);
+            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
+            {
+                typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
+            });
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types.</summary>

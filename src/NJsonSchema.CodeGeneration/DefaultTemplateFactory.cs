@@ -22,12 +22,24 @@ namespace NJsonSchema.CodeGeneration
     public class DefaultTemplateFactory : ITemplateFactory
     {
         private readonly CodeGeneratorSettingsBase _settings;
+        private readonly Assembly[] _assemblies;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
         /// <param name="settings">The settings.</param>
+        [Obsolete("Use other ctor instead.")]
         public DefaultTemplateFactory(CodeGeneratorSettingsBase settings)
+            : this(settings, new Assembly[0])
+        {
+            // TODO: Also remove Assembly.Load after ctor has been removed
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
+        /// <param name="settings">The settings.</param>
+        /// <param name="assemblies">The assemblies containing embedded Liquid templates.</param>
+        public DefaultTemplateFactory(CodeGeneratorSettingsBase settings, Assembly[] assemblies)
         {
             _settings = settings;
+            _assemblies = assemblies;
         }
 
         /// <summary>Creates a template for the given language, template name and template model.</summary>
@@ -49,13 +61,25 @@ namespace NJsonSchema.CodeGeneration
             return JsonSchema4.ToolchainVersion;
         }
 
+        /// <summary>Gets a Liquid template by name.</summary>
+        /// <param name="name">The assembly name.</param>
+        /// <returns>The assembly.</returns>
+        protected Assembly GetLiquidAssembly(string name)
+        {
+            var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
+            if (assembly != null)
+                return assembly;
+
+            return Assembly.Load(new AssemblyName(name));
+        }
+
         /// <summary>Tries to load an embedded Liquid template.</summary>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
         protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
-            var assembly = Assembly.Load(new AssemblyName("NJsonSchema.CodeGeneration." + language));
+            var assembly = GetLiquidAssembly("NJsonSchema.CodeGeneration." + language);
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
             var resource = assembly.GetManifestResourceStream(resourceName);
