@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
+using System.Reflection;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -28,7 +29,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ConvertConstructorInterfaceData = false;
 
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this);
+            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
+            {
+                typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly
+            });
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
