@@ -100,6 +100,7 @@
     <Compile Include="Validation\FormatDateTests.cs" />
     <Compile Include="Validation\LineInformationTest.cs" />
     <Compile Include="Validation\NullPropertyTests.cs" />
+    <Compile Include="Validation\NumberTests.cs" />
     <Compile Include="Validation\PatternPropertyValidationTests.cs" />
     <Compile Include="Validation\FormatBase64Tests.cs" />
     <Compile Include="Validation\FormatIpV6Tests.cs" />
