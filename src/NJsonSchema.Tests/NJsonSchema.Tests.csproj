@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Conversion\SchemaReferenceTests.cs" />
     <Compile Include="Conversion\ArrayTypeToSchemaTests.cs" />
+    <Compile Include="Generation\AbstractGenerationTests.cs" />
     <Compile Include="Generation\AnnotationsGenerationTests.cs" />
     <Compile Include="Generation\ContractResolverTests.cs" />
     <Compile Include="Generation\DataToJsonSchemaGeneratorTests.cs" />

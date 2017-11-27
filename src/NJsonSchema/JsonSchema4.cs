@@ -411,6 +411,10 @@ namespace NJsonSchema
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether the type is abstract, i.e. cannot be instantiated directly (x-abstract).</summary>
+        [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool IsAbstract { get; set; }
+
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
         public ICollection<object> Enumeration { get; internal set; }

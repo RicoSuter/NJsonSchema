@@ -311,7 +311,9 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             schemaResolver.AddSchema(type, false, schema);
+
             schema.AllowAdditionalProperties = false;
+            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
 
