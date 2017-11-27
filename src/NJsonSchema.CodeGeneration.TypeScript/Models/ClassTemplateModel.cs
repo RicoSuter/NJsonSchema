@@ -63,6 +63,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
+        /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
+        public bool IsAbstract => _schema.IsAbstract;
+
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance
         {

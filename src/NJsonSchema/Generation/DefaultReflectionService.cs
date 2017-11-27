@@ -70,7 +70,8 @@ namespace NJsonSchema.Generation
 
             if (type == typeof(DateTime) || 
                 type == typeof(DateTimeOffset) || 
-                type.FullName == "NodaTime.OffsetDateTime" || 
+                type.FullName == "NodaTime.OffsetDateTime" ||
+                type.FullName == "NodaTime.LocalDateTime" ||
                 type.FullName == "NodaTime.ZonedDateTime")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
