@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.CSharp;
+﻿using NJsonSchema.CodeGeneration.CSharp;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
 {
-    [TestClass]
-    public class AbstractGenerationTests
+    public class AbstractSchemaTests
     {
         public abstract class AbstractClass
         {
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_is_abstract_then_is_abstract_CSharp_keyword_is_generated()
         {
             /// Arrange
@@ -23,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
             var code = generator.GenerateFile("AbstractClass");
 
             /// Assert
-            Assert.IsTrue(code.Contains("public partial abstract class AbstractClass"));
+            Assert.True(code.Contains("public partial abstract class AbstractClass"));
         }
     }
 }

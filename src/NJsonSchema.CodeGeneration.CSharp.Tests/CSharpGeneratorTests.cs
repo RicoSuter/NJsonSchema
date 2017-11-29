@@ -6,19 +6,18 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.Generation;
+using Xunit;
+using NJsonSchema.Annotations;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
-    [TestClass]
     public class CSharpGeneratorTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_type_is_array_and_items_and_item_is_not_defined_then_any_array_is_generated()
         {
             //// Arrange
@@ -35,143 +34,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; } = "));
-        }
-
-        [TestMethod]
-        public async Task When_all_of_has_multiple_refs_then_the_properties_should_expand_to_single_class()
-        {
-            //// Arrange
-            var json = @"{
-                '$schema': 'http://json-schema.org/draft-04/schema#',
-                'id': 'http://some.domain.com/foo.json',
-                'type': 'object',
-                'additionalProperties': false,
-                'definitions': {
-                    'tRef1': {
-                        'properties': {
-                            'val1': {
-                                'type': 'string',
-                            }
-                        }
-                    },
-                    'tRef2': {
-                        'properties': {
-                            'val2': {
-                                'type': 'string',
-                            }
-                        }
-                    },
-                    'tRef3': {
-                        'properties': {
-                            'val3': {
-                                'type': 'string',
-                            }
-                        }
-                    }
-                },
-                'properties' : {
-                    'tAgg': {
-                        'allOf': [
-                            {'$ref': '#/definitions/tRef1'},
-                            {'$ref': '#/definitions/tRef2'},
-                            {'$ref': '#/definitions/tRef3'}
-                        ]
-                    }
-                }
-            }";
-
-            //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
-            var generator = new CSharpGenerator(schema, settings);
-            var output = generator.GenerateFile("Foo");
-
-            //// Assert
-            Assert.IsTrue(output.Contains("public partial class TAgg"));
-            Assert.IsTrue(output.Contains("public string Val1 { get; set; }"));
-            Assert.IsTrue(output.Contains("public string Val2 { get; set; }"));
-            Assert.IsTrue(output.Contains("public string Val3 { get; set; }"));
-        }
-
-        [TestMethod]
-        public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
-        {
-            //// Arrange
-            var json = @"{
-                '$schema': 'http://json-schema.org/draft-04/schema#',
-                'type': 'object',
-                'properties': { 
-                    'prop1' : { 'type' : 'string' } 
-                },
-                'allOf': [
-                    {
-                        'type': 'object', 
-                        'properties': { 
-                            'baseProperty' : { 'type' : 'string' } 
-                        }
-                    },
-                    {
-                        'properties': { 
-                            'prop2' : { 'type' : 'string' } 
-                        }
-                    }
-                ]
-            }";
-
-            //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
-
-            //// Assert
-            Assert.IsTrue(code.Contains(
-@"  public partial class Foo : Anonymous
-    {
-        [Newtonsoft.Json.JsonProperty(""prop1"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Prop1 { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty(""prop2"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Prop2 { get; set; }
-".Replace("\r", string.Empty)));
-
-            Assert.IsTrue(code.Contains("class Anonymous"));
-        }
-
-        [TestMethod]
-        public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
-        {
-            //// Arrange
-            var json = @"{
-                '$schema': 'http://json-schema.org/draft-04/schema#',
-                'type': 'object',
-                'properties': { 
-                    'prop1' : { 'type' : 'string' } 
-                },
-                'allOf': [
-                    {
-                        '$ref': '#/definitions/Bar'
-                    }
-                ], 
-                'definitions': {
-                    'Bar':  {
-                        'type': 'object', 
-                        'properties': { 
-                            'prop2' : { 'type' : 'string' } 
-                        }
-                    }
-                }
-            }";
-
-            //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
-            var code = generator.GenerateFile("Foo");
-
-            //// Assert
-            Assert.IsTrue(code.Contains("class Foo : Bar"));
-            Assert.IsTrue(code.Contains("public string Prop1 { get; set; }"));
-            Assert.IsTrue(code.Contains("public string Prop2 { get; set; }"));
+            Assert.True(output.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; } = "));
         }
 
         class CustomPropertyNameGenerator : IPropertyNameGenerator
@@ -189,7 +52,54 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }
         }
 
-        [TestMethod]
+        public class Teacher : Person
+        {
+            public string Class { get; set; }
+        }
+
+        public class Person
+        {
+            [Required]
+            public string FirstName { get; set; }
+
+            [JsonProperty("lastName")]
+            public string LastName { get; set; }
+
+            [ReadOnly(true)]
+            public DateTime Birthday { get; set; }
+
+            public TimeSpan TimeSpan { get; set; }
+
+            public TimeSpan? TimeSpanOrNull { get; set; }
+
+            public Gender Gender { get; set; }
+
+            public Gender? GenderOrNull { get; set; }
+
+            public Address Address { get; set; }
+
+            [CanBeNull]
+            public Address AddressOrNull { get; set; }
+
+            public List<string> Array { get; set; }
+
+            public Dictionary<string, int> Dictionary { get; set; }
+        }
+
+        public enum Gender
+        {
+            Male,
+            Female
+        }
+
+        public class Address
+        {
+            public string Street { get; set; }
+
+            public string City { get; set; }
+        }
+
+        [Fact]
         public async Task When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
         {
             //// Arrange
@@ -206,13 +116,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Console.WriteLine(output);
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
-            Assert.IsTrue(output.Contains(@"public string MyCustomLastName"));
-            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypeTeacher"));
-            Assert.IsTrue(output.Contains(@"public partial class MyCustomTypePerson"));
+            Assert.True(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
+            Assert.True(output.Contains(@"public string MyCustomLastName"));
+            Assert.True(output.Contains(@"public partial class MyCustomTypeTeacher"));
+            Assert.True(output.Contains(@"public partial class MyCustomTypePerson"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_contains_ref_to_definition_that_refs_another_definition_then_result_should_contain_correct_target_ref_type()
         {
             //// Arrange
@@ -255,81 +165,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = gen.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public System.Collections.ObjectModel.ObservableCollection<PRef>"));
+            Assert.True(output.Contains("public System.Collections.ObjectModel.ObservableCollection<PRef>"));
         }
 
-        [TestMethod]
-        public async Task When_property_has_interger_default_it_is_reflected_in_the_poco()
-        {
-            var data = @"{'properties': {
-                                'intergerWithDefault': {      
-                                    'type': 'integer',
-                                    'format': 'int32',
-                                    'default': 5
-                                 }
-                             }}";
-
-            var schema = await JsonSchema4.FromJsonAsync(data);
-            var settings = new CSharpGeneratorSettings
-            {
-                ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "ns",
-                GenerateDefaultValues = true
-            };
-            var gen = new CSharpGenerator(schema, settings);
-            var output = gen.GenerateFile("MyClass");
-
-            Assert.IsTrue(output.Contains("public int IntergerWithDefault { get; set; } = 5;"));
-        }
-
-        [TestMethod]
-        public async Task When_property_has_boolean_default_it_is_reflected_in_the_poco()
-        {
-            var data = @"{'properties': {
-                                'boolWithDefault': {
-                                    'type': 'boolean',
-                                    'default': false
-                                 }
-                             }}";
-
-            var schema = await JsonSchema4.FromJsonAsync(data);
-            var settings = new CSharpGeneratorSettings
-            {
-                ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "ns",
-                GenerateDefaultValues = true
-            };
-            var gen = new CSharpGenerator(schema, settings);
-            var output = gen.GenerateFile("MyClass");
-
-            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
-        }
-
-        [TestMethod]
-        public async Task When_property_has_boolean_default_and_default_value_generation_is_disabled_then_default_value_is_not_generated()
-        {
-            var data = @"{'properties': {
-                                'boolWithDefault': {
-                                    'type': 'boolean',
-                                    'default': false
-                                 }
-                             }}";
-
-            var schema = await JsonSchema4.FromJsonAsync(data);
-            var settings = new CSharpGeneratorSettings
-            {
-                ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "ns",
-                GenerateDefaultValues = false
-            };
-            var gen = new CSharpGenerator(schema, settings);
-            var output = gen.GenerateFile("MyClass");
-
-            Assert.IsTrue(output.Contains("public bool BoolWithDefault { get; set; }"));
-            Assert.IsFalse(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
-        }
-
-        [TestMethod]
+        [Fact]
         public async Task When_namespace_is_set_then_it_should_appear_in_output()
         {
             //// Arrange
@@ -339,12 +178,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("namespace MyNamespace"));
-            Assert.IsTrue(output.Contains("Dictionary<string, int>"));
+            Assert.True(output.Contains("namespace MyNamespace"));
+            Assert.True(output.Contains("Dictionary<string, int>"));
         }
 
-        [TestMethod]
-        public async Task When_POCO_is_set_then_auto_properties_is_available()
+        [Fact]
+        public async Task When_POCO_is_set_then_auto_properties_are_generated()
         {
             //// Arrange
             var generator = await CreateGeneratorAsync();
@@ -354,10 +193,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("{ get; set; }"));
+            Assert.True(output.Contains("{ get; set; }"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_name_does_not_match_property_name_then_attribute_is_correct()
         {
             //// Arrange
@@ -367,11 +206,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
-            Assert.IsTrue(output.Contains(@"public string LastName"));
+            Assert.True(output.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName"""));
+            Assert.True(output.Contains(@"public string LastName"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_timespan_than_csharp_timespan_is_used()
         {
             //// Arrange
@@ -383,10 +222,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"public System.TimeSpan TimeSpan"));
+            Assert.True(output.Contains(@"public System.TimeSpan TimeSpan"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
             //// Arrange
@@ -396,10 +235,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"class Teacher : Person, "));
+            Assert.True(output.Contains(@"class Teacher : Person, "));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
@@ -411,10 +250,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/// <summary>EnumDesc.</summary>"));
+            Assert.True(output.Contains(@"/// <summary>EnumDesc.</summary>"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
@@ -426,10 +265,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/// <summary>ClassDesc.</summary>"));
+            Assert.True(output.Contains(@"/// <summary>ClassDesc.</summary>"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
@@ -441,10 +280,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
+            Assert.True(output.Contains(@"/// <summary>PropertyDesc.</summary>"));
         }
 
-        [TestMethod]
+        public class File
+        {
+            public byte[] Content { get; set; }
+        }
+
+        [Fact]
         public async Task Can_generate_type_from_string_property_with_byte_format()
         {
             // Arrange
@@ -455,10 +299,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.IsTrue(output.Contains("public byte[] Content"));
+            Assert.True(output.Contains("public byte[] Content"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Can_generate_type_from_string_property_with_base64_format()
         {
             // Arrange
@@ -470,10 +314,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.IsTrue(output.Contains("public byte[] Content"));
+            Assert.True(output.Contains("public byte[] Content"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
             //// Arrange
@@ -489,11 +333,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.IsTrue(output.Contains(@"[Newtonsoft.Json.JsonProperty(""foo-bar"", "));
-            Assert.IsTrue(output.Contains(@"public string FooBar"));
+            Assert.True(output.Contains(@"[Newtonsoft.Json.JsonProperty(""foo-bar"", "));
+            Assert.True(output.Contains(@"public string FooBar"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {
             //// Arrange
@@ -504,7 +348,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(output.Contains(@"class  :"));
+            Assert.False(output.Contains(@"class  :"));
         }
 
         private static async Task<CSharpGenerator> CreateGeneratorAsync()
@@ -523,7 +367,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public object Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_object_then_any_type_is_generated()
         {
             //// Arrange
@@ -532,13 +376,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema4.FromTypeAsync<ObjectTestClass>();
 
             //// Assert
-            Assert.AreEqual(
+            Assert.Equal(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
 }".Replace("\r", string.Empty), schema.Properties["Foo"].ActualTypeSchema.ToJson().Replace("\r", string.Empty));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_object_then_object_property_is_generated()
         {
             //// Arrange
@@ -549,7 +393,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
+            Assert.True(code.Contains("public object Foo { get; set; }"));
         }
 
         public enum ConstructionCode
@@ -567,7 +411,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public ConstructionCode ConstructionCode { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_property_has_default_and_int_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
@@ -583,10 +427,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
+            Assert.True(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_property_has_default_and_string_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
@@ -602,10 +446,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
+            Assert.True(code.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_type_name_is_missing_then_default_value_is_still_correctly_set()
         {
             //// Arrange
@@ -642,10 +486,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = Foo.MyClassConstructionCode.JOIST_MAS;"));
+            Assert.True(code.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = Foo.MyClassConstructionCode.JOIST_MAS;"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_same_name_as_class_then_it_is_renamed()
         {
             //// Arrange
@@ -664,11 +508,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonProperty(\"Foo\", Required = Newtonsoft.Json.Required.DisallowNull"));
-            Assert.IsTrue(code.Contains("public string Foo1 { get; set; }"));
+            Assert.True(code.Contains("[Newtonsoft.Json.JsonProperty(\"Foo\", Required = Newtonsoft.Json.Required.DisallowNull"));
+            Assert.True(code.Contains("public string Foo1 { get; set; }"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
         {
             //// Arrange
@@ -693,10 +537,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public System.Collections.Generic.Dictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
+            Assert.True(code.Contains("public System.Collections.Generic.Dictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_object_has_generic_name_then_it_is_transformed()
         {
             //// Arrange
@@ -712,7 +556,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo[Bar[Inner]]");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public partial class FooOfBarOfInner"));
+            Assert.True(code.Contains("public partial class FooOfBarOfInner"));
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -730,7 +574,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public int? Age { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_required_then_CSharp_code_is_correct()
         {
             //// Arrange
@@ -742,7 +586,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(schemaJson.Replace("\r", string.Empty).Contains(
+            Assert.True(schemaJson.Replace("\r", string.Empty).Contains(
 @"  ""required"": [
     ""FirstName"",
     ""Age""
@@ -763,7 +607,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     }
   }".Replace("\r", string.Empty)));
 
-            Assert.IsTrue(code.Replace("\r", string.Empty).Contains(
+            Assert.True(code.Replace("\r", string.Empty).Contains(
 @"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
@@ -775,7 +619,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public int? Age { get; set; }".Replace("\r", string.Empty)));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -815,11 +659,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> A { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
-            Assert.IsFalse(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> B { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
+            Assert.True(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> A { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
+            Assert.False(code.Contains("public System.Collections.ObjectModel.ObservableCollection<string> B { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -859,12 +703,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public System.Collections.Generic.Dictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
-            Assert.IsFalse(code.Contains("public System.Collections.Generic.Dictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
+            Assert.True(code.Contains("public System.Collections.Generic.Dictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
+            Assert.False(code.Contains("public System.Collections.Generic.Dictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();"));
         }
 
-
-        [TestMethod]
+        [Fact]
         public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -912,11 +755,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public A A { get; set; } = new A();"));
-            Assert.IsFalse(code.Contains("public B B { get; set; } = new B();"));
+            Assert.True(code.Contains("public A A { get; set; } = new A();"));
+            Assert.False(code.Contains("public B B { get; set; } = new B();"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_is_named_Object_then_JObject_is_generated()
         {
             //// Arrange
@@ -946,7 +789,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public object Foo { get; set; }"));
+            Assert.True(code.Contains("public object Foo { get; set; }"));
         }
 
         public class ObsClass
@@ -954,7 +797,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public ObservableCollection<string> Test { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_ObservableCollection_then_generated_code_uses_the_same_class()
         {
             //// Arrange
@@ -967,10 +810,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Console.WriteLine(output);
 
             //// Assert
-            Assert.IsTrue(output.Contains("ObservableCollection<string>"));
+            Assert.True(output.Contains("ObservableCollection<string>"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_special_chars_then_they_should_be_converted()
         {
             //// Arrange
@@ -984,10 +827,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("Application_vnd_msExcel = 1,"));
+            Assert.True(output.Contains("Application_vnd_msExcel = 1,"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_not_supported_characters_then_they_are_removed()
         {
             //// Arrange
@@ -1007,10 +850,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains("public string OdataContext"));
+            Assert.True(output.Contains("public string OdataContext"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_minimum_a_range_attribute_is_added_with_minimum_and_max_double_maximum()
         {
             //// Arrange
@@ -1035,10 +878,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_maximum_a_range_attribute_is_added_with_min_double_minimum_and_maximum()
         {
             //// Arrange
@@ -1063,10 +906,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(int.MinValue, 10)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Range(int.MinValue, 10)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_both_minimum_and_maximum_a_range_attribute_is_added()
         {
             //// Arrange
@@ -1092,10 +935,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, 10)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Range(1, 10)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_maximum_a_range_attribute_is_not_added_for_anything_but_type_number_or_integer()
         {
             //// Arrange
@@ -1120,10 +963,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.Range"));
+            Assert.False(code.Contains("System.ComponentModel.DataAnnotations.Range"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_min_length_a_string_length_attribute_is_added()
         {
             //// Arrange
@@ -1148,10 +991,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 10)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 10)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_max_length_a_string_length_attribute_is_added()
         {
             //// Arrange
@@ -1176,10 +1019,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_both_min_and_max_length_a_string_length_attribute_is_added()
         {
             //// Arrange
@@ -1205,10 +1048,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20, MinimumLength = 10)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.StringLength(20, MinimumLength = 10)]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_both_min_length_a_string_length_attribute_is_added_only_for_type_string()
         {
             //// Arrange
@@ -1234,10 +1077,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains("System.ComponentModel.DataAnnotations.StringLength"));
+            Assert.False(code.Contains("System.ComponentModel.DataAnnotations.StringLength"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_pattern_a_regular_expression_attribute_is_added()
         {
             //// Arrange
@@ -1262,10 +1105,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(@""^[a-zA-Z''-'\s]{1,40}$"")]"));
+            Assert.True(code.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(@""^[a-zA-Z''-'\s]{1,40}$"")]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_pattern_but_type_is_not_string_a_regular_expression_should_not_be_added()
         {
             //// Arrange
@@ -1290,10 +1133,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations.RegularExpression"));
+            Assert.False(code.Contains(@"System.ComponentModel.DataAnnotations.RegularExpression"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_restrictions_but_render_data_annotations_is_set_to_false_they_should_not_be_included()
         {
             //// Arrange
@@ -1330,7 +1173,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains(@"System.ComponentModel.DataAnnotations"));
+            Assert.False(code.Contains(@"System.ComponentModel.DataAnnotations"));
         }
 
         public class MyByteTest
@@ -1338,7 +1181,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public byte? Cell { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_byte_then_its_type_is_preserved()
         {
             //// Arrange
@@ -1350,7 +1193,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public byte? Cell { get; set; }"));
+            Assert.True(code.Contains("public byte? Cell { get; set; }"));
         }
 
         public class MyRequiredNullableTest
@@ -1359,7 +1202,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public int? Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_nullable_property_is_required_then_it_is_not_nullable_in_generated_csharp_code()
         {
             //// Arrange
@@ -1371,10 +1214,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("public int Foo { get; set; }"));
+            Assert.True(code.Contains("public int Foo { get; set; }"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_date_converter_should_be_added_for_datetime()
         {
             //// Arrange
@@ -1400,11 +1243,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains(@"class DateFormatConverter"));
-            Assert.IsTrue(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+            Assert.True(code.Contains(@"class DateFormatConverter"));
+            Assert.True(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
 	    }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_date_converter_should_be_added_for_datetimeoffset()
         {
             //// Arrange
@@ -1430,11 +1273,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains(@"class DateFormatConverter"));
-            Assert.IsTrue(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+            Assert.True(code.Contains(@"class DateFormatConverter"));
+            Assert.True(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_definition_contains_datetime_converter_should_not_be_added()
         {
             //// Arrange
@@ -1460,8 +1303,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains(@"class DateFormatConverter"));
-            Assert.IsFalse(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
+            Assert.False(code.Contains(@"class DateFormatConverter"));
+            Assert.False(code.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]"));
         }
     }
 }

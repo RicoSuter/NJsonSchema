@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema", "NJsonSchema\NJsonSchema.csproj", "{7B7A2E32-E808-4A19-98B1-37E766580F8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema", "NJsonSchema\NJsonSchema.csproj", "{7B7A2E32-E808-4A19-98B1-37E766580F8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
 EndProject
@@ -11,13 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Demo", "NJsonSc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.Tests", "NJsonSchema.CodeGeneration.Tests\NJsonSchema.CodeGeneration.Tests.csproj", "{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration", "NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj", "{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration", "NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj", "{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.CSharp", "NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj", "{546CF985-2029-4CBB-8F7D-303C037EB293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration.CSharp", "NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj", "{546CF985-2029-4CBB-8F7D-303C037EB293}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.TypeScript", "NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj", "{3D8BA0A7-65AF-4328-82DC-8C131D9A9EA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration.TypeScript", "NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj", "{3D8BA0A7-65AF-4328-82DC-8C131D9A9EA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.CSharp.Tests", "NJsonSchema.CodeGeneration.CSharp.Tests\NJsonSchema.CodeGeneration.CSharp.Tests.csproj", "{0873FE5E-4A46-48B5-A171-AC629EC7C263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,22 @@ Global
 		{3D8BA0A7-65AF-4328-82DC-8C131D9A9EA8}.Release|x64.Build.0 = Release|Any CPU
 		{3D8BA0A7-65AF-4328-82DC-8C131D9A9EA8}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D8BA0A7-65AF-4328-82DC-8C131D9A9EA8}.Release|x86.Build.0 = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|ARM.Build.0 = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|x64.Build.0 = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Debug|x86.Build.0 = Debug|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|ARM.ActiveCfg = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|ARM.Build.0 = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x64.ActiveCfg = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x64.Build.0 = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x86.ActiveCfg = Release|Any CPU
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,5 +139,9 @@ Global
 		{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
+		{0873FE5E-4A46-48B5-A171-AC629EC7C263} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D5EDC80-5611-493B-804B-8B364816952B}
 	EndGlobalSection
 EndGlobal
