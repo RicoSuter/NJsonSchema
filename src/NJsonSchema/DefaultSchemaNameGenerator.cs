@@ -25,6 +25,10 @@ namespace NJsonSchema
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
                 return jsonSchemaAttribute.Name;
 
+            dynamic displayNameAttribute = type.GetTypeInfo().GetCustomAttributes().TryGetIfAssignableTo("System.ComponentModel.DisplayNameAttribute");
+            if (displayNameAttribute != null && !string.IsNullOrEmpty(displayNameAttribute.DisplayName))
+                return displayNameAttribute.DisplayName;
+
             //var jsonObjectAttribute = type.GetTypeInfo().GetCustomAttribute<JsonObjectAttribute>();
             //if (!string.IsNullOrEmpty(jsonObjectAttribute.Title) && Regex.IsMatch(jsonObjectAttribute.Title, "^[a-zA-Z0-9_]*$"))
             //    return jsonObjectAttribute.Title;
