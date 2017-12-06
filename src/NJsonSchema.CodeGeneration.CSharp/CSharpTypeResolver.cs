@@ -63,14 +63,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return "byte[]";
 
             if (schema.IsDictionary)
-            {
-                var valueType = ResolveDictionaryValueType(schema, "object", Settings.SchemaType);
-                return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
-            }
+                return ResolveDictionary(schema);
 
             return GetOrGenerateTypeName(schema, typeNameHint);
         }
-        
+
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Date)
@@ -130,14 +127,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveArrayOrTuple(JsonSchema4 schema)
         {
-            var property = schema;
-            if (property.Item != null)
-                return string.Format(Settings.ArrayType + "<{0}>", Resolve(property.Item, false, null));
+            if (schema.Item != null)
+                return string.Format(Settings.ArrayType + "<{0}>", Resolve(schema.Item, false, null));
 
-            if (property.Items != null && property.Items.Count > 0)
-                return string.Format("System.Tuple<" + string.Join(", ", property.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
+            if (schema.Items != null && schema.Items.Count > 0)
+                return string.Format("System.Tuple<" + string.Join(", ", schema.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
 
             return Settings.ArrayType + "<object>";
+        }
+
+        private string ResolveDictionary(JsonSchema4 schema)
+        {
+            var valueType = ResolveDictionaryValueType(schema, "object", Settings.SchemaType);
+            return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
         }
     }
 }
