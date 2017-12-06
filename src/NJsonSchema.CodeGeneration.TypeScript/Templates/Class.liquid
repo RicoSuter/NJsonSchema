@@ -86,10 +86,12 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
         if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Key }}")
             return createInstance<{{ derivedClass.Value }}>(data, _mappings, {{ derivedClass.Value }});
 {%       endfor -%}
-        return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
-{%   else -%}
-        return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
 {%   endif -%}
+{%     if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%     else -%}
+        return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
+{%     endif -%}
 {% else -%}
 {%   if HasBaseDiscriminator -%}
 {%       for derivedClass in DerivedClasses -%}
@@ -100,9 +102,13 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
         }
 {%       endfor -%}
 {%   endif -%}
+{%     if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%     else -%}
         let result = new {{ ClassName }}();
         result.init(data);
         return result;
+{%     endif -%}
 {% endif -%}
     }
 
