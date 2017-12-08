@@ -9,7 +9,7 @@
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
 {% template Class.Annotations %}
-{{ TypeAccessModifier }} partial {% if IsAbstract %}abstract {% endif %}class {{ClassName}} {{InheritanceCode}}
+{{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {{InheritanceCode}}
 {
 {% if RenderInpc -%}
 {% for property in Properties -%}
