@@ -11,32 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="References\LocalReferencesTests\animal.json" />
-    <None Remove="References\LocalReferencesTests\collection.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_collection_reference.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_indirect_reference.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_reference.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="References\LocalReferencesTests\animal.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\collection.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_collection_reference.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_indirect_reference.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_reference.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
@@ -52,6 +26,24 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="References\LocalReferencesTests\animal.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\LocalReferencesTests\collection.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\LocalReferencesTests\schema_with_collection_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\LocalReferencesTests\schema_with_indirect_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\LocalReferencesTests\schema_with_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
