@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class AnnotationsGenerationTests
     {
         public class AnnotationClass
@@ -26,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
@@ -37,11 +36,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Point"];
 
             //// Assert
-            Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
-            Assert.AreEqual("point", property.Format);
+            Assert.True(property.Type.HasFlag(JsonObjectType.String));
+            Assert.Equal("point", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
@@ -52,8 +51,8 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["ClassAsString"];
 
             //// Assert
-            Assert.IsTrue(property.Type.HasFlag(JsonObjectType.String));
-            Assert.AreEqual("point", property.Format);
+            Assert.True(property.Type.HasFlag(JsonObjectType.String));
+            Assert.Equal("point", property.Format);
         }
 
         public class MultipleOfClass
@@ -62,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
             public double Number { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_multipleOf_attribute_is_available_then_value_is_set_in_schema()
         {
             //// Arrange
@@ -72,7 +71,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Number"];
 
             //// Assert
-            Assert.AreEqual(4.5m, property.MultipleOf.Value);
+            Assert.Equal(4.5m, property.MultipleOf.Value);
         }
 
         public class SimpleClass
@@ -86,7 +85,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_multipleOf_is_fraction_then_it_is_validated_correctly()
         {
             //// Arrange
@@ -120,7 +119,7 @@ namespace NJsonSchema.Tests.Generation
             var errors = schema.Validate(jsonData);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
         [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
@@ -137,7 +136,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type()
         {
             //// Arrange
@@ -147,7 +146,7 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
+            Assert.Equal(JsonObjectType.String, schema.Item.Type);
         }
 
         [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
@@ -155,7 +154,7 @@ namespace NJsonSchema.Tests.Generation
         {
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
         {
             //// Arrange
@@ -165,7 +164,7 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
+            Assert.Equal(JsonObjectType.String, schema.Item.Type);
         }
 
         public class MyStructContainer
@@ -180,7 +179,7 @@ namespace NJsonSchema.Tests.Generation
         {
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_struct_then_it_is_not_nullable()
         {
             //// Arrange
@@ -190,8 +189,8 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.String, schema.Properties["Struct"].Type);
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["NullableStruct"].Type);
+            Assert.Equal(JsonObjectType.String, schema.Properties["Struct"].Type);
+            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, schema.Properties["NullableStruct"].Type);
         }
 
         public class StringLengthAttributeClass
@@ -200,7 +199,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_StringLengthAttribute_is_set_then_minLength_and_maxLenght_is_set()
         {
             //// Arrange
@@ -211,8 +210,8 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             var property = schema.Properties["Foo"];
 
-            Assert.AreEqual(5, property.MinLength);
-            Assert.AreEqual(10, property.MaxLength);
+            Assert.Equal(5, property.MinLength);
+            Assert.Equal(10, property.MaxLength);
         }
 
         public class DataTypeAttributeClass
@@ -241,58 +240,58 @@ namespace NJsonSchema.Tests.Generation
 #endif
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_DateTime_then_the_format_property_is_datetime()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["DateTime"];
 
-            Assert.AreEqual("date-time", property.Format);
+            Assert.Equal("date-time", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_Date_then_the_format_property_is_date()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Date"];
 
-            Assert.AreEqual("date", property.Format);
+            Assert.Equal("date", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_Time_then_the_format_property_is_time()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Time"];
 
-            Assert.AreEqual("time", property.Format);
+            Assert.Equal("time", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_EmailAddress_then_the_format_property_is_email()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["EmailAddress"];
 
-            Assert.AreEqual("email", property.Format);
+            Assert.Equal("email", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_PhoneNumber_then_the_format_property_is_phone()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["PhoneNumber"];
 
-            Assert.AreEqual("phone", property.Format);
+            Assert.Equal("phone", property.Format);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_DataTypeAttribute_is_Url_then_the_format_property_is_uri()
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties["Url"];
 
-            Assert.AreEqual("uri", property.Format);
+            Assert.Equal("uri", property.Format);
         }
     }
 }

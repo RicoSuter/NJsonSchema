@@ -1,17 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.CSharp;
+﻿using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
-    [TestClass]
     public class DefaultValueGeneratorTests
     {
         private CSharpValueGenerator _csharpGenerator;
         private TypeScriptValueGenerator _typescriptGenerator;
 
-        [TestInitialize]
-        public void Init()
+        public DefaultValueGeneratorTests()
         {
             var csharpSettings = new CSharpGeneratorSettings();
             _csharpGenerator = new CSharpValueGenerator(new CSharpTypeResolver(csharpSettings), csharpSettings);
@@ -20,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             _typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(typescriptSettings), typescriptSettings);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_int_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -35,11 +33,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "int", "int", true);
 
             //// Assert
-            Assert.AreEqual("6", csharpValue);
-            Assert.AreEqual("6", typescriptValue);
+            Assert.Equal("6", csharpValue);
+            Assert.Equal("6", typescriptValue);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_long_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -54,11 +52,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "long", "long", true);
 
             //// Assert
-            Assert.AreEqual("6000000000L", csharpValue);
-            Assert.AreEqual("6000000000", typescriptValue);
+            Assert.Equal("6000000000L", csharpValue);
+            Assert.Equal("6000000000", typescriptValue);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_float_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -73,11 +71,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "float", "float", true);
 
             //// Assert
-            Assert.AreEqual("1234.567F", csharpValue);
-            Assert.AreEqual("1234.567", typescriptValue);
+            Assert.Equal("1234.567F", csharpValue);
+            Assert.Equal("1234.567", typescriptValue);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_bool_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -92,11 +90,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "bool", "bool", true);
 
             //// Assert
-            Assert.AreEqual("true", csharpValue);
-            Assert.AreEqual("true", typescriptValue);
+            Assert.Equal("true", csharpValue);
+            Assert.Equal("true", typescriptValue);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_string_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -111,8 +109,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "string", "string", true);
 
             //// Assert
-            Assert.AreEqual("\"test\\\\test\\\"test\\r\\ntest\"", csharpValue);
-            Assert.AreEqual("\"test\\\\test\\\"test\\r\\ntest\"", typescriptValue);
+            Assert.Equal("\"test\\\\test\\\"test\\r\\ntest\"", csharpValue);
+            Assert.Equal("\"test\\\\test\\\"test\\r\\ntest\"", typescriptValue);
         }
 
         public class MyEnumNameGenerator : IEnumNameGenerator
@@ -123,7 +121,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void When_schema_has_default_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -148,8 +146,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true);
 
             //// Assert
-            Assert.AreEqual("Ns.MyEnum.bar", csharpValue);
-            Assert.AreEqual("MyEnum.bar", typescriptValue);
+            Assert.Equal("Ns.MyEnum.bar", csharpValue);
+            Assert.Equal("MyEnum.bar", typescriptValue);
         }
     }
 }

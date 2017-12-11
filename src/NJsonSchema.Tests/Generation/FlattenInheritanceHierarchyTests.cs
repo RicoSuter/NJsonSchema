@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class FlattenInheritanceHierarchyTests
     {
         public class Person
@@ -21,7 +17,7 @@ namespace NJsonSchema.Tests.Generation
             public string Class { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_properties_are_in_one_schema()
         {
             //// Arrange
@@ -36,8 +32,8 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("Name"));
-            Assert.IsTrue(schema.Properties.ContainsKey("Class"));
+            Assert.True(schema.Properties.ContainsKey("Name"));
+            Assert.True(schema.Properties.ContainsKey("Class"));
         }
 
         public interface IFoo : IBar, IBaz
@@ -60,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
             string Bar { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_interface_properties_are_in_one_schema()
         {
             //// Arrange
@@ -76,10 +72,10 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(3, schema.Properties.Count);
-            Assert.IsTrue(schema.Properties.ContainsKey("Foo"));
-            Assert.IsTrue(schema.Properties.ContainsKey("Bar"));
-            Assert.IsTrue(schema.Properties.ContainsKey("Baz"));
+            Assert.Equal(3, schema.Properties.Count);
+            Assert.True(schema.Properties.ContainsKey("Foo"));
+            Assert.True(schema.Properties.ContainsKey("Bar"));
+            Assert.True(schema.Properties.ContainsKey("Baz"));
         }
 
         public class Test
@@ -91,7 +87,7 @@ namespace NJsonSchema.Tests.Generation
 
         public class Metadata : Dictionary<string, string> { }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_and_generate_abstract_properties_works()
         {
             //// Arrange
@@ -108,7 +104,7 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_works()
         {
             //// Arrange

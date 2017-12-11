@@ -1,12 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class NumberTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_double_is_bigger_then_decimal_then_validation_works()
         {
             /// Arrange
@@ -36,10 +35,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = validationSchema.Validate(data);
 
             /// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        // [TestMethod]
+        // [Fact]
         public async Task When_integer_is_big_integer_then_validation_works()
         {
             // See https://github.com/RSuter/NJsonSchema/issues/568
@@ -67,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = validationSchema.Validate(data);
 
             /// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
     }

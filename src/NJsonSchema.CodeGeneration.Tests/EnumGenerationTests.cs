@@ -2,16 +2,15 @@ using System;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
-    [TestClass]
     public class EnumGenerationTests
     {
         public class StringAndIntegerEnumTestClass
@@ -33,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             C = 6,
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_string_and_integer_enum_used_then_two_enums_are_generated_in_typescript()
         {
             //// Arrange
@@ -48,10 +47,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.AreEqual(3, code.Split(new[] { "export enum " }, StringSplitOptions.None).Count()); // two found
+            Assert.Equal(3, code.Split(new[] { "export enum " }, StringSplitOptions.None).Count()); // two found
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_string_and_integer_enum_used_then_one_enum_is_generated_in_CSharp()
         {
             //// Arrange
@@ -66,16 +65,16 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass").Replace("\r", "");
 
             //// Assert
-            Assert.IsFalse(code.Contains("Ref_"));
-            Assert.IsTrue(code.Contains("public enum Bar\n"));
-            Assert.IsTrue(code.Contains("public enum Bar2\n"));
+            Assert.DoesNotContain("Ref_", code);
+            Assert.Contains("public enum Bar\n", code);
+            Assert.Contains("public enum Bar2\n", code);
 
-            Assert.IsTrue(code.Contains(" B = 5,")); // B must be 5 even if B = 1 is first defined
-            Assert.AreEqual(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
-            Assert.AreEqual(3, code.Split(new[] { "[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
+            Assert.Contains(" B = 5,", code); // B must be 5 even if B = 1 is first defined
+            Assert.Equal(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
+            Assert.Equal(3, code.Split(new[] { "[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_byte_enum_is_generated_then_no_exception_occurs()
         {
             //// Arrange
@@ -105,7 +104,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             C = 6,
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_string_value_then_CS_code_has_EnumMember_attribute()
         {
             //// Arrange
@@ -117,13 +116,13 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]"));
-            Assert.IsTrue(code.Contains("_0562 = 0,"));
-            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]"));
-            Assert.IsTrue(code.Contains("_0532 = 1,"));
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]", code);
+            Assert.Contains("_0562 = 0,", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]", code);
+            Assert.Contains("_0532 = 1,", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_string_value_then_TS_code_has_string_value()
         {
             //// Arrange
@@ -135,8 +134,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("_0562 = <any>\"0562\", "));
-            Assert.IsTrue(code.Contains("_0532 = <any>\"0532\", "));
+            Assert.Contains("_0562 = <any>\"0562\", ", code);
+            Assert.Contains("_0532 = <any>\"0532\", ", code);
         }
 
         public class ClassWithStringEnum
@@ -155,7 +154,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             _0532
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_integer_value_then_CS_code_has_EnumMember_attribute()
         {
             //// Arrange
@@ -167,13 +166,13 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains("[EnumMember(Value = \"0562\")]"));
-            Assert.IsTrue(code.Contains("_0562 = 10,"));
-            Assert.IsFalse(code.Contains("[EnumMember(Value = \"0532\")]"));
-            Assert.IsTrue(code.Contains("_0532 = 15,"));
+            Assert.DoesNotContain("[EnumMember(Value = \"0562\")]", code);
+            Assert.Contains("_0562 = 10,", code);
+            Assert.DoesNotContain("[EnumMember(Value = \"0532\")]", code);
+            Assert.Contains("_0532 = 15,", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_integer_value_then_TS_code_has_string_value()
         {
             //// Arrange
@@ -185,8 +184,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("_0562 = 10, "));
-            Assert.IsTrue(code.Contains("_0532 = 15, "));
+            Assert.Contains("_0562 = 10, ", code);
+            Assert.Contains("_0532 = 15, ", code);
         }
 
         public class ClassWithIntegerEnum
@@ -200,10 +199,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             _0532 = 15
         }
 
-
-
-
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_no_names_and_string_value_starts_with_number_then_underline_is_generated()
         {
             //// Arrange
@@ -236,13 +232,13 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]"));
-            Assert.IsTrue(code.Contains("_0562 = 0,"));
-            Assert.IsTrue(code.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]"));
-            Assert.IsTrue(code.Contains("_0532 = 1,"));
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]", code);
+            Assert.Contains("_0562 = 0,", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]", code);
+            Assert.Contains("_0532 = 1,", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_nullable_and_enum_allows_null_then_no_exception_is_thrown()
         {
             //// Arrange
@@ -272,7 +268,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.IsNotNull(code);
+            Assert.NotNull(code);
         }
     }
 }

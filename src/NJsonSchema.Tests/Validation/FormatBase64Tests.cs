@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class FormatBase64Tests
     {
-        [TestMethod]
+        [Fact]
         public void Validation_should_fail_if_string_is_not_base64_formatted()
         {
             //// Arrange
@@ -25,11 +24,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual(ValidationErrorKind.Base64Expected, errors.Single().Kind);
+            Assert.Equal(1, errors.Count);
+            Assert.Equal(ValidationErrorKind.Base64Expected, errors.Single().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void Validation_should_fail_if_string_is_not_byte_formatted()
         {
             //// Arrange
@@ -45,11 +44,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
-            Assert.AreEqual(ValidationErrorKind.Base64Expected, errors.Single().Kind);
+            Assert.Equal(1, errors.Count);
+            Assert.Equal(ValidationErrorKind.Base64Expected, errors.Single().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void Validation_should_succeed_if_string_is_base64_formatted_with_trailing_equals()
         {
             //// Arrange
@@ -66,10 +65,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void Validation_should_succeed_if_string_is_byte_formatted_with_trailing_equals()
         {
             //// Arrange
@@ -86,10 +85,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void Validation_should_succeed_if_string_is_base64_formatted_without_trailing_equals()
         {
             //// Arrange
@@ -106,10 +105,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void Validation_should_succeed_if_string_is_byte_formatted_without_trailing_equals()
         {
             //// Arrange
@@ -126,10 +125,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void Numeric_type_should_not_trigger_validation_if_has_byte_format()
         {
             //// Arrange
@@ -145,7 +144,7 @@ namespace NJsonSchema.Tests.Validation
             var numericErrors = numericSchema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, numericErrors.Count);
+            Assert.Equal(0, numericErrors.Count);
         }
     }
 }

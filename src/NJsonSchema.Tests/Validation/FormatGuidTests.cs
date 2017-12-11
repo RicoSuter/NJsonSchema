@@ -1,15 +1,14 @@
 using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class FormatGuidTests
     {
-        [TestMethod]
+        [Fact]
         public void When_format_guid_incorrect_then_validation_succeeds()
         {
             //// Arrange
@@ -23,10 +22,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.GuidExpected, errors.First().Kind);
+            Assert.Equal(ValidationErrorKind.GuidExpected, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_guid_correct_then_validation_succeeds()
         {
             //// Arrange
@@ -41,7 +40,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
     }
 }

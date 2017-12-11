@@ -24,6 +24,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ArrayType = "System.Collections.ObjectModel.ObservableCollection";
             DictionaryType = "System.Collections.Generic.Dictionary";
 
+            ArrayBaseType = "System.Collections.ObjectModel.ObservableCollection";
+            DictionaryBaseType = "System.Collections.Generic.Dictionary";
+
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
@@ -63,6 +66,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
         public string DictionaryType { get; set; }
+       
+        /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'ObservableCollection').</summary>
+        public string ArrayBaseType { get; set; }
+
+        /// <summary>Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').</summary>
+        public string DictionaryBaseType { get; set; }
 
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
