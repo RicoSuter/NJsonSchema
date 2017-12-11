@@ -85,7 +85,7 @@ namespace NJsonSchema.Tests.References
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
             var uri = new UriBuilder(codeBase);
-            return Uri.UnescapeDataString(uri.Path);
+            return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }
     }
 }
