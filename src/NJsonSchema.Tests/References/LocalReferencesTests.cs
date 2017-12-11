@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -38,7 +40,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_schema_references_collection_in_definitions_it_works()
         {
             //// Arrange
-            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_collection_reference.json";
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_collection_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
@@ -54,7 +56,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_schema_references_external_schema_then_it_is_inlined_with_ToJson()
         {
             //// Arrange
-            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_reference.json";
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
@@ -69,7 +71,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
         {
             //// Arrange
-            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
@@ -77,6 +79,13 @@ namespace NJsonSchema.Tests.References
 
             //// Assert
             Assert.Equal(1, schema.Definitions.Count);
+        }
+
+        private string GetTestDirectory()
+        {
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new UriBuilder(codeBase);
+            return Uri.UnescapeDataString(uri.Path);
         }
     }
 }
