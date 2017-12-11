@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.References
@@ -37,7 +38,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_schema_references_collection_in_definitions_it_works()
         {
             //// Arrange
-            var path = "References/LocalReferencesTests/schema_with_collection_reference.json";
+            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_collection_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
@@ -53,7 +54,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_schema_references_external_schema_then_it_is_inlined_with_ToJson()
         {
             //// Arrange
-            var path = "References/LocalReferencesTests/schema_with_reference.json";
+            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
@@ -61,7 +62,7 @@ namespace NJsonSchema.Tests.References
 
             //// Assert
             Assert.True(schema.Definitions.ContainsKey("Animal"));
-            Assert.True(json.Contains("\"$ref\": \"#/definitions/Animal\""));
+            Assert.Contains("\"$ref\": \"#/definitions/Animal\"", json);
         }
 
         //[TestMethod]
@@ -82,7 +83,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
         {
             //// Arrange
-            var path = "References/LocalReferencesTests/schema_with_indirect_reference.json";
+            var path = Path.GetDirectoryName(typeof(LocalReferencesTests).Assembly.Location) + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
 
             //// Act
             var schema = await JsonSchema4.FromFileAsync(path);
