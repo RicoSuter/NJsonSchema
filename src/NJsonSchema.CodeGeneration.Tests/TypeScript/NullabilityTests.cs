@@ -1,19 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.Tests.Models;
+﻿using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class NullabilityTests
     {
-        [TestMethod]
+        [Fact]
         public async Task Strict_nullability_in_TypeScript2()
         {
             var schema = await JsonSchema4.FromTypeAsync<Person>(
@@ -26,13 +21,13 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 
             var output = generator.GenerateFile("MyClass");
 
-            Assert.IsTrue(output.Contains("timeSpan: string;"));
-            Assert.IsTrue(output.Contains("gender: Gender;"));
-            Assert.IsTrue(output.Contains("address: Address = new Address();"));
+            Assert.Contains("timeSpan: string;", output);
+            Assert.Contains("gender: Gender;", output);
+            Assert.Contains("address: Address = new Address();", output);
 
-            Assert.IsTrue(output.Contains("timeSpanOrNull: string | undefined;"));
-            Assert.IsTrue(output.Contains("genderOrNull: Gender | undefined;"));
-            Assert.IsTrue(output.Contains("addressOrNull: Address | undefined;"));
+            Assert.Contains("timeSpanOrNull: string | undefined;", output);
+            Assert.Contains("genderOrNull: Gender | undefined;", output);
+            Assert.Contains("addressOrNull: Address | undefined;", output);
         }
     }
 }

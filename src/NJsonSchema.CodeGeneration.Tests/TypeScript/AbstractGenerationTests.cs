@@ -1,10 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.TypeScript;
+﻿using NJsonSchema.CodeGeneration.TypeScript;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript.Generation
 {
-    [TestClass]
     public class AbstractGenerationTests
     {
         public abstract class AbstractClass
@@ -12,7 +11,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_is_abstract_then_is_abstract_TypeScript_keyword_is_generated()
         {
             /// Arrange
@@ -23,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript.Generation
             var code = generator.GenerateFile("AbstractClass");
 
             /// Assert
-            Assert.IsTrue(code.Contains("export abstract class AbstractClass"));
+            Assert.True(code.Contains("export abstract class AbstractClass"));
         }
     }
 }

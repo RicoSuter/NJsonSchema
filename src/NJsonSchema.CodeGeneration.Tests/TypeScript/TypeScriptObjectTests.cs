@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class TypeScriptObjectTests
     {
         public class ObjectTest
@@ -13,7 +12,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public object Test { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
             //// Arrange
@@ -25,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("Test: any;"));
+            Assert.Contains("Test: any;", code);
         }
 
         public class DictionaryObjectTest
@@ -33,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public IDictionary<string, object> Test { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
             //// Arrange
@@ -45,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("Test: { [key: string] : any; };"));
+            Assert.Contains("Test: { [key: string] : any; };", code);
         }
     }
 }

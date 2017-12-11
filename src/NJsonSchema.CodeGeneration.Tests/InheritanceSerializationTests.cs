@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Converters;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
@@ -58,10 +58,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         public string Prop3 { get; set; }
     }
 
-    [TestClass]
     public class InheritanceSerializationTests
     {
-        [TestMethod]
+        [Fact]
         public void When_JsonInheritanceConverter_is_passed_null_it_deserializes_to_null()
         {
             //// Arrange
@@ -70,10 +69,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             var result = JsonConvert.DeserializeObject<SubClass>("null");
 
             //// Assert
-            Assert.IsNull(result);
+            Assert.Null(result);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized()
         {
             //// Arrange
@@ -100,12 +99,12 @@ namespace NJsonSchema.CodeGeneration.Tests
             var errors = schema.Validate(json);
 
             //// Assert
-            Assert.IsTrue(deserializedContainer.Animal is Dog);
-            Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
-            Assert.IsTrue((deserializedContainer.Animal as Dog).SubElements[1] is SubClass3);
+            Assert.True(deserializedContainer.Animal is Dog);
+            Assert.True((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
+            Assert.True((deserializedContainer.Animal as Dog).SubElements[1] is SubClass3);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_serializer_setting_is_changed_then_converter_uses_correct_settings()
         {
             //// Arrange
@@ -129,8 +128,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
             //// Assert
-            Assert.IsTrue(json.Contains("prop3"));
-            Assert.IsFalse(json.Contains("Prop3"));
+            Assert.Contains("prop3", json);
+            Assert.DoesNotContain("Prop3", json);
         }
 
         public class A
@@ -153,7 +152,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_dates_are_converted_then_JsonInheritanceConverter_should_inherit_settings()
         {
             //// Arrange
@@ -173,11 +172,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             var deserialized = JsonConvert.DeserializeObject<A>(json, settings);
 
             //// Assert
-            Assert.AreEqual(deserialized.created.Offset, offset);
-            Assert.AreEqual(deserialized.subclass.created.Offset, offset);
+            Assert.Equal(deserialized.created.Offset, offset);
+            Assert.Equal(deserialized.subclass.created.Offset, offset);
         }
 
-        [TestMethod]
+        [Fact]
         public void JsonInheritanceConverter_is_thread_safe()
         {
             //// Arrange
@@ -197,7 +196,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             // No exceptions
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
             //// Arrange
@@ -211,12 +210,12 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(property);
-            Assert.IsTrue(property.IsRequired);
-            Assert.AreEqual("discriminator", discriminator);
+            Assert.NotNull(property);
+            Assert.True(property.IsRequired);
+            Assert.Equal("discriminator", discriminator);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
@@ -227,12 +226,12 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(code.Contains("public string Discriminator")); // discriminator property is not generated
-            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]")); // attribute is generated
-            Assert.IsTrue(code.Contains("class JsonInheritanceConverter")); // converter is generated
+            Assert.DoesNotContain("public string Discriminator", code); // discriminator property is not generated
+            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code); // attribute is generated
+            Assert.Contains("class JsonInheritanceConverter", code); // converter is generated
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
             //// Arrange
@@ -247,18 +246,18 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("Container");
 
             //// Assert
-            Assert.IsTrue(code.Contains("export class Container"));
-            Assert.IsTrue(code.Contains("export class Animal"));
-            Assert.IsTrue(code.Contains("export class Dog"));
+            Assert.Contains("export class Container", code);
+            Assert.Contains("export class Animal", code);
+            Assert.Contains("export class Dog", code);
 
             // discriminator is available for deserialization
-            Assert.IsTrue(code.Contains("protected _discriminator: string;")); // discriminator must be private
-            Assert.IsTrue(code.Contains("new Dog();")); // type is chosen by discriminator 
-            Assert.IsTrue(code.Contains("new Animal();")); // type is chosen by discriminator 
+            Assert.Contains("protected _discriminator: string;", code); // discriminator must be private
+            Assert.Contains("new Dog();", code); // type is chosen by discriminator 
+            Assert.Contains("new Animal();", code); // type is chosen by discriminator 
 
             // discriminator is assign for serialization
-            Assert.IsTrue(code.Contains("this._discriminator = \"Animal\""));
-            Assert.IsTrue(code.Contains("this._discriminator = \"Dog\""));
+            Assert.Contains("this._discriminator = \"Animal\"", code);
+            Assert.Contains("this._discriminator = \"Dog\"", code);
         }
     }
 }

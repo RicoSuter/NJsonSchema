@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class DictionaryTests
     {
         public class AnyDictionary : Dictionary<string, object>
@@ -22,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_any_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
@@ -38,11 +34,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.IsFalse(code.Contains("extends { [key: string] : any; }"));
-            Assert.IsTrue(code.Contains("[key: string]: any; "));
+            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.Contains("[key: string]: any; ", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_any_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
@@ -58,12 +54,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.IsFalse(code.Contains("extends { [key: string] : any; }"));
-            Assert.IsFalse(code.Contains("super()"));
-            Assert.IsTrue(code.Contains("[key: string]: any; "));
+            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.DoesNotContain("super()", code);
+            Assert.Contains("[key: string]: any; ", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_string_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
@@ -79,11 +75,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.IsFalse(code.Contains("extends { [key: string] : string; }"));
-            Assert.IsTrue(code.Contains("[key: string]: string | any; "));
+            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.Contains("[key: string]: string | any; ", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_string_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
@@ -99,12 +95,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.IsFalse(code.Contains("extends { [key: string] : string; }"));
-            Assert.IsFalse(code.Contains("super()"));
-            Assert.IsTrue(code.Contains("[key: string]: string | any; "));
+            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.DoesNotContain("super()", code);
+            Assert.Contains("[key: string]: string | any; ", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_dto_dictionary_then_assignment_may_create_new_instance()
         {
             //// Arrange
@@ -137,10 +133,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.IsTrue(code.Contains("this.resource[key] = data[\"resource\"][key] ? MyItem.fromJS(data[\"resource\"][key]) : new MyItem();"));
+            Assert.Contains("this.resource[key] = data[\"resource\"][key] ? MyItem.fromJS(data[\"resource\"][key]) : new MyItem();", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_string_dictionary_then_assignment_is_correct()
         {
             //// Arrange
@@ -170,7 +166,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.IsTrue(code.Contains("this.resource[key] = data[\"resource\"][key];"));
+            Assert.Contains("this.resource[key] = data[\"resource\"][key];", code);
         }
     }
 }

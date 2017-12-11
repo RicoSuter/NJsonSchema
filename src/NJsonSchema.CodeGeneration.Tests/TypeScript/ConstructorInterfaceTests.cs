@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class ConstructorInterfaceTests
     {
         public class Person
@@ -40,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
             //// Arrange
@@ -59,23 +58,23 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             //// Assert
 
             // address property is converted:
-            Assert.IsTrue(output.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;"));
+            Assert.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;", output);
             // cars items are converted:
-            Assert.IsTrue(output.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;"));
+            Assert.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;", output);
             // skills values are converted:
-            Assert.IsTrue(output.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;"));
+            Assert.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;", output);
 
             // interface is correct
-            Assert.IsTrue(output.Replace("\r", "").Replace("\n", "").Contains(@"export interface IMyClass {
+            Assert.Contains(@"export interface IMyClass {
     address: IAddress;
     cars: ICar[];
     skills: { [key: string] : ISkill; };
     foo: Car[][];
     bar: { [key: string] : Skill[]; };
-}".Replace("\r", "").Replace("\n", "")));
+}".Replace("\r", "").Replace("\n", ""), output.Replace("\r", "").Replace("\n", ""));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_array_of_string_dictionary_is_used_with_ConvertConstructorInterfaceData_then_it_should_be_ignored()
         {
             //// Arrange
@@ -107,7 +106,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
             
             //// Assert
-            Assert.IsTrue(output.Contains("custom4: { [key: string] : string; }[];"));
+            Assert.Contains("custom4: { [key: string] : string; }[];", output);
         }
     }
 }

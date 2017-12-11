@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.Tests.Models;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class TypeScriptGeneratorTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
         {
             //// Arrange
@@ -40,15 +39,14 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
-            Assert.IsTrue(code.Contains(
-@"export class Foo extends Anonymous implements IFoo {
+            Assert.Contains(@"export class Foo extends Anonymous implements IFoo {
     prop1: string;
     prop2: string;
-".Replace("\r", string.Empty)));
-            Assert.IsTrue(code.Contains("class Anonymous"));
+".Replace("\r", string.Empty), code);
+            Assert.Contains("class Anonymous", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
         {
             //// Arrange
@@ -79,10 +77,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.IsTrue(code.Contains("class Foo extends Bar"));
+            Assert.Contains("class Foo extends Bar", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_name_does_not_match_property_name_then_casing_is_correct_in_output()
         {
             //// Arrange
@@ -92,11 +90,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"lastName: string;"));
-            Assert.IsTrue(output.Contains(@"Dictionary: { [key: string] : number; };"));
+            Assert.Contains(@"lastName: string;", output);
+            Assert.Contains(@"Dictionary: { [key: string] : number; };", output);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_required_name_then_TypeScript_property_is_not_optional()
         {
             //// Arrange
@@ -106,10 +104,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"FirstName: string;"));
+            Assert.True(output.Contains(@"FirstName: string;"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
             //// Arrange
@@ -119,10 +117,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"interface Teacher extends Person"));
+            Assert.Contains(@"interface Teacher extends Person", output);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
@@ -134,10 +132,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/** EnumDesc. *"));
+            Assert.Contains(@"/** EnumDesc. *", output);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
@@ -149,10 +147,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/** ClassDesc. *"));
+            Assert.Contains(@"/** ClassDesc. *", output);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
@@ -164,10 +162,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"/** PropertyDesc. *"));
+            Assert.Contains(@"/** PropertyDesc. *", output);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
@@ -182,10 +180,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"readonly Birthday"));
+            Assert.Contains(@"readonly Birthday", output);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
             //// Arrange
@@ -201,10 +199,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(output.Contains(@"""foo-bar"": string;"));
+            Assert.Contains(@"""foo-bar"": string;", output);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {
             //// Arrange
@@ -216,7 +214,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsFalse(output.Contains(@"interface  {"));
+            Assert.DoesNotContain(@"interface  {", output);
         }
 
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
@@ -227,7 +225,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             return generator;
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
         {
             //// Arrange
@@ -252,7 +250,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("dict: { [key: string] : string; } = {};")); // property not nullable, must be initialized with {}
+            Assert.Contains("dict: { [key: string] : string; } = {};", code); // property not nullable, must be initialized with {}
         }
     }
 }

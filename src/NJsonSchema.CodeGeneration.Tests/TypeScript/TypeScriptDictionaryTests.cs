@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class TypeScriptDictionaryTests
     {
         public enum PropertyName
@@ -23,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public IDictionary<PropertyName, string> Mapping2 { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_dictionary_key_is_enum_then_typescript_has_string_key()
         {
             //// Arrange
@@ -35,8 +34,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("Mapping: { [key: string] : string; };"));
-            Assert.IsTrue(code.Contains("Mapping2: { [key: string] : string; };"));
+            Assert.Contains("Mapping: { [key: string] : string; };", code);
+            Assert.Contains("Mapping2: { [key: string] : string; };", code);
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -53,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public IDictionary<string, Gender> Mapping2 { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_dictionary_value_is_enum_then_typescript_has_enum_value()
         {
             //// Arrange
@@ -65,8 +64,8 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("Mapping: { [key: string] : Gender; };"));
-            Assert.IsTrue(code.Contains("Mapping2: { [key: string] : Gender; };"));
+            Assert.Contains("Mapping: { [key: string] : Gender; };", code);
+            Assert.Contains("Mapping2: { [key: string] : Gender; };", code);
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class DateCodeGenerationTests
     {
         private const string Json =
@@ -16,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 	}
 }";
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_class()
         {
             //// Arrange
@@ -31,12 +30,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: string"));
-            Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"];"));
-            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate;"));
+            Assert.Contains("myDate: string", code);
+            Assert.Contains("this.myDate = data[\"myDate\"];", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate;", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_class()
         {
             //// Arrange
@@ -51,12 +50,12 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: moment.Moment"));
-            Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"] ? moment(data[\"myDate\"].toString()) : <any>undefined;"));
-            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;"));
+            Assert.Contains("myDate: moment.Moment", code);
+            Assert.Contains("this.myDate = data[\"myDate\"] ? moment(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_class()
         {
             //// Arrange
@@ -71,13 +70,13 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: Date"));
-            Assert.IsTrue(code.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;"));
-            Assert.IsTrue(code.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;"));
-            Assert.IsTrue(code.Contains("function formatDate("));
+            Assert.Contains("myDate: Date", code);
+            Assert.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
+            Assert.Contains("function formatDate(", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_interface()
         {
             //// Arrange
@@ -92,10 +91,10 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: Date;"));
+            Assert.Contains("myDate: Date;", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_interface()
         {
             //// Arrange
@@ -110,11 +109,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: moment.Moment;"));
+            Assert.Contains("myDate: moment.Moment;", code);
         }
 
 
-        [TestMethod]
+        [Fact]
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_interface()
         {
             //// Arrange
@@ -129,7 +128,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("myDate: string;"));
+            Assert.Contains("myDate: string;", code);
         }
     }
 }

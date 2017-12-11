@@ -213,22 +213,22 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Array");
         }
 
         [Fact]
         public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Collection");
         }
 
         [Fact]
         public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("List");
+            await When_converting_smth_then_items_must_correctly_be_loaded("List");
         }
 
-        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();

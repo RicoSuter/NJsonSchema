@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class ClassOrderTests
     {
-        [TestMethod]
+        [Fact]
         public void When_class_order_is_wrong_then_classes_are_correctly_reordered()
         {
             //// Arrange
@@ -26,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var order = string.Join(", ", classes.Select(c => c.TypeName));
 
             //// Assert
-            Assert.AreEqual("Car, Fruit, Apple, Person, Teacher, Professor", order);
+            Assert.Equal("Car, Fruit, Apple, Person, Teacher, Professor", order);
         }
     }
 }

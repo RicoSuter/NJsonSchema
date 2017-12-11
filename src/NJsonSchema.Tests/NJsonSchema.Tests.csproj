@@ -37,13 +37,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
-    <PackageReference Include="NodaTime" Version="2.2.0" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+
     <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
     <Reference Condition="'$(TargetFramework)' == 'net45'" Include="System.ComponentModel.DataAnnotations"></Reference>
     <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations"></Reference>
+
+    <PackageReference Include="NodaTime" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

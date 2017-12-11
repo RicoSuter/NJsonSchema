@@ -15,3 +15,4 @@ src/packages/Newtonsoft.Json**
 [Oo]bj/
 /src/packages
 .vs
+/src/NJsonSchema.CodeGeneration.Tests2

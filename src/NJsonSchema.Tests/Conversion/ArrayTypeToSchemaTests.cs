@@ -40,31 +40,31 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Array");
         }
 
         [Fact]
         public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Collection");
         }
 
         [Fact]
         public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("List");
+            await When_converting_smth_then_items_must_correctly_be_loaded("List");
         }
 
         [Fact]
         public async Task When_converting_interface_list_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("InterfaceList");
+            await When_converting_smth_then_items_must_correctly_be_loaded("InterfaceList");
         }
 
         [Fact]
         public async Task When_converting_enumerable_list_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Enumerable");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Enumerable");
         }
 
         public class MyType
@@ -87,7 +87,7 @@ namespace NJsonSchema.Tests.Conversion
             public string Id { get; set; }
         }
 
-        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();

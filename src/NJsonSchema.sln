@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema", "NJsonSchema\NJsonSchema.csproj", "{7B7A2E32-E808-4A19-98B1-37E766580F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Demo", "NJsonSchema.Demo\NJsonSchema.Demo.csproj", "{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.Tests", "NJsonSchema.CodeGeneration.Tests\NJsonSchema.CodeGeneration.Tests.csproj", "{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration", "NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj", "{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}"
 EndProject
@@ -19,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.CSharp.Tests", "NJsonSchema.CodeGeneration.CSharp.Tests\NJsonSchema.CodeGeneration.CSharp.Tests.csproj", "{0873FE5E-4A46-48B5-A171-AC629EC7C263}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration.CSharp.Tests", "NJsonSchema.CodeGeneration.CSharp.Tests\NJsonSchema.CodeGeneration.CSharp.Tests.csproj", "{0873FE5E-4A46-48B5-A171-AC629EC7C263}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.CodeGeneration.Tests", "NJsonSchema.CodeGeneration.Tests\NJsonSchema.CodeGeneration.Tests.csproj", "{974ED050-4A34-4513-8048-139B1AF1A95D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,16 +63,6 @@ Global
 		{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}.Release|ARM.ActiveCfg = Release|Any CPU
 		{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}.Release|x64.ActiveCfg = Release|Any CPU
 		{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}.Release|x86.ActiveCfg = Release|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Release|ARM.ActiveCfg = Release|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Release|x64.ActiveCfg = Release|Any CPU
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6}.Release|x86.ActiveCfg = Release|Any CPU
 		{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -131,6 +121,22 @@ Global
 		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x64.Build.0 = Release|Any CPU
 		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x86.ActiveCfg = Release|Any CPU
 		{0873FE5E-4A46-48B5-A171-AC629EC7C263}.Release|x86.Build.0 = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|x64.Build.0 = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Debug|x86.Build.0 = Debug|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|ARM.Build.0 = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|x64.ActiveCfg = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|x64.Build.0 = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|x86.ActiveCfg = Release|Any CPU
+		{974ED050-4A34-4513-8048-139B1AF1A95D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,8 +144,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
-		{A828E1D0-2D2C-45F7-B4E7-D466BA4156B6} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{0873FE5E-4A46-48B5-A171-AC629EC7C263} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
+		{974ED050-4A34-4513-8048-139B1AF1A95D} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9D5EDC80-5611-493B-804B-8B364816952B}
