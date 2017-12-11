@@ -38,5 +38,37 @@ namespace NJsonSchema.Tests.Validation
             /// Assert
             Assert.AreEqual(0, errors.Count);
         }
+
+        // [TestMethod]
+        public async Task When_integer_is_big_integer_then_validation_works()
+        {
+            // See https://github.com/RSuter/NJsonSchema/issues/568
+
+            /// Arrange
+            const string json = @"{
+  ""type"": ""object"",
+  ""properties"": {
+    ""property1"": {
+      ""type"": ""number""
+    }
+  },
+  ""required"": [""property1""],
+  ""additionalProperties"": false,
+  ""additionalItems"": false
+}";
+
+            var data = @"{
+                ""property1"": 34545734242323232423434
+            }";
+
+            var validationSchema = JsonSchema4.FromJsonAsync(json).Result;
+
+            /// Act
+            var errors = validationSchema.Validate(data);
+
+            /// Assert
+            Assert.AreEqual(0, errors.Count);
+        }
+
     }
 }
