@@ -163,10 +163,6 @@
       <Project>{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}</Project>
       <Name>NJsonSchema.CodeGeneration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NJsonSchema.Tests\NJsonSchema.Tests.csproj">
-      <Project>{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}</Project>
-      <Name>NJsonSchema.Tests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj">
       <Project>{7B7A2E32-E808-4A19-98B1-37E766580F8C}</Project>
       <Name>NJsonSchema</Name>

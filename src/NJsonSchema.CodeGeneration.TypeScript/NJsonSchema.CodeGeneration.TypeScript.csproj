@@ -14,35 +14,22 @@
     <PackageIconUrl>https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/NuGetIcon.png</PackageIconUrl>
     <Company />
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.3|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Class.liquid">
-      <Generator></Generator>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Class.liquid" />
     <EmbeddedResource Include="Templates\ConvertToClass.liquid" />
     <EmbeddedResource Include="Templates\ConvertToJavaScript.liquid" />
     <EmbeddedResource Include="Templates\Enum.liquid" />
     <EmbeddedResource Include="Templates\File.FormatDate.liquid" />
     <EmbeddedResource Include="Templates\File.liquid" />
-    <EmbeddedResource Include="Templates\Interface.liquid">
-      <Generator></Generator>
-      <CustomToolNamespace></CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\KnockoutClass.liquid">
-      <Generator></Generator>
-      <CustomToolNamespace></CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\File.ReferenceHandling.liquid">
-      <Generator></Generator>
-      <CustomToolNamespace></CustomToolNamespace>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Interface.liquid" />
+    <EmbeddedResource Include="Templates\KnockoutClass.liquid" />
+    <EmbeddedResource Include="Templates\File.ReferenceHandling.liquid" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />

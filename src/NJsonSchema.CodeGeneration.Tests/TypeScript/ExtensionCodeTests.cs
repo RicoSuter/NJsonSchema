@@ -1,10 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NJsonSchema.CodeGeneration.TypeScript;
+﻿using NJsonSchema.CodeGeneration.TypeScript;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class ExtensionCodeTests
     {
         private const string Code =
@@ -47,7 +46,7 @@ export abstract class BaseClass {
 
 var x = 10;";
 
-        [TestMethod]
+        [Fact]
         public void When_extension_code_is_processed_then_code_and_classes_are_correctly_detected_and_converted()
         {
             //// Arrange
@@ -57,26 +56,26 @@ var x = 10;";
             var ext = new TypeScriptExtensionCode(code, new[] { "Foo", "Bar" }, new [] { "BaseClass" });
 
             //// Assert
-            Assert.IsTrue(ext.ExtensionClasses.ContainsKey("Foo"));
-            Assert.IsTrue(ext.ExtensionClasses["Foo"].StartsWith("export class Foo extends Foo {"));
+            Assert.True(ext.ExtensionClasses.ContainsKey("Foo"));
+            Assert.StartsWith("export class Foo extends Foo {", ext.ExtensionClasses["Foo"]);
 
-            Assert.IsTrue(ext.ExtensionClasses.ContainsKey("Bar"));
-            Assert.IsTrue(ext.ExtensionClasses["Bar"].StartsWith("export class Bar extends Bar {"));
+            Assert.True(ext.ExtensionClasses.ContainsKey("Bar"));
+            Assert.StartsWith("export class Bar extends Bar {", ext.ExtensionClasses["Bar"]);
 
-            Assert.IsTrue(ext.ImportCode.Contains("<reference path"));
-            Assert.IsTrue(ext.ImportCode.Contains("import foo = require(\"foo/bar\")"));
-            Assert.IsTrue(ext.ImportCode.Contains("import bar = require(\"foo/bar\")"));
+            Assert.Contains("<reference path", ext.ImportCode);
+            Assert.Contains("import foo = require(\"foo/bar\")", ext.ImportCode);
+            Assert.Contains("import bar = require(\"foo/bar\")", ext.ImportCode);
 
-            Assert.IsTrue(ext.BottomCode.StartsWith("var clientClasses"));
-            Assert.IsTrue(ext.BottomCode.Contains("if (clientClasses.hasOwnProperty(clientClass))"));
-            Assert.IsTrue(ext.BottomCode.Contains("export class Test"));
-            Assert.IsTrue(ext.BottomCode.EndsWith("var x = 10;"));
+            Assert.StartsWith("var clientClasses", ext.BottomCode);
+            Assert.Contains("if (clientClasses.hasOwnProperty(clientClass))", ext.BottomCode);
+            Assert.Contains("export class Test", ext.BottomCode);
+            Assert.EndsWith("var x = 10;", ext.BottomCode);
 
-            Assert.IsTrue(ext.TopCode.Contains("export abstract class BaseClass"));
+            Assert.Contains("export abstract class BaseClass", ext.TopCode);
 
             var body = ext.GetExtensionClassBody("Foo");
-            Assert.IsTrue(body.Contains("get title() {"));
-            Assert.IsFalse(body.Contains("ignore();"));
+            Assert.Contains("get title() {", body);
+            Assert.DoesNotContain("ignore();", body);
         }
 
         public class Foo
@@ -91,7 +90,7 @@ var x = 10;";
             public string LastName { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_classes_have_extension_code_then_class_body_is_copied()
         {
             //// Arrange
@@ -106,12 +105,12 @@ var x = 10;";
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsFalse(code.Contains("FooBase"));
-            Assert.IsFalse(code.Contains("BarBase"));
-            Assert.IsFalse(code.Contains("generated."));
+            Assert.DoesNotContain("FooBase", code);
+            Assert.DoesNotContain("BarBase", code);
+            Assert.DoesNotContain("generated.", code);
 
-            Assert.IsTrue(code.Contains("return this.firstName + ' ' + this.lastName;"));
-            Assert.IsTrue(code.Contains("return this.bar ? this.bar.title : '';"));
+            Assert.Contains("return this.firstName + ' ' + this.lastName;", code);
+            Assert.Contains("return this.bar ? this.bar.title : '';", code);
         }
     }
 }

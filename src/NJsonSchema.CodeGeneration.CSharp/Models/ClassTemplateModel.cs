@@ -78,7 +78,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasInheritance => _schema.InheritedSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty) : null;
+        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty)
+                .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
+                .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
         public string TypeAccessModifier => _settings.TypeAccessModifier;

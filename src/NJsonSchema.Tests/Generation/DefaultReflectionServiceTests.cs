@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class DefaultReflectionServiceTests
     {
-        [TestMethod]
+        [Fact]
         public void When_ReferenceTypeNullHandling_is_Null_then_nullability_is_correct()
         {
             //// Arrange
@@ -45,10 +44,10 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.AreEqual(check.Value, svc.IsNullable(check.Key, null, settings), check.Key.Name + " must be nullable = " + check.Value);
+                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_ReferenceTypeNullHandling_is_NotNull_then_nullability_is_correct()
         {
             //// Arrange
@@ -85,8 +84,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.AreEqual(check.Value, svc.IsNullable(check.Key, null, settings), check.Key.Name + " must be nullable = " + check.Value);
-
+                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
         }
     }
 }

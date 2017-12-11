@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class KnownTypeGenerationTests
     {
         public class Teacher
@@ -43,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
             public WritingInstrument WritingInstrument { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_KnownType_attribute_exists_then_specified_classes_are_also_generated()
         {
             //// Arrange
@@ -53,14 +50,14 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson(); 
 
             //// Assert
-            Assert.IsTrue(schema.Definitions.Any(s => s.Key == "Teacher"));
+            Assert.True(schema.Definitions.Any(s => s.Key == "Teacher"));
         }
 
         public async Task ReproAsync()
         {
             var schema = await JsonSchema4.FromTypeAsync<Container>();
         }
-        [TestMethod]
+        [Fact]
         public async Task When_KnownType_attribute_includes_method_name_then_specified_classes_are_also_generated()
         {
             //// Arrange
@@ -70,8 +67,8 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Definitions.Any(s => s.Key == "Pen"));
-            Assert.IsTrue(schema.Definitions.Any(s => s.Key == "Pencil"));
+            Assert.True(schema.Definitions.Any(s => s.Key == "Pen"));
+            Assert.True(schema.Definitions.Any(s => s.Key == "Pencil"));
         }
     }
 }

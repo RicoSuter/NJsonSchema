@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.CSharp;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
-    [TestClass]
     public class ValueGeneratorTests
     {
         public class RangeClass
@@ -15,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public int Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_contains_range_then_code_is_correctly_generated()
         {
             //// Arrange
@@ -30,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("[System.ComponentModel.DataAnnotations.Range(2, int.MaxValue)]"));
+            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Range(2, int.MaxValue)]"));
         }
     }
 }

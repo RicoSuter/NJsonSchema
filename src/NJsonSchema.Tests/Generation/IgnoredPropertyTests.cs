@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class IgnoredPropertyTests
     {
         public class Mno
@@ -19,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
 
-        [TestMethod]
+        [Fact]
         public async Task When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
         {
             //// Arrange
@@ -29,7 +28,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsFalse(json.Contains("IgnoreMe"));
+            Assert.False(json.Contains("IgnoreMe"));
         }
 
         [DataContract]
@@ -41,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
             public string IgnoreMe;
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_field_has_no_DataMemberAttribute_then_it_is_ignored()
         {
             //// Arrange
@@ -51,7 +50,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsFalse(json.Contains("IgnoreMe"));
+            Assert.False(json.Contains("IgnoreMe"));
         }
 
         [Serializable]
@@ -73,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_indexer_property_has_ignore_attribute_then_it_is_ignored()
         {
             //// Arrange
@@ -83,7 +82,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(2, schema.Properties.Count);
+            Assert.Equal(2, schema.Properties.Count);
         }
     }
 }

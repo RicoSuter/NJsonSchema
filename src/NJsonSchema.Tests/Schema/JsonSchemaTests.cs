@@ -1,23 +1,20 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Xunit;
 
 namespace NJsonSchema.Tests.Schema
 {
-    [TestClass]
     public class JsonSchemaTests
     {
-        [TestMethod]
+        [Fact]
         public async Task Ensure_NJS_does_not_run_in_legacy_mode()
         { 
-            Assert.IsFalse(JsonSchema4.ToolchainVersion.Contains("NET40"));
+            Assert.False(JsonSchema4.ToolchainVersion.Contains("NET40"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_creating_schema_without_setting_properties_then_it_is_empty()
         {
             //// Arrange
@@ -27,14 +24,14 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(
+            Assert.Equal(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
 }", data);
-            Assert.IsTrue(schema.IsAnyType);
+            Assert.True(schema.IsAnyType);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_contains_refs_then_they_should_be_resolved()
         {
             //// Arrange
@@ -79,11 +76,11 @@ namespace NJsonSchema.Tests.Schema
             var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
-            Assert.IsNotNull(schema.Definitions["diskDevice"]);
-            Assert.IsTrue(schema.Properties["storage"].OneOf.All(p => p != null));
+            Assert.NotNull(schema.Definitions["diskDevice"]);
+            Assert.True(schema.Properties["storage"].OneOf.All(p => p != null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_deserializing_schema_then_it_should_be_read_correctly()
         {
             //// Arrange
@@ -112,11 +109,11 @@ namespace NJsonSchema.Tests.Schema
             var x = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(3, schema.Properties.Count);
-            Assert.AreEqual(JsonObjectType.Object, schema.Type);
+            Assert.Equal(3, schema.Properties.Count);
+            Assert.Equal(JsonObjectType.Object, schema.Type);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_deserializing_multiple_types_then_flags_should_be_set_correctly()
         {
             //// Arrange
@@ -132,11 +129,11 @@ namespace NJsonSchema.Tests.Schema
             var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
-            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
-            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Type.HasFlag(JsonObjectType.String));
+            Assert.True(schema.Type.HasFlag(JsonObjectType.Null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_deserializing_single_type_then_flags_should_be_set_correctly()
         {
             //// Arrange
@@ -149,11 +146,11 @@ namespace NJsonSchema.Tests.Schema
             var schema = await JsonSchema4.FromJsonAsync(data);
 
             //// Assert
-            Assert.IsTrue(schema.Type.HasFlag(JsonObjectType.String));
-            Assert.AreEqual(JsonObjectType.String, schema.Type);
+            Assert.True(schema.Type.HasFlag(JsonObjectType.String));
+            Assert.Equal(JsonObjectType.String, schema.Type);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_deserializing_schema_it_should_not_stackoverflow()
         {
             //// Arrange
@@ -167,10 +164,10 @@ namespace NJsonSchema.Tests.Schema
             var x = schema.ToJson();
 
             //// Assert
-            Assert.IsInstanceOfType(schema.ExtensionData.First().Value, typeof(DateTime));
+            Assert.True(schema.ExtensionData.First().Value is DateTime);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
@@ -181,10 +178,10 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(data.Contains(@"""type"": ""integer"""));
+            Assert.True(data.Contains(@"""type"": ""integer"""));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
@@ -195,14 +192,14 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(data.Contains(
+            Assert.True(data.Contains(
 @"  ""type"": [
     ""integer"",
     ""object""
   ]"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
@@ -212,11 +209,11 @@ namespace NJsonSchema.Tests.Schema
             schema.Properties.Add("test", new JsonProperty());
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("test"));
-            Assert.AreEqual(schema, schema.Properties["test"].ParentSchema);
+            Assert.True(schema.Properties.ContainsKey("test"));
+            Assert.Equal(schema, schema.Properties["test"].ParentSchema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
@@ -227,10 +224,10 @@ namespace NJsonSchema.Tests.Schema
             schema.Properties["test"].IsRequired = true;
 
             //// Assert
-            Assert.IsTrue(schema.RequiredProperties.Contains("test"));
+            Assert.True(schema.RequiredProperties.Contains("test"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
@@ -242,10 +239,10 @@ namespace NJsonSchema.Tests.Schema
             schema.Properties["test"].IsRequired = false;
 
             //// Assert
-            Assert.IsFalse(schema.RequiredProperties.Contains("test"));
+            Assert.False(schema.RequiredProperties.Contains("test"));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
             //// Arrange
@@ -260,10 +257,10 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate("{ test: null }");
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
+            Assert.Equal(1, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
@@ -281,10 +278,10 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_property_type_not_specified_then_anything_should_succeed()
         {
             //// Arrange
@@ -300,10 +297,10 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
         {
             //// Arrange
@@ -322,12 +319,11 @@ namespace NJsonSchema.Tests.Schema
             catch
             {
                 //// Assert
-                Assert.Fail("Validating JToken with a DateTimeOffset value threw an exception.");
+                throw new Exception("Validating JToken with a DateTimeOffset value threw an exception.");
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task When_schema_has_cyclic_references_then_exception_is_thrown()
         {
             //// Arrange
@@ -340,16 +336,18 @@ namespace NJsonSchema.Tests.Schema
     }
   }
 }";
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                //// Act
+                var schema = await JsonSchema4.FromJsonAsync(json);
+                var data = schema.ToJson();
 
-            //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var data = schema.ToJson();
-
-            //// Assert
-            var propertySchema = schema.Properties["topProp"].ActualTypeSchema;
+                //// Assert
+                var propertySchema = schema.Properties["topProp"].ActualPropertySchema;
+            });
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_is_loaded_then_all_refs_are_resolved()
         {
             //// Arrange
@@ -381,10 +379,10 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(schema.AllOf.First().Reference);
+            Assert.NotNull(schema.AllOf.First().Reference);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_json_schema_is_loaded_then_no_collection_modified_exception_is_thrown()
         {
             // https://github.com/NJsonSchema/NJsonSchema/issues/288
@@ -397,10 +395,10 @@ namespace NJsonSchema.Tests.Schema
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(json);
+            Assert.NotNull(json);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_has_metadata_properties_it_can_still_be_read()
         {
             //// Arrange

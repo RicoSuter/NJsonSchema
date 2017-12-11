@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class InterfaceTests
     {
         public class BusinessCategory : ICategory
@@ -26,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
             string Key { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_interface_then_properties_for_interface_are_generated()
         {
             //// Arrange
@@ -40,7 +39,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(2, schema.Definitions["ICategory"].Properties.Count);
+            Assert.Equal(2, schema.Definitions["ICategory"].Properties.Count);
         }
     }
 }

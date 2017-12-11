@@ -1,10 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class FieldGenerationTests
     {
         public class MyTest
@@ -12,7 +10,7 @@ namespace NJsonSchema.Tests.Generation
             public string MyField;
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_public_field_is_available_then_it_is_added_as_property()
         {
             //// Arrange
@@ -23,7 +21,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["MyField"].Type.HasFlag(JsonObjectType.String));
+            Assert.True(schema.Properties["MyField"].Type.HasFlag(JsonObjectType.String));
         }
     }
 }

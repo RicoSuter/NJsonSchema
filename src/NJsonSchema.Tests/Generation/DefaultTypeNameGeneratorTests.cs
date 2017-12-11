@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {   
-    [TestClass]
     public class DefaultTypeNameGeneratorTests
     {
-        [TestMethod]
+        [Fact]
         public void When_type_name_is_genererated_then_it_corret()
         {
             var tests = new Dictionary<string, string>
@@ -30,7 +29,7 @@ namespace NJsonSchema.Tests.Generation
                 var name = generator.Generate(new JsonSchema4(), p.Key, new List<string>());
 
                 //// Assert
-                Assert.AreEqual(p.Value, name);
+                Assert.Equal(p.Value, name);
             }
         }
     }

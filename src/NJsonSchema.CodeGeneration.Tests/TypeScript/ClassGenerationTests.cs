@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.CodeGeneration.TypeScript;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.TypeScript
 {
-    [TestClass]
     public class ClassGenerationTests
     {
         public class MyClassTest
@@ -44,31 +43,31 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             public string LastName { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_TypeScript_classes_then_output_is_correct()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.IsTrue(code.Contains("init(data?: any) {"));
+            Assert.Contains("init(data?: any) {", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_default_value_is_available_then_variable_is_initialized()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.IsTrue(code.Contains("name: string = \"foo\";"));
+            Assert.Contains("name: string = \"foo\";", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_TypeScript_knockout_classes_then_output_is_correct()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass });
 
             //// Assert
-            Assert.IsTrue(code.Contains("dateOfBirth = ko.observable<Date>();"));
+            Assert.Contains("dateOfBirth = ko.observable<Date>();", code);
         }
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
@@ -82,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             return code;
         }
 
-        [TestMethod]
+        [Fact]
         public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -122,11 +121,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("a: string[] = [];"));
-            Assert.IsTrue(code.Contains("b: string[];"));
+            Assert.Contains("a: string[] = [];", code);
+            Assert.Contains("b: string[];", code);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -166,11 +165,11 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("a: { [key: string] : string; } = {};"));
-            Assert.IsTrue(code.Contains("b: { [key: string] : string; };"));
+            Assert.Contains("a: { [key: string] : string; } = {};", code);
+            Assert.Contains("b: { [key: string] : string; };", code);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
@@ -218,35 +217,35 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("a: A = new A();"));
-            Assert.IsTrue(code.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();"));
+            Assert.Contains("a: A = new A();", code);
+            Assert.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();", code);
 
-            Assert.IsTrue(code.Contains("b: B;"));
-            Assert.IsTrue(code.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : <any>undefined;"));
+            Assert.Contains("b: B;", code);
+            Assert.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : <any>undefined;", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_is_generated_then_constructor_interfaces_are_correctly_generated()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.IsTrue(code.Contains("class Student extends Person implements IStudent {"));
-            Assert.IsTrue(code.Contains("interface IStudent extends IPerson {"));
-            Assert.IsTrue(code.Contains("interface IPerson {"));
+            Assert.Contains("class Student extends Person implements IStudent {", code);
+            Assert.Contains("interface IStudent extends IPerson {", code);
+            Assert.Contains("interface IPerson {", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_GenerateConstructorInterface_then_no_interfaces_are_generated()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, GenerateConstructorInterface = false });
 
             //// Assert
-            Assert.IsFalse(code.Contains("interface IStudent extends IPerson {"));
-            Assert.IsFalse(code.Contains("interface IPerson {"));
+            Assert.DoesNotContain("interface IStudent extends IPerson {", code);
+            Assert.DoesNotContain("interface IPerson {", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_Knockout_class_is_generated_then_initializers_are_correct()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings
@@ -257,7 +256,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             });
 
             //// Assert
-            Assert.IsFalse(code.Contains("let firstName_ = data[\"FirstName\"];"));
+            Assert.DoesNotContain("let firstName_ = data[\"FirstName\"];", code);
         }
     }
 }

@@ -344,7 +344,7 @@ namespace NJsonSchema.Infrastructure
                             {
                                 attribute = e.Attribute("cref");
                                 if (attribute != null)
-                                    value.Append(attribute.Value.Trim('!', ':').Trim());
+                                    value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
                             }
                         }
                         else

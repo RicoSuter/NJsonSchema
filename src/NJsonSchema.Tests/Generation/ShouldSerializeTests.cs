@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class ShouldSerializeTests
     {
         public class Test
@@ -15,7 +14,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void When_ShouldSerialize_method_exists_then_schema_is_generated()
         {
             //// Arrange
@@ -25,7 +24,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Assert
-            Assert.IsNotNull(schema);
+            Assert.NotNull(schema);
         }
     }
 }

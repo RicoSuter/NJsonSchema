@@ -1,17 +1,12 @@
-using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
-    [TestClass]
     public class DefaultGenerationTests
     {
         public class DefaultPropertyGenerationClass
@@ -20,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             public string Test { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_default_attribute_then_default_is_in_schema()
         {
             //// Arrange
@@ -32,10 +27,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             });
 
             //// Assert
-            Assert.AreEqual("foo", schema.Properties["Test"].Default); 
+            Assert.Equal("foo", schema.Properties["Test"].Default); 
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
         {
             //// Arrange
@@ -50,10 +45,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("private string _test = \"foo\";"));
+            Assert.Contains("private string _test = \"foo\";", code);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
         {
             //// Arrange
@@ -68,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public string Test { get; set; } = \"foo\";"));
+            Assert.Contains("public string Test { get; set; } = \"foo\";", code);
         }
     }
 }

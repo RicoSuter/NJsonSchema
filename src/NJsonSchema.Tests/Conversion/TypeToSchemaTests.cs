@@ -3,18 +3,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Conversion
 {
-    [TestClass]
     public class TypeToSchemaTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_converting_in_round_trip_then_json_should_be_the_same()
         {
             //// Arrange
@@ -26,10 +25,10 @@ namespace NJsonSchema.Tests.Conversion
             var schemaData2 = JsonConvert.SerializeObject(schema2, Formatting.Indented);
 
             //// Assert
-            Assert.AreEqual(schemaData1, schemaData2);
+            Assert.Equal(schemaData1, schemaData2);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_simple_property_then_property_must_be_in_schema()
         {
             //// Act
@@ -37,55 +36,55 @@ namespace NJsonSchema.Tests.Conversion
             var data = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["Integer"].Type);
-            Assert.AreEqual(JsonObjectType.Number, schema.Properties["Decimal"].Type);
-            Assert.AreEqual(JsonObjectType.Number, schema.Properties["Double"].Type);
-            Assert.AreEqual(JsonObjectType.Boolean, schema.Properties["Boolean"].Type);
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["String"].Type);
-            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, schema.Properties["Array"].Type);
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["Integer"].Type);
+            Assert.Equal(JsonObjectType.Number, schema.Properties["Decimal"].Type);
+            Assert.Equal(JsonObjectType.Number, schema.Properties["Double"].Type);
+            Assert.Equal(JsonObjectType.Boolean, schema.Properties["Boolean"].Type);
+            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, schema.Properties["String"].Type);
+            Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, schema.Properties["Array"].Type);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_nullable_simple_property_then_property_must_be_in_schema()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer | JsonObjectType.Null, schema.Properties["NullableInteger"].Type);
-            Assert.AreEqual(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDecimal"].Type);
-            Assert.AreEqual(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDouble"].Type);
-            Assert.AreEqual(JsonObjectType.Boolean | JsonObjectType.Null, schema.Properties["NullableBoolean"].Type);
+            Assert.Equal(JsonObjectType.Integer | JsonObjectType.Null, schema.Properties["NullableInteger"].Type);
+            Assert.Equal(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDecimal"].Type);
+            Assert.Equal(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDouble"].Type);
+            Assert.Equal(JsonObjectType.Boolean | JsonObjectType.Null, schema.Properties["NullableBoolean"].Type);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_property_with_description_then_description_should_be_in_schema()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.AreEqual("Test", schema.Properties["Integer"].Description);
+            Assert.Equal("Test", schema.Properties["Integer"].Description);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_required_property_then_it_should_be_required_in_schema()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["RequiredReference"].IsRequired);
+            Assert.True(schema.Properties["RequiredReference"].IsRequired);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_regex_property_then_it_should_be_set_as_pattern()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.AreEqual("regex", schema.Properties["RegexString"].Pattern);
+            Assert.Equal("regex", schema.Properties["RegexString"].Pattern);
         }
 
         public class ClassWithRegexDictionaryProperty
@@ -94,7 +93,7 @@ namespace NJsonSchema.Tests.Conversion
             public Dictionary<string, string> Versions { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
         {
             //// Act
@@ -102,66 +101,66 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsNull(schema.Properties["Versions"].Pattern);
-            Assert.IsNotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
+            Assert.Null(schema.Properties["Versions"].Pattern);
+            Assert.NotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_range_property_then_it_should_be_set_as_min_max()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.AreEqual(5, schema.Properties["RangeInteger"].Minimum);
-            Assert.AreEqual(10, schema.Properties["RangeInteger"].Maximum);
+            Assert.Equal(5, schema.Properties["RangeInteger"].Minimum);
+            Assert.Equal(10, schema.Properties["RangeInteger"].Maximum);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_not_nullable_properties_then_they_should_have_null_type()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.IsFalse(schema.Properties["Integer"].IsRequired);
-            Assert.IsFalse(schema.Properties["Decimal"].IsRequired);
-            Assert.IsFalse(schema.Properties["Double"].IsRequired);
-            Assert.IsFalse(schema.Properties["Boolean"].IsRequired);
-            Assert.IsFalse(schema.Properties["String"].IsRequired);
+            Assert.False(schema.Properties["Integer"].IsRequired);
+            Assert.False(schema.Properties["Decimal"].IsRequired);
+            Assert.False(schema.Properties["Double"].IsRequired);
+            Assert.False(schema.Properties["Boolean"].IsRequired);
+            Assert.False(schema.Properties["String"].IsRequired);
 
-            Assert.IsFalse(schema.Properties["Integer"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsFalse(schema.Properties["Decimal"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsFalse(schema.Properties["Double"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsFalse(schema.Properties["Boolean"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["String"].Type.HasFlag(JsonObjectType.Null));
+            Assert.False(schema.Properties["Integer"].Type.HasFlag(JsonObjectType.Null));
+            Assert.False(schema.Properties["Decimal"].Type.HasFlag(JsonObjectType.Null));
+            Assert.False(schema.Properties["Double"].Type.HasFlag(JsonObjectType.Null));
+            Assert.False(schema.Properties["Boolean"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["String"].Type.HasFlag(JsonObjectType.Null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_generating_nullable_primitive_properties_then_they_should_have_null_type()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["NullableInteger"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["NullableDecimal"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["NullableDouble"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["NullableBoolean"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["NullableInteger"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["NullableDecimal"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["NullableDouble"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["NullableBoolean"].Type.HasFlag(JsonObjectType.Null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_renamed_then_the_name_must_be_correct()
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("abc"));
-            Assert.IsFalse(schema.Properties.ContainsKey("ChangedName"));
+            Assert.True(schema.Properties.ContainsKey("abc"));
+            Assert.False(schema.Properties.ContainsKey("ChangedName"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_object_then_it_should_be_correct()
         {
             //// Act
@@ -170,11 +169,11 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             var property = schema.Properties["Reference"];
-            Assert.IsTrue(property.IsNullable(SchemaType.JsonSchema));
-            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
+            Assert.True(property.IsNullable(SchemaType.JsonSchema));
+            Assert.True(schema.Definitions.Any(d => d.Key == "MySubtype"));
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_converting_enum_then_enum_array_must_be_set()
         {
             //// Act
@@ -185,10 +184,10 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Color"];
 
             //// Assert
-            Assert.AreEqual(3, property.ActualTypeSchema.Enumeration.Count); // Color property has StringEnumConverter
-            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Red"));
-            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Green"));
-            Assert.IsTrue(property.ActualTypeSchema.Enumeration.Contains("Blue"));
+            Assert.Equal(3, property.ActualPropertySchema.Enumeration.Count); // Color property has StringEnumConverter
+            Assert.True(property.ActualPropertySchema.Enumeration.Contains("Red"));
+            Assert.True(property.ActualPropertySchema.Enumeration.Contains("Green"));
+            Assert.True(property.ActualPropertySchema.Enumeration.Contains("Blue"));
         }
 
         public class ClassWithJObjectProperty
@@ -196,7 +195,7 @@ namespace NJsonSchema.Tests.Conversion
             public JObject Property { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_type_is_JObject_then_generated_type_is_any()
         {
             //// Act
@@ -205,31 +204,31 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties["Property"];
 
             //// Assert
-            Assert.IsTrue(property.IsNullable(SchemaType.JsonSchema));
-            Assert.IsTrue(property.ActualTypeSchema.IsAnyType);
-            Assert.IsTrue(property.ActualTypeSchema.AllowAdditionalItems);
-            Assert.AreEqual(0, property.Properties.Count);
+            Assert.True(property.IsNullable(SchemaType.JsonSchema));
+            Assert.True(property.ActualPropertySchema.IsAnyType);
+            Assert.True(property.ActualPropertySchema.AllowAdditionalItems);
+            Assert.Equal(0, property.Properties.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_array_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Array");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Array");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_collection_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("Collection");
+            await When_converting_smth_then_items_must_correctly_be_loaded("Collection");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_converting_list_then_items_must_correctly_be_loaded()
         {
-            await When_converting_array_then_items_must_correctly_be_loaded("List");
+            await When_converting_smth_then_items_must_correctly_be_loaded("List");
         }
 
-        public async Task When_converting_array_then_items_must_correctly_be_loaded(string propertyName)
+        private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<MyType>();
@@ -237,10 +236,10 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             var property = schema.Properties[propertyName];
 
-            Assert.AreEqual(JsonObjectType.Array | JsonObjectType.Null, property.Type);
-            Assert.AreEqual(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.IsTrue(schema.Definitions.Any(d => d.Key == "MySubtype"));
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
+            Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, property.Type);
+            Assert.Equal(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
+            Assert.True(schema.Definitions.Any(d => d.Key == "MySubtype"));
+            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
 
         public class MyType

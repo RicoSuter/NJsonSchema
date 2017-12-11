@@ -2,11 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class GenericTests
     {
         public class Smth : IEnumerable<string>
@@ -22,7 +21,7 @@ namespace NJsonSchema.Tests.Generation
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_inherits_from_IEnumerable_then_it_should_become_a_json_array_type()
         {
             //// Arrange
@@ -32,8 +31,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Array, schema.Type);
-            Assert.AreEqual(JsonObjectType.String, schema.Item.Type);
+            Assert.Equal(JsonObjectType.Array, schema.Type);
+            Assert.Equal(JsonObjectType.String, schema.Item.Type);
         }
 
         public class A<T>
@@ -41,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
             public T B { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_open_generic_type_is_generated_then_no_exception_is_thrown()
         {
             //// Arrange
@@ -51,7 +50,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsNotNull(json);
+            Assert.NotNull(json);
         }
     }
 }

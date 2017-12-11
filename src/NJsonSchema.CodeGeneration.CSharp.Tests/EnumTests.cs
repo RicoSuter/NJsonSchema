@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
-    [TestClass]
-    public class CSharpEnumGeneratorTests
+    public class EnumTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_enum_has_no_type_then_enum_is_generated()
         {
             //// Arrange
@@ -34,10 +33,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("public enum MyClassCategory"));
+            Assert.True(code.Contains("public enum MyClassCategory"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_name_contains_colon_then_it_is_removed_and_next_word_converted_to_upper_case()
         {
             //// Arrange
@@ -82,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.IsTrue(code.Contains("PullrequestUpdated = 0,"));
+            Assert.True(code.Contains("PullrequestUpdated = 0,"));
         }
 
         public class MyStringEnumListTest
@@ -99,7 +98,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Bar = 1
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
         {
             //// Arrange
@@ -111,10 +110,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
+            Assert.True(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
             //// Arrange
@@ -126,7 +125,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"));
+            Assert.True(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"));
         }
 
         public enum SomeEnum { Thing1, Thing2 }
@@ -137,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public SomeEnum[] SomeEnums { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
             //// Arrange
@@ -149,8 +148,48 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.IsTrue(code.Contains("SomeEnum"));
-            Assert.IsFalse(code.Contains("Anonymous"));
+            Assert.True(code.Contains("SomeEnum"));
+            Assert.False(code.Contains("Anonymous"));
+        }
+
+        [Fact]
+        public async Task When_type_name_hint_has_generics_then_they_are_converted()
+        {
+            /// Arrange
+            var json = @"
+{
+    ""properties"": {
+        ""foo"": {
+            ""$ref"": ""#/definitions/FirstMetdod<MetValue>""
+        }
+    },
+    ""definitions"": {
+        ""FirstMetdod<MetValue>"": {
+            ""type"": ""object"",
+            ""properties"": {
+            ""GroupChar"": {
+                ""type"": ""string"",
+                    ""enum"": [
+                    ""A"",
+                    ""B"",
+                    ""C"",
+                    ""D""
+                    ]
+                }
+            }
+        }
+    }
+}";
+            /// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.True(code.Contains("public enum FirstMetdodOfMetValueGroupChar"));
         }
     }
 }
