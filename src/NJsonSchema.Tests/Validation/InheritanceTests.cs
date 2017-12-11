@@ -1,14 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class InheritanceTests
     {
-        [TestMethod]
+        [Fact]
         public void When_is_any_of_then_it_should_succeed()
         {
             //// Arrange
@@ -28,10 +27,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_is_not_any_of_then_it_should_fail()
         {
             //// Arrange
@@ -52,13 +51,13 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             var error = (ChildSchemaValidationError)errors.First();
-            Assert.AreEqual(ValidationErrorKind.NotAnyOf, error.Kind);
-            Assert.AreSame(schema, error.Schema);
-            Assert.AreEqual(ValidationErrorKind.StringExpected, error.Errors.First().Value.First().Kind);
-            Assert.AreSame(schema.AnyOf.First(), error.Errors.First().Value.First().Schema);
+            Assert.Equal(ValidationErrorKind.NotAnyOf, error.Kind);
+            Assert.Same(schema, error.Schema);
+            Assert.Equal(ValidationErrorKind.StringExpected, error.Errors.First().Value.First().Kind);
+            Assert.Same(schema.AnyOf.First(), error.Errors.First().Value.First().Schema);
         }
         
-        [TestMethod]
+        [Fact]
         public void When_is_all_of_then_it_should_succeed()
         {
             //// Arrange
@@ -78,10 +77,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_is_not_all_of_then_it_should_fail()
         {
             //// Arrange
@@ -101,11 +100,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NotAllOf, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NotAllOf, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_is_one_of_then_it_should_succeed()
         {
             //// Arrange
@@ -125,10 +124,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_is_not_one_of_then_it_should_fail()
         {
             //// Arrange
@@ -148,11 +147,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NotOneOf, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NotOneOf, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_one_of_matches_multiple_then_it_should_fail()
         {
             //// Arrange
@@ -176,11 +175,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NotOneOf, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NotOneOf, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_matches_excluded_schema_then_it_should_fail()
         {
             //// Arrange
@@ -196,11 +195,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.ExcludedSchemaValidates, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.ExcludedSchemaValidates, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_not_matches_excluded_schema_then_it_should_succeed()
         {
             //// Arrange
@@ -216,7 +215,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
     }
 }

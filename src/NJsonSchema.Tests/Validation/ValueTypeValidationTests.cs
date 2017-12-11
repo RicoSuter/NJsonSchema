@@ -1,14 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class ValueTypeValidationTests
     {
-        [TestMethod]
+        [Fact]
         public void When_string_required_and_string_provided_then_validation_succeeds()
         {
             //// Arrange
@@ -21,10 +20,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_required_but_integer_provided_then_validation_fails()
         {
             //// Arrange
@@ -37,11 +36,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.StringExpected, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_number_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
@@ -54,10 +53,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_number_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
@@ -70,11 +69,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NumberExpected, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NumberExpected, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_integer_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
@@ -87,10 +86,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_integer_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
@@ -103,11 +102,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.IntegerExpected, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.IntegerExpected, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_boolean_required_and_boolean_provided_then_validation_succeeds()
         {
             //// Arrange
@@ -120,10 +119,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_boolean_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
@@ -136,11 +135,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.BooleanExpected, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.BooleanExpected, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_pattern_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -154,11 +153,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.PatternMismatch, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.PatternMismatch, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_min_length_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -172,11 +171,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.StringTooShort, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.StringTooShort, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_max_length_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -190,11 +189,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.StringTooLong, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.StringTooLong, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_integer_minimum_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -208,11 +207,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_integer_maximum_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -226,11 +225,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NumberTooBig, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_number_minimum_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -244,11 +243,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NumberTooSmall, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_number_maximum_does_not_match_then_it_should_fail()
         {
             //// Arrange
@@ -262,11 +261,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NumberTooBig, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NumberTooBig, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_value_not_in_enumeration_then_it_should_fail()
         {
             //// Arrange
@@ -282,11 +281,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.NotInEnumeration, errors.First().Kind);
-            Assert.AreSame(schema, errors.First().Schema);
+            Assert.Equal(ValidationErrorKind.NotInEnumeration, errors.First().Kind);
+            Assert.Same(schema, errors.First().Schema);
         }
         
-        [TestMethod]
+        [Fact]
         public void When_value_in_enumeration_then_it_should_succeed()
         {
             //// Arrange
@@ -302,10 +301,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_value_is_wrong_type_in_enumeration_then_it_should_fail()
         {
             //// Arrange
@@ -321,7 +320,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count); // wrong type
+            Assert.Equal(1, errors.Count); // wrong type
         }
     }
 }

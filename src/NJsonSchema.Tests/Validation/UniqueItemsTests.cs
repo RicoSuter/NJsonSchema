@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class UniqueItemsTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_unique_items_is_set_and_items_are_objects_then_validation_works()
         {
             //// Arrange
@@ -48,7 +47,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(jsonData).ToList();
 
             //// Assert
-            Assert.AreEqual(1, errors.Count);
+            Assert.Equal(1, errors.Count);
         }
     }
 }

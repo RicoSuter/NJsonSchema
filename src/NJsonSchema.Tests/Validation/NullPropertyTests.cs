@@ -1,13 +1,11 @@
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class NullPropertyTests
     {
-        [TestMethod]
+        [Fact]
         public void When_property_can_be_null_then_null_is_allowed()
         {
             //// Arrange
@@ -26,7 +24,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(data);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
 
         public class NullablePropertyClass
@@ -39,7 +37,7 @@ namespace NJsonSchema.Tests.Validation
             public string Name { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_can_be_null_then_null_is_allowed2()
         {
             //// Arrange
@@ -51,7 +49,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(data);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
     }
 }

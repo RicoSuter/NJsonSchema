@@ -1,12 +1,11 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class PropertyNamesGenerationTests
     {
         [DataContract]
@@ -19,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             public string BarBar2 { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_name_is_default_then_schema_has_reflected_names()
         {
             //// Arrange
@@ -33,13 +32,13 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("BarBar1JsonProperty"));
-            Assert.AreEqual("BarBar1JsonProperty", schema.Properties["BarBar1JsonProperty"].Name);
-            Assert.IsTrue(schema.Properties.ContainsKey("BarBar2DataMember"));
-            Assert.AreEqual("BarBar2DataMember", schema.Properties["BarBar2DataMember"].Name);
+            Assert.True(schema.Properties.ContainsKey("BarBar1JsonProperty"));
+            Assert.Equal("BarBar1JsonProperty", schema.Properties["BarBar1JsonProperty"].Name);
+            Assert.True(schema.Properties.ContainsKey("BarBar2DataMember"));
+            Assert.Equal("BarBar2DataMember", schema.Properties["BarBar2DataMember"].Name);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_name_is_camel_then_schema_has_camel_names()
         {
             //// Arrange
@@ -53,13 +52,13 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("barBar1JsonProperty"));
-            Assert.AreEqual("barBar1JsonProperty", schema.Properties["barBar1JsonProperty"].Name);
-            Assert.IsTrue(schema.Properties.ContainsKey("barBar2DataMember"));
-            Assert.AreEqual("barBar2DataMember", schema.Properties["barBar2DataMember"].Name);
+            Assert.True(schema.Properties.ContainsKey("barBar1JsonProperty"));
+            Assert.Equal("barBar1JsonProperty", schema.Properties["barBar1JsonProperty"].Name);
+            Assert.True(schema.Properties.ContainsKey("barBar2DataMember"));
+            Assert.Equal("barBar2DataMember", schema.Properties["barBar2DataMember"].Name);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_name_is_snake_then_schema_has_snake_names()
         {
             //// Arrange
@@ -73,10 +72,10 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("bar_bar1_json_property"));
-            Assert.AreEqual("bar_bar1_json_property", schema.Properties["bar_bar1_json_property"].Name);
-            Assert.IsTrue(schema.Properties.ContainsKey("bar_bar2_data_member"));
-            Assert.AreEqual("bar_bar2_data_member", schema.Properties["bar_bar2_data_member"].Name);
+            Assert.True(schema.Properties.ContainsKey("bar_bar1_json_property"));
+            Assert.Equal("bar_bar1_json_property", schema.Properties["bar_bar1_json_property"].Name);
+            Assert.True(schema.Properties.ContainsKey("bar_bar2_data_member"));
+            Assert.Equal("bar_bar2_data_member", schema.Properties["bar_bar2_data_member"].Name);
         }
     }
 }

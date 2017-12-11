@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Annotations;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class NullPropertyTests
     {
         public class ClassRoom
@@ -16,7 +15,7 @@ namespace NJsonSchema.Tests.Generation
             public int? Size { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_nullable_then_property_schema_type_is_also_null()
         {
             //// Arrange
@@ -26,13 +25,13 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsFalse(schema.Properties["Id"].IsRequired);
-            Assert.IsFalse(schema.Properties["Name"].IsRequired);
-            Assert.IsFalse(schema.Properties["Size"].IsRequired);
+            Assert.False(schema.Properties["Id"].IsRequired);
+            Assert.False(schema.Properties["Name"].IsRequired);
+            Assert.False(schema.Properties["Size"].IsRequired);
 
-            Assert.IsFalse(schema.Properties["Id"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["Name"].Type.HasFlag(JsonObjectType.Null));
-            Assert.IsTrue(schema.Properties["Size"].Type.HasFlag(JsonObjectType.Null));
+            Assert.False(schema.Properties["Id"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["Name"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["Size"].Type.HasFlag(JsonObjectType.Null));
         }
 
         public class NotNullAttributeClass
@@ -43,7 +42,7 @@ namespace NJsonSchema.Tests.Generation
             public string Bar { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_NotNullAttribute_is_available_then_property_is_not_nullable()
         {
             //// Arrange
@@ -53,8 +52,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties["Foo"].IsNullable(SchemaType.JsonSchema));
-            Assert.IsFalse(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
+            Assert.True(schema.Properties["Foo"].IsNullable(SchemaType.JsonSchema));
+            Assert.False(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
         }
     }
 }

@@ -1,16 +1,15 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class AttributeGenerationTests
     {
 #if !LEGACY
 
-        [TestMethod]
+        [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
             //// Arrange
@@ -20,11 +19,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Items"];
 
             //// Assert
-            Assert.AreEqual(3, property.MinItems);
-            Assert.AreEqual(5, property.MaxItems);
+            Assert.Equal(3, property.MinItems);
+            Assert.Equal(5, property.MaxItems);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_string_then_minLength_and_maxLenght_are_set()
         {
             //// Arrange
@@ -34,13 +33,13 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["String"];
 
             //// Assert
-            Assert.AreEqual(3, property.MinLength);
-            Assert.AreEqual(5, property.MaxLength);
+            Assert.Equal(3, property.MinLength);
+            Assert.Equal(5, property.MaxLength);
         }
 
 #endif
 
-        [TestMethod]
+        [Fact]
         public async Task When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
         {
             //// Arrange
@@ -50,11 +49,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Double"];
 
             //// Assert
-            Assert.AreEqual(5.5m, property.Minimum);
-            Assert.AreEqual(10.5m, property.Maximum);
+            Assert.Equal(5.5m, property.Minimum);
+            Assert.Equal(10.5m, property.Maximum);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_Range_attribute_has_double_max_then_max_is_not_set()
         {
             //// Arrange
@@ -64,11 +63,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["DoubleOnlyMin"];
 
             //// Assert
-            Assert.AreEqual(5.5m, property.Minimum);
-            Assert.AreEqual(null, property.Maximum);
+            Assert.Equal(5.5m, property.Minimum);
+            Assert.Equal(null, property.Maximum);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_Range_attribute_is_set_on_integer_then_minimum_and_maximum_are_set()
         {
             //// Arrange
@@ -78,11 +77,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Integer"];
 
             //// Assert
-            Assert.AreEqual(5, property.Minimum);
-            Assert.AreEqual(10, property.Maximum);
+            Assert.Equal(5, property.Minimum);
+            Assert.Equal(10, property.Maximum);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_display_attribute_is_available_then_name_and_description_are_read()
         {
             //// Arrange
@@ -93,11 +92,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Display"];
 
             //// Assert
-            Assert.AreEqual("Foo", property.Title);
-            Assert.AreEqual("Bar", property.Description);
+            Assert.Equal("Foo", property.Title);
+            Assert.Equal("Bar", property.Description);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_description_attribute_is_available_then_description_are_read()
         {
             //// Arrange
@@ -108,10 +107,10 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Description"];
 
             //// Assert
-            Assert.AreEqual("Abc", property.Description);
+            Assert.Equal("Abc", property.Description);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_required_attribute_is_available_then_property_is_required()
         {
             //// Arrange
@@ -122,10 +121,10 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Required"];
 
             //// Assert
-            Assert.IsTrue(property.IsRequired);
+            Assert.True(property.IsRequired);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_required_attribute_is_not_available_then_property_is_can_be_null()
         {
             //// Arrange
@@ -136,11 +135,11 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Description"];
 
             //// Assert
-            Assert.IsFalse(property.IsRequired);
-            Assert.IsTrue(property.Type.HasFlag(JsonObjectType.Null));
+            Assert.False(property.IsRequired);
+            Assert.True(property.Type.HasFlag(JsonObjectType.Null));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
         {
             //// Arrange
@@ -151,7 +150,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["ReadOnly"];
 
             //// Assert
-            Assert.IsTrue(property.IsReadOnly);
+            Assert.True(property.IsReadOnly);
         }
 
         public class AttributeTestClass

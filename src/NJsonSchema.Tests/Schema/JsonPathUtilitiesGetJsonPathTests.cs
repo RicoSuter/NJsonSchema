@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.Schema
 {
-    [TestClass]
     public class JsonPathUtilitiesGetJsonPathTests
     {
-        [TestMethod]
+        [Fact]
         public void When_object_is_in_property_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -24,10 +23,10 @@ namespace NJsonSchema.Tests.Schema
             var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
-            Assert.AreEqual("#/Property/Property2", path);
+            Assert.Equal("#/Property/Property2", path);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_object_is_in_list_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -49,10 +48,10 @@ namespace NJsonSchema.Tests.Schema
             var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
-            Assert.AreEqual("#/Property/List/2", path);
+            Assert.Equal("#/Property/List/2", path);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_object_is_in_dictionary_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -74,10 +73,10 @@ namespace NJsonSchema.Tests.Schema
             var path = JsonPathUtilities.GetJsonPath(obj, objectToSearch);
 
             //// Assert
-            Assert.AreEqual("#/Property/List/Test3", path);
+            Assert.Equal("#/Property/List/Test3", path);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_object_is_root_then_path_should_be_built_correctly()
         {
             //// Arrange
@@ -87,7 +86,7 @@ namespace NJsonSchema.Tests.Schema
             var path = JsonPathUtilities.GetJsonPath(objectToSearch, objectToSearch);
 
             //// Assert
-            Assert.AreEqual("#", path);
+            Assert.Equal("#", path);
         }
     }
 }

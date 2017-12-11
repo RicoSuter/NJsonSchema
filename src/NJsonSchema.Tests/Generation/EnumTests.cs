@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NJsonSchema.Generation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class EnumTests
     {
         public enum MetadataSchemaType
@@ -34,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
             public MetadataSchemaCreateRequest MetadataSchemaCreateRequest { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_enum_is_used_multiple_times_in_array_then_it_is_always_referenced()
         {
             // Arrange
@@ -47,8 +46,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.IsTrue(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once
-            Assert.IsTrue(json.Split(new[] { "\"$ref\": \"#/definitions/MetadataSchemaType\"" }, StringSplitOptions.None).Length == 3); // both classes reference the enum
+            Assert.True(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once
+            Assert.True(json.Split(new[] { "\"$ref\": \"#/definitions/MetadataSchemaType\"" }, StringSplitOptions.None).Length == 3); // both classes reference the enum
         }
 
         public class ContainerWithEnumDictionary
@@ -56,7 +55,7 @@ namespace NJsonSchema.Tests.Generation
             public Dictionary<string, MetadataSchemaType> Dictionary { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_property_is_dictionary_with_enum_value_then_it_is_referenced()
         {
             // Arrange
@@ -69,7 +68,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.IsTrue(schema.Properties["Dictionary"].AdditionalPropertiesSchema.HasReference); 
+            Assert.True(schema.Properties["Dictionary"].AdditionalPropertiesSchema.HasReference); 
         }
     }
 }

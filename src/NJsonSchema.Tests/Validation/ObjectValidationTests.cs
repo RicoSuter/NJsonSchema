@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class ObjectValidationTests
     {
-        [TestMethod]
+        [Fact]
         public void When_token_is_not_object_then_validation_should_fail()
         {
             //// Arrange
@@ -23,10 +22,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.ObjectExpected, errors.First().Kind);
+            Assert.Equal(ValidationErrorKind.ObjectExpected, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_required_property_is_missing_then_it_should_be_in_error_list()
         {
             //// Arrange
@@ -43,13 +42,13 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(1, errors.Count());
-            Assert.AreEqual("Foo", errors.First().Property);
-            Assert.AreEqual("#/Foo", errors.First().Path);
-            Assert.AreEqual(ValidationErrorKind.PropertyRequired, errors.First().Kind);
+            Assert.Equal(1, errors.Count());
+            Assert.Equal("Foo", errors.First().Property);
+            Assert.Equal("#/Foo", errors.First().Path);
+            Assert.Equal(ValidationErrorKind.PropertyRequired, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
@@ -67,10 +66,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_optional_property_is_missing_then_it_should_succeed()
         {
             //// Arrange
@@ -87,10 +86,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_property_is_available_then_it_should_succeed()
         {
             //// Arrange
@@ -109,10 +108,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
 
-        [TestMethod]
+        [Fact]
         public void When_string_property_required_but_integer_provided_then_it_should_fail()
         {
             //// Arrange
@@ -131,12 +130,12 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.StringExpected, errors.First().Kind);
-            Assert.AreEqual("Foo", errors.First().Property);
-            Assert.AreEqual("#/Foo", errors.First().Path);
+            Assert.Equal(ValidationErrorKind.StringExpected, errors.First().Kind);
+            Assert.Equal("Foo", errors.First().Property);
+            Assert.Equal("#/Foo", errors.First().Path);
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_type_property_has_integer_type_then_it_is_validated_correctly()
         {
             //// Arrange
@@ -157,7 +156,7 @@ namespace NJsonSchema.Tests.Validation
             }");
 
             //// Assert
-            Assert.AreEqual(0, errors.Count);
+            Assert.Equal(0, errors.Count);
         }
     }
 }

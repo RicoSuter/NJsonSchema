@@ -1,23 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class ContractResolverTests
     {
-        [TestMethod]
+#if !NET45
+        [Fact]
+#endif
         public async Task Properties_should_match_custom_resolver()
         {
             var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings
@@ -28,14 +26,13 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Properties.ContainsKey("firstName"));
-            Assert.AreEqual("firstName", schema.Properties["firstName"].Name);
+            Assert.True(schema.Properties.ContainsKey("firstName"));
+            Assert.Equal("firstName", schema.Properties["firstName"].Name);
 
-            Assert.IsFalse(schema.Properties.ContainsKey("nameLength"));
+            Assert.False(schema.Properties.ContainsKey("nameLength"));
 
-            Assert.IsTrue(schema.Properties.ContainsKey("location"));
-            Assert.AreEqual(JsonObjectType.String | JsonObjectType.Null, schema.Properties["location"].Type,
-                "Location is resolved to a string contract because it has a type converter");
+            Assert.True(schema.Properties.ContainsKey("location"));
+            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, schema.Properties["location"].Type);
         }
 
         /// <summary>
@@ -66,13 +63,13 @@ namespace NJsonSchema.Tests.Generation
             }
 
             static HashSet<string> _systemConverters = new HashSet<string>(new[] {
-            "System.ComponentModel.ComponentConverter",
-            "System.ComponentModel.ReferenceConverter",
-            "System.ComponentModel.CollectionConverter" });
+                "System.ComponentModel.ComponentConverter",
+                "System.ComponentModel.ReferenceConverter",
+                "System.ComponentModel.CollectionConverter" });
 
             public static bool CanNonSystemTypeDescriptorConvertString(Type type)
             {
-                var typeConverter = TypeDescriptor.GetConverter(type);
+                var typeConverter = TypeDescriptor.GetConverter(type); // somehow this does not work in NET45
                 // use the objectType's TypeConverter if it has one and can convert to a string
                 if (typeConverter != null)
                 {

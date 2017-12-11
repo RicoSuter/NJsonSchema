@@ -1,14 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class PatternPropertyValidationTests
     {
-        [TestMethod]
+        [Fact]
         public void When_there_are_no_properties_matching_pattern_then_validation_fails()
         {
             //// Arrange
@@ -25,14 +24,14 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(2, errors.Count());
+            Assert.Equal(2, errors.Count());
             foreach (var validationError in errors)
             {
-                Assert.AreEqual(ValidationErrorKind.NoAdditionalPropertiesAllowed, validationError.Kind);
+                Assert.Equal(ValidationErrorKind.NoAdditionalPropertiesAllowed, validationError.Kind);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void When_there_are_properties_matching_pattern_but_types_doesnt_match_then_validation_fails()
         {
             //// Arrange
@@ -49,11 +48,11 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(2, errors.Count());
-            Assert.IsTrue(errors.All(error => error.Kind == ValidationErrorKind.AdditionalPropertiesNotValid));
+            Assert.Equal(2, errors.Count());
+            Assert.True(errors.All(error => error.Kind == ValidationErrorKind.AdditionalPropertiesNotValid));
         }
 
-        [TestMethod]
+        [Fact]
         public void When_there_are_properties_matching_pattern_and_types_matches_then_validation_succeds()
         {
             //// Arrange
@@ -70,7 +69,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
         
     }

@@ -1,14 +1,13 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
+using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
-    [TestClass]
     public class FormatIpV6Tests
     {
-        [TestMethod]
+        [Fact]
         public void When_format_ipv6_incorrect_then_validation_fails()
         {
             //// Arrange
@@ -22,10 +21,10 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(ValidationErrorKind.IpV6Expected, errors.First().Kind);
+            Assert.Equal(ValidationErrorKind.IpV6Expected, errors.First().Kind);
         }
 
-        [TestMethod]
+        [Fact]
         public void When_format_ipv6_correct_then_validation_succeeds()
         {
             //// Arrange
@@ -39,7 +38,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.AreEqual(0, errors.Count());
+            Assert.Equal(0, errors.Count());
         }
     }
 }
