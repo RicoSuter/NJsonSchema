@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.TypeScript
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class ClassGenerationTests
     {

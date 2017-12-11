@@ -1,22 +1,25 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.TypeScript
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
-    public class DateTimeCodeGenerationTests
+    public class DateCodeGenerationTests
     {
-        public class ClassWithDateTimeProperty
-        {
-            public DateTime MyDateTime { get; set; }
-        }
+        private const string Json =
+@"{
+    '$schema': 'http://json-schema.org/draft-04/schema#',
+	'type': 'object', 
+	'properties': {
+		'myDate': { 'type': 'string', 'format': 'date' }
+	}
+}";
 
         [Fact]
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -27,16 +30,16 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("myDateTime: string", code);
-            Assert.Contains("this.myDateTime = data[\"MyDateTime\"];", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime;", code);
+            Assert.Contains("myDate: string", code);
+            Assert.Contains("this.myDate = data[\"myDate\"];", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate;", code);
         }
 
         [Fact]
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -47,16 +50,16 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("myDateTime: moment.Moment", code);
-            Assert.Contains("this.myDateTime = data[\"MyDateTime\"] ? moment(data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("myDate: moment.Moment", code);
+            Assert.Contains("this.myDate = data[\"myDate\"] ? moment(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
         }
 
         [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -67,16 +70,17 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("myDateTime: Date", code);
-            Assert.Contains("this.myDateTime = data[\"MyDateTime\"] ? new Date(data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("myDate: Date", code);
+            Assert.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
+            Assert.Contains("function formatDate(", code);
         }
 
         [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -87,14 +91,14 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("MyDateTime: Date;", code);
+            Assert.Contains("myDate: Date;", code);
         }
 
         [Fact]
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -105,7 +109,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("MyDateTime: moment.Moment;", code);
+            Assert.Contains("myDate: moment.Moment;", code);
         }
 
 
@@ -113,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithDateTimeProperty>();
+            var schema = await JsonSchema4.FromJsonAsync(Json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -124,7 +128,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("MyDateTime: string;", code);
+            Assert.Contains("myDate: string;", code);
         }
     }
 }

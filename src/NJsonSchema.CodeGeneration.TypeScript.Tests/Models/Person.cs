@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 
-namespace NJsonSchema.CodeGeneration.Tests.Models
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests.Models
 {
     public class Person
     {

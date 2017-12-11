@@ -1,8 +1,7 @@
-﻿using NJsonSchema.CodeGeneration.TypeScript;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.TypeScript.Generation
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class AbstractGenerationTests
     {
@@ -22,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests.TypeScript.Generation
             var code = generator.GenerateFile("AbstractClass");
 
             /// Assert
-            Assert.True(code.Contains("export abstract class AbstractClass"));
+            Assert.Contains("export abstract class AbstractClass", code);
         }
     }
 }

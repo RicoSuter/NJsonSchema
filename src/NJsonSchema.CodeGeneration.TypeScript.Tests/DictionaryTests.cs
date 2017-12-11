@@ -4,7 +4,7 @@ using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.TypeScript
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class DictionaryTests
     {

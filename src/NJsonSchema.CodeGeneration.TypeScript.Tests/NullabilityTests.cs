@@ -1,10 +1,9 @@
-﻿using NJsonSchema.CodeGeneration.Tests.Models;
-using NJsonSchema.CodeGeneration.TypeScript;
+﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using NJsonSchema.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.TypeScript
+namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class NullabilityTests
     {
