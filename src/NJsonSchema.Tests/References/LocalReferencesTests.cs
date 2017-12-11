@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace NJsonSchema.Tests.References
 {
-    [TestClass]
     public class LocalReferencesTests
     {
-        [TestMethod]
+        [Fact]
         public async Task When_definitions_is_nested_then_refs_work()
         {
             //// Arrange
@@ -31,10 +30,10 @@ namespace NJsonSchema.Tests.References
             var j = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_references_collection_in_definitions_it_works()
         {
             //// Arrange
@@ -45,12 +44,12 @@ namespace NJsonSchema.Tests.References
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
-            Assert.AreEqual(1, schema.Definitions.Count);
-            Assert.AreEqual("./collection.json", schema.Definitions["collection"].DocumentPath);
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
+            Assert.Equal(1, schema.Definitions.Count);
+            Assert.Equal("./collection.json", schema.Definitions["collection"].DocumentPath);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_schema_references_external_schema_then_it_is_inlined_with_ToJson()
         {
             //// Arrange
@@ -61,8 +60,8 @@ namespace NJsonSchema.Tests.References
             var json = schema.ToJson();
 
             //// Assert
-            Assert.IsTrue(schema.Definitions.ContainsKey("Animal"));
-            Assert.IsTrue(json.Contains("\"$ref\": \"#/definitions/Animal\""));
+            Assert.True(schema.Definitions.ContainsKey("Animal"));
+            Assert.True(json.Contains("\"$ref\": \"#/definitions/Animal\""));
         }
 
         //[TestMethod]
@@ -79,7 +78,7 @@ namespace NJsonSchema.Tests.References
         //    Assert.AreEqual(0, schema.Definitions.Count);
         //}
 
-        [TestMethod]
+        [Fact]
         public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
         {
             //// Arrange
@@ -90,7 +89,7 @@ namespace NJsonSchema.Tests.References
             var json = schema.ToJson();
 
             //// Assert
-            Assert.AreEqual(1, schema.Definitions.Count);
+            Assert.Equal(1, schema.Definitions.Count);
         }
     }
 }

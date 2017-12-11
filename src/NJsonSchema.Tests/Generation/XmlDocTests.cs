@@ -72,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_summary_has_see_tag_then_it_is_converted()
         {
             //// Arrange
@@ -82,7 +82,7 @@ namespace NJsonSchema.Tests.Generation
             var summary = await typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
 
             //// Assert
-            Assert.AreEqual("null for the default Record.", summary);
+            Assert.Equal("null for the default Record.", summary);
         }
     }
 }

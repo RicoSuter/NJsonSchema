@@ -1,9 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    [TestClass]
     public class AbstractGenerationTests
     {
         public abstract class AbstractClass
@@ -11,7 +10,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task When_class_is_abstract_then_is_abstract_is_true()
         {
             /// Act
@@ -19,8 +18,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             /// Assert
-            Assert.IsTrue(json.Contains("x-abstract"));
-            Assert.IsTrue(schema.IsAbstract);
+            Assert.True(json.Contains("x-abstract"));
+            Assert.True(schema.IsAbstract);
         }
         
         public class NotAbstractClass
@@ -28,7 +27,7 @@ namespace NJsonSchema.Tests.Generation
             public string Foo { get; set; }
         }
         
-        [TestMethod]
+        [Fact]
         public async Task When_class_is_not_abstract_then_is_abstract_is_false()
         {
             /// Act
@@ -36,8 +35,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             /// Assert
-            Assert.IsFalse(json.Contains("x-abstract"));
-            Assert.IsFalse(schema.IsAbstract);
+            Assert.False(json.Contains("x-abstract"));
+            Assert.False(schema.IsAbstract);
         }
     }
 }
