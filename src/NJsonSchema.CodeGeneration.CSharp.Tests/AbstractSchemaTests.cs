@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
             var code = generator.GenerateFile("AbstractClass");
 
             /// Assert
-            Assert.IsTrue(code.Contains("public abstract partial class AbstractClass"));
+            Assert.True(code.Contains("public abstract partial class AbstractClass"));
         }
     }
 }
