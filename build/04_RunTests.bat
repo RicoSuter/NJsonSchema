@@ -1,0 +1,1 @@
+dotnet test "src\NJsonSchema.CodeGeneration.CSharp.Tests\NJsonSchema.CodeGeneration.CSharp.Tests.csproj" -c %CONFIGURATION%
