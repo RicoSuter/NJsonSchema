@@ -37,8 +37,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Person");
 
             //// Assert
-            Assert.True(code.Contains("[Newtonsoft.Json.JsonExtensionData]"));
-            Assert.True(code.Contains("public System.Collections.Generic.IDictionary<string, string> AdditionalProperties"));
+            Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> AdditionalProperties", code);
         }
     }
 }

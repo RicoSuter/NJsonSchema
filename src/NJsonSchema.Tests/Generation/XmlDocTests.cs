@@ -33,8 +33,8 @@ namespace NJsonSchema.Tests.Generation
             var summary = await typeof(WithComplexXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
 
             //// Assert
-            Assert.True(summary.Contains("\n\n"));
-            Assert.True(summary.Contains("    * Users"));
+            Assert.Contains("\n\n", summary);
+            Assert.Contains("    * Users", summary);
             Assert.Equal(summary.Trim(), summary);
         }
 

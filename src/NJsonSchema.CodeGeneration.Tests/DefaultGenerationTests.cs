@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;

@@ -38,7 +38,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
     }
 }

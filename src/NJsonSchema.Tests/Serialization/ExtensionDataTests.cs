@@ -21,11 +21,10 @@ namespace NJsonSchema.Tests.Serialization
             var json = schema.ToJson();
 
             //// Assert
-            Assert.True(json.Contains(
-@"{
+            Assert.Contains(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""Test"": 123
-}"));
+}", json);
         }
 
         [Fact]

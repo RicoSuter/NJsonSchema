@@ -33,8 +33,8 @@ namespace NJsonSchema.Tests.Conversion
 
             //// Assert
             Assert.Equal(JsonObjectType.Object, schema.Type);
-            Assert.False(json.Contains("Foo"));
-            Assert.False(json.Contains("foo"));
+            Assert.DoesNotContain("Foo", json);
+            Assert.DoesNotContain("foo", json);
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace NJsonSchema.Tests.Conversion
 
             Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, property.Type);
             Assert.Equal(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
-            Assert.True(schema.Definitions.Any(d => d.Key == "MySubtype"));
+            Assert.Contains(schema.Definitions, d => d.Key == "MySubtype");
             Assert.Equal(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
     }

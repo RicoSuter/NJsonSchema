@@ -33,8 +33,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Required]"));
-            Assert.True(code.Contains("public object Property { get; set; }"));
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
+            Assert.Contains("public object Property { get; set; }", code);
         }
 
         [Fact]
@@ -52,8 +52,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Required]"));
-            Assert.True(code.Contains("public object Property { get; set; }"));
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
+            Assert.Contains("public object Property { get; set; }", code);
         }
 
         private class ClassWithoutRequiredObject
@@ -80,8 +80,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.False(code.Contains("[Required]"));
-            Assert.True(code.Contains("public object Property { get; set; }"));
+            Assert.DoesNotContain("[Required]", code);
+            Assert.Contains("public object Property { get; set; }", code);
         }
 
 
@@ -100,8 +100,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.False(code.Contains("[Required]"));
-            Assert.True(code.Contains("public object Property { get; set; }"));
+            Assert.DoesNotContain("[Required]", code);
+            Assert.Contains("public object Property { get; set; }", code);
         }
     }
 }

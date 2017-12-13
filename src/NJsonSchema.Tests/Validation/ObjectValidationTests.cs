@@ -42,7 +42,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal("Foo", errors.First().Property);
             Assert.Equal("#/Foo", errors.First().Path);
             Assert.Equal(ValidationErrorKind.PropertyRequired, errors.First().Kind);
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]

@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.True(code.Contains("public enum MyClassCategory"));
+            Assert.Contains("public enum MyClassCategory", code);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.True(code.Contains("PullrequestUpdated = 0,"));
+            Assert.Contains("PullrequestUpdated = 0,", code);
         }
 
         public class MyStringEnumListTest
@@ -110,7 +110,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.True(code.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)"));
+            Assert.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)", code);
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.True(code.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"));
+            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]", code);
         }
 
         public enum SomeEnum { Thing1, Thing2 }
@@ -148,8 +148,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.True(code.Contains("SomeEnum"));
-            Assert.False(code.Contains("Anonymous"));
+            Assert.Contains("SomeEnum", code);
+            Assert.DoesNotContain("Anonymous", code);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             /// Assert
-            Assert.True(code.Contains("public enum FirstMetdodOfMetValueGroupChar"));
+            Assert.Contains("public enum FirstMetdodOfMetValueGroupChar", code);
         }
     }
 }

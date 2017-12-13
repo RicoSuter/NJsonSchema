@@ -24,10 +24,10 @@ namespace NJsonSchema.Tests.Infrastructure
             var propertiesAndFields = ReflectionCache.GetPropertiesAndFields(typeof(TestClass));
 
             //// Assert
-            Assert.True(propertiesAndFields.Any(p => p.MemberInfo.Name == "field"));
-            Assert.False(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticField"));
-            Assert.True(propertiesAndFields.Any(p => p.MemberInfo.Name == "property"));
-            Assert.False(propertiesAndFields.Any(p => p.MemberInfo.Name == "staticProperty"));
+            Assert.Contains(propertiesAndFields, p => p.MemberInfo.Name == "field");
+            Assert.DoesNotContain(propertiesAndFields, p => p.MemberInfo.Name == "staticField");
+            Assert.Contains(propertiesAndFields, p => p.MemberInfo.Name == "property");
+            Assert.DoesNotContain(propertiesAndFields, p => p.MemberInfo.Name == "staticProperty");
         }
    }
 }

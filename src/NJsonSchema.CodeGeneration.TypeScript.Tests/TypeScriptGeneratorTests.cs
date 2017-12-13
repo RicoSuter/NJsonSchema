@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.True(output.Contains(@"FirstName: string;"));
+            Assert.Contains(@"FirstName: string;", output);
         }
 
         [Fact]

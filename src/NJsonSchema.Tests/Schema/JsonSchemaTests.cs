@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task Ensure_NJS_does_not_run_in_legacy_mode()
         { 
-            Assert.False(JsonSchema4.ToolchainVersion.Contains("NET40"));
+            Assert.DoesNotContain("NET40", JsonSchema4.ToolchainVersion);
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.True(data.Contains(@"""type"": ""integer"""));
+            Assert.Contains(@"""type"": ""integer""", data);
         }
 
         [Fact]
@@ -192,11 +192,10 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             //// Assert
-            Assert.True(data.Contains(
-@"  ""type"": [
+            Assert.Contains(@"  ""type"": [
     ""integer"",
     ""object""
-  ]"));
+  ]", data);
         }
 
         [Fact]
@@ -278,7 +277,7 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -297,7 +296,7 @@ namespace NJsonSchema.Tests.Schema
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]

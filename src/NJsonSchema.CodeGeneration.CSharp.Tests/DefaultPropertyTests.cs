@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.True(output.Contains("public int IntergerWithDefault { get; set; } = 5;"));
+            Assert.Contains("public int IntergerWithDefault { get; set; } = 5;", output);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.True(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
+            Assert.Contains("public bool BoolWithDefault { get; set; } = false;", output);
         }
 
         [Fact]
@@ -72,8 +72,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.True(output.Contains("public bool BoolWithDefault { get; set; }"));
-            Assert.False(output.Contains("public bool BoolWithDefault { get; set; } = false;"));
+            Assert.Contains("public bool BoolWithDefault { get; set; }", output);
+            Assert.DoesNotContain("public bool BoolWithDefault { get; set; } = false;", output);
         }
     }
 }

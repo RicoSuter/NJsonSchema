@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.Equal(schema, schema.Properties["Car"].ActualPropertySchema.Properties["Person"].ActualPropertySchema);
+            Assert.Equal(schema, schema.Properties["Car"].ActualTypeSchema.Properties["Person"].ActualTypeSchema);
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = await JsonSchema4.FromTypeAsync<Car>();
 
             //// Assert
-            Assert.Equal(schema, schema.Properties["Person"].ActualPropertySchema.Properties["Car"].ActualPropertySchema);
+            Assert.Equal(schema, schema.Properties["Person"].ActualTypeSchema.Properties["Car"].ActualTypeSchema);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.True(json.Contains(@"""$ref"": ""#"""));
+            Assert.Contains(@"""$ref"": ""#""", json);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace NJsonSchema.Tests.Conversion
             var json = schema.ToJson();
 
             //// Assert
-            Assert.True(json.Contains(@"""$ref"": ""#/definitions/Person"));
+            Assert.Contains(@"""$ref"": ""#/definitions/Person", json);
         }
     }
 

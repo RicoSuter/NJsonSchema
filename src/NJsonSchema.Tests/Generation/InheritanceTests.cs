@@ -89,7 +89,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.NotNull(schema.Properties["Class"]);
 
             Assert.Equal(1, schema.AllOf.Count);
-            Assert.True(schema.Definitions.Any(d => d.Key == "Person"));
+            Assert.Contains(schema.Definitions, d => d.Key == "Person");
             Assert.NotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
 
