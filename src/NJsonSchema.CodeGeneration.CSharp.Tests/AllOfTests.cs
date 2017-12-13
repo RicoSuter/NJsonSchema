@@ -50,8 +50,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("A");
 
             //// Assert
-            Assert.False(code.Contains("Anonymous"));
-            Assert.True(code.Contains("A : B"));
+            Assert.DoesNotContain("Anonymous", code);
+            Assert.Contains("A : B", code);
         }
 
         [Fact]
@@ -102,8 +102,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("A");
 
             //// Assert
-            Assert.False(code.Contains("Anonymous"));
-            Assert.True(code.Contains("A : B"));
+            Assert.DoesNotContain("Anonymous", code);
+            Assert.Contains("A : B", code);
         }
 
         [Fact]
@@ -156,10 +156,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.True(output.Contains("public partial class TAgg"));
-            Assert.True(output.Contains("public string Val1 { get; set; }"));
-            Assert.True(output.Contains("public string Val2 { get; set; }"));
-            Assert.True(output.Contains("public string Val3 { get; set; }"));
+            Assert.Contains("public partial class TAgg", output);
+            Assert.Contains("public string Val1 { get; set; }", output);
+            Assert.Contains("public string Val2 { get; set; }", output);
+            Assert.Contains("public string Val3 { get; set; }", output);
         }
 
         [Fact]
@@ -193,17 +193,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
-            Assert.True(code.Contains(
-@"  public partial class Foo : Anonymous
+            Assert.Contains(@"  public partial class Foo : Anonymous
     {
         [Newtonsoft.Json.JsonProperty(""prop1"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop1 { get; set; }
     
         [Newtonsoft.Json.JsonProperty(""prop2"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop2 { get; set; }
-".Replace("\r", string.Empty)));
+".Replace("\r", string.Empty), code);
 
-            Assert.True(code.Contains("class Anonymous"));
+            Assert.Contains("class Anonymous", code);
         }
 
         [Fact]
@@ -237,9 +236,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             //// Assert
-            Assert.True(code.Contains("class Foo : Bar"));
-            Assert.True(code.Contains("public string Prop1 { get; set; }"));
-            Assert.True(code.Contains("public string Prop2 { get; set; }"));
+            Assert.Contains("class Foo : Bar", code);
+            Assert.Contains("public string Prop1 { get; set; }", code);
+            Assert.Contains("public string Prop2 { get; set; }", code);
         }
     }
 }

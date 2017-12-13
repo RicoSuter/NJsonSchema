@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.False(json.Contains("IgnoreMe"));
+            Assert.DoesNotContain("IgnoreMe", json);
         }
 
         [DataContract]
@@ -50,7 +50,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.False(json.Contains("IgnoreMe"));
+            Assert.DoesNotContain("IgnoreMe", json);
         }
 
         [Serializable]

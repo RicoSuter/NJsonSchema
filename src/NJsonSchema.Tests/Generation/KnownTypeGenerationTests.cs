@@ -50,7 +50,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson(); 
 
             //// Assert
-            Assert.True(schema.Definitions.Any(s => s.Key == "Teacher"));
+            Assert.Contains(schema.Definitions, s => s.Key == "Teacher");
         }
 
         public async Task ReproAsync()
@@ -67,8 +67,8 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.True(schema.Definitions.Any(s => s.Key == "Pen"));
-            Assert.True(schema.Definitions.Any(s => s.Key == "Pencil"));
+            Assert.Contains(schema.Definitions, s => s.Key == "Pen");
+            Assert.Contains(schema.Definitions, s => s.Key == "Pencil");
         }
     }
 }

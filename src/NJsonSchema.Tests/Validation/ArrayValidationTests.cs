@@ -75,7 +75,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooManyItemsInTuple, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -119,7 +119,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.ArrayItemNotValid, errors.First().Kind);
 
             var firstItemError = ((ChildSchemaValidationError)errors.First()).Errors.First().Value.First();
@@ -167,7 +167,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooManyItems, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -189,7 +189,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooFewItems, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -212,7 +212,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(1, errors.Count());
+            Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }

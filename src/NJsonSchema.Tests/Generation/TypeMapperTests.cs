@@ -37,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
             var property = schema.Properties["Bar1"].ActualTypeSchema;
 
             Assert.True(property.Type.HasFlag(JsonObjectType.String));
-            Assert.False(json.Contains("$ref"));
+            Assert.DoesNotContain("$ref", json);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
             Assert.True(property1.ActualPropertySchema == property2.ActualPropertySchema);
 
-            Assert.True(json.Contains("$ref"));
+            Assert.Contains("$ref", json);
         }
 
 

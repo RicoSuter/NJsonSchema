@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             /// Assert
-            Assert.True(json.Contains("x-abstract"));
+            Assert.Contains("x-abstract", json);
             Assert.True(schema.IsAbstract);
         }
         
@@ -35,7 +35,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             /// Assert
-            Assert.False(json.Contains("x-abstract"));
+            Assert.DoesNotContain("x-abstract", json);
             Assert.False(schema.IsAbstract);
         }
     }

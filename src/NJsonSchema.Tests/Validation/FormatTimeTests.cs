@@ -42,7 +42,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             //// Assert
-            Assert.Equal(0, errors.Count());
+            Assert.Empty(errors);
         }
     }
 }

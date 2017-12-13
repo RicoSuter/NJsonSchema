@@ -74,7 +74,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.True(schemaData.Contains("#/definitions/Bar"));
+            Assert.Contains("#/definitions/Bar", schemaData);
         }
 
         public class DefaultTests

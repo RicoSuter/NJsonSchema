@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.True(code.Contains("[System.ComponentModel.DataAnnotations.Range(2, int.MaxValue)]"));
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(2, int.MaxValue)]", code);
         }
     }
 }
