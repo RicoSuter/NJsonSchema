@@ -21,7 +21,8 @@ namespace NJsonSchema.CodeGeneration
         {
             return ConversionUtilities.ConvertToUpperCamelCase(name
                 .Replace(":", "-"), true)
-                .Replace(".", "_");
+                .Replace(".", "_")
+                .Replace("#", "_");
         }
     }
 }
