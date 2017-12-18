@@ -90,7 +90,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 
     private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
     {
-        foreach (var type in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), false))
+        foreach (var type in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), true))
         {
             if (type.Key == discriminator)
                 return type.Type;
