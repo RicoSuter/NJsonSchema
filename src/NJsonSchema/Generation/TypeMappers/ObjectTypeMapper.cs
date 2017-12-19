@@ -24,7 +24,6 @@ namespace NJsonSchema.Generation.TypeMappers
         {
         }
 
-
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schemaFactory">The schema factory.</param>
