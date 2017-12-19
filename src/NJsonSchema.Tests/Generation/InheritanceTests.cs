@@ -158,7 +158,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_root_schema_is_inherited_then_schema_is_generated()
         {
             //// Arrange
-            
+
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Animal>();
@@ -166,6 +166,96 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.NotNull(data);
+        }
+
+        [DataContract]
+        [KnownType(typeof(ACommonThing))]
+        [KnownType(typeof(BCommonThing))]
+        public abstract class CommonThingBase
+        {
+        }
+
+        [DataContract]
+        public class ACommonThing : CommonThingBase { }
+
+        [DataContract]
+        public class BCommonThing : CommonThingBase { }
+
+        public class ViewModelThing
+        {
+            public CommonThingBase CommonThing { get; set; }
+        }
+
+        [Fact]
+        public async Task When_discriminator_is_externally_defined_then_it_is_generated()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                DiscriminatorDefinitions =
+                {
+                    new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator")
+                }
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ViewModelThing>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey(nameof(CommonThingBase)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(ACommonThing)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
+
+            var baseSchema = schema.Definitions[nameof(CommonThingBase)];
+            Assert.Equal("discriminator", baseSchema.Discriminator);
+        }
+
+        [Fact]
+        public async Task When_serializing_object_with_inheritance_then_discriminator_is_added()
+        {
+            /// Arrange
+            var thing = new ViewModelThing
+            {
+                CommonThing = new ACommonThing()
+            };
+
+            var definitions = new[] { new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator") };
+
+            /// Act
+            var json = JsonConvert.SerializeObject(thing, Formatting.Indented, new[]
+            {
+                new GlobalJsonInheritanceConverter(definitions)
+            });
+
+            /// Assert
+            Assert.Contains("\"discriminator\": \"ACommonThing\"", json);
+        }
+
+        [Fact]
+        public async Task When_deserializing_object_with_inheritance_then_correct_type_is_generated()
+        {
+            /// Arrange
+            var json =
+            @"{
+              ""CommonThing"": {
+                ""discriminator"": ""ACommonThing""
+              }
+            }";
+
+            var definitions = new[] { new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator") };
+
+            /// Act
+            var vm = JsonConvert.DeserializeObject<ViewModelThing>(json, new JsonSerializerSettings
+            {
+                Converters = new[]
+                {
+                    new GlobalJsonInheritanceConverter(definitions)
+                }
+            });
+
+            /// Assert
+            Assert.Equal(typeof(ACommonThing), vm.CommonThing.GetType());
         }
     }
 }

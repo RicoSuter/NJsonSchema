@@ -251,7 +251,7 @@ namespace NJsonSchema.Generation
                 referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
-            var useDirectReference = Settings.AllowReferencesWithProperties || 
+            var useDirectReference = Settings.AllowReferencesWithProperties ||
                 !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema)).Properties().Any(); // TODO: Improve performance
 
             if (useDirectReference && referencingSchema.OneOf.Count == 0)
@@ -459,7 +459,7 @@ namespace NJsonSchema.Generation
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
-                    .Where(p => (p.GetMethod?.IsPublic == true && p.GetMethod?.IsStatic == false) || 
+                    .Where(p => (p.GetMethod?.IsPublic == true && p.GetMethod?.IsStatic == false) ||
                                 (p.SetMethod?.IsPublic == true && p.SetMethod?.IsStatic == false))
                 )
                 .ToList();
@@ -648,7 +648,7 @@ namespace NJsonSchema.Generation
         {
             if (!Settings.FlattenInheritanceHierarchy)
             {
-                var discriminator = TryGetInheritanceDiscriminator(type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>());
+                var discriminator = TryGetInheritanceDiscriminator(type);
                 if (!string.IsNullOrEmpty(discriminator))
                 {
                     if (schema.Properties.ContainsKey(discriminator))
@@ -664,8 +664,16 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private string TryGetInheritanceDiscriminator(IEnumerable<Attribute> typeAttributes)
+        private string TryGetInheritanceDiscriminator(Type type)
         {
+            var definition = Settings.DiscriminatorDefinitions.SingleOrDefault(d => d.BaseType == type);
+            if (definition != null)
+            {
+                return definition.PropertyName;
+            }
+
+            var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
+
             dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo("JsonConverterAttribute", TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {

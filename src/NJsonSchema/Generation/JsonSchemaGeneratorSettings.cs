@@ -86,7 +86,11 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
-        public IList<ISchemaProcessor> SchemaProcessors { get; } = new List<ISchemaProcessor>();
+        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
+
+        /// <summary>Gets the externally defined discriminator definitions.</summary>
+        [JsonIgnore]
+        public ICollection<DiscriminatorDefinition> DiscriminatorDefinitions { get; } = new Collection<DiscriminatorDefinition>();
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
