@@ -151,6 +151,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateEnum(JToken token, JsonSchema4 schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
+            if (schema.Enumeration.Contains(null) && token?.Type == JTokenType.Null)
+                return;
+
             if (schema.Enumeration.Count > 0 && schema.Enumeration.All(v => v?.ToString() != token?.ToString()))
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath, token, schema));
         }
@@ -219,6 +222,7 @@ namespace NJsonSchema.Validation
                             var isEmail = Regex.IsMatch(value,
                                 @"^\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
                                 @"@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z$", RegexOptions.IgnoreCase);
+
                             if (!isEmail)
                                 errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath, token, schema));
                         }
@@ -309,7 +313,7 @@ namespace NJsonSchema.Validation
 
                     if (schema.MultipleOf.HasValue && value % (double)schema.MultipleOf != 0)
                         errors.Add(new ValidationError(ValidationErrorKind.NumberNotMultipleOf, propertyName, propertyPath, token, schema));
-                }               
+                }
             }
         }
 
@@ -405,7 +409,7 @@ namespace NJsonSchema.Validation
             }
         }
 
-        private void ValidateAdditionalProperties(JToken token, List<JProperty> additionalProperties, JsonSchema4 schema, 
+        private void ValidateAdditionalProperties(JToken token, List<JProperty> additionalProperties, JsonSchema4 schema,
             string propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (schema.AdditionalPropertiesSchema != null)

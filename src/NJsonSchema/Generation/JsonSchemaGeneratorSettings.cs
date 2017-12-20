@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Runtime.Serialization;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
@@ -86,7 +86,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
-        public IList<ISchemaProcessor> SchemaProcessors { get; } = new List<ISchemaProcessor>();
+        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
