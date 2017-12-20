@@ -22,6 +22,7 @@ namespace NJsonSchema.Converters
     {
         internal static readonly string DefaultDiscriminatorName = "discriminator";
 
+        private readonly Type _baseType;
         private readonly string _discriminator;
         private readonly bool _readTypeProperty;
 
@@ -51,6 +52,24 @@ namespace NJsonSchema.Converters
         {
             _discriminator = discriminator;
             _readTypeProperty = readTypeProperty;
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class which only applies for the given base type.</summary>
+        /// <remarks>Use this constructor for global registered converters (not defined on class).</remarks>
+        /// <param name="baseType">The base type.</param>
+        public JsonInheritanceConverter(Type baseType)
+            : this(baseType, DefaultDiscriminatorName)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class which only applies for the given base type.</summary>
+        /// <remarks>Use this constructor for global registered converters (not defined on class).</remarks>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="discriminator">The discriminator.</param>
+        public JsonInheritanceConverter(Type baseType, string discriminator)
+            : this(discriminator, false)
+        {
+            _baseType = baseType;
         }
 
         /// <summary>Writes the JSON representation of the object.</summary>
@@ -106,6 +125,22 @@ namespace NJsonSchema.Converters
         /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
         public override bool CanConvert(Type objectType)
         {
+            if (_baseType != null)
+            {
+                var type = objectType;
+                while (type != null)
+                {
+                    if (type == _baseType)
+                    {
+                        return true;
+                    }
+
+                    type = type.GetTypeInfo().BaseType;
+                }
+
+                return false;
+            }
+
             return true;
         }
 
