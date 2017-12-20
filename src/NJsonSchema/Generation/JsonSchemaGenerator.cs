@@ -666,12 +666,6 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminator(Type type)
         {
-            var definition = Settings.DiscriminatorDefinitions.SingleOrDefault(d => d.BaseType == type);
-            if (definition != null)
-            {
-                return definition.PropertyName;
-            }
-
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
 
             dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo("JsonConverterAttribute", TypeNameStyle.Name);

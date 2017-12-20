@@ -7,39 +7,51 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 
 namespace NJsonSchema.Converters
 {
     /// <summary>Defines external <see cref="JsonInheritanceConverter"/>.</summary>
     public class GlobalJsonInheritanceConverter : JsonConverter
     {
-        private readonly Dictionary<DiscriminatorDefinition, JsonInheritanceConverter> _definitions;
+        private readonly Type _baseType;
+        private readonly JsonInheritanceConverter _converter;
 
         /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
-        /// <param name="definitions">The discriminator definitions.</param>
-        public GlobalJsonInheritanceConverter(IEnumerable<DiscriminatorDefinition> definitions)
+        public GlobalJsonInheritanceConverter(Type baseType, string discriminator)
         {
-            _definitions = definitions.ToDictionary(d => d, d => new JsonInheritanceConverter(d.PropertyName));
+            _baseType = baseType;
+            _converter = new JsonInheritanceConverter(discriminator);
         }
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON.</summary>
-        public override bool CanRead => _definitions.All(d => d.Value.CanRead);
+        public override bool CanRead => _converter.CanRead;
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
-        public override bool CanWrite => _definitions.All(d => d.Value.CanWrite);
+        public override bool CanWrite => _converter.CanWrite;
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
         /// <param name="objectType">Type of the object.</param>
         /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
         public override bool CanConvert(Type objectType)
         {
-            var definition = TryGetConverter(objectType);
-            return definition != null;
+            var type = objectType;
+            while (type != null)
+            {
+                if (type == _baseType)
+                {
+                    return true;
+                }
+
+#if NET40
+                type = type.BaseType;
+#else
+                type = type.GetTypeInfo().BaseType;
+#endif
+            }
+
+            return false;
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
@@ -50,8 +62,7 @@ namespace NJsonSchema.Converters
         /// <returns>The object value.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var definition = TryGetConverter(objectType);
-            return definition.ReadJson(reader, objectType, existingValue, serializer);
+            return _converter.ReadJson(reader, objectType, existingValue, serializer);
         }
 
         /// <summary>Writes the JSON representation of the object.</summary>
@@ -60,29 +71,7 @@ namespace NJsonSchema.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var definition = TryGetConverter(value?.GetType());
-            definition.WriteJson(writer, value, serializer);
-        }
-
-        private JsonInheritanceConverter TryGetConverter(Type objectType)
-        {
-            var type = objectType;
-            while (type != null)
-            {
-                var definition = _definitions.SingleOrDefault(d => d.Key.BaseType == type).Value;
-                if (definition != null)
-                {
-                    return definition;
-                }
-
-#if NET40
-                type = type.BaseType;
-#else
-                type = type.GetTypeInfo().BaseType;
-#endif
-            }
-
-            return null;
+            _converter.WriteJson(writer, value, serializer);
         }
     }
 }

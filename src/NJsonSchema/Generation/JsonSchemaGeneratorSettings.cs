@@ -14,7 +14,6 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
-using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
 {
@@ -87,10 +86,6 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
         public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
-
-        /// <summary>Gets the externally defined discriminator definitions.</summary>
-        [JsonIgnore]
-        public ICollection<DiscriminatorDefinition> DiscriminatorDefinitions { get; } = new Collection<DiscriminatorDefinition>();
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>

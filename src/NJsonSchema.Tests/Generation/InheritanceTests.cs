@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.Generation.SchemaProcessors;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -192,9 +193,9 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
             var settings = new JsonSchemaGeneratorSettings
             {
-                DiscriminatorDefinitions =
+                SchemaProcessors =
                 {
-                    new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator")
+                    new DiscriminatorSchemaProcessor(typeof(CommonThingBase), "discriminator")
                 }
             };
 
@@ -220,12 +221,10 @@ namespace NJsonSchema.Tests.Generation
                 CommonThing = new ACommonThing()
             };
 
-            var definitions = new[] { new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator") };
-
             /// Act
             var json = JsonConvert.SerializeObject(thing, Formatting.Indented, new[]
             {
-                new GlobalJsonInheritanceConverter(definitions)
+                new GlobalJsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
             });
 
             /// Assert
@@ -243,14 +242,12 @@ namespace NJsonSchema.Tests.Generation
               }
             }";
 
-            var definitions = new[] { new DiscriminatorDefinition(typeof(CommonThingBase), "discriminator") };
-
             /// Act
             var vm = JsonConvert.DeserializeObject<ViewModelThing>(json, new JsonSerializerSettings
             {
                 Converters = new[]
                 {
-                    new GlobalJsonInheritanceConverter(definitions)
+                    new GlobalJsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
                 }
             });
 
