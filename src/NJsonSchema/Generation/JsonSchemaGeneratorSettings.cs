@@ -9,11 +9,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Runtime.Serialization;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation.TypeMappers;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Generation
 {

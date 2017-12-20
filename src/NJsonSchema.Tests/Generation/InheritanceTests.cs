@@ -224,7 +224,7 @@ namespace NJsonSchema.Tests.Generation
             /// Act
             var json = JsonConvert.SerializeObject(thing, Formatting.Indented, new[]
             {
-                new GlobalJsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
+                new JsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
             });
 
             /// Assert
@@ -247,7 +247,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 Converters = new[]
                 {
-                    new GlobalJsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
+                    new JsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
                 }
             });
 
