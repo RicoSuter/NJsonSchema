@@ -50,6 +50,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return Resolve(schema, typeNameHint, false);
         }
 
+        /// <summary>Gets a value indicating whether the schema supports constructor conversion.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The result.</returns>
+        public bool SupportsConstructorConversion(JsonSchema4 schema)
+        {
+            return string.IsNullOrEmpty(schema?.ActualSchema.BaseDiscriminator);
+        }
+
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)
@@ -88,13 +96,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (schema.IsDictionary)
             {
-                var prefix = addInterfacePrefix && schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
+                var prefix = addInterfacePrefix &&
+                    SupportsConstructorConversion(schema.AdditionalPropertiesSchema) && 
+                    schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
                 var valueType = prefix + ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            return (addInterfacePrefix && string.IsNullOrEmpty(schema.BaseDiscriminator) ? "I" : "") + 
-                GetOrGenerateTypeName(schema, typeNameHint);
+            return (addInterfacePrefix && SupportsConstructorConversion(schema) ? "I" : "") +
+                base.GetOrGenerateTypeName(schema, typeNameHint);
         }
 
         private string ResolveString(JsonSchema4 schema, string typeNameHint)
@@ -149,7 +159,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
-                var prefix = addInterfacePrefix && isObject && !isDictionary ? "I" : "";
+                var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
                 return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
             }
 

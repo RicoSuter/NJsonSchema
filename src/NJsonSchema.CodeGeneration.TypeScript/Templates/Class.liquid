@@ -48,7 +48,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
                     }
                 }
             }
-{%                     elseif property.HasBaseDiscriminator == false -%}
+{%                     else -%}
             this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(<any>data.{{ property.PropertyName }}).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : <{{ property.Type }}>this.{{ property.PropertyName }}; 
 {%                     endif -%}
 {%                 endif -%}
