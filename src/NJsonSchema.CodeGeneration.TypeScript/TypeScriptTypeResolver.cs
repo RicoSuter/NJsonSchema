@@ -93,7 +93,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            return (addInterfacePrefix ? "I" : "") + GetOrGenerateTypeName(schema, typeNameHint);
+            return (addInterfacePrefix && string.IsNullOrEmpty(schema.BaseDiscriminator) ? "I" : "") + 
+                GetOrGenerateTypeName(schema, typeNameHint);
         }
 
         private string ResolveString(JsonSchema4 schema, string typeNameHint)

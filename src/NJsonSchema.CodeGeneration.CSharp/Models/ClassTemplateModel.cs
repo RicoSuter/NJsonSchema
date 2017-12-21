@@ -88,9 +88,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
 
-        /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
-        public bool IsAbstract => _schema.IsAbstract;
-
         /// <summary>Gets the inheritance code.</summary>
         public string InheritanceCode
         {
