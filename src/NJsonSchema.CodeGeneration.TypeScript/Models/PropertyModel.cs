@@ -54,6 +54,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _resolver.ResolveConstructorInterfaceName(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
             Type;
 
+        /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
+        public bool HasBaseDiscriminator => !string.IsNullOrEmpty(_property.BaseDiscriminator);
+
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
         public bool SupportsConstructorConversion
         {
