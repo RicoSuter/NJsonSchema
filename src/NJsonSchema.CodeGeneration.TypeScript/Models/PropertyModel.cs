@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             Type;
 
         /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
-        public bool HasBaseDiscriminator => !string.IsNullOrEmpty(_property.BaseDiscriminator);
+        public bool HasBaseDiscriminator => !string.IsNullOrEmpty(_property.ActualTypeSchema.BaseDiscriminator);
 
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
         public bool SupportsConstructorConversion
