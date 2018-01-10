@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
@@ -16,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings</param>
-        public TypeScriptValueGenerator(TypeResolverBase typeResolver, TypeScriptGeneratorSettings settings) 
+        public TypeScriptValueGenerator(TypeResolverBase typeResolver, TypeScriptGeneratorSettings settings)
             : base(typeResolver, settings.EnumNameGenerator)
         {
         }
@@ -46,27 +44,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         return "new " + targetType + "()";
                 }
             }
+
             return value;
         }
 
         /// <summary>Converts the default value to a TypeScript number literal. </summary>
+        /// <param name="type">The JSON type.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The TypeScript number literal.</returns>
-        public override string GetNumericValue(object value, string format)
+        public override string GetNumericValue(JsonObjectType type, object value, string format)
         {
-            if (value is byte) return ((byte)value).ToString(CultureInfo.InvariantCulture);
-            if (value is sbyte) return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
-            if (value is short) return ((short)value).ToString(CultureInfo.InvariantCulture);
-            if (value is ushort) return ((ushort)value).ToString(CultureInfo.InvariantCulture);
-            if (value is int) return ((int)value).ToString(CultureInfo.InvariantCulture);
-            if (value is uint) return ((uint)value).ToString(CultureInfo.InvariantCulture);
-            if (value is long) return ((long)value).ToString(CultureInfo.InvariantCulture);
-            if (value is ulong) return ((ulong)value).ToString(CultureInfo.InvariantCulture);
-            if (value is float) return ((float)value).ToString("r", CultureInfo.InvariantCulture);
-            if (value is double) return ((double)value).ToString("r", CultureInfo.InvariantCulture);
-            if (value is decimal) return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-            return null;
+            return ConvertNumberToString(value);
         }
     }
 }
