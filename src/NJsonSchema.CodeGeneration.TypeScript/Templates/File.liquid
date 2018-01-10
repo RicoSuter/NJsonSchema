@@ -10,7 +10,7 @@
 module {{ ModuleName }} {
 {% endif -%}
 {% if HasNamespace -%}
-namespace <#=Model.Namespace#> {
+namespace {{ Namespace }} {
 {% endif -%}
 {{ ExtensionCode.TopCode }}
 
