@@ -262,14 +262,9 @@ namespace NJsonSchema.Generation
             if (attributes == null)
                 return false;
 
-            dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
-            if (jsonConverterAttribute != null)
-            {
-                var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "StringEnumConverter")
-                    return true;
-            }
-            return false;
+            return attributes
+                .OfType<JsonConverterAttribute>()
+                .Any(a => a.ConverterType == typeof(StringEnumConverter));
         }
     }
 }
