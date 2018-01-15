@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.Generation
 {
