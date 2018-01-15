@@ -127,8 +127,8 @@ namespace NJsonSchema
             _typeRaw = new Lazy<object>(() =>
             {
                 var flags = Enum.GetValues(Type.GetType())
-                    .Cast<Enum>().Where(v => Type.HasFlag(v))
                     .OfType<JsonObjectType>()
+                    .Where(v => Type.HasFlag(v))
                     .Where(v => v != JsonObjectType.None)
                     .ToArray();
 
