@@ -63,12 +63,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     return false;
 
                 if (IsArray)
-                    return _property.ActualTypeSchema?.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                {
+                    return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.Item) &&
+                        _property.ActualTypeSchema?.Item.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                }
 
                 if (IsDictionary)
-                    return _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                {
+                    return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.AdditionalPropertiesSchema) &&
+                        _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                }
 
-                return !_property.ActualTypeSchema.IsTuple;
+                return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema) && 
+                    !_property.ActualTypeSchema.IsTuple;
             }
         }
 
@@ -129,6 +136,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Settings = _settings
                     });
                 }
+
                 return string.Empty;
             }
         }
@@ -153,6 +161,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Settings = _settings
                     });
                 }
+
                 return string.Empty;
             }
         }

@@ -41,6 +41,9 @@ namespace NJsonSchema
         /// <summary>Format for a double number. </summary>
         public const string Double = "double";
 
+        /// <summary>Format for a float number. </summary>
+        public const string Float = "float";
+
         /// <summary>Format for a decimal number. </summary>
         public const string Decimal = "decimal";
 

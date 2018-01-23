@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -7,8 +10,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class ConstructorInterfaceTests
     {
-        public class Person
+        public class Student : Person
         {
+            public string Course { get; set; }
+        }
+
+        [KnownType(typeof(Student))]
+        [JsonConverter(typeof(JsonInheritanceConverter))]
+        public abstract class Person
+        {
+            public Person Supervisor { get; set; }
+
             public Address Address { get; set; }
 
             public Car[] Cars { get; set; }
@@ -20,7 +32,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public List<Car[]> Foo { get; set; }
 
             public Dictionary<string, Skill[]> Bar { get; set; }
-
         }
 
         public class Car
@@ -56,6 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
 
+            Assert.DoesNotContain("new MyClass(", output);
             // address property is converted:
             Assert.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;", output);
             // cars items are converted:
@@ -65,6 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // interface is correct
             Assert.Contains(@"export interface IMyClass {
+    supervisor: MyClass;
     address: IAddress;
     cars: ICar[];
     skills: { [key: string] : ISkill; };

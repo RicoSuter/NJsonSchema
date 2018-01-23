@@ -46,6 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schema = new JsonSchema4()
             {
                 Type = JsonObjectType.Integer,
+                Format = JsonFormatStrings.Long,
                 Default = 6000000000L
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "long", "long", true);
@@ -57,6 +58,45 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [Fact]
+        public void When_schema_has_default_value_of_double_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.Number,
+                Format = JsonFormatStrings.Double,
+                Default = 1234.567F
+            };
+            var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true);
+            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true);
+
+            //// Assert
+            Assert.Equal("1234.567D", csharpValue);
+            Assert.Equal("1234.567", typescriptValue);
+        }
+
+        [Fact]
+        public void When_schema_has_default_value_of_double_without_format_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.Number,
+                Default = 1234.567F
+            };
+            var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true);
+            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true);
+
+            //// Assert
+            Assert.Equal("1234.567D", csharpValue);
+            Assert.Equal("1234.567", typescriptValue);
+        }
+
+        [Fact]
         public void When_schema_has_default_value_of_float_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
@@ -65,6 +105,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schema = new JsonSchema4()
             {
                 Type = JsonObjectType.Number,
+                Format = JsonFormatStrings.Float,
                 Default = 1234.567F
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "float", "float", true);

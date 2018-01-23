@@ -35,10 +35,10 @@
 {%   if property.RenderRegularExpressionAttribute -%}
     [System.ComponentModel.DataAnnotations.RegularExpression(@"{{ property.RegularExpressionValue }}")]
 {%   endif -%}
-{%   if(property.IsStringEnum -%}
+{%   if property.IsStringEnum -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%   endif -%}
-{%   if(property.IsDate -%}
+{%   if property.IsDate and UseDateFormatConverter -%}
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%   endif -%}
     {% template Class.Property.Annotations %}

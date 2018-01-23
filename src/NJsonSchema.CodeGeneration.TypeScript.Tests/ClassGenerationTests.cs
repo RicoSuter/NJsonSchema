@@ -237,7 +237,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_GenerateConstructorInterface_then_no_interfaces_are_generated()
         {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, GenerateConstructorInterface = false });
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                GenerateConstructorInterface = false
+            });
 
             //// Assert
             Assert.DoesNotContain("interface IStudent extends IPerson {", code);
@@ -250,7 +254,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.KnockoutClass,
-                GenerateConstructorInterface = false, 
+                GenerateConstructorInterface = false,
                 TypeScriptVersion = 2.0m
             });
 

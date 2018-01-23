@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonSchemaGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -688,11 +688,13 @@ namespace NJsonSchema.Generation
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
 
+            var underlyingType = Enum.GetUnderlyingType(type);
+            
             foreach (var enumName in Enum.GetNames(type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
                 {
-                    var value = Convert.ChangeType(Enum.Parse(type, enumName), Enum.GetUnderlyingType(type));
+                    var value = Convert.ChangeType(Enum.Parse(type, enumName), underlyingType);
                     schema.Enumeration.Add(value);
                 }
                 else

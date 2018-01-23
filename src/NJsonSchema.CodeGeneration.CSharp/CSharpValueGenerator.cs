@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Globalization;
-
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
@@ -45,46 +42,40 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         return "new " + targetType + "()";
                 }
             }
+
             return value;
         }
 
         /// <summary>Converts the default value to a C# number literal. </summary>
+        /// <param name="type">The JSON type.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The C# number literal.</returns>
-        public override string GetNumericValue(object value, string format)
+        public override string GetNumericValue(JsonObjectType type, object value, string format)
         {
-            if (string.IsNullOrEmpty(format))
+            var valueString = ConvertNumberToString(value);
+            if (valueString != null)
             {
-                if (value is byte) return "(byte)" + ((byte)value).ToString(CultureInfo.InvariantCulture);
-                if (value is sbyte) return "(sbyte)" + ((sbyte)value).ToString(CultureInfo.InvariantCulture);
-                if (value is short) return "(short)" + ((short)value).ToString(CultureInfo.InvariantCulture);
-                if (value is ushort) return "(ushort)" + ((ushort)value).ToString(CultureInfo.InvariantCulture);
-                if (value is int) return ((int)value).ToString(CultureInfo.InvariantCulture);
-                if (value is uint) return ((uint)value).ToString(CultureInfo.InvariantCulture) + "U";
-                if (value is long) return ((long)value).ToString(CultureInfo.InvariantCulture) + "L";
-                if (value is ulong) return ((ulong)value).ToString(CultureInfo.InvariantCulture) + "UL";
-                if (value is float) return ((float)value).ToString("r", CultureInfo.InvariantCulture) + "F";
-                if (value is double) return ((double)value).ToString("r", CultureInfo.InvariantCulture) + "D";
-                if (value is decimal) return ((decimal)value).ToString(CultureInfo.InvariantCulture) + "M";
-                return null;
+                switch (format)
+                {
+                    case JsonFormatStrings.Byte:
+                        return "(byte)" + valueString;
+                    case JsonFormatStrings.Integer:
+                        return valueString;
+                    case JsonFormatStrings.Long:
+                        return valueString + "L";
+                    case JsonFormatStrings.Double:
+                        return valueString + "D";
+                    case JsonFormatStrings.Float:
+                        return valueString + "F";
+                    case JsonFormatStrings.Decimal:
+                        return valueString + "M";
+                    default:
+                        return type.HasFlag(JsonObjectType.Integer) ? valueString : valueString + "D";
+                }
             }
 
-            switch (format)
-            {
-                case JsonFormatStrings.Byte:
-                    return "(byte)" + Convert.ToByte(value).ToString(CultureInfo.InvariantCulture);
-                case JsonFormatStrings.Integer:
-                    return Convert.ToInt64(value).ToString(CultureInfo.InvariantCulture);
-                case JsonFormatStrings.Long:
-                    return Convert.ToInt64(value).ToString(CultureInfo.InvariantCulture) + "L";
-                case JsonFormatStrings.Double:
-                    return Convert.ToDouble(value).ToString("r", CultureInfo.InvariantCulture) + "D";
-                case JsonFormatStrings.Decimal:
-                    return Convert.ToDecimal(value).ToString(CultureInfo.InvariantCulture) + "M";
-                default:
-                    return null;
-            }
+            return null;
         }
 
         /// <summary>Gets the enum default value.</summary>

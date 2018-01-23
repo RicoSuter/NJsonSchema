@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration
@@ -47,16 +48,17 @@ namespace NJsonSchema.CodeGeneration
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                 schema.Type.HasFlag(JsonObjectType.Number))
-                return GetNumericValue(schema.Default, schema.Format);
+                return GetNumericValue(schema.Type, schema.Default, schema.Format);
 
             return null;
         }
 
         /// <summary>Converts the default value to a number literal. </summary>
+        /// <param name="type">The JSON type.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The number literal.</returns>
-        public abstract string GetNumericValue(object value, string format);
+        public abstract string GetNumericValue(JsonObjectType type, object value, string format);
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
@@ -73,6 +75,47 @@ namespace NJsonSchema.CodeGeneration
                 : schema.Default.ToString();
 
             return typeName + "." + _enumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+        }
+
+        /// <summary>Converts a number to its string representation.</summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The string.</returns>
+        protected string ConvertNumberToString(object value)
+        {
+            if (value is byte)
+                return ((byte)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is sbyte)
+                return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is short)
+                return ((short)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is ushort)
+                return ((ushort)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is int)
+                return ((int)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is uint)
+                return ((uint)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is long)
+                return ((long)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is ulong)
+                return ((ulong)value).ToString(CultureInfo.InvariantCulture);
+
+            if (value is float)
+                return ((float)value).ToString("r", CultureInfo.InvariantCulture);
+
+            if (value is double)
+                return ((double)value).ToString("r", CultureInfo.InvariantCulture);
+
+            if (value is decimal)
+                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+
+            return null;
         }
     }
 }
