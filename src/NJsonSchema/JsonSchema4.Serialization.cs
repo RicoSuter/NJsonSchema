@@ -39,6 +39,34 @@ namespace NJsonSchema
         [JsonIgnore]
         public Collection<string> EnumerationNames { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
+        [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal object ExclusiveMaximumRaw
+        {
+            get { return ExclusiveMaximum ?? (IsExclusiveMaximum ? (object)true : null); }
+            set
+            {
+                if (value is bool)
+                    IsExclusiveMaximum = (bool)value;
+                else if (value != null)
+                    ExclusiveMaximum = Convert.ToDecimal(value);
+            }
+        }
+
+        /// <summary>Gets or sets a value indicating whether the minimum value is excluded. </summary>
+        [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal object ExclusiveMinimumRaw
+        {
+            get { return ExclusiveMinimum ?? (IsExclusiveMinimum ? (object)true : null); }
+            set
+            {
+                if (value is bool)
+                    IsExclusiveMinimum = (bool)value;
+                else if (value != null)
+                    ExclusiveMinimum = Convert.ToDecimal(value);
+            }
+        }
+
         [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object AdditionalItemsRaw
         {

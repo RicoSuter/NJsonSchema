@@ -359,24 +359,32 @@ namespace NJsonSchema
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Default { get; set; }
 
-        /// <summary>Gets or sets the required multiple of for the number value. </summary>
+        /// <summary>Gets or sets the required multiple of for the number value.</summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public decimal? MultipleOf { get; set; }
 
-        /// <summary>Gets or sets the maximum allowed value. </summary>
+        /// <summary>Gets or sets the maximum allowed value.</summary>
         [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public decimal? Maximum { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
-        [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        /// <summary>Gets or sets the exclusive maximum value (v6).</summary>
+        [JsonIgnore]
+        public decimal? ExclusiveMaximum { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the minimum value is excluded (v4).</summary>
+        [JsonIgnore]
         public bool IsExclusiveMaximum { get; set; }
 
         /// <summary>Gets or sets the minimum allowed value. </summary>
         [JsonProperty("minimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public decimal? Minimum { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the minimum value is excluded. </summary>
-        [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        /// <summary>Gets or sets the exclusive minimum value (v6).</summary>
+        [JsonIgnore]
+        public decimal? ExclusiveMinimum { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the minimum value is excluded (v4).</summary>
+        [JsonIgnore]
         public bool IsExclusiveMinimum { get; set; }
 
         /// <summary>Gets or sets the maximum length of the value string. </summary>
