@@ -27,6 +27,9 @@ namespace NJsonSchema
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
                 return "_" + input;
 
