@@ -6,6 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Globalization;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
@@ -53,25 +56,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The C# number literal.</returns>
         public override string GetNumericValue(JsonObjectType type, object value, string format)
         {
-            var valueString = ConvertNumberToString(value);
-            if (valueString != null)
+            if (value != null)
             {
                 switch (format)
                 {
                     case JsonFormatStrings.Byte:
-                        return "(byte)" + valueString;
+                        return "(byte)" + Convert.ToByte(value).ToString(CultureInfo.InvariantCulture);
                     case JsonFormatStrings.Integer:
-                        return valueString;
+                        return Convert.ToInt32(value).ToString(CultureInfo.InvariantCulture);
                     case JsonFormatStrings.Long:
-                        return valueString + "L";
+                        return Convert.ToInt64(value) + "L";
                     case JsonFormatStrings.Double:
-                        return valueString + "D";
+                        return ConvertNumberToString(value) + "D";
                     case JsonFormatStrings.Float:
-                        return valueString + "F";
+                        return ConvertNumberToString(value) + "F";
                     case JsonFormatStrings.Decimal:
-                        return valueString + "M";
+                        return ConvertNumberToString(value) + "M";
                     default:
-                        return type.HasFlag(JsonObjectType.Integer) ? valueString : valueString + "D";
+                        return type.HasFlag(JsonObjectType.Integer) ? 
+                            ConvertNumberToString(value) : 
+                            ConvertNumberToString(value) + "D";
                 }
             }
 
