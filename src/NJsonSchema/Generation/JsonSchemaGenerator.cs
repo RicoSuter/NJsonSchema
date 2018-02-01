@@ -310,21 +310,18 @@ namespace NJsonSchema.Generation
             Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            if (schemaResolver.HasSchema(type, false) == false)
-            {
-                schemaResolver.AddSchema(type, false, schema);
+            schemaResolver.AddSchema(type, false, schema);
 
-                schema.AllowAdditionalProperties = false;
-                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+            schema.AllowAdditionalProperties = false;
+            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-                await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
 
-                if (Settings.GenerateKnownTypes)
-                    await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+            if (Settings.GenerateKnownTypes)
+                await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
-                if (Settings.GenerateXmlObjects)
-                    schema.GenerateXmlObjectForType(type);
-            }
+            if (Settings.GenerateXmlObjects)
+                schema.GenerateXmlObjectForType(type);
         }
 
         private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
