@@ -120,7 +120,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         "double" : "int";
 
                 return _property.Minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Minimum.Value, format)
+                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -140,7 +140,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         "double" : "int";
 
                 return _property.Maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Maximum.Value, format)
+                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Maximum.Value, format)
                     : type + "." + nameof(double.MaxValue);
             }
         }

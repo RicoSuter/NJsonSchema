@@ -8,21 +8,31 @@ namespace NJsonSchema.Tests.Generation
 {
     public class KnownTypeGenerationTests
     {
+        public class SpecialTeacher : Teacher
+        {
+            public string Foo { get; set; }
+        }
+
+        [KnownType(typeof(SpecialTeacher))]
         public class Teacher
         {
+            public string Bar { get; set; }
         }
 
         [KnownType(typeof(Teacher))]
         public class Person
         {
+            public string Baz { get; set; }
         }
 
         public class Pen : WritingInstrument
         {
+            public string Foo { get; set; }
         }
 
         public class Pencil : WritingInstrument
         {
+            public string Bar { get; set; }
         }
 
         [KnownType("GetKnownTypes")]
@@ -32,11 +42,16 @@ namespace NJsonSchema.Tests.Generation
             {
                 return new[] { typeof(Pen), typeof(Pencil) };
             }
+
+            public string Baz { get; set; }
         }
 
         public class Container
         {
             public Person Person { get; set; }
+
+            public Teacher Teacher { get; set; }
+
             public WritingInstrument WritingInstrument { get; set; }
         }
 
@@ -47,10 +62,11 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Container>();
-            var schemaData = schema.ToJson(); 
+            var schemaData = schema.ToJson();
 
             //// Assert
             Assert.Contains(schema.Definitions, s => s.Key == "Teacher");
+            Assert.Contains(schema.Definitions, s => s.Key == "SpecialTeacher");
         }
 
         public async Task ReproAsync()

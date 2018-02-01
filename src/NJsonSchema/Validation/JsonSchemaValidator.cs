@@ -298,6 +298,12 @@ namespace NJsonSchema.Validation
                     if (schema.Maximum.HasValue && (schema.IsExclusiveMaximum ? value >= schema.Maximum : value > schema.Maximum))
                         errors.Add(new ValidationError(ValidationErrorKind.NumberTooBig, propertyName, propertyPath, token, schema));
 
+                    if (schema.ExclusiveMinimum.HasValue && value <= schema.ExclusiveMinimum)
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooSmall, propertyName, propertyPath, token, schema));
+
+                    if (schema.ExclusiveMaximum.HasValue && value >= schema.ExclusiveMaximum)
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooBig, propertyName, propertyPath, token, schema));
+
                     if (schema.MultipleOf.HasValue && value % schema.MultipleOf != 0)
                         errors.Add(new ValidationError(ValidationErrorKind.NumberNotMultipleOf, propertyName, propertyPath, token, schema));
                 }
@@ -309,6 +315,12 @@ namespace NJsonSchema.Validation
                         errors.Add(new ValidationError(ValidationErrorKind.NumberTooSmall, propertyName, propertyPath, token, schema));
 
                     if (schema.Maximum.HasValue && (schema.IsExclusiveMaximum ? value >= (double)schema.Maximum : value > (double)schema.Maximum))
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooBig, propertyName, propertyPath, token, schema));
+
+                    if (schema.ExclusiveMinimum.HasValue && value <= (double)schema.ExclusiveMinimum)
+                        errors.Add(new ValidationError(ValidationErrorKind.NumberTooSmall, propertyName, propertyPath, token, schema));
+
+                    if (schema.ExclusiveMaximum.HasValue && value >= (double)schema.ExclusiveMaximum)
                         errors.Add(new ValidationError(ValidationErrorKind.NumberTooBig, propertyName, propertyPath, token, schema));
 
                     if (schema.MultipleOf.HasValue && value % (double)schema.MultipleOf != 0)

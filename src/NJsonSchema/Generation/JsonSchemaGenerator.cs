@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonSchemaGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -310,18 +310,21 @@ namespace NJsonSchema.Generation
             Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            schemaResolver.AddSchema(type, false, schema);
+            if (schemaResolver.HasSchema(type, false) == false)
+            {
+                schemaResolver.AddSchema(type, false, schema);
 
-            schema.AllowAdditionalProperties = false;
-            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+                schema.AllowAdditionalProperties = false;
+                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+                await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
 
-            if (Settings.GenerateKnownTypes)
-                await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+                if (Settings.GenerateKnownTypes)
+                    await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
-            if (Settings.GenerateXmlObjects)
-                schema.GenerateXmlObjectForType(type);
+                if (Settings.GenerateXmlObjects)
+                    schema.GenerateXmlObjectForType(type);
+            }
         }
 
         private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -558,34 +561,33 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private async Task GenerateKnownTypesAsync(Type objectType, JsonSchemaResolver schemaResolver)
+        private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var type = objectType;
-            do
+            var knownTypeAttributes = type.GetTypeInfo()
+                .GetCustomAttributes(Settings.FlattenInheritanceHierarchy) // Known types of inherited classes will be generated later (in GenerateInheritanceAsync)
+                .Where(a => a.GetType().Name == "KnownTypeAttribute")
+                .OfType<Attribute>();
+
+            foreach (dynamic attribute in knownTypeAttributes)
             {
-                var knownTypeAttributes = type.GetTypeInfo().GetCustomAttributes(false).Where(a => a.GetType().Name == "KnownTypeAttribute").OfType<Attribute>();
-                foreach (dynamic attribute in knownTypeAttributes)
+                if (attribute.Type != null)
+                    await AddKnownTypeAsync(attribute.Type, schemaResolver).ConfigureAwait(false);
+                else if (attribute.MethodName != null)
                 {
-                    if (attribute.Type != null)
-                        await AddKnownTypeAsync(attribute.Type, schemaResolver).ConfigureAwait(false);
-                    else if (attribute.MethodName != null)
+                    var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                    if (methodInfo != null)
                     {
-                        var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
-                        if (methodInfo != null)
+                        var knownTypes = methodInfo.Invoke(null, null) as Type[];
+                        if (knownTypes != null)
                         {
-                            var knownTypes = methodInfo.Invoke(null, null) as Type[];
-                            if (knownTypes != null)
-                            {
-                                foreach (var knownType in knownTypes)
-                                    await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
-                            }
+                            foreach (var knownType in knownTypes)
+                                await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
                         }
                     }
-                    else
-                        throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
                 }
-                type = type.GetTypeInfo().BaseType;
-            } while (type != null);
+                else
+                    throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
+            }
         }
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
@@ -688,11 +690,13 @@ namespace NJsonSchema.Generation
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
 
+            var underlyingType = Enum.GetUnderlyingType(type);
+            
             foreach (var enumName in Enum.GetNames(type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
                 {
-                    var value = Convert.ChangeType(Enum.Parse(type, enumName), Enum.GetUnderlyingType(type));
+                    var value = Convert.ChangeType(Enum.Parse(type, enumName), underlyingType);
                     schema.Enumeration.Add(value);
                 }
                 else
