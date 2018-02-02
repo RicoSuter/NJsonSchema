@@ -1284,6 +1284,64 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_tuple_types_has_ints_then_it_is_generated_correctly()
+        {
+            //// Arrange
+            var json = @"
+{
+  ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+  ""title"": ""MySchema"",
+  ""type"": ""object"",
+  ""required"": [
+    ""OuterList""
+  ],
+  ""properties"": {
+    ""OuterList"": {
+      ""$ref"": ""#/definitions/OuterList""
+    }
+  },
+  ""additionalProperties"": false,
+  ""definitions"": {
+    ""InnerList"": {
+      ""description"": ""Only ever has 2 items"",
+      ""type"": ""array"",
+      ""minItems"": 2,
+      ""maxItems"": 2,
+      ""items"": [
+        {
+          ""type"": ""integer""
+        },
+        {
+          ""type"": ""integer""
+        }
+      ],
+      ""additionalItems"": false
+    },
+    ""OuterList"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""$ref"": ""#/definitions/InnerList""
+      }
+    }
+  }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime"
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain("System.Linq.Enumerable+SelectIListIterator", code);
+            Assert.Contains("ObservableCollection<System.Tuple<int, int>>", code);
+        }
+
+        [Fact]
         public async Task When_definition_contains_date_converter_should_be_added_for_datetimeoffset()
         {
             //// Arrange

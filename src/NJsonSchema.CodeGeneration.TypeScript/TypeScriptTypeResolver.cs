@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.IsDictionary)
             {
                 var prefix = addInterfacePrefix &&
-                    SupportsConstructorConversion(schema.AdditionalPropertiesSchema) && 
+                    SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
                 var valueType = prefix + ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
                 return $"{{ [key: string] : {valueType}; }}";
@@ -164,7 +164,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
-                return string.Format("[" + string.Join(", ", schema.Items.Select(i => Resolve(i.ActualSchema, false, null))) + "]");
+            {
+                var tupleTypes = schema.Items
+                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .ToArray();
+
+                return string.Format("[" + string.Join(", ", tupleTypes) + "]");
+            }
 
             return "any[]";
         }
