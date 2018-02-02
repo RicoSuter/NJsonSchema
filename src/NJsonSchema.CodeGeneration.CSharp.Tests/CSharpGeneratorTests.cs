@@ -1246,6 +1246,44 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	    }
 
         [Fact]
+        public async Task When_no_typeNameHint_is_available_then_title_is_used_as_class_name()
+        {
+            //// Arrange
+            var json = @"{
+  ""type"": ""object"",
+  ""title"": ""MyTestClass"",
+  ""properties"": {
+    ""Endpoints"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object"",
+        ""title"": ""Endpoint"",
+        ""properties"": {
+          ""url"": {
+            ""type"": ""string"",
+            ""retries"": ""integer""
+          }
+        }
+      }
+    }
+  }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime"
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain("Anonymous", code);
+        }
+
+        [Fact]
         public async Task When_definition_contains_date_converter_should_be_added_for_datetimeoffset()
         {
             //// Arrange
