@@ -80,27 +80,28 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
     }
 
     static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
+        data = typeof data === 'object' ? data : {};
 {% if HandleReferences -%}
 {%   if HasBaseDiscriminator -%}
-{%       for derivedClass in DerivedClasses -%}
+{%     for derivedClass in DerivedClasses -%}
         if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Key }}")
             return createInstance<{{ derivedClass.Value }}>(data, _mappings, {{ derivedClass.Value }});
-{%       endfor -%}
+{%     endfor -%}
 {%   endif -%}
-{%     if IsAbstract -%}
+{%   if IsAbstract -%}
         throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
-{%     else -%}
+{%   else -%}
         return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
-{%     endif -%}
+{%   endif -%}
 {% else -%}
 {%   if HasBaseDiscriminator -%}
-{%       for derivedClass in DerivedClasses -%}
+{%     for derivedClass in DerivedClasses -%}
         if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Key }}") {
             let result = new {{ derivedClass.Value }}();
             result.init(data);
             return result;
         }
-{%       endfor -%}
+{%     endfor -%}
 {%   endif -%}
 {%     if IsAbstract -%}
         throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");

@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema
 {
@@ -56,6 +57,13 @@ namespace NJsonSchema
         /// <returns>The type name.</returns>
         protected virtual string Generate(JsonSchema4 schema, string typeNameHint)
         {
+            if (string.IsNullOrEmpty(typeNameHint) &&
+                string.IsNullOrEmpty(schema.Title) == false &&
+                Regex.IsMatch(schema.Title, "^[a-zA-Z0-9_]*$"))
+            {
+                typeNameHint = schema.Title;
+            }
+
             var lastSegment = typeNameHint?.Split('.').Last();
             return ConversionUtilities.ConvertToUpperCamelCase(lastSegment ?? "Anonymous", true);
         }

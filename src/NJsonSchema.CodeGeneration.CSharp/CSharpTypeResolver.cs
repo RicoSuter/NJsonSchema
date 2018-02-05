@@ -131,7 +131,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return string.Format(Settings.ArrayType + "<{0}>", Resolve(schema.Item, false, null));
 
             if (schema.Items != null && schema.Items.Count > 0)
-                return string.Format("System.Tuple<" + string.Join(", ", schema.Items.Select(i => Resolve(i.ActualSchema, false, null)) + ">"));
+            {
+                var tupleTypes = schema.Items
+                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .ToArray();
+
+                return string.Format("System.Tuple<" + string.Join(", ", tupleTypes) + ">");
+            }
 
             return Settings.ArrayType + "<object>";
         }

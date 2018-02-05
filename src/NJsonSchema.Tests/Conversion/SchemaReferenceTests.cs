@@ -55,6 +55,42 @@ namespace NJsonSchema.Tests.Conversion
             //// Assert
             Assert.Contains(@"""$ref"": ""#/definitions/Person", json);
         }
+
+        [Fact]
+        public async Task When_ref_is_nested_then_it_should_be_resolved()
+        {
+            /// Arrange
+            var json = @"
+{
+    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+    ""$ref"": ""#/definitions/refOne"",
+    ""definitions"": {
+        ""refOne"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""Two"": {
+                    ""$ref"": ""#/definitions/refTwo""
+                }
+            }
+        },
+        ""refTwo"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""Id"": {
+                    ""type"": ""string""
+                }
+            }
+        }
+    }
+}";
+
+            /// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            /// Assert
+            var jsonOutput = schema.ToJson();
+            Assert.NotNull(jsonOutput);
+        }
     }
 
     public class Person

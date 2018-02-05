@@ -184,8 +184,19 @@ namespace NJsonSchema
                 return null;
 
             if (obj is IJsonReference reference && reference.Reference != null)
-                obj = reference.Reference;
+            {
+                var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, checkedObjects);
+                if (result == null)
+                    return ResolveDocumentReferenceWithoutDereferencing(obj, segments, checkedObjects);
+                else
+                    return result;
+            }
 
+            return ResolveDocumentReferenceWithoutDereferencing(obj, segments, checkedObjects);
+        }
+
+        private IJsonReference ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, HashSet<object> checkedObjects)
+        {
             if (segments.Count == 0)
                 return obj as IJsonReference;
 
@@ -195,7 +206,8 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 if (((IDictionary)obj).Contains(firstSegment))
-                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(),
+                        checkedObjects);
             }
             else if (obj is IEnumerable)
             {
@@ -212,10 +224,12 @@ namespace NJsonSchema
                 var extensionObj = obj as IJsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
-                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(),
+                        checkedObjects);
                 }
 
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType())
+                    .Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)
