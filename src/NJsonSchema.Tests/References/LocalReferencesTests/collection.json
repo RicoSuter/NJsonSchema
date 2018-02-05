@@ -1,8 +1,0 @@
-{
-	"myInt": {
-		"type": "integer"
-	},
-	"myBool": {
-		"type": "boolean"
-	}
-}

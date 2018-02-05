@@ -143,7 +143,7 @@ namespace NJsonSchema.Generation
         public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
             var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
-            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
+            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required != Required.AllowNull)
                 return false;
 
             if (parentAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
