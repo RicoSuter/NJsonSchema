@@ -36,9 +36,29 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool IsAbstract => _schema.IsAbstract;
 
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
-        public IDictionary<string, string> DerivedClasses => _schema
+        public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)
-            .Select(p => new { Discriminator = p.Value, ClassName = _resolver.GetOrGenerateTypeName(p.Key, p.Value), Schema = p.Value })
-            .ToDictionary(s => !string.IsNullOrEmpty(s.Discriminator) ? s.Discriminator : s.ClassName, s => s.ClassName);
+            .Select(p => new DerivedClassModel(p.Value, _resolver.GetOrGenerateTypeName(p.Key, p.Value), p.Key.ActualTypeSchema.IsAbstract))
+            .ToList();
+
+        /// <summary>The model of a derived class.</summary>
+        public class DerivedClassModel
+        {
+            internal DerivedClassModel(string discriminator, string className, bool isAbstract)
+            {
+                ClassName = className;
+                IsAbstract = isAbstract;
+                Discriminator = !string.IsNullOrEmpty(discriminator) ? discriminator : className;
+            }
+
+            /// <summary>Gets the discriminator.</summary>
+            public string Discriminator { get; }
+
+            /// <summary>Gets the class name.</summary>
+            public string ClassName { get; }
+
+            /// <summary>Gets a value indicating whether the class is abstract.</summary>
+            public bool IsAbstract { get; }
+        }
     }
 }

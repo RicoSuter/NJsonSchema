@@ -40,7 +40,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     if (schema.IsDictionary)
                         return "{}";
 
-                    if (schema.Type.HasFlag(JsonObjectType.Object))
+                    if (schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAbstract)
                         return "new " + targetType + "()";
                 }
             }
