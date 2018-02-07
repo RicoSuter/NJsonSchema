@@ -4,7 +4,7 @@
 {% if HasDiscriminator -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {% for derivedClass in DerivedClasses -%}
-[JsonInheritanceAttribute("{{ derivedClass.Key }}", typeof({{ derivedClass.Value }}))]
+[JsonInheritanceAttribute("{{ derivedClass.Discriminator }}", typeof({{ derivedClass.ClassName }}))]
 {% endfor -%}
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ToolchainVersion}}")]
