@@ -46,8 +46,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
+        /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
+        public bool AllowEmptyStrings => _property.MinLength == null || _property.MinLength == 0;
+
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
-        public bool HasSetter => 
+        public bool HasSetter =>
             (_property.IsNullable(_settings.SchemaType) == false && (
                 (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
@@ -152,6 +155,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 if (!_settings.GenerateDataAnnotations)
                     return false;
+
+                if (_property.IsRequired && _property.MinLength == 1 && _property.MaxLength == null)
+                    return false; // handled by RequiredAttribute
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
                        (_property.MinLength.HasValue || _property.MaxLength.HasValue);

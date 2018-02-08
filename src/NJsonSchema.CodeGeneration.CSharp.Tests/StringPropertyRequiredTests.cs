@@ -12,6 +12,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             [Required]
             public string Property { get; set; }
+
+            [Required(AllowEmptyStrings = true)]
+            public string Property2 { get; set; }
         }
 
         [Fact]
@@ -33,8 +36,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
-            Assert.Contains("public string Property { get; set; }", code);
+            Assert.Equal(1, schema.Properties["Property"].MinLength);
+            Assert.Null(schema.Properties["Property2"].MinLength);
+
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]\n" +
+                            "        public string Property { get; set; }\n", code);
+
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]\n" +
+                            "        public string Property2 { get; set; }\n", code);
         }
 
         [Fact]

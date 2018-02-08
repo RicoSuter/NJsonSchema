@@ -748,6 +748,9 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateXmlObjects)
                             p.GenerateXmlObjectForProperty(parentType, propertyName, propertyAttributes);
 
+                        if (hasRequiredAttribute && requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+                            p.MinLength = 1;
+
                         if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
                         {
                             if (!parentSchema.RequiredProperties.Contains(propertyName))
