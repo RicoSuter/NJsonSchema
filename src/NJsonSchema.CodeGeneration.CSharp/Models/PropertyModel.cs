@@ -47,7 +47,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
-        public bool AllowEmptyStrings => _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
+        public bool AllowEmptyStrings =>
+            _settings.SchemaType == SchemaType.JsonSchema &&
+            _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
             (_property.MinLength == null || _property.MinLength == 0);
 
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
