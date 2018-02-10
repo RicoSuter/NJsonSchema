@@ -603,28 +603,32 @@ namespace NJsonSchema.Generation
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object))
             {
-                if (Settings.FlattenInheritanceHierarchy)
+                if (baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null)
                 {
-                    var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
-                    if (!typeDescription.IsDictionary && !type.IsArray)
-                        await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
-                }
-                else
-                {
-                    var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
-                    var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, null, Settings);
-                    if (baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers))
+                    if (Settings.FlattenInheritanceHierarchy)
                     {
-                        if (schemaResolver.RootObject != baseSchema.ActualSchema)
-                            schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
-
-                        schema.AllOf.Add(new JsonSchema4
-                        {
-                            Reference = baseSchema.ActualSchema
-                        });
+                        var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
+                        if (!typeDescription.IsDictionary && !type.IsArray)
+                            await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
-                        schema.AllOf.Add(baseSchema);
+                    {
+                        var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
+                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, null, Settings);
+                        if (baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers))
+                        {
+                            if (schemaResolver.RootObject != baseSchema.ActualSchema)
+                                schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
+
+                            schema.AllOf.Add(new JsonSchema4
+                            {
+                                Reference = baseSchema.ActualSchema
+                            });
+                        }
+                        else
+                            schema.AllOf.Add(baseSchema);
+                    }
                 }
             }
 
@@ -688,7 +692,7 @@ namespace NJsonSchema.Generation
             schema.EnumerationNames.Clear();
 
             var underlyingType = Enum.GetUnderlyingType(type);
-            
+
             foreach (var enumName in Enum.GetNames(type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
