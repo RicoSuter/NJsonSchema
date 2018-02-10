@@ -592,7 +592,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
   ],
   ""properties"": {
     ""FirstName"": {
-      ""type"": ""string""
+      ""type"": ""string"",
+      ""minLength"": 1
     },
     ""MiddleName"": {
       ""type"": ""string""

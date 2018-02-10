@@ -12,29 +12,34 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             [Required]
             public string Property { get; set; }
+
+            [Required(AllowEmptyStrings = true)]
+            public string Property2 { get; set; }
         }
 
         [Fact]
         public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
-            {
-                SchemaType = SchemaType.Swagger2
-            });
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings());
             var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
-            Assert.Contains("public string Property { get; set; }", code);
+            Assert.Equal(1, schema.Properties["Property"].MinLength);
+            Assert.Null(schema.Properties["Property2"].MinLength);
+
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]\n" +
+                            "        public string Property { get; set; }\n", code);
+
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]\n" +
+                            "        public string Property2 { get; set; }\n", code);
         }
 
         [Fact]

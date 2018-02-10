@@ -24,7 +24,7 @@
 {%   endif -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
 {%   if property.RenderRequiredAttribute -%}
-    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.Required{% if property.AllowEmptyStrings %}(AllowEmptyStrings = true){% endif %}]
 {%   endif -%}
 {%   if property.RenderRangeAttribute -%}
     [System.ComponentModel.DataAnnotations.Range({{ property.RangeMinimumValue }}, {{ property.RangeMaximumValue }})]

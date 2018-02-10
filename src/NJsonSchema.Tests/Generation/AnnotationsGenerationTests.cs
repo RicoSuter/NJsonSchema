@@ -293,5 +293,32 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.Equal("uri", property.Format);
         }
+
+        [JsonSchemaIgnore]
+        public class BaseObject
+        {
+            public string Foo { get; set; }
+        }
+
+        public class Person : BaseObject
+        {
+            public string Bar { get; set; }
+        }
+
+        public class Student : Person
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_is_ignored_then_it_is_not_in_definitions()
+        {
+            /// Act
+            var schema = await JsonSchema4.FromTypeAsync<Student>();
+            var json = schema.ToJson();
+
+            /// Assert
+            Assert.False(schema.Definitions.ContainsKey("BaseObject"));
+        }
     }
 }
