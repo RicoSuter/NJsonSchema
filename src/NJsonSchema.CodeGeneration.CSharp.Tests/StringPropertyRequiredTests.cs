@@ -21,17 +21,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
-            {
-                SchemaType = SchemaType.Swagger2
-            });
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings());
             var schemaData = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 

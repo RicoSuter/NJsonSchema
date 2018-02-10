@@ -19,7 +19,7 @@ namespace NJsonSchema.Yaml
     /// <summary>Extension methods to load and save <see cref="JsonSchema4"/> from/to YAML.</summary>
     public static class JsonSchemaYaml
     {
-        /// <summary>Creates a Swagger specification from a YAML string.</summary>
+        /// <summary>Creates a JSON Schema from a YAML string.</summary>
         /// <param name="data">The JSON data.</param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <returns>The <see cref="JsonSchema4"/>.</returns>
@@ -36,7 +36,7 @@ namespace NJsonSchema.Yaml
             return await JsonSchema4.FromJsonAsync(json, documentPath).ConfigureAwait(false);
         }
 
-        /// <summary>Converts the Swagger specification to YAML.</summary>
+        /// <summary>Converts the JSON Schema to YAML.</summary>
         /// <returns>The YAML string.</returns>
         public static string ToYaml(this JsonSchema4 document)
         {
@@ -48,7 +48,7 @@ namespace NJsonSchema.Yaml
             return serializer.Serialize(deserializedObject);
         }
 
-        /// <summary>Creates a Swagger specification from a JSON file.</summary>
+        /// <summary>Creates a JSON Schema from a JSON file.</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The <see cref="JsonSchema4" />.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
@@ -57,7 +57,7 @@ namespace NJsonSchema.Yaml
             return await FromYamlAsync(data, filePath).ConfigureAwait(false);
         }
 
-        /// <summary>Creates a Swagger specification from an URL.</summary>
+        /// <summary>Creates a JSON Schema from an URL.</summary>
         /// <param name="url">The URL.</param>
         /// <returns>The <see cref="JsonSchema4"/>.</returns>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
