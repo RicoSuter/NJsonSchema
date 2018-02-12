@@ -6,7 +6,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
 {%   endif -%}
-    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% endif %}: {{ property.Type }}{{ property.TypePostfix }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif %};
+    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elseif RequiresStrictPropertyInitialization && !property.HasDefaultValue %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif %};
 {% endfor -%}
 {% if HasIndexerProperty -%}
 

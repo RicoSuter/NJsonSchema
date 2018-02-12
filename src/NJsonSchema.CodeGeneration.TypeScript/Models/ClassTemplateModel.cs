@@ -122,6 +122,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             .Where(v => v.IsInheritanceDiscriminator == false)
             .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings)).ToList();
 
+        /// <summary>Gets a value indicating whether </summary>
+        public bool RequiresStrictPropertyInitialization => _settings.TypeScriptVersion >= 2.7m;
+
         /// <summary>Gets the inherited schema.</summary>
         private JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
