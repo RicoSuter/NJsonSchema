@@ -124,7 +124,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (schema.Format == JsonFormatStrings.TimeSpan)
                     return "string";
             }
-            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS)
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS || 
+                     Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
                     return "moment.Moment";
