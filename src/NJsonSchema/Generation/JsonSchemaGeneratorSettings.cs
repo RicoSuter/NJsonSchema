@@ -13,6 +13,7 @@ using System.Runtime.Serialization;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 
@@ -32,6 +33,8 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
             ReflectionService = new DefaultReflectionService();
+
+            ExcludedTypeNames = new string[0];
         }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
@@ -67,6 +70,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the contract resolver.</summary>
         public IContractResolver ContractResolver { get; set; }
+
+        /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
+        public string[] ExcludedTypeNames { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]

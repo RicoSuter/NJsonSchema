@@ -604,7 +604,8 @@ namespace NJsonSchema.Generation
             if (baseType != null && baseType != typeof(object))
             {
                 if (baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
-                    baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null)
+                    baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    Settings.ExcludedTypeNames?.Contains(baseType.FullName) != true)
                 {
                     if (Settings.FlattenInheritanceHierarchy)
                     {
