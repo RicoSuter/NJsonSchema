@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <Description>JSON Schema draft v4 reader, generator and validator for .NET</Description>
-    <Version>9.10.26</Version>
+    <Version>9.10.27</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -22,9 +22,6 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Templates\Class.ToJson.liquid" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Templates\Class.Annotations.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
@@ -32,6 +29,7 @@
     <EmbeddedResource Include="Templates\Class.FromJson.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Class.Inheritance.liquid" />
     <EmbeddedResource Include="Templates\Class.Inpc.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>

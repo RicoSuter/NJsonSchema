@@ -80,8 +80,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
-                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" : "moment",
-                DateTimeToStringCode = "toISOString()",
+                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? 
+                    "new Date" : 
+                    (parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment"),
+                DateTimeToStringCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
             };
@@ -101,7 +103,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (format == JsonFormatStrings.TimeSpan)
                     return false;
             }
-            else if (type == TypeScriptDateTimeType.MomentJS)
+            else if (type == TypeScriptDateTimeType.MomentJS || 
+                     type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
                     return true;
@@ -124,7 +127,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (format == JsonFormatStrings.Date)
                     return true;
             }
-            else if (type == TypeScriptDateTimeType.MomentJS)
+            else if (type == TypeScriptDateTimeType.MomentJS || 
+                     type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)
                     return true;

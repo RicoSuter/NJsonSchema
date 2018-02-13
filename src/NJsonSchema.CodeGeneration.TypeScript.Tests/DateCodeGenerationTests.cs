@@ -77,6 +77,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_date_handling_is_offset_moment_then_date_property_are_generated_in_class()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromJsonAsync(Json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                DateTimeType = TypeScriptDateTimeType.OffsetMomentJS
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("myDate: moment.Moment", code);
+            Assert.Contains("this.myDate = data[\"myDate\"] ? moment.parseZone(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
+        }
+
+        [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_interface()
         {
             //// Arrange

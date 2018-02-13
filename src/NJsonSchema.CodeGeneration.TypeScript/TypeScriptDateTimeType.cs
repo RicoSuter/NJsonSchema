@@ -14,10 +14,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Uses the JavaScript Date object for date time handling.</summary>
         Date,
 
-        /// <summary>Uses the MomentJS.js for date time handling.</summary>
+        /// <summary>Uses the Moment.js for date time handling.</summary>
         MomentJS,
 
         /// <summary>Uses the strings for date time handling (no conversion).</summary>
-        String
+        String,
+
+        /// <summary>Uses the Moment.js for date time with offset handling.</summary>
+        OffsetMomentJS,
     }
 }
