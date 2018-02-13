@@ -1,0 +1,5 @@
+﻿{% if RenderInpc -%}
+{% if HasInheritance %}: {{ BaseClassName }}, System.ComponentModel.INotifyPropertyChanged{% else %}: System.ComponentModel.INotifyPropertyChanged{% endif %}
+{% else -%}
+{% if HasInheritance %}: {{ BaseClassName }}{% endif %}
+{% endif -%}

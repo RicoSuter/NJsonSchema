@@ -22,9 +22,6 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Templates\Class.ToJson.liquid" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Templates\Class.Annotations.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
@@ -32,6 +29,7 @@
     <EmbeddedResource Include="Templates\Class.FromJson.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\Class.Inheritance.liquid" />
     <EmbeddedResource Include="Templates\Class.Inpc.liquid">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>

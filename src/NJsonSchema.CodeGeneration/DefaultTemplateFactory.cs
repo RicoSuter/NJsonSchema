@@ -142,7 +142,11 @@ namespace NJsonSchema.CodeGeneration
                 if (!_templates.ContainsKey(_data))
                 {
                     var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
-                        "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                            "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                        RegexOptions.Singleline).Trim();
+
+                    data = Regex.Replace("\n" + data, "\\{% template (.*?) %}", m =>
+                            "{% " + TemplateTagName + " " + m.Groups[1].Value + " -1 %}",
                         RegexOptions.Singleline).Trim();
 
                     data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
@@ -211,11 +215,13 @@ namespace NJsonSchema.CodeGeneration
 
                     if (string.IsNullOrEmpty(output))
                         result.Write("");
-                    else
+                    else if (_tabCount >= 0)
                     {
                         result.Write(string.Join("", Enumerable.Repeat("    ", _tabCount)) +
                             ConversionUtilities.Tab(output, _tabCount) + "\r\n");
                     }
+                    else
+                        result.Write(output);
                 }
                 catch (InvalidOperationException)
                 {
