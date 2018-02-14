@@ -17,6 +17,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         Poco,
         
         /// <summary>Generates classes implementing the <see cref="INotifyPropertyChanged"/> interface.</summary>
-        Inpc
+        Inpc,
+
+        /// <summary>Generates classes implementing the Prism base class.</summary>
+        Prism
     }
 }
