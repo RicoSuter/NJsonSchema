@@ -2,8 +2,16 @@ version: 1.0.{build}
 image: Visual Studio 2017
 build_script:
 - cmd: >-
-    dotnet build -c release src/NJsonSchema/NJsonSchema.csproj
-
-    dotnet pack -c release src/NJsonSchema/NJsonSchema.csproj /p:Version=%APPVEYOR_BUILD_VERSION% 
-
-    dotnet nuget push src/NJsonSchema/bin/release/NJsonSchema.%APPVEYOR_BUILD_VERSION%.nupkg -k %NUGET_API_KEY% -s %NUGET_URL%
+    dotnet build -c release src/PageUp.NJsonSchema.csproj
+    dotnet pack -c release src/PageUp.NJsonSchema.csproj /p:Version=%APPVEYOR_BUILD_VERSION% 
+# for:
+# -
+#   branches:
+#       except:
+#         - master
+# -
+#   branches:
+#     only:
+#       - master
+#   deploy_script:
+#     - cmd: dotnet nuget push src/bin/release/PageUp.NJsonSchema.%APPVEYOR_BUILD_VERSION%.nupkg -k %NUGET_API_KEY% -s %NUGET_URL%
