@@ -3,6 +3,7 @@ image: Visual Studio 2017
 build_script:
 - cmd: >-
     dotnet build -c release src/PageUp.NJsonSchema.csproj
+    
     dotnet pack -c release src/PageUp.NJsonSchema.csproj /p:Version=%APPVEYOR_BUILD_VERSION% 
 # for:
 # -
