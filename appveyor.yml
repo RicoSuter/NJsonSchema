@@ -12,4 +12,5 @@ deploy:
   api_key:
     secure: Q9tkLQmKthhGcrD7gUr4JnpJOkQpbop3gtsuw0ZKMWDwnr+z//aR8gA4fg1aX1in
   skip_symbols: false
-  artifact: src/bin/release/PageUp.NJsonSchema.%APPVEYOR_BUILD_VERSION%.nupkg
+  artifacts: 
+    -path: ./src/bin/release/*.nupkg
