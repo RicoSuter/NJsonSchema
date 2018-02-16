@@ -5,14 +5,11 @@ build_script:
     dotnet build -c release src/PageUp.NJsonSchema.csproj
     
     dotnet pack -c release src/PageUp.NJsonSchema.csproj /p:Version=%APPVEYOR_BUILD_VERSION% 
-# for:
-# -
-#   branches:
-#       except:
-#         - master
-# -
-#   branches:
-#     only:
-#       - master
-#   deploy_script:
-#     - cmd: dotnet nuget push src/bin/release/PageUp.NJsonSchema.%APPVEYOR_BUILD_VERSION%.nupkg -k %NUGET_API_KEY% -s %NUGET_URL%
+deploy:
+  on:
+    branch: master
+  provider: NuGet
+  api_key:
+    secure: Q9tkLQmKthhGcrD7gUr4JnpJOkQpbop3gtsuw0ZKMWDwnr+z//aR8gA4fg1aX1in
+  skip_symbols: false
+  artifact: /.*\.nupkg/
