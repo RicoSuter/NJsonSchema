@@ -6,7 +6,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
 {%   endif -%}
-    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elseif RequiresStrictPropertyInitialization && !property.HasDefaultValue %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif %};
+    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elseif RequiresStrictPropertyInitialization && !property.HasDefaultValue %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
 {% endfor -%}
 {% if HasIndexerProperty -%}
 
@@ -54,6 +54,15 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
 {%                 endif -%}
 {%             endfor -%}
 {%         endif -%}
+        }
+{%     endif -%}
+{%     if HasDefaultValues -%}
+        if (!data) {
+{%         for property in Properties -%}
+{%             if property.HasDefaultValue -%}
+            this.{{ property.PropertyName }} = {{ property.DefaultValue }};
+{%             endif -%}
+{%         endfor -%}
         }
 {%     endif -%}
 {%     if HasBaseDiscriminator -%}
