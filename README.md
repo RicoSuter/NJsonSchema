@@ -1,9 +1,11 @@
 NJsonSchema for .NET
 ====================
 
-[![NuGet Version](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
-[![Build status](https://img.shields.io/appveyor/ci/rsuter/njsonschema.svg?label=build)](https://ci.appveyor.com/project/rsuter/njsonschema)
-[![Build status](https://img.shields.io/appveyor/ci/rsuter/njsonschema-jlw0p.svg?label=CI+build)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
+## PageUp Fork.
+This PageUp for is to make it compatable with Newtonsoft.Json 6.0.8 for the monolth.
+This is done by multi-targetting the project.
+
+
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 
