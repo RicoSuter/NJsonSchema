@@ -28,7 +28,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             _isWriting = true;
 
             var jObject = Newtonsoft.Json.Linq.JObject.FromObject(value, serializer);
-            jObject.AddFirst(new Newtonsoft.Json.Linq.JProperty(_discriminator, value.GetType().Name));
+            jObject.AddFirst(new Newtonsoft.Json.Linq.JProperty(_discriminator, GetSubtypeDiscriminator(value.GetType())));
             writer.WriteToken(jObject.CreateReader());
         }
         finally
@@ -97,5 +97,16 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         }
 
         return objectType;
+    }
+
+    private string GetSubtypeDiscriminator(System.Type objectType)
+    {
+        foreach (var type in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), true))
+        {
+            if (type.Type == objectType)
+                return type.Key;
+        }
+
+        return objectType.Name;
     }
 }
