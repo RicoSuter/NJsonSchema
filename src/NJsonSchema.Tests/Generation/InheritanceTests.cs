@@ -87,9 +87,9 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
 
             //// Assert
-            Assert.NotNull(schema.Properties["Class"]);
+            Assert.NotNull(schema.ActualProperties["Class"]);
 
-            Assert.Equal(1, schema.AllOf.Count);
+            Assert.Equal(2, schema.AllOf.Count);
             Assert.Contains(schema.Definitions, d => d.Key == "Person");
             Assert.NotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
