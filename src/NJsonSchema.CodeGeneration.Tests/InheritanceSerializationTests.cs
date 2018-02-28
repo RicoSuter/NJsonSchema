@@ -322,7 +322,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 #endif
 
 #if NET451
-            var provider = new CSharpCodeProvider();
+            var provider = new Microsoft.CSharp.CSharpCodeProvider();
             var parameters = new CompilerParameters()
             {
                 GenerateInMemory = true,
