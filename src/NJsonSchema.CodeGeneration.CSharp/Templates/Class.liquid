@@ -73,11 +73,13 @@
         get { return _additionalProperties; }
         set { _additionalProperties = value; }
     }
-
 {% endif -%}
+{% if GenerateJsonMethods -%}
+
     {% template Class.ToJson %}
     
     {% template Class.FromJson %}
+{% endif -%}
 {% if RenderInpc -%}
 
     {% template Class.Inpc %}

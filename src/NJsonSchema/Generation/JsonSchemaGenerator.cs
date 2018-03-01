@@ -574,7 +574,7 @@ namespace NJsonSchema.Generation
                     var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
                     if (methodInfo != null)
                     {
-                        var knownTypes = methodInfo.Invoke(null, null) as Type[];
+                        var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
                         if (knownTypes != null)
                         {
                             foreach (var knownType in knownTypes)
