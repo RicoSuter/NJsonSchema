@@ -57,7 +57,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.Contains("name: string = \"foo\";", code);
+            Assert.Contains("name: string;", code);
+            Assert.Contains("this.name = \"foo\";", code);
         }
 
         [Fact]
@@ -120,7 +121,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("a: string[] = [];", code);
+            Assert.Contains("a: string[];", code);
+            Assert.Contains("this.a = [];", code);
             Assert.Contains("b: string[];", code);
         }
 
@@ -164,7 +166,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("a: { [key: string] : string; } = {};", code);
+            Assert.Contains("a: { [key: string] : string; };", code);
+            Assert.Contains("this.a = {};", code);
             Assert.Contains("b: { [key: string] : string; };", code);
         }
 
@@ -216,7 +219,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("a: A = new A();", code);
+            Assert.Contains("a: A;", code);
+            Assert.Contains("this.a = new A();", code);
             Assert.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();", code);
 
             Assert.Contains("b: B;", code);

@@ -22,7 +22,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.Contains("timeSpan: string;", output);
             Assert.Contains("gender: Gender;", output);
-            Assert.Contains("address: Address = new Address();", output);
+            Assert.Contains("address: Address;", output);
+            Assert.Contains("this.address = new Address();", output);
 
             Assert.Contains("timeSpanOrNull: string | undefined;", output);
             Assert.Contains("genderOrNull: Gender | undefined;", output);

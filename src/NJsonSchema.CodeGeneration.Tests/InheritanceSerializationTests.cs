@@ -10,6 +10,10 @@ using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Converters;
 using Xunit;
 
+using System.IO;
+using System.Reflection;
+using System.CodeDom.Compiler;
+
 namespace NJsonSchema.CodeGeneration.Tests
 {
     public class Container
@@ -151,7 +155,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public class C : B
         {
         }
-        
+
         [Fact]
         public async Task When_dates_are_converted_then_JsonInheritanceConverter_should_inherit_settings()
         {
@@ -258,6 +262,77 @@ namespace NJsonSchema.CodeGeneration.Tests
             // discriminator is assign for serialization
             Assert.Contains("this._discriminator = \"Animal\"", code);
             Assert.Contains("this._discriminator = \"Dog\"", code);
+        }
+
+        [Fact]
+        public async Task Subtypes_are_serialized_with_correct_discriminator()
+        {
+            //// Arrange
+            var json = await JsonSchema4.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
+            var data = json.ToJson();
+
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            var assembly = Compile(code);
+            var type = assembly.GetType("foo.Foo");
+            if (type == null)
+            {
+                throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
+            }
+
+            var bar = JsonConvert.DeserializeObject(@"{""discriminator"":""bar""}", type);
+
+            //// Assert
+            Assert.Contains(@"""bar""", JsonConvert.SerializeObject(bar));
+        }
+
+        private Assembly Compile(string code)
+        {
+#if NETCOREAPP2_0
+            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);
+
+            Microsoft.CodeAnalysis.CSharp.CSharpCompilation compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create("assemblyName")
+             .WithOptions(new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary))
+             .AddReferences(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
+                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"))
+             .AddSyntaxTrees(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(code));
+
+            using (var stream = new MemoryStream())
+            {
+                var result = compilation.Emit(stream);
+
+                if (!result.Success)
+                {
+                    throw new Exception(String.Join(", ", result.Diagnostics
+                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
+                        .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
+                }
+
+                return Assembly.Load(stream.GetBuffer());
+            }
+#endif
+
+#if NET451
+            var provider = new Microsoft.CSharp.CSharpCodeProvider();
+            var parameters = new CompilerParameters()
+            {
+                GenerateInMemory = true,
+                GenerateExecutable = false
+            };
+            var compilationResult = provider.CompileAssemblyFromSource(parameters, code);
+            Assert.False(compilationResult.Errors.HasErrors, String.Join(", ", compilationResult.Errors));
+
+            return compilationResult.CompiledAssembly;
+#endif
         }
     }
 }

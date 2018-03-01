@@ -65,8 +65,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Description => _schema.Description;
 
         /// <summary>Gets a value indicating whether the class style is INPC.</summary>
-        /// <value><c>true</c> if inpc; otherwise, <c>false</c>.</value>
         public bool RenderInpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
+
+        /// <summary>Gets a value indicating whether the class style is Prism.</summary>
+        public bool RenderPrism => _settings.ClassStyle == CSharpClassStyle.Prism;
+
+        /// <summary>Gets a value indicating whether to render ToJson() and FromJson() methods.</summary>
+        public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
 
         /// <summary>Gets a value indicating whether the class has discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);

@@ -11,7 +11,7 @@
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
-{% if RenderInpc -%}
+{% if RenderInpc or RenderPrism -%}
 {% for property in Properties -%}
     private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
 {% endfor -%}
@@ -42,11 +42,12 @@
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%   endif -%}
     {% template Class.Property.Annotations %}
-    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}
+    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}
 {% else %}
     {
         get { return {{ property.FieldName }}; }
 {%     if property.HasSetter -%}
+{%         if RenderInpc -%}
         set 
         {
             if ({{ property.FieldName }} != value)
@@ -55,6 +56,9 @@
                 RaisePropertyChanged();
             }
         }
+{%         else -%}
+        set { SetProperty(ref {{ property.FieldName }}, value); }
+{%         endif -%}
 {%     endif -%}
     }
 {%   endif -%}
@@ -69,13 +73,16 @@
         get { return _additionalProperties; }
         set { _additionalProperties = value; }
     }
-
 {% endif -%}
+{% if GenerateJsonMethods -%}
+
     {% template Class.ToJson %}
     
     {% template Class.FromJson %}
+{% endif -%}
 {% if RenderInpc -%}
 
     {% template Class.Inpc %}
 {% endif -%}
+    {% template Class.Body %}
 }
