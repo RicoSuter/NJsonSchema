@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
-    <Description>JON Schema draft v4 reader, generator and validator for .NET</Description>
+    <Description>JSON Schema reader, generator and validator for .NET</Description>
     <Version>9.10.27</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
