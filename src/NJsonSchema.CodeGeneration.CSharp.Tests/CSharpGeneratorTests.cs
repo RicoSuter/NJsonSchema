@@ -1401,5 +1401,58 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.DoesNotContain(@"class DateFormatConverter", code);
             Assert.DoesNotContain(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
         }
+
+        [Fact]
+        public async Task When_record_no_setter_in_class_and_constructor_provided()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record
+            });
+
+            //// Act
+            var output = generator.GenerateFile("Address");
+
+            //// Assert
+            Assert.Contains      (@"public string Street { get; }",      output);
+            Assert.DoesNotContain(@"public string Street { get; set; }", output);
+
+            Assert.Contains("public Address(string Street, string City)", output);
+            Assert.Contains("public Address(string Street, string City)", output);
+        }
+
+        public abstract class AbstractAddress
+        {
+            [JsonProperty("city")]
+            [DefaultValue("Innsmouth")]
+            public string City   { get; set; }
+
+            [JsonProperty("street")]
+            public string Street { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_is_abstract_constructor_is_protected_for_record()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<AbstractAddress>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+            });
+
+            //// Act
+            var output = generator.GenerateFile("AbstractAddress");
+
+            //// Assert
+            Assert.Contains      (@"public string Street { get; }",      output);
+            Assert.DoesNotContain(@"public string Street { get; set; }", output);
+
+            Assert.Contains("protected AbstractAddress(string street, string city = \"Innsmouth\")", output);
+        }
     }
 }

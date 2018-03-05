@@ -20,6 +20,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         Inpc,
 
         /// <summary>Generates classes implementing the Prism base class.</summary>
-        Prism
+        Prism,
+
+        /// <summary>Generates Records - read only POCOs (Plain Old C# Objects).</summary>
+        Record
     }
 }
