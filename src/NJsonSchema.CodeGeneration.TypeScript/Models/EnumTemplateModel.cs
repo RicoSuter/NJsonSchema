@@ -56,7 +56,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         entries.Add(new EnumerationItemModel
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                            Value = _schema.Type.HasFlag(JsonObjectType.Integer) ? value.ToString() : "<any>\"" + value + "\"",
+                            Value = _schema.Type.HasFlag(JsonObjectType.Integer) ?
+                                value.ToString() :
+                                (_settings.TypeScriptVersion < 2.4m ? "<any>" : "") + "\"" + value + "\"",
                         });
                     }
                 }
