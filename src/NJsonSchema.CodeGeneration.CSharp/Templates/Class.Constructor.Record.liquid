@@ -4,6 +4,6 @@
 {% if IsAbstract %}protected{% else %}public{% endif %} {{ClassName}}({% for property in sortedProperties -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%} {{ property.Type }} {{ property.Name | lowercamelcase }}{% if property.HasDefaultValue == true %} = {{ property.DefaultValue }}{% endif %}{% endfor -%})
 {
 {% for property in Properties -%}
-    this.{{property.PropertyName}} = @{{property.Name}};
+    {{property.PropertyName}} = @{{property.Name | lowercamelcase}};
 {% endfor -%}
 }
