@@ -1420,18 +1420,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains      (@"public string Street { get; }",      output);
             Assert.DoesNotContain(@"public string Street { get; set; }", output);
 
-            Assert.Contains("public Address(string Street, string City)", output);
-            Assert.Contains("public Address(string Street, string City)", output);
+            Assert.Contains("public Address(string street, string city)", output);
+            Assert.Contains("public Address(string street, string city)", output);
         }
 
         public abstract class AbstractAddress
         {
             [JsonProperty("city")]
             [DefaultValue("Innsmouth")]
-            public string City   { get; set; }
+            public string CityName   { get; set; }
 
-            [JsonProperty("street")]
-            public string Street { get; set; }
+            [JsonProperty("streetName")]
+            public string StreetName { get; set; }
         }
 
         [Fact]
@@ -1449,10 +1449,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("AbstractAddress");
 
             //// Assert
-            Assert.Contains      (@"public string Street { get; }",      output);
-            Assert.DoesNotContain(@"public string Street { get; set; }", output);
+            Assert.Contains      (@"public string StreetName { get; }",      output);
+            Assert.DoesNotContain(@"public string StreetName { get; set; }", output);
+            
+            Assert.Contains      (@"public string City { get; }",      output);
+            Assert.DoesNotContain(@"public string City { get; set; }", output);
 
-            Assert.Contains("protected AbstractAddress(string street, string city = \"Innsmouth\")", output);
+            Assert.Contains("protected AbstractAddress(string streetName, string city = \"Innsmouth\")", output);
         }
     }
 }
