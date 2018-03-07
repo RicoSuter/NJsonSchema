@@ -185,6 +185,11 @@ namespace NJsonSchema.CodeGeneration
             {
                 return ConversionUtilities.ConvertToLowerCamelCase(input, firstCharacterMustBeAlpha);
             }
+
+            public static string Uppercamelcase(Context context, string input, bool firstCharacterMustBeAlpha = true)
+            {
+                return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
+            }
         }
 
         internal class TemplateTag : Tag
