@@ -15,12 +15,39 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema4 : IJsonExtensionObject
     {
+        /// <summary>Creates the serializer contract resolver based on the <see cref="SchemaType"/>.</summary>
+        /// <param name="schemaType">The schema type.</param>
+        /// <returns>The settings.</returns>
+        public static PropertyRenameAndIgnoreSerializerContractResolver CreateJsonSerializerContractResolver(SchemaType schemaType)
+        {
+            var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
+
+            if (schemaType == SchemaType.OpenApi3)
+            {
+                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-writeOnly", "writeOnly");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-nullable", "nullable");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-example", "example");
+            }
+            else if (schemaType == SchemaType.Swagger2)
+            {
+                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readOnly");
+            }
+            else
+            {
+                //resolver.IgnoreProperty(typeof(JsonSchema4), "title");
+            }
+
+            return resolver;
+        }
+
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
         [JsonExtensionData]
         public IDictionary<string, object> ExtensionData { get; set; }

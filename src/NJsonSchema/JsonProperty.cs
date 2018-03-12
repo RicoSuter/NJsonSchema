@@ -7,9 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using System.Linq;
 using Newtonsoft.Json;
-using System;
 
 namespace NJsonSchema
 {
@@ -74,15 +72,15 @@ namespace NJsonSchema
         [JsonIgnore]
         internal bool InitialIsRequired { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the property is read only.</summary>
+        /// <summary>Gets or sets a value indicating whether the property is read only (Swagger and Open API only).</summary>
         [DefaultValue(false)]
-        [JsonProperty("readOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("x-readOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsReadOnly { get; set; }
 
-        /// <summary>Gets the property schema (either oneOf schema or the actual schema).</summary>
-        [JsonIgnore]
-        [Obsolete("Use ActualTypeSchema instead.")]
-        public JsonSchema4 ActualPropertySchema => ActualTypeSchema;
+        /// <summary>Gets or sets a value indicating whether the property is write only (Open API only).</summary>
+        [DefaultValue(false)]
+        [JsonProperty("x-writeOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsWriteOnly { get; set; }
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         [JsonIgnore]

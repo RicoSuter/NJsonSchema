@@ -223,7 +223,7 @@ namespace NJsonSchema.Generation
 
                     if (isNullable)
                     {
-                        if (Settings.SchemaType != SchemaType.Swagger2)
+                        if (Settings.SchemaType == SchemaType.JsonSchema)
                         {
                             if (schema.Type == JsonObjectType.None)
                             {
@@ -247,8 +247,13 @@ namespace NJsonSchema.Generation
             if (transformation != null)
                 await transformation(referencingSchema, referencedSchema).ConfigureAwait(false);
 
-            if (isNullable && Settings.SchemaType != SchemaType.Swagger2)
-                referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+            if (isNullable)
+            {
+                if (Settings.SchemaType == SchemaType.JsonSchema)
+                    referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                else if (Settings.SchemaType == SchemaType.OpenApi3)
+                    referencingSchema.IsNullableRaw = true;
+            }
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
             var useDirectReference = Settings.AllowReferencesWithProperties ||
