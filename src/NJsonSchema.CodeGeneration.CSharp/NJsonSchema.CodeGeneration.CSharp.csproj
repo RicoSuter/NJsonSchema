@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>9.10.29</Version>
+    <Version>9.10.30</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2017</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Templates\Class.Body.liquid" />
+    <None Remove="Templates\Class.Constructor.Record.liquid" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\Class.Annotations.liquid">
@@ -31,6 +32,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Templates\Class.Body.liquid" />
     <EmbeddedResource Include="Templates\Class.Constructor.liquid" />
+    <EmbeddedResource Include="Templates\Class.Constructor.Record.liquid" />
     <EmbeddedResource Include="Templates\Class.FromJson.liquid">
       <CustomToolNamespace>
       </CustomToolNamespace>
