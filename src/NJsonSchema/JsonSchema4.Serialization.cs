@@ -42,7 +42,7 @@ namespace NJsonSchema
             }
             else
             {
-                //resolver.IgnoreProperty(typeof(JsonSchema4), "title");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readonly");
             }
 
             return resolver;
