@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -49,18 +50,19 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         public static void UpdateSchemaReferencePaths(object rootObject)
         {
-            UpdateSchemaReferencePaths(rootObject, false);
+            UpdateSchemaReferencePaths(rootObject, false, new DefaultContractResolver());
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
         /// from the available <see cref="IJsonReferenceBase.Reference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="removeExternalReferences">Specifies whether to remove external references (otherwise they are inlined).</param>
-        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences)
+        /// <param name="contractResolver">The contract resolver.</param>
+        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences, IContractResolver contractResolver)
         {
             var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
 
-            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences);
+            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences, contractResolver);
             updater.VisitAsync(rootObject).GetAwaiter().GetResult();
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
@@ -96,7 +98,7 @@ namespace NJsonSchema
                 {
                     if (_replaceRefsRound)
                     {
-                        if (path.EndsWith("/definitions/" + typeNameHint))
+                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
@@ -123,7 +125,8 @@ namespace NJsonSchema
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;
             private readonly bool _removeExternalReferences;
 
-            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences)
+            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences, IContractResolver contractResolver)
+                : base(contractResolver)
             {
                 _rootObject = rootObject;
                 _schemaReferences = schemaReferences;
