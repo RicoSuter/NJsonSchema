@@ -61,7 +61,10 @@ namespace NJsonSchema.Infrastructure
 
             if (IsIgnored(property.DeclaringType, property.PropertyName))
             {
+                property.Ignored = true;
+
                 property.ShouldSerialize = i => false;
+                property.ShouldDeserialize = i => false;
             }
 
             if (IsRenamed(property.DeclaringType, property.PropertyName, out var newJsonPropertyName))
