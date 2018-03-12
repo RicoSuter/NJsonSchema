@@ -47,7 +47,7 @@ namespace NJsonSchema.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false, serializer.ContractResolver);
             try
             {
                 _isWriting = true;

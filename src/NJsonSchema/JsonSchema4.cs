@@ -731,11 +731,13 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
 
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false);
+
+            var contractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
 
             var json = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
             {
-                ContractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema)
+                ContractResolver = contractResolver
             });
 
             SchemaVersion = oldSchema;
