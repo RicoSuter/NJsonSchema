@@ -180,6 +180,16 @@ namespace NJsonSchema.CodeGeneration
             {
                 return ConversionUtilities.Tab(input, tabCount);
             }
+
+            public static string Lowercamelcase(Context context, string input, bool firstCharacterMustBeAlpha = true)
+            {
+                return ConversionUtilities.ConvertToLowerCamelCase(input, firstCharacterMustBeAlpha);
+            }
+
+            public static string Uppercamelcase(Context context, string input, bool firstCharacterMustBeAlpha = true)
+            {
+                return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
+            }
         }
 
         internal class TemplateTag : Tag
