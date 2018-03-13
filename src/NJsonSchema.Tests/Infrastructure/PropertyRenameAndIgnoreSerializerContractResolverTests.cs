@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 using Xunit;
 
@@ -29,6 +30,48 @@ namespace NJsonSchema.Tests.Infrastructure
             //// Assert
             Assert.Contains("bar", json);
             Assert.Contains("abc", obj.Foo);
+        }
+
+        public class ClassWithDoubleProperties
+        {
+            [JsonProperty("schema")]
+            public JsonSchema4 Schema { get; set; }
+
+            [JsonProperty("definitions1")]
+            public Dictionary<string, JsonSchema4> Definitions1 => Definitions2;
+
+            [JsonProperty("definitions2")]
+            public Dictionary<string, JsonSchema4> Definitions2 { get; set; } = new Dictionary<string, JsonSchema4>();
+        }
+
+        [Fact]
+        public void When_property_is_ignored_then_refs_ignore_it()
+        {
+            //// Arrange
+            var contractResolver = new PropertyRenameAndIgnoreSerializerContractResolver();
+            contractResolver.IgnoreProperty(typeof(ClassWithDoubleProperties), "definitions1");
+
+            var schema = new JsonSchema4
+            {
+                Type = JsonObjectType.Object
+            };
+            var foo = new ClassWithDoubleProperties
+            {
+                Schema = new JsonSchema4 { Reference = schema },
+                Definitions1 =
+                {
+                    { "Bar", schema }
+                }
+            };
+
+            //// Act
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(foo, false, contractResolver);
+            var json = JsonConvert.SerializeObject(foo, Formatting.Indented, new JsonSerializerSettings { ContractResolver = contractResolver });
+            json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+
+            //// Assert
+            Assert.Contains("#/definitions2/Bar", json);
+            Assert.DoesNotContain("#/definitions1/Bar", json);
         }
     }
 }
