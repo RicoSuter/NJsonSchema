@@ -66,7 +66,7 @@ namespace NJsonSchema
             updater.VisitAsync(rootObject).GetAwaiter().GetResult();
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
-            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
+            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
 
             foreach (var p in schemaReferences)
                 p.Key.ReferencePath = result[p.Value];
@@ -124,6 +124,7 @@ namespace NJsonSchema
             private readonly object _rootObject;
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;
             private readonly bool _removeExternalReferences;
+            private readonly IContractResolver _contractResolver;
 
             public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences, IContractResolver contractResolver)
                 : base(contractResolver)
@@ -131,6 +132,7 @@ namespace NJsonSchema
                 _rootObject = rootObject;
                 _schemaReferences = schemaReferences;
                 _removeExternalReferences = removeExternalReferences;
+                _contractResolver = contractResolver;
             }
 
 #pragma warning disable 1998
@@ -145,7 +147,8 @@ namespace NJsonSchema
                     {
                         var externalReference = reference.Reference;
                         var externalReferenceRoot = externalReference.FindParentDocument();
-                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference).TrimEnd('#');
+                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(
+                            externalReferenceRoot, externalReference, _contractResolver).TrimEnd('#');
                     }
                 }
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)

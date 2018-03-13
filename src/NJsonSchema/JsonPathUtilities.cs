@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
@@ -27,26 +28,42 @@ namespace NJsonSchema
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static string GetJsonPath(object rootObject, object searchedObject)
         {
-            return GetJsonPaths(rootObject, new List<object> { searchedObject })[searchedObject];
+            // TODO: Remove this overload?
+            return GetJsonPath(rootObject, searchedObject, new DefaultContractResolver());
+        }
+
+        /// <summary>Gets the JSON path of the given object.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="searchedObject">The object to search.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <returns>The path or <c>null</c> when the object could not be found.</returns>
+        /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
+        public static string GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
+        {
+            return GetJsonPaths(rootObject, new List<object> { searchedObject }, contractResolver)[searchedObject];
         }
 
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="searchedObjects">The objects to search.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
 #if !LEGACY
-        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject,
+            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
 #else
-        public static IDictionary<object, string> GetJsonPaths(object rootObject, IEnumerable<object> searchedObjects)
+        public static IDictionary<object, string> GetJsonPaths(object rootObject, 
+            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
 #endif
         {
             if (rootObject == null)
                 throw new ArgumentNullException(nameof(rootObject));
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
-            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>());
+            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
 
             if (mappings.Any(p => p.Value == null))
             {
@@ -58,7 +75,8 @@ namespace NJsonSchema
             return mappings;
         }
 
-        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects, string basePath, HashSet<object> checkedObjects)
+        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects,
+            string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
                 return false;
@@ -76,7 +94,7 @@ namespace NJsonSchema
             {
                 foreach (var key in ((IDictionary)obj).Keys)
                 {
-                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects))
+                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects, contractResolver))
                         return true;
                 }
             }
@@ -85,7 +103,7 @@ namespace NJsonSchema
                 var i = 0;
                 foreach (var item in (IEnumerable)obj)
                 {
-                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects))
+                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects, contractResolver))
                         return true;
 
                     i++;
@@ -93,23 +111,32 @@ namespace NJsonSchema
             }
             else
             {
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
-                {
-                    var value = member.GetValue(obj);
-                    if (value != null)
-                    {
-                        var propertyName = member.GetName();
+                var contract = contractResolver.ResolveContract(obj.GetType()) as JsonObjectContract;
+                var ignoredProperties = contract?.Properties
+                    .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false).ToArray() ??
+                    new Newtonsoft.Json.Serialization.JsonProperty[0];
 
-                        var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
-                        if (isExtensionDataProperty)
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType())
+                    .Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                {
+                    var propertyName = member.GetName();
+
+                    var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
+                    if (isExtensionDataProperty || ignoredProperties.All(p2 => p2.UnderlyingName != member.MemberInfo.Name))
+                    {
+                        var value = member.GetValue(obj);
+                        if (value != null)
                         {
-                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects))
-                                return true;
-                        }
-                        else
-                        {
-                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects))
-                                return true;
+                            if (isExtensionDataProperty)
+                            {
+                                if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
+                                    return true;
+                            }
+                            else
+                            {
+                                if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, contractResolver))
+                                    return true;
+                            }
                         }
                     }
                 }
