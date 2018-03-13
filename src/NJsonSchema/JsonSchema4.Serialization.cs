@@ -31,18 +31,19 @@ namespace NJsonSchema
 
             if (schemaType == SchemaType.OpenApi3)
             {
-                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readOnly");
-                resolver.RenameProperty(typeof(JsonSchema4), "x-writeOnly", "writeOnly");
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonProperty), "x-writeOnly", "writeOnly");
+
                 resolver.RenameProperty(typeof(JsonSchema4), "x-nullable", "nullable");
                 resolver.RenameProperty(typeof(JsonSchema4), "x-example", "example");
             }
             else if (schemaType == SchemaType.Swagger2)
             {
-                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
             }
             else
             {
-                resolver.RenameProperty(typeof(JsonSchema4), "x-readOnly", "readonly");
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readonly");
             }
 
             return resolver;
