@@ -7,6 +7,22 @@ namespace NJsonSchema.Tests.Infrastructure
 {
     public class PropertyRenameAndIgnoreSerializerContractResolverTests
     {
+        [Fact]
+        public void When_property_is_renamed_then_it_does_not_land_in_extension_data()
+        {
+            //// Arrange
+            var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
+            resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+
+            var json = "{ \"readOnly\": true }";
+
+            //// Act
+            var obj = JsonConvert.DeserializeObject<JsonProperty>(json, new JsonSerializerSettings { ContractResolver = resolver });
+
+            //// Assert
+            Assert.True(obj.IsReadOnly);
+        }
+
         public class MyClass
         {
             [JsonProperty("foo")]
