@@ -17,14 +17,14 @@ namespace NJsonSchema.Infrastructure
     /// <summary>JsonConvert resolver that allows to ignore and rename properties for given types.</summary>
     public class PropertyRenameAndIgnoreSerializerContractResolver : DefaultContractResolver
     {
-        private readonly Dictionary<Type, HashSet<string>> _ignores;
-        private readonly Dictionary<Type, Dictionary<string, string>> _renames;
+        private readonly Dictionary<string, HashSet<string>> _ignores;
+        private readonly Dictionary<string, Dictionary<string, string>> _renames;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyRenameAndIgnoreSerializerContractResolver"/> class.</summary>
         public PropertyRenameAndIgnoreSerializerContractResolver()
         {
-            _ignores = new Dictionary<Type, HashSet<string>>();
-            _renames = new Dictionary<Type, Dictionary<string, string>>();
+            _ignores = new Dictionary<string, HashSet<string>>();
+            _renames = new Dictionary<string, Dictionary<string, string>>();
         }
 
         /// <summary>Ignore the given property/properties of the given type.</summary>
@@ -32,11 +32,11 @@ namespace NJsonSchema.Infrastructure
         /// <param name="jsonPropertyNames">One or more JSON properties to ignore.</param>
         public void IgnoreProperty(Type type, params string[] jsonPropertyNames)
         {
-            if (!_ignores.ContainsKey(type))
-                _ignores[type] = new HashSet<string>();
+            if (!_ignores.ContainsKey(type.FullName))
+                _ignores[type.FullName] = new HashSet<string>();
 
             foreach (var prop in jsonPropertyNames)
-                _ignores[type].Add(prop);
+                _ignores[type.FullName].Add(prop);
         }
 
         /// <summary>Rename a property of the given type.</summary>
@@ -45,10 +45,10 @@ namespace NJsonSchema.Infrastructure
         /// <param name="newJsonPropertyName">The new JSON property name.</param>
         public void RenameProperty(Type type, string propertyName, string newJsonPropertyName)
         {
-            if (!_renames.ContainsKey(type))
-                _renames[type] = new Dictionary<string, string>();
+            if (!_renames.ContainsKey(type.FullName))
+                _renames[type.FullName] = new Dictionary<string, string>();
 
-            _renames[type][propertyName] = newJsonPropertyName;
+            _renames[type.FullName][propertyName] = newJsonPropertyName;
         }
 
         /// <summary>Creates a Newtonsoft.Json.Serialization.JsonProperty for the given System.Reflection.MemberInfo.</summary>
@@ -77,17 +77,15 @@ namespace NJsonSchema.Infrastructure
 
         private bool IsIgnored(Type type, string jsonPropertyName)
         {
-            if (!_ignores.ContainsKey(type))
+            if (!_ignores.ContainsKey(type.FullName))
                 return false;
 
-            return _ignores[type].Contains(jsonPropertyName);
+            return _ignores[type.FullName].Contains(jsonPropertyName);
         }
 
         private bool IsRenamed(Type type, string jsonPropertyName, out string newJsonPropertyName)
         {
-            Dictionary<string, string> renames;
-
-            if (!_renames.TryGetValue(type, out renames) || !renames.TryGetValue(jsonPropertyName, out newJsonPropertyName))
+            if (!_renames.TryGetValue(type.FullName, out var renames) || !renames.TryGetValue(jsonPropertyName, out newJsonPropertyName))
             {
                 newJsonPropertyName = null;
                 return false;
