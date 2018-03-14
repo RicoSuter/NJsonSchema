@@ -27,7 +27,7 @@ namespace NJsonSchema
         /// <returns>The settings.</returns>
         public static PropertyRenameAndIgnoreSerializerContractResolver CreateJsonSerializerContractResolver(SchemaType schemaType)
         {
-            var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
+            var resolver = new IgnoreEmptyCollectionsContractResolver();
 
             if (schemaType == SchemaType.OpenApi3)
             {
@@ -40,6 +40,7 @@ namespace NJsonSchema
             else if (schemaType == SchemaType.Swagger2)
             {
                 resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-example", "example");
             }
             else
             {
