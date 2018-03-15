@@ -334,6 +334,15 @@ namespace NJsonSchema.Generation
             var context = new SchemaProcessorContext(type, schema, schemaResolver, this);
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
+
+            var operationProcessorAttribute = type.GetTypeInfo().GetCustomAttributes()
+                .Where(a => a.GetType().IsAssignableTo(nameof(JsonSchemaProcessorAttribute), TypeNameStyle.Name));
+
+            foreach (dynamic attribute in operationProcessorAttribute)
+            {
+                var processor = Activator.CreateInstance(attribute.Type, attribute.Parameters);
+                await processor.ProcessAsync(context).ConfigureAwait(false);
+            }
         }
 
         private void ApplyExtensionDataAttributes<TSchemaType>(Type type, TSchemaType schema, IEnumerable<Attribute> parentAttributes)
