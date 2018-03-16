@@ -279,20 +279,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
-        public string BaseDiscriminator
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(Discriminator))
-                    return Discriminator;
-
-                var baseDiscriminator = InheritedSchema?.ActualSchema.BaseDiscriminator;
-                if (!string.IsNullOrEmpty(baseDiscriminator))
-                    return baseDiscriminator;
-
-                return null;
-            }
-        }
+        public OpenApiDiscriminator BaseDiscriminator => DiscriminatorObject ?? InheritedSchema?.ActualSchema.BaseDiscriminator;
 
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
