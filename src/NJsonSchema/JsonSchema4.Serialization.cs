@@ -60,9 +60,48 @@ namespace NJsonSchema
             Initialize();
         }
 
-        /// <summary>Gets or sets the discriminator (used in Swagger schemas).</summary>
+        /// <summary>Gets or sets the discriminator property (Swagger only).</summary>
+        [JsonIgnore]
+        public string Discriminator
+        {
+            get => DiscriminatorObject?.PropertyName;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    DiscriminatorObject = new OpenApiDiscriminator
+                    {
+                        PropertyName = value
+                    };
+                }
+                else
+                    DiscriminatorObject = null;
+            }
+        }
+
+        /// <summary>Gets or sets the discriminator (OpenApi only).</summary>
+        [JsonIgnore]
+        public OpenApiDiscriminator DiscriminatorObject { get; set; }
+
+        /// <summary>Gets or sets the discriminator.</summary>
         [JsonProperty("discriminator", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 5)]
-        public string Discriminator { get; set; }
+        internal object DiscriminatorRaw
+        {
+            get
+            {
+                if (JsonSchemaSerializationContext.CurrentSchemaType != SchemaType.Swagger2)
+                    return DiscriminatorObject;
+                else
+                    return Discriminator;
+            }
+            set
+            {
+                if (value is String)
+                    Discriminator = (string)value;
+                else if (value != null)
+                    DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
+            }
+        }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonIgnore]

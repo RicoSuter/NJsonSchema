@@ -199,6 +199,7 @@ namespace NJsonSchema
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
 
+            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
             var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, settings);
             schema.DocumentPath = documentPath;
 
@@ -733,8 +734,9 @@ namespace NJsonSchema
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
             var contractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
 
+            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
             var json = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
             {
                 ContractResolver = contractResolver
