@@ -38,17 +38,23 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)
-            .Select(p => new DerivedClassModel(p.Value, _resolver.GetOrGenerateTypeName(p.Key, p.Value), p.Key.ActualTypeSchema.IsAbstract))
+            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualSchema.BaseDiscriminator, _resolver))
             .ToList();
 
         /// <summary>The model of a derived class.</summary>
         public class DerivedClassModel
         {
-            internal DerivedClassModel(string discriminator, string className, bool isAbstract)
+            internal DerivedClassModel(string typeName, JsonSchema4 schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
             {
-                ClassName = className;
-                IsAbstract = isAbstract;
-                Discriminator = !string.IsNullOrEmpty(discriminator) ? discriminator : className;
+                var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualSchema == schema.ActualSchema);
+
+                ClassName = resolver.GetOrGenerateTypeName(schema, typeName);
+                IsAbstract = schema.ActualTypeSchema.IsAbstract;
+
+                Discriminator =
+                    mapping.Value != null ? mapping.Key :
+                    !string.IsNullOrEmpty(typeName) ? typeName :
+                    ClassName;
             }
 
             /// <summary>Gets the discriminator.</summary>
