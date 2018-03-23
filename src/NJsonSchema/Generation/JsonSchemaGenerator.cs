@@ -684,20 +684,19 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminator(Type type)
         {
-            var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
+            var jsonConverterAttribute = type
+                .GetTypeInfo()
+                .GetCustomAttributes(false)
+                .OfType<JsonConverterAttribute>()
+                .FirstOrDefault(_ => _.ConverterType == typeof(JsonInheritanceConverter));
 
-            dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo("JsonConverterAttribute", TypeNameStyle.Name);
-            if (jsonConverterAttribute != null)
-            {
-                var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "JsonInheritanceConverter")
-                {
-                    if (jsonConverterAttribute.ConverterParameters != null && jsonConverterAttribute.ConverterParameters.Length > 0)
-                        return jsonConverterAttribute.ConverterParameters[0];
-                    return JsonInheritanceConverter.DefaultDiscriminatorName;
-                }
-            }
-            return null;
+            if (jsonConverterAttribute == null) return null;
+
+            var converterParameter = jsonConverterAttribute.ConverterParameters?.FirstOrDefault();
+
+            return converterParameter is string parameter
+                ? parameter
+                : JsonInheritanceConverter.DefaultDiscriminatorName;
         }
 
         private void LoadEnumerations(Type type, JsonSchema4 schema, JsonTypeDescription typeDescription)
