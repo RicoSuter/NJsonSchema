@@ -7,15 +7,17 @@ namespace NJsonSchema.CodeGeneration.Tests
     public class DefaultValueGeneratorTests
     {
         private CSharpValueGenerator _csharpGenerator;
-        private TypeScriptValueGenerator _typescriptGenerator;
 
         public DefaultValueGeneratorTests()
         {
             var csharpSettings = new CSharpGeneratorSettings();
             _csharpGenerator = new CSharpValueGenerator(new CSharpTypeResolver(csharpSettings), csharpSettings);
+        }
 
+        private TypeScriptValueGenerator CreateTypeScriptValueGenerator(object rootObject)
+        {
             var typescriptSettings = new TypeScriptGeneratorSettings();
-            _typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(typescriptSettings), typescriptSettings);
+            return new TypeScriptValueGenerator(new TypeScriptTypeResolver(rootObject, typescriptSettings), typescriptSettings);
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = (int)6
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "int", "int", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "int", "int", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "int", "int", true);
 
             //// Assert
             Assert.Equal("6", csharpValue);
@@ -50,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = 6000000000L
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "long", "long", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "long", "long", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "long", "long", true);
 
             //// Assert
             Assert.Equal("6000000000L", csharpValue);
@@ -70,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = 1234.567F
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "double", "double", true);
 
             //// Assert
             Assert.Equal("1234.567D", csharpValue);
@@ -89,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = 1234.567F
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "double", "double", true);
 
             //// Assert
             Assert.Equal("1234.567D", csharpValue);
@@ -109,7 +111,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = 1234.567F
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "float", "float", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "float", "float", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "float", "float", true);
 
             //// Assert
             Assert.Equal("1234.567F", csharpValue);
@@ -128,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = true
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "bool", "bool", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "bool", "bool", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "bool", "bool", true);
 
             //// Assert
             Assert.Equal("true", csharpValue);
@@ -147,7 +149,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 Default = "test\\test\"test\r\ntest"
             };
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "string", "string", true);
-            var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "string", "string", true);
+            var typescriptValue = CreateTypeScriptValueGenerator(schema).GetDefaultValue(schema, true, "string", "string", true);
 
             //// Assert
             Assert.Equal("\"test\\\\test\\\"test\\r\\ntest\"", csharpValue);
@@ -169,9 +171,6 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator(), Namespace = "Ns" };
             var csharpGenerator = new CSharpValueGenerator(new CSharpTypeResolver(csharpSettings), csharpSettings);
 
-            var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator() };
-            var typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(typescriptSettings), typescriptSettings);
-
             //// Act
             var schema = new JsonSchema4()
             {
@@ -183,6 +182,10 @@ namespace NJsonSchema.CodeGeneration.Tests
                 },
                 Default = "Bar"
             };
+
+            var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator() };
+            var typescriptGenerator = new TypeScriptValueGenerator(new TypeScriptTypeResolver(schema, typescriptSettings), typescriptSettings);
+
             var csharpValue = csharpGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true);
             var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true);
 

@@ -17,6 +17,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     {
         private readonly CSharpTypeResolver _resolver;
         private readonly JsonSchema4 _schema;
+        private readonly object _rootObject;
         private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel"/> class.</summary>
@@ -31,6 +32,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             _resolver = resolver;
             _schema = schema;
+            _rootObject = rootObject;
             _settings = settings;
 
             ClassName = typeName;
@@ -83,10 +85,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Discriminator => _schema.Discriminator;
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
-        public bool HasInheritance => _schema.InheritedSchema != null;
+        public bool HasInheritance => _schema.GetInheritedSchema(_rootObject) != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty)
+        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.GetInheritedSchema(_rootObject), false, string.Empty)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 

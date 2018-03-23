@@ -14,11 +14,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>
     public class TypeScriptTypeResolver : TypeResolverBase
     {
+        private readonly object _rootObject;
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
+        /// <param name="rootObject">The root object.</param>
         /// <param name="settings">The settings.</param>
-        public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
+        public TypeScriptTypeResolver(object rootObject, TypeScriptGeneratorSettings settings)
             : base(settings)
         {
+            _rootObject = rootObject;
             Settings = settings;
         }
 
@@ -52,10 +56,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets a value indicating whether the schema supports constructor conversion.</summary>
         /// <param name="schema">The schema.</param>
+        /// <param name="rootObject">The root object.</param>
         /// <returns>The result.</returns>
-        public bool SupportsConstructorConversion(JsonSchema4 schema)
+        public bool SupportsConstructorConversion(JsonSchema4 schema, object rootObject)
         {
-            return schema?.ActualSchema.BaseDiscriminator == null;
+            return schema?.ActualSchema.GetBaseDiscriminator(rootObject) == null;
         }
 
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
@@ -97,13 +102,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.IsDictionary)
             {
                 var prefix = addInterfacePrefix &&
-                    SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
+                    SupportsConstructorConversion(schema.AdditionalPropertiesSchema, _rootObject) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
                 var valueType = prefix + ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
                 return $"{{ [key: string] : {valueType}; }}";
             }
 
-            return (addInterfacePrefix && SupportsConstructorConversion(schema) ? "I" : "") +
+            return (addInterfacePrefix && SupportsConstructorConversion(schema, _rootObject) ? "I" : "") +
                 base.GetOrGenerateTypeName(schema, typeNameHint);
         }
 
@@ -160,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
-                var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
+                var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item, _rootObject) && isObject && !isDictionary ? "I" : "";
                 return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
             }
 

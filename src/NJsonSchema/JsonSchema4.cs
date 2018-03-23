@@ -222,65 +222,6 @@ namespace NJsonSchema
             return schema;
         }
 
-        /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
-        /// <remarks>Used for code generation.</remarks>
-        [JsonIgnore]
-#if !LEGACY
-        public JsonSchema4 InheritedSchema
-#else
-        public JsonSchema4 InheritedSchema
-#endif
-        {
-            get
-            {
-                if (AllOf == null || AllOf.Count == 0 || HasReference)
-                    return null;
-
-                if (AllOf.Count == 1)
-                    return AllOf.First().ActualSchema;
-
-                if (AllOf.Any(s => s.HasReference && !s.ActualSchema.IsAnyType))
-                    return AllOf.First(s => s.HasReference && !s.ActualSchema.IsAnyType).ActualSchema;
-
-                if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
-                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
-
-                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
-            }
-        }
-
-        /// <summary>Gets the list of all inherited/parent schemas.</summary>
-        /// <remarks>Used for code generation.</remarks>
-        [JsonIgnore]
-#if !LEGACY
-        public IReadOnlyCollection<JsonSchema4> AllInheritedSchemas
-#else
-        public ICollection<JsonSchema4> AllInheritedSchemas
-#endif
-        {
-            get
-            {
-                var inheritedSchema = this.InheritedSchema != null ?
-                    new List<JsonSchema4> { this.InheritedSchema } :
-                    new List<JsonSchema4>();
-
-                return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
-            }
-        }
-
-        /// <summary>Determines whether the given schema is the parent schema of this schema (i.e. super/base class).</summary>
-        /// <param name="schema">The possible subtype schema.</param>
-        /// <returns>true or false</returns>
-        public bool Inherits(JsonSchema4 schema)
-        {
-            schema = schema.ActualSchema;
-            return InheritedSchema?.ActualSchema == schema || InheritedSchema?.Inherits(schema) == true;
-        }
-
-        /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
-        [JsonIgnore]
-        public OpenApiDiscriminator BaseDiscriminator => DiscriminatorObject ?? InheritedSchema?.ActualSchema.BaseDiscriminator;
-
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
@@ -294,7 +235,7 @@ namespace NJsonSchema
             get
             {
                 var properties = Properties
-                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema)
+                    .Union(AllOf.Where(s => s.ActualSchema != this.GetInheritedSchema(null))
                     .SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToList();
 
@@ -746,16 +687,6 @@ namespace NJsonSchema
         //    SchemaVersion = oldSchema;
         //    return json;
         //}
-
-        /// <summary>Gets a value indicating whether this schema inherits from the given parent schema.</summary>
-        /// <param name="parentSchema">The parent schema.</param>
-        /// <returns>true or false.</returns>
-        public bool InheritsSchema(JsonSchema4 parentSchema)
-        {
-            return parentSchema != null && ActualSchema
-                .AllInheritedSchemas.Concat(new List<JsonSchema4> { this })
-                .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
-        }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>

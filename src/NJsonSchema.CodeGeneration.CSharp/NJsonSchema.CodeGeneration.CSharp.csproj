@@ -77,10 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
-    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    <PackageReference Include="NJsonSchema">
+      <Version>9.10.37</Version>
+    </PackageReference>
+    <PackageReference Include="NJsonSchema.CodeGeneration">
+      <Version>9.10.37</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Update="NJsonSchema.CodeGeneration.CSharp.nuspec">

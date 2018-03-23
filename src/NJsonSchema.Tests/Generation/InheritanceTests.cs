@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.NotNull(schema.InheritedSchema);
+            Assert.NotNull(schema.GetInheritedSchema(schema));
             Assert.Equal(2, schema.ActualProperties.Count);
             Assert.True(schema.ActualProperties.ContainsKey("prop1"));
             Assert.True(schema.ActualProperties.ContainsKey("prop2"));
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromJsonAsync(json);
 
             //// Assert
-            Assert.NotNull(schema.InheritedSchema);
+            Assert.NotNull(schema.GetInheritedSchema(schema));
             Assert.Equal(1, schema.ActualProperties.Count);
             Assert.True(schema.ActualProperties.ContainsKey("prop1"));
         }
