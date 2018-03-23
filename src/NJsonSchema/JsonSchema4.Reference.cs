@@ -8,8 +8,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
+using NJsonSchema.Collections;
 using NJsonSchema.References;
 
 namespace NJsonSchema
@@ -78,6 +80,25 @@ namespace NJsonSchema
                     return AllOf.First().GetActualSchema(checkedSchemas);
 
                 return Reference.GetActualSchema(checkedSchemas);
+            }
+
+            if (AllOf.Count > 1)
+            {
+                var schemas = AllOf.Where(s => !s.HasReference).ToArray();
+                return new JsonSchema4
+                {
+                    
+
+                    Properties = new ObservableDictionary<string, JsonProperty>(
+                        Properties.Concat(schemas.SelectMany(s => s.Properties)).ToDictionary(p => p.Key, p => p.Value)),
+
+                    AllOf = new ObservableCollection<JsonSchema4>(
+                        AllOf.Where(s => s.HasReference))
+                };
+
+
+                // TODO: Merge this schema + all AllOf where !HasReference => new AllOf = all where HasReference
+                //return AllOf.Last(s => !s.HasReference).GetActualSchema(checkedSchemas);
             }
 
             return this;
