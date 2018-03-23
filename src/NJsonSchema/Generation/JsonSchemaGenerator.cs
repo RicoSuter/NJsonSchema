@@ -615,7 +615,7 @@ namespace NJsonSchema.Generation
             GenerateInheritanceDiscriminator(type, schema);
 
             var baseType = type.GetTypeInfo().BaseType;
-            if (baseType != null && baseType != typeof(object))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
             {
                 if (baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
                     baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
