@@ -18,7 +18,8 @@ namespace NJsonSchema.Infrastructure
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-            if (property.PropertyType != typeof(string) &&
+            if ((property.Required == Required.Default || property.Required == Required.DisallowNull) &&
+                property.PropertyType != typeof(string) &&
                 typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
             {
                 property.ShouldSerialize = instance =>
