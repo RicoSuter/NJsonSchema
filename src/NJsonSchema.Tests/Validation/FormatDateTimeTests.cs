@@ -40,5 +40,56 @@ namespace NJsonSchema.Tests.Validation
             //// Assert
             Assert.Empty(errors);
         }
+
+        [Fact]
+        public void When_format_date_time_with_non_iso8601_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("25/01/2015");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.Equal(ValidationErrorKind.DateTimeExpected, errors.First().Kind);
+        }
+
+        [Fact]
+        public void When_format_date_time_with_iso8601_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("2015-01-25T15:43:30Z");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public void When_format_date_time_with_iso8601_with_timezone_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("2015-01-25T15:43:30+10:00");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.Empty(errors);
+        }
     }
 }
