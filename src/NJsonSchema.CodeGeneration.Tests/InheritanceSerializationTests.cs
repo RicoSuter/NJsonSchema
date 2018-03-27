@@ -220,6 +220,23 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [Fact]
+        public async Task When_JsonInheritanceConverter_is_set_then_discriminator_mappings_are_generated()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var json = schema.ToJson();
+
+            //// Act
+            var baseSchema = schema.Definitions["SubClass"].ActualSchema;
+
+            //// Assert
+            Assert.Equal(3, baseSchema.DiscriminatorObject.Mapping.Count);
+            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass1"));
+            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass2"));
+            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass3"));
+        }
+
+        [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
