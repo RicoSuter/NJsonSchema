@@ -201,17 +201,18 @@ namespace NJsonSchema.Infrastructure
 #endif
                 try
                 {
-                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                        return null;
-
-                    if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
-                    {
-                        Cache[assemblyName.FullName] = null;
-                        return null;
-                    }
-
                     if (!Cache.ContainsKey(assemblyName.FullName))
+                    {
+                        if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+                        {
+                            Cache[assemblyName.FullName] = null;
+                            return null;
+                        }
+
                         Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
+                    }
+                    else if (Cache[assemblyName.FullName] == null)
+                        return null;
 
                     return GetXmlDocumentation(member, Cache[assemblyName.FullName]);
                 }
@@ -246,17 +247,18 @@ namespace NJsonSchema.Infrastructure
 #endif
                 try
                 {
-                    if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                        return null;
-
-                    if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
-                    {
-                        Cache[assemblyName.FullName] = null;
-                        return null;
-                    }
-
                     if (!Cache.ContainsKey(assemblyName.FullName))
+                    {
+                        if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
+                        {
+                            Cache[assemblyName.FullName] = null;
+                            return null;
+                        }
+
                         Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
+                    }
+                    else if (Cache[assemblyName.FullName] == null)
+                        return null;
 
                     return GetXmlDocumentation(parameter, Cache[assemblyName.FullName]);
                 }
