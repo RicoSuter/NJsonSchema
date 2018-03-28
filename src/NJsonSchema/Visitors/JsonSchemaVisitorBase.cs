@@ -29,7 +29,7 @@ namespace NJsonSchema.Visitors
         protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
         {
             if (reference is JsonSchema4 schema)
-                return await VisitSchemaAsync(schema, path, typeNameHint);
+                return await VisitSchemaAsync(schema, path, typeNameHint).ConfigureAwait(false);
 
             return reference;
         }
