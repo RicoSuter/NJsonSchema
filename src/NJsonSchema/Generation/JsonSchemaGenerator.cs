@@ -221,7 +221,7 @@ namespace NJsonSchema.Generation
 
                     if (isNullable)
                     {
-                        if (Settings.SchemaType != SchemaType.Swagger2)
+                        if (Settings.SchemaType == SchemaType.JsonSchema)
                         {
                             if (schema.Type == JsonObjectType.None)
                             {
@@ -245,8 +245,13 @@ namespace NJsonSchema.Generation
             if (transformation != null)
                 await transformation(referencingSchema, referencedSchema).ConfigureAwait(false);
 
-            if (isNullable && Settings.SchemaType != SchemaType.Swagger2)
-                referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+            if (isNullable)
+            {
+                if (Settings.SchemaType == SchemaType.JsonSchema)
+                    referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                else if (Settings.SchemaType == SchemaType.OpenApi3)
+                    referencingSchema.IsNullableRaw = true;
+            }
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
             var useDirectReference = Settings.AllowReferencesWithProperties ||
@@ -336,6 +341,15 @@ namespace NJsonSchema.Generation
             var context = new SchemaProcessorContext(type, schema, schemaResolver, this);
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
+
+            var operationProcessorAttribute = type.GetTypeInfo().GetCustomAttributes()
+                .Where(a => a.GetType().IsAssignableTo(nameof(JsonSchemaProcessorAttribute), TypeNameStyle.Name));
+
+            foreach (dynamic attribute in operationProcessorAttribute)
+            {
+                var processor = Activator.CreateInstance(attribute.Type, attribute.Parameters);
+                await processor.ProcessAsync(context).ConfigureAwait(false);
+            }
         }
 
         private void ApplyExtensionDataAttributes<TSchemaType>(Type type, TSchemaType schema, IEnumerable<Attribute> parentAttributes)
@@ -579,7 +593,7 @@ namespace NJsonSchema.Generation
                     var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
                     if (methodInfo != null)
                     {
-                        var knownTypes = methodInfo.Invoke(null, null) as Type[];
+                        var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
                         if (knownTypes != null)
                         {
                             foreach (var knownType in knownTypes)

@@ -20,7 +20,7 @@ namespace NJsonSchema.Converters
         private static bool _isWriting = false;
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
-        public override bool CanWrite => _isWriting;
+        public override bool CanWrite => !_isWriting;
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
         /// <param name="objectType">Type of the object.</param>
@@ -47,12 +47,18 @@ namespace NJsonSchema.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false);
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false, serializer.ContractResolver);
             try
             {
                 _isWriting = true;
+
                 var json = JsonConvert.SerializeObject(value, serializer.Formatting);
-                writer.WriteRaw(JsonSchemaReferenceUtilities.ConvertPropertyReferences(json));
+                json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+
+                if (writer.WriteState == WriteState.Property)
+                    writer.WriteRawValue(json);
+                else
+                    writer.WriteRaw(json);
             }
             finally
             {

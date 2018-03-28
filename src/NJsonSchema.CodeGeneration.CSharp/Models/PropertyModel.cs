@@ -118,7 +118,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 var format =
                     _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
+                    _property.Format == JsonFormatStrings.Float ||
+                    _property.Format == JsonFormatStrings.Decimal ||
+                    _property.Format == JsonFormatStrings.Long ?
                         JsonFormatStrings.Double : JsonFormatStrings.Integer;
                 var type =
                     _property.Format == JsonFormatStrings.Double ||
@@ -138,7 +140,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 var format =
                     _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
+                    _property.Format == JsonFormatStrings.Float ||
+                    _property.Format == JsonFormatStrings.Decimal ||
+                    _property.Format == JsonFormatStrings.Long ?
                         JsonFormatStrings.Double : JsonFormatStrings.Integer;
                 var type =
                     _property.Format == JsonFormatStrings.Double ||

@@ -15,12 +15,41 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema4 : IJsonExtensionObject
     {
+        /// <summary>Creates the serializer contract resolver based on the <see cref="SchemaType"/>.</summary>
+        /// <param name="schemaType">The schema type.</param>
+        /// <returns>The settings.</returns>
+        public static PropertyRenameAndIgnoreSerializerContractResolver CreateJsonSerializerContractResolver(SchemaType schemaType)
+        {
+            var resolver = new IgnoreEmptyCollectionsContractResolver();
+
+            if (schemaType == SchemaType.OpenApi3)
+            {
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonProperty), "x-writeOnly", "writeOnly");
+
+                resolver.RenameProperty(typeof(JsonSchema4), "x-nullable", "nullable");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-example", "example");
+            }
+            else if (schemaType == SchemaType.Swagger2)
+            {
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonSchema4), "x-example", "example");
+            }
+            else
+            {
+                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readonly");
+            }
+
+            return resolver;
+        }
+
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
         [JsonExtensionData]
         public IDictionary<string, object> ExtensionData { get; set; }
@@ -31,9 +60,48 @@ namespace NJsonSchema
             Initialize();
         }
 
-        /// <summary>Gets or sets the discriminator (used in Swagger schemas).</summary>
+        /// <summary>Gets or sets the discriminator property (Swagger only).</summary>
+        [JsonIgnore]
+        public string Discriminator
+        {
+            get => DiscriminatorObject?.PropertyName;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    DiscriminatorObject = new OpenApiDiscriminator
+                    {
+                        PropertyName = value
+                    };
+                }
+                else
+                    DiscriminatorObject = null;
+            }
+        }
+
+        /// <summary>Gets or sets the discriminator (OpenApi only).</summary>
+        [JsonIgnore]
+        public OpenApiDiscriminator DiscriminatorObject { get; set; }
+
+        /// <summary>Gets or sets the discriminator.</summary>
         [JsonProperty("discriminator", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 5)]
-        public string Discriminator { get; set; }
+        internal object DiscriminatorRaw
+        {
+            get
+            {
+                if (JsonSchemaSerializationContext.CurrentSchemaType != SchemaType.Swagger2)
+                    return DiscriminatorObject;
+                else
+                    return Discriminator;
+            }
+            set
+            {
+                if (value is String)
+                    Discriminator = (string)value;
+                else if (value != null)
+                    DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
+            }
+        }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonIgnore]

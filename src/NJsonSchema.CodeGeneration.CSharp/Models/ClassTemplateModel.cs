@@ -70,6 +70,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the class style is Prism.</summary>
         public bool RenderPrism => _settings.ClassStyle == CSharpClassStyle.Prism;
 
+        /// <summary>Gets a value indicating whether the class style is Record.</summary>
+        public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
+
         /// <summary>Gets a value indicating whether to render ToJson() and FromJson() methods.</summary>
         public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
 

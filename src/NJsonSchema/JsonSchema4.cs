@@ -189,14 +189,18 @@ namespace NJsonSchema
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
             data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
-            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
+
+            var settings = new JsonSerializerSettings
             {
+                ContractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema),
                 MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
                 ConstructorHandling = ConstructorHandling.Default,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            });
+            };
 
+            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
+            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, settings);
             schema.DocumentPath = documentPath;
 
             var referenceResolver = referenceResolverFactory(schema);
@@ -275,20 +279,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
-        public string BaseDiscriminator
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(Discriminator))
-                    return Discriminator;
-
-                var baseDiscriminator = InheritedSchema?.ActualSchema.BaseDiscriminator;
-                if (!string.IsNullOrEmpty(baseDiscriminator))
-                    return baseDiscriminator;
-
-                return null;
-            }
-        }
+        public OpenApiDiscriminator BaseDiscriminator => DiscriminatorObject ?? InheritedSchema?.ActualSchema.BaseDiscriminator;
 
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
@@ -419,9 +410,21 @@ namespace NJsonSchema
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether the schema is deprecated (Swagger and Open API only).</summary>
+        [JsonProperty("x-deprecated", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsDeprecated { get; set; }
+
         /// <summary>Gets or sets a value indicating whether the type is abstract, i.e. cannot be instantiated directly (x-abstract).</summary>
         [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool IsAbstract { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the schema is nullable (Open API only).</summary>
+        [JsonProperty("x-nullable", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool? IsNullableRaw { get; set; }
+
+        /// <summary>Gets or sets the example (Swagger and Open API only).</summary>
+        [JsonProperty("x-example", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public object Example { get; set; }
 
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
@@ -436,7 +439,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
 
-#region Child JSON schemas
+        #region Child JSON schemas
 
         /// <summary>Gets the properties of the type. </summary>
         [JsonIgnore]
@@ -690,13 +693,16 @@ namespace NJsonSchema
                                  MultipleOf == null &&
                                  IsEnumeration == false;
 
-#endregion
+        #endregion
 
         /// <summary>Gets a value indicating whether the validated data can be null.</summary>
         /// <param name="schemaType">The schema type.</param>
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(SchemaType schemaType)
         {
+            if (schemaType == SchemaType.OpenApi3 && IsNullableRaw.HasValue)
+                return IsNullableRaw.Value;
+
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
 
@@ -711,11 +717,20 @@ namespace NJsonSchema
         public string ToJson()
         {
             var oldSchema = SchemaVersion;
+
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false);
-            var json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(JsonConvert.SerializeObject(this, Formatting.Indented));
+
+            var contractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
+
+            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
+            var json = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver
+            });
+
             SchemaVersion = oldSchema;
-            return json;
+            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
         }
 
         ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>

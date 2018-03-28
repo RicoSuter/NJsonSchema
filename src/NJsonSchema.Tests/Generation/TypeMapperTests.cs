@@ -73,8 +73,8 @@ namespace NJsonSchema.Tests.Generation
             var property1 = schema.Properties["Bar1"];
             var property2 = schema.Properties["Bar2"];
 
-            Assert.True(property1.ActualPropertySchema.Properties.ContainsKey("Prop"));
-            Assert.True(property1.ActualPropertySchema == property2.ActualPropertySchema);
+            Assert.True(property1.ActualTypeSchema.Properties.ContainsKey("Prop"));
+            Assert.True(property1.ActualTypeSchema == property2.ActualTypeSchema);
 
             Assert.Contains("$ref", json);
         }

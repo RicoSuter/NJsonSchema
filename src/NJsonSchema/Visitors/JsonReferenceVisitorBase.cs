@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
@@ -22,7 +23,21 @@ namespace NJsonSchema.Visitors
     /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
     public abstract class JsonReferenceVisitorBase
     {
+        private readonly IContractResolver _contractResolver;
         private readonly string[] _jsonSchemaProperties = typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name).ToArray();
+
+        /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
+        protected JsonReferenceVisitorBase()
+            : this(new DefaultContractResolver())
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
+        /// <param name="contractResolver">The contract resolver.</param>
+        protected JsonReferenceVisitorBase(IContractResolver contractResolver)
+        {
+            _contractResolver = contractResolver;
+        }
 
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
@@ -162,17 +177,29 @@ namespace NJsonSchema.Visitors
 
         private async Task VisitPropertiesAsync(object obj, string path, ISet<object> checkedObjects)
         {
-            foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
-                p.MemberInfo is PropertyInfo &&
-                (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
-                (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
-                p.CanRead &&
-                p.IsIndexer == false &&
-                p.CustomAttributes.JsonIgnoreAttribute == null))
+            if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
             {
-                var value = member.GetValue(obj);
-                if (value != null)
-                    await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
+                foreach (var property in contract.Properties.Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                {
+                    var value = property.ValueProvider.GetValue(obj);
+                    if (value != null)
+                        await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o));
+                }
+            }
+            else
+            {
+                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
+                    p.MemberInfo is PropertyInfo &&
+                    (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
+                    (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
+                    p.CanRead &&
+                    p.IsIndexer == false &&
+                    p.CustomAttributes.JsonIgnoreAttribute == null))
+                {
+                    var value = member.GetValue(obj);
+                    if (value != null)
+                        await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o));
+                }
             }
         }
 

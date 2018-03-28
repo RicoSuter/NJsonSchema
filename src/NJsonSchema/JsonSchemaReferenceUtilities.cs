@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -49,22 +50,23 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         public static void UpdateSchemaReferencePaths(object rootObject)
         {
-            UpdateSchemaReferencePaths(rootObject, false);
+            UpdateSchemaReferencePaths(rootObject, false, new DefaultContractResolver());
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
         /// from the available <see cref="IJsonReferenceBase.Reference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="removeExternalReferences">Specifies whether to remove external references (otherwise they are inlined).</param>
-        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences)
+        /// <param name="contractResolver">The contract resolver.</param>
+        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences, IContractResolver contractResolver)
         {
             var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
 
-            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences);
+            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences, contractResolver);
             updater.VisitAsync(rootObject).GetAwaiter().GetResult();
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
-            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
+            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
 
             foreach (var p in schemaReferences)
                 p.Key.ReferencePath = result[p.Value];
@@ -96,7 +98,7 @@ namespace NJsonSchema
                 {
                     if (_replaceRefsRound)
                     {
-                        if (path.EndsWith("/definitions/" + typeNameHint))
+                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
@@ -122,12 +124,15 @@ namespace NJsonSchema
             private readonly object _rootObject;
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;
             private readonly bool _removeExternalReferences;
+            private readonly IContractResolver _contractResolver;
 
-            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences)
+            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences, IContractResolver contractResolver)
+                : base(contractResolver)
             {
                 _rootObject = rootObject;
                 _schemaReferences = schemaReferences;
                 _removeExternalReferences = removeExternalReferences;
+                _contractResolver = contractResolver;
             }
 
 #pragma warning disable 1998
@@ -142,7 +147,8 @@ namespace NJsonSchema
                     {
                         var externalReference = reference.Reference;
                         var externalReferenceRoot = externalReference.FindParentDocument();
-                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(externalReferenceRoot, externalReference).TrimEnd('#');
+                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(
+                            externalReferenceRoot, externalReference, _contractResolver).TrimEnd('#');
                     }
                 }
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)

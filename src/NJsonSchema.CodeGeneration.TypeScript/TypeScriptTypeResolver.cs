@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The result.</returns>
         public bool SupportsConstructorConversion(JsonSchema4 schema)
         {
-            return string.IsNullOrEmpty(schema?.ActualSchema.BaseDiscriminator);
+            return schema?.ActualSchema.BaseDiscriminator == null;
         }
 
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
@@ -124,7 +124,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (schema.Format == JsonFormatStrings.TimeSpan)
                     return "string";
             }
-            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS || 
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                      Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)

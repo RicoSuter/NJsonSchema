@@ -18,6 +18,10 @@
 
 {% endif -%}
     {% template Class.Constructor %}
+{% if RenderRecord == true -%}
+    {% template Class.Constructor.Record %}
+
+{% endif -%}
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
     /// <summary>{{ property.Description | csharpdocs }}</summary>
@@ -42,7 +46,7 @@
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%   endif -%}
     {% template Class.Property.Annotations %}
-    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}
+    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}
 {% else %}
     {
         get { return {{ property.FieldName }}; }
@@ -75,7 +79,6 @@
     }
 {% endif -%}
 {% if GenerateJsonMethods -%}
-
     {% template Class.ToJson %}
     
     {% template Class.FromJson %}
@@ -84,5 +87,6 @@
 
     {% template Class.Inpc %}
 {% endif -%}
+
     {% template Class.Body %}
 }
