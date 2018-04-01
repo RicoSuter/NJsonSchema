@@ -612,8 +612,6 @@ namespace NJsonSchema.Generation
 
         private async Task GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            GenerateInheritanceDiscriminator(type, schema);
-
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
             {
@@ -660,44 +658,67 @@ namespace NJsonSchema.Generation
                         await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
+
+            GenerateInheritanceDiscriminator(type, schema);
         }
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
         {
             if (!Settings.FlattenInheritanceHierarchy)
             {
-                var discriminator = TryGetInheritanceDiscriminator(type);
-                if (!string.IsNullOrEmpty(discriminator))
+                var discriminatorConverter = TryGetInheritanceDiscriminatorConverter(type);
+                if (discriminatorConverter != null)
                 {
-                    if (schema.Properties.ContainsKey(discriminator))
-                        throw new InvalidOperationException("The JSON property '" + discriminator + "' is defined multiple times on type '" + type.FullName + "'.");
+                    var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
+                    if (schema.Properties.ContainsKey(discriminatorName))
+                        throw new InvalidOperationException("The JSON property '" + discriminatorName + "' is defined multiple times on type '" + type.FullName + "'.");
 
-                    schema.Discriminator = discriminator;
-                    schema.Properties[discriminator] = new JsonProperty
+                    var discriminator = new OpenApiDiscriminator
+                    {
+                        JsonInheritanceConverter = discriminatorConverter,
+                        PropertyName = discriminatorName
+                    };
+
+                    schema.DiscriminatorObject = discriminator;
+                    schema.Properties[discriminatorName] = new JsonProperty
                     {
                         Type = JsonObjectType.String,
                         IsRequired = true
                     };
                 }
+                else
+                {
+                    var baseDiscriminator = schema.BaseDiscriminator;
+                    baseDiscriminator?.AddMapping(type, schema);
+                }
             }
         }
 
-        private string TryGetInheritanceDiscriminator(Type type)
+        private object TryGetInheritanceDiscriminatorConverter(Type type)
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
 
-            dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo("JsonConverterAttribute", TypeNameStyle.Name);
+            dynamic jsonConverterAttribute = typeAttributes.TryGetIfAssignableTo(nameof(JsonConverterAttribute), TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "JsonInheritanceConverter")
+                if (converterType.IsAssignableTo(nameof(JsonInheritanceConverter), TypeNameStyle.Name))
                 {
-                    if (jsonConverterAttribute.ConverterParameters != null && jsonConverterAttribute.ConverterParameters.Length > 0)
-                        return jsonConverterAttribute.ConverterParameters[0];
-                    return JsonInheritanceConverter.DefaultDiscriminatorName;
+                    return jsonConverterAttribute.ConverterParameters != null && jsonConverterAttribute.ConverterParameters.Length > 0 ?
+                        Activator.CreateInstance(jsonConverterAttribute.ConverterType, jsonConverterAttribute.ConverterParameters) :
+                        Activator.CreateInstance(jsonConverterAttribute.ConverterType);
                 }
             }
+
             return null;
+        }
+
+        private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
+        {
+            if (ReflectionExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
+                return jsonInheritanceConverter.DiscriminatorName;
+
+            return JsonInheritanceConverter.DefaultDiscriminatorName;
         }
 
         private void LoadEnumerations(Type type, JsonSchema4 schema, JsonTypeDescription typeDescription)

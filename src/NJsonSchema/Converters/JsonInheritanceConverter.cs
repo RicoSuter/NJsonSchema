@@ -72,6 +72,9 @@ namespace NJsonSchema.Converters
             _baseType = baseType;
         }
 
+        /// <summary>Gets the discriminator property name.</summary>
+        public virtual string DiscriminatorName => _discriminator;
+
         /// <summary>Writes the JSON representation of the object.</summary>
         /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
@@ -83,7 +86,7 @@ namespace NJsonSchema.Converters
                 _isWriting = true;
 
                 var jObject = JObject.FromObject(value, serializer);
-                jObject.AddFirst(new JProperty(_discriminator, value.GetType().Name));
+                jObject.AddFirst(new JProperty(_discriminator, GetDiscriminatorValue(value.GetType())));
                 writer.WriteToken(jObject.CreateReader());
             }
             finally
@@ -157,7 +160,7 @@ namespace NJsonSchema.Converters
                 return null;
 
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
-            var subtype = GetObjectSubtype(jObject, objectType, discriminator);
+            var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
             try
             {
@@ -170,16 +173,29 @@ namespace NJsonSchema.Converters
             }
         }
 
-        private Type GetObjectSubtype(JObject jObject, Type objectType, string discriminator)
+        /// <summary>Gets the discriminator value for the given type.</summary>
+        /// <param name="type">The object type.</param>
+        /// <returns>The discriminator value.</returns>
+        public virtual string GetDiscriminatorValue(Type type)
         {
-            if (objectType.Name == discriminator)
+            return type.Name;
+        }
+
+        /// <summary>Gets the type for the given discriminator value.</summary>
+        /// <param name="jObject">The JSON object.</param>
+        /// <param name="objectType">The object (base) type.</param>
+        /// <param name="discriminatorValue">The discriminator value.</param>
+        /// <returns></returns>
+        protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
+        {
+            if (objectType.Name == discriminatorValue)
                 return objectType;
 
-            var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminator);
+            var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminatorValue);
             if (knownTypeAttributesSubtype != null)
                 return knownTypeAttributesSubtype;
 
-            var typeName = objectType.Namespace + "." + discriminator;
+            var typeName = objectType.Namespace + "." + discriminatorValue;
             var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
             if (subtype != null)
                 return subtype;
@@ -191,7 +207,7 @@ namespace NJsonSchema.Converters
                     return Type.GetType(typeInfo.Value<string>());
             }
 
-            throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminator + "'.");
+            throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
         private Type GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
@@ -222,6 +238,7 @@ namespace NJsonSchema.Converters
                 }
                 type = type.GetTypeInfo().BaseType;
             } while (type != null);
+
             return null;
         }
     }

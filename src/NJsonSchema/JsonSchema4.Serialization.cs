@@ -89,7 +89,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (JsonSchemaSerializationContext.CurrentSchemaType != SchemaType.Swagger2)
+                if (JsonSchemaSerialization.CurrentSchemaType != SchemaType.Swagger2)
                     return DiscriminatorObject;
                 else
                     return Discriminator;

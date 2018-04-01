@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
 using Xunit;
@@ -83,6 +84,20 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.Equal("null for the default Record.", summary);
+        }
+
+        [Fact]
+        public async Task When_xml_doc_is_missing_then_summary_is_missing()
+        {
+            //// Arrange
+
+
+            //// Act
+            var summary = await typeof(Point).GetXmlSummaryAsync();
+            var summary2 = await typeof(Point).GetXmlSummaryAsync();
+
+            //// Assert
+            Assert.Empty(summary);
         }
     }
 }

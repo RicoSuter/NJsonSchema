@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using Xunit;
 
@@ -33,7 +33,6 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             //// Act
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.Swagger2; // will be ignored
             var json = schema.ToJson();
 
             //// Assert
@@ -83,8 +82,7 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             //// Act
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.Swagger2;
-            var json = JsonConvert.SerializeObject(schema, Formatting.Indented);
+            var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, new DefaultContractResolver());
 
             //// Assert
             Assert.Contains(@"""discriminator"": ""discr""", json);
