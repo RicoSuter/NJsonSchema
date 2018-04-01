@@ -188,27 +188,10 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
+            var schemaType = SchemaType.JsonSchema;
+            var contractResolver = CreateJsonSerializerContractResolver(schemaType);
 
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema),
-                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            };
-
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
-            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, settings);
-            schema.DocumentPath = documentPath;
-
-            var referenceResolver = referenceResolverFactory(schema);
-            if (!string.IsNullOrEmpty(documentPath))
-                referenceResolver.AddDocumentReference(documentPath, schema);
-
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver).ConfigureAwait(false);
-            return schema;
+            return await JsonSchemaSerialization.FromJsonAsync(data, schemaType, documentPath, referenceResolverFactory, contractResolver);
         }
 
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
@@ -219,6 +202,7 @@ namespace NJsonSchema
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
+
             return schema;
         }
 
@@ -328,7 +312,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the description. </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Description { get; set; }
+        public virtual string Description { get; set; }
 
         /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
@@ -717,20 +701,14 @@ namespace NJsonSchema
         public string ToJson()
         {
             var oldSchema = SchemaVersion;
-
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var contractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
-
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
-            var json = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver
-            });
+            var schemaType = SchemaType.JsonSchema;
+            var contractResolver = CreateJsonSerializerContractResolver(schemaType);
+            var json = JsonSchemaSerialization.ToJson(this, schemaType, contractResolver);
 
             SchemaVersion = oldSchema;
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+            return json;
         }
 
         ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>
