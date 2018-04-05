@@ -37,7 +37,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             Properties = _schema.ActualProperties.Values
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
-                .ToList();
+                .ToArray();
+
+            if (HasInheritance)
+            {
+                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
+                AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
+            }
+            else
+                AllProperties = Properties;
         }
 
         /// <summary>Gets or sets the class name.</summary>
@@ -57,6 +65,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the property models.</summary>
         public IEnumerable<PropertyModel> Properties { get; }
+
+        /// <summary>Gets the property models with inherited properties.</summary>
+        public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
@@ -89,6 +100,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
+
+        /// <summary>Base class model </summary>
+        public ClassTemplateModel BaseClass { get; }
 
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
         public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");

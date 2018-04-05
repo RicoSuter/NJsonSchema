@@ -190,6 +190,17 @@ namespace NJsonSchema.CodeGeneration
             {
                 return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
             }
+
+            public static IEnumerable<object> Concat(Context context, IEnumerable<object> input, IEnumerable<object> concat)
+            {
+                return input.Concat(concat ?? Enumerable.Empty<object>()).ToList();
+            }
+
+            public static IEnumerable<object> Empty(Context context, object input)
+            {
+                return Enumerable.Empty<object>();
+            }
+
         }
 
         internal class TemplateTag : Tag

@@ -40,8 +40,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             });
         }
 
-        /// <summary>Gets or sets the .NET namespace of the generated types.</summary>
-        public string Namespace { get; set; }
+        /// <summary>Gets or sets the .NET namespace of the generated types. (default: System)</summary>
+        public string Namespace { get; set; } = "System";
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
         /// (sets Required.Always when the property is required) (default: true).</summary>
