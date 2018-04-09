@@ -102,7 +102,11 @@ namespace NJsonSchema.Generation
             get
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default && ContractResolver != null)
-                    throw new InvalidOperationException("The settingsDefaultPropertyNameHandling and ContractResolver cannot be used at the same time.");
+                {
+                    throw new InvalidOperationException("The settings DefaultPropertyNameHandling and ContractResolver cannot be used at the same time " +
+                                                        "(set DefaultPropertyNameHandling to Default when using a custom ContractResolver and change the " +
+                                                        "property name handling on the custom ContractResolver).");
+                }
 
                 if (ContractResolver != null)
                     return ContractResolver;
