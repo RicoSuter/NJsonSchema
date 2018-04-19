@@ -50,10 +50,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasAdditionalPropertiesType => _schema.AdditionalPropertiesSchema != null;
 
         /// <summary>Gets the type of the additional properties.</summary>
-        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
-            _schema.AdditionalPropertiesSchema,
-            _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
-            string.Empty) : null;
+        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
+        //public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
+        //    _schema.AdditionalPropertiesSchema,
+        //    _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
+        //    string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
         public IEnumerable<PropertyModel> Properties { get; }
@@ -89,6 +90,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
+
+        /// <summary>Gets a value indicating whether the class inherits from exception.</summary>
+        public bool InheritsExceptionSchema => _resolver.ExceptionSchema != null &&
+                                               _schema?.InheritsSchema(_resolver.ExceptionSchema) == true;
 
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
         public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");

@@ -151,11 +151,15 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
     }
 {% if GenerateCloneMethod -%}
 
-    clone() {
+    clone(): {{ ClassName }} {
+{%   if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%   else -%}
         const json = this.toJSON();
         let result = new {{ ClassName }}();
         result.init(json);
         return result;
+{%   endif -%}
     }
 {% endif -%}
 }

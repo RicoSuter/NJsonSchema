@@ -8,6 +8,9 @@
 {% endfor -%}
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{% if InheritsExceptionSchema -%}
+[Newtonsoft.Json.JsonObjectAttribute]
+{% endif -%}
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
