@@ -6,12 +6,15 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Newtonsoft.Json;
+
 namespace NJsonSchema
 {
     /// <summary>Provides a property to get a documents path or base URI.</summary>
     public interface IDocumentPathProvider
     {
         /// <summary>Gets the document path (URI or file path).</summary>
-        string DocumentPath { get; }
+        [JsonIgnore]
+        string DocumentPath { get; set; }
     }
 }
