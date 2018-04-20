@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }
 
-        /// <summary>sets the access modifier of set properties pf generated generated classes (default: '').</summary>
+        /// <summary>Gets the access modifier of property setters (default: '').</summary>
         public string SetPropertyTypeAccessModifier { get; set; }
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
