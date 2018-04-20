@@ -31,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
             TypeAccessModifier = "public";
-            SetPropertyTypeAccessModifier = string.Empty;
+            PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = true;
 
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string TypeAccessModifier { get; set; }
 
         /// <summary>Gets the access modifier of property setters (default: '').</summary>
-        public string SetPropertyTypeAccessModifier { get; set; }
+        public string PropertySetterAccessModifier { get; set; }
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
         public string[] JsonConverters { get; set; }
