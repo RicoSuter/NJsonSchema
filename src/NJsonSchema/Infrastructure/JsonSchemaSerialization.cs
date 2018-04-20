@@ -81,8 +81,8 @@ namespace NJsonSchema.Infrastructure
             };
 
             var schema = JsonConvert.DeserializeObject<T>(json, settings);
-            if (schema is IJsonReferenceBase referenceSchemaBase)
-                referenceSchemaBase.DocumentPath = documentPath;
+            if (schema is IDocumentPathProvider documentPathProvider)
+                documentPathProvider.DocumentPath = documentPath;
 
             var referenceResolver = referenceResolverFactory.Invoke(schema);
             if (schema is IJsonReference referenceSchema)
