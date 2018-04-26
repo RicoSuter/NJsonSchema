@@ -32,7 +32,7 @@ CI NuGet Feed: https://www.myget.org/gallery/njsonschema-ci
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 - Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
-- Supports JSON Schema, Swagger and OpenAPI schemas
+- Supports JSON Schema, Swagger and OpenAPI DTO schemas
 
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
 
