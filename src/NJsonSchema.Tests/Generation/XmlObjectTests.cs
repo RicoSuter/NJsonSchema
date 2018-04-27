@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using System.Xml.Serialization;
+﻿using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -14,6 +14,7 @@ namespace NJsonSchema.Tests.Generation
         private const string DoubleArray = "DoubleArray";
         private const string DecimalArray = "DecimalArray";
         private const string InternalItemArray = "InternalItem";
+        private const string ShouldBeThisPropertyName = "ShouldBeThisPropertyName";
         private const string Foo = "Foo";
 
         public class WithoutXmlAttributesDefined
@@ -25,7 +26,15 @@ namespace NJsonSchema.Tests.Generation
             public decimal[] DecimalArray { get; set; }
             public WithoutXmlAttributeItem[] InternalItem { get; set; }
 
+            public WithXmlAttribute ShouldBeThisPropertyName { get; set; }
+
             public class WithoutXmlAttributeItem
+            {
+                public string Name { get; set; }
+            }
+
+            [XmlType("ShouldNOTBeThis")]
+            public class WithXmlAttribute
             {
                 public string Name { get; set; }
             }
@@ -42,7 +51,7 @@ namespace NJsonSchema.Tests.Generation
                 testObject.DoubleArray = new double[] { 1 };
                 testObject.DecimalArray = new decimal[] { 1 };
                 testObject.InternalItem = new[] { new WithoutXmlAttributesDefined.WithoutXmlAttributeItem() { Name = "Test" } };
-
+                testObject.ShouldBeThisPropertyName = new WithXmlAttribute(){Name="Test2"};
                 var sio = new System.IO.StringWriter();
                 serializer.Serialize(sio, testObject);
                 return sio.ToString();
@@ -70,6 +79,9 @@ namespace NJsonSchema.Tests.Generation
              *   <Name>Test</Name>
              *  </WithoutXmlAttributeItem>
              * </InternalItem>
+             * <ShouldBeThisPropertyName>
+             *  <Name>Test2</Name>
+             * </ShouldBeThisPropertyName>
              *</WithoutXmlAttributesDefined>
             */
         }
@@ -88,6 +100,7 @@ namespace NJsonSchema.Tests.Generation
             var doubleArrayProperty = schema.Properties[DoubleArray];
             var decimalArrayProperty = schema.Properties[DecimalArray];
             var internalItemProperty = schema.Properties[InternalItemArray];
+            var shouldBeThisNameProperty = schema.Properties[ShouldBeThisPropertyName];
 
             Assert.Null(internalItemProperty.Xml.Name);
             Assert.Null(stringArrayProperty.Xml.Name);
@@ -108,6 +121,9 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(typeof(double).Name, doubleArrayProperty.Item.Xml.Name);
             Assert.Equal(typeof(decimal).Name, decimalArrayProperty.Item.Xml.Name);
             Assert.NotNull(internalItemProperty.Item.Xml);
+            //https://github.com/swagger-api/swagger-ui/issues/2610
+            Assert.NotNull(shouldBeThisNameProperty.Xml); // Make sure that type reference properties have an xml object
+            Assert.Equal(shouldBeThisNameProperty.Name, shouldBeThisNameProperty.Xml.Name); // Make sure that the property name and the xml name is the same
         }
 
         [Fact]
