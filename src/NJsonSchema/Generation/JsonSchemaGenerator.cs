@@ -688,7 +688,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    var baseDiscriminator = schema.BaseDiscriminator;
+                    var baseDiscriminator = schema.DiscriminatorObject;
                     baseDiscriminator?.AddMapping(type, schema);
                 }
             }

@@ -95,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class inherits from exception.</summary>
         public bool InheritsExceptionSchema => _resolver.ExceptionSchema != null &&
-                                               _schema?.InheritsSchema(_resolver.ExceptionSchema) == true;
+                                               _schema?.InheritsSchema(_resolver.ExceptionSchema, _rootObject) == true;
 
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
         public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");

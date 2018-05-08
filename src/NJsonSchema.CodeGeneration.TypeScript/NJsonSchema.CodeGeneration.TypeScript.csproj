@@ -34,12 +34,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="NJsonSchema">
-      <Version>9.10.37</Version>
-    </PackageReference>
-    <PackageReference Include="NJsonSchema.CodeGeneration">
-      <Version>9.10.37</Version>
-    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
+    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
