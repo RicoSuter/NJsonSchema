@@ -8,6 +8,9 @@
 {% endfor -%}
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{% if InheritsExceptionSchema -%}
+[Newtonsoft.Json.JsonObjectAttribute]
+{% endif -%}
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
@@ -52,7 +55,7 @@
         get { return {{ property.FieldName }}; }
 {%     if property.HasSetter -%}
 {%         if RenderInpc -%}
-        set 
+        {{PropertySetterAccessModifier}}set 
         {
             if ({{ property.FieldName }} != value)
             {
@@ -61,7 +64,7 @@
             }
         }
 {%         else -%}
-        set { SetProperty(ref {{ property.FieldName }}, value); }
+        {{PropertySetterAccessModifier}}set { SetProperty(ref {{ property.FieldName }}, value); }
 {%         endif -%}
 {%     endif -%}
     }
@@ -75,7 +78,7 @@
     public System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> AdditionalProperties
     {
         get { return _additionalProperties; }
-        set { _additionalProperties = value; }
+        {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
     }
 {% endif -%}
 {% if GenerateJsonMethods -%}

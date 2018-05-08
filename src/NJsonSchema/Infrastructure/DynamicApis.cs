@@ -8,6 +8,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -62,7 +63,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsHttpClientApis)
                 throw new NotSupportedException("The System.Net.Http.HttpClient API is not available on this platform.");
 
-            using (dynamic client = (IDisposable) Activator.CreateInstance(HttpClientType))
+            using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType))
             {
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
@@ -78,7 +79,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
-            return Task.Factory.StartNew(() => (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { }));
+            return FromResult((string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { }));
         }
 
         /// <summary>Gets the files of the given directory.</summary>
@@ -91,7 +92,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
-            return Task.Factory.StartNew(() => (string[])DirectoryType.GetRuntimeMethod("GetFiles", 
+            return FromResult((string[])DirectoryType.GetRuntimeMethod("GetFiles",
                 new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { directory, filter }));
         }
 
@@ -103,7 +104,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
-            return Task.Factory.StartNew(() => DirectoryType.GetRuntimeMethod("CreateDirectory", 
+            return FromResult(DirectoryType.GetRuntimeMethod("CreateDirectory",
                 new[] { typeof(string) }).Invoke(null, new object[] { directory }));
         }
 
@@ -119,7 +120,7 @@ namespace NJsonSchema.Infrastructure
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            return await Task.Factory.StartNew(() => (bool)DirectoryType.GetRuntimeMethod("Exists", 
+            return await FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
                 new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
         }
 
@@ -135,7 +136,7 @@ namespace NJsonSchema.Infrastructure
             if (string.IsNullOrEmpty(filePath))
                 return false;
 
-            return await Task.Factory.StartNew(() => (bool)FileType.GetRuntimeMethod("Exists", 
+            return await FromResult((bool)FileType.GetRuntimeMethod("Exists",
                 new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
         }
 
@@ -148,7 +149,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
-            return Task.Factory.StartNew(() =>(string)FileType.GetRuntimeMethod("ReadAllText", 
+            return Task.Factory.StartNew(() => (string)FileType.GetRuntimeMethod("ReadAllText",
                 new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 }));
         }
 
@@ -162,7 +163,7 @@ namespace NJsonSchema.Infrastructure
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
-            return Task.Factory.StartNew(() => FileType.GetRuntimeMethod("WriteAllText",
+            return FromResult(FileType.GetRuntimeMethod("WriteAllText",
                 new[] { typeof(string), typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, text, Encoding.UTF8 }));
         }
 
@@ -175,7 +176,7 @@ namespace NJsonSchema.Infrastructure
         {
             if (!SupportsPathApis)
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
-            
+
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
         }
 
@@ -200,9 +201,22 @@ namespace NJsonSchema.Infrastructure
         {
             if (!SupportsXPathApis)
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
-            
+
             return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
         }
+
+#if LEGACY
+        private static async Task<T> FromResult<T>(T result)
+        {
+            return result;
+        }
+#else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Task<T> FromResult<T>(T result)
+        {
+            return Task.FromResult(result);
+        }
+#endif
 
         private static Type TryLoadType(params string[] typeNames)
         {

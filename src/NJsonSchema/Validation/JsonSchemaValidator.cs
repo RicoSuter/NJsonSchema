@@ -184,8 +184,24 @@ namespace NJsonSchema.Validation
                     {
                         if (schema.Format == JsonFormatStrings.DateTime)
                         {
-                            DateTime dateTimeResult;
-                            if (token.Type != JTokenType.Date && DateTime.TryParse(value, out dateTimeResult) == false)
+                            var acceptableFormats = new string[] {
+                                "yyyy-MM-dd'T'HH:mm:ss.FFFK",
+                                "yyyy-MM-dd' 'HH:mm:ss.FFFK",
+                                "yyyy-MM-dd'T'HH:mm:ssK",
+                                "yyyy-MM-dd' 'HH:mm:ssK",
+                                "yyyy-MM-dd'T'HH:mm:ss",
+                                "yyyy-MM-dd' 'HH:mm:ss",
+                                "yyyy-MM-dd'T'HH:mm",
+                                "yyyy-MM-dd' 'HH:mm",
+                                "yyyy-MM-dd'T'HH",
+                                "yyyy-MM-dd' 'HH",
+                                "yyyy-MM-dd",
+                                "yyyy-MM-dd",
+                                "yyyyMMdd",
+                                "yyyy-MM",
+                                "yyyy" };
+                            DateTimeOffset dateTimeResult;
+                            if (token.Type != JTokenType.Date && DateTimeOffset.TryParseExact(value, acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTimeResult) == false)
                                 errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath, token, schema));
                         }
 
