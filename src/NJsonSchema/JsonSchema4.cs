@@ -24,6 +24,10 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema4 : IDocumentPathProvider
     {
+        private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
+        private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
+            () => CreateJsonSerializerContractResolver(SerializationSchemaType));
+
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
@@ -188,10 +192,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            var schemaType = SchemaType.JsonSchema;
-            var contractResolver = CreateJsonSerializerContractResolver(schemaType);
-
-            return await JsonSchemaSerialization.FromJsonAsync(data, schemaType, documentPath, referenceResolverFactory, contractResolver);
+            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value);
         }
 
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
@@ -703,9 +704,7 @@ namespace NJsonSchema
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var schemaType = SchemaType.JsonSchema;
-            var contractResolver = CreateJsonSerializerContractResolver(schemaType);
-            var json = JsonSchemaSerialization.ToJson(this, schemaType, contractResolver);
+            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value);
 
             SchemaVersion = oldSchema;
             return json;

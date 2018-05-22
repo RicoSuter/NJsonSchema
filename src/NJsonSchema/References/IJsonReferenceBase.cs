@@ -11,12 +11,8 @@ using Newtonsoft.Json;
 namespace NJsonSchema.References
 {
     /// <summary>A JSON object which may reference other objects with $ref.</summary>
-    public interface IJsonReferenceBase
+    public interface IJsonReferenceBase : IDocumentPathProvider
     {
-        /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
-        [JsonIgnore]
-        string DocumentPath { get; set; }
-
         /// <summary>Gets or sets the type reference path ($ref). </summary>
         [JsonProperty(JsonPathUtilities.ReferenceReplaceString, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         string ReferencePath { get; set; }

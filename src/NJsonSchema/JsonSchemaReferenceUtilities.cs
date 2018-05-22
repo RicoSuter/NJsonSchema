@@ -19,13 +19,21 @@ namespace NJsonSchema
     /// <summary>Provides utilities to resolve and set JSON schema references.</summary>
     public static class JsonSchemaReferenceUtilities
     {
-        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the 
+        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
         /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
-        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver)
+        public static Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver) =>
+            UpdateSchemaReferencesAsync(rootObject, referenceResolver, new DefaultContractResolver());
+
+        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
+        /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
+        /// <param name="referenceResolver">The JSON document resolver.</param>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
         {
-            var updater = new JsonReferenceUpdater(rootObject, referenceResolver);
+            var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
             await updater.VisitAsync(rootObject).ConfigureAwait(false);
         }
 
@@ -78,7 +86,8 @@ namespace NJsonSchema
             private readonly JsonReferenceResolver _referenceResolver;
             private bool _replaceRefsRound;
 
-            public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver)
+            public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
+                : base(contractResolver)
             {
                 _rootObject = rootObject;
                 _referenceResolver = referenceResolver;

@@ -81,8 +81,8 @@ namespace NJsonSchema.Infrastructure
             };
 
             var schema = JsonConvert.DeserializeObject<T>(json, settings);
-            if (schema is IJsonReferenceBase referenceSchemaBase)
-                referenceSchemaBase.DocumentPath = documentPath;
+            if (schema is IDocumentPathProvider documentPathProvider)
+                documentPathProvider.DocumentPath = documentPath;
 
             var referenceResolver = referenceResolverFactory.Invoke(schema);
             if (schema is IJsonReference referenceSchema)
@@ -91,7 +91,7 @@ namespace NJsonSchema.Infrastructure
                     referenceResolver.AddDocumentReference(documentPath, referenceSchema);
             }
 
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver).ConfigureAwait(false);
+            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);
             return schema;
         }
     }

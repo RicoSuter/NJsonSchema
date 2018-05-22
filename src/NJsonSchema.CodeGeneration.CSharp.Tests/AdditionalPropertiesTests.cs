@@ -38,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> AdditionalProperties", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
         }
     }
 }

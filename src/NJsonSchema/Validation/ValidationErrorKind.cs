@@ -138,6 +138,9 @@ namespace NJsonSchema.Validation
         TooFewProperties,
 
         /// <summary>A Base64 string is expected. </summary>
-        Base64Expected
+        Base64Expected,
+
+        /// <summary>No type of the types does validate (check error details in <see cref="MultiTypeValidationError"/>). </summary>
+        NoTypeValidates
     }
 }

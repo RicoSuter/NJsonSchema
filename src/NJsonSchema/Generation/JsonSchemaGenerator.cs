@@ -6,20 +6,20 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.Generation.TypeMappers;
+using NJsonSchema.Infrastructure;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation
 {
@@ -331,7 +331,7 @@ namespace NJsonSchema.Generation
 
         private async Task ApplySchemaProcessorsAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(type, schema, schemaResolver, this);
+            var context = new SchemaProcessorContext(type, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
 
@@ -786,7 +786,7 @@ namespace NJsonSchema.Generation
                     propertyType, propertyAttributes, isNullable, schemaResolver, async (p, s) =>
                     {
                         if (Settings.GenerateXmlObjects)
-                            p.GenerateXmlObjectForProperty(parentType, propertyName, propertyAttributes);
+                            p.GenerateXmlObjectForProperty(propertyType, propertyName, propertyAttributes);
 
                         if (Settings.SchemaType == SchemaType.JsonSchema &&
                             hasRequiredAttribute &&
