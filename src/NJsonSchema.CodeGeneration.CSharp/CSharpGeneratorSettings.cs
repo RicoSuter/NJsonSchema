@@ -34,6 +34,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = true;
 
+            ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
             {

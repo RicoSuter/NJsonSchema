@@ -14,16 +14,13 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>Converts the default value to a language specific identifier.</summary>
     public abstract class ValueGeneratorBase
     {
-        private readonly TypeResolverBase _typeResolver;
-        private readonly IEnumNameGenerator _enumNameGenerator;
+        private readonly CodeGeneratorSettingsBase _settings;
 
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
-        /// <param name="typeResolver">The type typeResolver.</param>
-        /// <param name="enumNameGenerator">The enum name generator.</param>
-        protected ValueGeneratorBase(TypeResolverBase typeResolver, IEnumNameGenerator enumNameGenerator)
+        /// <param name="settings">The settings.</param>
+        protected ValueGeneratorBase(CodeGeneratorSettingsBase settings)
         {
-            _typeResolver = typeResolver;
-            _enumNameGenerator = enumNameGenerator;
+            _settings = settings;
         }
 
         /// <summary>Gets the default value code.</summary>
@@ -32,15 +29,16 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="targetType">The type of the target.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault)
+        public virtual string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             if (schema.Default == null || !useSchemaDefault)
                 return null;
 
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
-                return GetEnumDefaultValue(schema, actualSchema, typeNameHint);
+                return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
 
             if (schema.Type.HasFlag(JsonObjectType.String))
                 return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
@@ -64,17 +62,18 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="actualSchema">The actual schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The enum default value.</returns>
-        protected virtual string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint)
+        protected virtual string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint, TypeResolverBase typeResolver)
         {
-            var typeName = _typeResolver.Resolve(actualSchema, false, typeNameHint);
+            var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
             var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
             var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
                 ? actualSchema.EnumerationNames.ElementAt(index)
                 : schema.Default.ToString();
 
-            return typeName + "." + _enumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+            return typeName + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }
 
         /// <summary>Converts a number to its string representation.</summary>

@@ -32,13 +32,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var valueGenerator = new TypeScriptValueGenerator(parameters.Resolver, parameters.Settings);
+            var valueGenerator = parameters.Settings.ValueGenerator;
 
             var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
             var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
                 ? valueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
                     parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.SchemaType), dictionaryValueType, parameters.TypeNameHint,
-                    parameters.Settings.GenerateDefaultValues)
+                    parameters.Settings.GenerateDefaultValues, parameters.Resolver)
                 : null;
 
             return new
@@ -49,9 +49,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Value = parameters.Value,
 
                 HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
-                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues) != null,
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
                 DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
-                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues),
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 

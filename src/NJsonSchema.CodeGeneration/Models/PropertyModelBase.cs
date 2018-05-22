@@ -15,23 +15,24 @@ namespace NJsonSchema.CodeGeneration.Models
     {
         private readonly ClassTemplateModelBase _classTemplateModel;
         private readonly JsonProperty _property;
+        private readonly TypeResolverBase _typeResolver;
         private readonly CodeGeneratorSettingsBase _settings;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModelBase"/> class.</summary>
         /// <param name="property">The property.</param>
         /// <param name="classTemplateModel">The class template model.</param>
-        /// <param name="valueGenerator">The default value generator.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
         protected PropertyModelBase(
             JsonProperty property,
             ClassTemplateModelBase classTemplateModel,
-            ValueGeneratorBase valueGenerator,
+            TypeResolverBase typeResolver,
             CodeGeneratorSettingsBase settings)
         {
             _classTemplateModel = classTemplateModel;
             _property = property;
-            ValueGenerator = valueGenerator;
             _settings = settings;
+            _typeResolver = typeResolver;
 
             PropertyName = _settings.PropertyNameGenerator.Generate(_property);
         }
@@ -43,11 +44,11 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string Type { get; }
 
         /// <summary>Gets the default value generator.</summary>
-        public ValueGeneratorBase ValueGenerator { get; }
+        public ValueGeneratorBase ValueGenerator => _settings.ValueGenerator;
 
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => ValueGenerator.GetDefaultValue(_property, 
-            _property.IsNullable(_settings.SchemaType), Type, _property.Name, _settings.GenerateDefaultValues);
+        public string DefaultValue => ValueGenerator.GetDefaultValue(_property,
+            _property.IsNullable(_settings.SchemaType), Type, _property.Name, _settings.GenerateDefaultValues, _typeResolver);
 
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }

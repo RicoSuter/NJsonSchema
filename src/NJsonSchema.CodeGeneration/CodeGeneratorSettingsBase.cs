@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
         public bool GenerateDefaultValues { get; set; }
-        
+
         /// <summary>Gets or sets the excluded type names (must be defined in an import or other namespace).</summary>
         public string[] ExcludedTypeNames { get; set; }
 
@@ -47,5 +47,8 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets the template directory path.</summary>
         public string TemplateDirectory { get; set; }
+
+        /// <summary>Gets or sets the output language specific value generator.</summary>
+        public ValueGeneratorBase ValueGenerator { get; set; }
     }
 }

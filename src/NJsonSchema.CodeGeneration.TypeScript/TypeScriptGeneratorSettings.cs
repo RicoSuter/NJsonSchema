@@ -28,6 +28,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             GenerateConstructorInterface = true;
             ConvertConstructorInterfaceData = false;
 
+            ValueGenerator = new TypeScriptValueGenerator(this);
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
             {
