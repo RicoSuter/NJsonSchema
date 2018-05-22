@@ -1520,8 +1520,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains      (@"public string Street { get; }",      output);
             Assert.DoesNotContain(@"public string Street { get; set; }", output);
 
-            Assert.Contains("public Address(string street, string city)", output);
-            Assert.Contains("public Address(string street, string city)", output);
+            Assert.Contains("public Address(string city, string street)", output);
         
             AssertCompile(output);
         }
@@ -1571,7 +1570,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.DoesNotContain(@"public string City { get; } =",    output);
             Assert.DoesNotContain(@"public string City { get; set; }", output);
 
-            Assert.Contains("protected AbstractAddress(string streetName, string city = \"Innsmouth\")", output);
+            Assert.Contains("protected AbstractAddress(string city, string streetName)", output);
 
             AssertCompile(output);
         }
@@ -1591,13 +1590,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var output = generator.GenerateFile("PersonAddress");
 
-            Assert.Contains("protected AbstractAddress(string streetName, string city = \"Innsmouth\")", output);
+            Assert.Contains("protected AbstractAddress(string city, string streetName)", output);
             
-            Assert.Contains("public PostAddress(string zip, int houseNumber, string streetName, string city = \"Innsmouth\")", output);
-            Assert.Contains(":base(streetName, city)", output);
+            Assert.Contains("public PostAddress(string city, int houseNumber, string streetName, string zip)", output);
+            Assert.Contains(":base(city, streetName)", output);
 
-            Assert.Contains("public PersonAddress(string addressee, string zip, int houseNumber, string streetName, string city = \"Innsmouth\")", output);
-            Assert.Contains(":base(zip, houseNumber, streetName, city)", output);
+            Assert.Contains("public PersonAddress(string addressee, string city, int houseNumber, string streetName, string zip)", output);
+            Assert.Contains(":base(city, houseNumber, streetName, zip)", output);
 
             AssertCompile(output);
         }
