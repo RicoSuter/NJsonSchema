@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
+using NJsonSchema.References;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema
@@ -220,7 +221,7 @@ namespace NJsonSchema
             get
             {
                 var properties = Properties
-                    .Union(AllOf.Where(s => s.ActualSchema != this.GetInheritedSchema(null))
+                    .Union(AllOf.Where(s => s.ActualSchema != this.GetInheritedSchema(((IJsonReference)this).PossibleRoot))
                     .SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToList();
 
