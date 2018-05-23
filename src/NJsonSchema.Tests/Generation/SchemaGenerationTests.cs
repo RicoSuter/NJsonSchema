@@ -132,6 +132,26 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(!string.IsNullOrEmpty(json));
         }
 
+        public class FilterDto
+        {
+            public long FieldId { get; set; }
+
+            public object Value { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_is_object_then_it_should_not_be_a_dictonary_but_any()
+        {
+            /// Act
+            var schema = await JsonSchema4.FromTypeAsync<FilterDto>();
+            var json = schema.ToJson();
+
+            /// Assert
+            var property = schema.Properties["Value"].ActualTypeSchema;
+            Assert.True(property.IsAnyType);
+            Assert.False(property.IsDictionary);
+        }
+
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
 
         //public class TestClass
