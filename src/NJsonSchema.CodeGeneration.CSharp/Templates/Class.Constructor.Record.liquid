@@ -12,7 +12,7 @@
 {% if IsAbstract %}protected{% else %}public{% endif %} {{ClassName}}({% for property in sortedProperties -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%} {{ property.Type }} {{ property.Name | lowercamelcase }}{% endfor -%})
 {% assign skipComma = true -%}
 {% if HasInheritance -%}
-    :base({% for property in sortedParentProperties -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}{{ property.Name | lowercamelcase }}{% endfor -%})
+    : base({% for property in sortedParentProperties -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}{{ property.Name | lowercamelcase }}{% endfor -%})
 {% endif -%}
 {
 {% for property in Properties -%}
