@@ -1588,10 +1588,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains("protected AbstractAddress(string city, string streetName)", output);
 
             Assert.Contains("public PostAddress(string city, int houseNumber, string streetName, string zip)", output);
-            Assert.Contains(":base(city, streetName)", output);
+            Assert.Contains(": base(city, streetName)", output);
 
             Assert.Contains("public PersonAddress(string addressee, string city, int houseNumber, string streetName, string zip)", output);
-            Assert.Contains(":base(city, houseNumber, streetName, zip)", output);
+            Assert.Contains(": base(city, houseNumber, streetName, zip)", output);
 
             AssertCompile(output);
         }
