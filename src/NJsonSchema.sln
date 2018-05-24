@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Yaml", "NJsonSc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Demo.Performance", "NJsonSchema.Demo.Performance\NJsonSchema.Demo.Performance.csproj", "{75B834E0-1F0D-4BC2-911D-5CF079BCE73B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Benchmark", "NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj", "{E59CE32B-181F-4AAE-BF62-772AEEFC3177}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,22 @@ Global
 		{75B834E0-1F0D-4BC2-911D-5CF079BCE73B}.Release|x64.Build.0 = Release|Any CPU
 		{75B834E0-1F0D-4BC2-911D-5CF079BCE73B}.Release|x86.ActiveCfg = Release|Any CPU
 		{75B834E0-1F0D-4BC2-911D-5CF079BCE73B}.Release|x86.Build.0 = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|x64.Build.0 = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Debug|x86.Build.0 = Debug|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|ARM.Build.0 = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|x64.ActiveCfg = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|x64.Build.0 = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|x86.ActiveCfg = Release|Any CPU
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -202,6 +220,7 @@ Global
 		{974ED050-4A34-4513-8048-139B1AF1A95D} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{E767A007-6007-4898-B80A-FE4ACBF2C588} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 		{75B834E0-1F0D-4BC2-911D-5CF079BCE73B} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
+		{E59CE32B-181F-4AAE-BF62-772AEEFC3177} = {785552E3-F3BB-4AEB-B5CF-819AE38AEA8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9D5EDC80-5611-493B-804B-8B364816952B}

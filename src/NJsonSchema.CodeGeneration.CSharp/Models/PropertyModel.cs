@@ -21,14 +21,18 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
         /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="property">The property.</param>
-        /// <param name="resolver">The resolver.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
-        public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(property, classTemplateModel, new CSharpValueGenerator(resolver, settings), settings)
+        public PropertyModel(
+            ClassTemplateModel classTemplateModel,
+            JsonProperty property,
+            CSharpTypeResolver typeResolver,
+            CSharpGeneratorSettings settings)
+            : base(property, classTemplateModel, typeResolver, settings)
         {
             _property = property;
             _settings = settings;
-            _resolver = resolver;
+            _resolver = typeResolver;
         }
 
         /// <summary>Gets the name of the property.</summary>

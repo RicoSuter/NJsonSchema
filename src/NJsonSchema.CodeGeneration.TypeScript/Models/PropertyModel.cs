@@ -26,13 +26,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="property">The property.</param>
         /// <param name="parentTypeName">Name of the parent type.</param>
-        /// <param name="resolver">The resolver.</param>
+        /// <param name="typeResolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
-        public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, classTemplateModel, new TypeScriptValueGenerator(resolver, settings), settings)
+        public PropertyModel(
+            ClassTemplateModel classTemplateModel,
+            JsonProperty property, string parentTypeName,
+            TypeScriptTypeResolver typeResolver,
+            TypeScriptGeneratorSettings settings)
+            : base(property, classTemplateModel, typeResolver, settings)
         {
             _property = property;
-            _resolver = resolver;
+            _resolver = typeResolver;
             _parentTypeName = parentTypeName;
             _settings = settings;
         }
@@ -74,7 +78,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 }
 
-                return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema) && 
+                return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema) &&
                     !_property.ActualTypeSchema.IsTuple;
             }
         }

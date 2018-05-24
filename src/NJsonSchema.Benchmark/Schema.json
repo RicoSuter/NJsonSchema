@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "some_property": {
+      "description": "Example property",
+      "type": "string",
+      "maxLength": 64
+    }
+  }
+}

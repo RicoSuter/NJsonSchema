@@ -91,7 +91,7 @@ namespace NJsonSchema.Infrastructure
                     referenceResolver.AddDocumentReference(documentPath, referenceSchema);
             }
 
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver).ConfigureAwait(false);
+            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);
             return schema;
         }
     }
