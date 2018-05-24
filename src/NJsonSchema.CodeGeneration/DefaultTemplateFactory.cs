@@ -200,7 +200,6 @@ namespace NJsonSchema.CodeGeneration
             {
                 return Enumerable.Empty<object>();
             }
-
         }
 
         internal class TemplateTag : Tag
