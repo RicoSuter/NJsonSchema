@@ -34,7 +34,6 @@ namespace NJsonSchema.CodeGeneration.Models
             _settings = settings;
             _typeResolver = typeResolver;
 
-            ValueGenerator = valueGenerator;
             PropertyName = _settings.PropertyNameGenerator.Generate(_property);
         }
 
