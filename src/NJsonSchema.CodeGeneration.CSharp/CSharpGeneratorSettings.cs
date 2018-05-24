@@ -16,6 +16,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            Namespace = "MyNamespace";
+
             DateType = "System.DateTime";
             DateTimeType = "System.DateTime";
             TimeType = "System.TimeSpan";
@@ -42,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             });
         }
 
-        /// <summary>Gets or sets the .NET namespace of the generated types.</summary>
+        /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
         public string Namespace { get; set; }
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
