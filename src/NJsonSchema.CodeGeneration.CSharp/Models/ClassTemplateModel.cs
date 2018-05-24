@@ -102,7 +102,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
-        /// <summary>Base class model </summary>
+        /// <summary>Gets the base class model.</summary>
         public ClassTemplateModel BaseClass { get; }
 
         /// <summary>Gets a value indicating whether the class inherits from exception.</summary>

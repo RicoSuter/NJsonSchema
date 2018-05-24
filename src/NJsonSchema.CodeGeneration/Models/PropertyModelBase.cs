@@ -30,20 +30,20 @@ namespace NJsonSchema.CodeGeneration.Models
         {
             _classTemplateModel = classTemplateModel;
             _property = property;
-            ValueGenerator = valueGenerator;
             _settings = settings;
 
+            ValueGenerator = valueGenerator;
             PropertyName = _settings.PropertyNameGenerator.Generate(_property);
         }
-
-        /// <summary>Gets a value indicating whether the property has default value.</summary>
-        public bool HasDefaultValue => _settings.GenerateDefaultValues && !string.IsNullOrEmpty(DefaultValue);
 
         /// <summary>Gets the type of the property.</summary>
         public abstract string Type { get; }
 
         /// <summary>Gets the default value generator.</summary>
         public ValueGeneratorBase ValueGenerator { get; }
+
+        /// <summary>Gets a value indicating whether the property has default value.</summary>
+        public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);
 
         /// <summary>Gets the default value as string.</summary>
         public string DefaultValue => ValueGenerator.GetDefaultValue(_property, 
