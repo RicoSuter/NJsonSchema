@@ -29,6 +29,18 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
+            var isNullable = IsNullable(type, parentAttributes, settings);
+
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
+                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
+
+            if (jsonSchemaAttribute != null)
+            {
+                var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
+                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
+                return JsonTypeDescription.Create(type, classType, isNullable, format);
+            }
+
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
@@ -58,7 +70,6 @@ namespace NJsonSchema.Generation
             if (type == typeof(bool))
                 return JsonTypeDescription.Create(type, JsonObjectType.Boolean, false, null);
 
-            var isNullable = IsNullable(type, parentAttributes, settings);
             if (type == typeof(string) || type == typeof(Type))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
 
@@ -119,15 +130,6 @@ namespace NJsonSchema.Generation
 #endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
-            }
-
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
-                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
-            if (jsonSchemaAttribute != null)
-            {
-                var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
-                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return JsonTypeDescription.Create(type, classType, isNullable, format);
             }
 
             if (contract is JsonStringContract)
