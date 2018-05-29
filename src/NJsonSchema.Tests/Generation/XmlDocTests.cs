@@ -118,5 +118,25 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Empty(summary);
         }
+
+        public class WithValueTagInXmlDoc
+        {
+            /// <summary>Gets or sets the foo.</summary>
+            /// <value>The foo.</value>
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_has_value_tag_then_it_is_used()
+        {
+            //// Arrange
+
+
+            //// Act
+            var summary = await typeof(WithValueTagInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
+
+            //// Assert
+            Assert.Equal("The foo.", summary);
+        }
     }
 }

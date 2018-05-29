@@ -71,6 +71,13 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The contents of the "summary" tag for the member.</returns>
         public static async Task<string> GetXmlSummaryAsync(this MemberInfo member)
         {
+            var value = await GetXmlDocumentationTagAsync(member, "value").ConfigureAwait(false);
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
             return await GetXmlDocumentationTagAsync(member, "summary").ConfigureAwait(false);
         }
 
