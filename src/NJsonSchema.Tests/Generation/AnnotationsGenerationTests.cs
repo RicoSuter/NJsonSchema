@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -53,6 +54,27 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(property.Type.HasFlag(JsonObjectType.String));
             Assert.Equal("point", property.Format);
+        }
+
+        public class DateAttributeClass
+        {
+            [JsonSchemaDate]
+            public DateTime Date { get; set; }
+        }
+
+        [Fact]
+        public async Task When_DateTime_property_has_JsonSchemaDate_attribute_then_format_and_type_is_correct()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<DateAttributeClass>();
+            var data = schema.ToJson();
+
+            //// Act
+            var property = schema.Properties["Date"];
+
+            //// Assert
+            Assert.True(property.Type.HasFlag(JsonObjectType.String));
+            Assert.Equal("date", property.Format);
         }
 
         public class MultipleOfClass
