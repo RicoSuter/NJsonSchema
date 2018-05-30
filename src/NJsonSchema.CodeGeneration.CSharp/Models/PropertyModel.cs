@@ -12,7 +12,7 @@ using NJsonSchema.CodeGeneration.Models;
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     /// <summary>The CSharp property template model.</summary>
-    public class PropertyModel : PropertyModelBase
+    public partial class PropertyModel : PropertyModelBase
     {
         private readonly JsonProperty _property;
         private readonly CSharpGeneratorSettings _settings;
@@ -33,6 +33,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = typeResolver;
+
+            this.Description = GetPropertySummaryXmlDocumentationFromDescription(_property.Description);
+            this.HasDescription = string.IsNullOrEmpty(this.Description);
+
+            this.ValueDescription = GetPropertyValueXmlDocumentationFromDescription(_property.Description);
+            this.HasValueDescription = string.IsNullOrEmpty(this.ValueDescription);
         }
 
         /// <summary>Gets the name of the property.</summary>
@@ -42,10 +48,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
-        public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
+        public bool HasDescription { get; }
 
         /// <summary>Gets the description.</summary>
         public string Description => _property.Description;
+
+        /// <summary>Gets a value indicating whether the property value has a description.</summary>
+        public bool HasValueDescription { get; }
+
+        /// <summary>Gets the value description.</summary>
+        public string ValueDescription { get; }
 
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
@@ -201,5 +213,57 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.Format == JsonFormatStrings.Date;
+
+        /// <summary>
+        /// Gets the property's summary XML documentation from description.
+        /// </summary>
+        /// <param name="description">The description.</param>
+        /// <returns>The property's summary XML documentation from description.</returns>
+        private static string GetPropertySummaryXmlDocumentationFromDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description))
+            {
+                return null;
+            }
+
+            if (description.StartsWith("gets ", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return description;
+            }
+
+            var builder = new StringBuilder(description);
+            builder[0] = char.ToLower(builder[0]);
+            builder.Insert(0, "Gets or sets ");
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// Gets the property's value XML documentation from description.
+        /// </summary>
+        /// <param name="description">The description.</param>
+        /// <returns>The property's value XML documentation from description.</returns>
+        private static string GetPropertyValueXmlDocumentationFromDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description))
+            {
+                return null;
+            }
+
+            if (description.StartsWith("gets or sets ", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var builder = new StringBuilder(description);
+                builder[0] = char.ToUpper(builder["gets or sets ".Length]);
+                return builder.ToString("gets or sets ".Length, description.Length);
+            }
+
+            if (description.StartsWith("gets ", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var builder = new StringBuilder(description);
+                builder[0] = char.ToUpper(builder["gets ".Length]);
+                return builder.ToString("gets ".Length, description.Length);
+            }
+
+            return description;
+        }
     }
 }

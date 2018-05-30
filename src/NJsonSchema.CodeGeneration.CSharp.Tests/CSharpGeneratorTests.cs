@@ -268,7 +268,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>EnumDesc.</summary>", output);
+            Assert.Contains(@"/// <summary>Gets or sets enumDesc.</summary>", output);
+            Assert.Contains(@"/// <value>EnumDesc.</value>", output);
 
             AssertCompile(output);
         }
@@ -302,8 +303,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>PropertyDesc.</summary>", output);
-
+            Assert.Contains(@"/// <summary>Gets or sets propertyDesc.</summary>", output);
+            Assert.Contains(@"/// <value>PropertyDesc.</value>", output);
+             
             AssertCompile(output);
         }
 

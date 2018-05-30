@@ -29,6 +29,9 @@
 {%   if property.HasDescription -%}
     /// <summary>{{ property.Description | csharpdocs }}</summary>
 {%   endif -%}
+{%   if property.HasValueDescription -%}
+    /// <value>{{ property.ValueDescription | csharpdocs }}</value>
+{%   endif -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
 {%   if property.RenderRequiredAttribute -%}
     [System.ComponentModel.DataAnnotations.Required{% if property.AllowEmptyStrings %}(AllowEmptyStrings = true){% endif %}]
@@ -55,16 +58,16 @@
         get { return {{ property.FieldName }}; }
 {%     if property.HasSetter -%}
 {%         if RenderInpc -%}
-        {{PropertySetterAccessModifier}}set 
+{{PropertySetterAccessModifier}}set
         {
             if ({{ property.FieldName }} != value)
             {
-                {{ property.FieldName }} = value; 
+{{ property.FieldName }} = value;
                 RaisePropertyChanged();
             }
         }
 {%         else -%}
-        {{PropertySetterAccessModifier}}set { SetProperty(ref {{ property.FieldName }}, value); }
+{{PropertySetterAccessModifier}}set { SetProperty(ref {{ property.FieldName }}, value); }
 {%         endif -%}
 {%     endif -%}
     }
@@ -72,25 +75,28 @@
 
 {% endfor -%}
 {% if HasAdditionalPropertiesType -%}
-    private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
+    private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}>
+    _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>
+        ();
 
-    [Newtonsoft.Json.JsonExtensionData]
-    public System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> AdditionalProperties
-    {
-        get { return _additionalProperties; }
-        {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
-    }
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}>
+            AdditionalProperties
+            {
+            get { return _additionalProperties; }
+            {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
+            }
 
-{% endif -%}
-{% if GenerateJsonMethods -%}
-    {% template Class.ToJson %}
-    
-    {% template Class.FromJson %}
-{% endif -%}
-{% if RenderInpc -%}
+            {% endif -%}
+            {% if GenerateJsonMethods -%}
+            {% template Class.ToJson %}
 
-    {% template Class.Inpc %}
-{% endif -%}
+            {% template Class.FromJson %}
+            {% endif -%}
+            {% if RenderInpc -%}
 
-    {% template Class.Body %}
-}
+            {% template Class.Inpc %}
+            {% endif -%}
+
+            {% template Class.Body %}
+            }

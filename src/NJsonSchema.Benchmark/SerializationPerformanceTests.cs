@@ -20,9 +20,9 @@ namespace NJsonSchema.Benchmark
         }
 
         [PerfSetup]
-        #pragma warning disable xUnit1013 // Public method should be marked as test
+#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Setup(BenchmarkContext context)
-        #pragma warning restore xUnit1013 // Public method should be marked as test
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             _counter = context.GetCounter("Iterations");
         }
@@ -31,6 +31,7 @@ namespace NJsonSchema.Benchmark
         /// Ensure that we can serialise at least 200 times per second (5ms).
         /// </summary>
         [NBenchFact]
+        [Trait("Category", "SkipWhenLiveUnitTesting")]
         [PerfBenchmark(
             Description = "Ensure serialization doesn't take too long",
             NumberOfIterations = 3,
@@ -48,6 +49,7 @@ namespace NJsonSchema.Benchmark
         /// Ensure that we can deserialise at least 200 times per second (5ms).
         /// </summary>
         [NBenchFact]
+        [Trait("Category", "SkipWhenLiveUnitTesting")]
         [PerfBenchmark(
             Description = "Ensure deserialization doesn't take too long",
             NumberOfIterations = 3,
