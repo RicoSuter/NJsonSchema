@@ -659,11 +659,11 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsTuple => Type.HasFlag(JsonObjectType.Array) && Items?.Any() == true;
 
-        /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
+        /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties or PatternProperties contain a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
                                     ActualProperties.Count == 0 &&
-                                    (AllowAdditionalProperties || PatternProperties.Any());
+                                    (AdditionalPropertiesSchema != null || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]

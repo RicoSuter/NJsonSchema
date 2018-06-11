@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -134,6 +133,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("this.resource[key] = data[\"resource\"][key] ? MyItem.fromJS(data[\"resource\"][key]) : new MyItem();", code);
+        }
+
+        [Fact]
+        public async Task When_property_is_object_and_not_dictionary_it_should_be_assigned_in_init_method()
+        {
+            //// Arrange
+            var json = @"{
+    ""properties"": {
+        ""resource"": {
+            ""type"": ""object""
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullValue = TypeScriptNullValue.Null
+            });
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            Assert.Contains("resource: any;", code);
+            Assert.DoesNotContain("this.resource[key] = data[\"resource\"][key];", code);
+            Assert.DoesNotContain(" : new any();", code);
         }
 
         [Fact]
