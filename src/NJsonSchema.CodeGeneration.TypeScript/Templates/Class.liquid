@@ -17,7 +17,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
     protected _discriminator: string;
 {% endif -%}
 
-{% if GenerateConstructorInterface or Model.HasBaseDiscriminator -%}
+{% if GenerateConstructorInterface or HasBaseDiscriminator -%}
     constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
