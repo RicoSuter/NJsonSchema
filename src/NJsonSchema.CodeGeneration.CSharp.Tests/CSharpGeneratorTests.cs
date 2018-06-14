@@ -1605,7 +1605,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_class_has_property_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
+        public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
@@ -1620,9 +1620,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("PersonAddress");
 
             //// Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
-            Assert.True(schema.AllowAdditionalProperties);
-            Assert.True(schema.AdditionalPropertiesSchema.ActualSchema.IsAnyType);
+            Assert.Contains("JsonExtensionData", output);
         }
 
         private static void AssertCompile(string code)
