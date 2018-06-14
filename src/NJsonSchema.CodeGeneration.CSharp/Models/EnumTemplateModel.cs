@@ -46,6 +46,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
         public string TypeAccessModifier => _settings.TypeAccessModifier;
 
+        /// <summary>Gets or sets if we output as Bit Flags.</summary>
+        public bool IsEnumAsBitFlags => _settings.GenerateEnumAsBitFlags;
+
         /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationItemModel> Enums
         {
@@ -65,7 +68,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             Value = value.ToString(),
-                            InternalValue = _schema.Type.HasFlag(JsonObjectType.Integer) ? value.ToString() : i.ToString()
+                            InternalValue = _schema.Type.HasFlag(JsonObjectType.Integer) ? value.ToString() : i.ToString(),
+                            InternalFlagValue = i == 0 ? "0" : (1 << i).ToString()
                         });
                     }
                 }
