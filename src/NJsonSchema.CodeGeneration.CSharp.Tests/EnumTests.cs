@@ -64,7 +64,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public enum MyClassCategory", code);
+            Assert.Contains("[System.Flags]", code);
+            Assert.Contains("Commercial = 1,", code);
+            Assert.Contains("Residential = 2,", code);
+            Assert.Contains("Government = 4,", code);
+            Assert.Contains("Military = 8,", code);
+            Assert.Contains(" Foreigngovernment = 16,", code);
         }
 
         [Fact]
