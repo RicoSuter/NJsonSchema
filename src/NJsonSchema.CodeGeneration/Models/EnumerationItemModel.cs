@@ -19,5 +19,8 @@ namespace NJsonSchema.CodeGeneration.Models
 
         /// <summary>Gets or sets the internal value (e.g. the underlying/system value).</summary>
         public string InternalValue { get; set; }
+
+        /// <summary>Gets or sets the internal flag value (e.g. the underlying/system value).</summary>
+        public string InternalFlagValue { get; set; }
     }
 }
