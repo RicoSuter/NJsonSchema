@@ -69,7 +69,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             Value = value.ToString(),
                             InternalValue = _schema.Type.HasFlag(JsonObjectType.Integer) ? value.ToString() : i.ToString(),
-                            InternalFlagValue = i == 0 ? "0" : (1 << i).ToString()
+                            InternalFlagValue = (1 << i).ToString()
                         });
                     }
                 }
