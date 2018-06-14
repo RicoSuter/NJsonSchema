@@ -1596,6 +1596,33 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
+        public class ClassWithExtensionData
+        {
+            public string Foo { get; set; }
+
+            [JsonExtensionData]
+            public IDictionary<string, object> ExtensionData { get; set; }
+        }
+
+        [Fact]
+        public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var json = schema.ToJson();
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+
+            //// Act
+            var output = generator.GenerateFile("PersonAddress");
+
+            //// Assert
+            Assert.Contains("JsonExtensionData", output);
+        }
+
         private static void AssertCompile(string code)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(code);

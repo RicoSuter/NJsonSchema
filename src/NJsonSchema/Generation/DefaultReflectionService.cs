@@ -105,6 +105,9 @@ namespace NJsonSchema.Generation
             if (type == typeof(byte[]))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
 
+            if (type == typeof(JArray))
+                return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+
             if (type == typeof(JObject) || 
                 type == typeof(JToken) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
