@@ -411,6 +411,10 @@ namespace NJsonSchema
         [JsonProperty("x-example", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Example { get; set; }
 
+        /// <summary>Gets or sets a value indicating this is an bit flag enum (custom extension, sets 'x-enumFlags', default: false).</summary>
+        [JsonProperty("x-enumFlags", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool IsFlaggedEnumerable { get; set; }
+
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
         public ICollection<object> Enumeration { get; internal set; }

@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string TypeAccessModifier => _settings.TypeAccessModifier;
 
         /// <summary>Gets or sets if we output as Bit Flags.</summary>
-        public bool IsEnumAsBitFlags => _settings.GenerateEnumAsBitFlags;
+        public bool IsEnumAsBitFlags => _settings.EnforceFlaggedEnums || _schema.IsFlaggedEnumerable;
 
         /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationItemModel> Enums
