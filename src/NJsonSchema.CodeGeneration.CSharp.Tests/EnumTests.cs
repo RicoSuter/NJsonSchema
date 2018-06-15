@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_enum_has_no_type_then_enum_is_generated_withflags()
+        public async Task When_enum_has_no_type_then_enum_is_generated_with_flags()
         {
             //// Arrange
             var json =
@@ -55,10 +55,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                     }
                 }
             }";
+
             var schema = await JsonSchema4.FromJsonAsync(json);
-
-
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings() { GenerateEnumAsBitFlags = true });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlaggedEnums = true });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
@@ -69,7 +68,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("Residential = 2,", code);
             Assert.Contains("Government = 4,", code);
             Assert.Contains("Military = 8,", code);
-            Assert.Contains(" Foreigngovernment = 16,", code);
+            Assert.Contains("Foreigngovernment = 16,", code);
         }
 
         [Fact]
