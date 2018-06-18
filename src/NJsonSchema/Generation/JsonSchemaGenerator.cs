@@ -745,6 +745,10 @@ namespace NJsonSchema.Generation
 
             var underlyingType = Enum.GetUnderlyingType(type);
 
+            var converters = Settings.ActualSerializerSettings.Converters;
+            if (!converters.OfType<StringEnumConverter>().Any())
+                converters.Add(new StringEnumConverter());
+
             foreach (var enumName in Enum.GetNames(type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
@@ -754,12 +758,17 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    var attributes = type.GetTypeInfo().GetDeclaredField(enumName).GetCustomAttributes(); // EnumMember only checked if StringEnumConverter is used
+                    // EnumMember only checked if StringEnumConverter is used
+                    var attributes = type.GetTypeInfo().GetDeclaredField(enumName).GetCustomAttributes();
                     dynamic enumMemberAttribute = attributes.TryGetIfAssignableTo("System.Runtime.Serialization.EnumMemberAttribute");
                     if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
                         schema.Enumeration.Add((string)enumMemberAttribute.Value);
                     else
-                        schema.Enumeration.Add(enumName);
+                    {
+                        var value = Enum.Parse(type, enumName);
+                        var json = JsonConvert.SerializeObject(value, Formatting.None, converters.ToArray());
+                        schema.Enumeration.Add(JsonConvert.DeserializeObject<string>(json));
+                    }
                 }
 
                 schema.EnumerationNames.Add(enumName);

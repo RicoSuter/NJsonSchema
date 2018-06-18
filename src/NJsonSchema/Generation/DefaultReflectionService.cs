@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.Generation
 {
@@ -43,20 +44,20 @@ namespace NJsonSchema.Generation
 
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
+                var isStringEnum = IsStringEnum(type, parentAttributes, settings);
                 return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
-            if (type == typeof(short) || 
-                type == typeof(uint) || 
+            if (type == typeof(short) ||
+                type == typeof(uint) ||
                 type == typeof(ushort))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
 
             if (type == typeof(int))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
 
-            if (type == typeof(long) || 
+            if (type == typeof(long) ||
                 type == typeof(ulong))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
 
@@ -79,14 +80,14 @@ namespace NJsonSchema.Generation
             if (type == typeof(Guid))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime) || 
-                type == typeof(DateTimeOffset) || 
+            if (type == typeof(DateTime) ||
+                type == typeof(DateTimeOffset) ||
                 type.FullName == "NodaTime.OffsetDateTime" ||
                 type.FullName == "NodaTime.LocalDateTime" ||
                 type.FullName == "NodaTime.ZonedDateTime")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
-            if (type == typeof(TimeSpan) || 
+            if (type == typeof(TimeSpan) ||
                 type.FullName == "NodaTime.Duration")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
 
@@ -108,7 +109,7 @@ namespace NJsonSchema.Generation
             if (type == typeof(JArray))
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
-            if (type == typeof(JObject) || 
+            if (type == typeof(JObject) ||
                 type == typeof(JToken) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
                 type == typeof(object))
@@ -254,13 +255,13 @@ namespace NJsonSchema.Generation
 
 #endif
 
-        private bool IsStringEnum(Type type, IEnumerable<Attribute> propertyAttributes, EnumHandling defaultEnumHandling)
+        private bool IsStringEnum(Type type, IEnumerable<Attribute> propertyAttributes, JsonSchemaGeneratorSettings settings)
         {
-            if (defaultEnumHandling == EnumHandling.String)
-                return true;
+            var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
+            var hasStringEnumConverterOnProperty = propertyAttributes != null && HasStringEnumConverter(propertyAttributes);
 
-            return HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) ||
-                (propertyAttributes != null && HasStringEnumConverter(propertyAttributes));
+            return hasGlobalStringEnumConverter || hasStringEnumConverterOnType || hasStringEnumConverterOnProperty;
         }
 
         private bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
@@ -272,8 +273,7 @@ namespace NJsonSchema.Generation
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "StringEnumConverter")
-                    return true;
+                return converterType.IsAssignableTo("StringEnumConverter", TypeNameStyle.Name);
             }
             return false;
         }
