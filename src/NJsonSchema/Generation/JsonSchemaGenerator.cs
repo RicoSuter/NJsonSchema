@@ -6,6 +6,12 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -14,12 +20,6 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation
 {
@@ -686,8 +686,13 @@ namespace NJsonSchema.Generation
                 if (discriminatorConverter != null)
                 {
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
-                    if (schema.Properties.ContainsKey(discriminatorName))
+
+                    // Existing property can be discriminator only if it has String type  
+                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty)
+                        && (existingProperty.Type & JsonObjectType.String) == 0)
+                    {
                         throw new InvalidOperationException("The JSON property '" + discriminatorName + "' is defined multiple times on type '" + type.FullName + "'.");
+                    }
 
                     var discriminator = new OpenApiDiscriminator
                     {
