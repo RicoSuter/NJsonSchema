@@ -86,7 +86,7 @@ namespace NJsonSchema.Converters
                 _isWriting = true;
 
                 var jObject = JObject.FromObject(value, serializer);
-                jObject.AddFirst(new JProperty(_discriminator, GetDiscriminatorValue(value.GetType())));
+                jObject[_discriminator] = JToken.FromObject(GetDiscriminatorValue(value.GetType()));
                 writer.WriteToken(jObject.CreateReader());
             }
             finally
