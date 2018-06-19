@@ -106,5 +106,103 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal("Value1", schema.EnumerationNames.First());
             Assert.Equal("Value2", schema.EnumerationNames.Last());
         }
+
+        [Flags]
+        public enum EnumWithFlags
+        {
+            Foo = 1,
+            Bar = 2,
+            Baz = 4,
+        }
+
+        [Fact]
+        public async Task When_enum_has_FlagsAttribute_then_custom_property_is_set()
+        {
+            // Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumWithFlags>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.IsFlagEnumerable);
+            Assert.Contains("x-enumFlags", json);
+        }
+
+        public enum EnumWithoutFlags
+        {
+            Foo = 1,
+            Bar = 2,
+            Baz = 3,
+        }
+
+        [Fact]
+        public async Task When_enum_does_not_have_FlagsAttribute_then_custom_property_is_not_set()
+        {
+            // Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumWithoutFlags>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.False(schema.IsFlagEnumerable);
+            Assert.DoesNotContain("x-enumFlags", json);
+        }
+
+        [Flags]
+        public enum EnumWithFlags
+        {
+            Foo = 1,
+            Bar = 2,
+            Baz = 4,
+        }
+
+        [Fact]
+        public async Task When_enum_has_FlagsAttribute_then_custom_property_is_set()
+        {
+            // Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumWithFlags>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.IsFlagEnumerable);
+            Assert.Contains("x-enumFlags", json);
+        }
+
+        public enum EnumWithoutFlags
+        {
+            Foo = 1,
+            Bar = 2,
+            Baz = 3,
+        }
+
+        [Fact]
+        public async Task When_enum_does_not_have_FlagsAttribute_then_custom_property_is_not_set()
+        {
+            // Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumWithoutFlags>(new JsonSchemaGeneratorSettings
+            {
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.False(schema.IsFlagEnumerable);
+            Assert.DoesNotContain("x-enumFlags", json);
+        }
     }
 }
