@@ -37,6 +37,41 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_enum_has_no_type_then_enum_is_generated_with_flags()
+        {
+            //// Arrange
+            var json =
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""category"" : {
+                        ""enum"" : [
+                            ""commercial"",
+                            ""residential"",
+                            ""government"",
+                            ""military"",
+                            ""foreigngovernment""
+                        ]
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlagEnums = true });
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("[System.Flags]", code);
+            Assert.Contains("Commercial = 1,", code);
+            Assert.Contains("Residential = 2,", code);
+            Assert.Contains("Government = 4,", code);
+            Assert.Contains("Military = 8,", code);
+            Assert.Contains("Foreigngovernment = 16,", code);
+        }
+
+        [Fact]
         public async Task When_enum_name_contains_colon_then_it_is_removed_and_next_word_converted_to_upper_case()
         {
             //// Arrange
