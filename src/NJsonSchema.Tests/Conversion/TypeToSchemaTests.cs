@@ -241,7 +241,29 @@ namespace NJsonSchema.Tests.Conversion
             Assert.Contains(schema.Definitions, d => d.Key == "MySubtype");
             Assert.Equal(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
         }
+        
+        [TestMethod]
+        public async Task When_converting_object_with_display_name_then_schema_title_should_be_set()
+        {
+            var schema = await JsonSchema4.FromTypeAsync<MyType>();
 
+            Assert.AreEqual("My Type", schema.Title);
+        }
+
+        [TestMethod]
+        public async Task When_converting_object_with_empty_display_name_then_fallback_to_reflection()
+        {
+            var schema = await JsonSchema4.FromTypeAsync<FallBackDisplayName>();
+
+            Assert.AreEqual(nameof(FallBackDisplayName), schema.Title);
+        }
+
+        [System.ComponentModel.DisplayName]
+        public class FallBackDisplayName
+        {
+        }
+
+        [System.ComponentModel.DisplayName("My Type")]
         public class MyType
         {
             [System.ComponentModel.Description("Test")]
