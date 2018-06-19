@@ -688,10 +688,10 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty)
-                        && (existingProperty.Type & JsonObjectType.String) == 0)
+                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) && 
+                        (existingProperty.Type & JsonObjectType.String) == 0)
                     {
-                        throw new InvalidOperationException("The JSON property '" + discriminatorName + "' is defined multiple times on type '" + type.FullName + "'.");
+                        throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
                     }
 
                     var discriminator = new OpenApiDiscriminator
