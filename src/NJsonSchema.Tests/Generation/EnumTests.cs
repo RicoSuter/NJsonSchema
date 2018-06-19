@@ -128,7 +128,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.True(schema.IsFlaggedEnumerable);
+            Assert.True(schema.IsFlagEnumerable);
             Assert.Contains("x-enumFlags", json);
         }
 
@@ -152,7 +152,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.False(schema.IsFlaggedEnumerable);
+            Assert.False(schema.IsFlagEnumerable);
             Assert.DoesNotContain("x-enumFlags", json);
         }
 
@@ -177,7 +177,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.True(schema.IsFlaggedEnumerable);
+            Assert.True(schema.IsFlagEnumerable);
             Assert.Contains("x-enumFlags", json);
         }
 
@@ -201,7 +201,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.False(schema.IsFlaggedEnumerable);
+            Assert.False(schema.IsFlagEnumerable);
             Assert.DoesNotContain("x-enumFlags", json);
         }
     }

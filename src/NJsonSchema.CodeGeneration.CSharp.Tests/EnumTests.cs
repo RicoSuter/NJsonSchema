@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }";
 
             var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlaggedEnums = true });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlagEnums = true });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
