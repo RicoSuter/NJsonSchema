@@ -115,6 +115,12 @@ namespace NJsonSchema.Generation
         public virtual async Task GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+            var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
+                                          parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
+
+            if (jsonSchemaTypeAttribute != null)
+                type = jsonSchemaTypeAttribute.Type;
+
             ApplyExtensionDataAttributes(type, schema, parentAttributes);
 
             if (await TryHandleSpecialTypesAsync(type, schema, schemaResolver, parentAttributes).ConfigureAwait(false))
