@@ -209,7 +209,7 @@ namespace NJsonSchema.Infrastructure
                             return null;
                         }
 
-                        Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile)).ConfigureAwait(false);
+                        Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace)).ConfigureAwait(false);
                     }
                     else if (Cache[assemblyName.FullName] == null)
                         return null;
@@ -344,9 +344,20 @@ namespace NJsonSchema.Infrastructure
                                 value.Append(attribute.Value);
                             else
                             {
-                                attribute = e.Attribute("cref");
-                                if (attribute != null)
-                                    value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
+                                if (!string.IsNullOrEmpty(e.Value))
+                                    value.Append(e.Value);
+                                else
+                                {
+                                    attribute = e.Attribute("cref");
+                                    if (attribute != null)
+                                        value.Append(attribute.Value.Trim('!', ':').Trim().Split('.').Last());
+                                    else
+                                    {
+                                        attribute = e.Attribute("href");
+                                        if (attribute != null)
+                                            value.Append(attribute.Value);
+                                    }
+                                }
                             }
                         }
                         else
