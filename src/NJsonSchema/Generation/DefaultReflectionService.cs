@@ -32,6 +32,17 @@ namespace NJsonSchema.Generation
         {
             var isNullable = IsNullable(type, parentAttributes, settings);
 
+            var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
+                                          parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
+
+            if (jsonSchemaTypeAttribute != null)
+            {
+                type = jsonSchemaTypeAttribute.Type;
+
+                if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
+                    isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
+            }
+            
             var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
                                       parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
 
@@ -128,9 +139,10 @@ namespace NJsonSchema.Generation
             if (type.Name == "Nullable`1")
             {
 #if !LEGACY
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes, settings);
+                // Remove JsonSchemaTypeAttributes to avoid stack overflows
+                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes, settings);
+                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
