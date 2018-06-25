@@ -140,9 +140,9 @@ namespace NJsonSchema.Generation
             {
 #if !LEGACY
                 // Remove JsonSchemaTypeAttributes to avoid stack overflows
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
+                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
+                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
@@ -267,11 +267,11 @@ namespace NJsonSchema.Generation
 
 #endif
 
-        private bool IsStringEnum(Type type, IEnumerable<Attribute> propertyAttributes, JsonSchemaGeneratorSettings settings)
+        private bool IsStringEnum(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
             var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
-            var hasStringEnumConverterOnProperty = propertyAttributes != null && HasStringEnumConverter(propertyAttributes);
+            var hasStringEnumConverterOnProperty = parentAttributes != null && HasStringEnumConverter(parentAttributes);
 
             return hasGlobalStringEnumConverter || hasStringEnumConverterOnType || hasStringEnumConverterOnProperty;
         }
