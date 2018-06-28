@@ -80,6 +80,7 @@
         get { return _additionalProperties; }
         {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
     }
+
 {% endif -%}
 {% if GenerateJsonMethods -%}
     {% template Class.ToJson %}

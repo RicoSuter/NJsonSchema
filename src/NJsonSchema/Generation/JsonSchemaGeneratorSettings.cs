@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
@@ -69,7 +70,12 @@ namespace NJsonSchema.Generation
         public SchemaType SchemaType { get; set; }
 
         /// <summary>Gets or sets the contract resolver.</summary>
+        /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
         public IContractResolver ContractResolver { get; set; }
+
+        /// <summary>Gets or sets the serializer settings.</summary>
+        /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
+        public JsonSerializerSettings SerializerSettings { get; set; }
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
         public string[] ExcludedTypeNames { get; set; }
@@ -96,20 +102,29 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
-        /// <exception cref="InvalidOperationException">The settings DefaultPropertyNameHandling and ContractResolver cannot be used at the same time.</exception>
+        /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
         public IContractResolver ActualContractResolver
         {
             get
             {
-                if (DefaultPropertyNameHandling != PropertyNameHandling.Default && ContractResolver != null)
+                if (SerializerSettings != null)
                 {
-                    throw new InvalidOperationException("The settings DefaultPropertyNameHandling and ContractResolver cannot be used at the same time " +
-                                                        "(set DefaultPropertyNameHandling to Default when using a custom ContractResolver and change the " +
-                                                        "property name handling on the custom ContractResolver).");
+                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
+                    if (ContractResolver != null)
+                        throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+
+                    return SerializerSettings.ContractResolver;
                 }
 
                 if (ContractResolver != null)
+                {
+                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
                     return ContractResolver;
+                }
 
                 if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
                     return new CamelCasePropertyNamesContractResolver();
@@ -118,6 +133,38 @@ namespace NJsonSchema.Generation
                     return new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
 
                 return new DefaultContractResolver();
+            }
+        }
+
+        /// <summary>Gets the serializer settings.</summary>
+        /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
+        public JsonSerializerSettings ActualSerializerSettings
+        {
+            get
+            {
+                if (SerializerSettings != null)
+                {
+                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
+                    if (ContractResolver != null)
+                        throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+
+                    if (DefaultEnumHandling != EnumHandling.Integer)
+                        throw new InvalidOperationException("The setting DefaultEnumHandling cannot be used when SerializerSettings is set.");
+
+                    return SerializerSettings;
+                }
+
+                var settings = new JsonSerializerSettings();
+                settings.ContractResolver = ActualContractResolver;
+
+                if (DefaultEnumHandling == EnumHandling.String)
+                    settings.Converters.Add(new StringEnumConverter());
+                else if (DefaultEnumHandling == EnumHandling.CamelCaseString)
+                    settings.Converters.Add(new StringEnumConverter(true));
+
+                return settings;
             }
         }
 
