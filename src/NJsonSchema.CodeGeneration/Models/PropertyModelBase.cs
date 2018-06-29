@@ -53,6 +53,12 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
 
+        /// <summary>Gets a value indicating whether the property is nullable.</summary>
+        public bool IsNullable => _property.IsNullable(_settings.SchemaType);
+
+        /// <summary>Gets a value indicating whether the property is required.</summary>
+        public bool IsRequired => _property.IsRequired;
+
         /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
         public bool IsStringEnumArray =>
             _property.ActualTypeSchema.IsArray &&
