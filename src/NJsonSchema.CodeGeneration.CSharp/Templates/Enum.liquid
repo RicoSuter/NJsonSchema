@@ -11,13 +11,11 @@
 {%   if IsStringEnum -%}
     [System.Runtime.Serialization.EnumMember(Value = "{{ enum.Value }}")]
 {%   endif -%}
-
 {% if IsEnumAsBitFlags -%}
     {{ enum.Name }} = {{ enum.InternalFlagValue }},
 {% else -%}
     {{ enum.Name }} = {{ enum.InternalValue }},
 {% endif -%}
-
 
 {% endfor -%}
 }

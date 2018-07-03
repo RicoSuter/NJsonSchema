@@ -34,6 +34,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly
             });
+
+            ClassTypes = new string[0];
+            ExtendedClasses = new string[0];
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
