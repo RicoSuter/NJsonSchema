@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.Models
 {
@@ -65,6 +66,9 @@ namespace NJsonSchema.CodeGeneration.Models
             _property.ActualTypeSchema.Item != null &&
             _property.ActualTypeSchema.Item.ActualSchema.IsEnumeration &&
             _property.ActualTypeSchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
+
+        /// <summary>Gets the property extension data.</summary>
+        public IDictionary<string, object> ExtensionData => _property.ExtensionData;
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()
