@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
 using Xunit;
 
-namespace NJsonSchema.CodeGeneration.Tests.CSharp
+namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
     public class StringPropertyRequiredTests
     {
@@ -28,6 +27,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -52,13 +52,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Poco
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.JsonSchema
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
-            Assert.Contains("public string Property { get; set; }", code);
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required]\n" +
+                            "        public string Property { get; set; }\n", code);
+
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]\n" +
+                            "        public string Property2 { get; set; }\n", code);
         }
 
         public class ClassWithoutRequiredObject
@@ -99,7 +103,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Poco
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.JsonSchema
             });
             var code = generator.GenerateFile("MyClass");
 

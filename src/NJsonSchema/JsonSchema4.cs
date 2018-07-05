@@ -705,10 +705,18 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
+            return ToJson(Formatting.Indented);
+        }
+
+        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
+        /// <param name="formatting">The formatting.</param>
+        /// <returns>The JSON string.</returns>
+        public string ToJson(Formatting formatting)
+        {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value);
+            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value, formatting);
 
             SchemaVersion = oldSchema;
             return json;
