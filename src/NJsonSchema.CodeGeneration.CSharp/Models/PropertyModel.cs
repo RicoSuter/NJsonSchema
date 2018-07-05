@@ -52,7 +52,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
-            _settings.SchemaType == SchemaType.JsonSchema &&
             _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
             (_property.MinLength == null || _property.MinLength == 0);
 
