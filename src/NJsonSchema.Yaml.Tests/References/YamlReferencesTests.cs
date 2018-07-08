@@ -9,11 +9,11 @@ namespace NJsonSchema.Yaml.Tests.References
     public class LocalReferencesTests
     {
         [Theory]
-        [InlineData("/References/YamlReferencesTest/json_schema_with_json_reference.json")]
-        [InlineData("/References/YamlReferencesTest/yaml_schema_with_json_reference.yaml")]
-        [InlineData("/References/YamlReferencesTest/yaml_schema_with_yaml_reference.yaml")]
-        [InlineData("/References/YamlReferencesTest/json_schema_with_yaml_reference.json")]
-        public async Task When_yaml_schema_has_references_it_works(string relativePath)
+        [InlineData("/References/YamlReferencesTest/json_schema_with_json_reference.json", "./collection.json")]
+        [InlineData("/References/YamlReferencesTest/yaml_schema_with_json_reference.yaml", "./collection.json")]
+        [InlineData("/References/YamlReferencesTest/yaml_schema_with_yaml_reference.yaml", "./collection.yaml")]
+        [InlineData("/References/YamlReferencesTest/json_schema_with_yaml_reference.json", "./collection.yaml")]
+        public async Task When_yaml_schema_has_references_it_works(string relativePath, string documentPath)
         {
             //// Arrange
             var path = GetTestDirectory() + relativePath;
@@ -25,7 +25,7 @@ namespace NJsonSchema.Yaml.Tests.References
             //// Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
             Assert.Equal(1, schema.Definitions.Count);
-            Assert.Equal("./collection.json", schema.Definitions["collection"].DocumentPath);
+            Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
         }
 
         private string GetTestDirectory()

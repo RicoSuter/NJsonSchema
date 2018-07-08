@@ -25,15 +25,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema4"/>.</returns>
         public static async Task<JsonSchema4> FromYamlAsync(string data, string documentPath = null)
         {
-            var deserializer = new DeserializerBuilder().Build();
-            var yamlObject = deserializer.Deserialize(new StringReader(data));
-
-            var serializer = new SerializerBuilder()
-                .JsonCompatible()
-                .Build();
-
-            var json = serializer.Serialize(yamlObject);
-            return await JsonSchema4.FromJsonAsync(json, documentPath).ConfigureAwait(false);
+            return await JsonSchema4.FromJsonAsync(data, documentPath, ConvertYamlToJson).ConfigureAwait(false);
         }
 
         /// <summary>Converts the JSON Schema to YAML.</summary>
@@ -64,6 +56,19 @@ namespace NJsonSchema.Yaml
         {
             var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
             return await FromYamlAsync(data, url).ConfigureAwait(false);
+        }
+        
+        private static string ConvertYamlToJson(string data)
+        {
+            var deserializer = new DeserializerBuilder().Build();
+            var yamlObject = deserializer.Deserialize(new StringReader(data));
+
+            var serializer = new SerializerBuilder()
+                .JsonCompatible()
+                .Build();
+
+            var json = serializer.Serialize(yamlObject);
+            return json;
         }
     }
 }
