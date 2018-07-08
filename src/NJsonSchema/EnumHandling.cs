@@ -16,5 +16,8 @@ namespace NJsonSchema
 
         /// <summary>Generates a string field with JSON Schema enumeration.</summary>
         String,
+
+        /// <summary>Generates a camel-cased string field with JSON Schema enumeration.</summary>
+        CamelCaseString,
     }
 }

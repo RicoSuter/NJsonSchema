@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.Models
 {
@@ -53,12 +54,21 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the name of the property.</summary>
         public string PropertyName { get; set; }
 
+        /// <summary>Gets a value indicating whether the property is nullable.</summary>
+        public bool IsNullable => _property.IsNullable(_settings.SchemaType);
+
+        /// <summary>Gets a value indicating whether the property is required.</summary>
+        public bool IsRequired => _property.IsRequired;
+
         /// <summary>Gets a value indicating whether the property is a string enum array.</summary>
         public bool IsStringEnumArray =>
             _property.ActualTypeSchema.IsArray &&
             _property.ActualTypeSchema.Item != null &&
             _property.ActualTypeSchema.Item.ActualSchema.IsEnumeration &&
             _property.ActualTypeSchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
+
+        /// <summary>Gets the property extension data.</summary>
+        public IDictionary<string, object> ExtensionData => _property.ExtensionData;
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()

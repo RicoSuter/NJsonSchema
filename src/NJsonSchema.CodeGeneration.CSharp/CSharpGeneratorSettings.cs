@@ -35,6 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             TypeAccessModifier = "public";
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = true;
+            EnforceFlagEnums = false;
 
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
@@ -104,5 +105,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: true).</summary>
         public bool GenerateJsonMethods { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
+        public bool EnforceFlagEnums { get; set; }
     }
 }

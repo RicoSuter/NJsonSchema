@@ -23,10 +23,10 @@ if ({{ Value }}) {
             {{ Variable }}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%     elseif IsDictionaryValueNewableArray -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
-{%     elseif IsDictionaryValueDate or Model.IsDictionaryValueDateTime -%}
+{%     elseif IsDictionaryValueDate or IsDictionaryValueDateTime -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%     else -%}
-{%         if(Model.HasDictionaryValueDefaultValue || Model.NullValue != "undefined"){ -%}
+{%         if(HasDictionaryValueDefaultValue || NullValue != "undefined"){ -%}
             {{ Variable }}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%         else -%}
             {{ Variable }}[key] = {{ Value }}[key];

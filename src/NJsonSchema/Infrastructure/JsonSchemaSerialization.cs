@@ -43,13 +43,25 @@ namespace NJsonSchema.Infrastructure
         /// <param name="schemaType">The schema type.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be removed soon.")]
         public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver)
+        {
+            return ToJson(obj, schemaType, contractResolver, Formatting.Indented);
+        }
+
+        /// <summary>Serializes an object to a JSON string with reference handling.</summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="schemaType">The schema type.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="formatting">The formatting.</param>
+        /// <returns></returns>
+        public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver, Formatting formatting)
         {
             IsWriting = false;
             CurrentSchemaType = schemaType;
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false, contractResolver);
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings
+            var json = JsonConvert.SerializeObject(obj, formatting, new JsonSerializerSettings
             {
                 ContractResolver = contractResolver
             });

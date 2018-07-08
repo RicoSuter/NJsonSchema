@@ -451,6 +451,10 @@ namespace NJsonSchema
         [JsonProperty("x-example", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Example { get; set; }
 
+        /// <summary>Gets or sets a value indicating this is an bit flag enum (custom extension, sets 'x-enumFlags', default: false).</summary>
+        [JsonProperty("x-enumFlags", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool IsFlagEnumerable { get; set; }
+
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
         public ICollection<object> Enumeration { get; internal set; }
@@ -741,10 +745,18 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
+            return ToJson(Formatting.Indented);
+        }
+
+        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
+        /// <param name="formatting">The formatting.</param>
+        /// <returns>The JSON string.</returns>
+        public string ToJson(Formatting formatting)
+        {
             var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value);
+            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value, formatting);
 
             SchemaVersion = oldSchema;
             return json;

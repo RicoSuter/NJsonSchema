@@ -35,6 +35,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
         public bool IsAbstract => _schema.IsAbstract;
 
+        /// <summary>Gets the property extension data.</summary>
+        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)

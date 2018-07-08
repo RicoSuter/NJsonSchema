@@ -1518,7 +1518,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains(@"public string Street { get; }", output);
             Assert.DoesNotContain(@"public string Street { get; set; }", output);
 
-            Assert.Contains("public Address(string city, string street)", output);
+            Assert.Contains("public Address(string @city, string @street)", output);
 
             AssertCompile(output);
         }
@@ -1566,7 +1566,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.DoesNotContain(@"public string City { get; } =", output);
             Assert.DoesNotContain(@"public string City { get; set; }", output);
 
-            Assert.Contains("protected AbstractAddress(string city, string streetName)", output);
+            Assert.Contains("protected AbstractAddress(string @city, string @streetName)", output);
 
             AssertCompile(output);
         }
@@ -1585,15 +1585,42 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Act
             var output = generator.GenerateFile("PersonAddress");
 
-            Assert.Contains("protected AbstractAddress(string city, string streetName)", output);
+            Assert.Contains("protected AbstractAddress(string @city, string @streetName)", output);
 
-            Assert.Contains("public PostAddress(string city, int houseNumber, string streetName, string zip)", output);
+            Assert.Contains("public PostAddress(string @city, int @houseNumber, string @streetName, string @zip)", output);
             Assert.Contains(": base(city, streetName)", output);
 
-            Assert.Contains("public PersonAddress(string addressee, string city, int houseNumber, string streetName, string zip)", output);
+            Assert.Contains("public PersonAddress(string @addressee, string @city, int @houseNumber, string @streetName, string @zip)", output);
             Assert.Contains(": base(city, houseNumber, streetName, zip)", output);
 
             AssertCompile(output);
+        }
+
+        public class ClassWithExtensionData
+        {
+            public string Foo { get; set; }
+
+            [JsonExtensionData]
+            public IDictionary<string, object> ExtensionData { get; set; }
+        }
+
+        [Fact]
+        public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var json = schema.ToJson();
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+
+            //// Act
+            var output = generator.GenerateFile("PersonAddress");
+
+            //// Assert
+            Assert.Contains("JsonExtensionData", output);
         }
 
         private static void AssertCompile(string code)
