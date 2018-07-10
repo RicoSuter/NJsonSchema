@@ -21,22 +21,13 @@ namespace NJsonSchema
     public class JsonReferenceResolver
     {
         private readonly JsonSchemaResolver _schemaResolver;
-        private readonly JsonReferenceResolverSettings _settings;
         private readonly Dictionary<string, IJsonReference> _resolvedObjects = new Dictionary<string, IJsonReference>();
-
-        /// <inheritdoc />
-        public JsonReferenceResolver(JsonSchemaResolver schemaResolver)
-            :this(schemaResolver, new JsonReferenceResolverSettings())
-        {
-        }
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
         /// <param name="schemaResolver">The schema resolver.</param>
-        /// <param name="settings">The settings.</param>
-        public JsonReferenceResolver(JsonSchemaResolver schemaResolver, JsonReferenceResolverSettings settings)
+        public JsonReferenceResolver(JsonSchemaResolver schemaResolver)
         {
             _schemaResolver = schemaResolver;
-            _settings = settings;
         }
 
         /// <summary>Adds a document reference.</summary>
@@ -89,7 +80,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public virtual async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
         {
-            return await JsonSchema4.FromFileAsync(filePath, schema => this, _settings.TransformationFunction).ConfigureAwait(false);
+            return await JsonSchema4.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
@@ -97,7 +88,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public virtual async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
         {
-            return await JsonSchema4.FromUrlAsync(url, schema => this, _settings.TransformationFunction).ConfigureAwait(false);
+            return await JsonSchema4.FromUrlAsync(url, schema => this).ConfigureAwait(false);
         }
 
         private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, bool append)
@@ -269,12 +260,5 @@ namespace NJsonSchema
 
             return null;
         }
-    }
-
-    /// <summary>JSON Pointer references resolver settings  </summary>
-    public class JsonReferenceResolverSettings
-    {
-        /// <summary>Function to transfor source references data. </summary>
-        public Func<string, string> TransformationFunction { get; set; }
     }
 }

@@ -75,16 +75,13 @@ namespace NJsonSchema.Infrastructure
         /// <param name="documentPath">The document path.</param>
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
         /// <param name="contractResolver">The contract resolver.</param>
-        /// <param name="transformFunc">Function to transform source data.</param>
         /// <returns>The deserialized schema.</returns>
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
-            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver,
-            Func<string, string> transformFunc)
+            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
         {
             IsWriting = true;
             CurrentSchemaType = schemaType;
 
-            json = transformFunc?.Invoke(json) ?? json;
             json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
             var settings = new JsonSerializerSettings
             {
