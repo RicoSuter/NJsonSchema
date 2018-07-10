@@ -43,40 +43,51 @@ namespace NJsonSchema.CodeGeneration
                 var value = _properties[key].GetValue(Object);
                 if (IsObject(value))
                 {
-                    if (value is IDictionary dictionary)
-                    {
-                        var hash = new Hash();
-                        foreach (var k in dictionary.Keys)
-                        {
-                            var v = dictionary[k];
-                            hash[k.ToString()] = IsObject(v) ? new LiquidProxyHash(v) : v;
-                        }
-                        return hash;
-                    }
-                    else if (value is IEnumerable enumerable)
-                    {
-                        if (enumerable.OfType<object>().Any(i => !IsObject(i)))
-                        {
-                            var list = new List<object>();
-                            foreach (var item in enumerable)
-                                list.Add(item);
-                            return list;
-                        }
-                        else
-                        {
-                            var list = new List<LiquidProxyHash>();
-                            foreach (var item in enumerable)
-                                list.Add(new LiquidProxyHash(item));
-                            return list;
-                        }
-                    }
-                    else
-                        return new LiquidProxyHash(value);
+                    return GetObjectValue(value);
                 }
+
                 return value;
             }
             else
+            {
                 return base.GetValue(key);
+            }
+        }
+
+        private object GetObjectValue(object value)
+        {
+            if (value is IDictionary dictionary)
+            {
+                var hash = new Hash();
+                foreach (var k in dictionary.Keys)
+                {
+                    var v = dictionary[k];
+                    hash[k.ToString()] = IsObject(v) ? GetObjectValue(v) : v;
+                }
+
+                return hash;
+            }
+            else if (value is IEnumerable enumerable)
+            {
+                if (enumerable.OfType<object>().Any(i => !IsObject(i)))
+                {
+                    var list = new List<object>();
+                    foreach (var item in enumerable)
+                        list.Add(item);
+                    return list;
+                }
+                else
+                {
+                    var list = new List<LiquidProxyHash>();
+                    foreach (var item in enumerable)
+                        list.Add(new LiquidProxyHash(item));
+                    return list;
+                }
+            }
+            else
+            {
+                return new LiquidProxyHash(value);
+            }
         }
 
         public override int GetHashCode()
@@ -87,7 +98,9 @@ namespace NJsonSchema.CodeGeneration
         public override bool Equals(object obj)
         {
             if (obj is LiquidProxyHash hash && hash.Object != Object)
+            {
                 return false;
+            }
 
             return base.Equals(obj);
         }
