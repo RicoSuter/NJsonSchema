@@ -173,8 +173,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath)
         {
-            var referenceResolverFactory = CreateReferenceResolverFactory();
-            return await FromJsonAsync(data, documentPath, referenceResolverFactory).ConfigureAwait(false);
+            return await FromJsonAsync(data, documentPath, CreateReferenceResolverFactory()).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
@@ -184,8 +183,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath,
-                referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
+            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
         }
 
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
