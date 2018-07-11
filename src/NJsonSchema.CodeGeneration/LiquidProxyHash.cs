@@ -58,29 +58,38 @@ namespace NJsonSchema.CodeGeneration
         {
             if (value is IDictionary dictionary)
             {
-                var hash = new Hash();
-                foreach (var k in dictionary.Keys)
-                {
-                    var v = dictionary[k];
-                    hash[k.ToString()] = IsObject(v) ? GetObjectValue(v) : v;
-                }
-
-                return hash;
+                return CreateDictionaryHash(dictionary);
             }
             else if (value is IEnumerable enumerable)
             {
-                if (enumerable.OfType<object>().Any(i => !IsObject(i)))
+                if (enumerable.OfType<object>().All(i => !IsObject(i)))
                 {
                     var list = new List<object>();
                     foreach (var item in enumerable)
+                    {
                         list.Add(item);
+                    }
+
+                    return list;
+                }
+                else if (enumerable.OfType<object>().All(i => i is IDictionary))
+                {
+                    var list = new List<object>();
+                    foreach (IDictionary item in enumerable)
+                    {
+                        list.Add(CreateDictionaryHash(item));
+                    }
+
                     return list;
                 }
                 else
                 {
                     var list = new List<LiquidProxyHash>();
                     foreach (var item in enumerable)
+                    {
                         list.Add(new LiquidProxyHash(item));
+                    }
+
                     return list;
                 }
             }
@@ -88,6 +97,18 @@ namespace NJsonSchema.CodeGeneration
             {
                 return new LiquidProxyHash(value);
             }
+        }
+
+        private object CreateDictionaryHash(IDictionary dictionary)
+        {
+            var hash = new Hash();
+            foreach (var k in dictionary.Keys)
+            {
+                var v = dictionary[k];
+                hash[k.ToString()] = IsObject(v) ? GetObjectValue(v) : v;
+            }
+
+            return hash;
         }
 
         public override int GetHashCode()
