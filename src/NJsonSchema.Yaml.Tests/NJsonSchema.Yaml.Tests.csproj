@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net46;net45</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup>
+      <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Yaml.Tests.xml</DocumentationFile>
+  </PropertyGroup>  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
+    <Reference Condition="'$(TargetFramework)' == 'net45'" Include="System.ComponentModel.DataAnnotations">
+    </Reference>
+    <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations">
+    </Reference>
+    <PackageReference Include="NodaTime" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    <ProjectReference Include="..\NJsonSchema.Yaml\NJsonSchema.Yaml.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="References\YamlReferencesTest\collection.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\YamlReferencesTest\collection.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\YamlReferencesTest\json_schema_with_yaml_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+    <Content Include="References\YamlReferencesTest\json_schema_with_json_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\YamlReferencesTest\yaml_schema_with_json_reference.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\YamlReferencesTest\yaml_schema_with_yaml_reference.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
