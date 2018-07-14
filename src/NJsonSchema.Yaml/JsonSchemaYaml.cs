@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
-using NJsonSchema.References;
 using YamlDotNet.Serialization;
 
 namespace NJsonSchema.Yaml
@@ -27,7 +26,8 @@ namespace NJsonSchema.Yaml
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromYamlAsync(string data)
         {
-            return await JsonSchemaYaml.FromYamlAsync(data, null, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await JsonSchemaYaml.FromYamlAsync(data, null, factory).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
@@ -36,7 +36,8 @@ namespace NJsonSchema.Yaml
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromYamlAsync(string data, string documentPath)
         {
-            return await JsonSchemaYaml.FromYamlAsync(data, documentPath, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromYamlAsync(data, documentPath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
@@ -73,7 +74,8 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema4" />.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            return await FromFileAsync(filePath, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromFileAsync(filePath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Creates a JSON Schema from a JSON file.</summary>
@@ -107,31 +109,6 @@ namespace NJsonSchema.Yaml
 
             var json = serializer.Serialize(yamlObject);
             return json;
-        }
-
-        private static Func<JsonSchema4, JsonReferenceResolver> CreateReferenceResolverFactory()
-        {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
-                new JsonAndYamlReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
-            return ReferenceResolverFactory;
-        }
-
-        private class JsonAndYamlReferenceResolver : JsonReferenceResolver
-        {
-            public JsonAndYamlReferenceResolver(JsonSchemaResolver schemaResolver)
-                : base(schemaResolver)
-            {
-            }
-
-            public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
-            {
-                return await FromFileAsync(filePath, schema => this).ConfigureAwait(false);
-            }
-
-            public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
-            {
-                return await FromUrlAsync(url, schema => this).ConfigureAwait(false);
-            }
         }
     }
 }
