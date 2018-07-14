@@ -125,7 +125,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            return await FromFileAsync(filePath, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromFileAsync(filePath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -145,7 +146,8 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
         {
-            return await FromUrlAsync(url, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromUrlAsync(url, factory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -173,7 +175,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath)
         {
-            return await FromJsonAsync(data, documentPath, CreateReferenceResolverFactory()).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromJsonAsync(data, documentPath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
@@ -815,13 +818,6 @@ namespace NJsonSchema
 
             if (EnumerationNames == null)
                 EnumerationNames = new Collection<string>();
-        }
-
-        private static Func<JsonSchema4, JsonReferenceResolver> CreateReferenceResolverFactory()
-        {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
-                new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
-            return ReferenceResolverFactory;
         }
     }
 }

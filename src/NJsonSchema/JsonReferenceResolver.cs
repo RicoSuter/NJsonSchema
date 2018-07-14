@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
@@ -28,6 +29,17 @@ namespace NJsonSchema
         public JsonReferenceResolver(JsonSchemaResolver schemaResolver)
         {
             _schemaResolver = schemaResolver;
+        }
+
+        /// <summary>Creates the factory to be used in the FromJsonAsync method.</summary>
+        /// <param name="settings">The generator settings.</param>
+        /// <returns>The factory.</returns>
+        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonReferenceResolverFactory(JsonSchemaGeneratorSettings settings)
+        {
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
+                new JsonReferenceResolver(new JsonSchemaResolver(schema, settings));
+
+            return ReferenceResolverFactory;
         }
 
         /// <summary>Adds a document reference.</summary>
