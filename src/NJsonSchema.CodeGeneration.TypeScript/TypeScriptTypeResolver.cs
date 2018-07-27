@@ -137,7 +137,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Moment";
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
-                    return "moment.Moment";
+                    return "moment.Duration";
             }
 
             if (schema.IsEnumeration)
