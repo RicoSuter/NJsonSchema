@@ -12,10 +12,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptValueGenerator : ValueGeneratorBase
     {
         /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
-        /// <param name="typeResolver">The type resolver.</param>
-        /// <param name="settings">The settings</param>
-        public TypeScriptValueGenerator(TypeResolverBase typeResolver, TypeScriptGeneratorSettings settings)
-            : base(typeResolver, settings.EnumNameGenerator)
+        /// <param name="settings">The settings.</param>
+        public TypeScriptValueGenerator(TypeScriptGeneratorSettings settings)
+            : base(settings)
         {
         }
 
@@ -25,10 +24,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="targetType">The type of the target.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault)
+        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
-            var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault);
+            var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
                 schema = schema.ActualSchema;
@@ -40,8 +40,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     if (schema.IsDictionary)
                         return "{}";
 
-                    if (schema.Type.HasFlag(JsonObjectType.Object) && !schema.IsAbstract)
+                    if (schema.Type.HasFlag(JsonObjectType.Object) &&
+                        !schema.IsAbstract &&
+                        !schema.IsAnyType)
+                    {
                         return "new " + targetType + "()";
+                    }
                 }
             }
 

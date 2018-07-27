@@ -60,23 +60,26 @@ namespace NJsonSchema.Validation
 
         private void ValidateType(JToken token, JsonSchema4 schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            var types = GetTypes(schema).ToDictionary(t => t, t => new List<ValidationError>());
-            if (types.Count > 0)
+            var types = GetTypes(schema).ToDictionary(t => t, t => (ICollection<ValidationError>)new List<ValidationError>());
+            if (types.Count > 1)
             {
                 foreach (var type in types)
                 {
-                    ValidateArray(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateString(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateNumber(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateInteger(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateBoolean(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateNull(token, schema, type.Key, propertyName, propertyPath, type.Value);
-                    ValidateObject(token, schema, type.Key, propertyName, propertyPath, type.Value);
+                    ValidateArray(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateString(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateNumber(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateInteger(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateBoolean(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateNull(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
+                    ValidateObject(token, schema, type.Key, propertyName, propertyPath, (List<ValidationError>)type.Value);
                 }
 
                 // just one has to validate when multiple types are defined
                 if (types.All(t => t.Value.Count > 0))
-                    errors.AddRange(types.SelectMany(t => t.Value));
+                {
+                    errors.Add(new MultiTypeValidationError(
+                        ValidationErrorKind.NoTypeValidates, propertyName, propertyPath, types, token, schema));
+                }
             }
             else
             {

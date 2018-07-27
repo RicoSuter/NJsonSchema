@@ -24,6 +24,10 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema4 : IDocumentPathProvider
     {
+        private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
+        private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
+            () => CreateJsonSerializerContractResolver(SerializationSchemaType));
+
         private IDictionary<string, JsonProperty> _properties;
         private IDictionary<string, JsonSchema4> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
@@ -121,10 +125,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
-                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
-
-            return await FromFileAsync(filePath, referenceResolverFactory).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromFileAsync(filePath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -144,10 +146,8 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
         {
-            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
-                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
-
-            return await FromUrlAsync(url, referenceResolverFactory).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromUrlAsync(url, factory).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -175,10 +175,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath)
         {
-            Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory =
-                schema => new JsonReferenceResolver(new JsonSchemaResolver(schema, new JsonSchemaGeneratorSettings()));
-
-            return await FromJsonAsync(data, documentPath, referenceResolverFactory).ConfigureAwait(false);
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            return await FromJsonAsync(data, documentPath, factory).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema4" />.</summary>
@@ -188,27 +186,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            data = JsonSchemaReferenceUtilities.ConvertJsonReferences(data);
-
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema),
-                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            };
-
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
-            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, settings);
-            schema.DocumentPath = documentPath;
-
-            var referenceResolver = referenceResolverFactory(schema);
-            if (!string.IsNullOrEmpty(documentPath))
-                referenceResolver.AddDocumentReference(documentPath, schema);
-
-            await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver).ConfigureAwait(false);
-            return schema;
+            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
         }
 
         internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
@@ -219,6 +197,7 @@ namespace NJsonSchema
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             });
+
             return schema;
         }
 
@@ -328,7 +307,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the description. </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Description { get; set; }
+        public virtual string Description { get; set; }
 
         /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
@@ -425,6 +404,10 @@ namespace NJsonSchema
         /// <summary>Gets or sets the example (Swagger and Open API only).</summary>
         [JsonProperty("x-example", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object Example { get; set; }
+
+        /// <summary>Gets or sets a value indicating this is an bit flag enum (custom extension, sets 'x-enumFlags', default: false).</summary>
+        [JsonProperty("x-enumFlags", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public bool IsFlagEnumerable { get; set; }
 
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
@@ -674,11 +657,11 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsTuple => Type.HasFlag(JsonObjectType.Array) && Items?.Any() == true;
 
-        /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties contains a schema).</summary>
+        /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties or PatternProperties contain a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.HasFlag(JsonObjectType.Object) &&
                                     ActualProperties.Count == 0 &&
-                                    (AllowAdditionalProperties || PatternProperties.Any());
+                                    (AdditionalPropertiesSchema != null || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
@@ -716,21 +699,21 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            var oldSchema = SchemaVersion;
+            return ToJson(Formatting.Indented);
+        }
 
+        /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
+        /// <param name="formatting">The formatting.</param>
+        /// <returns>The JSON string.</returns>
+        public string ToJson(Formatting formatting)
+        {
+            var oldSchema = SchemaVersion;
             SchemaVersion = "http://json-schema.org/draft-04/schema#";
 
-            var contractResolver = CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
-
-            JsonSchemaSerializationContext.CurrentSchemaType = SchemaType.JsonSchema;
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(this, false, contractResolver);
-            var json = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver
-            });
+            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value, formatting);
 
             SchemaVersion = oldSchema;
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+            return json;
         }
 
         ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>

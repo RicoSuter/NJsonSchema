@@ -37,7 +37,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             Properties = _schema.ActualProperties.Values
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
-                .ToList();
+                .ToArray();
+
+            if (HasInheritance)
+            {
+                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
+                AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
+            }
+            else
+                AllProperties = Properties;
         }
 
         /// <summary>Gets or sets the class name.</summary>
@@ -50,13 +58,17 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasAdditionalPropertiesType => _schema.AdditionalPropertiesSchema != null;
 
         /// <summary>Gets the type of the additional properties.</summary>
-        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
-            _schema.AdditionalPropertiesSchema,
-            _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
-            string.Empty) : null;
+        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
+        //public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
+        //    _schema.AdditionalPropertiesSchema,
+        //    _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
+        //    string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
         public IEnumerable<PropertyModel> Properties { get; }
+
+        /// <summary>Gets the property models with inherited properties.</summary>
+        public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
@@ -90,11 +102,21 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
+        /// <summary>Gets the base class model.</summary>
+        public ClassTemplateModel BaseClass { get; }
+
+        /// <summary>Gets a value indicating whether the class inherits from exception.</summary>
+        public bool InheritsExceptionSchema => _resolver.ExceptionSchema != null &&
+                                               _schema?.InheritsSchema(_resolver.ExceptionSchema) == true;
+
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
         public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
         public string TypeAccessModifier => _settings.TypeAccessModifier;
+
+        /// <summary>Gets the access modifier of property setters (default: '').</summary>
+        public string PropertySetterAccessModifier => !string.IsNullOrEmpty(_settings.PropertySetterAccessModifier) ? _settings.PropertySetterAccessModifier + " " : "";
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);

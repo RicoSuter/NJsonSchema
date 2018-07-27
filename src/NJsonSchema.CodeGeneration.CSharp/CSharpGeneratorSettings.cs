@@ -16,6 +16,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            Namespace = "MyNamespace";
+
             DateType = "System.DateTime";
             DateTimeType = "System.DateTime";
             TimeType = "System.TimeSpan";
@@ -31,8 +33,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
             GenerateDataAnnotations = true;
             ClassStyle = CSharpClassStyle.Inpc;
             TypeAccessModifier = "public";
+            PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = true;
+            EnforceFlagEnums = false;
 
+            ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
             {
@@ -40,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             });
         }
 
-        /// <summary>Gets or sets the .NET namespace of the generated types.</summary>
+        /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
         public string Namespace { get; set; }
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
@@ -80,6 +85,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }
 
+        /// <summary>Gets the access modifier of property setters (default: '').</summary>
+        public string PropertySetterAccessModifier { get; set; }
+
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
         public string[] JsonConverters { get; set; }
 
@@ -97,5 +105,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: true).</summary>
         public bool GenerateJsonMethods { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
+        public bool EnforceFlagEnums { get; set; }
     }
 }

@@ -32,13 +32,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static object CreateModel(DataConversionParameters parameters)
         {
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
-            var valueGenerator = new TypeScriptValueGenerator(parameters.Resolver, parameters.Settings);
+            var valueGenerator = parameters.Settings.ValueGenerator;
 
             var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
             var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
                 ? valueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
                     parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.SchemaType), dictionaryValueType, parameters.TypeNameHint,
-                    parameters.Settings.GenerateDefaultValues)
+                    parameters.Settings.GenerateDefaultValues, parameters.Resolver)
                 : null;
 
             return new
@@ -48,10 +48,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
-                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues) != null,
-                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
-                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues),
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
+                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
+                    parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 
@@ -80,10 +80,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
-                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? 
-                    "new Date" : 
-                    (parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment"),
-                DateTimeToStringCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
+                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" :
+                        (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
+                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "moment.duration" :
+                    parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment",
+                DateTimeToStringCode =
+                        (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
+                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "format('HH:mm:ss')" :
+                    parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
             };
@@ -103,7 +109,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (format == JsonFormatStrings.TimeSpan)
                     return false;
             }
-            else if (type == TypeScriptDateTimeType.MomentJS || 
+            else if (type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
@@ -127,7 +133,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (format == JsonFormatStrings.Date)
                     return true;
             }
-            else if (type == TypeScriptDateTimeType.MomentJS || 
+            else if (type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)
@@ -139,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static bool IsNewableObject(JsonSchema4 schema)
         {
             schema = schema.ActualSchema;
-            return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None) 
+            return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None)
                 && !schema.IsAnyType && !schema.IsDictionary && !schema.IsEnumeration;
         }
     }

@@ -340,5 +340,57 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal("#/Key", error.Path);
             Assert.Same(schema, error.Schema);
         }
+
+        [Fact]
+        public async Task When_multiple_types_fail_with_errors_take_the_best_group()
+        {
+            //// Arrange
+            var schemaJson = @"{
+        ""$schema"": ""http://json-schema.org/schema#"",
+        ""type"": ""object"",
+        ""properties"": {
+         ""name"": {
+           ""type"": ""string"",
+           ""maxLength"": 40
+         },
+         ""settings"": {
+           ""type"": [ ""object"", ""null"" ],
+           ""properties"": {
+            ""security"": {
+              ""type"": [ ""object"", ""null"" ],
+              ""properties"": {
+               ""timeout"": {
+                 ""type"": [ ""integer"", ""null"" ],
+                 ""minimum"": 1,
+                 ""maximum"": 10
+               }
+              },
+              ""additionalProperties"": false
+            }
+           },
+           ""additionalProperties"": false
+         }
+        },
+        ""required"": [ ""name"" ],
+        ""additionalProperties"": false
+      }";
+
+            var json = @"{
+   ""name"":""abc"",
+   ""settings"": {
+     ""security"":{
+      ""timeout"": 0
+     }
+   }
+}";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var errors = schema.Validate(json);
+
+            //// Assert
+            Assert.Equal(1, errors.Count);
+            Assert.Contains(errors, e => e.Kind == ValidationErrorKind.NoTypeValidates);
+        }
     }
 }

@@ -5,15 +5,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
 using Xunit;
-using NJsonSchema.Annotations;
 
-namespace NJsonSchema.CodeGeneration.Tests.CSharp
+namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
     public class CSharpGeneratorTests
     {
@@ -35,6 +37,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; } = ", output);
+
+            AssertCompile(output);
         }
 
         class CustomPropertyNameGenerator : IPropertyNameGenerator
@@ -120,6 +124,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains(@"public string MyCustomLastName", output);
             Assert.Contains(@"public partial class MyCustomTypeTeacher", output);
             Assert.Contains(@"public partial class MyCustomTypePerson", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -166,6 +172,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<PRef>", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -180,6 +188,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("namespace MyNamespace", output);
             Assert.Contains("Dictionary<string, int>", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -194,6 +204,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("{ get; set; }", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -208,6 +220,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName""", output);
             Assert.Contains(@"public string LastName", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -223,6 +237,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"public System.TimeSpan TimeSpan", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -236,6 +252,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"class Teacher : Person, ", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -251,6 +269,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"/// <summary>EnumDesc.</summary>", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -266,6 +286,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"/// <summary>ClassDesc.</summary>", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -281,6 +303,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"/// <summary>PropertyDesc.</summary>", output);
+
+            AssertCompile(output);
         }
 
         public class File
@@ -300,6 +324,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             Assert.Contains("public byte[] Content", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -315,6 +341,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             Assert.Contains("public byte[] Content", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -335,6 +363,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             // Assert
             Assert.Contains(@"[Newtonsoft.Json.JsonProperty(""foo-bar"", ", output);
             Assert.Contains(@"public string FooBar", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -349,6 +379,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain(@"class  :", output);
+
+            AssertCompile(output);
         }
 
         private static async Task<CSharpGenerator> CreateGeneratorAsync()
@@ -394,6 +426,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public object Foo { get; set; }", code);
+
+            AssertCompile(code);
         }
 
         public enum ConstructionCode
@@ -428,6 +462,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -447,6 +483,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -487,6 +525,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public MyClassConstructionCode ConstructionCode { get; set; } = Foo.MyClassConstructionCode.JOIST_MAS;", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -510,6 +550,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("[Newtonsoft.Json.JsonProperty(\"Foo\", Required = Newtonsoft.Json.Required.DisallowNull", code);
             Assert.Contains("public string Foo1 { get; set; }", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -538,6 +580,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public System.Collections.Generic.Dictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -557,6 +601,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public partial class FooOfBarOfInner", code);
+
+            AssertCompile(code);
         }
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -616,6 +662,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     
         [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
         public int? Age { get; set; }".Replace("\r", string.Empty), code.Replace("\r", string.Empty));
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -660,6 +708,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<string> A { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();", code);
             Assert.DoesNotContain("public System.Collections.ObjectModel.ObservableCollection<string> B { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -704,6 +754,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("public System.Collections.Generic.Dictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
             Assert.DoesNotContain("public System.Collections.Generic.Dictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -756,6 +808,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("public A A { get; set; } = new A();", code);
             Assert.DoesNotContain("public B B { get; set; } = new B();", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -789,6 +843,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public object Foo { get; set; }", code);
+
+            AssertCompile(code);
         }
 
         public class ObsClass
@@ -810,6 +866,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("ObservableCollection<string>", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -827,6 +885,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("Application_vnd_msExcel = 1,", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -850,6 +910,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public string OdataContext", output);
+
+            AssertCompile(output);
         }
 
         [Fact]
@@ -878,6 +940,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -906,6 +970,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.Range(int.MinValue, 10)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -935,6 +1001,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.Range(1, 10)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -963,6 +1031,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain("System.ComponentModel.DataAnnotations.Range", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -991,6 +1061,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 10)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1019,6 +1091,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.StringLength(20)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1048,6 +1122,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.StringLength(20, MinimumLength = 10)]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1077,6 +1153,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain("System.ComponentModel.DataAnnotations.StringLength", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1105,6 +1183,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains(@"[System.ComponentModel.DataAnnotations.RegularExpression(@""^[a-zA-Z''-'\s]{1,40}$"")]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1133,6 +1213,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain(@"System.ComponentModel.DataAnnotations.RegularExpression", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1173,6 +1255,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain(@"System.ComponentModel.DataAnnotations", code);
+
+            AssertCompile(code);
         }
 
         public class MyByteTest
@@ -1193,6 +1277,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public byte? Cell { get; set; }", code);
+
+            AssertCompile(code);
         }
 
         public class MyRequiredNullableTest
@@ -1214,6 +1300,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public int Foo { get; set; }", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1244,7 +1332,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains(@"class DateFormatConverter", code);
             Assert.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
-	    }
+
+            AssertCompile(code);
+        }
 
         [Fact]
         public async Task When_no_typeNameHint_is_available_then_title_is_used_as_class_name()
@@ -1282,6 +1372,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.DoesNotContain("Anonymous", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1340,6 +1432,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.DoesNotContain("System.Linq.Enumerable+SelectIListIterator", code);
             Assert.Contains("ObservableCollection<System.Tuple<int, int>>", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1370,6 +1464,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains(@"class DateFormatConverter", code);
             Assert.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1400,6 +1496,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.DoesNotContain(@"class DateFormatConverter", code);
             Assert.DoesNotContain(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
+
+            AssertCompile(code);
         }
 
         [Fact]
@@ -1417,21 +1515,33 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var output = generator.GenerateFile("Address");
 
             //// Assert
-            Assert.Contains      (@"public string Street { get; }",      output);
+            Assert.Contains(@"public string Street { get; }", output);
             Assert.DoesNotContain(@"public string Street { get; set; }", output);
 
-            Assert.Contains("public Address(string street, string city)", output);
-            Assert.Contains("public Address(string street, string city)", output);
+            Assert.Contains("public Address(string @city, string @street)", output);
+
+            AssertCompile(output);
         }
 
         public abstract class AbstractAddress
         {
             [JsonProperty("city")]
             [DefaultValue("Innsmouth")]
-            public string CityName   { get; set; }
+            public string CityName { get; set; }
 
             [JsonProperty("streetName")]
             public string StreetName { get; set; }
+        }
+
+        public class PostAddress : AbstractAddress
+        {
+            public string Zip { get; set; }
+            public int HouseNumber { get; set; }
+        }
+
+        public class PersonAddress : PostAddress
+        {
+            public string Addressee { get; set; }
         }
 
         [Fact]
@@ -1442,20 +1552,89 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Record,
+                ClassStyle = CSharpClassStyle.Record
             });
 
             //// Act
             var output = generator.GenerateFile("AbstractAddress");
 
             //// Assert
-            Assert.Contains      (@"public string StreetName { get; }",      output);
+            Assert.Contains(@"public string StreetName { get; }", output);
             Assert.DoesNotContain(@"public string StreetName { get; set; }", output);
-            
-            Assert.Contains      (@"public string City { get; }",      output);
+
+            Assert.Contains(@"public string City { get; }", output);
+            Assert.DoesNotContain(@"public string City { get; } =", output);
             Assert.DoesNotContain(@"public string City { get; set; }", output);
 
-            Assert.Contains("protected AbstractAddress(string streetName, string city = \"Innsmouth\")", output);
+            Assert.Contains("protected AbstractAddress(string @city, string @streetName)", output);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_record_has_inheritance()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<PersonAddress>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record
+            });
+
+            //// Act
+            var output = generator.GenerateFile("PersonAddress");
+
+            Assert.Contains("protected AbstractAddress(string @city, string @streetName)", output);
+
+            Assert.Contains("public PostAddress(string @city, int @houseNumber, string @streetName, string @zip)", output);
+            Assert.Contains(": base(city, streetName)", output);
+
+            Assert.Contains("public PersonAddress(string @addressee, string @city, int @houseNumber, string @streetName, string @zip)", output);
+            Assert.Contains(": base(city, houseNumber, streetName, zip)", output);
+
+            AssertCompile(output);
+        }
+
+        public class ClassWithExtensionData
+        {
+            public string Foo { get; set; }
+
+            [JsonExtensionData]
+            public IDictionary<string, object> ExtensionData { get; set; }
+        }
+
+        [Fact]
+        public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var json = schema.ToJson();
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+
+            //// Act
+            var output = generator.GenerateFile("PersonAddress");
+
+            //// Assert
+            Assert.Contains("JsonExtensionData", output);
+        }
+
+        private static void AssertCompile(string code)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var errors = syntaxTree
+                .GetDiagnostics()
+                .Where(_ => _.Severity == DiagnosticSeverity.Error);
+
+            var sb = new StringBuilder();
+            foreach (var e in errors)
+                sb.AppendLine($"{e.Id} at {e.Location}: {e.GetMessage()}");
+
+            Assert.Empty(sb.ToString());
         }
     }
 }

@@ -69,7 +69,7 @@ namespace NJsonSchema.Tests.Generation
 
         public class WithSeeTagInXmlDoc
         {
-            /// <summary><see langword="null"/> for the default <see cref="Record"/>.</summary>
+            /// <summary><see langword="null"/> for the default <see cref="Record"/>. See <see cref="Record">this</see> and <see href="https://github.com/rsuter/njsonschema">this</see> at <see href="https://github.com/rsuter/njsonschema"/>.</summary>
             public string Foo { get; set; }
         }
 
@@ -83,7 +83,26 @@ namespace NJsonSchema.Tests.Generation
             var summary = await typeof(WithSeeTagInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
 
             //// Assert
-            Assert.Equal("null for the default Record.", summary);
+            Assert.Equal("null for the default Record. See this and this at https://github.com/rsuter/njsonschema.", summary);
+        }
+
+        public class WithGenericTagsInXmlDoc
+        {
+            /// <summary>This <c>are</c> <strong>some</strong> tags.</summary>
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_summary_has_generic_tags_then_it_is_converted()
+        {
+            //// Arrange
+
+
+            //// Act
+            var summary = await typeof(WithGenericTagsInXmlDoc).GetProperty("Foo").GetXmlSummaryAsync();
+
+            //// Assert
+            Assert.Equal("This are some tags.", summary);
         }
 
         [Fact]

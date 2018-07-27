@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.Generation
 {
@@ -29,22 +30,45 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
+            var isNullable = IsNullable(type, parentAttributes, settings);
+
+            var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
+                                          parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
+
+            if (jsonSchemaTypeAttribute != null)
+            {
+                type = jsonSchemaTypeAttribute.Type;
+
+                if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
+                    isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
+            }
+            
+            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
+                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
+
+            if (jsonSchemaAttribute != null)
+            {
+                var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
+                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
+                return JsonTypeDescription.Create(type, classType, isNullable, format);
+            }
+
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
+                var isStringEnum = IsStringEnum(type, parentAttributes, settings);
                 return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
-            if (type == typeof(short) || 
-                type == typeof(uint) || 
+            if (type == typeof(short) ||
+                type == typeof(uint) ||
                 type == typeof(ushort))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
 
             if (type == typeof(int))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
 
-            if (type == typeof(long) || 
+            if (type == typeof(long) ||
                 type == typeof(ulong))
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
 
@@ -58,7 +82,6 @@ namespace NJsonSchema.Generation
             if (type == typeof(bool))
                 return JsonTypeDescription.Create(type, JsonObjectType.Boolean, false, null);
 
-            var isNullable = IsNullable(type, parentAttributes, settings);
             if (type == typeof(string) || type == typeof(Type))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
 
@@ -68,14 +91,14 @@ namespace NJsonSchema.Generation
             if (type == typeof(Guid))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
 
-            if (type == typeof(DateTime) || 
-                type == typeof(DateTimeOffset) || 
+            if (type == typeof(DateTime) ||
+                type == typeof(DateTimeOffset) ||
                 type.FullName == "NodaTime.OffsetDateTime" ||
                 type.FullName == "NodaTime.LocalDateTime" ||
                 type.FullName == "NodaTime.ZonedDateTime")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
-            if (type == typeof(TimeSpan) || 
+            if (type == typeof(TimeSpan) ||
                 type.FullName == "NodaTime.Duration")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
 
@@ -94,7 +117,10 @@ namespace NJsonSchema.Generation
             if (type == typeof(byte[]))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
 
-            if (type == typeof(JObject) || 
+            if (type == typeof(JArray))
+                return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+
+            if (type == typeof(JObject) ||
                 type == typeof(JToken) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
                 type == typeof(object))
@@ -113,21 +139,13 @@ namespace NJsonSchema.Generation
             if (type.Name == "Nullable`1")
             {
 #if !LEGACY
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes, settings);
+                // Remove JsonSchemaTypeAttributes to avoid stack overflows
+                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes, settings);
+                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
 #endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
-            }
-
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
-                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
-            if (jsonSchemaAttribute != null)
-            {
-                var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
-                var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return JsonTypeDescription.Create(type, classType, isNullable, format);
             }
 
             if (contract is JsonStringContract)
@@ -249,13 +267,13 @@ namespace NJsonSchema.Generation
 
 #endif
 
-        private bool IsStringEnum(Type type, IEnumerable<Attribute> propertyAttributes, EnumHandling defaultEnumHandling)
+        private bool IsStringEnum(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
-            if (defaultEnumHandling == EnumHandling.String)
-                return true;
+            var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
+            var hasStringEnumConverterOnProperty = parentAttributes != null && HasStringEnumConverter(parentAttributes);
 
-            return HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) ||
-                (propertyAttributes != null && HasStringEnumConverter(propertyAttributes));
+            return hasGlobalStringEnumConverter || hasStringEnumConverterOnType || hasStringEnumConverterOnProperty;
         }
 
         private bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
@@ -267,8 +285,7 @@ namespace NJsonSchema.Generation
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "StringEnumConverter")
-                    return true;
+                return converterType.IsAssignableTo("StringEnumConverter", TypeNameStyle.Name);
             }
             return false;
         }

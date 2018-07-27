@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -253,6 +254,54 @@ namespace NJsonSchema.Tests.Generation
 
             /// Assert
             Assert.Equal(typeof(ACommonThing), vm.CommonThing.GetType());
+        }
+
+        [KnownType(typeof(InheritedClass_WithStringDiscriminant))]
+        [JsonConverter(typeof(JsonInheritanceConverter), nameof(Kind))]
+        public class BaseClass_WithStringDiscriminant
+        {
+            public string Kind { get; set; }
+        }
+
+        public class InheritedClass_WithStringDiscriminant : BaseClass_WithStringDiscriminant
+        {
+
+        }
+
+        [Fact]
+        public async Task Existing_string_property_can_be_discriminant()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<BaseClass_WithStringDiscriminant>();
+
+            //// Assert
+            Assert.NotNull(schema.Properties["Kind"]);
+        }
+
+        [KnownType(typeof(InheritedClass_WithIntDiscriminant))]
+        [JsonConverter(typeof(JsonInheritanceConverter), nameof(Kind))]
+        public class BaseClass_WithIntDiscriminant
+        {
+            public int Kind { get; set; }
+        }
+
+        public class InheritedClass_WithIntDiscriminant : BaseClass_WithStringDiscriminant
+        {
+
+        }
+
+        [Fact]
+        public async Task Existing_non_string_property_cant_be_discriminant()
+        {
+            //// Arrange
+
+            //// Act
+            Task<JsonSchema4> getSchema() => JsonSchema4.FromTypeAsync<BaseClass_WithIntDiscriminant>();
+
+            //// Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(getSchema);
         }
     }
 }

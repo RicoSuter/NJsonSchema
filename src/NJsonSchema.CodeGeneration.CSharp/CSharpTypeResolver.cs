@@ -16,10 +16,22 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
         /// <param name="settings">The generator settings.</param>
         public CSharpTypeResolver(CSharpGeneratorSettings settings)
+            : this(settings, null)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpTypeResolver"/> class.</summary>
+        /// <param name="settings">The generator settings.</param>
+        /// <param name="exceptionSchema">The exception type schema.</param>
+        public CSharpTypeResolver(CSharpGeneratorSettings settings, JsonSchema4 exceptionSchema)
             : base(settings)
         {
             Settings = settings;
+            ExceptionSchema = exceptionSchema;
         }
+
+        /// <summary>Gets the exception schema.</summary>
+        public JsonSchema4 ExceptionSchema { get; }
 
         /// <summary>Gets the generator settings.</summary>
         public CSharpGeneratorSettings Settings { get; }
@@ -32,6 +44,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             schema = schema.ActualSchema;
+
+            if (schema == ExceptionSchema)
+                return "System.Exception";
 
             if (schema.IsAnyType)
                 return "object";
