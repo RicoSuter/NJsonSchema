@@ -28,7 +28,18 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema4 ActualTypeSchema => OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+        public virtual JsonSchema4 ActualTypeSchema
+        {
+            get
+            {
+                if (AllOf.Count(s => !s.HasReference) == 1)
+                {
+                    return AllOf.First(s => !s.HasReference);
+                }
+
+                return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+            }
+        }
 
         /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
         [JsonIgnore]
@@ -80,25 +91,6 @@ namespace NJsonSchema
                     return AllOf.First().GetActualSchema(checkedSchemas);
 
                 return Reference.GetActualSchema(checkedSchemas);
-            }
-
-            if (AllOf.Count > 1)
-            {
-                var schemas = AllOf.Where(s => !s.HasReference).ToArray();
-                return new JsonSchema4
-                {
-                    
-
-                    Properties = new ObservableDictionary<string, JsonProperty>(
-                        Properties.Concat(schemas.SelectMany(s => s.Properties)).ToDictionary(p => p.Key, p => p.Value)),
-
-                    AllOf = new ObservableCollection<JsonSchema4>(
-                        AllOf.Where(s => s.HasReference))
-                };
-
-
-                // TODO: Merge this schema + all AllOf where !HasReference => new AllOf = all where HasReference
-                //return AllOf.Last(s => !s.HasReference).GetActualSchema(checkedSchemas);
             }
 
             return this;
