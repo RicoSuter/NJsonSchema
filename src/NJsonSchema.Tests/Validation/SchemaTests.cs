@@ -8,19 +8,6 @@ namespace NJsonSchema.Tests.Validation
     public class SchemaTests
     {
         [Fact]
-        public async Task When_json_schem_is_loaded_via_url_then_it_works()
-        {
-            //// Arrange
-
-            //// Act
-            var schema = await JsonSchema4.FromUrlAsync("http://json-schema.org/card");
-            var json = schema.ToJson();
-
-            //// Assert
-            Assert.NotNull(json);
-        }
-
-        [Fact]
         public async Task When_no_additional_properties_are_allowed_then_this_error_is_returned()
         {
             //// Arrange
