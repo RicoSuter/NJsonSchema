@@ -88,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 DateTimeToStringCode =
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                         parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
-                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "format('HH:mm:ss.SS')" :
+                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS')" :
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
