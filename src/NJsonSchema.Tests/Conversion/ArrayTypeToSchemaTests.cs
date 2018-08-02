@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Conversion
             var data = schema.ToJson();
 
             //// Assert
-            Assert.Equal(JsonObjectType.Object, schema.ActualSchema.Type);
+            Assert.Equal(JsonObjectType.Object, schema.ActualTypeSchema.Type);
             Assert.DoesNotContain("Foo", json);
             Assert.DoesNotContain("foo", json);
         }

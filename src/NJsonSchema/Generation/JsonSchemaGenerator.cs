@@ -318,6 +318,7 @@ namespace NJsonSchema.Generation
             JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
+            var rootSchema = schema;
 
             var hasInheritance = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
             if (hasInheritance)
@@ -333,7 +334,9 @@ namespace NJsonSchema.Generation
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             await GeneratePropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
-            await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver);
+            await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
+
+            GenerateInheritanceDiscriminator(type, rootSchema);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -652,8 +655,10 @@ namespace NJsonSchema.Generation
                         var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
                         if (!typeDescription.IsDictionary && !type.IsArray)
                         {
-                            await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
                             await GeneratePropertiesAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                            await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+
+                            GenerateInheritanceDiscriminator(baseType, schema);
                         }
                     }
                     else
@@ -690,13 +695,13 @@ namespace NJsonSchema.Generation
                     if (!typeDescription.IsDictionary && !type.IsArray &&
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
-                        await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
                         await GeneratePropertiesAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                        await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+
+                        GenerateInheritanceDiscriminator(i, schema);
                     }
                 }
             }
-
-            GenerateInheritanceDiscriminator(type, schema);
 
             return false;
         }
