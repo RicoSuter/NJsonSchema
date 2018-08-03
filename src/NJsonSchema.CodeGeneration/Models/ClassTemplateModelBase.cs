@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)
-            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualTypeSchema.BaseDiscriminator, _resolver))
+            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualSchema.BaseDiscriminator, _resolver))
             .ToList();
 
         /// <summary>The model of a derived class.</summary>
