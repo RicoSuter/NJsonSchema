@@ -465,7 +465,24 @@ namespace NJsonSchema.Generation
         {
             var genericTypeArguments = type.GetGenericTypeArguments();
 
+            var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string);
+
+            if (keyType != typeof(string)) {
+                var itemSchema = await GenerateAsync(keyType, schemaResolver).ConfigureAwait(false);
+                var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, null, Settings);
+                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
+                {
+                    schema.Item = new JsonSchema4
+                    {
+                        Reference = itemSchema
+                    };
+                }
+                else
+                    schema.Item = itemSchema;
+            }
+
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
+
             if (valueType == typeof(object))
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
             else

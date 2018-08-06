@@ -102,5 +102,18 @@ namespace NJsonSchema.CodeGeneration
 
             return fallbackType;
         }
+
+        /// <summary>Resolves the type of the dictionary key of the given schema (must be a dictionary schema).</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
+        /// <param name="schemaType">The schema type.</param>
+        /// <returns>The type.</returns>
+        protected string ResolveDictionaryKeyType(JsonSchema4 schema, string fallbackType, SchemaType schemaType)
+        {
+            if (schema.Item != null)
+                return Resolve(schema.Item, schema.Item.ActualSchema.IsNullable(schemaType), null);
+
+            return fallbackType;
+        }
     }
 }
