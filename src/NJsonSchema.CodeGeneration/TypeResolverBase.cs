@@ -112,9 +112,9 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type.</returns>
         protected string ResolveDictionaryKeyType(JsonSchema4 schema, string fallbackType)
         {
-            if (schema.KeySchema != null)
+            if (schema.DictionaryKey != null)
             {
-                return Resolve(schema.KeySchema, schema.KeySchema.ActualSchema.IsNullable(_settings.SchemaType), null);
+                return Resolve(schema.DictionaryKey, schema.DictionaryKey.ActualSchema.IsNullable(_settings.SchemaType), null);
             }
 
             return fallbackType;

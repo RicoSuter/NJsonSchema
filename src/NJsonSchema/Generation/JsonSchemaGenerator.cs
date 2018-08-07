@@ -473,14 +473,14 @@ namespace NJsonSchema.Generation
                 var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, null, Settings);
                 if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
                 {
-                    schema.KeySchema = new JsonSchema4
+                    schema.DictionaryKey = new JsonSchema4
                     {
                         Reference = keySchema
                     };
                 }
                 else
                 {
-                    schema.KeySchema = keySchema;
+                    schema.DictionaryKey = keySchema;
                 }
             }
 

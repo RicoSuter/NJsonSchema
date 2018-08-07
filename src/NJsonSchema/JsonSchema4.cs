@@ -36,7 +36,7 @@ namespace NJsonSchema
         private ICollection<JsonSchema4> _anyOf;
         private ICollection<JsonSchema4> _oneOf;
         private JsonSchema4 _not;
-        private JsonSchema4 _keySchema;
+        private JsonSchema4 _dictionaryKey;
 
         private JsonSchema4 _item;
         private ICollection<JsonSchema4> _items;
@@ -426,15 +426,15 @@ namespace NJsonSchema
         #region Child JSON schemas
 
         /// <summary>Gets or sets the dictionary key schema (x-key, only enum schemas are allowed).</summary>
-        [JsonProperty("x-key", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public JsonSchema4 KeySchema
+        [JsonProperty("x-dictionaryKey", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public JsonSchema4 DictionaryKey
         {
-            get { return _keySchema; }
+            get { return _dictionaryKey; }
             set
             {
-                _keySchema = value;
-                if (_keySchema != null)
-                    _keySchema.Parent = this;
+                _dictionaryKey = value;
+                if (_dictionaryKey != null)
+                    _dictionaryKey.Parent = this;
             }
         }
 

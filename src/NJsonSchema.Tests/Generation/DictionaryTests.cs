@@ -28,10 +28,10 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.True(schema.Properties["Mapping"].IsDictionary);
-            Assert.True(schema.Properties["Mapping"].KeySchema.ActualSchema.IsEnumeration);
+            Assert.True(schema.Properties["Mapping"].DictionaryKey.ActualSchema.IsEnumeration);
 
             Assert.True(schema.Properties["Mapping2"].IsDictionary);
-            Assert.True(schema.Properties["Mapping2"].KeySchema.ActualSchema.IsEnumeration);
+            Assert.True(schema.Properties["Mapping2"].DictionaryKey.ActualSchema.IsEnumeration);
         }
     }
 }
