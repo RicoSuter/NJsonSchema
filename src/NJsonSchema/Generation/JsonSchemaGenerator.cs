@@ -779,7 +779,7 @@ namespace NJsonSchema.Generation
 
             var underlyingType = Enum.GetUnderlyingType(type);
 
-            var converters = Settings.ActualSerializerSettings.Converters;
+            var converters = Settings.ActualSerializerSettings.Converters.ToList();
             if (!converters.OfType<StringEnumConverter>().Any())
                 converters.Add(new StringEnumConverter());
 
