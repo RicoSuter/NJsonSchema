@@ -99,12 +99,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var prefix = addInterfacePrefix &&
                     SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
-                var valueType = prefix + ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
-                return $"{{ [key: string] : {valueType}; }}";
+
+                var valueType = prefix + ResolveDictionaryValueType(schema, "any");
+
+                var defaultType = "string";
+                var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + ResolveDictionaryKeyType(schema, defaultType) : defaultType;
+                if (keyType != defaultType)
+                {
+                    return $"{{ [key in keyof typeof {keyType}] : {valueType}; }}";
+                }
+
+                return $"{{ [key: {keyType}] : {valueType}; }}";
             }
 
             return (addInterfacePrefix && SupportsConstructorConversion(schema) ? "I" : "") +
-                base.GetOrGenerateTypeName(schema, typeNameHint);
+                GetOrGenerateTypeName(schema, typeNameHint);
         }
 
         private string ResolveString(JsonSchema4 schema, string typeNameHint)

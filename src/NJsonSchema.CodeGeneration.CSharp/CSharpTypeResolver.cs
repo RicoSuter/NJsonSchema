@@ -159,8 +159,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveDictionary(JsonSchema4 schema)
         {
-            var valueType = ResolveDictionaryValueType(schema, "object", Settings.SchemaType);
-            return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+            var valueType = ResolveDictionaryValueType(schema, "object");
+            var keyType = ResolveDictionaryKeyType(schema, "string");
+            return string.Format(Settings.DictionaryType + "<{0}, {1}>", keyType, valueType);
         }
     }
 }
