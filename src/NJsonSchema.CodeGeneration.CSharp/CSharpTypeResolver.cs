@@ -97,6 +97,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.Format == JsonFormatStrings.TimeSpan)
                 return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
 
+            if (schema.Format == JsonFormatStrings.Uri)
+                return "System.Uri";
+
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
             if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
