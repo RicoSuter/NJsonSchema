@@ -32,9 +32,9 @@ namespace NJsonSchema
         {
             get
             {
-                if (AllOf.Count(s => !s.HasReference) == 1)
+                if (AllOf.Count > 1 && AllOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
                 {
-                    return AllOf.First(s => !s.HasReference);
+                    return AllOf.First(s => !s.HasReference && !s.IsDictionary);
                 }
 
                 return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
