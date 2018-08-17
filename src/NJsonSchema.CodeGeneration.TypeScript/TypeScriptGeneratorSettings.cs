@@ -27,6 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             TypeScriptVersion = 1.8m;
             GenerateConstructorInterface = true;
             ConvertConstructorInterfaceData = false;
+            ExportTypes = true;
 
             ValueGenerator = new TypeScriptValueGenerator(this);
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
@@ -83,6 +84,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether POJO objects in the constructor data are converted to DTO instances (GenerateConstructorInterface must be enabled, default: false).</summary>
         public bool ConvertConstructorInterfaceData { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the export keyword should be added to all classes and enums (default: true).</summary>
+        public bool ExportTypes { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {
