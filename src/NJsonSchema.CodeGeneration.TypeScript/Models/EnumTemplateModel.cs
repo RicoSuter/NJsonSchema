@@ -38,6 +38,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the description.</summary>
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
 
+        /// <summary>Gets a value indicating whether the export keyword should be added to all enums.</summary>
+        public bool ExportTypes => _settings.ExportTypes;
+
         /// <summary>Gets the enum values.</summary>
         public List<EnumerationItemModel> Enums
         {

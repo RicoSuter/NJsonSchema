@@ -128,6 +128,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether </summary>
         public bool RequiresStrictPropertyInitialization => _settings.TypeScriptVersion >= 2.7m;
 
+        /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
+        public bool ExportTypes => _settings.ExportTypes;
+
         /// <summary>Gets the inherited schema.</summary>
         private JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }

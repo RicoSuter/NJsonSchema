@@ -51,6 +51,46 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [Fact]
+        public async Task When_export_types_is_true_add_export_before_enum_in_typescript()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var data = schema.ToJson();
+
+            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
+            {
+                ExportTypes = true
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, typeScriptGeneratorSettings);
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("export enum", code);
+        }
+
+        [Fact]
+        public async Task When_add_export_keyword_is_false_dont_add_export_before_enum_in_typescript()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var data = schema.ToJson();
+
+            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
+            {
+                ExportTypes = false
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, typeScriptGeneratorSettings);
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain("export enum", code);
+        }
+
+        [Fact]
         public async Task When_string_and_integer_enum_used_then_one_enum_is_generated_in_CSharp()
         {
             //// Arrange
