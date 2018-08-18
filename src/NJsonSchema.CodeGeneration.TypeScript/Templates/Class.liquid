@@ -1,7 +1,7 @@
 ﻿{% if HasDescription -%}
 /** {{ Description }} */
 {% endif -%}
-{% if ExportTypes -%}export {% endif -%}{% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
+{% if ExportTypes %}export {% endif %}{% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
@@ -168,7 +168,7 @@
 {%   if HasDescription -%}
 /** {{ Description }} */
 {%   endif -%}
-{% if ExportTypes -%}export {% endif -%}interface I{{ ClassName }}{{ InterfaceInheritance }} {
+{% if ExportTypes %}export {% endif %}interface I{{ ClassName }}{{ InterfaceInheritance }} {
 {%   for property in Properties -%}
 {%       if property.HasDescription -%}
     /** {{ property.Description }} */
