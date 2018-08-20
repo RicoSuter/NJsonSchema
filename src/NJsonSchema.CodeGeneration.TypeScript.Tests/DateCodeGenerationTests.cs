@@ -73,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.Contains("myTimeSpan: moment.Duration", code);
             Assert.Contains("this.myTimeSpan = data[\"myTimeSpan\"] ? moment.duration(data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('d.hh:mm:ss.SS') : <any>undefined;", code);
+            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('d.hh:mm:ss.SS', { trim: false }) : <any>undefined;", code);
         }
 
         [Fact]
