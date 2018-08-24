@@ -72,7 +72,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
         public string DictionaryType { get; set; }
-       
+
+        /// <summary>Gets or sets the generic array .NET type which is used for ArrayType instances (default: empty = use ArrayType).</summary>
+        public string ArrayInstanceType { get; set; }
+
+        /// <summary>Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: empty = use DictionaryType).</summary>
+        public string DictionaryInstanceType { get; set; }
+
         /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'ObservableCollection').</summary>
         public string ArrayBaseType { get; set; }
 
