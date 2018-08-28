@@ -92,11 +92,11 @@ namespace NJsonSchema.Infrastructure
                 return null;
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (await IsAssemblyLoadedButHasNoXmlAsync(assemblyName, useLock))
+            if (await IgnoreAssemblyAsync(assemblyName, useLock))
                 return null;
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-            return await GetXmlDocumentationAsync(member, documentationPath).ConfigureAwait(false);
+            return await GetXmlDocumentationAsync(member, documentationPath, useLock).ConfigureAwait(false);
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
@@ -109,7 +109,7 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (await IsAssemblyLoadedButHasNoXmlAsync(assemblyName, true))
+            if (await IgnoreAssemblyAsync(assemblyName, true))
                 return string.Empty;
 
             var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
@@ -126,7 +126,7 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = parameter.Member.Module.Assembly.GetName();
-            if (await IsAssemblyLoadedButHasNoXmlAsync(assemblyName, true))
+            if (await IgnoreAssemblyAsync(assemblyName, true))
                 return string.Empty;
             
             var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
@@ -337,8 +337,6 @@ namespace NJsonSchema.Infrastructure
 
                     Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace)).ConfigureAwait(false);
                 }
-                else if (Cache[assemblyName.FullName] == null)
-                    return null;
 
                 return Cache[assemblyName.FullName];
             }
@@ -349,7 +347,7 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-        private static async Task<bool> IsAssemblyLoadedButHasNoXmlAsync(AssemblyName assemblyName, bool useLock)
+        private static async Task<bool> IgnoreAssemblyAsync(AssemblyName assemblyName, bool useLock)
         {
             if (useLock)
             {
