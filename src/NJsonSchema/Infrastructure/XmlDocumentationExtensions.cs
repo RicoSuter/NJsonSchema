@@ -406,6 +406,9 @@ namespace NJsonSchema.Infrastructure
         private static async Task ReplaceInheritdocElementsAsync(this MemberInfo member, XElement element, bool useLock)
         {
 #if !LEGACY
+            if (element == null)
+                return;
+
             if (useLock)
                 await _lock.WaitAsync();
 
