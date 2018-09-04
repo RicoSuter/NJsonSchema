@@ -849,7 +849,9 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateXmlObjects)
                             p.GenerateXmlObjectForProperty(propertyType, propertyName, propertyAttributes);
 
-                        if (hasRequiredAttribute && requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+                        if (hasRequiredAttribute &&
+                            propertyTypeDescription.Type == JsonObjectType.String &&
+                            requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
                         {
                             p.MinLength = 1;
                         }
