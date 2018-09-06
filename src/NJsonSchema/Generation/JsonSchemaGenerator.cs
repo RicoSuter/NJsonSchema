@@ -375,14 +375,14 @@ namespace NJsonSchema.Generation
                 // class
                 var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
             else
             {
                 // property or parameter
                 var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
         }
 
