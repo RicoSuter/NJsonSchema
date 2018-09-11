@@ -923,7 +923,17 @@ namespace NJsonSchema.Generation
 
             dynamic defaultValueAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
-                schema.Default = defaultValueAttribute.Value;
+            {
+                if (typeDescription.IsEnum &&
+                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                {
+                    schema.Default = defaultValueAttribute.Value?.ToString();
+                }
+                else
+                {
+                    schema.Default = defaultValueAttribute.Value;
+                }
+            }
 
             dynamic regexAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)

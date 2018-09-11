@@ -128,5 +128,32 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(Bar.C, schema.Properties["Bar"].Default);
             Assert.True(schema.Properties["Bar"].HasReference);
         }
+
+        public class EnumPropertyWithDefaultClass
+        {
+            [DefaultValue(MyEnumeration.C)]
+            public MyEnumeration MyEnumeration { get; set; }
+        }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum MyEnumeration
+        {
+            A,
+            B,
+            C
+        }
+
+        [Fact]
+        public async Task When_string_enum_property_has_default_then_default_is_converted_to_string()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<EnumPropertyWithDefaultClass>(new JsonSchemaGeneratorSettings());
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal("C", schema.Properties["MyEnumeration"].Default);
+        }
     }
 }
