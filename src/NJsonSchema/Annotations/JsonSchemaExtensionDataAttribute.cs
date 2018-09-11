@@ -16,16 +16,16 @@ namespace NJsonSchema.Annotations
     public class JsonSchemaExtensionDataAttribute : Attribute
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaExtensionDataAttribute"/> class.</summary>
-        /// <param name="property">The property.</param>
+        /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        public JsonSchemaExtensionDataAttribute(string property, object value)
+        public JsonSchemaExtensionDataAttribute(string key, object value)
         {
-            Property = property;
+            Key = key;
             Value = value;
         }
 
         /// <summary>Gets the property name.</summary>
-        public string Property { get; private set; }
+        public string Key { get; private set; }
 
         /// <summary>Gets the value.</summary>
         public object Value { get; private set; }
