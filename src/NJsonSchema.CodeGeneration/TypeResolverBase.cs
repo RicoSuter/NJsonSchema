@@ -82,22 +82,39 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
-        /// <param name="schemaType">The schema type.</param>
         /// <returns>The type.</returns>
-        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType, SchemaType schemaType)
+        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType)
         {
             if (schema.AdditionalPropertiesSchema != null)
-                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(schemaType), null);
+            {
+                return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(_settings.SchemaType), null);
+            }
 
             if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
             {
                 var valueTypes = schema.PatternProperties
-                    .Select(p => Resolve(p.Value, p.Value.IsNullable(schemaType), null))
+                    .Select(p => Resolve(p.Value, p.Value.IsNullable(_settings.SchemaType), null))
                     .Distinct()
                     .ToList();
 
                 if (valueTypes.Count == 1)
+                {
                     return valueTypes.First();
+                }
+            }
+
+            return fallbackType;
+        }
+
+        /// <summary>Resolves the type of the dictionary key of the given schema (must be a dictionary schema).</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
+        /// <returns>The type.</returns>
+        protected string ResolveDictionaryKeyType(JsonSchema4 schema, string fallbackType)
+        {
+            if (schema.DictionaryKey != null)
+            {
+                return Resolve(schema.DictionaryKey, schema.DictionaryKey.ActualSchema.IsNullable(_settings.SchemaType), null);
             }
 
             return fallbackType;

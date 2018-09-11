@@ -97,6 +97,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.Format == JsonFormatStrings.TimeSpan)
                 return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
 
+            if (schema.Format == JsonFormatStrings.Uri)
+                return "System.Uri";
+
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
             if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
@@ -159,8 +162,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveDictionary(JsonSchema4 schema)
         {
-            var valueType = ResolveDictionaryValueType(schema, "object", Settings.SchemaType);
-            return string.Format(Settings.DictionaryType + "<string, {0}>", valueType);
+            var valueType = ResolveDictionaryValueType(schema, "object");
+            var keyType = ResolveDictionaryKeyType(schema, "string");
+            return string.Format(Settings.DictionaryType + "<{0}, {1}>", keyType, valueType);
         }
     }
 }

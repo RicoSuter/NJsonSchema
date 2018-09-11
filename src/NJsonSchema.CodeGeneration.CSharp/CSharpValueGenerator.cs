@@ -42,7 +42,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 {
                     if (schema.Type.HasFlag(JsonObjectType.Array) ||
                         schema.Type.HasFlag(JsonObjectType.Object))
+                    {
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType)
+                            ? targetType.Replace(_settings.DictionaryType + "<", _settings.DictionaryInstanceType + "<")
+                            : targetType;
+
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType)
+                            ? targetType.Replace(_settings.ArrayType + "<", _settings.ArrayInstanceType + "<")
+                            : targetType;
+
                         return "new " + targetType + "()";
+                    }
                 }
             }
 
@@ -73,8 +83,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     case JsonFormatStrings.Decimal:
                         return ConvertNumberToString(value) + "M";
                     default:
-                        return type.HasFlag(JsonObjectType.Integer) ? 
-                            ConvertNumberToString(value) : 
+                        return type.HasFlag(JsonObjectType.Integer) ?
+                            ConvertNumberToString(value) :
                             ConvertNumberToString(value) + "D";
                 }
             }

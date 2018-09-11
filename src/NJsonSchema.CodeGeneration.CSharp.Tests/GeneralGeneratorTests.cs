@@ -17,7 +17,7 @@ using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
-    public class CSharpGeneratorTests
+    public class GeneralGeneratorTests
     {
         [Fact]
         public async Task When_type_is_array_and_items_and_item_is_not_defined_then_any_array_is_generated()
@@ -441,7 +441,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public class ClassWithDefaultEnumProperty
         {
             [JsonConverter(typeof(StringEnumConverter))]
-            [DefaultValue(CSharpGeneratorTests.ConstructionCode.NON_CBST)]
+            [DefaultValue(GeneralGeneratorTests.ConstructionCode.NON_CBST)]
             public ConstructionCode ConstructionCode { get; set; }
         }
 

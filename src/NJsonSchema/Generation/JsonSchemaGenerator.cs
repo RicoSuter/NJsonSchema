@@ -386,14 +386,14 @@ namespace NJsonSchema.Generation
                 // class
                 var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
             else
             {
                 // property or parameter
                 var extensionDataAttributes = parentAttributes.OfType<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Property, a => a.Value);
+                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
         }
 
@@ -476,12 +476,34 @@ namespace NJsonSchema.Generation
         {
             var genericTypeArguments = type.GetGenericTypeArguments();
 
+            var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string);
+            if (keyType.GetTypeInfo().IsEnum)
+            {
+                var keySchema = await GenerateAsync(keyType, schemaResolver).ConfigureAwait(false);
+
+                var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, null, Settings);
+                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
+                {
+                    schema.DictionaryKey = new JsonSchema4
+                    {
+                        Reference = keySchema
+                    };
+                }
+                else
+                {
+                    schema.DictionaryKey = keySchema;
+                }
+            }
+
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
             if (valueType == typeof(object))
+            {
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
+            }
             else
             {
                 var additionalPropertiesSchema = await GenerateAsync(valueType, schemaResolver).ConfigureAwait(false);
+
                 var valueTypeDescription = Settings.ReflectionService.GetDescription(valueType, null, Settings);
                 if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
                 {
@@ -491,7 +513,9 @@ namespace NJsonSchema.Generation
                     };
                 }
                 else
+                {
                     schema.AdditionalPropertiesSchema = additionalPropertiesSchema;
+                }
             }
 
             schema.AllowAdditionalProperties = true;
@@ -716,7 +740,7 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) && 
+                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
                         throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -847,7 +871,9 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateXmlObjects)
                             p.GenerateXmlObjectForProperty(propertyType, propertyName, propertyAttributes);
 
-                        if (hasRequiredAttribute && requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+                        if (hasRequiredAttribute &&
+                            propertyTypeDescription.Type == JsonObjectType.String &&
+                            requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
                         {
                             p.MinLength = 1;
                         }
@@ -921,7 +947,17 @@ namespace NJsonSchema.Generation
 
             dynamic defaultValueAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
-                schema.Default = defaultValueAttribute.Value;
+            {
+                if (typeDescription.IsEnum &&
+                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                {
+                    schema.Default = defaultValueAttribute.Value?.ToString();
+                }
+                else
+                {
+                    schema.Default = defaultValueAttribute.Value;
+                }
+            }
 
             dynamic regexAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)

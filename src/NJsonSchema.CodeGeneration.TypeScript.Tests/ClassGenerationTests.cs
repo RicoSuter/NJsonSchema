@@ -228,6 +228,46 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_export_types_is_true_add_export_before_class_and_interface()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = true });
+
+            //// Assert
+            Assert.Contains("export class Student extends Person implements IStudent {", code);
+            Assert.Contains("export interface IStudent extends IPerson {", code);
+            Assert.Contains("export interface IPerson {", code);
+        }
+
+        [Fact]
+        public async Task When_export_types_is_false_dont_add_export_before_class_and_interface()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = false });
+
+            //// Assert
+            Assert.DoesNotContain("export class Student extends Person implements IStudent {", code);
+            Assert.DoesNotContain("export interface IStudent extends IPerson {", code);
+            Assert.DoesNotContain("export interface IPerson {", code);
+        }
+
+        [Fact]
+        public async Task When_add_export_keyword_is_true_with_knockout_class_add_export_before_class()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = true });
+
+            //// Assert
+            Assert.Contains("export class Student extends Person {", code);
+        }
+
+        [Fact]
+        public async Task When_add_export_keyword_is_false_with_knockout_class_dont_add_export_before_class()
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = false });
+
+            //// Assert
+            Assert.DoesNotContain("export class Student extends Person {", code);
+        }
+
+        [Fact]
         public async Task When_class_is_generated_then_constructor_interfaces_are_correctly_generated()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });

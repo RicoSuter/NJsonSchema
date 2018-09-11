@@ -236,6 +236,49 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(10, property.MaxLength);
         }
 
+        public class StringRequiredClass
+        {
+            [Required(AllowEmptyStrings = false)]
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_RequiredAttribute_is_set_with_AllowEmptyStrings_false_then_minLength_and_required_are_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<StringRequiredClass>();
+
+            //// Assert
+            var property = schema.Properties["Foo"];
+
+            Assert.Equal(1, property.MinLength);
+            Assert.True(property.IsRequired);
+        }
+
+        public class DtoRequiredClass
+        {
+            [Required(AllowEmptyStrings = false)]
+            public StringRequiredClass Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_RequiredAttribute_is_set_with_AllowEmptyStrings_false_on_class_property_then_minLength_is_not_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<DtoRequiredClass>();
+            var json = schema.ToJson();
+
+            //// Assert
+            var property = schema.Properties["Foo"];
+
+            Assert.Null(property.MinLength);
+            Assert.True(property.IsRequired);
+        }
+
         public class DataTypeAttributeClass
         {
             [DataType(DataType.EmailAddress)]
