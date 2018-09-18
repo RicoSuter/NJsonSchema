@@ -925,7 +925,17 @@ namespace NJsonSchema.Generation
 
             dynamic defaultValueAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
-                schema.Default = defaultValueAttribute.Value;
+            {
+                if (typeDescription.IsEnum &&
+                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                {
+                    schema.Default = defaultValueAttribute.Value?.ToString();
+                }
+                else
+                {
+                    schema.Default = defaultValueAttribute.Value;
+                }
+            }
 
             dynamic regexAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
@@ -939,14 +949,7 @@ namespace NJsonSchema.Generation
             if (typeDescription.Type == JsonObjectType.Number ||
                 typeDescription.Type == JsonObjectType.Integer)
             {
-                dynamic rangeAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RangeAttribute");
-                if (rangeAttribute != null)
-                {
-                    if (rangeAttribute.Minimum != null && rangeAttribute.Minimum > double.MinValue)
-                        schema.Minimum = (decimal?)(double)rangeAttribute.Minimum;
-                    if (rangeAttribute.Maximum != null && rangeAttribute.Maximum < double.MaxValue)
-                        schema.Maximum = (decimal?)(double)rangeAttribute.Maximum;
-                }
+                ApplyRangeAttribute(schema, parentAttributes);
 
                 var multipleOfAttribute = parentAttributes.OfType<MultipleOfAttribute>().SingleOrDefault();
                 if (multipleOfAttribute != null)
@@ -987,6 +990,53 @@ namespace NJsonSchema.Generation
                 var dataType = dataTypeAttribute.DataType.ToString();
                 if (DataTypeFormats.ContainsKey(dataType))
                     schema.Format = DataTypeFormats[dataType];
+            }
+        }
+
+        private void ApplyRangeAttribute(JsonSchema4 schema, IEnumerable<Attribute> parentAttributes)
+        {
+            dynamic rangeAttribute = parentAttributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.RangeAttribute");
+            if (rangeAttribute != null)
+            {
+                if (rangeAttribute.Minimum != null)
+                {
+                    if (rangeAttribute.OperandType == typeof(double))
+                    {
+                        var minimum = (double) Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
+                        if (minimum > double.MinValue)
+                        {
+                            schema.Minimum = (decimal) minimum;
+                        }
+                    }
+                    else
+                    {
+                        var minimum = (decimal) Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
+                        if (minimum > decimal.MinValue)
+                        {
+                            schema.Minimum = minimum;
+                        }
+                    }
+                }
+
+                if (rangeAttribute.Maximum != null)
+                {
+                    if (rangeAttribute.OperandType == typeof(double))
+                    {
+                        var maximum = (double) Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
+                        if (maximum < double.MaxValue)
+                        {
+                            schema.Maximum = (decimal) maximum;
+                        }
+                    }
+                    else
+                    {
+                        var maximum = (decimal) Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
+                        if (maximum < decimal.MaxValue)
+                        {
+                            schema.Maximum = maximum;
+                        }
+                    }
+                }
             }
         }
 
