@@ -337,7 +337,7 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                     return null;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
@@ -370,7 +370,7 @@ namespace NJsonSchema.Infrastructure
         {
             try
             {
-                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                     return null;
 
                 var assemblyName = member.Module.Assembly.GetName();
@@ -565,6 +565,9 @@ namespace NJsonSchema.Infrastructure
 
                 var assemblyName = assembly.GetName();
                 if (string.IsNullOrEmpty(assemblyName.Name))
+                    return null;
+
+                if (Cache.ContainsKey(assemblyName.FullName))
                     return null;
 
                 var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
