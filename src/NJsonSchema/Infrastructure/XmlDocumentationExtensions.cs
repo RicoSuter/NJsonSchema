@@ -151,12 +151,12 @@ namespace NJsonSchema.Infrastructure
                     return null;
 
                 var assemblyName = member.Module.Assembly.GetName();
-                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile);
+                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile).ConfigureAwait(false);
                 if (document == null)
                     return null;
 
                 var element = GetXmlDocumentation(member, document);
-                await ReplaceInheritdocElementsAsync(member, element);
+                await ReplaceInheritdocElementsAsync(member, element).ConfigureAwait(false);
                 return element;
             }
             catch
@@ -177,11 +177,11 @@ namespace NJsonSchema.Infrastructure
                     return null;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile);
+                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile).ConfigureAwait(false);
                 if (document == null)
                     return null;
 
-                return await GetXmlDocumentationAsync(parameter, document);
+                return await GetXmlDocumentationAsync(parameter, document).ConfigureAwait(false);
             }
             catch
             {
@@ -333,7 +333,7 @@ namespace NJsonSchema.Infrastructure
                 task = Cache[assemblyName.FullName];
             }
 
-            return await task;
+            return await task.ConfigureAwait(false);
         }
 
         private static bool IgnoreAssembly(AssemblyName assemblyName)
@@ -360,7 +360,7 @@ namespace NJsonSchema.Infrastructure
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
             var element = result.OfType<XElement>().First();
-            await ReplaceInheritdocElementsAsync(parameter.Member, element);
+            await ReplaceInheritdocElementsAsync(parameter.Member, element).ConfigureAwait(false);
 
             if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
@@ -385,7 +385,7 @@ namespace NJsonSchema.Infrastructure
                     var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                     if (baseMember != null)
                     {
-                        var baseDoc = await baseMember.GetXmlDocumentationAsync();
+                        var baseDoc = await baseMember.GetXmlDocumentationAsync().ConfigureAwait(false);
                         if (baseDoc != null)
                         {
                             lock (Cache)
@@ -396,12 +396,12 @@ namespace NJsonSchema.Infrastructure
                         }
                         else
                         {
-                            await ProcessInheritdocInterfaceElementsAsync(member, child);
+                            await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
                         }
                     }
                     else
                     {
-                        await ProcessInheritdocInterfaceElementsAsync(member, child);
+                        await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
                     }
                 }
             }
@@ -416,7 +416,7 @@ namespace NJsonSchema.Infrastructure
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
                 {
-                    var baseDoc = await baseMember.GetXmlDocumentationAsync();
+                    var baseDoc = await baseMember.GetXmlDocumentationAsync().ConfigureAwait(false);
                     if (baseDoc != null)
                     {
                         lock (Cache)
