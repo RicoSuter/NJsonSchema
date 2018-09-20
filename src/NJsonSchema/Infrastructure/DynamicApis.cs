@@ -206,13 +206,13 @@ namespace NJsonSchema.Infrastructure
         }
 
 #if LEGACY
-        private static async Task<T> FromResult<T>(T result)
+        internal static async Task<T> FromResult<T>(T result)
         {
             return result;
         }
 #else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Task<T> FromResult<T>(T result)
+        internal static Task<T> FromResult<T>(T result)
         {
             return Task.FromResult(result);
         }
