@@ -388,7 +388,7 @@ namespace NJsonSchema.Infrastructure
                         var baseDoc = await baseMember.GetXmlDocumentationAsync().ConfigureAwait(false);
                         if (baseDoc != null)
                         {
-                            lock (Cache)
+                            lock (Cache) // modify xml (possible race condition)
                             {
                                 var nodes = baseDoc.Nodes().OfType<object>().ToArray();
                                 child.ReplaceWith(nodes);
@@ -419,7 +419,7 @@ namespace NJsonSchema.Infrastructure
                     var baseDoc = await baseMember.GetXmlDocumentationAsync().ConfigureAwait(false);
                     if (baseDoc != null)
                     {
-                        lock (Cache)
+                        lock (Cache) // modify xml (possible race condition)
                         {
                             var nodes = baseDoc.Nodes().OfType<object>().ToArray();
                             child.ReplaceWith(nodes);
