@@ -23,24 +23,7 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private class AsyncLock : IDisposable
-        {
-            private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
-
-            public AsyncLock Lock()
-            {
-                _semaphoreSlim.Wait();
-                return this;
-            }
-
-            public void Dispose()
-            {
-                _semaphoreSlim.Release();
-            }
-        }
-
         private static readonly AsyncLock Lock = new AsyncLock();
-
         private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
 #if !LEGACY
@@ -575,6 +558,22 @@ namespace NJsonSchema.Infrastructure
             catch
             {
                 return null;
+            }
+        }
+
+        private class AsyncLock : IDisposable
+        {
+            private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
+            public AsyncLock Lock()
+            {
+                _semaphoreSlim.Wait();
+                return this;
+            }
+
+            public void Dispose()
+            {
+                _semaphoreSlim.Release();
             }
         }
     }
