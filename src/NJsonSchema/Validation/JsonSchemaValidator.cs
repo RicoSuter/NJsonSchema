@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Validation
@@ -21,6 +22,7 @@ namespace NJsonSchema.Validation
         /// <summary>Validates the given JSON data.</summary>
         /// <param name="jsonData">The json data.</param>
         /// <param name="schema">The schema.</param>
+        /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The list of validation errors.</returns>
         public ICollection<ValidationError> Validate(string jsonData, JsonSchema4 schema)
         {

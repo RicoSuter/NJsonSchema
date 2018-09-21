@@ -23,10 +23,8 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private static readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-
-        private static readonly Dictionary<string, XDocument> Cache =
-            new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
+        private static readonly AsyncLock Lock = new AsyncLock();
+        private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
 #if !LEGACY
 
@@ -80,91 +78,6 @@ namespace NJsonSchema.Infrastructure
         public static async Task<string> GetXmlRemarksAsync(this MemberInfo member)
         {
             return await GetXmlDocumentationTagAsync(member, "remarks").ConfigureAwait(false);
-        }
-
-        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this MemberInfo member)
-        {
-            return GetXmlDocumentationAsync(member, true);
-        }
-
-        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
-        /// <param name="tagName">Name of the tag.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static async Task<string> GetXmlDocumentationTagAsync(this MemberInfo member, string tagName)
-        {
-            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
-                return string.Empty;
-
-            var assemblyName = member.Module.Assembly.GetName();
-            if (await IgnoreAssemblyAsync(assemblyName, true))
-                return string.Empty;
-
-            var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-            var element = await GetXmlDocumentationAsync(member, documentationPath).ConfigureAwait(false);
-            return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element?.Element(tagName)));
-        }
-
-        /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
-        /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static async Task<string> GetXmlDocumentationAsync(this ParameterInfo parameter)
-        {
-            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
-                return string.Empty;
-
-            var assemblyName = parameter.Member.Module.Assembly.GetName();
-            if (await IgnoreAssemblyAsync(assemblyName, true))
-                return string.Empty;
-            
-            var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
-            var element = await GetXmlDocumentationAsync(parameter, documentationPath).ConfigureAwait(false);
-            return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element));
-        }
-
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this Type type, string pathToXmlFile)
-        {
-            return ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationAsync(pathToXmlFile);
-        }
-
-        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
-        /// <param name="member">The reflected member.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile)
-        {
-            return GetXmlDocumentationAsync(member, pathToXmlFile, true);
-        }
-
-        /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
-        /// <param name="parameter">The reflected parameter or return info.</param>
-        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
-        /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static async Task<XElement> GetXmlDocumentationAsync(this ParameterInfo parameter, string pathToXmlFile)
-        {
-            try
-            {
-                if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
-                    return null;
-
-                var assemblyName = parameter.Member.Module.Assembly.GetName();
-                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile, true);
-                if (document == null)
-                    return null;
-
-                return await GetXmlDocumentationAsync(parameter, document);
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
@@ -269,51 +182,161 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Clears the cache.</summary>
         /// <returns>The task.</returns>
-        public static async Task ClearCacheAsync()
+        public static Task ClearCacheAsync()
         {
-#if !LEGACY
-            await _lock.WaitAsync();
-#else
-            _lock.Wait();
-#endif
-
-            try
+            using (Lock.Lock())
             {
                 Cache.Clear();
-            }
-            finally
-            {
-                _lock.Release();
+                return DynamicApis.FromResult<object>(null);
             }
         }
 
-        private static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, bool useLock)
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <param name="tagName">Name of the tag.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static async Task<string> GetXmlDocumentationTagAsync(this MemberInfo member, string tagName)
         {
             if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
-                return null;
+                return string.Empty;
 
             var assemblyName = member.Module.Assembly.GetName();
-            if (await IgnoreAssemblyAsync(assemblyName, useLock))
-                return null;
+            using (Lock.Lock())
+            {
+                if (IgnoreAssembly(assemblyName))
+                    return string.Empty;
 
-            var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
-            return await GetXmlDocumentationAsync(member, documentationPath, useLock).ConfigureAwait(false);
+                var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
+                var element = await GetXmlDocumentationWithoutLockAsync(member, documentationPath).ConfigureAwait(false);
+                return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element?.Element(tagName)));
+            }
         }
 
-        private static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile, bool useLock)
+        /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
+        /// <param name="parameter">The reflected parameter or return info.</param>
+        /// <returns>The contents of the "returns" or "param" tag.</returns>
+        public static async Task<string> GetXmlDocumentationAsync(this ParameterInfo parameter)
+        {
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                return string.Empty;
+
+            var assemblyName = parameter.Member.Module.Assembly.GetName();
+            using (Lock.Lock())
+            {
+                if (IgnoreAssembly(assemblyName))
+                    return string.Empty;
+
+                var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
+                var element = await GetXmlDocumentationWithoutLockAsync(parameter, documentationPath).ConfigureAwait(false);
+                return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element));
+            }
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="type">The type.</param>
+        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static async Task<XElement> GetXmlDocumentationAsync(this Type type, string pathToXmlFile)
+        {
+            using (Lock.Lock())
+            {
+                return await ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationWithoutLockAsync(pathToXmlFile).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
+        /// <param name="parameter">The reflected parameter or return info.</param>
+        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <returns>The contents of the "returns" or "param" tag.</returns>
+        public static async Task<XElement> GetXmlDocumentationAsync(this ParameterInfo parameter, string pathToXmlFile)
         {
             try
             {
                 if (pathToXmlFile == null || DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
                     return null;
 
+                var assemblyName = parameter.Member.Module.Assembly.GetName();
+                using (Lock.Lock())
+                {
+                    return await GetXmlDocumentationWithoutLockAsync(parameter, pathToXmlFile).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member)
+        {
+            using (Lock.Lock())
+            {
+                return await GetXmlDocumentationWithoutLockAsync(member).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
+        /// <param name="member">The reflected member.</param>
+        /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
+        /// <returns>The contents of the "summary" tag for the member.</returns>
+        public static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile)
+        {
+            using (Lock.Lock())
+            {
+                return await GetXmlDocumentationWithoutLockAsync(member, pathToXmlFile).ConfigureAwait(false);
+            }
+        }
+
+        private static async Task<XElement> GetXmlDocumentationWithoutLockAsync(this ParameterInfo parameter, string pathToXmlFile)
+        {
+            try
+            {
+                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                    return null;
+
+                var assemblyName = parameter.Member.Module.Assembly.GetName();
+                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile).ConfigureAwait(false);
+                if (document == null)
+                    return null;
+
+                return await GetXmlDocumentationAsync(parameter, document).ConfigureAwait(false);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static async Task<XElement> GetXmlDocumentationWithoutLockAsync(this MemberInfo member)
+        {
+            if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                return null;
+
+            var assemblyName = member.Module.Assembly.GetName();
+            if (IgnoreAssembly(assemblyName))
+                return null;
+
+            var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
+            return await GetXmlDocumentationWithoutLockAsync(member, documentationPath).ConfigureAwait(false);
+        }
+
+        private static async Task<XElement> GetXmlDocumentationWithoutLockAsync(this MemberInfo member, string pathToXmlFile)
+        {
+            try
+            {
+                if (DynamicApis.SupportsXPathApis == false || DynamicApis.SupportsFileApis == false || DynamicApis.SupportsPathApis == false)
+                    return null;
+
                 var assemblyName = member.Module.Assembly.GetName();
-                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile, useLock);
+                var document = await TryGetXmlDocumentAsync(assemblyName, pathToXmlFile).ConfigureAwait(false);
                 if (document == null)
                     return null;
 
                 var element = GetXmlDocumentation(member, document);
-                await ReplaceInheritdocElementsAsync(member, element, useLock);
+                await ReplaceInheritdocElementsAsync(member, element).ConfigureAwait(false);
                 return element;
             }
             catch
@@ -322,60 +345,26 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-        private static async Task<XDocument> TryGetXmlDocumentAsync(AssemblyName assemblyName, string pathToXmlFile, bool useLock)
+        private static async Task<XDocument> TryGetXmlDocumentAsync(AssemblyName assemblyName, string pathToXmlFile)
         {
-            if (useLock)
+            if (!Cache.ContainsKey(assemblyName.FullName))
             {
-#if !LEGACY
-                await _lock.WaitAsync();
-#else
-                _lock.Wait();
-#endif
-            }
-
-            try
-            {
-                if (!Cache.ContainsKey(assemblyName.FullName))
+                if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
                 {
-                    if (await DynamicApis.FileExistsAsync(pathToXmlFile).ConfigureAwait(false) == false)
-                    {
-                        Cache[assemblyName.FullName] = null;
-                        return null;
-                    }
-
-                    Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace)).ConfigureAwait(false);
+                    Cache[assemblyName.FullName] = null;
+                    return null;
                 }
 
-                return Cache[assemblyName.FullName];
+                Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace)).ConfigureAwait(false);
             }
-            finally
-            {
-                if (useLock)
-                    _lock.Release();
-            }
+
+            return Cache[assemblyName.FullName];
         }
 
-        private static async Task<bool> IgnoreAssemblyAsync(AssemblyName assemblyName, bool useLock)
+        private static bool IgnoreAssembly(AssemblyName assemblyName)
         {
-            if (useLock)
-            {
-#if !LEGACY
-                await _lock.WaitAsync();
-#else
-                _lock.Wait();
-#endif
-            }
-
-            try
-            {
-                if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
-                    return true;
-            }
-            finally
-            {
-                if (useLock)
-                    _lock.Release();
-            }
+            if (Cache.ContainsKey(assemblyName.FullName) && Cache[assemblyName.FullName] == null)
+                return true;
 
             return false;
         }
@@ -393,7 +382,7 @@ namespace NJsonSchema.Infrastructure
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
             var element = result.OfType<XElement>().First();
-            await ReplaceInheritdocElementsAsync(parameter.Member, element, true);
+            await ReplaceInheritdocElementsAsync(parameter.Member, element).ConfigureAwait(false);
 
             if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
                 result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
@@ -403,48 +392,37 @@ namespace NJsonSchema.Infrastructure
             return result.OfType<XElement>().FirstOrDefault();
         }
 
-        private static async Task ReplaceInheritdocElementsAsync(this MemberInfo member, XElement element, bool useLock)
+        private static async Task ReplaceInheritdocElementsAsync(this MemberInfo member, XElement element)
         {
 #if !LEGACY
             if (element == null)
                 return;
 
-            if (useLock)
-                await _lock.WaitAsync();
-
-            try
+            var children = element.Nodes().ToList();
+            foreach (var child in children.OfType<XElement>())
             {
-                var children = element.Nodes().ToList();
-                foreach (var child in children.OfType<XElement>())
+                if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
                 {
-                    if (child.Name.LocalName.ToLowerInvariant() == "inheritdoc")
+                    var baseType = member.DeclaringType.GetTypeInfo().BaseType;
+                    var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
+                    if (baseMember != null)
                     {
-                        var baseType = member.DeclaringType.GetTypeInfo().BaseType;
-                        var baseMember = baseType?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
-                        if (baseMember != null)
+                        var baseDoc = await baseMember.GetXmlDocumentationWithoutLockAsync().ConfigureAwait(false);
+                        if (baseDoc != null)
                         {
-                            var baseDoc = await baseMember.GetXmlDocumentationAsync(false);
-                            if (baseDoc != null)
-                            {
-                                var nodes = baseDoc.Nodes().OfType<object>().ToArray();
-                                child.ReplaceWith(nodes);
-                            }
-                            else
-                            {
-                                await ProcessInheritdocInterfaceElementsAsync(member, child);
-                            }
+                            var nodes = baseDoc.Nodes().OfType<object>().ToArray();
+                            child.ReplaceWith(nodes);
                         }
                         else
                         {
-                            await ProcessInheritdocInterfaceElementsAsync(member, child);
+                            await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
                         }
                     }
+                    else
+                    {
+                        await ProcessInheritdocInterfaceElementsAsync(member, child).ConfigureAwait(false);
+                    }
                 }
-            }
-            finally
-            {
-                if (useLock)
-                    _lock.Release();
             }
 #endif
         }
@@ -457,7 +435,7 @@ namespace NJsonSchema.Infrastructure
                 var baseMember = baseInterface?.GetTypeInfo().DeclaredMembers.SingleOrDefault(m => m.Name == member.Name);
                 if (baseMember != null)
                 {
-                    var baseDoc = await baseMember.GetXmlDocumentationAsync(false);
+                    var baseDoc = await baseMember.GetXmlDocumentationWithoutLockAsync().ConfigureAwait(false);
                     if (baseDoc != null)
                     {
                         var nodes = baseDoc.Nodes().OfType<object>().ToArray();
@@ -550,6 +528,9 @@ namespace NJsonSchema.Infrastructure
                 if (string.IsNullOrEmpty(assemblyName.Name))
                     return null;
 
+                if (Cache.ContainsKey(assemblyName.FullName))
+                    return null;
+
                 var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
                 var path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
                 if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
@@ -581,6 +562,22 @@ namespace NJsonSchema.Infrastructure
             catch
             {
                 return null;
+            }
+        }
+
+        private class AsyncLock : IDisposable
+        {
+            private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
+            public AsyncLock Lock()
+            {
+                _semaphoreSlim.Wait();
+                return this;
+            }
+
+            public void Dispose()
+            {
+                _semaphoreSlim.Release();
             }
         }
     }

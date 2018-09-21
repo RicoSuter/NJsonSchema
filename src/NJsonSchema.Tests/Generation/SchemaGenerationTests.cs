@@ -152,6 +152,25 @@ namespace NJsonSchema.Tests.Generation
             Assert.False(property.IsDictionary);
         }
 
+        public class ClassWithStaticProperty
+        {
+            public static string Foo { get; set; }
+
+            public string Bar { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_is_static_then_it_is_ignored()
+        {
+            /// Act
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithStaticProperty>();
+            var json = schema.ToJson();
+
+            /// Assert
+            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.True(schema.ActualProperties.ContainsKey("Bar"));
+        }
+
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056
 
         //public class TestClass

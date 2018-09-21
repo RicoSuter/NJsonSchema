@@ -58,7 +58,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
         public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, true);
+            return await ResolveReferenceAsync(rootObject, jsonPath, true).ConfigureAwait(false);
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -69,7 +69,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
         public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, false);
+            return await ResolveReferenceAsync(rootObject, jsonPath, false).ConfigureAwait(false);
         }
 
         /// <summary>Resolves a document reference.</summary>
