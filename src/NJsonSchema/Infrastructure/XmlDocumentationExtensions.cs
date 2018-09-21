@@ -23,43 +23,23 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private class AsyncLock
+        private class AsyncLock : IDisposable
         {
-            private SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+            private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-            public async Task<T> RunAsync<T>(Func<Task<T>> lockedAction)
+            public async Task<AsyncLock> LockAsync()
             {
-                try
-                {
 #if !LEGACY
-                    await _lock.WaitAsync().ConfigureAwait(false);
+                await _semaphoreSlim.WaitAsync();
 #else
-                    _lock.Wait();
+                _semaphoreSlim.Wait();
 #endif
-                    return await lockedAction().ConfigureAwait(false);
-                }
-                finally
-                {
-                    _lock.Release();
-                }
+                return this;
             }
 
-
-            public async Task RunAsync(Func<Task> lockedAction)
+            public void Dispose()
             {
-                try
-                {
-#if !LEGACY
-                    await _lock.WaitAsync().ConfigureAwait(false);
-#else
-                    _lock.Wait();
-#endif
-                    await lockedAction().ConfigureAwait(false);
-                }
-                finally
-                {
-                    _lock.Release();
-                }
+                _semaphoreSlim.Release();
             }
         }
 
@@ -93,7 +73,6 @@ namespace NJsonSchema.Infrastructure
         {
             return GetXmlDocumentationTagAsync(type, "summary");
         }
-
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
@@ -224,13 +203,12 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Clears the cache.</summary>
         /// <returns>The task.</returns>
-        public static Task ClearCacheAsync()
+        public static async Task ClearCacheAsync()
         {
-            return Lock.RunAsync(() =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
                 Cache.Clear();
-                return DynamicApis.FromResult<object>(null);
-            });
+            }
         }
 
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
@@ -243,7 +221,7 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = member.Module.Assembly.GetName();
-            return await Lock.RunAsync(async () =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
                 if (IgnoreAssembly(assemblyName))
                     return string.Empty;
@@ -251,7 +229,7 @@ namespace NJsonSchema.Infrastructure
                 var documentationPath = await GetXmlDocumentationPathAsync(member.Module.Assembly).ConfigureAwait(false);
                 var element = await GetXmlDocumentationWithoutLockAsync(member, documentationPath).ConfigureAwait(false);
                 return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element?.Element(tagName)));
-            }).ConfigureAwait(false);
+            }
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
@@ -263,7 +241,7 @@ namespace NJsonSchema.Infrastructure
                 return string.Empty;
 
             var assemblyName = parameter.Member.Module.Assembly.GetName();
-            return await Lock.RunAsync(async () =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
                 if (IgnoreAssembly(assemblyName))
                     return string.Empty;
@@ -271,26 +249,26 @@ namespace NJsonSchema.Infrastructure
                 var documentationPath = await GetXmlDocumentationPathAsync(parameter.Member.Module.Assembly).ConfigureAwait(false);
                 var element = await GetXmlDocumentationWithoutLockAsync(parameter, documentationPath).ConfigureAwait(false);
                 return RemoveLineBreakWhiteSpaces(GetXmlDocumentationText(element));
-            }).ConfigureAwait(false);
+            }
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="type">The type.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this Type type, string pathToXmlFile)
+        public static async Task<XElement> GetXmlDocumentationAsync(this Type type, string pathToXmlFile)
         {
-            return Lock.RunAsync(async () =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
                 return await ((MemberInfo)type.GetTypeInfo()).GetXmlDocumentationWithoutLockAsync(pathToXmlFile).ConfigureAwait(false);
-            });
+            }
         }
 
         /// <summary>Returns the contents of the "returns" or "param" XML documentation tag for the specified parameter.</summary>
         /// <param name="parameter">The reflected parameter or return info.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "returns" or "param" tag.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this ParameterInfo parameter, string pathToXmlFile)
+        public static async Task<XElement> GetXmlDocumentationAsync(this ParameterInfo parameter, string pathToXmlFile)
         {
             try
             {
@@ -298,10 +276,10 @@ namespace NJsonSchema.Infrastructure
                     return null;
 
                 var assemblyName = parameter.Member.Module.Assembly.GetName();
-                return Lock.RunAsync(async () =>
+                using (await Lock.LockAsync().ConfigureAwait(false))
                 {
-                    return await GetXmlDocumentationWithoutLockAsync(parameter, pathToXmlFile);
-                });
+                    return await GetXmlDocumentationWithoutLockAsync(parameter, pathToXmlFile).ConfigureAwait(false);
+                }
             }
             catch
             {
@@ -312,24 +290,24 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Returns the contents of an XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this MemberInfo member)
+        public static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member)
         {
-            return Lock.RunAsync(() =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
-                return GetXmlDocumentationWithoutLockAsync(member);
-            });
+                return await GetXmlDocumentationWithoutLockAsync(member).ConfigureAwait(false);
+            }
         }
 
         /// <summary>Returns the contents of the "summary" XML documentation tag for the specified member.</summary>
         /// <param name="member">The reflected member.</param>
         /// <param name="pathToXmlFile">The path to the XML documentation file.</param>
         /// <returns>The contents of the "summary" tag for the member.</returns>
-        public static Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile)
+        public static async Task<XElement> GetXmlDocumentationAsync(this MemberInfo member, string pathToXmlFile)
         {
-            return Lock.RunAsync(() =>
+            using (await Lock.LockAsync().ConfigureAwait(false))
             {
-                return GetXmlDocumentationWithoutLockAsync(member, pathToXmlFile);
-            });
+                return await GetXmlDocumentationWithoutLockAsync(member, pathToXmlFile).ConfigureAwait(false);
+            }
         }
 
         private static async Task<XElement> GetXmlDocumentationWithoutLockAsync(this ParameterInfo parameter, string pathToXmlFile)
