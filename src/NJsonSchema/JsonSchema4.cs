@@ -756,6 +756,7 @@ namespace NJsonSchema
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
+        /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData)
         {
