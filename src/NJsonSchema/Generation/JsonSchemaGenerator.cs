@@ -325,7 +325,7 @@ namespace NJsonSchema.Generation
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
-            await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver);
+            await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -345,7 +345,7 @@ namespace NJsonSchema.Generation
                 var genericTypeArguments = extensionDataProperty.PropertyType.GetGenericTypeArguments();
                 var extensionDataPropertyType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
 
-                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(extensionDataPropertyType, null, schemaResolver);
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(extensionDataPropertyType, null, schemaResolver).ConfigureAwait(false);
             }
             else
                 schema.AllowAdditionalProperties = false;
