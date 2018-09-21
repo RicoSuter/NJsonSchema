@@ -314,7 +314,7 @@ namespace NJsonSchema.Generation
         /// <param name="schema">The properties</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The task.</returns>
-        protected virtual async Task GenerateObjectAsync(Type type, 
+        protected virtual async Task GenerateObjectAsync(Type type,
             JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
@@ -333,8 +333,10 @@ namespace NJsonSchema.Generation
             schema.AllowAdditionalProperties = false;
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            await GeneratePropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
             await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
+
+            GenerateInheritanceDiscriminator(type, rootSchema);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -1022,15 +1024,15 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var minimum = (double) Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
+                        var minimum = (double)Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
                         if (minimum > double.MinValue)
                         {
-                            schema.Minimum = (decimal) minimum;
+                            schema.Minimum = (decimal)minimum;
                         }
                     }
                     else
                     {
-                        var minimum = (decimal) Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
+                        var minimum = (decimal)Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
                         if (minimum > decimal.MinValue)
                         {
                             schema.Minimum = minimum;
@@ -1042,15 +1044,15 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var maximum = (double) Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
+                        var maximum = (double)Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
                         if (maximum < double.MaxValue)
                         {
-                            schema.Maximum = (decimal) maximum;
+                            schema.Maximum = (decimal)maximum;
                         }
                     }
                     else
                     {
-                        var maximum = (decimal) Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
+                        var maximum = (decimal)Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
                         if (maximum < decimal.MaxValue)
                         {
                             schema.Maximum = maximum;
