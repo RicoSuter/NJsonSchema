@@ -278,7 +278,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            schema.ActualSchema.Description = "ClassDesc.";
+            schema.Description = "ClassDesc.";
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -295,7 +295,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            schema.ActualProperties["Class"].Description = "PropertyDesc.";
+            schema.Properties["Class"].Description = "PropertyDesc.";
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
             //// Act

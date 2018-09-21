@@ -19,7 +19,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             /// Arrange
             var schema = await JsonSchema4.FromTypeAsync<AbstractClass>();
-            var json = schema.ToJson();
 
             /// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
@@ -27,10 +26,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             /// Assert
             Assert.Contains("export abstract class AbstractClass", code);
-
-            Assert.Contains("base: string", code);
-            Assert.Contains("super: string", code);
-            Assert.Contains("foo: string", code);
         }
 
         public class ContainerClass
@@ -58,12 +53,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [JsonConverter(typeof(JsonInheritanceConverter))]
         public class BaseClass
         {
-            public string Base { get; set; }
+
         }
 
         public class SuperClass : AbstractClass
         {
-            public string Super { get; set; }
+
         }
 
         [Fact]
