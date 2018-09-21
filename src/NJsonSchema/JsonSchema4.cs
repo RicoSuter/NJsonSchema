@@ -158,7 +158,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.HttpGetAsync(url);
+            var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
             return await FromJsonAsync(data, url, referenceResolverFactory).ConfigureAwait(false);
         }
 

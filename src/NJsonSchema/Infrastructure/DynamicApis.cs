@@ -121,7 +121,7 @@ namespace NJsonSchema.Infrastructure
                 return false;
 
             return await FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
         }
 
         /// <summary>Checks whether a file exists.</summary>
@@ -137,7 +137,7 @@ namespace NJsonSchema.Infrastructure
                 return false;
 
             return await FromResult((bool)FileType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
         }
 
         /// <summary>Reads all content of a file (UTF8).</summary>

@@ -96,9 +96,9 @@ namespace NJsonSchema
             public override async Task VisitAsync(object obj)
             {
                 _replaceRefsRound = true;
-                await base.VisitAsync(obj);
+                await base.VisitAsync(obj).ConfigureAwait(false);
                 _replaceRefsRound = false;
-                await base.VisitAsync(obj);
+                await base.VisitAsync(obj).ConfigureAwait(false);
             }
 
             protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)

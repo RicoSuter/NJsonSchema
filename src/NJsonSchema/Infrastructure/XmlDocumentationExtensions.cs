@@ -32,11 +32,11 @@ namespace NJsonSchema.Infrastructure
                 try
                 {
 #if !LEGACY
-                    await _lock.WaitAsync();
+                    await _lock.WaitAsync().ConfigureAwait(false);
 #else
                     _lock.Wait();
 #endif
-                    return await lockedAction();
+                    return await lockedAction().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -50,11 +50,11 @@ namespace NJsonSchema.Infrastructure
                 try
                 {
 #if !LEGACY
-                    await _lock.WaitAsync();
+                    await _lock.WaitAsync().ConfigureAwait(false);
 #else
                     _lock.Wait();
 #endif
-                    await lockedAction();
+                    await lockedAction().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -65,8 +65,7 @@ namespace NJsonSchema.Infrastructure
 
         private static readonly AsyncLock Lock = new AsyncLock();
 
-        private static readonly Dictionary<string, Task<XDocument>> Cache =
-            new Dictionary<string, Task<XDocument>>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, XDocument> Cache = new Dictionary<string, XDocument>(StringComparer.OrdinalIgnoreCase);
 
 #if !LEGACY
 
@@ -398,10 +397,10 @@ namespace NJsonSchema.Infrastructure
                     return null;
                 }
 
-                Cache[assemblyName.FullName] = Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace));
+                Cache[assemblyName.FullName] = await Task.Factory.StartNew(() => XDocument.Load(pathToXmlFile, LoadOptions.PreserveWhitespace)).ConfigureAwait(false);
             }
 
-            return await Cache[assemblyName.FullName].ConfigureAwait(false);
+            return Cache[assemblyName.FullName];
         }
 
         private static bool IgnoreAssembly(AssemblyName assemblyName)
