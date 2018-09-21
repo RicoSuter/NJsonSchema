@@ -24,8 +24,8 @@ namespace NJsonSchema.Tests.Generation
             var exceptionSchema = schema.InheritedSchema.ActualSchema;
 
             //// Assert
-            Assert.True(schema.Properties.ContainsKey("foo"));
-            Assert.True(exceptionSchema.Properties.ContainsKey("InnerException"));
+            Assert.True(schema.ActualProperties.ContainsKey("foo"));
+            Assert.True(exceptionSchema.ActualProperties.ContainsKey("InnerException"));
         }
     }
 }
