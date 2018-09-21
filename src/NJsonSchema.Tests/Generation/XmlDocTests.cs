@@ -118,7 +118,7 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Empty(summary);
         }
-        
+
         public abstract class BaseBaseClass
         {
             /// <summary>Foo.</summary>

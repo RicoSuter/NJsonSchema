@@ -121,7 +121,7 @@ namespace NJsonSchema.Infrastructure
                 return false;
 
             return await FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
         }
 
         /// <summary>Checks whether a file exists.</summary>
@@ -137,7 +137,7 @@ namespace NJsonSchema.Infrastructure
                 return false;
 
             return await FromResult((bool)FileType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
         }
 
         /// <summary>Reads all content of a file (UTF8).</summary>
@@ -206,13 +206,13 @@ namespace NJsonSchema.Infrastructure
         }
 
 #if LEGACY
-        private static async Task<T> FromResult<T>(T result)
+        internal static async Task<T> FromResult<T>(T result)
         {
             return result;
         }
 #else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Task<T> FromResult<T>(T result)
+        internal static Task<T> FromResult<T>(T result)
         {
             return Task.FromResult(result);
         }

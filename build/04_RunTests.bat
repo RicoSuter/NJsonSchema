@@ -1,3 +1,4 @@
+dotnet test "%~dp0/../src\NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj" -c Release || goto :error
 dotnet test "%~dp0/../src\NJsonSchema.Tests\NJsonSchema.Tests.csproj" -c Release || goto :error
 dotnet test "%~dp0/../src\NJsonSchema.CodeGeneration.Tests\NJsonSchema.CodeGeneration.Tests.csproj" -c Release || goto :error
 dotnet test "%~dp0/../src\NJsonSchema.CodeGeneration.CSharp.Tests\NJsonSchema.CodeGeneration.CSharp.Tests.csproj" -c Release || goto :error

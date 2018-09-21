@@ -158,7 +158,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.HttpGetAsync(url);
+            var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
             return await FromJsonAsync(data, url, referenceResolverFactory).ConfigureAwait(false);
         }
 
@@ -756,6 +756,7 @@ namespace NJsonSchema
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
+        /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData)
         {

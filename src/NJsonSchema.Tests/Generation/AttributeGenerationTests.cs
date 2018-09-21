@@ -188,5 +188,25 @@ namespace NJsonSchema.Tests.Generation
             [ReadOnly(true)]
             public bool ReadOnly { get; set; }
         }
+
+        public class ClassWithTypedRange
+        {
+            [Range(typeof(decimal), "0", "1")]
+            public decimal Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_range_has_type_and_strings_then_it_is_processed_correctly()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithTypedRange>();
+            var property = schema.Properties["Foo"];
+
+            //// Assert
+            Assert.Equal(0.0m, property.Minimum);
+            Assert.Equal(1.0m, property.Maximum);
+        }
     }
 }
