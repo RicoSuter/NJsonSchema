@@ -463,11 +463,7 @@ namespace NJsonSchema.Infrastructure
         private static string GetMemberElementName(dynamic member)
         {
             char prefixCode;
-
-            var memberName = member is Type memberType && !string.IsNullOrEmpty(memberType.FullName) ?
-                memberType.FullName :
-                member.DeclaringType.FullName + "." + member.Name;
-
+            string memberName = member is Type ? ((Type)member).FullName : (member.DeclaringType.FullName + "." + member.Name);
             switch ((string)member.MemberType.ToString())
             {
                 case "Constructor":
