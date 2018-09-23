@@ -146,9 +146,7 @@ namespace NJsonSchema.Generation
                         schema.Reference = schemaResolver.GetSchema(type, false);
                     else if (schema.GetType() == typeof(JsonSchema4))
                     {
-                        typeDescription.ApplyType(schema);
-                        schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-                        await GenerateObjectAsync(type, schema, schemaResolver).ConfigureAwait(false);
+                        await GenerateObjectAsync(type, typeDescription, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
                         schema.Reference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
@@ -311,21 +309,34 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>Generates the properties for the given type and schema.</summary>
-        /// <typeparam name="TSchemaType">The type of the schema type.</typeparam>
         /// <param name="type">The types.</param>
+        /// <param name="typeDescription">The type description.</param>
         /// <param name="schema">The properties</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The task.</returns>
-        protected virtual async Task GenerateObjectAsync<TSchemaType>(
-            Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+        protected virtual async Task GenerateObjectAsync(Type type,
+            JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
+            var rootSchema = schema;
 
+            var hasInheritance = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            if (hasInheritance)
+            {
+                var actualSchema = new JsonSchema4();
+                schema.AllOf.Add(actualSchema);
+                schema = actualSchema;
+            }
+
+            typeDescription.ApplyType(schema);
+            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+            schema.AllowAdditionalProperties = false;
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            await GeneratePropertiesAndInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            await GeneratePropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
             await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
+
+            GenerateInheritanceDiscriminator(type, rootSchema);
 
             if (Settings.GenerateKnownTypes)
                 await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
@@ -510,7 +521,7 @@ namespace NJsonSchema.Generation
             schema.AllowAdditionalProperties = true;
         }
 
-        private async Task GeneratePropertiesAndInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task GeneratePropertiesAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
 #if !LEGACY
             var propertiesAndFields = type.GetTypeInfo()
@@ -603,8 +614,6 @@ namespace NJsonSchema.Generation
                     await LoadPropertyOrFieldAsync(property, info, type, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
-
-            await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
         }
 
         /// <summary>Gets the properties of the given type or null to take all properties.</summary>
@@ -656,7 +665,7 @@ namespace NJsonSchema.Generation
                 await GenerateAsync(type, schemaResolver).ConfigureAwait(false);
         }
 
-        private async Task GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task<bool> GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
@@ -669,7 +678,12 @@ namespace NJsonSchema.Generation
                     {
                         var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
                         if (!typeDescription.IsDictionary && !type.IsArray)
-                            await GeneratePropertiesAndInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                        {
+                            await GeneratePropertiesAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                            await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+
+                            GenerateInheritanceDiscriminator(baseType, schema);
+                        }
                     }
                     else
                     {
@@ -687,6 +701,8 @@ namespace NJsonSchema.Generation
                         }
                         else
                             schema.AllOf.Add(baseSchema);
+
+                        return true;
                     }
                 }
             }
@@ -700,12 +716,18 @@ namespace NJsonSchema.Generation
 #endif
                 {
                     var typeDescription = Settings.ReflectionService.GetDescription(i, null, Settings);
-                    if (!typeDescription.IsDictionary && !type.IsArray && !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
-                        await GeneratePropertiesAndInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                    if (!typeDescription.IsDictionary && !type.IsArray &&
+                        !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
+                    {
+                        await GeneratePropertiesAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                        await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+
+                        GenerateInheritanceDiscriminator(i, schema);
+                    }
                 }
             }
 
-            GenerateInheritanceDiscriminator(type, schema);
+            return false;
         }
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
@@ -1002,15 +1024,15 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var minimum = (double) Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
+                        var minimum = (double)Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
                         if (minimum > double.MinValue)
                         {
-                            schema.Minimum = (decimal) minimum;
+                            schema.Minimum = (decimal)minimum;
                         }
                     }
                     else
                     {
-                        var minimum = (decimal) Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
+                        var minimum = (decimal)Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
                         if (minimum > decimal.MinValue)
                         {
                             schema.Minimum = minimum;
@@ -1022,15 +1044,15 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var maximum = (double) Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
+                        var maximum = (double)Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
                         if (maximum < double.MaxValue)
                         {
-                            schema.Maximum = (decimal) maximum;
+                            schema.Maximum = (decimal)maximum;
                         }
                     }
                     else
                     {
-                        var maximum = (decimal) Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
+                        var maximum = (decimal)Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
                         if (maximum < decimal.MaxValue)
                         {
                             schema.Maximum = maximum;

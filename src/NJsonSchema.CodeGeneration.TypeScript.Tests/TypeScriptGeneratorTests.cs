@@ -154,7 +154,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            schema.Properties["Class"].Description = "PropertyDesc.";
+            schema.ActualProperties["Class"].Description = "PropertyDesc.";
+            var json = schema.ToJson();
+
             var generator = new TypeScriptGenerator(schema);
 
             //// Act

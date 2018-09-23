@@ -8,8 +8,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
+using NJsonSchema.Collections;
 using NJsonSchema.References;
 
 namespace NJsonSchema
@@ -26,7 +28,18 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema4 ActualTypeSchema => OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+        public virtual JsonSchema4 ActualTypeSchema
+        {
+            get
+            {
+                if (AllOf.Count > 1 && AllOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
+                {
+                    return AllOf.First(s => !s.HasReference && !s.IsDictionary);
+                }
+
+                return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+            }
+        }
 
         /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
         [JsonIgnore]
