@@ -241,16 +241,22 @@ namespace NJsonSchema.Generation
                                 schema.Type = schema.Type | JsonObjectType.Null;
                         }
                         else if (Settings.SchemaType == SchemaType.OpenApi3)
+                        {
                             schema.IsNullableRaw = isNullable;
+                        }
                     }
 
                     return schema;
                 }
                 else // TODO: Is this else needed?
+                {
                     referencedSchema = schema.ActualSchema;
+                }
             }
             else
+            {
                 referencedSchema = await GenerateAsync<JsonSchema4>(type, parentAttributes, schemaResolver).ConfigureAwait(false);
+            }
 
             var referencingSchema = new TSchemaType();
             if (transformation != null)
