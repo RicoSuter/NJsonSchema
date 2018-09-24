@@ -240,11 +240,13 @@ namespace NJsonSchema.Generation
                             else
                                 schema.Type = schema.Type | JsonObjectType.Null;
                         }
+                        else if (Settings.SchemaType == SchemaType.OpenApi3)
+                            schema.IsNullableRaw = isNullable;
                     }
 
                     return schema;
                 }
-                else
+                else // TODO: Is this else needed?
                     referencedSchema = schema.ActualSchema;
             }
             else
