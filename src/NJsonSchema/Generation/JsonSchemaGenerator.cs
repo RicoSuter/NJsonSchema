@@ -143,13 +143,17 @@ namespace NJsonSchema.Generation
                 else
                 {
                     if (schemaResolver.HasSchema(type, false))
+                    {
                         schema.Reference = schemaResolver.GetSchema(type, false);
+                    }
                     else if (schema.GetType() == typeof(JsonSchema4))
                     {
                         await GenerateObjectAsync(type, typeDescription, schema, schemaResolver).ConfigureAwait(false);
                     }
                     else
+                    {
                         schema.Reference = await GenerateAsync(type, parentAttributes, schemaResolver).ConfigureAwait(false);
+                    }
                 }
             }
             else if (typeDescription.IsEnum)
@@ -320,21 +324,21 @@ namespace NJsonSchema.Generation
             schemaResolver.AddSchema(type, false, schema);
             var rootSchema = schema;
 
-            var hasInheritance = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
-            if (hasInheritance)
+            var actualSchema = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            if (actualSchema != null)
             {
-                var actualSchema = new JsonSchema4();
-                schema.AllOf.Add(actualSchema);
                 schema = actualSchema;
+            }
+            else
+            {
+                await GeneratePropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
+                await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
             }
 
             typeDescription.ApplyType(schema);
-            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-            schema.AllowAdditionalProperties = false;
-            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            await GeneratePropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
-            await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
+            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             GenerateInheritanceDiscriminator(type, rootSchema);
 
@@ -665,7 +669,7 @@ namespace NJsonSchema.Generation
                 await GenerateAsync(type, schemaResolver).ConfigureAwait(false);
         }
 
-        private async Task<bool> GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task<JsonSchema4> GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
@@ -687,6 +691,10 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
+                        var actualSchema = new JsonSchema4();
+                        await GeneratePropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
+                        await ApplyAdditionalPropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
+
                         var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
                         var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, null, Settings);
                         if (baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers))
@@ -702,7 +710,8 @@ namespace NJsonSchema.Generation
                         else
                             schema.AllOf.Add(baseSchema);
 
-                        return true;
+                        schema.AllOf.Add(actualSchema);
+                        return actualSchema;
                     }
                 }
             }
@@ -727,7 +736,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            return false;
+            return null;
         }
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)

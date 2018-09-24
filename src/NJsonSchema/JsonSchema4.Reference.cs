@@ -41,9 +41,9 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
+        /// <summary>Gets a value indicating whether this is a schema reference ($ref, <see cref="HasAllOfSchemaReference"/> or <see cref="HasOneOfSchemaReference"/>).</summary>
         [JsonIgnore]
-        public bool HasReference => Reference != null || HasAllOfSchemaReference;
+        public bool HasReference => Reference != null || HasAllOfSchemaReference || HasOneOfSchemaReference;
 
         /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
         [JsonIgnore]
@@ -52,6 +52,20 @@ namespace NJsonSchema
                                                Type == JsonObjectType.None &&
                                                AnyOf.Count == 0 &&
                                                OneOf.Count == 0 &&
+                                               Properties.Count == 0 &&
+                                               PatternProperties.Count == 0 &&
+                                               AllowAdditionalProperties &&
+                                               AdditionalPropertiesSchema == null &&
+                                               MultipleOf == null &&
+                                               IsEnumeration == false;
+
+        /// <summary>Gets a value indicating whether this is an oneOf schema reference.</summary>
+        [JsonIgnore]
+        public bool HasOneOfSchemaReference => OneOf.Count == 1 &&
+                                               OneOf.Any(s => s.HasReference) &&
+                                               Type == JsonObjectType.None &&
+                                               AnyOf.Count == 0 &&
+                                               AllOf.Count == 0 &&
                                                Properties.Count == 0 &&
                                                PatternProperties.Count == 0 &&
                                                AllowAdditionalProperties &&
@@ -68,7 +82,7 @@ namespace NJsonSchema
             set => Reference = value;
         }
 
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref or <see cref="HasAllOfSchemaReference"/>).</summary>
+        /// <summary>Gets a value indicating whether this is a schema reference ($ref, <see cref="HasAllOfSchemaReference"/> or <see cref="HasOneOfSchemaReference"/>).</summary>
         [JsonIgnore]
         [Obsolete("Use the HasReference property instead.")]
         public bool HasSchemaReference => HasReference;
@@ -89,6 +103,9 @@ namespace NJsonSchema
 
                 if (HasAllOfSchemaReference)
                     return AllOf.First().GetActualSchema(checkedSchemas);
+
+                if (HasOneOfSchemaReference)
+                    return OneOf.First().GetActualSchema(checkedSchemas);
 
                 return Reference.GetActualSchema(checkedSchemas);
             }
