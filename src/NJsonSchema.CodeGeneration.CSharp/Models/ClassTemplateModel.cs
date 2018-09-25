@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToArray();
 
-            if (HasInheritance)
+            if (schema.InheritedSchema != null)
             {
                 BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
@@ -95,10 +95,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Discriminator => _schema.Discriminator;
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
-        public bool HasInheritance => _schema.InheritedSchema != null;
+        public bool HasInheritance => _schema.InheritedTypeSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedSchema, false, string.Empty)
+        public string BaseClassName => HasInheritance ? _resolver.ResolveDirect(_schema.InheritedTypeSchema, false, string.Empty)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 

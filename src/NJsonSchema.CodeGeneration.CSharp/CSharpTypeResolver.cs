@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public override string ResolveDirect(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             schema = schema.ActualSchema;
 
@@ -81,6 +81,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return ResolveDictionary(schema);
 
             return GetOrGenerateTypeName(schema, typeNameHint);
+        }
+
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected override bool IsTypeSchema(JsonSchema4 schema)
+        {
+            if (schema.IsDictionary || schema.IsArray)
+            {
+                return true;
+            }
+
+            return base.IsTypeSchema(schema);
         }
 
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)

@@ -41,7 +41,23 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public abstract string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint);
+        public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        {
+            schema = schema.ActualSchema;
+            if (Types.ContainsKey(schema))
+            {
+                return Types[schema];
+            }
+
+            return ResolveDirect(schema, isNullable, typeNameHint);
+        }
+
+        /// <summary>Resolves and possibly generates the specified schema.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
+        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
+        /// <returns>The type name.</returns>
+        public abstract string ResolveDirect(JsonSchema4 schema, bool isNullable, string typeNameHint);
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
         /// <param name="schema">The schema.</param>
@@ -70,13 +86,25 @@ namespace NJsonSchema.CodeGeneration
                 foreach (var pair in definitions)
                 {
                     var schema = pair.Value.ActualSchema;
-                    var isCodeGeneratingSchema = !schema.IsDictionary && !schema.IsAnyType &&
-                        (schema.IsEnumeration || schema.Type == JsonObjectType.None || schema.Type.HasFlag(JsonObjectType.Object));
 
-                    if (isCodeGeneratingSchema)
+                    if (IsTypeSchema(schema))
+                    {
                         GetOrGenerateTypeName(schema, pair.Key);
+                    }
                 }
             }
+        }
+
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected virtual bool IsTypeSchema(JsonSchema4 schema)
+        {
+            return !schema.IsDictionary &&
+                   !schema.IsAnyType &&
+                   (schema.IsEnumeration ||
+                    schema.Type == JsonObjectType.None ||
+                    schema.Type.HasFlag(JsonObjectType.Object));
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
