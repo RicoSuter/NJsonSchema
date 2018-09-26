@@ -41,23 +41,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
-        {
-            schema = schema.ActualSchema;
-            if (Types.ContainsKey(schema))
-            {
-                return Types[schema];
-            }
-
-            return ResolveDirect(schema, isNullable, typeNameHint);
-        }
-
-        /// <summary>Resolves and possibly generates the specified schema.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
-        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
-        /// <returns>The type name.</returns>
-        public abstract string ResolveDirect(JsonSchema4 schema, bool isNullable, string typeNameHint);
+        public abstract string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint);
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
         /// <param name="schema">The schema.</param>

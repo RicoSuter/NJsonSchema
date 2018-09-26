@@ -226,5 +226,38 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             /// Assert
             Assert.Contains("public enum FirstMetdodOfMetValueGroupChar", code);
         }
+
+        [Fact]
+        public async Task When_enum_property_is_not_required_in_Swagger2_then_it_is_nullable()
+        {
+            //// Arrange
+            var json =
+            @"{
+    ""type"": ""object"",
+    ""required"": [
+        ""name"",
+        ""photoUrls""
+    ],
+    ""properties"": {
+        ""status"": {
+            ""type"": ""string"",
+            ""description"": ""pet status in the store"",
+            ""enum"": [
+                ""available"",
+                ""pending"",
+                ""sold""
+            ]
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("private MyClassStatus? _status;", code);
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public override string ResolveDirect(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, false);
         }

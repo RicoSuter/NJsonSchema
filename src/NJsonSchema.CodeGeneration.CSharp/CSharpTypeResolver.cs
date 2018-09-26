@@ -41,7 +41,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public override string ResolveDirect(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        {
+            return Resolve(schema, isNullable, typeNameHint, true);
+        }
+
+        /// <summary>Resolves and possibly generates the specified schema.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
+        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
+        /// <param name="checkForExistingSchema">Checks whether a named schema is already registered.</param>
+        /// <returns>The type name.</returns>
+        public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint, bool checkForExistingSchema)
         {
             schema = schema.ActualSchema;
 
@@ -59,9 +70,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema);
-
             if (type.HasFlag(JsonObjectType.Number))
                 return ResolveNumber(schema, isNullable);
 
@@ -73,6 +81,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (type.HasFlag(JsonObjectType.String))
                 return ResolveString(schema, isNullable, typeNameHint);
+
+            if (Types.ContainsKey(schema) && checkForExistingSchema)
+                return Types[schema];
+
+            if (type.HasFlag(JsonObjectType.Array))
+                return ResolveArrayOrTuple(schema);
 
             if (type.HasFlag(JsonObjectType.File))
                 return "byte[]";

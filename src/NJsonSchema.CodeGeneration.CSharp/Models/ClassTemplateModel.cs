@@ -98,7 +98,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasInheritance => _schema.InheritedTypeSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.ResolveDirect(_schema.InheritedTypeSchema, false, string.Empty)
+        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema, false, string.Empty, false)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
