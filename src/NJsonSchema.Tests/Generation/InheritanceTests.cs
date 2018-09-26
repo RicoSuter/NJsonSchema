@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -88,9 +89,9 @@ namespace NJsonSchema.Tests.Generation
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
 
             //// Assert
-            Assert.NotNull(schema.Properties["Class"]);
+            Assert.NotNull(schema.ActualProperties["Class"]);
 
-            Assert.Equal(1, schema.AllOf.Count);
+            Assert.Equal(2, schema.AllOf.Count);
             Assert.Contains(schema.Definitions, d => d.Key == "Person");
             Assert.NotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
@@ -298,10 +299,45 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            Task<JsonSchema4> getSchema() => JsonSchema4.FromTypeAsync<BaseClass_WithIntDiscriminant>();
+            Task<JsonSchema4> GetSchema() => JsonSchema4.FromTypeAsync<BaseClass_WithIntDiscriminant>();
 
             //// Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(getSchema);
+            await Assert.ThrowsAsync<InvalidOperationException>(GetSchema);
+        }
+
+        public class Foo
+        {
+            public Bar Bar { get; set; }
+        }
+
+        public class Bar : Dictionary<string, string>
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_inherits_from_dictionary_then_allOf_contains_base_dictionary_schema_and_actual_schema()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>(settings);
+            var json = schema.ToJson();
+
+            //// Assert
+            var bar = schema.Definitions["Bar"];
+
+            Assert.Equal(2, bar.AllOf.Count);
+
+            Assert.Equal(bar.AllOf.Last(), bar.ActualTypeSchema);
+            Assert.Equal(bar.AllOf.First(), bar.InheritedSchema);
+
+            Assert.True(bar.AllOf.First().IsDictionary); // base class (dictionary)
+            Assert.True(bar.AllOf.Last().ActualProperties.Any()); // actual class
         }
     }
 }

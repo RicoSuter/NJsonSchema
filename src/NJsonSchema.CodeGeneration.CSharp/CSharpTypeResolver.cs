@@ -43,6 +43,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The type name.</returns>
         public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
+            return Resolve(schema, isNullable, typeNameHint, true);
+        }
+
+        /// <summary>Resolves and possibly generates the specified schema.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
+        /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
+        /// <param name="checkForExistingSchema">Checks whether a named schema is already registered.</param>
+        /// <returns>The type name.</returns>
+        public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint, bool checkForExistingSchema)
+        {
             schema = schema.ActualSchema;
 
             if (schema == ExceptionSchema)
@@ -59,9 +70,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema);
-
             if (type.HasFlag(JsonObjectType.Number))
                 return ResolveNumber(schema, isNullable);
 
@@ -74,6 +82,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (type.HasFlag(JsonObjectType.String))
                 return ResolveString(schema, isNullable, typeNameHint);
 
+            if (Types.ContainsKey(schema) && checkForExistingSchema)
+                return Types[schema];
+
+            if (type.HasFlag(JsonObjectType.Array))
+                return ResolveArrayOrTuple(schema);
+
             if (type.HasFlag(JsonObjectType.File))
                 return "byte[]";
 
@@ -81,6 +95,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return ResolveDictionary(schema);
 
             return GetOrGenerateTypeName(schema, typeNameHint);
+        }
+
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected override bool IsTypeSchema(JsonSchema4 schema)
+        {
+            if (schema.IsDictionary || schema.IsArray)
+            {
+                return true;
+            }
+
+            return base.IsTypeSchema(schema);
         }
 
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)

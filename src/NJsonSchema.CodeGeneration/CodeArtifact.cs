@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The type generator result.</summary>
@@ -49,6 +51,11 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="template">The template to render the code.</param>
         public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, ITemplate template)
         {
+            if (typeName == baseTypeName)
+            {
+                throw new ArgumentException("The baseTypeName cannot equal typeName.", nameof(typeName));
+            }
+
             TypeName = typeName;
             BaseTypeName = baseTypeName;
 

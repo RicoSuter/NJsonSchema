@@ -205,11 +205,7 @@ namespace NJsonSchema
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
-#if !LEGACY
         public JsonSchema4 InheritedSchema
-#else
-        public JsonSchema4 InheritedSchema
-#endif
         {
             get
             {
@@ -226,6 +222,21 @@ namespace NJsonSchema
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
 
                 return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+            }
+        }
+
+        /// <summary>Gets the inherited/parent schema which may also be inlined 
+        /// (the schema itself if it is a dictionary or array, otherwise <see cref="InheritedSchema"/>).</summary>
+        /// <remarks>Used for code generation.</remarks>
+        [JsonIgnore]
+        public JsonSchema4 InheritedTypeSchema
+        {
+            get
+            {
+                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray)
+                    return ActualTypeSchema;
+
+                return InheritedSchema;
             }
         }
 

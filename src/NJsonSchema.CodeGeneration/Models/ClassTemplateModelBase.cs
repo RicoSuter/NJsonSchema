@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Models
         public abstract string ClassName { get; }
 
         /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
-        public bool IsAbstract => _schema.IsAbstract;
+        public bool IsAbstract => _schema.ActualTypeSchema.IsAbstract;
 
         /// <summary>Gets the property extension data.</summary>
         public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.Models
         {
             internal DerivedClassModel(string typeName, JsonSchema4 schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
             {
-                var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualSchema == schema.ActualSchema);
+                var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualTypeSchema == schema.ActualTypeSchema);
 
                 ClassName = resolver.GetOrGenerateTypeName(schema, typeName);
                 IsAbstract = schema.ActualTypeSchema.IsAbstract;

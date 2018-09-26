@@ -70,13 +70,25 @@ namespace NJsonSchema.CodeGeneration
                 foreach (var pair in definitions)
                 {
                     var schema = pair.Value.ActualSchema;
-                    var isCodeGeneratingSchema = !schema.IsDictionary && !schema.IsAnyType &&
-                        (schema.IsEnumeration || schema.Type == JsonObjectType.None || schema.Type.HasFlag(JsonObjectType.Object));
 
-                    if (isCodeGeneratingSchema)
+                    if (IsTypeSchema(schema))
+                    {
                         GetOrGenerateTypeName(schema, pair.Key);
+                    }
                 }
             }
+        }
+
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected virtual bool IsTypeSchema(JsonSchema4 schema)
+        {
+            return !schema.IsDictionary &&
+                   !schema.IsAnyType &&
+                   (schema.IsEnumeration ||
+                    schema.Type == JsonObjectType.None ||
+                    schema.Type.HasFlag(JsonObjectType.Object));
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
