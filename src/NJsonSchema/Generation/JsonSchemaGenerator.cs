@@ -700,26 +700,46 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var actualSchema = new JsonSchema4();
+
                         await GeneratePropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
                         await ApplyAdditionalPropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
 
-                        var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
                         var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, null, Settings);
-                        if (baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers))
-                        {
-                            if (schemaResolver.RootObject != baseSchema.ActualSchema)
-                                schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
+                        var requiresSchemaReference = baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers);
 
-                            schema.AllOf.Add(new JsonSchema4
+                        if (actualSchema.Properties.Any() || requiresSchemaReference)
+                        {
+                            // Use allOf inheritance only if the schema is an object with properties 
+                            // (not empty class which just inherits from array or dictionary)
+
+                            var baseSchema = await GenerateAsync(baseType, schemaResolver).ConfigureAwait(false);
+                            if (requiresSchemaReference)
                             {
-                                Reference = baseSchema.ActualSchema
-                            });
+                                if (schemaResolver.RootObject != baseSchema.ActualSchema)
+                                {
+                                    schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
+                                }
+
+                                schema.AllOf.Add(new JsonSchema4
+                                {
+                                    Reference = baseSchema.ActualSchema
+                                });
+                            }
+                            else
+                            {
+                                schema.AllOf.Add(baseSchema);
+                            }
+
+                            // First schema is the (referenced) base schema, second is the type schema itself
+                            schema.AllOf.Add(actualSchema);
+                            return actualSchema;
                         }
                         else
-                            schema.AllOf.Add(baseSchema);
-
-                        schema.AllOf.Add(actualSchema);
-                        return actualSchema;
+                        {
+                            // Array and dictionary inheritance are not expressed with allOf but inline
+                            await GenerateAsync(baseType, null, schema, schemaResolver).ConfigureAwait(false);
+                            return schema;
+                        }
                     }
                 }
             }
