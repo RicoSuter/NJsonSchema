@@ -386,7 +386,7 @@ namespace NJsonSchema.Validation
 
             foreach (var propertyInfo in schema.Properties)
             {
-                var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyInfo.Key : propertyInfo.Key;
+                var newPropertyPath = GetPropertyPath(propertyPath, propertyInfo.Key);
 
                 var property = obj?.Property(propertyInfo.Key);
                 if (property != null)
@@ -396,6 +396,20 @@ namespace NJsonSchema.Validation
                 }
                 else if (propertyInfo.Value.IsRequired)
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, propertyInfo.Key, newPropertyPath, token, schema));
+            }
+
+            // Properties may be required in a schema without being specified as a property.
+            foreach (var requiredProperty in schema.RequiredProperties)
+            {
+                if (schema.Properties.ContainsKey(requiredProperty))
+                {
+                    // The property has already been checked.
+                    continue;
+                }
+
+                var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
+                if (obj?.Property(requiredProperty) == null)
+                    errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, requiredProperty, newPropertyPath, token, schema));
             }
 
             if (obj != null)
@@ -410,6 +424,11 @@ namespace NJsonSchema.Validation
                 ValidatePatternProperties(additionalProperties, schema, errors);
                 ValidateAdditionalProperties(token, additionalProperties, schema, propertyName, propertyPath, errors);
             }
+        }
+
+        private string GetPropertyPath(string propertyPath, string propertyName)
+        {
+            return !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyName : propertyName;
         }
 
         private void ValidateMaxProperties(JToken token, IList<JProperty> properties, JsonSchema4 schema, string propertyName, string propertyPath, List<ValidationError> errors)
