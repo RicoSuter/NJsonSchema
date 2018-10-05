@@ -8,17 +8,42 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema.Validation
 {
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
     public class JsonSchemaValidator
     {
+        private readonly IEnumerable<IFormatValidator> _formatValidators = new IFormatValidator[]
+        {
+            new DateTimeFormatValidator(),
+            new DateFormatValidator(),
+            new EmailFormatValidator(),
+            new GuidFormatValidator(),
+            new HostnameFormatValidator(),
+            new IpV4FormatValidator(),
+            new IpV6FormatValidator(),
+            new TimeFormatValidator(),
+            new TimeSpanFormatValidator(),
+            new UriFormatValidator(),
+            new ByteFormatValidator(),
+            new Base64FormatValidator()
+        };
+        private readonly IDictionary<string, IFormatValidator> _formatValidatorsMap;
+
+        /// <summary>
+        /// Initializes JsonSchemaValidator
+        /// </summary>
+        public JsonSchemaValidator()
+        {
+            _formatValidatorsMap = _formatValidators.ToDictionary(v => v.Format, v => v);
+        }
+
         /// <summary>Validates the given JSON data.</summary>
         /// <param name="jsonData">The json data.</param>
         /// <param name="schema">The schema.</param>
@@ -138,19 +163,17 @@ namespace NJsonSchema.Validation
 
         private void ValidateNot(JToken token, JsonSchema4 schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.Not != null)
+            if (schema.Not != null && Validate(token, schema.Not).Count == 0)
             {
-                if (Validate(token, schema.Not).Count == 0)
-                    errors.Add(new ValidationError(ValidationErrorKind.ExcludedSchemaValidates, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.ExcludedSchemaValidates, propertyName, propertyPath, token, schema));
             }
         }
 
         private void ValidateNull(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Null))
+            if (type.HasFlag(JsonObjectType.Null) && token != null && token.Type != JTokenType.Null)
             {
-                if (token != null && token.Type != JTokenType.Null)
-                    errors.Add(new ValidationError(ValidationErrorKind.NullExpected, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.NullExpected, propertyName, propertyPath, token, schema));
             }
         }
 
@@ -185,126 +208,32 @@ namespace NJsonSchema.Validation
                     if (schema.MaxLength.HasValue && value.Length > schema.MaxLength)
                         errors.Add(new ValidationError(ValidationErrorKind.StringTooLong, propertyName, propertyPath, token, schema));
 
-                    if (!string.IsNullOrEmpty(schema.Format))
+                    if (!string.IsNullOrEmpty(schema.Format) 
+                        && _formatValidatorsMap.TryGetValue(schema.Format, out var formatValidator) 
+                        && !formatValidator.IsValid(value, token.Type))
                     {
-                        if (schema.Format == JsonFormatStrings.DateTime)
-                        {
-                            var acceptableFormats = new string[] {
-                                "yyyy-MM-dd'T'HH:mm:ss.FFFK",
-                                "yyyy-MM-dd' 'HH:mm:ss.FFFK",
-                                "yyyy-MM-dd'T'HH:mm:ssK",
-                                "yyyy-MM-dd' 'HH:mm:ssK",
-                                "yyyy-MM-dd'T'HH:mm:ss",
-                                "yyyy-MM-dd' 'HH:mm:ss",
-                                "yyyy-MM-dd'T'HH:mm",
-                                "yyyy-MM-dd' 'HH:mm",
-                                "yyyy-MM-dd'T'HH",
-                                "yyyy-MM-dd' 'HH",
-                                "yyyy-MM-dd",
-                                "yyyy-MM-dd",
-                                "yyyyMMdd",
-                                "yyyy-MM",
-                                "yyyy" };
-                            DateTimeOffset dateTimeResult;
-                            if (token.Type != JTokenType.Date && DateTimeOffset.TryParseExact(value, acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTimeResult) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.DateTimeExpected, propertyName, propertyPath, token, schema));
-                        }
+                        var error = new ValidationError(
+                            formatValidator.ValidationErrorKind,
+                            propertyName,
+                            propertyPath,
+                            token,
+                            schema);
 
-                        if (schema.Format == JsonFormatStrings.Date)
-                        {
-                            DateTime dateTimeResult;
-                            if (token.Type != JTokenType.Date && (DateTime.TryParseExact(value, "yyyy-MM-dd", null, DateTimeStyles.None, out dateTimeResult) == false || dateTimeResult.Date != dateTimeResult))
-                                errors.Add(new ValidationError(ValidationErrorKind.DateExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.Time)
-                        {
-                            DateTime dateTimeResult;
-                            if (token.Type != JTokenType.Date && DateTime.TryParseExact(value, "HH:mm:ss.FFFFFFFK", null, DateTimeStyles.None, out dateTimeResult) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.TimeExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.TimeSpan)
-                        {
-                            TimeSpan timeSpanResult;
-                            if (token.Type != JTokenType.TimeSpan && TimeSpan.TryParse(value, out timeSpanResult) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.TimeSpanExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.Uri)
-                        {
-                            Uri uriResult;
-                            if (token.Type != JTokenType.Uri && Uri.TryCreate(value, UriKind.Absolute, out uriResult) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.UriExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.Email)
-                        {
-                            var isEmail = Regex.IsMatch(value,
-                                @"^\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
-                                @"@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z$", RegexOptions.IgnoreCase);
-
-                            if (!isEmail)
-                                errors.Add(new ValidationError(ValidationErrorKind.EmailExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.IpV4)
-                        {
-                            var isIpV4 = Regex.IsMatch(value,
-                                @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", RegexOptions.IgnoreCase);
-
-                            if (!isIpV4)
-                                errors.Add(new ValidationError(ValidationErrorKind.IpV4Expected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.IpV6)
-                        {
-                            var isIpV6 = Uri.CheckHostName(value) == UriHostNameType.IPv6;
-
-                            if (!isIpV6)
-                                errors.Add(new ValidationError(ValidationErrorKind.IpV6Expected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.Guid)
-                        {
-                            Guid guid;
-                            if (Guid.TryParse(value, out guid) == false)
-                                errors.Add(new ValidationError(ValidationErrorKind.GuidExpected, propertyName, propertyPath, token, schema));
-                        }
-
-                        if (schema.Format == JsonFormatStrings.Hostname)
-                        {
-                            var isHostname = Regex.IsMatch(value, "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*" +
-                                                                  "([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$", RegexOptions.IgnoreCase);
-                            if (!isHostname)
-                                errors.Add(new ValidationError(ValidationErrorKind.HostnameExpected, propertyName, propertyPath, token, schema));
-                        }
-
-#pragma warning disable 618 //Base64 check is used for backward compatibility
-                        if (schema.Format == JsonFormatStrings.Byte || schema.Format == JsonFormatStrings.Base64)
-#pragma warning restore 618
-                        {
-                            var isBase64 = (value.Length % 4 == 0) && Regex.IsMatch(value, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
-
-                            if (!isBase64)
-                                errors.Add(new ValidationError(ValidationErrorKind.Base64Expected, propertyName, propertyPath, token, schema));
-                        }
+                        errors.Add(error);
                     }
                 }
             }
-            else
-            {
-                if (type.HasFlag(JsonObjectType.String))
-                    errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath, token, schema));
+            else if (type.HasFlag(JsonObjectType.String))
+            { 
+                errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath, token, schema));
             }
         }
 
         private void ValidateNumber(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Number))
+            if (type.HasFlag(JsonObjectType.Number) && token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
             {
-                if (token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath, token, schema));
             }
 
             if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
@@ -352,29 +281,25 @@ namespace NJsonSchema.Validation
 
         private void ValidateInteger(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Integer))
+            if (type.HasFlag(JsonObjectType.Integer) && token.Type != JTokenType.Integer)
             {
-                if (token.Type != JTokenType.Integer)
-                    errors.Add(new ValidationError(ValidationErrorKind.IntegerExpected, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.IntegerExpected, propertyName, propertyPath, token, schema));
             }
         }
 
         private void ValidateBoolean(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Boolean))
+            if (type.HasFlag(JsonObjectType.Boolean) && token.Type != JTokenType.Boolean)
             {
-                if (token.Type != JTokenType.Boolean)
-                    errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath, token, schema));
             }
         }
 
         private void ValidateObject(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Object))
+            if (type.HasFlag(JsonObjectType.Object) && !(token is JObject))
             {
-                var obj = token as JObject;
-                if (obj == null)
-                    errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath, token, schema));
+                errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath, token, schema));
             }
         }
 
@@ -455,23 +380,19 @@ namespace NJsonSchema.Validation
                         errors.Add(error);
                 }
             }
-            else
+            else if (!schema.AllowAdditionalProperties && additionalProperties.Any())
             {
-                if (!schema.AllowAdditionalProperties && additionalProperties.Any())
+                foreach (var property in additionalProperties)
                 {
-                    foreach (var property in additionalProperties)
-                    {
-                        var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + property.Name : property.Name;
-                        errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, newPropertyPath, property, schema));
-                    }
+                    var newPropertyPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + property.Name : property.Name;
+                    errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, property.Name, newPropertyPath, property, schema));
                 }
             }
         }
 
         private void ValidateArray(JToken token, JsonSchema4 schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            var array = token as JArray;
-            if (array != null)
+            if (token is JArray array)
             {
                 if (schema.MinItems > 0 && array.Count < schema.MinItems)
                     errors.Add(new ValidationError(ValidationErrorKind.TooFewItems, propertyName, propertyPath, token, schema));
@@ -515,23 +436,17 @@ namespace NJsonSchema.Validation
                     if (error != null)
                         errors.Add(error);
                 }
-                else
+                else if (schema.AdditionalItemsSchema != null)
                 {
-                    if (schema.AdditionalItemsSchema != null)
-                    {
-                        var error = TryCreateChildSchemaError(item,
-                            schema.AdditionalItemsSchema, ValidationErrorKind.AdditionalItemNotValid, propertyIndex, propertyPath + propertyIndex);
-                        if (error != null)
-                            errors.Add(error);
-                    }
-                    else
-                    {
-                        if (!schema.AllowAdditionalItems)
-                        {
-                            errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple,
-                                propertyIndex, propertyPath + propertyIndex, item, schema));
-                        }
-                    }
+                    var error = TryCreateChildSchemaError(item,
+                        schema.AdditionalItemsSchema, ValidationErrorKind.AdditionalItemNotValid, propertyIndex, propertyPath + propertyIndex);
+                    if (error != null)
+                        errors.Add(error);
+                }
+                else if (!schema.AllowAdditionalItems)
+                {
+                    errors.Add(new ValidationError(ValidationErrorKind.TooManyItemsInTuple,
+                        propertyIndex, propertyPath + propertyIndex, item, schema));
                 }
             }
         }
