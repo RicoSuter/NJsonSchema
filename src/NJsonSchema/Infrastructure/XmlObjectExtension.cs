@@ -46,12 +46,11 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The item type.</param>
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
-            //Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
+            // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
             var attributes = type.GetTypeInfo().GetCustomAttributes().ToList();
             dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
 
             var itemName = GetXmlItemName(type);
-
             if (xmlTypeAttribute != null)
                 itemName = xmlTypeAttribute.TypeName;
 
