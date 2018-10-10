@@ -428,7 +428,7 @@ namespace NJsonSchema.Generation
                             s.GenerateXmlObjectForItemType(itemType);
                     }).ConfigureAwait(false);
 
-                if(Settings.GenerateXmlObjects)
+                if (Settings.GenerateXmlObjects)
                     schema.GenerateXmlObjectForArrayType(type);
             }
             else
