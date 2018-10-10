@@ -6,12 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -20,6 +14,12 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation
 {
@@ -450,6 +450,9 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateXmlObjects)
                             s.GenerateXmlObjectForItemType(itemType);
                     }).ConfigureAwait(false);
+
+                if (Settings.GenerateXmlObjects)
+                    schema.GenerateXmlObjectForArrayType(type);
             }
             else
                 schema.Item = JsonSchema4.CreateAnySchema();

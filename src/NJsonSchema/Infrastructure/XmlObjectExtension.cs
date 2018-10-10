@@ -29,14 +29,32 @@ namespace NJsonSchema.Infrastructure
                     GenerateXmlObject(xmlTypeAttribute.TypeName, xmlTypeAttribute.Namespace, false, false, schema);
             }
         }
+
+        /// <summary>Generates an XML object for a JSON Schema definition.</summary>
+        /// <param name="schema">The JSON Schema</param>
+        /// <param name="type">The array type</param>
+        public static void GenerateXmlObjectForArrayType(this JsonSchema4 schema, Type type)
+        {
+            if (schema.IsArray && schema.ParentSchema == null)
+            {
+                GenerateXmlObject($@"ArrayOf{schema.Item.Xml.Name}", null, true, false, schema);
+            }
+        }
+
         /// <summary>Generates XMLObject structure for an array with primitive types</summary>
         /// <param name="schema">The JSON Schema of the item.</param>
         /// <param name="type">The item type.</param>
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
-            //Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
-            if (schema.Xml == null)
-                GenerateXmlObject(type.Name, null, false, false, schema);
+            // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
+            var attributes = type.GetTypeInfo().GetCustomAttributes().ToList();
+            dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+
+            var itemName = GetXmlItemName(type);
+            if (xmlTypeAttribute != null)
+                itemName = xmlTypeAttribute.TypeName;
+
+            GenerateXmlObject(itemName, null, false, false, schema);
         }
 
         /// <summary>Generates XMLObject structure for a property.</summary>
@@ -87,8 +105,8 @@ namespace NJsonSchema.Infrastructure
                     xmlNamespace = xmlAttribute.Namespace;
             }
 
-            //Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
-            //We need to ensure that the property name is preserved
+            // Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
+            // We need to ensure that the property name is preserved
             if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
             {
                 var referencedTypeAttributes = type.GetTypeInfo().GetCustomAttributes();
@@ -113,6 +131,22 @@ namespace NJsonSchema.Infrastructure
                 ParentSchema = schema,
                 Attribute = isAttribute
             };
+        }
+
+        /// <summary>type.Name is used int will return Int32, string will return String etc. 
+        /// These are not valid with how the XMLSerializer performs.</summary>
+        private static string GetXmlItemName(Type type)
+        {
+            if (type == typeof(int))
+                return "int";
+            else if (type == typeof(string))
+                return "string";
+            else if (type == typeof(double))
+                return "double";
+            else if (type == typeof(decimal))
+                return "decimal";
+            else
+                return type.Name;
         }
     }
 }
