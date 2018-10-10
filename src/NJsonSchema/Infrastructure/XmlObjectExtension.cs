@@ -30,9 +30,7 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-        /// <summary>
-        /// Generate XML object for a JSON Schema definition
-        /// </summary>
+        /// <summary>Generates an XML object for a JSON Schema definition.</summary>
         /// <param name="schema">The JSON Schema</param>
         /// <param name="type">The array type</param>
         public static void GenerateXmlObjectForArrayType(this JsonSchema4 schema, Type type)
@@ -108,8 +106,8 @@ namespace NJsonSchema.Infrastructure
                     xmlNamespace = xmlAttribute.Namespace;
             }
 
-            //Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
-            //We need to ensure that the property name is preserved
+            // Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
+            // We need to ensure that the property name is preserved
             if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
             {
                 var referencedTypeAttributes = type.GetTypeInfo().GetCustomAttributes();
@@ -136,11 +134,8 @@ namespace NJsonSchema.Infrastructure
             };
         }
 
-        /// <summary>
-        /// If type.Name is used int will return Int32, string will return String etc. These are not valid with how the XMLSerializer perform.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <summary>type.Name is used int will return Int32, string will return String etc. 
+        /// These are not valid with how the XMLSerializer performs.</summary>
         private static string GetXmlItemName(Type type)
         {
             if (type == typeof(int))
@@ -153,7 +148,6 @@ namespace NJsonSchema.Infrastructure
                 return "decimal";
             else
                 return type.Name;
-
         }
     }
 }
