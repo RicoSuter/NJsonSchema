@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -54,7 +55,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The type name.</returns>
         public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint, bool checkForExistingSchema)
         {
-            schema = schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? schema.ActualSchema;
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            schema = GetResolvableSchema(schema);
 
             if (schema == ExceptionSchema)
                 return "System.Exception";
