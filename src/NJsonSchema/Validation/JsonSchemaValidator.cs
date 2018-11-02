@@ -34,6 +34,7 @@ namespace NJsonSchema.Validation
             new ByteFormatValidator(),
             new Base64FormatValidator()
         };
+
         private readonly IDictionary<string, IFormatValidator> _formatValidatorsMap;
 
         /// <summary>
@@ -208,8 +209,8 @@ namespace NJsonSchema.Validation
                     if (schema.MaxLength.HasValue && value.Length > schema.MaxLength)
                         errors.Add(new ValidationError(ValidationErrorKind.StringTooLong, propertyName, propertyPath, token, schema));
 
-                    if (!string.IsNullOrEmpty(schema.Format) 
-                        && _formatValidatorsMap.TryGetValue(schema.Format, out var formatValidator) 
+                    if (!string.IsNullOrEmpty(schema.Format)
+                        && _formatValidatorsMap.TryGetValue(schema.Format, out var formatValidator)
                         && !formatValidator.IsValid(value, token.Type))
                     {
                         var error = new ValidationError(
@@ -224,7 +225,7 @@ namespace NJsonSchema.Validation
                 }
             }
             else if (type.HasFlag(JsonObjectType.String))
-            { 
+            {
                 errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath, token, schema));
             }
         }

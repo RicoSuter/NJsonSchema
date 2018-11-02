@@ -1,12 +1,17 @@
-﻿using Newtonsoft.Json.Linq;
+﻿//-----------------------------------------------------------------------
+// <copyright file="DateTimeFormatValidator.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
+using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
 
 namespace NJsonSchema.Validation.FormatValidators
 {
-    /// <summary>
-    /// Validator for DateTime format
-    /// </summary>
+    /// <summary>Validator for DateTime format.</summary>
     public class DateTimeFormatValidator : IFormatValidator
     {
         private readonly string[] _acceptableFormats = new [] {
@@ -27,19 +32,13 @@ namespace NJsonSchema.Validation.FormatValidators
             "yyyy"
         };
 
-        /// <summary>
-        /// Format attribute's value
-        /// </summary>
+        /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.DateTime;
 
-        /// <summary>
-        /// Returns validation error kind.
-        /// </summary>
+        /// <summary>Gets the validation error kind.</summary>
         public ValidationErrorKind ValidationErrorKind { get; } = ValidationErrorKind.DateTimeExpected;
 
-        /// <summary>
-        /// Validates if a string is valid DateTime
-        /// </summary>
+        /// <summary>Validates if a string is valid DateTime.</summary>
         /// <param name="value">String value.</param>
         /// <param name="tokenType">Type of token holding the value.</param>
         /// <returns></returns>
