@@ -79,6 +79,14 @@ namespace NJsonSchema.CodeGeneration
             }
         }
 
+        /// <summary>Gets the actual schema and removes a nullable oneOf reference if available.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The actually resolvable schema</returns>
+        protected JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
+        {
+            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? schema.ActualSchema;
+        }
+
         /// <summary>Checks whether the given schema should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>

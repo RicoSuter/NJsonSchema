@@ -51,11 +51,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
-            _resolver.ResolveConstructorInterfaceName(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
+            _resolver.ResolveConstructorInterfaceName(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
             Type;
 
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
@@ -78,7 +78,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 }
 
-                return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema) &&
+                return _resolver.SupportsConstructorConversion(_property) &&
                     !_property.ActualTypeSchema.IsTuple;
             }
         }
@@ -129,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
-                        Schema = _property.ActualTypeSchema,
+                        Schema = _property.ActualSchema,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
@@ -154,7 +154,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
-                        Schema = _property.ActualTypeSchema,
+                        Schema = _property.ActualSchema,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,

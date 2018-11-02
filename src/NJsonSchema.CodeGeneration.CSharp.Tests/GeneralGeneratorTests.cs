@@ -419,6 +419,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ObjectTestClass>();
+            var json = schema.ToJson();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });

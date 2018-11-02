@@ -54,6 +54,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
+            var json = schema.ToJson();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

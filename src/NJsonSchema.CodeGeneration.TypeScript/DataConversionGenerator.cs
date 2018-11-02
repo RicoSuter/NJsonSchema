@@ -34,10 +34,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var type = parameters.Resolver.Resolve(parameters.Schema, parameters.IsPropertyNullable, parameters.TypeNameHint);
             var valueGenerator = parameters.Settings.ValueGenerator;
 
-            var dictionaryValueType = parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
-            var dictionaryValueDefaultValue = parameters.Schema.AdditionalPropertiesSchema != null
-                ? valueGenerator.GetDefaultValue(parameters.Schema.AdditionalPropertiesSchema,
-                    parameters.Schema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.SchemaType), dictionaryValueType, parameters.TypeNameHint,
+            var typeSchema = parameters.Schema.ActualTypeSchema;
+            var dictionaryValueType = parameters.Resolver.TryResolve(typeSchema.AdditionalPropertiesSchema, parameters.TypeNameHint) ?? "any";
+            var dictionaryValueDefaultValue = typeSchema.AdditionalPropertiesSchema != null
+                ? valueGenerator.GetDefaultValue(typeSchema.AdditionalPropertiesSchema,
+                    typeSchema.AdditionalPropertiesSchema.IsNullable(parameters.Settings.SchemaType), dictionaryValueType, parameters.TypeNameHint,
                     parameters.Settings.GenerateDefaultValues, parameters.Resolver)
                 : null;
 
@@ -48,47 +49,47 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
+                HasDefaultValue = valueGenerator.GetDefaultValue(typeSchema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
-                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
+                DefaultValue = valueGenerator.GetDefaultValue(typeSchema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 
-                IsNewableObject = IsNewableObject(parameters.Schema),
-                IsDate = IsDate(parameters.Schema.Format, parameters.Settings.DateTimeType),
-                IsDateTime = IsDateTime(parameters.Schema.Format, parameters.Settings.DateTimeType),
+                IsNewableObject = IsNewableObject(typeSchema),
+                IsDate = IsDate(typeSchema.Format, parameters.Settings.DateTimeType),
+                IsDateTime = IsDateTime(typeSchema.Format, parameters.Settings.DateTimeType),
 
-                IsDictionary = parameters.Schema.IsDictionary,
+                IsDictionary = typeSchema.IsDictionary,
                 DictionaryValueType = dictionaryValueType,
                 DictionaryValueDefaultValue = dictionaryValueDefaultValue,
                 HasDictionaryValueDefaultValue = dictionaryValueDefaultValue != null,
 
-                IsDictionaryValueNewableObject = parameters.Schema.AdditionalPropertiesSchema != null && IsNewableObject(parameters.Schema.AdditionalPropertiesSchema),
-                IsDictionaryValueDate = IsDate(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
-                IsDictionaryValueDateTime = IsDateTime(parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
-                IsDictionaryValueNewableArray = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
-                    IsNewableObject(parameters.Schema.AdditionalPropertiesSchema.Item),
-                DictionaryValueArrayItemType = parameters.Schema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
-                    parameters.Resolver.TryResolve(parameters.Schema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : "any",
+                IsDictionaryValueNewableObject = typeSchema.AdditionalPropertiesSchema != null && IsNewableObject(typeSchema.AdditionalPropertiesSchema),
+                IsDictionaryValueDate = IsDate(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
+                IsDictionaryValueDateTime = IsDateTime(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
+                IsDictionaryValueNewableArray = typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
+                    IsNewableObject(typeSchema.AdditionalPropertiesSchema.Item),
+                DictionaryValueArrayItemType = typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
+                    parameters.Resolver.TryResolve(typeSchema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : "any",
 
-                IsArray = parameters.Schema.IsArray,
-                ArrayItemType = parameters.Resolver.TryResolve(parameters.Schema.Item, parameters.TypeNameHint) ?? "any",
-                IsArrayItemNewableObject = parameters.Schema.Item != null && IsNewableObject(parameters.Schema.Item),
-                IsArrayItemDate = IsDate(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),
-                IsArrayItemDateTime = IsDateTime(parameters.Schema.Item?.Format, parameters.Settings.DateTimeType),
+                IsArray = typeSchema.IsArray,
+                ArrayItemType = parameters.Resolver.TryResolve(typeSchema.Item, parameters.TypeNameHint) ?? "any",
+                IsArrayItemNewableObject = typeSchema.Item != null && IsNewableObject(typeSchema.Item),
+                IsArrayItemDate = IsDate(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
+                IsArrayItemDateTime = IsDateTime(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
 
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" :
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                         parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
-                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "moment.duration" :
+                        typeSchema.Format == JsonFormatStrings.TimeSpan ? "moment.duration" :
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment",
                 DateTimeToStringCode =
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                         parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
-                        parameters.Schema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS', { trim: false })" :
+                        typeSchema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS', { trim: false })" :
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
