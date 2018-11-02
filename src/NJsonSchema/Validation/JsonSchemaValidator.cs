@@ -19,30 +19,24 @@ namespace NJsonSchema.Validation
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
     public class JsonSchemaValidator
     {
-        private readonly IEnumerable<IFormatValidator> _formatValidators = new IFormatValidator[]
-        {
-            new DateTimeFormatValidator(),
-            new DateFormatValidator(),
-            new EmailFormatValidator(),
-            new GuidFormatValidator(),
-            new HostnameFormatValidator(),
-            new IpV4FormatValidator(),
-            new IpV6FormatValidator(),
-            new TimeFormatValidator(),
-            new TimeSpanFormatValidator(),
-            new UriFormatValidator(),
-            new ByteFormatValidator(),
-            new Base64FormatValidator()
-        };
-
+        private readonly JsonSchemaValidatorSettings _settings;
         private readonly IDictionary<string, IFormatValidator> _formatValidatorsMap;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
         public JsonSchemaValidator()
+            :this(JsonSchemaValidatorSettings.Default)
         {
-            _formatValidatorsMap = _formatValidators.ToDictionary(v => v.Format, v => v);
+        }
+
+        /// <summary>
+        /// Initializes JsonSchemaValidator
+        /// </summary>
+        public JsonSchemaValidator(JsonSchemaValidatorSettings settings)
+        {
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _formatValidatorsMap = settings.FormatValidators.ToDictionary(v => v.Format, v => v);
         }
 
         /// <summary>Validates the given JSON data.</summary>
