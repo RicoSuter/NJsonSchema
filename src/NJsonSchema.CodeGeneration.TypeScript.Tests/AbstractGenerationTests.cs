@@ -44,12 +44,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             /// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ContainerClass>();
+            var json = schema.ToJson();
 
             /// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
             var code = generator.GenerateFile("ContainerClass");
 
             /// Assert
+            Assert.Contains("foo: AbstractClass", code);
             Assert.Contains("this.foo = data[\"Foo\"] ? AbstractClass.fromJS(data[\"Foo\"]) : <any>undefined;", code);
         }
 

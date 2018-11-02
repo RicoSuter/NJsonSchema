@@ -116,6 +116,8 @@ namespace NJsonSchema
             {
                 if (value is bool)
                     IsExclusiveMaximum = (bool)value;
+                else if (value != null && (value.Equals("true") || value.Equals("false")))
+                    IsExclusiveMaximum = value.Equals("true");
                 else if (value != null)
                     ExclusiveMaximum = Convert.ToDecimal(value);
             }
@@ -130,6 +132,8 @@ namespace NJsonSchema
             {
                 if (value is bool)
                     IsExclusiveMinimum = (bool)value;
+                else if (value != null && (value.Equals("true") || value.Equals("false")))
+                    IsExclusiveMinimum = value.Equals("true");
                 else if (value != null)
                     ExclusiveMinimum = Convert.ToDecimal(value);
             }
@@ -150,6 +154,8 @@ namespace NJsonSchema
             {
                 if (value is bool)
                     AllowAdditionalItems = (bool)value;
+                else if (value != null && (value.Equals("true") || value.Equals("false")))
+                    AllowAdditionalItems = value.Equals("true");
                 else if (value != null)
                     AdditionalItemsSchema = FromJsonWithoutReferenceHandling(value.ToString());
             }
@@ -170,6 +176,8 @@ namespace NJsonSchema
             {
                 if (value is bool)
                     AllowAdditionalProperties = (bool)value;
+                else if (value != null && (value.Equals("true") || value.Equals("false")))
+                    AllowAdditionalProperties = value.Equals("true");
                 else if (value != null)
                     AdditionalPropertiesSchema = FromJsonWithoutReferenceHandling(value.ToString());
             }

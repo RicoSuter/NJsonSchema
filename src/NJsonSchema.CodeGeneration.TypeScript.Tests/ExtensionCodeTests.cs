@@ -1,5 +1,4 @@
-﻿using NJsonSchema.CodeGeneration.TypeScript;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -53,27 +52,27 @@ var x = 10;";
             var code = Code;
 
             //// Act
-            var ext = new TypeScriptExtensionCode(code, new[] { "Foo", "Bar" }, new [] { "BaseClass" });
+            var extensionCode = new TypeScriptExtensionCode(code, new[] { "Foo", "Bar" }, new [] { "BaseClass" });
 
             //// Assert
-            Assert.True(ext.ExtensionClasses.ContainsKey("Foo"));
-            Assert.StartsWith("export class Foo extends Foo {", ext.ExtensionClasses["Foo"]);
+            Assert.True(extensionCode.ExtensionClasses.ContainsKey("Foo"));
+            Assert.StartsWith("export class Foo extends Foo {", extensionCode.ExtensionClasses["Foo"]);
 
-            Assert.True(ext.ExtensionClasses.ContainsKey("Bar"));
-            Assert.StartsWith("export class Bar extends Bar {", ext.ExtensionClasses["Bar"]);
+            Assert.True(extensionCode.ExtensionClasses.ContainsKey("Bar"));
+            Assert.StartsWith("export class Bar extends Bar {", extensionCode.ExtensionClasses["Bar"]);
 
-            Assert.Contains("<reference path", ext.ImportCode);
-            Assert.Contains("import foo = require(\"foo/bar\")", ext.ImportCode);
-            Assert.Contains("import bar = require(\"foo/bar\")", ext.ImportCode);
+            Assert.Contains("<reference path", extensionCode.ImportCode);
+            Assert.Contains("import foo = require(\"foo/bar\")", extensionCode.ImportCode);
+            Assert.Contains("import bar = require(\"foo/bar\")", extensionCode.ImportCode);
 
-            Assert.StartsWith("var clientClasses", ext.BottomCode);
-            Assert.Contains("if (clientClasses.hasOwnProperty(clientClass))", ext.BottomCode);
-            Assert.Contains("export class Test", ext.BottomCode);
-            Assert.EndsWith("var x = 10;", ext.BottomCode);
+            Assert.StartsWith("var clientClasses", extensionCode.BottomCode);
+            Assert.Contains("if (clientClasses.hasOwnProperty(clientClass))", extensionCode.BottomCode);
+            Assert.Contains("export class Test", extensionCode.BottomCode);
+            Assert.EndsWith("var x = 10;", extensionCode.BottomCode);
 
-            Assert.Contains("export abstract class BaseClass", ext.TopCode);
+            Assert.Contains("export abstract class BaseClass", extensionCode.TopCode);
 
-            var body = ext.GetExtensionClassBody("Foo");
+            var body = extensionCode.GetExtensionClassBody("Foo");
             Assert.Contains("get title() {", body);
             Assert.DoesNotContain("ignore();", body);
         }
@@ -111,6 +110,28 @@ var x = 10;";
 
             Assert.Contains("return this.firstName + ' ' + this.lastName;", code);
             Assert.Contains("return this.bar ? this.bar.title : '';", code);
+        }
+
+        [Fact]
+        public void When_extension_code_has_comment_then_it_is_processed_correctly()
+        {
+            //// Arrange
+            var code = @"// This is the class that uses HTTP
+
+export class UseHttpCookiesForApi {
+    protected transformOptions(options: RequestInit): Promise<RequestInit> {
+        options.credentials = 'same-origin';
+        return Promise.resolve(options);
+    }
+}";
+
+            //// Act
+            var extensionCode = new TypeScriptExtensionCode(code, new string[0], new[] { "UseHttpCookiesForApi" });
+
+            //// Assert
+            Assert.Empty(extensionCode.ExtensionClasses);
+            Assert.DoesNotContain("UseHttpCookiesForApi", extensionCode.BottomCode);
+            Assert.Contains("UseHttpCookiesForApi", extensionCode.TopCode);
         }
     }
 }

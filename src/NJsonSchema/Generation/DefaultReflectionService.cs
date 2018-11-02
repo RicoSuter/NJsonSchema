@@ -282,11 +282,12 @@ namespace NJsonSchema.Generation
                 return false;
 
             dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
-            if (jsonConverterAttribute != null)
+            if (ReflectionExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
                 return converterType.IsAssignableTo("StringEnumConverter", TypeNameStyle.Name);
             }
+
             return false;
         }
     }

@@ -18,3 +18,4 @@ src/packages/Newtonsoft.Json**
 /src/NJsonSchema.CodeGeneration.Tests2
 *.vspx
 /src/TestResults
+/src/.cr/*

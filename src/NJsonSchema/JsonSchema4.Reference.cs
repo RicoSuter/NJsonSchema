@@ -32,12 +32,13 @@ namespace NJsonSchema
         {
             get
             {
-                if (AllOf.Count > 1 && AllOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
+                var schema = Reference != null ? Reference : this;
+                if (schema.AllOf.Count > 1 && schema.AllOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
                 {
-                    return AllOf.First(s => !s.HasReference && !s.IsDictionary);
+                    return schema.AllOf.First(s => !s.HasReference && !s.IsDictionary).ActualSchema;
                 }
 
-                return OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+                return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
             }
         }
 
