@@ -27,8 +27,8 @@ CI NuGet Feed: https://www.myget.org/gallery/njsonschema-ci
 
 **Features:**
 
-- Read existing JSON Schemas and validate JSON data (`JsonSchema4.FromJsonAsync()`)
-- Generate JSON Schema from .NET type via reflection (with support for many attributes/annotations) (`JsonSchema4.FromTypeAsync<MyType>()`)
+- [Read existing JSON Schemas](https://github.com/RSuter/NJsonSchema/wiki/JsonSchema4) and [validate JSON data](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema4.FromJsonAsync()`)
+- [Generate JSON Schema from .NET type via reflection](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema4.FromTypeAsync<MyType>()`)
 - [Generate JSON Schema from sample JSON data](https://github.com/RSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema4.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
