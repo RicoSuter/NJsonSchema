@@ -18,20 +18,21 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             Namespace = "MyNamespace";
 
-            DateType = "System.DateTime";
-            DateTimeType = "System.DateTime";
+            DateType = "System.DateTimeOffset";
+            DateTimeType = "System.DateTimeOffset";
             TimeType = "System.TimeSpan";
             TimeSpanType = "System.TimeSpan";
 
-            ArrayType = "System.Collections.ObjectModel.ObservableCollection";
-            DictionaryType = "System.Collections.Generic.Dictionary";
+            ArrayType = "System.Collections.Generic.ICollection";
+            DictionaryType = "System.Collections.Generic.IDictionary";
 
-            ArrayBaseType = "System.Collections.ObjectModel.ObservableCollection";
+            ArrayBaseType = "System.Collections.Generic.Collection";
             DictionaryBaseType = "System.Collections.Generic.Dictionary";
+
+            ClassStyle = CSharpClassStyle.Poco;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
-            ClassStyle = CSharpClassStyle.Inpc;
             TypeAccessModifier = "public";
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = true;
