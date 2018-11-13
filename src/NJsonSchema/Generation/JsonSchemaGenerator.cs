@@ -645,7 +645,7 @@ namespace NJsonSchema.Generation
         private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
         {
             var knownTypeAttributes = type.GetTypeInfo()
-                .GetCustomAttributes(Settings.FlattenInheritanceHierarchy) // Known types of inherited classes will be generated later (in GenerateInheritanceAsync)
+                .GetCustomAttributes(Settings.GetActualFlattenInheritanceHierarchy(type)) // Known types of inherited classes will be generated later (in GenerateInheritanceAsync)
                 .Where(a => a.GetType().Name == "KnownTypeAttribute")
                 .OfType<Attribute>();
 
@@ -689,7 +689,7 @@ namespace NJsonSchema.Generation
                     baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
                     Settings.ExcludedTypeNames?.Contains(baseType.FullName) != true)
                 {
-                    if (Settings.FlattenInheritanceHierarchy)
+                    if (Settings.GetActualFlattenInheritanceHierarchy(type))
                     {
                         var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
                         if (!typeDescription.IsDictionary && !type.IsArray)
@@ -747,7 +747,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            if (Settings.FlattenInheritanceHierarchy && Settings.GenerateAbstractProperties)
+            if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
 #if !LEGACY
                 foreach (var i in type.GetTypeInfo().ImplementedInterfaces)
@@ -772,7 +772,7 @@ namespace NJsonSchema.Generation
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
         {
-            if (!Settings.FlattenInheritanceHierarchy)
+            if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
                 var discriminatorConverter = TryGetInheritanceDiscriminatorConverter(type);
                 if (discriminatorConverter != null)
