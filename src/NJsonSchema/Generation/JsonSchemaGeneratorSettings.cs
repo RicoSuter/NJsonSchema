@@ -17,6 +17,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
+using System.Linq;
 
 namespace NJsonSchema.Generation
 {
@@ -176,6 +177,15 @@ namespace NJsonSchema.Generation
             return !type.GetTypeInfo().IsGenericTypeDefinition ?
                 ActualContractResolver.ResolveContract(type) :
                 null;
+        }
+
+        /// <summary>Gets the actual computed <see cref="FlattenInheritanceHierarchy"/> setting based on the global setting and the JsonSchemaFlattenAttribute attribute.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The result.</returns>
+        public bool GetActualFlattenInheritanceHierarchy(Type type)
+        {
+            return FlattenInheritanceHierarchy || type.GetTypeInfo().GetCustomAttributes(false)
+                .Any(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
         }
     }
 }
