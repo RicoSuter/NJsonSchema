@@ -49,6 +49,7 @@ namespace NJsonSchema.CodeGeneration
         public string TemplateDirectory { get; set; }
 
         /// <summary>Gets or sets the output language specific value generator.</summary>
+        [JsonIgnore]
         public ValueGeneratorBase ValueGenerator { get; set; }
     }
 }

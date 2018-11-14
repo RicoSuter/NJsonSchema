@@ -71,10 +71,12 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the contract resolver.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
+        [JsonIgnore]
         public IContractResolver ContractResolver { get; set; }
 
         /// <summary>Gets or sets the serializer settings.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
+        [JsonIgnore]
         public JsonSerializerSettings SerializerSettings { get; set; }
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
@@ -103,6 +105,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
+        [JsonIgnore]
         public IContractResolver ActualContractResolver
         {
             get
@@ -138,6 +141,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets the serializer settings.</summary>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
+        [JsonIgnore]
         public JsonSerializerSettings ActualSerializerSettings
         {
             get
