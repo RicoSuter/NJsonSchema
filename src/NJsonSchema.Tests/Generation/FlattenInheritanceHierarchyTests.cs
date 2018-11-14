@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -118,6 +119,41 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             //// Assert
+        }
+
+        public class A : B
+        {
+            public string Aaa { get; set; }
+        }
+
+        [JsonSchemaFlatten]
+        public class B : C
+        {
+            public string Bbb { get; set; }
+        }
+
+        public class C
+        {
+            public string Ccc { get; set; }
+        }
+
+        [Fact]
+        public async Task When_JsonSchemaFlattenAttribute_is_used_on_class_then_inherited_classed_are_merged()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings();
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<A>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey("B"));
+            Assert.False(schema.Definitions.ContainsKey("C"));
+
+            Assert.True(schema.ActualProperties.ContainsKey("Aaa"));
+            Assert.True(schema.Definitions["B"].Properties.ContainsKey("Bbb"));
+            Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
         }
     }
 }

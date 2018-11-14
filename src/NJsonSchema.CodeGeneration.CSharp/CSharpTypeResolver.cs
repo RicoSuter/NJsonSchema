@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -54,12 +55,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The type name.</returns>
         public string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint, bool checkForExistingSchema)
         {
-            schema = schema.ActualSchema;
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            schema = GetResolvableSchema(schema);
 
             if (schema == ExceptionSchema)
                 return "System.Exception";
 
-            if (schema.IsAnyType)
+            if (schema.ActualTypeSchema.IsAnyType)
                 return "object";
 
             var type = schema.Type;
@@ -178,7 +182,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.Items != null && schema.Items.Count > 0)
             {
                 var tupleTypes = schema.Items
-                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .Select(i => Resolve(i, false, null))
                     .ToArray();
 
                 return string.Format("System.Tuple<" + string.Join(", ", tupleTypes) + ">");

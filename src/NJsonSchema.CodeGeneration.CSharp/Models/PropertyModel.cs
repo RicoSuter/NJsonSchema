@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name => _property.Name;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);

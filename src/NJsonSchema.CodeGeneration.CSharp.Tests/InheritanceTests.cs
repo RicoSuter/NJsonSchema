@@ -34,6 +34,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Equal(0, dschema.AllOf.Count);
             Assert.True(dschema.IsDictionary);
 
+            Assert.DoesNotContain("class CustomDictionary :", code);
             Assert.Contains("public EmptyClassInheritingDictionary CustomDictionary", code);
             Assert.Contains("public partial class EmptyClassInheritingDictionary : System.Collections.Generic.Dictionary<string, object>", code);
         }

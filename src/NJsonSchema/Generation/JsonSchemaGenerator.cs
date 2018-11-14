@@ -350,8 +350,7 @@ namespace NJsonSchema.Generation
 
             GenerateInheritanceDiscriminator(type, rootSchema);
 
-            if (Settings.GenerateKnownTypes)
-                await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
+            await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateXmlObjects)
                 schema.GenerateXmlObjectForType(type);
@@ -644,30 +643,48 @@ namespace NJsonSchema.Generation
 
         private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var knownTypeAttributes = type.GetTypeInfo()
-                .GetCustomAttributes(Settings.FlattenInheritanceHierarchy) // Known types of inherited classes will be generated later (in GenerateInheritanceAsync)
-                .Where(a => a.GetType().Name == "KnownTypeAttribute")
-                .OfType<Attribute>();
+            var attributes = type.GetTypeInfo()
+                .GetCustomAttributes(Settings.GetActualFlattenInheritanceHierarchy(type));
 
-            foreach (dynamic attribute in knownTypeAttributes)
+            if (Settings.GenerateKnownTypes)
             {
-                if (attribute.Type != null)
-                    await AddKnownTypeAsync(attribute.Type, schemaResolver).ConfigureAwait(false);
-                else if (attribute.MethodName != null)
+                var knownTypeAttributes = attributes
+                   // Known types of inherited classes will be generated later (in GenerateInheritanceAsync)
+                   .Where(a => a.GetType().IsAssignableTo("KnownTypeAttribute", TypeNameStyle.Name))
+                   .OfType<Attribute>();
+
+                foreach (dynamic attribute in knownTypeAttributes)
                 {
-                    var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
-                    if (methodInfo != null)
+                    if (attribute.Type != null)
+                        await AddKnownTypeAsync(attribute.Type, schemaResolver).ConfigureAwait(false);
+                    else if (attribute.MethodName != null)
                     {
-                        var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
-                        if (knownTypes != null)
+                        var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        if (methodInfo != null)
                         {
-                            foreach (var knownType in knownTypes)
-                                await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
+                            var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
+                            if (knownTypes != null)
+                            {
+                                foreach (var knownType in knownTypes)
+                                    await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
+                            }
                         }
                     }
+                    else
+                        throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
                 }
-                else
-                    throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
+            }
+
+            foreach (var jsonConverterAttribute in attributes
+                .Where(a => a.GetType().IsAssignableTo("JsonInheritanceAttribute", TypeNameStyle.Name)))
+            {
+                var knownType = ReflectionExtensions.TryGetPropertyValue<Type>(
+                    jsonConverterAttribute, "Type", null);
+
+                if (knownType != null)
+                {
+                    await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
+                }
             }
         }
 
@@ -689,7 +706,7 @@ namespace NJsonSchema.Generation
                     baseType.GetTypeInfo().GetCustomAttributes(false).TryGetIfAssignableTo("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
                     Settings.ExcludedTypeNames?.Contains(baseType.FullName) != true)
                 {
-                    if (Settings.FlattenInheritanceHierarchy)
+                    if (Settings.GetActualFlattenInheritanceHierarchy(type))
                     {
                         var typeDescription = Settings.ReflectionService.GetDescription(baseType, null, Settings);
                         if (!typeDescription.IsDictionary && !type.IsArray)
@@ -747,7 +764,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            if (Settings.FlattenInheritanceHierarchy && Settings.GenerateAbstractProperties)
+            if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
 #if !LEGACY
                 foreach (var i in type.GetTypeInfo().ImplementedInterfaces)
@@ -772,7 +789,7 @@ namespace NJsonSchema.Generation
 
         private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
         {
-            if (!Settings.FlattenInheritanceHierarchy)
+            if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
                 var discriminatorConverter = TryGetInheritanceDiscriminatorConverter(type);
                 if (discriminatorConverter != null)

@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
 
-            schema = schema.ActualSchema;
+            schema = GetResolvableSchema(schema);
 
             if (schema.IsAnyType)
                 return "any";
