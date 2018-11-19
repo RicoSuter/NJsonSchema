@@ -426,8 +426,12 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+            if (type.IsAssignableTo(nameof(JArray), TypeNameStyle.Name) == false &&
+                (type.IsAssignableTo(nameof(JToken), TypeNameStyle.Name) == true ||
+                 type == typeof(object)))
+            {
                 return true;
+            }
 
             return false;
         }
