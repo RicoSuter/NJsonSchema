@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = JsonSchema4.FromSampleJson(data);
             var json = schema.ToJson();
-            var property = schema.Properties["array"].ActualTypeSchema;
+            var property = schema.Properties["persons"].ActualTypeSchema;
 
             //// Assert
             Assert.Equal(JsonObjectType.Array, property.Type);
