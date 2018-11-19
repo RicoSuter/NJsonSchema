@@ -426,7 +426,7 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (type == typeof(JObject) || type == typeof(JToken) || type == typeof(object))
+            if (type.IsAssignableTo("JToken", TypeNameStyle.Name) || type == typeof(object))
                 return true;
 
             return false;
