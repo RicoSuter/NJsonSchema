@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Generation
         {
             //// Arrange
             var data = @"{
-                array: [
+                persons: [
                     {
                         foo: ""bar"", 
                         bar: ""foo""
@@ -63,6 +63,7 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Equal(JsonObjectType.Array, property.Type);
             Assert.Equal(3, property.Item.ActualSchema.Properties.Count);
+            Assert.True(schema.Definitions.ContainsKey("Person"));
         }
 
         [Fact]
