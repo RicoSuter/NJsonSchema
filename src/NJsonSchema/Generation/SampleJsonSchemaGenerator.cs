@@ -37,8 +37,23 @@ namespace NJsonSchema.Generation
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)
             {
-                var referencedSchema = new JsonSchema4();
-                AddSchemaDefinition(rootSchema, referencedSchema, typeNameHint);
+                JsonSchema4 referencedSchema = null;
+                if (token is JObject obj)
+                {
+                    var properties = obj.Properties();
+
+                    referencedSchema = rootSchema.Definitions
+                        .Select(t => t.Value)
+                        .FirstOrDefault(s =>
+                            s.Type == JsonObjectType.Object &&
+                            properties.All(p => s.Properties.ContainsKey(p.Name)));
+                }
+                
+                if (referencedSchema == null)
+                {
+                    referencedSchema = new JsonSchema4();
+                    AddSchemaDefinition(rootSchema, referencedSchema, typeNameHint);
+                }
 
                 schema.Reference = referencedSchema;
                 GenerateWithoutReference(token, referencedSchema, rootSchema, typeNameHint);
@@ -123,7 +138,8 @@ namespace NJsonSchema.Generation
             foreach (var property in ((JObject)token).Properties())
             {
                 var propertySchema = new JsonProperty();
-                var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(ConversionUtilities.Singularize(property.Name), true);
+                var propertyName = property.Value.Type == JTokenType.Array ? ConversionUtilities.Singularize(property.Name) : property.Name;
+                var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(propertyName, true);
 
                 Generate(property.Value, propertySchema, rootSchema, typeNameHint);
                 schema.Properties[property.Name] = propertySchema;
