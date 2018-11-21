@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -7,7 +9,7 @@ namespace NJsonSchema.Tests.Serialization
     public class DiscriminatorSerializationTests
     {
         [Fact]
-        public void When_discriminator_object_is_set_then_schema_is_correctly_serialized()
+        public async Task When_discriminator_object_is_set_then_schema_is_correctly_serialized()
         {
             //// Arrange
             var childSchema = new JsonSchema4
@@ -34,11 +36,16 @@ namespace NJsonSchema.Tests.Serialization
 
             //// Act
             var json = schema.ToJson();
+            var schema2 = await JsonSchema4.FromJsonAsync(json);
+            var json2 = schema2.ToJson();
 
             //// Assert
             Assert.Contains(@"""propertyName"": ""discr""", json);
-            Assert.Contains(@"""Bar""", json);
-            Assert.Contains(@"""$ref"": ""#/definitions/Foo""", json);
+            Assert.Contains(@"""Bar"": ""#/definitions/Foo""", json);
+
+            Assert.Equal(json, json2);
+
+            Assert.Equal(schema2.Definitions["Foo"], schema2.DiscriminatorObject.Mapping["Bar"].ActualSchema);
         }
 
         [Fact]
@@ -82,12 +89,11 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             //// Act
-            var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, new DefaultContractResolver());
+            var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, new DefaultContractResolver(), Formatting.Indented);
 
             //// Assert
             Assert.Contains(@"""discriminator"": ""discr""", json);
-            Assert.DoesNotContain(@"""Bar""", json);
-            Assert.DoesNotContain(@"""$ref"": ""#/definitions/Foo""", json);
+            Assert.DoesNotContain(@"""Bar"": ""#/definitions/Foo""", json);
         }
     }
 }
