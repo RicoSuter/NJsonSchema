@@ -54,7 +54,7 @@ namespace NJsonSchema
 
             return input;
         }
-        
+
         /// <summary>Converts the string to a string literal which can be used in C# or TypeScript code.</summary>
         /// <param name="input">The input.</param>
         /// <returns>The literal.</returns>
@@ -125,6 +125,17 @@ namespace NJsonSchema
                 .Replace("  \n", " \n")
                 .Replace("\n", "")
                 .Trim('\n', '\t', ' ');
+        }
+
+        /// <summary>Singularizes the given noun in plural.</summary>
+        /// <param name="word">The plural noun.</param>
+        /// <returns>The singular noun.</returns>
+        public static string Singularize(string word)
+        {
+            if (word == "people")
+                return "Person";
+
+            return word.EndsWith("s") ? word.Substring(0, word.Length - 1) : word;
         }
 
         /// <summary>Add tabs to the given string.</summary>

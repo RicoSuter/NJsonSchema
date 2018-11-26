@@ -16,6 +16,6 @@
 {% endif -%}
 {
 {% for property in Properties -%}
-    {{property.PropertyName}} = @{{property.Name | lowercamelcase}};
+    this.{{property.PropertyName}} = @{{property.Name | lowercamelcase}};
 {% endfor -%}
 }

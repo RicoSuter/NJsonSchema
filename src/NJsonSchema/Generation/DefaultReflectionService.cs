@@ -42,7 +42,7 @@ namespace NJsonSchema.Generation
                 if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
             }
-            
+
             var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
                                       parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
 
@@ -117,14 +117,15 @@ namespace NJsonSchema.Generation
             if (type == typeof(byte[]))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
 
-            if (type == typeof(JArray))
+            if (type.IsAssignableTo(nameof(JArray), TypeNameStyle.Name))
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
-            if (type == typeof(JObject) ||
-                type == typeof(JToken) ||
+            if (type.IsAssignableTo(nameof(JToken), TypeNameStyle.Name) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
                 type == typeof(object))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
+            }
 
             if (IsFileType(type, parentAttributes))
                 return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);

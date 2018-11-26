@@ -17,6 +17,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
+using System.Linq;
 
 namespace NJsonSchema.Generation
 {
@@ -71,10 +72,12 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the contract resolver.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
+        [JsonIgnore]
         public IContractResolver ContractResolver { get; set; }
 
         /// <summary>Gets or sets the serializer settings.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
+        [JsonIgnore]
         public JsonSerializerSettings SerializerSettings { get; set; }
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
@@ -103,6 +106,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
+        [JsonIgnore]
         public IContractResolver ActualContractResolver
         {
             get
@@ -138,6 +142,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets the serializer settings.</summary>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
+        [JsonIgnore]
         public JsonSerializerSettings ActualSerializerSettings
         {
             get
@@ -176,6 +181,15 @@ namespace NJsonSchema.Generation
             return !type.GetTypeInfo().IsGenericTypeDefinition ?
                 ActualContractResolver.ResolveContract(type) :
                 null;
+        }
+
+        /// <summary>Gets the actual computed <see cref="FlattenInheritanceHierarchy"/> setting based on the global setting and the JsonSchemaFlattenAttribute attribute.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The result.</returns>
+        public bool GetActualFlattenInheritanceHierarchy(Type type)
+        {
+            return FlattenInheritanceHierarchy || type.GetTypeInfo().GetCustomAttributes(false)
+                .Any(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
         }
     }
 }
