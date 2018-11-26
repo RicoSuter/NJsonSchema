@@ -34,7 +34,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 1.8m
+            });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
@@ -173,7 +177,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface, 
+                TypeStyle = TypeScriptTypeStyle.Interface,
                 TypeScriptVersion = 2.0m
             });
 
@@ -222,7 +226,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             var schema = await JsonSchema4.FromTypeAsync<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                TypeScriptVersion = 1.8m
+            });
             return generator;
         }
 
