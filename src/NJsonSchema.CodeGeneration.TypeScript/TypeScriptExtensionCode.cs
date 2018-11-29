@@ -14,6 +14,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             code = code
                 .Replace("\r", string.Empty)
+                .Replace("\t", "    ")
                 .Replace("generated.", string.Empty) + "\n";
 
             code = Regex.Replace(code, "(.*?)// ignore(.*?)\\n", string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
