@@ -691,12 +691,11 @@ namespace NJsonSchema.Generation
                         {
                             await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
                         }
-
-                        return;
-#endif
+#else
                         throw new ArgumentException(
                             $"A KnownType attribute on {type.FullName} does not specify a type or a method name.",
                             nameof(type));
+#endif
                     }
                 }
             }
