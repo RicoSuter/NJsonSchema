@@ -13,6 +13,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public class Student : Person
         {
             public string Course { get; set; }
+            public Car Car { get; set; }
         }
 
         [KnownType(typeof(Student))]
@@ -75,6 +76,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;", output);
             // skills values are converted:
             Assert.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;", output);
+            // student car is converted:
+            Assert.Contains("this.car = data.car && !(<any>data.car).toJSON ? new Car(data.car) : <Car>this.car;", output);
 
             // interface is correct
             Assert.Contains(@"export interface IMyClass {
