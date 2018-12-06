@@ -21,15 +21,15 @@
     constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
-{%        endif -%}
-{%     if GenerateConstructorInterface and PropertiesCount > 0 -%}
+{%     endif -%}
+{%     if GenerateConstructorInterface and Properties.size > 0 -%}
         if (data) {
-{%          unless HasInheritance-%}
+{%         if !HasInheritance -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
-{%         endunless -%}
+{%         endif -%}
 {%         if ConvertConstructorInterfaceData -%}
 {%             for property in Properties -%}
 {%                 if property.SupportsConstructorConversion -%}
