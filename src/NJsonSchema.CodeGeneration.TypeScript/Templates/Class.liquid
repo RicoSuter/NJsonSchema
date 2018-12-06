@@ -1,4 +1,4 @@
-﻿{% if HasDescription -%}
+{% if HasDescription -%}
 /** {{ Description }} */
 {% endif -%}
 {% if ExportTypes %}export {% endif %}{% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
@@ -21,12 +21,15 @@
     constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
-{%     elseif GenerateConstructorInterface -%}
+{%     endif -%}
+{%     if GenerateConstructorInterface and Properties.size > 0 -%}
         if (data) {
+{%         if !HasInheritance -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+{%         endif -%}
 {%         if ConvertConstructorInterfaceData -%}
 {%             for property in Properties -%}
 {%                 if property.SupportsConstructorConversion -%}
