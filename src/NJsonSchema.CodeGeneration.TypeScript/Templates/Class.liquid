@@ -24,7 +24,7 @@
 {%     endif -%}
 {%     if GenerateConstructorInterface and Properties.size > 0 -%}
         if (data) {
-{%         if !HasInheritance -%}
+{%         if HasInheritance == false -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
