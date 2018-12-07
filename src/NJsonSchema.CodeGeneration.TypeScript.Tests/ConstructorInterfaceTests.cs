@@ -62,7 +62,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 GenerateConstructorInterface = true,
                 ConvertConstructorInterfaceData = true
-
             });
 
             var output = generator.GenerateFile("MyClass");
