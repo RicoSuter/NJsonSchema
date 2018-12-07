@@ -683,9 +683,10 @@ namespace NJsonSchema.Generation
                         if (methodInfo != null)
                         {
                             var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
-                            foreach (var knownType in knownTypes)
+                            if (knownTypes != null)
                             {
-                                knownTypeSchemas.Add(await AddKnownTypeAsync(knownType, schemaResolver));
+                                foreach (var knownType in knownTypes)
+                                    knownTypeSchemas.Add(await AddKnownTypeAsync(knownType, schemaResolver));
                             }
                         }
                     }
