@@ -275,9 +275,9 @@ namespace NJsonSchema.Generation
                 !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema)).Properties().Any(); // TODO: Improve performance
 
             //TODO : use InheritanceMode ?
-            if (Settings.SchemaType == SchemaType.JsonSchema && referencedSchema.KnownTypesSchemas.Any())
+            if (Settings.SchemaType == SchemaType.JsonSchema && referencedSchema.ActualSchema.KnownTypesSchemas?.Any() == true)
             {
-                foreach (var schema in referencedSchema.KnownTypesSchemas)
+                foreach (var schema in referencedSchema.ActualSchema.KnownTypesSchemas)
                 {
                     referencingSchema.OneOf.Add(new JsonSchema4
                     {
