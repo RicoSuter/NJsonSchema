@@ -4,7 +4,7 @@
     <Description>JSON Schema reader, generator and validator for .NET</Description>
     <Version>9.13.2</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
-    <Copyright>Copyright © Rico Suter, 2017</Copyright>
+    <Copyright>Copyright © Rico Suter, 2018</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
     <SignAssembly>True</SignAssembly>
