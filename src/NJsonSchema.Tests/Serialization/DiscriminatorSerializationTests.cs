@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Serialization
 
             Assert.Equal(json, json2);
 
-            Assert.Equal(schema2.Definitions["Foo"], schema2.DiscriminatorObject.Mapping["Bar"].ActualSchema);
+            Assert.Equal(schema2.Definitions["Foo"], schema2.ActualDiscriminatorObject.Mapping["Bar"].ActualSchema);
         }
 
         [Fact]

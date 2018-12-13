@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The result.</returns>
         public bool SupportsConstructorConversion(JsonSchema4 schema)
         {
-            return schema?.ActualSchema.BaseDiscriminator == null;
+            return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
         }
 
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)

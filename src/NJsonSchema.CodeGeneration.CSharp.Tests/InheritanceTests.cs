@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Converters;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -37,6 +41,40 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.DoesNotContain("class CustomDictionary :", code);
             Assert.Contains("public EmptyClassInheritingDictionary CustomDictionary", code);
             Assert.Contains("public partial class EmptyClassInheritingDictionary : System.Collections.Generic.Dictionary<string, object>", code);
+        }
+
+        [KnownType(typeof(MyException))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
+        public class ExceptionBase : Exception
+        {
+            public string Foo { get; set; }
+        }
+
+        public class MyException : ExceptionBase
+        {
+            public string Bar { get; set; }
+        }
+
+        public class ExceptionContainer
+        {
+            public ExceptionBase Exception { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ExceptionContainer>();
+            var data = schema.ToJson();
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("class ExceptionBase : Exception", code);
+            Assert.Contains("class MyException : ExceptionBase", code);
         }
     }
 }

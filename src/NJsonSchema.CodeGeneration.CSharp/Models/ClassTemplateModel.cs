@@ -89,10 +89,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
 
         /// <summary>Gets a value indicating whether the class has discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
+        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
 
         /// <summary>Gets the discriminator property name.</summary>
-        public string Discriminator => _schema.Discriminator;
+        public string Discriminator => _schema.ActualDiscriminator;
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedTypeSchema != null;

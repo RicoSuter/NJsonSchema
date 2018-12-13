@@ -330,8 +330,8 @@ namespace NJsonSchema.Generation
             JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
-            var rootSchema = schema;
 
+            var rootSchema = schema;
             var actualSchema = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
             if (actualSchema != null)
             {
@@ -348,7 +348,7 @@ namespace NJsonSchema.Generation
             schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            GenerateInheritanceDiscriminator(type, rootSchema);
+            GenerateInheritanceDiscriminator(type, rootSchema, schema);
 
             await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
@@ -716,9 +716,9 @@ namespace NJsonSchema.Generation
                         if (!typeDescription.IsDictionary && !type.IsArray)
                         {
                             await GeneratePropertiesAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
-                            await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                            var actualSchema = await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
 
-                            GenerateInheritanceDiscriminator(baseType, schema);
+                            GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema);
                         }
                     }
                     else
@@ -781,9 +781,9 @@ namespace NJsonSchema.Generation
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
                         await GeneratePropertiesAsync(i, schema, schemaResolver).ConfigureAwait(false);
-                        await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                        var actualSchema = await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
 
-                        GenerateInheritanceDiscriminator(i, schema);
+                        GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
                     }
                 }
             }
@@ -791,7 +791,7 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
+        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema, JsonSchema4 typeSchema)
         {
             if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
@@ -801,7 +801,7 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
                         throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -813,8 +813,8 @@ namespace NJsonSchema.Generation
                         PropertyName = discriminatorName
                     };
 
-                    schema.DiscriminatorObject = discriminator;
-                    schema.Properties[discriminatorName] = new JsonProperty
+                    typeSchema.DiscriminatorObject = discriminator;
+                    typeSchema.Properties[discriminatorName] = new JsonProperty
                     {
                         Type = JsonObjectType.String,
                         IsRequired = true
@@ -822,7 +822,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    var baseDiscriminator = schema.BaseDiscriminator;
+                    var baseDiscriminator = schema.ResponsibleDiscriminatorObject ?? schema.ActualTypeSchema.ResponsibleDiscriminatorObject;
                     baseDiscriminator?.AddMapping(type, schema);
                 }
             }

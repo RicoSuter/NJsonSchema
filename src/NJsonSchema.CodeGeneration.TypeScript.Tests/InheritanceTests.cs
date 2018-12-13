@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using NJsonSchema.Converters;
+using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,6 +38,40 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
             Assert.Contains("customDictionary: { [key: string] : any; } | undefined;", code);
+        }
+
+        [KnownType(typeof(MyException))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
+        public class ExceptionBase : Exception
+        {
+            public string Foo { get; set; }
+        }
+
+        public class MyException : ExceptionBase
+        {
+            public string Bar { get; set; }
+        }
+
+        public class ExceptionContainer
+        {
+            public ExceptionBase Exception { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ExceptionContainer>();
+            var data = schema.ToJson();
+
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("class ExceptionBase extends Exception", code);
+            Assert.Contains("class MyException extends ExceptionBase", code);
         }
     }
 }

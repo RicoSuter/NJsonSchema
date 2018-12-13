@@ -46,13 +46,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string DiscriminatorName { get; }
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
+        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
 
         /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
-        public bool HasBaseDiscriminator => _schema.BaseDiscriminator != null;
+        public bool HasBaseDiscriminator => _schema.ResponsibleDiscriminatorObject != null;
 
         /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
-        public string BaseDiscriminator => _schema.BaseDiscriminator?.PropertyName;
+        public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
