@@ -211,7 +211,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
 
             var baseSchema = schema.Definitions[nameof(CommonThingBase)];
-            Assert.Equal("discriminator", baseSchema.Discriminator);
+            Assert.Equal("discriminator", baseSchema.ActualDiscriminator);
         }
 
         [Fact]
@@ -338,6 +338,44 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.True(bar.AllOf.First().IsDictionary); // base class (dictionary)
             Assert.True(bar.AllOf.Last().ActualProperties.Any()); // actual class
+        }
+
+        [KnownType(typeof(MyException))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
+        public class ExceptionBase : Exception
+        {
+            public string Foo { get; set; }
+        }
+
+        public class MyException : ExceptionBase
+        {
+            public string Bar { get; set; }
+        }
+
+        public class ExceptionContainer
+        {
+            public ExceptionBase Exception { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_with_discriminator_has_base_class_then_mapping_is_placed_in_type_schema_and_not_root()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3
+            };
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ExceptionContainer>(settings);
+            var json = schema.ToJson();
+
+            //// Assert
+            var exceptionBase = schema.Definitions["ExceptionBase"];
+
+            Assert.Null(exceptionBase.DiscriminatorObject);
+            Assert.NotNull(exceptionBase.ActualTypeSchema.DiscriminatorObject);
+            Assert.True(exceptionBase.ActualTypeSchema.DiscriminatorObject.Mapping.ContainsKey("MyException"));
         }
     }
 }

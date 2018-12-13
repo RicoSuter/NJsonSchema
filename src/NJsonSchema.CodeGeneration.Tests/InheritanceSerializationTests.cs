@@ -208,7 +208,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
             //// Act
             var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
-            var discriminator = baseSchema.Discriminator;
+            var discriminator = baseSchema.ActualDiscriminator;
             var property = baseSchema.Properties["discriminator"];
 
             var json = schema.ToJson();
@@ -230,10 +230,10 @@ namespace NJsonSchema.CodeGeneration.Tests
             var baseSchema = schema.Definitions["SubClass"].ActualSchema;
 
             //// Assert
-            Assert.Equal(3, baseSchema.DiscriminatorObject.Mapping.Count);
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass1"));
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass2"));
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass3"));
+            Assert.Equal(3, baseSchema.ActualDiscriminatorObject.Mapping.Count);
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass1"));
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass2"));
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass3"));
         }
 
         [Fact]

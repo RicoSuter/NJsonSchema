@@ -60,7 +60,11 @@ namespace NJsonSchema
             Initialize();
         }
 
-        /// <summary>Gets or sets the discriminator property (Swagger only).</summary>
+        /// <summary>Gets the discriminator property (Swagger only).</summary>
+        [JsonIgnore]
+        public string ActualDiscriminator => ActualTypeSchema.Discriminator;
+
+        /// <summary>Gets or sets the discriminator property (Swagger only, should not be used in internal tooling).</summary>
         [JsonIgnore]
         public string Discriminator
         {
@@ -75,11 +79,17 @@ namespace NJsonSchema
                     };
                 }
                 else
+                {
                     DiscriminatorObject = null;
+                }
             }
         }
 
-        /// <summary>Gets or sets the discriminator (OpenApi only).</summary>
+        /// <summary>Gets the actual resolved discriminator of this schema (no inheritance, OpenApi only).</summary>
+        [JsonIgnore]
+        public OpenApiDiscriminator ActualDiscriminatorObject => DiscriminatorObject ?? ActualTypeSchema.DiscriminatorObject;
+
+        /// <summary>Gets or sets the discriminator of this schema (OpenApi only).</summary>
         [JsonIgnore]
         public OpenApiDiscriminator DiscriminatorObject { get; set; }
 
@@ -96,7 +106,7 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is String)
+                if (value is string)
                     Discriminator = (string)value;
                 else if (value != null)
                     DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();

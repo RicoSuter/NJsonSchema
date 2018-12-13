@@ -84,7 +84,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         [JsonIgnore]
-        public bool IsInheritanceDiscriminator => ParentSchema.Discriminator == Name;
+        public bool IsInheritanceDiscriminator => ParentSchema.ActualDiscriminator == Name;
 
         /// <summary>Determines whether the specified property null handling is nullable.</summary>
         /// <param name="schemaType">The schema type.</param>
