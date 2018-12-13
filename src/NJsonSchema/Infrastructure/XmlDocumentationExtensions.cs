@@ -521,9 +521,6 @@ namespace NJsonSchema.Infrastructure
                 if (assembly == null)
                     return null;
 
-                if (string.IsNullOrEmpty(assembly.Location))
-                    return null;
-
                 var assemblyName = assembly.GetName();
                 if (string.IsNullOrEmpty(assemblyName.Name))
                     return null;
@@ -531,10 +528,14 @@ namespace NJsonSchema.Infrastructure
                 if (Cache.ContainsKey(assemblyName.FullName))
                     return null;
 
-                var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-                var path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
-                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
-                    return path;
+                string path;
+                if (!string.IsNullOrEmpty(assembly.Location))
+                {
+                    var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                    path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
+                    if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                        return path;
+                }
 
                 if (ReflectionExtensions.HasProperty(assembly, "CodeBase"))
                 {

@@ -22,7 +22,7 @@
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
 {%     endif -%}
-{%     if GenerateConstructorInterface and Properties.size > 0 and (HasInheritance == false or ConvertConstructorInterfaceData) -%}
+{%     if GenerateConstructorInterface and (HasInheritance == false or ConvertConstructorInterfaceData) -%}
         if (data) {
 {%         if HasInheritance == false -%}
             for (var property in data) {
