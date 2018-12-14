@@ -55,10 +55,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonProperty) &&
+            (!string.IsNullOrEmpty(_schema.Description) ||
+             !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
         /// <summary>Gets the description.</summary>
-        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
+        public string Description => ConversionUtilities.RemoveLineBreaks(
+            !string.IsNullOrEmpty(_schema.Description) ?
+                _schema.Description : _schema.ActualTypeSchema.Description);
 
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
