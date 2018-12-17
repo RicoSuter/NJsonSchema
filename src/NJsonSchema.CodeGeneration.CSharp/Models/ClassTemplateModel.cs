@@ -103,9 +103,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the discriminator property name.</summary>
         public string Discriminator => _schema.ActualDiscriminator;
 
-        /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
-        public bool IsObject => _schema.ActualTypeSchema.IsObject;
-
         /// <summary>Gets a value indicating whether this class represents a tuple.</summary>
         public bool IsTuple => _schema.ActualTypeSchema.IsTuple;
 
