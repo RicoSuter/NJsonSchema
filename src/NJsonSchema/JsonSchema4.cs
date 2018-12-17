@@ -233,7 +233,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray)
+                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple)
                     return ActualTypeSchema;
 
                 return InheritedSchema;
@@ -674,6 +674,10 @@ namespace NJsonSchema
                 }
             }
         }
+
+        /// <summary>Gets a value indicating whether the schema describes an object.</summary>
+        [JsonIgnore]
+        public bool IsObject => Type.HasFlag(JsonObjectType.Object);
 
         /// <summary>Gets a value indicating whether the schema represents an array type (an array where each item has the same type).</summary>
         [JsonIgnore]

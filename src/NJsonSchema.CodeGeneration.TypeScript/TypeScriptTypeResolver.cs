@@ -58,6 +58,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
         }
 
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected override bool IsTypeSchema(JsonSchema4 schema)
+        {
+            if (schema.IsDictionary && !Settings.InlineNamedDictionaries)
+            {
+                return true;
+            }
+
+            return base.IsTypeSchema(schema);
+        }
+
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)
@@ -65,7 +78,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             schema = GetResolvableSchema(schema);
 
-            if (schema.IsAnyType)
+            if (schema.ActualTypeSchema.IsAnyType)
                 return "any";
 
             var type = schema.Type;

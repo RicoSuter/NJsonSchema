@@ -194,5 +194,43 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.Contains("this.resource[key] = data[\"resource\"][key];", code);
         }
+
+        public class DictionaryContainer
+        {
+            public DisplayValueDictionary Foo { get; set; }
+        }
+
+        public class DisplayValueDictionary : Dictionary<string, string>
+        {
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries)
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<DictionaryContainer>();
+            var json = schema.ToJson();
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                NullValue = TypeScriptNullValue.Undefined,
+                InlineNamedDictionaries = inlineNamedDictionaries
+            });
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            if (inlineNamedDictionaries)
+            {
+                Assert.Contains("foo: { [key: string] : string; };", code);
+            }
+            else
+            {
+                Assert.Contains("foo: DisplayValueDictionary", code);
+            }
+        }
     }
 }
