@@ -126,6 +126,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool InlineNamedTuples { get; set; }
 
         /// <summary>Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.</summary>
-        public bool InlineNamedArrays { get; internal set; }
+        public bool InlineNamedArrays { get; set; }
     }
 }
