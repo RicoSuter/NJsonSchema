@@ -19,14 +19,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
         }
 
-        [Fact]
-        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries)
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<MyContainer>();
             var data = schema.ToJson();
 
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeScriptVersion = 2.0m,
+                InlineNamedDictionaries = inlineNamedDictionaries
+            });
 
             //// Act
             var code = generator.GenerateFile("ContainerClass");
@@ -36,8 +42,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Equal(0, dschema.AllOf.Count);
             Assert.True(dschema.IsDictionary);
 
-            Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
-            Assert.Contains("customDictionary: { [key: string] : any; } | undefined;", code);
+            if (inlineNamedDictionaries)
+            {
+                Assert.Contains("customDictionary: { [key: string] : any; } | undefined;", code);
+                Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
+            }
+            else
+            {
+                Assert.Contains("customDictionary: EmptyClassInheritingDictionary", code);
+                Assert.Contains("[key: string]: any;", code);
+            }
         }
 
         [KnownType(typeof(MyException))]

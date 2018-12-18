@@ -32,6 +32,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the class.</summary>
         public abstract string ClassName { get; }
 
+        /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
+        public bool IsObject => _schema.ActualTypeSchema.IsObject;
+
         /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
         public bool IsAbstract => _schema.ActualTypeSchema.IsAbstract;
 

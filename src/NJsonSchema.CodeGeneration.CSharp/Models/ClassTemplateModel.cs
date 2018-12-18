@@ -103,6 +103,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the discriminator property name.</summary>
         public string Discriminator => _schema.ActualDiscriminator;
 
+        /// <summary>Gets a value indicating whether this class represents a tuple.</summary>
+        public bool IsTuple => _schema.ActualTypeSchema.IsTuple;
+
+        /// <summary>Gets the tuple types.</summary>
+        public string[] TupleTypes => _schema.ActualTypeSchema.Items
+            .Select(i => _resolver.Resolve(i, i.IsNullable(_settings.SchemaType), string.Empty, false))
+            .ToArray();
+
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedTypeSchema != null;
 

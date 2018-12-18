@@ -49,7 +49,8 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
-            schema = schema.ActualSchema;
+            schema = RemoveNullability(schema).ActualSchema;
+
             RegisterSchemaDefinitions(schema.Definitions);
 
             if (!_generatedTypeNames.ContainsKey(schema))
@@ -79,12 +80,22 @@ namespace NJsonSchema.CodeGeneration
             }
         }
 
-        /// <summary>Gets the actual schema and removes a nullable oneOf reference if available.</summary>
+        /// <summary>Removes a nullable oneOf reference if available.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The actually resolvable schema</returns>
+        protected JsonSchema4 RemoveNullability(JsonSchema4 schema)
+        {
+            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
+        }
+
+        /// <summary>Gets the actual schema (i.e. when not referencing a type schema or it is inlined) 
+        /// and removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
         protected JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
         {
-            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? schema.ActualSchema;
+            schema = RemoveNullability(schema);
+            return IsTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
         }
 
         /// <summary>Checks whether the given schema should generate a type.</summary>
@@ -92,7 +103,9 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>True if the schema should generate a type.</returns>
         protected virtual bool IsTypeSchema(JsonSchema4 schema)
         {
-            return !schema.IsDictionary &&
+            return !schema.IsTuple &&
+                   !schema.IsDictionary &&
+                   !schema.IsArray &&
                    !schema.IsAnyType &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||

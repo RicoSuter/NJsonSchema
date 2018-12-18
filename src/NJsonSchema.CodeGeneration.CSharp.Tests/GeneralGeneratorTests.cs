@@ -1377,8 +1377,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(code);
         }
 
-        [Fact]
-        public async Task When_tuple_types_has_ints_then_it_is_generated_correctly()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_tuple_types_has_ints_then_it_is_generated_correctly(bool inlineNamedTuples)
         {
             //// Arrange
             var json = @"
@@ -1426,13 +1428,23 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 SchemaType = SchemaType.Swagger2,
-                DateType = "System.DateTime"
+                DateType = "System.DateTime",
+                InlineNamedTuples = inlineNamedTuples
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.DoesNotContain("System.Linq.Enumerable+SelectIListIterator", code);
-            Assert.Contains("ObservableCollection<System.Tuple<int, int>>", code);
+
+            if (inlineNamedTuples)
+            {
+                Assert.Contains("ObservableCollection<System.Tuple<int, int>>", code);
+            }
+            else
+            {
+                Assert.Contains("ObservableCollection<InnerList>", code);
+                Assert.Contains("partial class InnerList : System.Tuple<int, int>", code);
+            }
 
             AssertCompile(code);
         }
