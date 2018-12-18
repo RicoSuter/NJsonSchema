@@ -45,8 +45,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.Equal(0, dschema.AllOf.Count);
             Assert.True(dschema.IsDictionary);
-            Assert.Contains("Foobar.", data);
-            Assert.Contains("Foobar.", code);
 
             if (inlineNamedDictionaries)
             {
@@ -55,6 +53,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             }
             else
             {
+                Assert.Contains("Foobar.", data);
+                Assert.Contains("Foobar.", code);
+
                 Assert.Contains("customDictionary: EmptyClassInheritingDictionary", code);
                 Assert.Contains("[key: string]: any;", code);
             }
