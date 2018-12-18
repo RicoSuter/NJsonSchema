@@ -55,10 +55,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonProperty) &&
+            (!string.IsNullOrEmpty(_schema.Description) ||
+             !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
         /// <summary>Gets the description.</summary>
-        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
+        public string Description => ConversionUtilities.RemoveLineBreaks(
+            !string.IsNullOrEmpty(_schema.Description) ?
+                _schema.Description : _schema.ActualTypeSchema.Description);
 
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
@@ -86,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
-        public bool HasIndexerProperty => _schema.InheritedSchema?.IsDictionary == true;
+        public bool HasIndexerProperty => _schema.IsDictionary || _schema.InheritedSchema?.IsDictionary == true;
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
@@ -105,9 +109,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                var valueType = InheritedSchema?.AdditionalPropertiesSchema != null
-                    ? _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty)
-                    : "any";
+                var valueType =
+                    _schema?.AdditionalPropertiesSchema != null ?
+                        _resolver.Resolve(_schema.AdditionalPropertiesSchema, true, string.Empty) :
+                    InheritedSchema?.AdditionalPropertiesSchema != null ?
+                        _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) :
+                    "any";
 
                 // TODO: Find solution to avoid using union with any
                 return valueType != "any" ? valueType + " | any" : valueType;

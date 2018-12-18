@@ -55,7 +55,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Namespace => _settings.Namespace;
 
         /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
-        public bool HasAdditionalPropertiesType => _schema.AdditionalPropertiesSchema != null;
+        public bool HasAdditionalPropertiesType =>
+            !_schema.IsDictionary &&
+            !_schema.ActualTypeSchema.IsDictionary &&
+            !_schema.IsArray &&
+            !_schema.ActualTypeSchema.IsArray &&
+            (_schema.AdditionalPropertiesSchema != null ||
+             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null);
 
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
@@ -71,10 +77,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonProperty) &&
+            (!string.IsNullOrEmpty(_schema.Description) ||
+             !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
         /// <summary>Gets the description.</summary>
-        public string Description => _schema.Description;
+        public string Description => !string.IsNullOrEmpty(_schema.Description) ?
+            _schema.Description : _schema.ActualTypeSchema.Description;
 
         /// <summary>Gets a value indicating whether the class style is INPC.</summary>
         public bool RenderInpc => _settings.ClassStyle == CSharpClassStyle.Inpc;
@@ -93,6 +102,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the discriminator property name.</summary>
         public string Discriminator => _schema.ActualDiscriminator;
+
+        /// <summary>Gets a value indicating whether this class represents a tuple.</summary>
+        public bool IsTuple => _schema.ActualTypeSchema.IsTuple;
+
+        /// <summary>Gets the tuple types.</summary>
+        public string[] TupleTypes => _schema.ActualTypeSchema.Items
+            .Select(i => _resolver.Resolve(i, i.IsNullable(_settings.SchemaType), string.Empty, false))
+            .ToArray();
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedTypeSchema != null;

@@ -14,6 +14,12 @@
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
+{% if IsTuple -%}
+    public {{ClassName}}({% for tupleType in TupleTypes -%}{{ tupleType }} item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%}) : base({% for tupleType in TupleTypes -%}item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%})
+    {
+    }
+
+{% endif -%}
 {% if RenderInpc or RenderPrism -%}
 {% for property in Properties -%}
     private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
@@ -84,7 +90,7 @@
 {% endif -%}
 {% if GenerateJsonMethods -%}
     {% template Class.ToJson %}
-    
+
     {% template Class.FromJson %}
 {% endif -%}
 {% if RenderInpc -%}
