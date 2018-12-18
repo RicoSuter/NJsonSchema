@@ -17,6 +17,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public EmptyClassInheritingDictionary CustomDictionary { get; set; }
         }
 
+        /// <summary>
+        /// Foobar.
+        /// </summary>
         public sealed class EmptyClassInheritingDictionary : Dictionary<string, object>
         {
         }
@@ -35,8 +38,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             var dschema = schema.Definitions["EmptyClassInheritingDictionary"];
+
             Assert.Equal(0, dschema.AllOf.Count);
             Assert.True(dschema.IsDictionary);
+            Assert.Contains("Foobar.", data);
+            Assert.Contains("Foobar.", code);
 
             Assert.DoesNotContain("class CustomDictionary :", code);
             Assert.Contains("public EmptyClassInheritingDictionary CustomDictionary", code);
@@ -50,6 +56,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public string Foo { get; set; }
         }
 
+        /// <summary>
+        /// Foobar.
+        /// </summary>
         public class MyException : ExceptionBase
         {
             public string Bar { get; set; }
@@ -73,6 +82,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
+            Assert.Contains("Foobar.", data);
+            Assert.Contains("Foobar.", code);
+
             Assert.Contains("class ExceptionBase : Exception", code);
             Assert.Contains("class MyException : ExceptionBase", code);
         }
