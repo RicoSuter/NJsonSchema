@@ -725,7 +725,13 @@ namespace NJsonSchema
             if ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType)))
                 return true;
 
-            return ActualSchema != this ? ActualSchema.IsNullable(schemaType) : false;
+            if (ActualSchema != this && ActualSchema.IsNullable(schemaType))
+                return true;
+
+            if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
+                return true;
+
+            return false;
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
