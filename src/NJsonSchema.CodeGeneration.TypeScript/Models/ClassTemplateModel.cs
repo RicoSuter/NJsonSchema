@@ -37,6 +37,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             DiscriminatorName = discriminatorName;
+
+            Properties = _schema.ActualProperties.Values
+                .Where(v => v.IsInheritanceDiscriminator == false)
+                .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
+                .ToList();
         }
 
         /// <summary>Gets the class name.</summary>
@@ -124,10 +129,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether to handle JSON references.</summary>
         public bool HandleReferences => _settings.HandleReferences;
 
+        /// <summary>Gets a value indicating whether the type has properties.</summary>
+        public bool HasProperties => Properties.Any();
+
         /// <summary>Gets the property models.</summary>
-        public List<PropertyModel> Properties => _schema.ActualProperties.Values
-            .Where(v => v.IsInheritanceDiscriminator == false)
-            .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings)).ToList();
+        public List<PropertyModel> Properties { get; }
 
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
         public bool HasDefaultValues => Properties.Any(p => p.HasDefaultValue);

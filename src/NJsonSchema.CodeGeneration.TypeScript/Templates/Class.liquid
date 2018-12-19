@@ -78,17 +78,19 @@
 {% if HasInheritance -%}
         super.init(data);
 {% endif -%}
+{% if HasIndexerProperty or HasProperties -%}
         if (data) {
-{% if HasIndexerProperty -%}
+{%     if HasIndexerProperty -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     this[property] = data[property];
             }
-{% endif -%}
-{% for property in Properties -%}
+{%     endif -%}
+{%     for property in Properties -%}
             {{ property.ConvertToClassCode | tab }}
-{% endfor -%}
+{%     endfor -%}
         }
+{% endif -%}
     }
 
     static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
