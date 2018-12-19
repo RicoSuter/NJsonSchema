@@ -425,4 +425,4 @@ Applications which use the library:
 
 - [VisualJsonEditor](http://visualjsoneditor.org), a JSON schema based file editor for Windows. 
 - [NSwag](http://nswag.org): The Swagger API toolchain for .NET
-- [SigSpec](https://github.com/RSuter/SigSpec) for SignlaR Core: Specification and code generator for SignalR Core. 
+- [SigSpec for SignalR Core](https://github.com/RSuter/SigSpec): Specification and code generator for SignalR Core. 
