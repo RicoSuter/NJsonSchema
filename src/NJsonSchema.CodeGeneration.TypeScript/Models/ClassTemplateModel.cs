@@ -99,7 +99,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
 
         /// <summary>Gets or sets a value indicating whether POJO objects in the constructor data are converted to DTO instances (default: true).</summary>
-        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData;
+        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData && Properties.Any(p => p.SupportsConstructorConversion);
 
         /// <summary>Gets the null value.</summary>
         public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
