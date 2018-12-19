@@ -226,9 +226,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             if (inlineNamedDictionaries)
             {
                 Assert.Contains("foo: { [key: string] : string; };", code);
+                Assert.Contains(@"data[""Foo""] = {};", code);
+                Assert.Contains(@"this.foo = {};", code);
             }
             else
             {
+                Assert.DoesNotContain("this.foo = {};", code);
+                Assert.DoesNotContain("data[\"Foo\"] = {};", code);
+
+                Assert.Contains(@"this.foo = data[""Foo""] ? DisplayValueDictionary.fromJS(data[""Foo""]) : <any>undefined;", code);
+                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : <any>undefined;", code);
+
                 Assert.Contains("foo: DisplayValueDictionary", code);
             }
         }

@@ -104,7 +104,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Checks whether the given schema should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>
-        protected override bool IsTypeSchema(JsonSchema4 schema)
+        public override bool IsDefinitionTypeSchema(JsonSchema4 schema)
         {
             if ((schema.IsDictionary && !Settings.InlineNamedDictionaries) ||
                 (schema.IsArray && !Settings.InlineNamedArrays) ||
@@ -113,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return true;
             }
 
-            return base.IsTypeSchema(schema);
+            return base.IsDefinitionTypeSchema(schema);
         }
 
         private string ResolveString(JsonSchema4 schema, bool isNullable, string typeNameHint)
