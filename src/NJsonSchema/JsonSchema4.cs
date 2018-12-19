@@ -270,7 +270,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
-        public OpenApiDiscriminator ResponsibleDiscriminatorObject => 
+        public OpenApiDiscriminator ResponsibleDiscriminatorObject =>
             ActualDiscriminatorObject ?? InheritedSchema?.ActualSchema.ResponsibleDiscriminatorObject;
 
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
@@ -713,16 +713,25 @@ namespace NJsonSchema
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(SchemaType schemaType)
         {
-            if (schemaType == SchemaType.OpenApi3 && IsNullableRaw.HasValue)
-                return IsNullableRaw.Value;
+            if (schemaType == SchemaType.OpenApi3 && IsNullableRaw == true)
+                return true;
 
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
 
-            if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
+            if (Type.HasFlag(JsonObjectType.Null))
                 return true;
 
-            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType));
+            if ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType)))
+                return true;
+
+            if (ActualSchema != this && ActualSchema.IsNullable(schemaType))
+                return true;
+
+            if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
+                return true;
+
+            return false;
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
