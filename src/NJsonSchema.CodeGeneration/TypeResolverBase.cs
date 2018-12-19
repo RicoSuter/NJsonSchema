@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration
                 {
                     var schema = pair.Value.ActualSchema;
 
-                    if (IsTypeSchema(schema))
+                    if (IsDefinitionTypeSchema(schema))
                     {
                         GetOrGenerateTypeName(schema, pair.Key);
                     }
@@ -83,8 +83,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
-        protected JsonSchema4 RemoveNullability(JsonSchema4 schema)
+        public JsonSchema4 RemoveNullability(JsonSchema4 schema)
         {
+            // TODO: Method on JsonSchema4?
             return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
         }
 
@@ -95,13 +96,13 @@ namespace NJsonSchema.CodeGeneration
         protected JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
         {
             schema = RemoveNullability(schema);
-            return IsTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
+            return IsDefinitionTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
         }
 
         /// <summary>Checks whether the given schema should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>
-        protected virtual bool IsTypeSchema(JsonSchema4 schema)
+        public bool IsTypeSchema(JsonSchema4 schema)
         {
             return !schema.IsTuple &&
                    !schema.IsDictionary &&
@@ -110,6 +111,14 @@ namespace NJsonSchema.CodeGeneration
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||
                     schema.Type.HasFlag(JsonObjectType.Object));
+        }
+
+        /// <summary>Checks whether the given schema from definitions should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        public virtual bool IsDefinitionTypeSchema(JsonSchema4 schema)
+        {
+            return IsTypeSchema(schema);
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>
