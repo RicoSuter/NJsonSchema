@@ -49,9 +49,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(typeSchema,
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
-                DefaultValue = valueGenerator.GetDefaultValue(typeSchema,
+                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
@@ -148,10 +148,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.ActualTypeSchema.IsEnumeration)
                 return false;
 
-            schema = parameters.Resolver.RemoveNullability(schema);
-
-            return parameters.Resolver.IsTypeSchema(schema) ||
-                (schema.HasReference && parameters.Resolver.IsDefinitionTypeSchema(schema.ActualSchema));
+            return parameters.Resolver.GeneratesType(schema);
         }
     }
 }

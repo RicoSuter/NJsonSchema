@@ -23,9 +23,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries)
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<MyContainer>();
@@ -34,7 +36,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeScriptVersion = 2.0m,
-                InlineNamedDictionaries = inlineNamedDictionaries
+                InlineNamedDictionaries = inlineNamedDictionaries,
+                ConvertConstructorInterfaceData = convertConstructorInterfaceData
             });
 
             //// Act
@@ -58,6 +61,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
                 Assert.Contains("customDictionary: EmptyClassInheritingDictionary", code);
                 Assert.Contains("[key: string]: any;", code);
+
+                if (convertConstructorInterfaceData)
+                {
+                    Assert.Contains("this.customDictionary = data.customDictionary && !(<any>data.customDictionary).toJSON ? new EmptyClassInheritingDictionary(data.customDictionary) : <EmptyClassInheritingDictionary>this.customDictionary;", code);
+                }
+                else
+                {
+                    Assert.DoesNotContain("new EmptyClassInheritingDictionary(data.customDictionary)", code);
+                }
             }
         }
 
