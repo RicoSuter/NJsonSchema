@@ -205,9 +205,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries)
+        [InlineData(false, true)]
+        [InlineData(true, true)]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<DictionaryContainer>();
@@ -218,6 +220,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullValue = TypeScriptNullValue.Undefined,
+                ConvertConstructorInterfaceData = convertConstructorInterfaceData,
                 InlineNamedDictionaries = inlineNamedDictionaries
             });
             var code = codeGenerator.GenerateFile("Test");
@@ -228,6 +231,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 Assert.Contains("foo: { [key: string] : string; };", code);
                 Assert.Contains(@"data[""Foo""] = {};", code);
                 Assert.Contains(@"this.foo = {};", code);
+
+                // for convertConstructorInterfaceData == true or false
+                Assert.DoesNotContain("new DisplayValueDictionary", code);
             }
             else
             {
@@ -238,6 +244,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : <any>undefined;", code);
 
                 Assert.Contains("foo: DisplayValueDictionary", code);
+
+                if (convertConstructorInterfaceData)
+                {
+                    Assert.Contains("this.foo = data.foo && !(<any>data.foo).toJSON ? new DisplayValueDictionary(data.foo) : <DisplayValueDictionary>this.foo;", code);
+                }
+                else
+                {
+                    Assert.DoesNotContain("new DisplayValueDictionary(data.foo)", code);
+                }
             }
         }
     }

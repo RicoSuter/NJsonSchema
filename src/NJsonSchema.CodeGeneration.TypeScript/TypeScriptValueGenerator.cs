@@ -31,20 +31,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false)
                 {
-                    if (schema.IsArray)
-                        return "[]";
-
-                    if (schema.IsDictionary)
-                        return "{}";
-
-                    if (schema.Type.HasFlag(JsonObjectType.Object) &&
-                        !schema.IsAbstract &&
-                        !schema.IsAnyType)
+                    if (typeResolver.GeneratesType(schema) && 
+                        !schema.ActualTypeSchema.IsEnumeration &&
+                        !schema.ActualTypeSchema.IsAbstract)
                     {
                         return "new " + targetType + "()";
+                    }
+
+                    if (schema.ActualTypeSchema.IsArray)
+                    {
+                        return "[]";
+                    }
+
+                    if (schema.ActualTypeSchema.IsDictionary)
+                    {
+                        return "{}";
                     }
                 }
             }
