@@ -259,7 +259,8 @@ namespace NJsonSchema.CodeGeneration.Tests
       ""type"": ""string"",
       ""enum"": [
         ""0562"",
-        ""0532""
+        ""\""0532\"""",
+        ""a\\b\\c""
       ],
       ""description"": """"
     }
@@ -274,8 +275,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Assert
             Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
             Assert.Contains("_0562 = 0,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0532\")]", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"\"\"0532\"\"\")]", code);
             Assert.Contains("_0532 = 1,", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"a\\b\\c\")]", code);
+            Assert.Contains("A_b_c = 2,", code);
+
         }
 
         [Fact]

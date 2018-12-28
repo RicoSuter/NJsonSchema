@@ -9,7 +9,7 @@
 {
 {% for enum in Enums -%}
 {%   if IsStringEnum -%}
-    [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value }}")]
+    [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
 {%   endif -%}
 {% if IsEnumAsBitFlags -%}
     {{ enum.Name }} = {{ enum.InternalFlagValue }},

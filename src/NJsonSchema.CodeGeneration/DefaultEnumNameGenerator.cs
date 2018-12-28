@@ -20,7 +20,7 @@ namespace NJsonSchema.CodeGeneration
         public string Generate(int index, string name, object value, JsonSchema4 schema)
         {
             return ConversionUtilities.ConvertToUpperCamelCase(name
-                .Replace(":", "-"), true)
+                .Replace(":", "-").Replace(@"""", @""), true)
                 .Replace(".", "_")
                 .Replace("#", "_")
                 .Replace("\\", "_");
