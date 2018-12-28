@@ -63,37 +63,38 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema == ExceptionSchema)
                 return "System.Exception";
 
+            // Primitive schemas (no new type)
+
             if (schema.ActualTypeSchema.IsAnyType)
                 return "object";
 
-            var type = schema.Type;
-            if (type == JsonObjectType.None && schema.IsEnumeration)
+            var type = schema.ActualTypeSchema.Type;
+            if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
             {
-                type = schema.Enumeration.All(v => v is int) ?
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
             }
 
             if (type.HasFlag(JsonObjectType.Number))
-                return ResolveNumber(schema, isNullable);
+                return ResolveNumber(schema.ActualTypeSchema, isNullable);
 
             if (type.HasFlag(JsonObjectType.Integer))
-                return ResolveInteger(schema, isNullable, typeNameHint);
+                return ResolveInteger(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return ResolveBoolean(isNullable);
 
             if (type.HasFlag(JsonObjectType.String))
-                return ResolveString(schema, isNullable, typeNameHint);
-
-            if (Types.ContainsKey(schema) && checkForExistingSchema)
-                return Types[schema];
-
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema);
+                return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
                 return "byte[]";
+
+            // Type generating schemas
+
+            if (schema.Type.HasFlag(JsonObjectType.Array))
+                return ResolveArrayOrTuple(schema);
 
             if (schema.IsDictionary)
                 return ResolveDictionary(schema);
