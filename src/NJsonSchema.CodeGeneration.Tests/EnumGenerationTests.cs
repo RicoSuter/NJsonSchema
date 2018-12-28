@@ -156,9 +156,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
             Assert.Contains("_0562 = 0,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0532\")]", code);
             Assert.Contains("_0532 = 1,", code);
         }
 
@@ -272,9 +272,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0562\")]", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
             Assert.Contains("_0562 = 0,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = \"0532\")]", code);
+            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0532\")]", code);
             Assert.Contains("_0532 = 1,", code);
         }
 
