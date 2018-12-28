@@ -94,13 +94,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type.HasFlag(JsonObjectType.Number))
                 return "number";
 
-            if (type.HasFlag(JsonObjectType.Integer))
+            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return "boolean";
 
-            if (type.HasFlag(JsonObjectType.String))
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveString(schema.ActualTypeSchema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             // Type generating schemas
 
-            if (schema.IsEnumeration)
+            if (schema.ActualTypeSchema.IsEnumeration)
                 return GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.Type.HasFlag(JsonObjectType.Array))
@@ -169,17 +169,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Duration";
             }
 
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
-
             return "string";
         }
 
         private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
         {
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
-
             return "number";
         }
 

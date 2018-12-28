@@ -79,13 +79,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (type.HasFlag(JsonObjectType.Number))
                 return ResolveNumber(schema.ActualTypeSchema, isNullable);
 
-            if (type.HasFlag(JsonObjectType.Integer))
+            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveInteger(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return ResolveBoolean(isNullable);
 
-            if (type.HasFlag(JsonObjectType.String))
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
@@ -98,6 +98,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.IsDictionary)
                 return ResolveDictionary(schema);
+
+            if (schema.ActualTypeSchema.IsEnumeration)
+                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             return GetOrGenerateTypeName(schema, typeNameHint);
         }
@@ -144,9 +147,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
 #pragma warning restore 618
 
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
-
             return "string";
         }
 
@@ -157,9 +157,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveInteger(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
-
             if (schema.Format == JsonFormatStrings.Byte)
                 return isNullable ? "byte?" : "byte";
 
