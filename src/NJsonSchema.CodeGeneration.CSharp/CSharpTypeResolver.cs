@@ -63,40 +63,44 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema == ExceptionSchema)
                 return "System.Exception";
 
+            // Primitive schemas (no new type)
+
             if (schema.ActualTypeSchema.IsAnyType)
                 return "object";
 
-            var type = schema.Type;
-            if (type == JsonObjectType.None && schema.IsEnumeration)
+            var type = schema.ActualTypeSchema.Type;
+            if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
             {
-                type = schema.Enumeration.All(v => v is int) ?
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
             }
 
             if (type.HasFlag(JsonObjectType.Number))
-                return ResolveNumber(schema, isNullable);
+                return ResolveNumber(schema.ActualTypeSchema, isNullable);
 
-            if (type.HasFlag(JsonObjectType.Integer))
-                return ResolveInteger(schema, isNullable, typeNameHint);
+            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+                return ResolveInteger(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return ResolveBoolean(isNullable);
 
-            if (type.HasFlag(JsonObjectType.String))
-                return ResolveString(schema, isNullable, typeNameHint);
-
-            if (Types.ContainsKey(schema) && checkForExistingSchema)
-                return Types[schema];
-
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema);
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+                return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.File))
                 return "byte[]";
 
+            // Type generating schemas
+
+            if (schema.Type.HasFlag(JsonObjectType.Array))
+                return ResolveArrayOrTuple(schema);
+
             if (schema.IsDictionary)
                 return ResolveDictionary(schema);
+
+            if (schema.ActualTypeSchema.IsEnumeration)
+                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
 
             return GetOrGenerateTypeName(schema, typeNameHint);
         }
@@ -143,9 +147,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
 #pragma warning restore 618
 
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
-
             return "string";
         }
 
@@ -156,9 +157,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveInteger(JsonSchema4 schema, bool isNullable, string typeNameHint)
         {
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
-
             if (schema.Format == JsonFormatStrings.Byte)
                 return isNullable ? "byte?" : "byte";
 
