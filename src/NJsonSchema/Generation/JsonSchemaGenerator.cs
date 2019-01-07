@@ -814,11 +814,14 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonProperty
+                    if (existingProperty == null)
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true
-                    };
+                    	typeSchema.Properties[discriminatorName] = new JsonProperty
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = true
+                        };
+                    }
                 }
                 else
                 {
