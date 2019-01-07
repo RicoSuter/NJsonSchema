@@ -279,6 +279,7 @@ namespace NJsonSchema.Generation
             {
                 foreach (var schema in referencedSchema.ActualSchema.KnownTypesSchemas)
                 {
+                    referencingSchema.Type = JsonObjectType.Object;
                     referencingSchema.OneOf.Add(new JsonSchema4
                     {
                         Reference = schema
