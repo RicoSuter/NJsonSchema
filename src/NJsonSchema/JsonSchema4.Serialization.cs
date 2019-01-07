@@ -394,8 +394,18 @@ namespace NJsonSchema
             else if (sender is ObservableDictionary<string, JsonSchema4>)
             {
                 var collection = (ObservableDictionary<string, JsonSchema4>)sender;
-                foreach (var item in collection.Values)
-                    item.Parent = this;
+
+                foreach (var pair in collection.ToArray())
+                {
+                    if (pair.Value == null)
+                    {
+                        collection.Remove(pair.Key);
+                    }
+                    else
+                    {
+                        pair.Value.Parent = this;
+                    }
+                }
             }
         }
     }
