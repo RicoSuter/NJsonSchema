@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
+using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -1634,6 +1635,34 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Assert
             Assert.Contains("JsonExtensionData", output);
+        }
+
+        [Fact]
+        public void When_schema_has_negative_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+            var settings = new CSharpGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
+            var generator = new CSharpGenerator(null, settings);
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.Integer,
+                Enumeration =
+                {
+                    0,
+                    1,
+                    2,
+                    -1,
+                },
+                Default = "-1"
+            };
+
+            var types = generator.GenerateTypes(schema, "MyEnum");
+
+            //// Assert
+            Assert.Contains("_1 = 1", types.Artifacts.First().Code);
+            Assert.Contains("__1 = -1", types.Artifacts.First().Code);
         }
 
         private static void AssertCompile(string code)
