@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
+using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -1648,6 +1649,40 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 sb.AppendLine($"{e.Id} at {e.Location}: {e.GetMessage()}");
 
             Assert.Empty(sb.ToString());
+        }
+
+        [Fact]
+        public void When_schema_has_negative_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+            var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
+            var csharpGenerator = new CSharpGenerator(null, csharpSettings);
+            var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
+            var typescriptGenerator = new TypeScriptGenerator(null, typescriptSettings);
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.Integer,
+                Enumeration =
+                {
+                    0,
+                    1,
+                    2,
+                    -1,
+                },
+                Default = "-1"
+            };
+
+            var csharpType = csharpGenerator.GenerateTypes(schema, "MyEnum");
+            var typescriptType = typescriptGenerator.GenerateTypes(schema, "MyEnum");
+
+            //// Assert
+            Assert.Contains("_1 = 1", csharpType.Artifacts.First().Code);
+            Assert.Contains("__1 = -1", csharpType.Artifacts.First().Code);
+
+            Assert.Contains("_1 = 1", typescriptType.Artifacts.First().Code);
+            Assert.Contains("__1 = -1", typescriptType.Artifacts.First().Code);
         }
     }
 }
