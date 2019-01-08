@@ -516,6 +516,7 @@ namespace NJsonSchema.Infrastructure
 
         private static async Task<string> GetXmlDocumentationPathAsync(dynamic assembly)
         {
+            string path;
             try
             {
                 if (assembly == null)
@@ -528,7 +529,6 @@ namespace NJsonSchema.Infrastructure
                 if (Cache.ContainsKey(assemblyName.FullName))
                     return null;
 
-                string path;
                 if (!string.IsNullOrEmpty(assembly.Location))
                 {
                     var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
@@ -547,8 +547,8 @@ namespace NJsonSchema.Infrastructure
                         return path;
                 }
 
-                var currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-                if (currentDomain.HasProperty("BaseDirectory"))
+                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain").GetValue(null);
+                if (currentDomain?.HasProperty("BaseDirectory") == true)
                 {
                     var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
                     path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
@@ -556,6 +556,19 @@ namespace NJsonSchema.Infrastructure
                         return path;
 
                     return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                }
+
+                var currentDirectory = await DynamicApis.DirectoryGetCurrentDirectoryAsync();
+                path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                {
+                    return path;
+                }
+
+                path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                {
+                    return path;
                 }
 
                 return null;
