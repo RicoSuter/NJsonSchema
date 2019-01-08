@@ -12,7 +12,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
-using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 
