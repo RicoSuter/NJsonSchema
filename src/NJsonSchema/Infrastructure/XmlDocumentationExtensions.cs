@@ -516,6 +516,7 @@ namespace NJsonSchema.Infrastructure
 
         private static async Task<string> GetXmlDocumentationPathAsync(dynamic assembly)
         {
+            string path;
             try
             {
                 if (assembly == null)
@@ -528,7 +529,6 @@ namespace NJsonSchema.Infrastructure
                 if (Cache.ContainsKey(assemblyName.FullName))
                     return null;
 
-                string path;
                 if (!string.IsNullOrEmpty(assembly.Location))
                 {
                     var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
@@ -562,6 +562,11 @@ namespace NJsonSchema.Infrastructure
             }
             catch
             {
+                var currentDirectory = await DynamicApis.DirectoryGetCurrentDirectoryAsync();
+                path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                    return path;
+
                 return null;
             }
         }
