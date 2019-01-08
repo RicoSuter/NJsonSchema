@@ -562,11 +562,26 @@ namespace NJsonSchema.Infrastructure
             }
             catch
             {
+                // ignored
+            }
+
+            try
+            {
                 var currentDirectory = await DynamicApis.DirectoryGetCurrentDirectoryAsync();
+                path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                {
+                    return path;
+                }
+
                 path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
                 if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
                     return path;
 
+                return null;
+            }
+            catch
+            {
                 return null;
             }
         }
