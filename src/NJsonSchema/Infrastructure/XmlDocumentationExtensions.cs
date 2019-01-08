@@ -547,8 +547,8 @@ namespace NJsonSchema.Infrastructure
                         return path;
                 }
 
-                var currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-                if (currentDomain.HasProperty("BaseDirectory"))
+                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain").GetValue(null);
+                if (currentDomain?.HasProperty("BaseDirectory") == true)
                 {
                     var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
                     path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
