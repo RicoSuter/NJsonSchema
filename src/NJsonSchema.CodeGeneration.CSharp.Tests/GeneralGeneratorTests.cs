@@ -1637,28 +1637,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains("JsonExtensionData", output);
         }
 
-        private static void AssertCompile(string code)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var errors = syntaxTree
-                .GetDiagnostics()
-                .Where(_ => _.Severity == DiagnosticSeverity.Error);
-
-            var sb = new StringBuilder();
-            foreach (var e in errors)
-                sb.AppendLine($"{e.Id} at {e.Location}: {e.GetMessage()}");
-
-            Assert.Empty(sb.ToString());
-        }
-
         [Fact]
         public void When_schema_has_negative_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
             //// Arrange
-            var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
-            var csharpGenerator = new CSharpGenerator(null, csharpSettings);
-            var typescriptSettings = new TypeScriptGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
-            var typescriptGenerator = new TypeScriptGenerator(null, typescriptSettings);
+            var settings = new CSharpGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
+            var generator = new CSharpGenerator(null, settings);
 
             //// Act
             var schema = new JsonSchema4()
@@ -1674,15 +1658,25 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 Default = "-1"
             };
 
-            var csharpType = csharpGenerator.GenerateTypes(schema, "MyEnum");
-            var typescriptType = typescriptGenerator.GenerateTypes(schema, "MyEnum");
+            var types = generator.GenerateTypes(schema, "MyEnum");
 
             //// Assert
-            Assert.Contains("_1 = 1", csharpType.Artifacts.First().Code);
-            Assert.Contains("__1 = -1", csharpType.Artifacts.First().Code);
+            Assert.Contains("_1 = 1", types.Artifacts.First().Code);
+            Assert.Contains("__1 = -1", types.Artifacts.First().Code);
+        }
 
-            Assert.Contains("_1 = 1", typescriptType.Artifacts.First().Code);
-            Assert.Contains("__1 = -1", typescriptType.Artifacts.First().Code);
+        private static void AssertCompile(string code)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var errors = syntaxTree
+                .GetDiagnostics()
+                .Where(_ => _.Severity == DiagnosticSeverity.Error);
+
+            var sb = new StringBuilder();
+            foreach (var e in errors)
+                sb.AppendLine($"{e.Id} at {e.Location}: {e.GetMessage()}");
+
+            Assert.Empty(sb.ToString());
         }
     }
 }
