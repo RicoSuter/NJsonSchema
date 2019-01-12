@@ -127,5 +127,47 @@ namespace NJsonSchema.Tests.Generation
                 return base.ConvertFrom(context, culture, value);
             }
         }
+
+        [JsonObject(ItemRequired = Required.Always)]
+        public class ClassWithClassLevelAttribute
+        {
+            public string Foo { get; set; }
+
+            [JsonProperty("Bar", Required = Required.Default)]
+            public string Bar { get; set; }
+        }
+
+        [Fact]
+        public void When_JsonObject_ItemRequired_is_always_then_property_without_attribute_is_required_when_deserializing()
+        {
+            // Check whether JsonObjectAttribute.ItemRequired controls property without JsonPropertyAttribute
+
+            // Act
+            Assert.Throws<JsonSerializationException>(() =>
+            {
+                JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{}");
+            });
+        }
+
+        [Fact]
+        public void When_JsonObject_ItemRequired_is_always_then_property_with_attribute_is_optional_when_deserializing()
+        {
+            // Check whether JsonPropertyAttribute.Required overrides JsonObjectAttribute.ItemRequired
+
+            /// Act
+            JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{ \"Foo\": \"abc\" }");
+        }
+
+        [Fact]
+        public async Task When_JsonObject_ItemRequired_is_always_then_properties_without_attributes_are_required_in_schema()
+        {
+            // Act
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithClassLevelAttribute>();
+            var schemaData = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.Properties["Foo"].IsRequired);
+            Assert.False(schema.Properties["Bar"].IsRequired);
+        }
     }
 }
