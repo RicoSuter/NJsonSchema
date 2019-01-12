@@ -916,7 +916,9 @@ namespace NJsonSchema.Generation
                 
                 var propertyRequired = 
                     objectContract?.ItemRequired != null && 
-                    !propertyAttributes.OfType<JsonPropertyAttribute>().Any() ? objectContract.ItemRequired : property.Required;
+                    !propertyAttributes.OfType<JsonPropertyAttribute>()
+                        .Any(/*a => a.TryGetPropertyValue<object>("_required", null) != null*/) ? 
+                        objectContract.ItemRequired : property.Required;
 
                 var hasJsonNetAttributeRequired = propertyRequired == Required.Always || propertyRequired == Required.AllowNull;
                 var isDataContractMemberRequired = GetDataMemberAttribute(parentType, propertyAttributes)?.IsRequired == true;

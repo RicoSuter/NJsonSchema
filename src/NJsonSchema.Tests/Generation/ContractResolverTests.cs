@@ -131,6 +131,9 @@ namespace NJsonSchema.Tests.Generation
         [JsonObject(ItemRequired = Required.Always)]
         public class ClassWithClassLevelAttribute
         {
+            public string Abc { get; set; }
+
+            [JsonProperty("Foo")]
             public string Foo { get; set; }
 
             [JsonProperty("Bar", Required = Required.Default)]
@@ -140,12 +143,19 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_JsonObject_ItemRequired_is_always_then_property_without_attribute_is_required_when_deserializing()
         {
-            // Check whether JsonObjectAttribute.ItemRequired controls property without JsonPropertyAttribute
+            // Check whether JsonObjectAttribute.ItemRequired controls property without JsonPropertyAttribute or JsonPropertyAttribute.Required
 
             // Act
             Assert.Throws<JsonSerializationException>(() =>
             {
-                JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{}");
+                // Exception: Foo not set
+                JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{ \"Abc\": \"abc\" }");
+            });
+
+            Assert.Throws<JsonSerializationException>(() =>
+            {
+                // Exception: Abc not set
+                JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{ \"Foo\": \"abc\" }");
             });
         }
 
@@ -155,7 +165,7 @@ namespace NJsonSchema.Tests.Generation
             // Check whether JsonPropertyAttribute.Required overrides JsonObjectAttribute.ItemRequired
 
             /// Act
-            JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{ \"Foo\": \"abc\" }");
+            JsonConvert.DeserializeObject<ClassWithClassLevelAttribute>("{ \"Abc\": \"abc\", \"Foo\": \"abc\" }");
         }
 
         [Fact]
@@ -166,6 +176,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
 
             // Assert
+            Assert.True(schema.Properties["Abc"].IsRequired);
             Assert.True(schema.Properties["Foo"].IsRequired);
             Assert.False(schema.Properties["Bar"].IsRequired);
         }
