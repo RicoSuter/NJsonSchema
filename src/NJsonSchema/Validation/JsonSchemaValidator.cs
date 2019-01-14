@@ -36,12 +36,16 @@ namespace NJsonSchema.Validation
         };
 
         private readonly IDictionary<string, IFormatValidator> _formatValidatorsMap;
+        
+        private readonly SchemaType _schemaType;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
-        public JsonSchemaValidator()
+        /// <param name="schemaType">The JSON schema type.</param>
+        public JsonSchemaValidator(SchemaType schemaType = SchemaType.JsonSchema)
         {
+            _schemaType = schemaType;
             _formatValidatorsMap = _formatValidators.ToDictionary(v => v.Format, v => v);
         }
 
