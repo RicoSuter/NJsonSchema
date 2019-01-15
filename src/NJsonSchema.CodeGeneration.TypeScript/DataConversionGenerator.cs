@@ -79,6 +79,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemDate = IsDate(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
                 IsArrayItemDateTime = IsDateTime(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
 
+                RequiresStrictPropertyInitialization = parameters.Settings.TypeScriptVersion >= 2.7m,
+
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" :

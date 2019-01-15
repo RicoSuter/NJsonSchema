@@ -230,7 +230,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 Assert.Contains("foo: { [key: string] : string; };", code);
                 Assert.Contains(@"data[""Foo""] = {};", code);
-                Assert.Contains(@"this.foo = {};", code);
+                Assert.Contains(@"this.foo = {} as any;", code);
 
                 // for convertConstructorInterfaceData == true or false
                 Assert.DoesNotContain("new DisplayValueDictionary", code);
