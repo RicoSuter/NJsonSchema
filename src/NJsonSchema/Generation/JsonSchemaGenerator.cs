@@ -343,7 +343,10 @@ namespace NJsonSchema.Generation
                 await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
             }
 
-            typeDescription.ApplyType(schema);
+            if (!schema.Type.HasFlag(JsonObjectType.Array))
+            {
+                typeDescription.ApplyType(schema);
+            }
 
             schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
@@ -353,7 +356,9 @@ namespace NJsonSchema.Generation
             await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateXmlObjects)
+            {
                 schema.GenerateXmlObjectForType(type);
+            }
         }
 
         private async Task ApplyAdditionalPropertiesAsync<TSchemaType>(Type type, TSchemaType schema,
