@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "description": "This is the class B",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "This is the ID of B"
+    },
+    "type": {
+      "$ref": "./C.json",
+      "description": "This is the type of B"
+    },
+    "empty": {
+      "$ref": "./D.json",
+      "description": "This one should be of type D and not object"
+    }
+  }
+}
