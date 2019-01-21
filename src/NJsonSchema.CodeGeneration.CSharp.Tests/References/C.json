@@ -1,0 +1,8 @@
+{
+  "type":"string",
+  "description":"Possible types",
+  "enum":[
+    "First",
+    "Second"
+  ]
+}
