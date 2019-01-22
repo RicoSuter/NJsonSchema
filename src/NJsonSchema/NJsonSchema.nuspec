@@ -7,7 +7,6 @@
     <description>$description$</description>
     <tags>json schema validation generator .net</tags>
     <projectUrl>http://NJsonSchema.org</projectUrl>
-    <licenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
     <license type="expression">MIT</license>
   </metadata>
   <files>
