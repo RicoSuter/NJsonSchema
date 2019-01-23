@@ -231,6 +231,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var schemaJson = @"{
+                ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 

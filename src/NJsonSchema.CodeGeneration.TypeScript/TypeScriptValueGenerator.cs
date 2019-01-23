@@ -31,7 +31,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                if (schema != null && allowsNull == false)
+                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+                if (schema != null && allowsNull == false && isOptional == false)
                 {
                     if (typeResolver.GeneratesType(schema) && 
                         !schema.ActualTypeSchema.IsEnumeration &&

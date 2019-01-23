@@ -26,6 +26,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests.Models
 
         public Gender? GenderOrNull { get; set; }
 
+        [JsonProperty("address", Required = Required.Always)]
         public Address Address { get; set; }
 
         [CanBeNull]
