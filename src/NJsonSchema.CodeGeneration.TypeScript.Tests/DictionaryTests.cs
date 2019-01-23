@@ -104,6 +104,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var json = @"{
+    ""required"": [ ""resource"" ],
     ""properties"": {
         ""resource"": {
             ""type"": ""object"",
