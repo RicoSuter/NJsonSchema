@@ -39,6 +39,7 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
             ReflectionService = new DefaultReflectionService();
+            XmlDocumentationService = new XmlDocumentationService();
 
             ExcludedTypeNames = new string[0];
         }
@@ -87,6 +88,9 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the reflection service.</summary>
         [JsonIgnore]
         public IReflectionService ReflectionService { get; set; }
+
+        /// <summary>Gets or sets the xml documentation service.</summary>
+        public IXmlDocumentationService XmlDocumentationService { get; set; }
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]

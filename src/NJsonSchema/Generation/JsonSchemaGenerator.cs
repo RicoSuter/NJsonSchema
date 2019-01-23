@@ -348,7 +348,7 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+            schema.Description = await Settings.XmlDocumentationService.GetDescriptionAsync(type.GetTypeInfo(), type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
@@ -485,7 +485,7 @@ namespace NJsonSchema.Generation
                 LoadEnumerations(type, schema, typeDescription);
 
                 typeDescription.ApplyType(schema);
-                schema.Description = await type.GetXmlSummaryAsync().ConfigureAwait(false);
+                schema.Description = await Settings.XmlDocumentationService.GetXmlSummaryAsync(type.GetTypeInfo()).ConfigureAwait(false);
 
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
@@ -955,7 +955,9 @@ namespace NJsonSchema.Generation
                             p.IsReadOnly = readOnlyAttribute.IsReadOnly;
 
                         if (p.Description == null)
-                            p.Description = await propertyInfo.GetDescriptionAsync(propertyAttributes).ConfigureAwait(false);
+                        {
+                            p.Description = await Settings.XmlDocumentationService.GetDescriptionAsync(propertyInfo, propertyAttributes).ConfigureAwait(false);
+                        }
 
                         p.Default = ConvertDefaultValue(property);
 
