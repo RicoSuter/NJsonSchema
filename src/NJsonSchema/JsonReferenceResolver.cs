@@ -146,7 +146,7 @@ namespace NJsonSchema
             try
             {
                 var arr = Regex.Split(fullJsonPath, @"(?=#)");
-                var filePath = arr[0];
+                var filePath = DynamicApis.GetFullPath(arr[0]);
                 if (!_resolvedObjects.ContainsKey(filePath))
                 {
                     var schema = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);

@@ -24,6 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var json = @"{
+                'required': [ 'emptySchema' ],
                 'properties': {
                     'emptySchema': { 'type': 'array' }
                 }
@@ -560,6 +561,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schemaJson = @"{
+                ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 

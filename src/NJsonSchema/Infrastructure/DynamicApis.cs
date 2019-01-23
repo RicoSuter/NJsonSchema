@@ -180,6 +180,18 @@ namespace NJsonSchema.Infrastructure
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
         }
 
+        /// <summary>Gets the full path from a given path</summary>
+        /// <param name="path">The path</param>
+        /// <returns>The full path</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
+        public static string GetFullPath(string path)
+        {
+            if (!SupportsPathApis)
+                throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+
+            return (string)PathType.GetRuntimeMethod("GetFullPath", new[] { typeof(string) }).Invoke(null, new object[] { path });
+        }
+
         /// <summary>Gets the directory path of a file path.</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The directory name.</returns>

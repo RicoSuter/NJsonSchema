@@ -60,7 +60,7 @@
         }
 {%     endif -%}
 {%     if HasDefaultValues -%}
-        if (!data) {
+        {% if GenerateConstructorInterface %}if (!data) {% endif %}{
 {%         for property in Properties -%}
 {%             if property.HasDefaultValue -%}
             this.{{ property.PropertyName }} = {{ property.DefaultValue }};

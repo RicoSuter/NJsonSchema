@@ -37,8 +37,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
+                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+
                 schema = schema.ActualSchema;
-                if (schema != null && allowsNull == false)
+                if (schema != null && allowsNull == false && isOptional == false)
                 {
                     if (schema.Type.HasFlag(JsonObjectType.Array) ||
                         schema.Type.HasFlag(JsonObjectType.Object))
