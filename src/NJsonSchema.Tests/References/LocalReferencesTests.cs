@@ -6,6 +6,8 @@ using Xunit;
 
 namespace NJsonSchema.Tests.References
 {
+    using NJsonSchema.Generation;
+
     public class LocalReferencesTests
     {
         [Fact]
@@ -79,6 +81,44 @@ namespace NJsonSchema.Tests.References
 
             //// Assert
             Assert.Equal(1, schema.Definitions.Count);
+        }
+
+        [Fact]
+        public async Task When_reference_is_registered_in_custom_resolver_it_should_not_try_to_access_file()
+        {
+            //// Arrange
+            var externalSchema = await JsonSchema4.FromJsonAsync(
+            @"{
+                    ""type"": ""object"", 
+                    ""properties"": {
+                        ""foo"": {
+                            ""type"": ""string""
+                       }
+                     }
+                   }");
+
+            Func<JsonSchema4, JsonReferenceResolver> factory = schema4 =>
+                {
+                    var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
+                    var resolver = new JsonReferenceResolver(schemaResolver);
+                    resolver.AddDocumentReference("../dir/external.json", externalSchema);
+                    return resolver;
+                };
+
+            string schemaJson = @"{
+                                    ""$schema"": ""http://json-schema.org/draft-07/schema#"",
+                                    ""type"": ""object"",
+                                    ""properties"": {
+                                      ""title"": {
+                                         ""$ref"": ""../dir/external.json#""
+                                      }
+                                    }
+                                 }";
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson, ".", factory);
+
+            //// Assert
+            Assert.NotNull(schema);
         }
 
         private string GetTestDirectory()
