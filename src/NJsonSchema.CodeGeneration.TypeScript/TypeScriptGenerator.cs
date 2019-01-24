@@ -9,6 +9,7 @@
 using System;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -81,13 +82,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (artifacts.Any(r => r.Code.Contains("formatDate(")))
             {
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", null);
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", new TemplateModelBase());
                 artifacts.Add(new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
             }
 
             if (Settings.HandleReferences)
             {
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", null);
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", new TemplateModelBase());
                 artifacts.Add(new CodeArtifact("jsonParse", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
             }
 
