@@ -22,6 +22,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     .Replace(".", "-")
                     .Replace("=", "-")
                     .Replace("+", "plus"), true)
+                .Replace("*", "Star")
                 .Replace(":", "_")
                 .Replace("-", "_");
         }
