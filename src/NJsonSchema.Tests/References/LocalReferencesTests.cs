@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.References
 		}
 	}
 }";
-            
+
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(json);
             var j = schema.ToJson();
@@ -89,31 +89,33 @@ namespace NJsonSchema.Tests.References
             //// Arrange
             var externalSchema = await JsonSchema4.FromJsonAsync(
             @"{
-                    ""type"": ""object"", 
-                    ""properties"": {
-                        ""foo"": {
-                            ""type"": ""string""
-                       }
-                     }
-                   }");
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""foo"": {
+                        ""type"": ""string""
+                    }
+                }
+            }");
 
             Func<JsonSchema4, JsonReferenceResolver> factory = schema4 =>
-                {
-                    var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
-                    var resolver = new JsonReferenceResolver(schemaResolver);
-                    resolver.AddDocumentReference("../dir/external.json", externalSchema);
-                    return resolver;
-                };
+            {
+                var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
+                var resolver = new JsonReferenceResolver(schemaResolver);
+                resolver.AddDocumentReference("../dir/external.json", externalSchema);
+                return resolver;
+            };
 
-            string schemaJson = @"{
-                                    ""$schema"": ""http://json-schema.org/draft-07/schema#"",
-                                    ""type"": ""object"",
-                                    ""properties"": {
-                                      ""title"": {
-                                         ""$ref"": ""../dir/external.json#""
-                                      }
-                                    }
-                                 }";
+            string schemaJson =
+            @"{
+                ""$schema"": ""http://json-schema.org/draft-07/schema#"",
+                ""type"": ""object"",
+                ""properties"": {
+                    ""title"": {
+                        ""$ref"": ""../dir/external.json#""
+                    }
+                }
+            }";
+
             //// Act
             var schema = await JsonSchema4.FromJsonAsync(schemaJson, ".", factory);
 
