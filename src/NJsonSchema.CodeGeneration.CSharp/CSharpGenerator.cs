@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
                 {
                     var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new TemplateModelBase());
-                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                    results.Add(new CodeArtifact("JsonInheritanceAttribute", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
                 }
 
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
