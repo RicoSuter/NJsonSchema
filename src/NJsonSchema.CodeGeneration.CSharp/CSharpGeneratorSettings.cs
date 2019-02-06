@@ -47,6 +47,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
             InlineNamedTuples = true;
+            UseActionResultType = false;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
@@ -127,5 +128,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.</summary>
         public bool InlineNamedArrays { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether ASP.Net Core ActionResult type is used (default: false).</summary>
+        public bool UseActionResultType { get; set; }
     }
 }

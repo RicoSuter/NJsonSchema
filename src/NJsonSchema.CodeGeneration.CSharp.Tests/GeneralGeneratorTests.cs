@@ -1666,6 +1666,28 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains("__1 = -1", types.Artifacts.First().Code);
         }
 
+        [Fact]
+        public void When_aspnet_action_type_defaults_to_false()          
+        {
+            //// Arrange
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(null, settings);
+         
+            //// Assert
+            Assert.False(generator.Settings.UseActionResultType);
+        }
+
+        [Fact]
+        public void When_aspnet_action_type_is_defined()
+        {
+            //// Arrange
+            var settings = new CSharpGeneratorSettings{ UseActionResultType = true };
+            var generator = new CSharpGenerator(null, settings);
+
+            //// Assert
+            Assert.True(generator.Settings.UseActionResultType);
+        }
+
         private static void AssertCompile(string code)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
