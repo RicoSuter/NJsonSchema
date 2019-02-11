@@ -18,7 +18,8 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
-        internal const string ReferenceReplaceString = "__referencePath";
+        /// <summary>Gets the $ref replacement string.</summary>
+        public const string ReferenceReplaceString = "__referencePath";
 
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
