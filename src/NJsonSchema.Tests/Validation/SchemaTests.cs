@@ -379,5 +379,37 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal(1, errors.Count);
             Assert.Contains(errors, e => e.Kind == ValidationErrorKind.NoTypeValidates);
         }
+
+        [Fact]
+        public async Task When_datetime_with_regex_validation_then_datetime_is_not_altered()
+        {
+            //// Arrange
+            var schemaJson = @"
+            {
+              ""$schema"": ""http://json-schema.org/draft-07/schema#"",
+              ""type"": ""object"",
+              ""required"": [
+                ""my_datetime""
+              ],
+              ""properties"": {
+                ""my_datetime"": {
+                  ""type"": ""string"",
+                  ""pattern"": ""^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$""
+                }
+              }
+            }";
+
+            var json = @"
+            {
+              ""my_datetime"": ""2018-12-19T16:58:07.270Z""
+            }";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var errors = schema.Validate(json);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
     }
 }
