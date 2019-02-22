@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -52,8 +53,15 @@ namespace NJsonSchema.Validation
         /// <returns>The list of validation errors.</returns>
         public ICollection<ValidationError> Validate(string jsonData, JsonSchema4 schema)
         {
-            var jsonObject = JToken.Parse(jsonData);
-            return Validate(jsonObject, schema);
+            using (var reader = new StringReader(jsonData))
+            using (var jsonReader = new JsonTextReader(reader)
+            {
+                DateParseHandling = DateParseHandling.None
+            })
+            {
+                var jsonObject = JToken.ReadFrom(jsonReader);
+                return Validate(jsonObject, schema);
+            }
         }
 
         /// <summary>Validates the given JSON token.</summary>
