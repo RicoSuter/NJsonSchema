@@ -149,6 +149,27 @@ namespace NJsonSchema.Tests.Generation
             public string Bar { get; set; }
         }
 
+        public interface IBase { string BaseProp { get; set; } }
+        public interface IMiddle:IBase { int MiddleProp { get; set; } }
+        public interface ITop:IMiddle { DateTime TopProp { get; set; } }
+
+        [Fact]
+        public async Task When_generating_type_with_inheritance_and_flattening_from_a_csharp_interface_then_schema_has_all_properties_of_inherited_classes()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<ITop>(new JsonSchemaGeneratorSettings
+            {
+                GenerateAbstractProperties = true,
+                FlattenInheritanceHierarchy = true
+            });
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(3, schema.Properties.Count);
+        }
+
         [KnownType(typeof(Dog))]
         [KnownType(typeof(Horse))]
         [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
