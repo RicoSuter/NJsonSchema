@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -15,7 +17,19 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-
+        private readonly List<string> _formatNotCompatibleWithString = new List<string>()
+        {
+            JsonFormatStrings.Date,
+            JsonFormatStrings.DateTime,
+            JsonFormatStrings.Time,
+            JsonFormatStrings.TimeSpan,
+            JsonFormatStrings.Uri,
+            JsonFormatStrings.Guid,
+            JsonFormatStrings.Uuid,
+            JsonFormatStrings.Base64,
+            JsonFormatStrings.Byte,
+        };
+        
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
         protected ValueGeneratorBase(CodeGeneratorSettingsBase settings)
@@ -41,7 +55,8 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
 
             if (schema.Type.HasFlag(JsonObjectType.String))
-                return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
+                return GetStringValue(schema.Type, schema.Default, schema.Format);
+                
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
                 return schema.Default.ToString().ToLowerInvariant();
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
@@ -49,6 +64,14 @@ namespace NJsonSchema.CodeGeneration
                 return GetNumericValue(schema.Type, schema.Default, schema.Format);
 
             return null;
+        }
+
+        private string GetStringValue(JsonObjectType type, object value, string format)
+        {
+            if(!_formatNotCompatibleWithString.Contains(format))
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(value.ToString()) + "\"";
+            else
+                return null;
         }
 
         /// <summary>Converts the default value to a number literal. </summary>
