@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public class ClassWithNullableArrayItems
         {
             [NotNull]
-            [JsonSchemaArrayNullableItems]
+            [ItemsCanBeNull]
             public List<int?> Items { get; set; }
         }
 

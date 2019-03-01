@@ -453,7 +453,7 @@ namespace NJsonSchema.Generation
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    itemType, null, parentAttributes?.OfType<JsonSchemaArrayNullableItemsAttribute>().Any() == true, schemaResolver, async (s, r) =>
+                    itemType, null, parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {

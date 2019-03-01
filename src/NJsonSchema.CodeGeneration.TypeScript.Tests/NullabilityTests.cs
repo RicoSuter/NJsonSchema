@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public class ClassWithNullableArrayItems
         {
             [NotNull]
-            [JsonSchemaArrayNullableItems]
+            [ItemsCanBeNull]
             public List<string> Items { get; set; }
         }
 

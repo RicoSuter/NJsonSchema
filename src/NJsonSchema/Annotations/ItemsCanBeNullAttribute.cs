@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="JsonSchemaDateAttribute.cs" company="NJsonSchema">
+// <copyright file="ItemsCanBeNullAttribute.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
@@ -12,7 +12,7 @@ namespace NJsonSchema.Annotations
 {
     /// <summary>Annotation to specify that array items are nullable.</summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.Field)]
-    public class JsonSchemaArrayNullableItemsAttribute : Attribute
+    public class ItemsCanBeNullAttribute : Attribute
     {
     }
 }
