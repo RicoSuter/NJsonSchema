@@ -177,12 +177,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         private string ResolveArrayOrTuple(JsonSchema4 schema)
         {
             if (schema.Item != null)
-                return string.Format(Settings.ArrayType + "<{0}>", Resolve(schema.Item, false, null));
+            {
+                return string.Format(Settings.ArrayType + "<{0}>", Resolve(schema.Item, schema.Item.IsNullable(Settings.SchemaType), null));
+            }
 
             if (schema.Items != null && schema.Items.Count > 0)
             {
                 var tupleTypes = schema.Items
-                    .Select(i => Resolve(i, false, null))
+                    .Select(i => Resolve(i, i.IsNullable(Settings.SchemaType), null))
                     .ToArray();
 
                 return string.Format("System.Tuple<" + string.Join(", ", tupleTypes) + ">");

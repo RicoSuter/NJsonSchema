@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NJsonSchema.Annotations;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Xunit;
@@ -31,6 +32,29 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Assert
             Assert.Contains("public Foo<string> ArrayProperty { get; set; } = new Bar<string>();", code);
+        }
+
+        public class ClassWithNullableArrayItems
+        {
+            [NotNull]
+            [JsonSchemaArrayNullableItems]
+            public List<int?> Items { get; set; }
+        }
+
+        [Fact]
+        public async Task When_array_item_is_nullable_then_generated_CSharp_is_correct()
+        {
+            // Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithNullableArrayItems>();
+            var json = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
+
+            // Act
+            var output = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
+            Assert.Contains("System.Collections.ObjectModel.ObservableCollection<int?> Items", output);
         }
     }
 }

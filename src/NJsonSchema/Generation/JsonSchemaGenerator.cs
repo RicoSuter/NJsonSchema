@@ -159,7 +159,7 @@ namespace NJsonSchema.Generation
             else if (typeDescription.IsEnum)
                 await GenerateEnum(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
             else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
-                await GenerateArray(schema, type, typeDescription, schemaResolver).ConfigureAwait(false);
+                await GenerateArray(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
             else
                 typeDescription.ApplyType(schema);
 
@@ -442,28 +442,36 @@ namespace NJsonSchema.Generation
         }
 
         private async Task GenerateArray<TSchemaType>(
-            TSchemaType schema, Type type, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
+            TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+#pragma warning disable 1998
+
             typeDescription.ApplyType(schema);
 
             var itemType = type.GetEnumerableItemType();
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-#pragma warning disable 1998
-                    itemType, null, false, schemaResolver, async (s, r) =>
-#pragma warning restore 1998
+                    itemType, null, parentAttributes?.OfType<JsonSchemaArrayNullableItemsAttribute>().Any() == true, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
+                        {
                             s.GenerateXmlObjectForItemType(itemType);
+                        }
                     }).ConfigureAwait(false);
 
                 if (Settings.GenerateXmlObjects)
+                {
                     schema.GenerateXmlObjectForArrayType(type);
+                }
             }
             else
+            {
                 schema.Item = JsonSchema4.CreateAnySchema();
+            }
+
+#pragma warning restore 1998
         }
 
         private async Task GenerateEnum<TSchemaType>(

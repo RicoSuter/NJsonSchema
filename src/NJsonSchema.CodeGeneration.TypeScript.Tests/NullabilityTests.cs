@@ -1,5 +1,7 @@
-﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
+﻿using NJsonSchema.Annotations;
+using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using NJsonSchema.Generation;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -158,6 +160,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.DoesNotContain(": new ChildDto();", output);
+        }
+
+        public class ClassWithNullableArrayItems
+        {
+            [NotNull]
+            [JsonSchemaArrayNullableItems]
+            public List<string> Items { get; set; }
+        }
+
+        [Fact]
+        public async Task When_array_item_is_nullable_then_generated_TypeScript_is_correct()
+        {
+            // Arrange
+            var schema = await JsonSchema4.FromTypeAsync<ClassWithNullableArrayItems>();
+            var json = schema.ToJson();
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeScriptVersion = 2.7m,
+                NullValue = TypeScriptNullValue.Null
+            });
+
+            // Act
+            var output = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
+            Assert.Contains(": (string | null)[]", output);
         }
     }
 }
