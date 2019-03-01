@@ -183,20 +183,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
+
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
-                return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
+                var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
+
+                return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
             {
                 var tupleTypes = schema.Items
-                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .Select(s => GetNullableItemType(s, Resolve(s, false, null)))
                     .ToArray();
 
                 return string.Format("[" + string.Join(", ", tupleTypes) + "]");
             }
 
             return "any[]";
+        }
+
+        private string GetNullableItemType(JsonSchema4 schema, string itemType)
+        {
+            if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
+            {
+                return string.Format("({0} | {1})", itemType, Settings.NullValue.ToString().ToLowerInvariant());
+            }
+
+            return itemType;
         }
     }
 }
