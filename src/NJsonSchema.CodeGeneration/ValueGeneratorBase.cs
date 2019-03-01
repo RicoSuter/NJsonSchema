@@ -17,7 +17,8 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _formatNotCompatibleWithString = new List<string>() {
+        private readonly List<string> _formatNotCompatibleWithString = new List<string>()
+        {
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
             JsonFormatStrings.Time,
@@ -67,10 +68,10 @@ namespace NJsonSchema.CodeGeneration
 
         private string GetStringValue(JsonObjectType type, object value, string format)
         {
-            if(_formatNotCompatibleWithString.Contains(format))
-                return null;
-            else
+            if(!_formatNotCompatibleWithString.Contains(format))
                 return "\"" + ConversionUtilities.ConvertToStringLiteral(value.ToString()) + "\"";
+            else
+                return null;
         }
 
         /// <summary>Converts the default value to a number literal. </summary>
