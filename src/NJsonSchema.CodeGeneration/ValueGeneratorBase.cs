@@ -25,9 +25,11 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.TimeSpan,
             JsonFormatStrings.Uri,
             JsonFormatStrings.Guid,
+            JsonFormatStrings.Byte,
+#pragma warning disable CS0618 // Type or member is obsolete
             JsonFormatStrings.Uuid,
             JsonFormatStrings.Base64,
-            JsonFormatStrings.Byte,
+#pragma warning restore CS0618 // Type or member is obsolete
         };
         
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
