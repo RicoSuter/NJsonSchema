@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _formatNotCompatibleWithString = new List<string>()
+        private readonly List<string> _unsupportedFormatStrings = new List<string>()
         {
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
@@ -54,26 +54,28 @@ namespace NJsonSchema.CodeGeneration
 
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
+            {
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+            }
 
-            if (schema.Type.HasFlag(JsonObjectType.String))
-                return GetStringValue(schema.Type, schema.Default, schema.Format);
-                
+            if (schema.Type.HasFlag(JsonObjectType.String) && _unsupportedFormatStrings.Contains(schema.Format) == false)
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+            // TODO: Add conversion for format string, e.g. in C# DateTime.Parse()
+
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
+            {
                 return schema.Default.ToString().ToLowerInvariant();
+            }
+
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                 schema.Type.HasFlag(JsonObjectType.Number))
+            {
                 return GetNumericValue(schema.Type, schema.Default, schema.Format);
+            }
 
             return null;
-        }
-
-        private string GetStringValue(JsonObjectType type, object value, string format)
-        {
-            if(!_formatNotCompatibleWithString.Contains(format))
-                return "\"" + ConversionUtilities.ConvertToStringLiteral(value.ToString()) + "\"";
-            else
-                return null;
         }
 
         /// <summary>Converts the default value to a number literal. </summary>
@@ -99,6 +101,14 @@ namespace NJsonSchema.CodeGeneration
                 : schema.Default.ToString();
 
             return typeName + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+        }
+
+        /// <summary>Gets the default value as string literal.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The string literal.</returns>
+        protected string GetDefaultAsStringLiteral(JsonSchema4 schema)
+        {
+            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
         }
 
         /// <summary>Converts a number to its string representation.</summary>

@@ -13,7 +13,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
     public class TypeScriptValueGenerator : ValueGeneratorBase
     {
-        private readonly List<string> _formatCompatibleWithString = new List<string>()
+        private readonly List<string> _supportedFormatStrings = new List<string>()
         {
             JsonFormatStrings.Uri,
             JsonFormatStrings.Guid,
@@ -42,9 +42,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                if (schema.Type.HasFlag(JsonObjectType.String) && _formatCompatibleWithString.Contains(schema.Format))
+                if (schema.Type.HasFlag(JsonObjectType.String) && _supportedFormatStrings.Contains(schema.Format))
                 {
-                    return "\"" + ConversionUtilities.ConvertToStringLiteral(value.ToString()) + "\"";
+                    return GetDefaultAsStringLiteral(schema);
                 }
 
                 var isOptional = (schema as JsonProperty)?.IsRequired == false;
