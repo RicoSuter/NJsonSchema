@@ -42,9 +42,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                if (schema.Type.HasFlag(JsonObjectType.String) && _supportedFormatStrings.Contains(schema.Format))
+                if (schema.Default != null && useSchemaDefault)
                 {
-                    return GetDefaultAsStringLiteral(schema);
+                    if (schema.Type.HasFlag(JsonObjectType.String) && 
+                        _supportedFormatStrings.Contains(schema.Format))
+                    {
+                        return GetDefaultAsStringLiteral(schema);
+                    }
                 }
 
                 var isOptional = (schema as JsonProperty)?.IsRequired == false;
