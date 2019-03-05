@@ -43,13 +43,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                if (schema?.Default != null && useSchemaDefault)
+                if (schema.Default != null && useSchemaDefault)
                 {
-                    var stringLiteral = GetDefaultAsStringLiteral(schema);
-
                     if (_typesWithStringConstructor.Contains(targetType))
                     {
-                        return $"new {targetType} ({stringLiteral})";
+                        var stringLiteral = GetDefaultAsStringLiteral(schema);
+                        return $"new {targetType}({stringLiteral})";
                     }
                 }
 
