@@ -602,7 +602,7 @@ namespace NJsonSchema.Generation
                         var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                         var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
                         if (Settings.GenerateAbstractProperties || propertyInfo == null ||
