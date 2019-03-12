@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30.1234567Z");
+            var token = new JValue("2015-01-25T15:43:30Z");
 
             //// Act
             var errors = schema.Validate(token);
@@ -84,6 +84,23 @@ namespace NJsonSchema.Tests.Validation
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("2015-01-25T15:43:30+10:00");
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.Empty(errors);
+        }
+        
+        [Fact]
+        public void When_format_date_time_with_iso8601_an_fractional_seconds_then_validation_succeeds()
+        {
+            //// Arrange
+            var schema = new JsonSchema4();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.DateTime;
+
+            var token = new JValue("2015-01-25T15:43:30.1234567Z");
 
             //// Act
             var errors = schema.Validate(token);
