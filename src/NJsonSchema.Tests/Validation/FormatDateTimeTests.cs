@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Validation
         }
         
         [Fact]
-        public void When_format_date_time_with_iso8601_an_fractional_seconds_then_validation_succeeds()
+        public void When_format_date_time_with_iso8601_and_fractional_seconds_then_validation_succeeds()
         {
             //// Arrange
             var schema = new JsonSchema4();
