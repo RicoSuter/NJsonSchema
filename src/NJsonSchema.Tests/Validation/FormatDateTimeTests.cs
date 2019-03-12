@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30Z");
+            var token = new JValue("2015-01-25T15:43:30.1234567Z");
 
             //// Act
             var errors = schema.Validate(token);
