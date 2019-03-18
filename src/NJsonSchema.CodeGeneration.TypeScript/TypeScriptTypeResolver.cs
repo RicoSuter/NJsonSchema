@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveString(schema.ActualTypeSchema, typeNameHint);
 
-            if (type.HasFlag(JsonObjectType.File))
+            if (schema.IsBinary)
                 return "any";
 
             // Type generating schemas

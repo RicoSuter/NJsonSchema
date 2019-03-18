@@ -95,7 +95,8 @@ namespace NJsonSchema.Generation
                 type == typeof(DateTimeOffset) ||
                 type.FullName == "NodaTime.OffsetDateTime" ||
                 type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime")
+                type.FullName == "NodaTime.ZonedDateTime" ||
+                type.FullName == "NodaTime.Instant")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(TimeSpan) ||
@@ -127,8 +128,17 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
             }
 
-            if (IsFileType(type, parentAttributes))
-                return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
+            if (IsBinary(type, parentAttributes))
+            {
+                if (settings.SchemaType == SchemaType.Swagger2)
+                {
+                    return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
+                }
+                else
+                {
+                    return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Binary);
+                }
+            }
 
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(type, parentAttributes) && contract is JsonDictionaryContract)
@@ -179,11 +189,11 @@ namespace NJsonSchema.Generation
             return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
-        /// <summary>Checks whether the given type is a file type.</summary>
+        /// <summary>Checks whether the given type is a file/binary type.</summary>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent attributes.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsBinary(Type type, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Move all file handling to NSwag. How?
 
