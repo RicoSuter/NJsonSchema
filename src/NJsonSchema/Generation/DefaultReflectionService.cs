@@ -95,7 +95,8 @@ namespace NJsonSchema.Generation
                 type == typeof(DateTimeOffset) ||
                 type.FullName == "NodaTime.OffsetDateTime" ||
                 type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime")
+                type.FullName == "NodaTime.ZonedDateTime" ||
+                type.FullName == "NodaTime.Instant")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(TimeSpan) ||
