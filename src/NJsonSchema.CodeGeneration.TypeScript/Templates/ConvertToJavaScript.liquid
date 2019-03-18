@@ -19,7 +19,7 @@ if ({{ Value }}) {
     {{ Variable }} = {};
     for (let key in {{ Value }}) {
         if ({{ Value }}.hasOwnProperty(key))
-{%     if IsDictionaryValueNewableObjec -%}
+{%     if IsDictionaryValueNewableObject -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].toJSON() : <any>{{ NullValue }};
 {%     elseif IsDictionaryValueDate -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {% if UseJsDate %}formatDate({{ Value }}[key]){% else %}{{ Value }}[key].format('YYYY-MM-DD'){% endif %} : <any>{{ NullValue }};
