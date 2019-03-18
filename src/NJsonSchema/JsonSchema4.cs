@@ -202,6 +202,17 @@ namespace NJsonSchema
             return schema;
         }
 
+        /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>
+        [JsonIgnore]
+        public bool IsBinary
+        {
+            get
+            {
+                return Type.HasFlag(JsonObjectType.File) ||
+                    (Type.HasFlag(JsonObjectType.String) && Format == JsonFormatStrings.Binary);
+            }
+        }
+
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]

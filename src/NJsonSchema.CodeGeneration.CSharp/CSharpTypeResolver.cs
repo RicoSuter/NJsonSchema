@@ -88,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
                 return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
 
-            if (type.HasFlag(JsonObjectType.File))
+            if (schema.IsBinary)
                 return "byte[]";
 
             // Type generating schemas
