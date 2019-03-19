@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             // Primitive schemas (no new type)
 
-            if (schema.ActualTypeSchema.IsAnyType)
+            if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
                 return "object";
 
             var type = schema.ActualTypeSchema.Type;

@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             // Primitive schemas (no new type)
 
-            if (schema.ActualTypeSchema.IsAnyType)
+            if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
                 return "any";
 
             var type = schema.ActualTypeSchema.Type;
