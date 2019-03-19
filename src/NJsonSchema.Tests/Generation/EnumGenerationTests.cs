@@ -155,5 +155,29 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Equal("C", schema.Properties["MyEnumeration"].Default);
         }
+
+        public class Party
+        {
+            public MyEnumeration? EnumValue { get; set; }
+
+            public bool ShouldSerializeEnumValue()
+            {
+                return EnumValue.HasValue;
+            }
+        }
+
+        [Fact]
+        public async Task When_enum_property_has_should_serialize_then_no_npe()
+        {
+            //// Arrange
+            var schema = await JsonSchema4.FromTypeAsync<Party>(new JsonSchemaGeneratorSettings());
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Properties.ContainsKey("EnumValue"));
+            Assert.NotNull(json);
+        }
     }
 }
