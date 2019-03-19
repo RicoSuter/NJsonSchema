@@ -605,7 +605,7 @@ namespace NJsonSchema.Generation
                         if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
                             (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
                         {
