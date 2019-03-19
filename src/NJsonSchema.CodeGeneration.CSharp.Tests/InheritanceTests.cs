@@ -88,5 +88,49 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("class ExceptionBase : Exception", code);
             Assert.Contains("class MyException : ExceptionBase", code);
         }
+
+        [Fact]
+        public async Task When_property_references_any_schema_with_inheritance_then_property_type_is_correct()
+        {
+            //// Arrange
+            var json = @"{
+    ""type"": ""object"",
+    ""properties"": {
+        ""dog"": {
+            ""$ref"": ""#/definitions/Dog""
+        }
+    },
+    ""definitions"": {
+        ""Pet"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""name"": {
+                    ""type"": ""string""
+                }
+            }
+        },
+        ""Dog"": {
+            ""title"": ""Dog"",
+            ""description"": """",
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/Pet""
+                },
+                {
+                    ""type"": ""object""
+                }
+            ]
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("public Dog Dog { get; set; }", code);
+        }
     }
 }
