@@ -19,6 +19,11 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The enumeration name.</returns>
         public string Generate(int index, string name, object value, JsonSchema4 schema)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                return "Empty";
+            }
+
             if (name.StartsWith("_-"))
             {
                 name = "__" + name.Substring(2);
@@ -27,6 +32,7 @@ namespace NJsonSchema.CodeGeneration
             return ConversionUtilities.ConvertToUpperCamelCase(name
                 .Replace(":", "-").Replace(@"""", @""), true)
                 .Replace(".", "_")
+                .Replace(",", "_")
                 .Replace("#", "_")
                 .Replace("-", "_")
                 .Replace("\\", "_");
