@@ -45,6 +45,12 @@
 {%   if property.RenderStringLengthAttribute -%}
     [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
 {%   endif -%}
+{%   if property.RenderMinLengthAttribute -%}
+    [System.ComponentModel.DataAnnotations.MinLength({{ property.MinLengthAttribute }})]
+{%   endif -%}
+{%   if property.RenderMaxLengthAttribute -%}
+    [System.ComponentModel.DataAnnotations.MaxLength({{ property.MaxLengthAttribute }})]
+{%   endif -%}
 {%   if property.RenderRegularExpressionAttribute -%}
     [System.ComponentModel.DataAnnotations.RegularExpression(@"{{ property.RegularExpressionValue }}")]
 {%   endif -%}
