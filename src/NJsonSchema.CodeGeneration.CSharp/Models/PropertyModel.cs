@@ -180,6 +180,36 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the maximum value of the string length attribute.</summary>
         public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
 
+        /// <summary>Gets a value indicating whether to render the min length attribute.</summary>
+        public bool RenderMinLengthAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                    return false;
+
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MinItems > 0;
+            }
+        }
+
+        /// <summary>Gets the value of the min length attribute.</summary>
+        public int MinLengthAttribute => _property.MinItems;
+
+        /// <summary>Gets a value indicating whether to render the max length attribute.</summary>
+        public bool RenderMaxLengthAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                    return false;
+
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MaxItems > 0;
+            }
+        }
+
+        /// <summary>Gets the value of the max length attribute.</summary>
+        public int MaxLengthAttribute => _property.MaxItems;
+
         /// <summary>Gets a value indicating whether to render a regular expression attribute.</summary>
         public bool RenderRegularExpressionAttribute
         {

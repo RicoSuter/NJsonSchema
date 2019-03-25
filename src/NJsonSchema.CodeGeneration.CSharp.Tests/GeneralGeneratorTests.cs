@@ -1161,6 +1161,38 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_definition_contains_both_min_items_and_max_items_a_min_length_and_max_length_attributes_are_added_only_for_type_array()
+        {
+            //// Arrange
+            var json =
+                @"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""array"",
+		  ""minItems"": ""10"",
+		  ""maxItems"": ""20""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("System.ComponentModel.DataAnnotations.MinLength(10)", code);
+            Assert.Contains("System.ComponentModel.DataAnnotations.MaxLength(20)", code);
+
+            AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_definition_contains_pattern_a_regular_expression_attribute_is_added()
         {
             //// Arrange
