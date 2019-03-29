@@ -490,10 +490,10 @@ namespace NJsonSchema.Generation
                 schema.Reference = schemaResolver.GetSchema(type, isIntegerEnumeration);
             else if (schema.GetType() == typeof(JsonSchema4))
             {
-                LoadEnumerations(type, schema, typeDescription);
-
                 typeDescription.ApplyType(schema);
                 schema.Description = await type.GetXmlSummaryAsync().ConfigureAwait(false);
+
+                LoadEnumerations(type, schema, typeDescription);
 
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
@@ -904,6 +904,12 @@ namespace NJsonSchema.Generation
                 }
 
                 schema.EnumerationNames.Add(enumName);
+            }
+
+            if (typeDescription.Type == JsonObjectType.Integer && Settings.GenerateEnumMappingDescription)
+            {
+                schema.Description = (schema.Description + "\n\n" +
+                    string.Join("\n", schema.Enumeration.Select((e, i) => e + " = " + schema.EnumerationNames[i]))).Trim();
             }
         }
 

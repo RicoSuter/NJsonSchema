@@ -65,6 +65,9 @@ namespace NJsonSchema.Generation
         /// defined on the object (otherwise allOf/oneOf with $ref is used, default: false).</summary>
         public bool AllowReferencesWithProperties { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to generate a description with number to enum name mappings (for integer enums only, default: false).</summary>
+        public bool GenerateEnumMappingDescription { get; set; }
+
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
 

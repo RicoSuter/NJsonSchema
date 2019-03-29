@@ -18,6 +18,9 @@ namespace NJsonSchema.Tests.Generation
             public Bar Bar2 { get; set; }
         }
 
+        /// <summary>
+        /// Foo bar.
+        /// </summary>
         public enum Bar
         {
             A = 0,
@@ -34,7 +37,8 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.Integer
+                DefaultEnumHandling = EnumHandling.Integer,
+                GenerateEnumMappingDescription = true
             });
             var data = schema.ToJson();
 
@@ -44,6 +48,9 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(0, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(0));
             Assert.Equal(5, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(1));
             Assert.Equal(6, schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(2));
+
+            Assert.Contains("Foo bar.", schema.Properties["Bar"].ActualTypeSchema.Description); // option is enabled
+            Assert.Contains("5 = B", schema.Properties["Bar"].ActualTypeSchema.Description); // option is enabled
         }
 
         [Fact]
@@ -63,6 +70,8 @@ namespace NJsonSchema.Tests.Generation
             Assert.NotNull(schema.Properties["Bar"].ActualTypeSchema);
             Assert.NotNull(schema.Properties["Bar2"].ActualTypeSchema); // must not be a reference but second enum declaration
             Assert.NotEqual(schema.Properties["Bar"].ActualTypeSchema, schema.Properties["Bar2"].ActualTypeSchema);
+
+            Assert.DoesNotContain("5 = B", schema.Properties["Bar"].ActualTypeSchema.Description); // option is not enabled
         }
 
         [Fact]
@@ -74,8 +83,10 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String
+                DefaultEnumHandling = EnumHandling.String,
+                GenerateEnumMappingDescription = true
             });
+            var data = schema.ToJson();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Bar"].ActualTypeSchema.Type);
@@ -83,6 +94,8 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal("A", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(0));
             Assert.Equal("B", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(1));
             Assert.Equal("C", schema.Properties["Bar"].ActualTypeSchema.Enumeration.ElementAt(2));
+
+            Assert.DoesNotContain("=", schema.Properties["Bar"].ActualTypeSchema.Description); // string enums do not have mapping in description
         }
 
         [Fact]
