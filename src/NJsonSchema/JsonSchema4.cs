@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -328,6 +329,10 @@ namespace NJsonSchema
         /// <summary>Gets or sets the title. </summary>
         [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         public string Title { get; set; }
+
+        /// <summary>Gets a value indicating whether the schema title can be used as type name.</summary>
+        [JsonIgnore]
+        public bool HasTypeNameTitle => !string.IsNullOrEmpty(Title) && Regex.IsMatch(Title, "^[a-zA-Z0-9_]*$");
 
         /// <summary>Gets or sets the description. </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration
         public CodeGeneratorSettingsBase()
         {
             GenerateDefaultValues = true;
-            ExcludedTypeNames = new string[] { };
+            ExcludedTypeNames = new string[0];
         }
 
         /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>

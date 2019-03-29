@@ -236,6 +236,48 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(10, property.MaxLength);
         }
 
+        public class MinLengthAttributeClass
+        {
+            [MinLength(1)]
+            public int[] Items { get; set; }
+
+            [MinLength(50)]
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_MinLengthAttribute_is_set_then_minItems_or_minLength_is_set()
+        {
+            var schema = await JsonSchema4.FromTypeAsync<MinLengthAttributeClass>();
+
+            var arrayProperty = schema.Properties["Items"];
+            Assert.Equal(1, arrayProperty.MinItems);
+
+            var stringProperty = schema.Properties["Foo"];
+            Assert.Equal(50, stringProperty.MinLength);
+        }
+
+        public class MaxLengthAttributeClass
+        {
+            [MaxLength(100)]
+            public int[] Items { get; set; }
+
+            [MaxLength(500)]
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_MaxLengthAttribute_is_set_then_maxItems_or_maxLength_is_set()
+        {
+            var schema = await JsonSchema4.FromTypeAsync<MaxLengthAttributeClass>();
+
+            var arrayProperty = schema.Properties["Items"];
+            Assert.Equal(100, arrayProperty.MaxItems);
+
+            var stringProperty = schema.Properties["Foo"];
+            Assert.Equal(500, stringProperty.MaxLength);
+        }
+
         public class StringRequiredClass
         {
             [Required(AllowEmptyStrings = false)]
