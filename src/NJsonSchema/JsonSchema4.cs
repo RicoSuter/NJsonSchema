@@ -331,6 +331,7 @@ namespace NJsonSchema
         public string Title { get; set; }
 
         /// <summary>Gets a value indicating whether the schema title can be used as type name.</summary>
+        [JsonIgnore]
         public bool HasTypeNameTitle => !string.IsNullOrEmpty(Title) && Regex.IsMatch(Title, "^[a-zA-Z0-9_]*$");
 
         /// <summary>Gets or sets the description. </summary>
