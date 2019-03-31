@@ -154,7 +154,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool ExportTypes => _settings.ExportTypes;
 
         /// <summary>Gets a string representation of the cloneable generic interface.</summary>
-        /// <remarks>We cannot use nameof(ICloneable), because on of the current target frameworks (netstandart 1.*) 
+        /// <remarks>We cannot use nameof(ICloneable), because one of the current target frameworks (netstandart 1.*) 
         /// doesn't contain this interface in the <see cref="System"/> namespace.
         /// </remarks>
         private string CloneableInterface => GenerateCloneMethod ? $"ICloneable<{ClassName}>" : default(string);
