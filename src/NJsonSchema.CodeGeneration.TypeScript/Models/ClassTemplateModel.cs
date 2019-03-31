@@ -6,8 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Collections.Generic;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
@@ -77,14 +78,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
+                var sb = new StringBuilder();
                 if (HasInheritance)
                 {
-                    return " extends " + BaseClass + (GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
-                        " implements I" + ClassName : string.Empty);
+                    sb.AppendFormat(" extends {0}", BaseClass);
                 }
 
-                return GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class ?
-                    " implements I" + ClassName : string.Empty;
+                var interfaces = new[] { ConstructorInterface, CloneableInterface }
+                    .Where(i => i != default(string))
+                    .ToArray();
+                
+                if (interfaces.Any())
+                {
+                    sb.AppendFormat(" implements {0}", string.Join(",", interfaces));
+                }
+
+                return sb.ToString();
             }
         }
 
@@ -144,6 +153,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;
 
+        /// <summary>Gets a string representation of the cloneable generic interface.</summary>
+        /// <remarks>We cannot use nameof(ICloneable), because on of the current target frameworks (netstandart 1.*) 
+        /// doesn't contain this interface in the <see cref="System"/> namespace.
+        /// </remarks>
+        private string CloneableInterface => GenerateCloneMethod ? $"ICloneable<{ClassName}>" : default(string);
+
+        /// <summary>Gets a string representation of the constructor interface.</summary>
+        private string ConstructorInterface =>
+            GenerateConstructorInterface && _settings.TypeStyle == TypeScriptTypeStyle.Class
+                ? "I" + ClassName
+                : default(string);
+        
         /// <summary>Gets the inherited schema.</summary>
         private JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
