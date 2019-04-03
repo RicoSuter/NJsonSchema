@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration
             }
 
             return ConversionUtilities.ConvertToUpperCamelCase(name
-                .Replace(":", "_").Replace(@"""", @""), true)
+                .Replace(":", "-").Replace(@"""", @""), true)
                 .Replace(".", "_")
                 .Replace(",", "_")
                 .Replace("#", "_")
