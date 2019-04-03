@@ -34,7 +34,11 @@ namespace NJsonSchema.CodeGeneration
                 .Replace(".", "_")
                 .Replace(",", "_")
                 .Replace("#", "_")
+                .Replace("&", "_")
                 .Replace("-", "_")
+                .Replace("'", "_")
+                .Replace("(", "_")
+                .Replace(")", "_")
                 .Replace("\\", "_");
         }
     }
