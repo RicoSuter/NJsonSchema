@@ -450,7 +450,8 @@ namespace NJsonSchema.Generation
 
             typeDescription.ApplyType(schema);
 
-            var itemType = type.GetEnumerableItemType();
+            var jsonSchemaAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaAttribute>();
+            var itemType = jsonSchemaAttribute.ArrayItem ?? type.GetEnumerableItemType();
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
