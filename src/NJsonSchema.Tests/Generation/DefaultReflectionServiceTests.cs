@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NJsonSchema.Generation;
 using Xunit;
+using Namotion.Reflection;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -44,7 +45,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
+                Assert.Equal(check.Value, svc.IsNullable(check.Key.GetTypeWithContext(), settings));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
+                Assert.Equal(check.Value, svc.IsNullable(check.Key.GetTypeWithContext(), settings));
         }
     }
 }

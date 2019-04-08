@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
-using NJsonSchema.Infrastructure;
 using System.Reflection;
 using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
@@ -25,16 +24,16 @@ namespace NJsonSchema.Generation
     public class DefaultReflectionService : IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="type">The type. </param>
-        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="typeWithContext">The type. </param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public virtual JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
         {
-            var isNullable = IsNullable(type, parentAttributes, settings);
+            var type = typeWithContext.OriginalType;
+            var isNullable = IsNullable(typeWithContext, settings);
 
-            var jsonSchemaTypeAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
-                                          parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
+            var jsonSchemaTypeAttribute = typeWithContext.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
+                                          typeWithContext.GetContextAttribute<JsonSchemaTypeAttribute>();
 
             if (jsonSchemaTypeAttribute != null)
             {
@@ -44,8 +43,8 @@ namespace NJsonSchema.Generation
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
             }
 
-            var jsonSchemaAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaAttribute>() ??
-                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
+            var jsonSchemaAttribute = typeWithContext.GetTypeAttribute<JsonSchemaAttribute>() ??
+                                      typeWithContext.GetContextAttribute<JsonSchemaAttribute>();
 
             if (jsonSchemaAttribute != null)
             {
@@ -56,7 +55,7 @@ namespace NJsonSchema.Generation
 
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(type, parentAttributes, settings);
+                var isStringEnum = IsStringEnum(typeWithContext, settings);
                 return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
@@ -129,7 +128,7 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
             }
 
-            if (IsBinary(type, parentAttributes))
+            if (IsBinary(typeWithContext))
             {
                 if (settings.SchemaType == SchemaType.Swagger2)
                 {
@@ -142,20 +141,15 @@ namespace NJsonSchema.Generation
             }
 
             var contract = settings.ResolveContract(type);
-            if (IsDictionaryType(type, parentAttributes) && contract is JsonDictionaryContract)
+            if (IsDictionaryType(typeWithContext) && contract is JsonDictionaryContract)
                 return JsonTypeDescription.CreateForDictionary(type, JsonObjectType.Object, isNullable);
 
-            if (IsArrayType(type, parentAttributes) && contract is JsonArrayContract)
+            if (IsArrayType(typeWithContext) && contract is JsonArrayContract)
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
             if (type.Name == "Nullable`1")
             {
-#if !LEGACY
-                // Remove JsonSchemaTypeAttributes to avoid stack overflows
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
-#else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
-#endif
+                var typeDescription = GetDescription(typeWithContext.OriginalGenericArguments[0], settings);
                 typeDescription.IsNullable = true;
                 return typeDescription;
             }
@@ -167,123 +161,117 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>Checks whether a type is nullable.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <param name="settings">The settings</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public virtual bool IsNullable(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
         {
-            var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
+            var jsonPropertyAttribute = typeWithContext.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
                 return false;
 
-            if (parentAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (typeWithContext.ContextAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
                 return false;
 
-            if (parentAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (typeWithContext.ContextAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
                 return true;
 
-            if (type.Name == "Nullable`1")
+            if (typeWithContext.OriginalType.Name == "Nullable`1")
                 return true;
 
-            var isValueType = type != typeof(string) && type.GetTypeInfo().IsValueType;
+            var isValueType = typeWithContext.Type != typeof(string) && typeWithContext.Type.GetTypeInfo().IsValueType;
             return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
         /// <summary>Checks whether the given type is a file/binary type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsBinary(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsBinary(TypeWithContext typeWithContext)
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = type.Name;
+            var parameterTypeName = typeWithContext.Type.Name;
             return parameterTypeName == "IFormFile" ||
-                   type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
-                   type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
+                   typeWithContext.Type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
+                   typeWithContext.Type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
 #if !LEGACY
-                   type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+                   typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
 #else
-                   type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
+                   typeWithContext.Type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
 #endif
         }
 
 #if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsArrayType(TypeWithContext typeWithContext)
         {
-            if (IsDictionaryType(type, parentAttributes))
+            if (IsDictionaryType(typeWithContext))
                 return false;
 
             // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1")
+            if (typeWithContext.Type.Name == "ObservableCollection`1")
                 return true;
 
-            return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
-                (type.GetTypeInfo().BaseType == null ||
-                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
+            return typeWithContext.Type.IsArray || (typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
+                (typeWithContext.Type.GetTypeInfo().BaseType == null ||
+                !typeWithContext.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsDictionaryType(TypeWithContext typeWithContext)
         {
-            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
+            if (typeWithContext.Type.Name == "IDictionary`2" || typeWithContext.Type.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
-                (type.GetTypeInfo().BaseType == null ||
-                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
+            return typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
+                (typeWithContext.Type.GetTypeInfo().BaseType == null ||
+                !typeWithContext.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
 #else
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsArrayType(TypeWithContext typeWithContext)
         {
-            if (IsDictionaryType(type, parentAttributes))
+            if (IsDictionaryType(typeWithContext))
                 return false;
 
             // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1")
+            if (typeWithContext.OriginalType.Name == "ObservableCollection`1")
                 return true;
 
-            return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
-                                    (type.GetTypeInfo().BaseType == null ||
-                                     !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
+            return typeWithContext.OriginalType.IsArray || (typeWithContext.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
+                                    (typeWithContext.OriginalType.GetTypeInfo().BaseType == null ||
+                                     !typeWithContext.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsDictionaryType(TypeWithContext typeWithContext)
         {
-            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
+            if (typeWithContext.OriginalType.Name == "IDictionary`2" || typeWithContext.OriginalType.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return type.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
-                   (type.GetTypeInfo().BaseType == null ||
-                    !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
+            return typeWithContext.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
+                   (typeWithContext.OriginalType.GetTypeInfo().BaseType == null ||
+                    !typeWithContext.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
         }
 
 #endif
 
-        private bool IsStringEnum(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        private bool IsStringEnum(TypeWithContext type, JsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
-            var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeWithContext().Attributes);
-            var hasStringEnumConverterOnProperty = parentAttributes != null && HasStringEnumConverter(parentAttributes);
+            var hasStringEnumConverterOnType = HasStringEnumConverter(type.TypeAttributes);
+            var hasStringEnumConverterOnProperty = HasStringEnumConverter(type.ContextAttributes);
 
             return hasGlobalStringEnumConverter || hasStringEnumConverterOnType || hasStringEnumConverterOnProperty;
         }

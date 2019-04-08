@@ -24,14 +24,14 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The name.</returns>
         public static string GetName(this MemberWithContext member)
         {
-            var jsonPropertyAttribute = member.GetCustomAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = member.GetTypeAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
                 return jsonPropertyAttribute.PropertyName;
 
-            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithContext().GetCustomAttribute<DataContractAttribute>();
+            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithContext().GetTypeAttribute<DataContractAttribute>();
             if (dataContractAttribute != null)
             {
-                var dataMemberAttribute = member.GetCustomAttribute<DataMemberAttribute>();
+                var dataMemberAttribute = member.GetTypeAttribute<DataMemberAttribute>();
                 if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
                     return dataMemberAttribute.Name;
             }

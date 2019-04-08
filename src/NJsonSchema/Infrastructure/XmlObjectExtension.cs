@@ -22,7 +22,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The type of the JSON Schema.</param>
         public static void GenerateXmlObjectForType(this JsonSchema4 schema, Type type)
         {
-            var attributes = type.GetTypeWithContext().Attributes;
+            var attributes = type.GetTypeWithContext().ContextAttributes;
             if (attributes.Any())
             {
                 dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
@@ -48,7 +48,7 @@ namespace NJsonSchema.Infrastructure
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
             // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
-            var attributes = type.GetTypeWithContext().Attributes;
+            var attributes = type.GetTypeWithContext().ContextAttributes;
             dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
 
             var itemName = GetXmlItemName(type);
@@ -110,7 +110,7 @@ namespace NJsonSchema.Infrastructure
             // We need to ensure that the property name is preserved
             if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
             {
-                var referencedTypeAttributes = type.GetTypeWithContext().Attributes;
+                var referencedTypeAttributes = type.GetTypeWithContext().ContextAttributes;
                 dynamic xmlReferenceTypeAttribute = referencedTypeAttributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
                 if (xmlReferenceTypeAttribute != null)
                 {

@@ -196,7 +196,7 @@ namespace NJsonSchema.Visitors
                     (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
                     ((PropertyInfo)p.MemberInfo).CanRead &&
                     ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0 &&
-                    p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                    p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var value = member.GetValue(obj);
                     if (value != null)

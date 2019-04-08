@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection;
 using System;
-using System.Collections.Generic;
 
 namespace NJsonSchema.Generation
 {
@@ -15,17 +15,15 @@ namespace NJsonSchema.Generation
     public interface IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="type">The type. </param>
-        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="typeWithContext">The type. </param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
+        JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Checks whether a type is nullable.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <param name="settings">The settings</param>
         /// <returns>true if the type can be null.</returns>
-        bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
+        bool IsNullable(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings);
     }
 }

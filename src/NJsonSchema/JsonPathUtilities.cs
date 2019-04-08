@@ -121,7 +121,7 @@ namespace NJsonSchema
 
                 foreach (var member in obj.GetType()
                     .GetPropertiesAndFieldsWithContext()
-                    .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
+                    .Where(p => p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var propertyName = member.GetName();
 
