@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Namotion.Reflection;
+using Newtonsoft.Json;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
@@ -240,8 +242,8 @@ namespace NJsonSchema
                         checkedObjects);
                 }
 
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType())
-                    .Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in obj.GetType().GetPropertiesAndFieldsWithContext()
+                    .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)

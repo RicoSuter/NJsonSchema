@@ -305,7 +305,8 @@ namespace NJsonSchema.Generation
         {
             try
             {
-                var propertyName = memberInfo != null ? ReflectionCache.GetPropertiesAndFields(memberInfo.DeclaringType)
+                var propertyName = memberInfo != null ? memberInfo
+                    .DeclaringType.GetPropertiesAndFieldsWithContext()
                     .First(p => p.MemberInfo.Name == memberInfo.Name).GetName() : property.PropertyName;
 
                 var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
@@ -451,7 +452,7 @@ namespace NJsonSchema.Generation
             typeDescription.ApplyType(schema);
 
             var jsonSchemaAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaAttribute>();
-            var itemType = jsonSchemaAttribute.ArrayItem ?? type.GetEnumerableItemType();
+            var itemType = jsonSchemaAttribute?.ArrayItem ?? type.GetEnumerableItemType();
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(

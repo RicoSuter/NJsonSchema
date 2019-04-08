@@ -10,6 +10,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Namotion.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 
@@ -117,8 +119,9 @@ namespace NJsonSchema
                     .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false).ToArray() ??
                     new Newtonsoft.Json.Serialization.JsonProperty[0];
 
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType())
-                    .Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                foreach (var member in obj.GetType()
+                    .GetPropertiesAndFieldsWithContext()
+                    .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var propertyName = member.GetName();
 

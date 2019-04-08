@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Namotion.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
@@ -189,13 +190,13 @@ namespace NJsonSchema.Visitors
             }
             else
             {
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
+                foreach (var member in obj.GetType().GetPropertiesAndFieldsWithContext().Where(p =>
                     p.MemberInfo is PropertyInfo &&
                     (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
                     (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
-                    p.CanRead &&
-                    p.IsIndexer == false &&
-                    p.CustomAttributes.JsonIgnoreAttribute == null))
+                    ((PropertyInfo)p.MemberInfo).CanRead &&
+                    ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0 &&
+                    p.GetCustomAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var value = member.GetValue(obj);
                     if (value != null)

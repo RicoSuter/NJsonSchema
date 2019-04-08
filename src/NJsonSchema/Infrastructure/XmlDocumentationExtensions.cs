@@ -7,9 +7,11 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace NJsonSchema.Infrastructure
@@ -18,6 +20,25 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
+        /// <summary>Gets the name of the property for JSON serialization.</summary>
+        /// <returns>The name.</returns>
+        public static string GetName(this MemberWithContext member)
+        {
+            var jsonPropertyAttribute = member.GetCustomAttribute<JsonPropertyAttribute>();
+            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
+                return jsonPropertyAttribute.PropertyName;
+
+            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithContext().GetCustomAttribute<DataContractAttribute>();
+            if (dataContractAttribute != null)
+            {
+                var dataMemberAttribute = member.GetCustomAttribute<DataMemberAttribute>();
+                if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
+                    return dataMemberAttribute.Name;
+            }
+
+            return member.MemberInfo.Name;
+        }
+
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="memberInfo">The member info</param>
         /// <param name="attributes">The attributes.</param>
