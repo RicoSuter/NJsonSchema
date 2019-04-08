@@ -8,6 +8,7 @@
 
 using System.Collections;
 using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Infrastructure

@@ -18,6 +18,7 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 using System.Linq;
+using Namotion.Reflection;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace NJsonSchema.Generation

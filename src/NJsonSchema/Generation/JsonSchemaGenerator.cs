@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -115,7 +116,7 @@ namespace NJsonSchema.Generation
         public virtual async Task GenerateAsync<TSchemaType>(Type type, IEnumerable<Attribute> parentAttributes, TSchemaType schema, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
+            var jsonSchemaTypeAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
                                           parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
 
             if (jsonSchemaTypeAttribute != null)
@@ -348,7 +349,7 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeWithContext().Attributes).ConfigureAwait(false);
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
@@ -384,7 +385,7 @@ namespace NJsonSchema.Generation
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
 
-            var operationProcessorAttribute = type.GetTypeInfo().GetCustomAttributes()
+            var operationProcessorAttribute = type.GetTypeWithContext().Attributes
                 .Where(a => a.GetType().IsAssignableTo(nameof(JsonSchemaProcessorAttribute), TypeNameStyle.Name));
 
             foreach (dynamic attribute in operationProcessorAttribute)
@@ -400,7 +401,7 @@ namespace NJsonSchema.Generation
             if (parentAttributes == null)
             {
                 // class
-                var extensionDataAttributes = type.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
+                var extensionDataAttributes = type.GetTypeWithContext().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
                     schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
@@ -873,7 +874,7 @@ namespace NJsonSchema.Generation
             schema.Type = typeDescription.Type;
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
-            schema.IsFlagEnumerable = type.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() != null;
+            schema.IsFlagEnumerable = type.GetTypeWithContext().GetCustomAttribute<FlagsAttribute>() != null;
 
             var underlyingType = Enum.GetUnderlyingType(type);
 
@@ -1009,7 +1010,7 @@ namespace NJsonSchema.Generation
 
         private static bool HasDataContractAttribute(Type parentType)
         {
-            return parentType.GetTypeInfo().GetCustomAttributes()
+            return parentType.GetTypeWithContext().Attributes
                 .TryGetIfAssignableTo("DataContractAttribute", TypeNameStyle.Name) != null;
         }
 

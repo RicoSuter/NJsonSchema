@@ -17,6 +17,7 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
 using Newtonsoft.Json.Converters;
+using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
 {
@@ -32,7 +33,7 @@ namespace NJsonSchema.Generation
         {
             var isNullable = IsNullable(type, parentAttributes, settings);
 
-            var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
+            var jsonSchemaTypeAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
                                           parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
 
             if (jsonSchemaTypeAttribute != null)
@@ -43,7 +44,7 @@ namespace NJsonSchema.Generation
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
             }
 
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
+            var jsonSchemaAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaAttribute>() ??
                                       parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
 
             if (jsonSchemaAttribute != null)
@@ -281,7 +282,7 @@ namespace NJsonSchema.Generation
         private bool IsStringEnum(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
-            var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes());
+            var hasStringEnumConverterOnType = HasStringEnumConverter(type.GetTypeWithContext().Attributes);
             var hasStringEnumConverterOnProperty = parentAttributes != null && HasStringEnumConverter(parentAttributes);
 
             return hasGlobalStringEnumConverter || hasStringEnumConverterOnType || hasStringEnumConverterOnProperty;

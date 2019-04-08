@@ -1,5 +1,5 @@
-﻿using NJsonSchema.Infrastructure;
-using Xunit;
+﻿using Xunit;
+using Namotion.Reflection;
 
 namespace NJsonSchema.Tests.Generation
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using NJsonSchema.Infrastructure;
+using Namotion.Reflection;
 using Xunit;
 
 namespace NJsonSchema.Tests.Infrastructure

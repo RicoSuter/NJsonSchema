@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The type of the JSON Schema.</param>
         public static void GenerateXmlObjectForType(this JsonSchema4 schema, Type type)
         {
-            var attributes = type.GetTypeInfo().GetCustomAttributes().ToList();
+            var attributes = type.GetTypeWithContext().Attributes;
             if (attributes.Any())
             {
                 dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
@@ -47,7 +48,7 @@ namespace NJsonSchema.Infrastructure
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
             // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
-            var attributes = type.GetTypeInfo().GetCustomAttributes().ToList();
+            var attributes = type.GetTypeWithContext().Attributes;
             dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
 
             var itemName = GetXmlItemName(type);
@@ -109,7 +110,7 @@ namespace NJsonSchema.Infrastructure
             // We need to ensure that the property name is preserved
             if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
             {
-                var referencedTypeAttributes = type.GetTypeInfo().GetCustomAttributes();
+                var referencedTypeAttributes = type.GetTypeWithContext().Attributes;
                 dynamic xmlReferenceTypeAttribute = referencedTypeAttributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
                 if (xmlReferenceTypeAttribute != null)
                 {

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Infrastructure
@@ -78,7 +79,7 @@ namespace NJsonSchema.Infrastructure
             {
                 if (!DataContractAttributeCacheByType.ContainsKey(type))
                 {
-                    var attribute = type.GetTypeInfo().GetCustomAttributes().SingleOrDefault(a => a.GetType().Name == "DataContractAttribute");
+                    var attribute = type.GetTypeWithContext().Attributes.SingleOrDefault(a => a.GetType().Name == "DataContractAttribute");
                     DataContractAttributeCacheByType[type] = attribute;
                 }
 

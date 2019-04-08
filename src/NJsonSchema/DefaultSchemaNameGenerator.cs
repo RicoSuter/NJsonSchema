@@ -7,9 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Reflection;
+using Namotion.Reflection;
 using NJsonSchema.Annotations;
-using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -21,7 +20,7 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(Type type)
         {
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = type.GetTypeWithContext().GetCustomAttribute<JsonSchemaAttribute>();
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
                 return jsonSchemaAttribute.Name;
 
@@ -29,7 +28,7 @@ namespace NJsonSchema
             //if (!string.IsNullOrEmpty(jsonObjectAttribute.Title) && Regex.IsMatch(jsonObjectAttribute.Title, "^[a-zA-Z0-9_]*$"))
             //    return jsonObjectAttribute.Title;
 
-            return ReflectionExtensions.GetSafeTypeName(type);
+            return type.GetSafeTypeName();
         }
     }
 }
