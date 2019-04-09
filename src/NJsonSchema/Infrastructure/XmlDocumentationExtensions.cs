@@ -28,7 +28,7 @@ namespace NJsonSchema.Infrastructure
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
                 return jsonPropertyAttribute.PropertyName;
 
-            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithContext().GetTypeAttribute<DataContractAttribute>();
+            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithoutContext().GetTypeAttribute<DataContractAttribute>();
             if (dataContractAttribute != null)
             {
                 var dataMemberAttribute = member.GetTypeAttribute<DataMemberAttribute>();

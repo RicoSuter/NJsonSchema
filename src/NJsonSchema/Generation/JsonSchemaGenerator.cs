@@ -55,7 +55,7 @@ namespace NJsonSchema.Generation
         {
             var schema = new JsonSchema4();
             var schemaResolver = new JsonSchemaResolver(schema, Settings);
-            await GenerateAsync(type.GetTypeWithContext(), schema, schemaResolver).ConfigureAwait(false);
+            await GenerateAsync(TypeWithContext.ForType(type), schema, schemaResolver).ConfigureAwait(false);
             return schema;
         }
 
@@ -77,7 +77,7 @@ namespace NJsonSchema.Generation
         public Task<TSchemaType> GenerateAsync<TSchemaType>(Type type, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
-            return GenerateAsync<TSchemaType>(type.GetTypeWithContext(), schemaResolver);
+            return GenerateAsync<TSchemaType>(TypeWithContext.ForType(type), schemaResolver);
         }
 
         /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
@@ -343,7 +343,7 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeWithContext().ContextAttributes).ConfigureAwait(false);
+            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeWithoutContext().TypeAttributes).ConfigureAwait(false);
             schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
@@ -367,7 +367,8 @@ namespace NJsonSchema.Generation
                 var genericTypeArguments = extensionDataProperty.PropertyType.GetGenericTypeArguments();
                 var extensionDataPropertyType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
 
-                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(extensionDataPropertyType.GetTypeWithContext(), schemaResolver).ConfigureAwait(false);
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                    TypeWithContext.ForType(extensionDataPropertyType), schemaResolver).ConfigureAwait(false);
             }
             else
                 schema.AllowAdditionalProperties = false;
@@ -379,7 +380,7 @@ namespace NJsonSchema.Generation
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
 
-            var operationProcessorAttribute = type.GetTypeWithContext().ContextAttributes
+            var operationProcessorAttribute = TypeWithContext.ForType(type).ContextAttributes
                 .Where(a => a.GetType().IsAssignableTo(nameof(JsonSchemaProcessorAttribute), TypeNameStyle.Name));
 
             foreach (dynamic attribute in operationProcessorAttribute)
@@ -447,7 +448,7 @@ namespace NJsonSchema.Generation
             if (itemType != null)
             {
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    itemType.GetTypeWithContext(), typeWithContext.GetContextAttributes<ItemsCanBeNullAttribute>().Any() == true, schemaResolver, async (s, r) =>
+                    TypeWithContext.ForType(itemType), typeWithContext.GetContextAttributes<ItemsCanBeNullAttribute>().Any() == true, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
@@ -500,7 +501,7 @@ namespace NJsonSchema.Generation
         {
             var genericTypeArguments = typeWithContext.GenericArguments;
 
-            var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string).GetTypeWithContext();
+            var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : TypeWithContext.ForType(typeof(string));
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
                 var keySchema = await GenerateAsync(keyType.OriginalType, schemaResolver).ConfigureAwait(false);
@@ -519,7 +520,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).GetTypeWithContext();
+            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : TypeWithContext.ForType(typeof(object));
             if (valueType.OriginalType == typeof(object))
             {
                 schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
@@ -688,7 +689,7 @@ namespace NJsonSchema.Generation
             foreach (var jsonConverterAttribute in attributes
                 .Where(a => a.GetType().IsAssignableTo("JsonInheritanceAttribute", TypeNameStyle.Name)))
             {
-                var knownType = ReflectionExtensions.TryGetPropertyValue<Type>(
+                var knownType = ObjectExtensions.TryGetPropertyValue<Type>(
                     jsonConverterAttribute, "Type", null);
 
                 if (knownType != null)
@@ -700,7 +701,7 @@ namespace NJsonSchema.Generation
 
         private async Task AddKnownTypeAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            var typeDescription = Settings.ReflectionService.GetDescription(type.GetTypeWithContext(), Settings);
+            var typeDescription = Settings.ReflectionService.GetDescription(TypeWithContext.ForType(type), Settings);
             var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
             if (!schemaResolver.HasSchema(type, isIntegerEnum))
@@ -718,7 +719,7 @@ namespace NJsonSchema.Generation
                 {
                     if (Settings.GetActualFlattenInheritanceHierarchy(type))
                     {
-                        var typeDescription = Settings.ReflectionService.GetDescription(baseType.GetTypeWithContext(), Settings);
+                        var typeDescription = Settings.ReflectionService.GetDescription(TypeWithContext.ForType(baseType), Settings);
                         if (!typeDescription.IsDictionary && !type.IsArray)
                         {
                             await GeneratePropertiesAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
@@ -734,7 +735,7 @@ namespace NJsonSchema.Generation
                         await GeneratePropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
                         await ApplyAdditionalPropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
 
-                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType.GetTypeWithContext(), Settings);
+                        var baseTypeInfo = Settings.ReflectionService.GetDescription(TypeWithContext.ForType(baseType), Settings);
                         var requiresSchemaReference = baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers);
 
                         if (actualSchema.Properties.Any() || requiresSchemaReference)
@@ -767,7 +768,7 @@ namespace NJsonSchema.Generation
                         else
                         {
                             // Array and dictionary inheritance are not expressed with allOf but inline
-                            await GenerateAsync(baseType.GetTypeWithContext(), schema, schemaResolver).ConfigureAwait(false);
+                            await GenerateAsync(TypeWithContext.ForType(baseType), schema, schemaResolver).ConfigureAwait(false);
                             return schema;
                         }
                     }
@@ -782,7 +783,7 @@ namespace NJsonSchema.Generation
                 foreach (var i in type.GetTypeInfo().GetInterfaces())
 #endif
                 {
-                    var typeDescription = Settings.ReflectionService.GetDescription(i.GetTypeWithContext(), Settings);
+                    var typeDescription = Settings.ReflectionService.GetDescription(TypeWithContext.ForType(i), Settings);
                     if (!typeDescription.IsDictionary && !type.IsArray &&
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
@@ -855,7 +856,7 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
         {
-            if (ReflectionExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
+            if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
                 return jsonInheritanceConverter.DiscriminatorName;
 
             return JsonInheritanceConverter.DefaultDiscriminatorName;
@@ -866,7 +867,7 @@ namespace NJsonSchema.Generation
             schema.Type = typeDescription.Type;
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
-            schema.IsFlagEnumerable = type.GetTypeWithContext().GetTypeAttribute<FlagsAttribute>() != null;
+            schema.IsFlagEnumerable = type.GetTypeWithoutContext().GetTypeAttribute<FlagsAttribute>() != null;
 
             var underlyingType = Enum.GetUnderlyingType(type);
 
@@ -1005,7 +1006,7 @@ namespace NJsonSchema.Generation
 
         private static bool HasDataContractAttribute(Type parentType)
         {
-            return parentType.GetTypeWithContext().ContextAttributes
+            return parentType.GetTypeWithoutContext().TypeAttributes
                 .TryGetIfAssignableTo("DataContractAttribute", TypeNameStyle.Name) != null;
         }
 

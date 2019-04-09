@@ -20,7 +20,7 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(Type type)
         {
-            var jsonSchemaAttribute = type.GetTypeWithContext().GetTypeAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = type.GetTypeWithoutContext().GetTypeAttribute<JsonSchemaAttribute>();
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
                 return jsonSchemaAttribute.Name;
 
