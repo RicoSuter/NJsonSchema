@@ -127,41 +127,49 @@ namespace NJsonSchema.CodeGeneration
 
             public string Render()
             {
-                var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
-                hash[TemplateTag.LanguageKey] = _language;
-                hash[TemplateTag.TemplateKey] = _template;
-                hash[TemplateTag.SettingsKey] = _settings;
-                hash["ToolchainVersion"] = _toolchainVersion;
-
-                if (!Templates.ContainsKey(_data))
+                try
                 {
-                    var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
-                            "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
-                        RegexOptions.Singleline).Trim();
+                    var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
+                    hash[TemplateTag.LanguageKey] = _language;
+                    hash[TemplateTag.TemplateKey] = _template;
+                    hash[TemplateTag.SettingsKey] = _settings;
+                    hash["ToolchainVersion"] = _toolchainVersion;
 
-                    data = Regex.Replace("\n" + data, "\\{% template (.*?) %}", m =>
-                            "{% " + TemplateTagName + " " + m.Groups[1].Value + " -1 %}",
-                        RegexOptions.Singleline).Trim();
+                    if (!Templates.ContainsKey(_data))
+                    {
+                        var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
+                                "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                            RegexOptions.Singleline).Trim();
 
-                    data = data.Replace("{% template %}", "{% " + TemplateTagName + " %}");
+                        data = Regex.Replace("\n" + data, "\\{% template (.*?) %}", m =>
+                                "{% " + TemplateTagName + " " + m.Groups[1].Value + " -1 %}",
+                            RegexOptions.Singleline).Trim();
 
-                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
-                        m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
-                        RegexOptions.Singleline);
+                        data = data.Replace("{% template %}", "{% " + TemplateTagName + " %}");
 
-                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
-                        m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
-                        RegexOptions.Singleline);
+                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
+                            RegexOptions.Singleline);
 
-                    Templates[_data] = Template.Parse(data);
+                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
+                            RegexOptions.Singleline);
+
+                        Templates[_data] = Template.Parse(data);
+                    }
+
+                    var template = Templates[_data];
+                    return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
+                    {
+                        LocalVariables = hash,
+                        Filters = new[] { typeof(LiquidFilters) },
+                        ErrorsOutputMode = ErrorsOutputMode.Rethrow
+                    }).Replace("\r", "").Trim();
                 }
-
-                var template = Templates[_data];
-                return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
+                catch (Exception exception)
                 {
-                    LocalVariables = hash,
-                    Filters = new[] { typeof(LiquidFilters) }
-                }).Replace("\r", "").Trim();
+                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}.", exception);
+                }
             }
         }
 
