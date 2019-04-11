@@ -177,7 +177,7 @@ namespace NJsonSchema.CodeGeneration
         {
             public static string Csharpdocs(string input, int tabCount)
             {
-                return ConversionUtilities.ConvertCSharpDocBreaks(input, tabCount);
+                return ConversionUtilities.ConvertCSharpDocs(input, tabCount);
             }
 
             public static string Tab(Context context, string input, int tabCount)
