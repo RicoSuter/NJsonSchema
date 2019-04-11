@@ -12,22 +12,22 @@ namespace NJsonSchema.Annotations
 {
     /// <summary>Annotation to merge all inherited properties into this class/schema.</summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class JsonSchemaFlattenAttribute : Attribute
+    public class JsonSchemaAbstractAttribute : Attribute
     {
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaFlattenAttribute"/> class.</summary>
-        public JsonSchemaFlattenAttribute()
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaAbstractAttribute"/> class.</summary>
+        public JsonSchemaAbstractAttribute()
         {
-            Flatten = true;
+            IsAbstract = true;
         }
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAbstractAttribute"/> class.</summary>
-        /// <param name="flatten">The explicit flag to override the global setting (i.e. disable the generation for a type).</param>
-        public JsonSchemaFlattenAttribute(bool flatten)
+        /// <param name="isAbstract">The explicit flag to override the global setting (i.e. disable the generation for a type).</param>
+        public JsonSchemaAbstractAttribute(bool isAbstract)
         {
-            Flatten = flatten;
+            IsAbstract = isAbstract;
         }
 
-        /// <summary>Gets or sets a value indicating whether to flatten the given type.</summary>
-        public bool Flatten { get; }
+        /// <summary>Gets or sets a value indicating whether to set the x-abstract property for given type.</summary>
+        public bool IsAbstract { get; }
     }
 }
