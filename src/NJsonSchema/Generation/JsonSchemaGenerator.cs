@@ -349,10 +349,13 @@ namespace NJsonSchema.Generation
             }
 
             schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+
+            if (Settings.GetActualGenerateAbstractSchema(type))
+            {
+                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+            }
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
-
             await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateXmlObjects)

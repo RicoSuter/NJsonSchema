@@ -30,6 +30,7 @@ namespace NJsonSchema.Generation
         {
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
             SchemaType = SchemaType.JsonSchema;
+            GenerateAbstractSchemas = true;
 
             // Obsolete, use SerializerSettings instead
             DefaultEnumHandling = EnumHandling.Integer;
@@ -51,6 +52,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate the x-abstract flag on schemas (default: true).</summary>
+        public bool GenerateAbstractSchemas { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to generate schemas for types in <see cref="KnownTypeAttribute"/> attributes (default: true).</summary>
         public bool GenerateKnownTypes { get; set; } = true;
@@ -193,13 +197,26 @@ namespace NJsonSchema.Generation
                 null;
         }
 
+        /// <summary>Gets the actual computed <see cref="GenerateAbstractSchemas"/> setting based on the global setting and the JsonSchemaAbstractAttribute attribute.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The result.</returns>
+        public bool GetActualGenerateAbstractSchema(Type type)
+        {
+            var attribute = type.GetTypeInfo().GetCustomAttributes(false)
+                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
+
+            return (GenerateAbstractSchemas && attribute == null) || attribute?.TryGetPropertyValue("IsAbstract", true) == true;
+        }
+
         /// <summary>Gets the actual computed <see cref="FlattenInheritanceHierarchy"/> setting based on the global setting and the JsonSchemaFlattenAttribute attribute.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The result.</returns>
         public bool GetActualFlattenInheritanceHierarchy(Type type)
         {
-            return FlattenInheritanceHierarchy || type.GetTypeInfo().GetCustomAttributes(false)
-                .Any(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+            var attribute = type.GetTypeInfo().GetCustomAttributes(false)
+                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+
+            return (FlattenInheritanceHierarchy && attribute == null) || attribute?.TryGetPropertyValue("Flatten", true) == true;
         }
     }
 }
