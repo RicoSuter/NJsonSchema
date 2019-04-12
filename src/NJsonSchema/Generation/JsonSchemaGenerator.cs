@@ -343,11 +343,14 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeWithoutContext().TypeAttributes).ConfigureAwait(false);
-            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+            schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
+
+            if (Settings.GetActualGenerateAbstractSchema(type))
+            {
+                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+            }
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
-
             await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateXmlObjects)
