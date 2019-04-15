@@ -178,7 +178,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             if (schema.Item != null)
             {
-                return string.Format(Settings.ArrayType + "<{0}>", Resolve(schema.Item, schema.Item.IsNullable(Settings.SchemaType), null));
+                var itemTypeNameHint = (schema as JsonProperty)?.Name;
+                var itemType = Resolve(schema.Item, schema.Item.IsNullable(Settings.SchemaType), itemTypeNameHint);
+                return string.Format(Settings.ArrayType + "<{0}>", itemType);
             }
 
             if (schema.Items != null && schema.Items.Count > 0)

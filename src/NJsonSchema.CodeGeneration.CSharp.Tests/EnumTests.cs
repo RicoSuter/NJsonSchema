@@ -259,5 +259,55 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("private MyClassStatus? _status;", code);
         }
+
+        [Fact]
+        public async Task When_array_item_enum_is_not_referenced_then_type_name_hint_is_property_name()
+        {
+            /// Arrange
+            var json = @"
+{
+    ""properties"": {
+        ""foo"": {
+            ""$ref"": ""#/definitions/NewOrderModel""
+        }
+    },
+    ""definitions"": {
+         ""NewOrderModel"": {
+            ""type"": ""object"",
+            ""properties"": {
+            ""id"": {
+                ""format"": ""int32"",
+                ""type"": ""integer""
+            },
+            ""name"": {
+                ""type"": ""string""
+            },
+            ""status"": {
+                ""uniqueItems"": false,
+                ""type"": ""array"",
+                ""items"": {
+                    ""enum"": [
+                        ""Finished"",
+                        ""InProgress""
+                    ],
+                    ""type"": ""string""
+                    }
+                }
+            }
+        }
+    }
+}";
+            /// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.DoesNotContain("public enum Anonymous", code);
+            Assert.Contains("public enum Status", code);
+        }
     }
 }
