@@ -138,7 +138,7 @@ namespace NJsonSchema.Generation
                 if (typeDescription.IsDictionary)
                 {
                     typeDescription.ApplyType(schema);
-                    await GenerateDictionaryAsync(schema, type, schemaResolver).ConfigureAwait(false);
+                    await GenerateDictionaryAsync(schema, type, parentAttributes, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -455,8 +455,11 @@ namespace NJsonSchema.Generation
             var itemType = type.GetEnumerableItemType();
             if (itemType != null)
             {
+                var itemIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
+                    itemType.Name == "Nullable`1";
+
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    itemType, null, parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true, schemaResolver, async (s, r) =>
+                    itemType, null, itemIsNullable, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
@@ -505,7 +508,7 @@ namespace NJsonSchema.Generation
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        private async Task GenerateDictionaryAsync<TSchemaType>(TSchemaType schema, Type type, JsonSchemaResolver schemaResolver)
+        private async Task GenerateDictionaryAsync<TSchemaType>(TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var genericTypeArguments = type.GetGenericTypeArguments();
@@ -513,20 +516,8 @@ namespace NJsonSchema.Generation
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string);
             if (keyType.GetTypeInfo().IsEnum)
             {
-                var keySchema = await GenerateAsync(keyType, schemaResolver).ConfigureAwait(false);
-
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, null, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.DictionaryKey = new JsonSchema4
-                    {
-                        Reference = keySchema
-                    };
-                }
-                else
-                {
-                    schema.DictionaryKey = keySchema;
-                }
+                schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
+                    keyType, null, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
@@ -536,20 +527,18 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var additionalPropertiesSchema = await GenerateAsync(valueType, schemaResolver).ConfigureAwait(false);
+                var valueIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
+                    valueType.Name == "Nullable`1";
 
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(valueType, null, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.AdditionalPropertiesSchema = new JsonSchema4
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                    valueType, null, valueIsNullable, schemaResolver/*, async (s, r) =>
                     {
-                        Reference = additionalPropertiesSchema
-                    };
-                }
-                else
-                {
-                    schema.AdditionalPropertiesSchema = additionalPropertiesSchema;
-                }
+                        // TODO: Generate xml for key
+                        if (Settings.GenerateXmlObjects)
+                        {
+                            s.GenerateXmlObjectForItemType(keyType);
+                        }
+                    }*/).ConfigureAwait(false);
             }
 
             schema.AllowAdditionalProperties = true;
