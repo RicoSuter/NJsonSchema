@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NJsonSchema.Generation;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -49,6 +50,21 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
+        }
+
+        [Fact]
+        public async Task When_value_type_is_nullable_then_json_schema_is_nullable_Swagger2()
+        {
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.Swagger2
+            });
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Properties["Mapping3"].IsDictionary);
+            Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.Swagger2));
         }
     }
 }

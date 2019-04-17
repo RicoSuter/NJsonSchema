@@ -238,9 +238,11 @@ namespace NJsonSchema.Generation
                                 schema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                             }
                             else
+                            {
                                 schema.Type = schema.Type | JsonObjectType.Null;
+                            }
                         }
-                        else if (Settings.SchemaType == SchemaType.OpenApi3)
+                        else
                         {
                             schema.IsNullableRaw = isNullable;
                         }
@@ -265,9 +267,13 @@ namespace NJsonSchema.Generation
             if (isNullable)
             {
                 if (Settings.SchemaType == SchemaType.JsonSchema)
+                {
                     referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                else if (Settings.SchemaType == SchemaType.OpenApi3)
+                }
+                else
+                {
                     referencingSchema.IsNullableRaw = true;
+                }
             }
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
