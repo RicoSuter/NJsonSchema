@@ -103,6 +103,9 @@ namespace NJsonSchema.Generation
         [JsonIgnore]
         public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
 
+        /// <summary>Gets or sets a value indicating whether to generate x-nullable properties (Swagger 2 only).</summary>
+        public bool GenerateCustomNullableProperties { get; set; }
+
         /// <summary>Gets or sets the contract resolver.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
         [JsonIgnore]

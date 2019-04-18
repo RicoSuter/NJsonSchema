@@ -58,7 +58,8 @@ namespace NJsonSchema.Tests.Generation
             //// Act
             var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
             {
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                GenerateCustomNullableProperties = true
             });
             var data = schema.ToJson();
 

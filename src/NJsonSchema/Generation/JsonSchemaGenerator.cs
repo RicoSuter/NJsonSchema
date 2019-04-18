@@ -242,7 +242,7 @@ namespace NJsonSchema.Generation
                                 schema.Type = schema.Type | JsonObjectType.Null;
                             }
                         }
-                        else
+                        else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                         {
                             schema.IsNullableRaw = isNullable;
                         }
@@ -270,7 +270,7 @@ namespace NJsonSchema.Generation
                 {
                     referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                 }
-                else
+                else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                 {
                     referencingSchema.IsNullableRaw = true;
                 }
