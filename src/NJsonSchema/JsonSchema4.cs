@@ -191,16 +191,9 @@ namespace NJsonSchema
             return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
         }
 
-        internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
+        internal static JsonSchema4 FromJsonWithCurrentSettings(string data)
         {
-            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
-            {
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            });
-
-            return schema;
+            return JsonConvert.DeserializeObject<JsonSchema4>(data, JsonSchemaSerialization.CurrentSerializerSettings);
         }
 
         /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>

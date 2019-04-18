@@ -24,11 +24,21 @@ namespace NJsonSchema.Infrastructure
         [ThreadStatic]
         private static bool _isWriting;
 
+        [ThreadStatic]
+        private static JsonSerializerSettings _currentSerializerSettings;
+
         /// <summary>Gets or sets the current schema type.</summary>
         public static SchemaType CurrentSchemaType
         {
             get => _currentSchemaType;
             private set => _currentSchemaType = value;
+        }
+
+        /// <summary>Gets the current serializer settings.</summary>
+        public static JsonSerializerSettings CurrentSerializerSettings
+        {
+            get => _currentSerializerSettings;
+            private set => _currentSerializerSettings = value;
         }
 
         /// <summary>Gets or sets a value indicating whether the object is currently converted to JSON.</summary>
@@ -54,19 +64,34 @@ namespace NJsonSchema.Infrastructure
         /// <param name="schemaType">The schema type.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="formatting">The formatting.</param>
-        /// <returns></returns>
+        /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver, Formatting formatting)
         {
             IsWriting = false;
             CurrentSchemaType = schemaType;
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false, contractResolver);
-            var json = JsonConvert.SerializeObject(obj, formatting, new JsonSerializerSettings
+            var json = FromJson(obj, contractResolver, formatting);
+            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+        }
+
+        /// <summary>Serializes an object to a JSON string.</summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="formatting">The formatting.</param>
+        /// <returns>The JSON.</returns>
+        public static string FromJson(object obj, IContractResolver contractResolver, Formatting formatting)
+        {
+            IsWriting = false;
+            CurrentSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = contractResolver
-            });
+            };
 
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+            var json = JsonConvert.SerializeObject(obj, formatting, CurrentSerializerSettings);
+            CurrentSerializerSettings = null;
+
+            return json;
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -79,20 +104,9 @@ namespace NJsonSchema.Infrastructure
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
         {
-            IsWriting = true;
             CurrentSchemaType = schemaType;
 
-            json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver,
-                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            };
-
-            var schema = JsonConvert.DeserializeObject<T>(json, settings);
+            var schema = FromJson<T>(json, contractResolver);
             if (schema is IDocumentPathProvider documentPathProvider)
                 documentPathProvider.DocumentPath = documentPath;
 
@@ -105,6 +119,30 @@ namespace NJsonSchema.Infrastructure
 
             await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);
             return schema;
+        }
+
+        /// <summary>Deserializes JSON data with the given contract resolver.</summary>
+        /// <param name="json">The JSON data.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <returns>The deserialized schema.</returns>
+        public static T FromJson<T>(string json, IContractResolver contractResolver)
+        {
+            IsWriting = true;
+            CurrentSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                ConstructorHandling = ConstructorHandling.Default,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            };
+
+            json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
+
+            var obj = JsonConvert.DeserializeObject<T>(json, CurrentSerializerSettings);
+            CurrentSerializerSettings = null;
+
+            return obj;
         }
     }
 }
