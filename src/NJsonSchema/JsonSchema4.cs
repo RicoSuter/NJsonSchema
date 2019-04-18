@@ -426,7 +426,7 @@ namespace NJsonSchema
         [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool IsAbstract { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the schema is nullable (Open API only).</summary>
+        /// <summary>Gets or sets a value indicating whether the schema is nullable (native in Open API 'nullable', custom in Swagger 'x-nullable').</summary>
         [JsonProperty("x-nullable", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool? IsNullableRaw { get; set; }
 
@@ -729,7 +729,7 @@ namespace NJsonSchema
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(SchemaType schemaType)
         {
-            if (schemaType == SchemaType.OpenApi3 && IsNullableRaw == true)
+            if (IsNullableRaw == true)
                 return true;
 
             if (IsEnumeration && Enumeration.Contains(null))
