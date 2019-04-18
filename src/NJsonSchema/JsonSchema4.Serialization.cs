@@ -167,7 +167,7 @@ namespace NJsonSchema
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                     AllowAdditionalItems = value.Equals("true");
                 else if (value != null)
-                    AdditionalItemsSchema = FromJsonWithCurrentSettings(value.ToString());
+                    AdditionalItemsSchema = FromJsonWithCurrentSettings(value);
             }
         }
 
@@ -189,7 +189,7 @@ namespace NJsonSchema
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                     AllowAdditionalProperties = value.Equals("true");
                 else if (value != null)
-                    AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value.ToString());
+                    AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value);
             }
         }
 
@@ -207,9 +207,9 @@ namespace NJsonSchema
             set
             {
                 if (value is JArray)
-                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t.ToString())));
+                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t)));
                 else if (value != null)
-                    Item = FromJsonWithCurrentSettings(value.ToString());
+                    Item = FromJsonWithCurrentSettings(value);
             }
         }
 
