@@ -134,7 +134,7 @@ namespace NJsonSchema.Infrastructure
                 MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
                 ConstructorHandling = ConstructorHandling.Default,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                PreserveReferencesHandling = PreserveReferencesHandling.None
             };
 
             json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
