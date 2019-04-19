@@ -8,6 +8,7 @@
 
 using System.ComponentModel;
 using Newtonsoft.Json;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -18,8 +19,8 @@ namespace NJsonSchema
 
         internal static JsonProperty FromJsonSchema(string name, JsonSchema4 type)
         {
-            var data = JsonConvert.SerializeObject(type);
-            var property = JsonConvert.DeserializeObject<JsonProperty>(data);
+            var data = JsonConvert.SerializeObject(type, JsonSchemaSerialization.CurrentSerializerSettings);
+            var property = JsonConvert.DeserializeObject<JsonProperty>(data, JsonSchemaSerialization.CurrentSerializerSettings);
             property.Name = name;
             return property;
         }
