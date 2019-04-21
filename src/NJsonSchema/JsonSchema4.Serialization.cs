@@ -264,34 +264,34 @@ namespace NJsonSchema
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> PropertiesRaw
+        internal IDictionary<string, JsonProperty> PropertiesRaw
         {
             get
             {
                 return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
+                    Properties.ToDictionary(p => p.Key, p => p.Value) : null;
             }
             set
             {
                 Properties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) :
+                    new ObservableDictionary<string, JsonProperty>(value) :
                     new ObservableDictionary<string, JsonProperty>();
             }
         }
 
         [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> PatternPropertiesRaw
+        internal IDictionary<string, JsonProperty> PatternPropertiesRaw
         {
             get
             {
                 return PatternProperties != null && PatternProperties.Count > 0 ?
-                    PatternProperties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
+                    PatternProperties.ToDictionary(p => p.Key, p => p.Value) : null;
             }
             set
             {
                 PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonSchema4>(value.ToDictionary(p => p.Key, p => p.Value)) :
-                    new ObservableDictionary<string, JsonSchema4>();
+                    new ObservableDictionary<string, JsonProperty>(value) :
+                    new ObservableDictionary<string, JsonProperty>();
             }
         }
 
@@ -350,14 +350,15 @@ namespace NJsonSchema
             }
         }
 
-        private void RegisterSchemaDictionary(IDictionary<string, JsonSchema4> oldCollection, IDictionary<string, JsonSchema4> newCollection)
+        private void RegisterSchemaDictionary<T>(IDictionary<string, T> oldCollection, IDictionary<string, T> newCollection)
+            where T : JsonSchema4
         {
             if (oldCollection != null)
-                ((ObservableDictionary<string, JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+                ((ObservableDictionary<string, T>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
 
             if (newCollection != null)
             {
-                ((ObservableDictionary<string, JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
+                ((ObservableDictionary<string, T>)newCollection).CollectionChanged += InitializeSchemaCollection;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
