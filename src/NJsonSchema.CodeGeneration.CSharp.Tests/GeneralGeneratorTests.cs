@@ -368,6 +368,36 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
+        [Theory]
+        [InlineData("foo@bar", "Foobar")]
+        [InlineData("foo$bar", "Foobar")]
+        [InlineData("foobars[]", "Foobars")]
+        [InlineData("foo.bar", "FooBar")]
+        [InlineData("foo=bar", "FooBar")]
+        [InlineData("foo+bar", "Fooplusbar")]
+        [InlineData("foo*bar", "FooStarbar")]
+        [InlineData("foo:bar", "Foo_bar")]
+        public void When_name_contains_unallowed_characters_then_they_are_converted_to_valid_csharp(string jsonPropertyName, string expectedCSharpName)
+        {
+            // Arrange
+            var schema = new JsonSchema4();
+            schema.Properties[jsonPropertyName] = new JsonProperty
+            {
+                Type = JsonObjectType.String
+            };
+            
+            var generator = new CSharpGenerator(schema);
+            
+            // Act
+            var output = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains($@"[Newtonsoft.Json.JsonProperty(""{jsonPropertyName}"", ", output);
+            Assert.Contains($@"public string {expectedCSharpName}", output);
+
+            AssertCompile(output);
+        }
+
         [Fact]
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {

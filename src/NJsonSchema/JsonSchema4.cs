@@ -30,7 +30,7 @@ namespace NJsonSchema
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
 
         private IDictionary<string, JsonProperty> _properties;
-        private IDictionary<string, JsonSchema4> _patternProperties;
+        private IDictionary<string, JsonProperty> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
 
         private ICollection<JsonSchema4> _allOf;
@@ -494,7 +494,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the pattern properties of the type. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonSchema4> PatternProperties
+        public IDictionary<string, JsonProperty> PatternProperties
         {
             get { return _patternProperties; }
             internal set
@@ -846,7 +846,7 @@ namespace NJsonSchema
                 Properties = new ObservableDictionary<string, JsonProperty>();
 
             if (PatternProperties == null)
-                PatternProperties = new ObservableDictionary<string, JsonSchema4>();
+                PatternProperties = new ObservableDictionary<string, JsonProperty>();
 
             if (Definitions == null)
                 Definitions = new ObservableDictionary<string, JsonSchema4>();
