@@ -138,7 +138,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromFileAsync(string filePath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.FileReadAllTextAsync(filePath);
+            var data = await DynamicApis.FileReadAllTextAsync(filePath).ConfigureAwait(false);
             return await FromJsonAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 
