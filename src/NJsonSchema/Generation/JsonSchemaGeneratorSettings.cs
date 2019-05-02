@@ -44,7 +44,7 @@ namespace NJsonSchema.Generation
             ExcludedTypeNames = new string[0];
         }
 
-        /// <summary>Gets or sets the default null handling (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
+        /// <summary>Gets or sets the default reference type null handling when no nullability information is available (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
         public ReferenceTypeNullHandling DefaultReferenceTypeNullHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to generate abstract properties (i.e. interface and abstract properties. Properties may defined multiple times in a inheritance hierarchy, default: false).</summary>

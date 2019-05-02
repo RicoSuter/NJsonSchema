@@ -17,6 +17,15 @@ namespace NJsonSchema.Generation
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="type">The type. </param>
         /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes,
+            ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings);
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="type">The type. </param>
+        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
@@ -24,8 +33,8 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether a type is nullable.</summary>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
-        /// <param name="settings">The settings</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
+        bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, ReferenceTypeNullHandling defaultReferenceTypeNullHandling);
     }
 }
