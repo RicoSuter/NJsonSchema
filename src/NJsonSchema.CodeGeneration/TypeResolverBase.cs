@@ -117,7 +117,6 @@ namespace NJsonSchema.CodeGeneration
             return !schema.IsTuple &&
                    !schema.IsDictionary &&
                    !schema.IsArray &&
-                   !schema.IsAnyType &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||
                     schema.Type.HasFlag(JsonObjectType.Object));

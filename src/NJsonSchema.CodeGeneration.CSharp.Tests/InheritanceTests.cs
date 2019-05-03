@@ -132,5 +132,45 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("public Dog Dog { get; set; }", code);
         }
+
+        [Fact]
+        public async Task When_base_schema_contains_no_properties_then_subschema_should_still_inherit_it()
+        {
+            //// Arrange
+            var json = @"{
+    ""type"": ""object"",
+    ""properties"": {
+        ""dog"": {
+            ""$ref"": ""#/definitions/Dog""
+        }
+    },
+    ""definitions"": {
+        ""Pet"": {
+            ""type"": ""object""
+        },
+        ""Dog"": {
+            ""title"": ""Dog"",
+            ""description"": """",
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/Pet""
+                },
+                {
+                    ""type"": ""object""
+                }
+            ]
+        }
+    }
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("public partial class Dog : Pet", code);
+            Assert.Contains("public partial class Pet", code);
+        }
     }
 }

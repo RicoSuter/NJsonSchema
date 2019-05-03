@@ -219,15 +219,15 @@ namespace NJsonSchema
                     return null;
 
                 if (AllOf.Count == 1)
-                    return AllOf.First().ActualSchema;
+                    return AllOf.First();
 
-                if (AllOf.Any(s => s.HasReference && !s.ActualSchema.IsAnyType))
-                    return AllOf.First(s => s.HasReference && !s.ActualSchema.IsAnyType).ActualSchema;
+                if (AllOf.Any(s => s.HasReference))
+                    return AllOf.First(s => s.HasReference);
 
                 if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
-                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
+                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType);
 
-                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+                return AllOf.First(s => !s.ActualSchema.IsAnyType);
             }
         }
 
@@ -257,8 +257,8 @@ namespace NJsonSchema
         {
             get
             {
-                var inheritedSchema = this.InheritedSchema != null ?
-                    new List<JsonSchema4> { this.InheritedSchema } :
+                var inheritedSchema = InheritedSchema != null ?
+                    new List<JsonSchema4> { InheritedSchema } :
                     new List<JsonSchema4>();
 
                 return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
