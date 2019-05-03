@@ -16,14 +16,6 @@ namespace NJsonSchema
     {
         private object _parent;
 
-        internal static JsonProperty FromJsonSchema(string name, JsonSchema4 type)
-        {
-            var data = JsonConvert.SerializeObject(type);
-            var property = JsonConvert.DeserializeObject<JsonProperty>(data);
-            property.Name = name;
-            return property;
-        }
-
         /// <summary>Gets or sets the name of the property. </summary>
         [JsonIgnore]
         public string Name { get; internal set; }

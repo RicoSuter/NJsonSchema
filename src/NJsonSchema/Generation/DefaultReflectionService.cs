@@ -27,10 +27,21 @@ namespace NJsonSchema.Generation
         /// <param name="typeWithContext">The type. </param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
-            var type = typeWithContext.OriginalType;
-            var isNullable = IsNullable(typeWithContext, settings);
+            return GetDescription(type, parentAttributes, settings.DefaultReferenceTypeNullHandling, settings);
+        }
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="type">The type. </param>
+        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes,
+            ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        {
+            var isNullable = IsNullable(type, parentAttributes, defaultReferenceTypeNullHandling);
 
             var jsonSchemaTypeAttribute = typeWithContext.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
                                           typeWithContext.GetContextAttribute<JsonSchemaTypeAttribute>();
@@ -149,7 +160,7 @@ namespace NJsonSchema.Generation
 
             if (type.Name == "Nullable`1")
             {
-                var typeDescription = GetDescription(typeWithContext.OriginalGenericArguments[0], settings);
+                var typeDescription = GetDescription(typeWithContext.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
                 typeDescription.IsNullable = true;
                 return typeDescription;
             }
@@ -162,9 +173,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Checks whether a type is nullable.</summary>
         /// <param name="typeWithContext">The type.</param>
-        /// <param name="settings">The settings</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
+        public virtual bool IsNullable(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             var jsonPropertyAttribute = typeWithContext.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
@@ -180,7 +191,7 @@ namespace NJsonSchema.Generation
                 return true;
 
             var isValueType = typeWithContext.Type != typeof(string) && typeWithContext.Type.GetTypeInfo().IsValueType;
-            return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
+            return isValueType == false && defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
         /// <summary>Checks whether the given type is a file/binary type.</summary>

@@ -232,9 +232,11 @@ namespace NJsonSchema.Generation
                                 schema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                             }
                             else
+                            {
                                 schema.Type = schema.Type | JsonObjectType.Null;
+                            }
                         }
-                        else if (Settings.SchemaType == SchemaType.OpenApi3)
+                        else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                         {
                             schema.IsNullableRaw = isNullable;
                         }
@@ -259,9 +261,13 @@ namespace NJsonSchema.Generation
             if (isNullable)
             {
                 if (Settings.SchemaType == SchemaType.JsonSchema)
+                {
                     referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                else if (Settings.SchemaType == SchemaType.OpenApi3)
+                }
+                else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
+                {
                     referencingSchema.IsNullableRaw = true;
+                }
             }
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
@@ -450,8 +456,11 @@ namespace NJsonSchema.Generation
             var itemType = jsonSchemaAttribute?.ArrayItem ?? typeWithContext.OriginalType.GetEnumerableItemType();
             if (itemType != null)
             {
+                var itemIsNullable = typeWithContext.GetContextAttributes<ItemsCanBeNullAttribute>().Any() == true ||
+                    itemType.Name == "Nullable`1";
+
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    TypeWithContext.ForType(itemType), typeWithContext.GetContextAttributes<ItemsCanBeNullAttribute>().Any() == true, schemaResolver, async (s, r) =>
+                    TypeWithContext.ForType(itemType), itemIsNullable, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
@@ -507,20 +516,8 @@ namespace NJsonSchema.Generation
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : TypeWithContext.ForType(typeof(string));
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
-                var keySchema = await GenerateAsync(keyType.OriginalType, schemaResolver).ConfigureAwait(false);
-
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.DictionaryKey = new JsonSchema4
-                    {
-                        Reference = keySchema
-                    };
-                }
-                else
-                {
-                    schema.DictionaryKey = keySchema;
-                }
+                schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
+                    keyType, null, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : TypeWithContext.ForType(typeof(object));
@@ -530,20 +527,18 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var additionalPropertiesSchema = await GenerateAsync(valueType.OriginalType, schemaResolver).ConfigureAwait(false);
+                var valueIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
+                    valueType.Name == "Nullable`1";
 
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(valueType, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.AdditionalPropertiesSchema = new JsonSchema4
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                    valueType, null, valueIsNullable, schemaResolver/*, async (s, r) =>
                     {
-                        Reference = additionalPropertiesSchema
-                    };
-                }
-                else
-                {
-                    schema.AdditionalPropertiesSchema = additionalPropertiesSchema;
-                }
+                        // TODO: Generate xml for key
+                        if (Settings.GenerateXmlObjects)
+                        {
+                            s.GenerateXmlObjectForItemType(keyType);
+                        }
+                    }*/).ConfigureAwait(false);
             }
 
             schema.AllowAdditionalProperties = true;

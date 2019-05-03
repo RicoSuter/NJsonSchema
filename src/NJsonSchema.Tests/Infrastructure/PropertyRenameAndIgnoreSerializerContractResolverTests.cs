@@ -13,14 +13,17 @@ namespace NJsonSchema.Tests.Infrastructure
             //// Arrange
             var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+            resolver.RenameProperty(typeof(JsonSchema4), "x-nullable", "nullable");
 
-            var json = "{ \"readOnly\": true }";
+            var json = "{ \"readOnly\": true, \"nullable\": true, \"additionalProperties\": { \"nullable\": true } }";
 
             //// Act
-            var obj = JsonConvert.DeserializeObject<JsonProperty>(json, new JsonSerializerSettings { ContractResolver = resolver });
+            var obj = JsonSchemaSerialization.FromJson<JsonProperty>(json, resolver);
 
             //// Assert
             Assert.True(obj.IsReadOnly);
+            Assert.True(obj.IsNullableRaw);
+            Assert.True(obj.AdditionalPropertiesSchema.IsNullableRaw);
         }
 
         public class MyClass
