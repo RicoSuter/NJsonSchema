@@ -341,64 +341,31 @@ namespace NJsonSchema.Tests.Generation
             [DataType(DataType.Url)]
             public string Url { get; set; }
 
-#if !LEGACY
-            [DataType(DataType.Upload)]
-            public string Upload { get; set; }
-#endif
+            [EmailAddress] // should be equivalent to [DataType(DataType.EmailAddress)]
+            public string EmailAddress2 { get; set; }
+
+            [Phone] // should be equivalent to [DataType(DataType.PhoneNumber)]
+            public string PhoneNumber2 { get; set; }
+
+            [Url] // should be equivalent to [DataType(DataType.Url)]
+            public string Url2 { get; set; }
         }
 
-        [Fact]
-        public async Task When_DataTypeAttribute_is_DateTime_then_the_format_property_is_datetime()
+        [Theory]
+        [InlineData(nameof(DataTypeAttributeClass.EmailAddress), "email")]
+        [InlineData(nameof(DataTypeAttributeClass.PhoneNumber), "phone")]
+        [InlineData(nameof(DataTypeAttributeClass.DateTime), "date-time")]
+        [InlineData(nameof(DataTypeAttributeClass.Time), "time")]
+        [InlineData(nameof(DataTypeAttributeClass.Url), "uri")]
+        [InlineData(nameof(DataTypeAttributeClass.EmailAddress2), "email")]
+        [InlineData(nameof(DataTypeAttributeClass.PhoneNumber2), "phone")]
+        [InlineData(nameof(DataTypeAttributeClass.Url2), "uri")]
+        public async Task When_DataTypeAttribute_is_set_then_the_format_property_should_come_from_the_attribute(string propertyName, string expectedFormat)
         {
             var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["DateTime"];
+            var property = schema.Properties[propertyName];
 
-            Assert.Equal("date-time", property.Format);
-        }
-
-        [Fact]
-        public async Task When_DataTypeAttribute_is_Date_then_the_format_property_is_date()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["Date"];
-
-            Assert.Equal("date", property.Format);
-        }
-
-        [Fact]
-        public async Task When_DataTypeAttribute_is_Time_then_the_format_property_is_time()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["Time"];
-
-            Assert.Equal("time", property.Format);
-        }
-
-        [Fact]
-        public async Task When_DataTypeAttribute_is_EmailAddress_then_the_format_property_is_email()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["EmailAddress"];
-
-            Assert.Equal("email", property.Format);
-        }
-
-        [Fact]
-        public async Task When_DataTypeAttribute_is_PhoneNumber_then_the_format_property_is_phone()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["PhoneNumber"];
-
-            Assert.Equal("phone", property.Format);
-        }
-
-        [Fact]
-        public async Task When_DataTypeAttribute_is_Url_then_the_format_property_is_uri()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
-            var property = schema.Properties["Url"];
-
-            Assert.Equal("uri", property.Format);
+            Assert.Equal(expectedFormat, property.Format);
         }
 
         [JsonSchemaIgnore]
