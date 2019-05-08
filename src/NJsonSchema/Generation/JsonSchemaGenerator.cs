@@ -389,7 +389,7 @@ namespace NJsonSchema.Generation
             foreach (var processor in Settings.SchemaProcessors)
                 await processor.ProcessAsync(context).ConfigureAwait(false);
 
-            var operationProcessorAttribute = TypeWithContext.ForType(type).ContextAttributes
+            var operationProcessorAttribute = TypeWithContext.ForType(type).TypeAttributes
                 .Where(a => a.GetType().IsAssignableTo(nameof(JsonSchemaProcessorAttribute), TypeNameStyle.Name));
 
             foreach (dynamic attribute in operationProcessorAttribute)
@@ -403,7 +403,7 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             // class
-            var extensionDataAttributes = typeWithContext.GetTypeAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
+            var extensionDataAttributes = typeWithContext.GetAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
             if (extensionDataAttributes.Any())
             {
                 schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
@@ -411,7 +411,7 @@ namespace NJsonSchema.Generation
             else
             {
                 // property or parameter
-                extensionDataAttributes = typeWithContext.GetTypeAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
+                extensionDataAttributes = typeWithContext.GetAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
                 if (extensionDataAttributes.Any())
                     schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
@@ -517,7 +517,7 @@ namespace NJsonSchema.Generation
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
                 schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
-                    typeWithContext, schemaResolver).ConfigureAwait(false);
+                    keyType, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : TypeWithContext.ForType(typeof(object));

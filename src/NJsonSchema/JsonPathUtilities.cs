@@ -115,31 +115,34 @@ namespace NJsonSchema
             else
             {
                 var contract = contractResolver.ResolveContract(obj.GetType()) as JsonObjectContract;
-                var ignoredProperties = contract?.Properties
-                    .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false).ToArray() ??
-                    new Newtonsoft.Json.Serialization.JsonProperty[0];
-
-                foreach (var member in obj.GetType()
-                    .GetPropertiesAndFieldsWithContext()
-                    .Where(p => p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
+                if (contract != null)
                 {
-                    var propertyName = member.GetName();
+                    var ignoredProperties = contract.Properties
+                        .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false)
+                        .ToArray();
 
-                    var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
-                    if (isExtensionDataProperty || ignoredProperties.All(p2 => p2.UnderlyingName != member.MemberInfo.Name))
+                    foreach (var member in obj.GetType()
+                        .GetPropertiesAndFieldsWithContext()
+                        .Where(p => p.GetContextAttribute<JsonIgnoreAttribute>() == null))
                     {
-                        var value = member.GetValue(obj);
-                        if (value != null)
+                        var propertyName = member.GetName();
+
+                        var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
+                        if (isExtensionDataProperty || ignoredProperties.All(p2 => p2.UnderlyingName != member.MemberInfo.Name))
                         {
-                            if (isExtensionDataProperty)
+                            var value = member.GetValue(obj);
+                            if (value != null)
                             {
-                                if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
-                                    return true;
-                            }
-                            else
-                            {
-                                if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, contractResolver))
-                                    return true;
+                                if (isExtensionDataProperty)
+                                {
+                                    if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
+                                        return true;
+                                }
+                                else
+                                {
+                                    if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, contractResolver))
+                                        return true;
+                                }
                             }
                         }
                     }
