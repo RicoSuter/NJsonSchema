@@ -24,27 +24,27 @@ namespace NJsonSchema.Generation
     public class DefaultReflectionService : IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="typeWithContext">The type. </param>
+        /// <param name="typeWithContext">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
         {
-            return GetDescription(type, parentAttributes, settings.DefaultReferenceTypeNullHandling, settings);
+            return GetDescription(typeWithContext, settings.DefaultReferenceTypeNullHandling, settings);
         }
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="type">The type. </param>
-        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="typeWithContext">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes,
-            ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        public virtual JsonTypeDescription GetDescription(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
         {
-            var isNullable = IsNullable(type, parentAttributes, defaultReferenceTypeNullHandling);
+            var isNullable = IsNullable(typeWithContext, defaultReferenceTypeNullHandling);
 
             var jsonSchemaTypeAttribute = typeWithContext.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
                                           typeWithContext.GetContextAttribute<JsonSchemaTypeAttribute>();
+
+            var type = typeWithContext.OriginalType;
 
             if (jsonSchemaTypeAttribute != null)
             {

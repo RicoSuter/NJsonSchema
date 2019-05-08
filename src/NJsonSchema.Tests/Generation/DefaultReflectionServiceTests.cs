@@ -40,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, ReferenceTypeNullHandling.Null));
+                Assert.Equal(check.Value, svc.IsNullable(TypeWithContext.ForType(check.Key), ReferenceTypeNullHandling.Null));
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, ReferenceTypeNullHandling.NotNull));
+                Assert.Equal(check.Value, svc.IsNullable(TypeWithContext.ForType(check.Key), ReferenceTypeNullHandling.NotNull));
         }
     }
 }

@@ -517,7 +517,7 @@ namespace NJsonSchema.Generation
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
                 schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
-                    keyType, null, schemaResolver).ConfigureAwait(false);
+                    typeWithContext, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : TypeWithContext.ForType(typeof(object));
@@ -527,11 +527,11 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var valueIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
-                    valueType.Name == "Nullable`1";
+                var valueIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
+                    valueType.OriginalType.Name == "Nullable`1";
 
                 schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    valueType, null, valueIsNullable, schemaResolver/*, async (s, r) =>
+                    valueType, valueIsNullable, schemaResolver/*, async (s, r) =>
                     {
                         // TODO: Generate xml for key
                         if (Settings.GenerateXmlObjects)
