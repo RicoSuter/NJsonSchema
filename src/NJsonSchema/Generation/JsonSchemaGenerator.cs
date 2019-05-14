@@ -306,7 +306,7 @@ namespace NJsonSchema.Generation
             {
                 var propertyName = memberInfo != null ? memberInfo
                     .DeclaringType.GetPropertiesAndFieldsWithContext()
-                    .First(p => p.MemberInfo.Name == memberInfo.Name).GetName() : property.PropertyName;
+                    .First(p => p.Name == memberInfo.Name).GetName() : property.PropertyName;
 
                 var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
                 return contractResolver != null

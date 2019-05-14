@@ -20,6 +20,9 @@ namespace NJsonSchema
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
+        private static Dictionary<Type, HashSet<string>> _ignoredPropertyCache =
+            new Dictionary<Type, HashSet<string>>();
+
         /// <summary>Gets the $ref replacement string.</summary>
         public const string ReferenceReplaceString = "__referencePath";
 
@@ -114,12 +117,24 @@ namespace NJsonSchema
             }
             else
             {
-                var contract = contractResolver.ResolveContract(obj.GetType()) as JsonObjectContract;
+                var type = obj.GetType();
+                var contract = contractResolver.ResolveContract(type) as JsonObjectContract;
                 if (contract != null)
                 {
-                    var ignoredProperties = contract.Properties
-                        .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false)
-                        .ToArray();
+                    if (!_ignoredPropertyCache.ContainsKey(type))
+                    {
+                        lock (_ignoredPropertyCache)
+                        {
+                            if (!_ignoredPropertyCache.ContainsKey(type))
+                            {
+                                _ignoredPropertyCache[type] = new HashSet<string>(contract.Properties
+                                    .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false)
+                                    .Select(p => p.UnderlyingName));
+                            }
+                        }
+                    }
+
+                    var ignoredProperties = _ignoredPropertyCache[type];
 
                     foreach (var member in obj.GetType()
                         .GetPropertiesAndFieldsWithContext()
@@ -128,7 +143,7 @@ namespace NJsonSchema
                         var propertyName = member.GetName();
 
                         var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
-                        if (isExtensionDataProperty || ignoredProperties.All(p2 => p2.UnderlyingName != member.MemberInfo.Name))
+                        if (isExtensionDataProperty || !ignoredProperties.Contains(member.Name))
                         {
                             var value = member.GetValue(obj);
                             if (value != null)

@@ -26,7 +26,7 @@ namespace NJsonSchema.Visitors
     public abstract class JsonReferenceVisitorBase
     {
         private readonly IContractResolver _contractResolver;
-        private readonly string[] _jsonSchemaProperties = typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name).ToArray();
+        private readonly HashSet<string> _jsonSchemaPropertyCache = new HashSet<string>(typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name));
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
         protected JsonReferenceVisitorBase()
@@ -192,7 +192,7 @@ namespace NJsonSchema.Visitors
             {
                 foreach (var member in obj.GetType().GetPropertiesAndFieldsWithContext().Where(p =>
                     p.MemberInfo is PropertyInfo &&
-                    (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
+                    (!(obj is JsonSchema4) || !_jsonSchemaPropertyCache.Contains(p.Name)) &&
                     (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
                     ((PropertyInfo)p.MemberInfo).CanRead &&
                     ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0 &&

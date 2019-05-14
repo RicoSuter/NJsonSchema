@@ -20,23 +20,43 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
+        private static Dictionary<MemberWithContext, string> _names = new Dictionary<MemberWithContext, string>();
+
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
         public static string GetName(this MemberWithContext member)
+        {
+            if (!_names.ContainsKey(member))
+            {
+                lock (_names)
+                {
+                    if (!_names.ContainsKey(member))
+                    {
+                        // TODO: Move somewhere else as this is not XML docs related
+                        _names[member] = GetNameWithoutCache(member);
+                    }
+                }
+            }
+            return _names[member];
+        }
+
+        private static string GetNameWithoutCache(MemberWithContext member)
         {
             var jsonPropertyAttribute = member.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
                 return jsonPropertyAttribute.PropertyName;
 
-            var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithoutContext().GetTypeAttribute<DataContractAttribute>();
-            if (dataContractAttribute != null)
+            var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
+            if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
-                var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
-                if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
+                var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithoutContext().GetTypeAttribute<DataContractAttribute>();
+                if (dataContractAttribute != null)
+                {
                     return dataMemberAttribute.Name;
+                }
             }
 
-            return member.MemberInfo.Name;
+            return member.Name;
         }
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
