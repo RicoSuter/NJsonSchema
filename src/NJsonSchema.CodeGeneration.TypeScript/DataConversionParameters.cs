@@ -34,5 +34,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the settings.</summary>
         public TypeScriptGeneratorSettings Settings { get; set; }
+
+        /// <summary>ParsingUtils used for interfaces.</summary>
+        public bool UseParsingUtils { get; set; }
     }
 }

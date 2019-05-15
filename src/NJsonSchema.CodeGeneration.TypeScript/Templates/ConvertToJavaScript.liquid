@@ -1,5 +1,5 @@
 ﻿{% if IsNewableObject -%}
-{{ Variable }} = {{ Value }} ? {{ Value }}.toJSON() : <any>{{ NullValue }};
+{{ Variable }} = {{ Value }} ? {% if UseParsingUtils -%}{{ Type }}ParsingUtils.toJSON({{ Value }}) {%  else -%}{{ Value }}.toJSON() {% endif -%} : <any>{{ NullValue }};
 {% elseif IsArray -%}
 if ({{ Value }} && {{ Value }}.constructor === Array) {
     {{ Variable }} = [];

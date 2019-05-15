@@ -134,11 +134,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         NullValue = _settings.NullValue,
-                        Settings = _settings
+                        Settings = _settings,
+                        UseParsingUtils = false
                     });
                 }
-
-                return string.Empty;
+                else
+                {
+                    return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
+                    {
+                        Variable = typeStyle == TypeScriptTypeStyle.Interface ?
+                            (IsReadOnly ? "(<any>result)." : "result.") + PropertyName : PropertyName + "_",
+                        Value = "data[\"" + _property.Name + "\"]",
+                        Schema = _property,
+                        IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
+                        TypeNameHint = PropertyName,
+                        Resolver = _resolver,
+                        NullValue = _settings.NullValue,
+                        Settings = _settings,
+                        UseParsingUtils = true
+                    });
+                }
             }
         }
 
@@ -159,11 +174,25 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
                         NullValue = _settings.NullValue,
-                        Settings = _settings
+                        Settings = _settings,
+                        UseParsingUtils = false
                     });
                 }
-
-                return string.Empty;
+                else
+                {
+                    return DataConversionGenerator.RenderConvertToJavaScriptCode(new DataConversionParameters
+                    {
+                        Variable = "data[\"" + _property.Name + "\"]",
+                        Value = typeStyle == TypeScriptTypeStyle.Interface ? "dto." + PropertyName : PropertyName + "_",
+                        Schema = _property,
+                        IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
+                        TypeNameHint = PropertyName,
+                        Resolver = _resolver,
+                        NullValue = _settings.NullValue,
+                        Settings = _settings,
+                        UseParsingUtils = true
+                    });
+                }
             }
         }
     }
