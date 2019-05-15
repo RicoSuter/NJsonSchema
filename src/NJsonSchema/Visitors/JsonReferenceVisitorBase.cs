@@ -197,11 +197,11 @@ namespace NJsonSchema.Visitors
             {
                 foreach (var member in type.GetPropertiesAndFieldsWithContext().Where(p =>
                     p.MemberInfo is PropertyInfo &&
+                    p.GetTypeAttribute<JsonIgnoreAttribute>() == null &&
                     (!(obj is JsonSchema4) || !_jsonSchemaPropertyCache.Contains(p.Name)) &&
                     (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == type)) && // only check additional properties of dictionary
                     ((PropertyInfo)p.MemberInfo).CanRead &&
-                    ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0 &&
-                    p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
+                    ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0))
                 {
                     var value = member.GetValue(obj);
                     if (value != null)
