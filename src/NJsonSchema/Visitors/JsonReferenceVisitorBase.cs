@@ -25,11 +25,11 @@ namespace NJsonSchema.Visitors
     /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
     public abstract class JsonReferenceVisitorBase
     {
-        private static Dictionary<string, HashSet<string>> _ignoredPropertyCache =
-            new Dictionary<string, HashSet<string>>();
-
         private readonly IContractResolver _contractResolver;
-        private readonly HashSet<string> _jsonSchemaPropertyCache = new HashSet<string>(typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name));
+        private readonly string[] _jsonSchemaPropertyCache = typeof(JsonSchema4)
+            .GetRuntimeProperties()
+            .Select(p => p.Name)
+            .ToArray();
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
         protected JsonReferenceVisitorBase()
@@ -185,22 +185,8 @@ namespace NJsonSchema.Visitors
             var type = obj.GetType();
             if (_contractResolver.ResolveContract(type) is JsonObjectContract contract)
             {
-                var typeName = type.FullName;
-                if (!_ignoredPropertyCache.ContainsKey(typeName))
-                {
-                    lock (_ignoredPropertyCache)
-                    {
-                        if (!_ignoredPropertyCache.ContainsKey(typeName))
-                        {
-                            _ignoredPropertyCache[typeName] = new HashSet<string>(contract.Properties
-                                .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false)
-                                .Select(p => p.PropertyName));
-                        }
-                    }
-                }
-
-                var ignoredProperties = _ignoredPropertyCache[typeName];
-                foreach (var property in contract.Properties.Where(p => !ignoredProperties.Contains(p.PropertyName)))
+                foreach (var property in contract.Properties
+                    .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
                 {
                     var value = property.ValueProvider.GetValue(obj);
                     if (value != null)
