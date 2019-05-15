@@ -16,7 +16,7 @@ namespace NJsonSchema.Demo
             for (int i = 0; i < 10000; i++)
             {
                 var serializationPerformance = new SerializationPerformance();
-                serializationPerformance.ToJson();
+                serializationPerformance.FromJson();
             }
 
             Console.BufferHeight = 2000;

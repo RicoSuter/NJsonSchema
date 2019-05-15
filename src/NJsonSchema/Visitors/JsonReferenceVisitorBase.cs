@@ -25,6 +25,9 @@ namespace NJsonSchema.Visitors
     /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
     public abstract class JsonReferenceVisitorBase
     {
+        private static Dictionary<string, HashSet<string>> _ignoredPropertyCache =
+            new Dictionary<string, HashSet<string>>();
+
         private readonly IContractResolver _contractResolver;
         private readonly HashSet<string> _jsonSchemaPropertyCache = new HashSet<string>(typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name));
 
@@ -179,9 +182,25 @@ namespace NJsonSchema.Visitors
 
         private async Task VisitPropertiesAsync(object obj, string path, ISet<object> checkedObjects)
         {
-            if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
+            var type = obj.GetType();
+            if (_contractResolver.ResolveContract(type) is JsonObjectContract contract)
             {
-                foreach (var property in contract.Properties.Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                var typeName = type.FullName;
+                if (!_ignoredPropertyCache.ContainsKey(typeName))
+                {
+                    lock (_ignoredPropertyCache)
+                    {
+                        if (!_ignoredPropertyCache.ContainsKey(typeName))
+                        {
+                            _ignoredPropertyCache[typeName] = new HashSet<string>(contract.Properties
+                                .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false)
+                                .Select(p => p.PropertyName));
+                        }
+                    }
+                }
+
+                var ignoredProperties = _ignoredPropertyCache[typeName];
+                foreach (var property in contract.Properties.Where(p => !ignoredProperties.Contains(p.PropertyName)))
                 {
                     var value = property.ValueProvider.GetValue(obj);
                     if (value != null)
@@ -190,10 +209,10 @@ namespace NJsonSchema.Visitors
             }
             else
             {
-                foreach (var member in obj.GetType().GetPropertiesAndFieldsWithContext().Where(p =>
+                foreach (var member in type.GetPropertiesAndFieldsWithContext().Where(p =>
                     p.MemberInfo is PropertyInfo &&
                     (!(obj is JsonSchema4) || !_jsonSchemaPropertyCache.Contains(p.Name)) &&
-                    (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
+                    (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == type)) && // only check additional properties of dictionary
                     ((PropertyInfo)p.MemberInfo).CanRead &&
                     ((PropertyInfo)p.MemberInfo).GetIndexParameters().Length == 0 &&
                     p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
