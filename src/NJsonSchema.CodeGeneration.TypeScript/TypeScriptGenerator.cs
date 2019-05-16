@@ -130,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var model = new EnumTemplateModel(typeName, schema, Settings);
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
-                return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Dto, template);
+                return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
             else
             {
@@ -141,7 +141,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     ? CodeArtifactType.Interface
                     : CodeArtifactType.Class;
 
-                return new CodeArtifact(typeName, model.BaseClass, type, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Dto, template);
+                return new CodeArtifact(typeName, model.BaseClass, type, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
         }
     }
