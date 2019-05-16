@@ -17,8 +17,8 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Client.</summary>
         Client,
 
-        /// <summary>DTO.</summary>
-        Dto,
+        /// <summary>Contract.</summary>
+        Contract,
 
         /// <summary>Utility.</summary>
         Utility

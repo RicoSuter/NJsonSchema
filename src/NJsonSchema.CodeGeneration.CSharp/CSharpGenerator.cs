@@ -114,7 +114,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
-            return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Dto, template);
+            return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
 
         private void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
@@ -134,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var model = new EnumTemplateModel(typeName, schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
-            return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Dto, template);
+            return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
     }
 }
