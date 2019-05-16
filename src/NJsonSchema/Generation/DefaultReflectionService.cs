@@ -24,39 +24,39 @@ namespace NJsonSchema.Generation
     public class DefaultReflectionService : IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(ContextualType typeWithContext, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
         {
-            return GetDescription(typeWithContext, settings.DefaultReferenceTypeNullHandling, settings);
+            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, settings);
         }
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        public virtual JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
         {
-            var isNullable = IsNullable(typeWithContext, defaultReferenceTypeNullHandling);
+            var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
 
-            var jsonSchemaTypeAttribute = typeWithContext.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
-                                          typeWithContext.GetContextAttribute<JsonSchemaTypeAttribute>();
+            var jsonSchemaTypeAttribute = contextualType.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
+                                          contextualType.GetContextAttribute<JsonSchemaTypeAttribute>();
 
-            var type = typeWithContext.OriginalType;
+            var type = contextualType.OriginalType;
 
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;
-                typeWithContext = type.ToContextualType();
+                contextualType = type.ToContextualType();
 
                 if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
             }
 
-            var jsonSchemaAttribute = typeWithContext.GetTypeAttribute<JsonSchemaAttribute>() ??
-                                      typeWithContext.GetContextAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = contextualType.GetTypeAttribute<JsonSchemaAttribute>() ??
+                                      contextualType.GetContextAttribute<JsonSchemaAttribute>();
 
             if (jsonSchemaAttribute != null)
             {
@@ -67,7 +67,7 @@ namespace NJsonSchema.Generation
 
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(typeWithContext, settings);
+                var isStringEnum = IsStringEnum(contextualType, settings);
                 return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
@@ -140,7 +140,7 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
             }
 
-            if (IsBinary(typeWithContext))
+            if (IsBinary(contextualType))
             {
                 if (settings.SchemaType == SchemaType.Swagger2)
                 {
@@ -153,15 +153,15 @@ namespace NJsonSchema.Generation
             }
 
             var contract = settings.ResolveContract(type);
-            if (IsDictionaryType(typeWithContext) && contract is JsonDictionaryContract)
+            if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
                 return JsonTypeDescription.CreateForDictionary(type, JsonObjectType.Object, isNullable);
 
-            if (IsArrayType(typeWithContext) && contract is JsonArrayContract)
+            if (IsArrayType(contextualType) && contract is JsonArrayContract)
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
             if (type.Name == "Nullable`1")
             {
-                var typeDescription = GetDescription(typeWithContext.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
+                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
                 typeDescription.IsNullable = true;
                 return typeDescription;
             }
@@ -173,116 +173,116 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>Checks whether a type is nullable.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
+        public virtual bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            var jsonPropertyAttribute = typeWithContext.GetContextAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
             {
                 return false;
             }
 
-            if (typeWithContext.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
             {
                 return false;
             }
 
-            if (typeWithContext.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
             {
                 return true;
             }
 
-            if (typeWithContext.Nullability != Nullability.Unknown)
+            if (contextualType.Nullability != Nullability.Unknown)
             {
-                return typeWithContext.Nullability == Nullability.Nullable;
+                return contextualType.Nullability == Nullability.Nullable;
             }
 
-            var isValueType = typeWithContext.Type != typeof(string) && typeWithContext.Type.GetTypeInfo().IsValueType;
+            var isValueType = contextualType.Type != typeof(string) && contextualType.Type.GetTypeInfo().IsValueType;
             return isValueType == false && defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
         /// <summary>Checks whether the given type is a file/binary type.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsBinary(ContextualType typeWithContext)
+        protected virtual bool IsBinary(ContextualType contextualType)
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = typeWithContext.Type.Name;
+            var parameterTypeName = contextualType.Type.Name;
             return parameterTypeName == "IFormFile" ||
-                   typeWithContext.Type.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
-                   typeWithContext.Type.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
+                   contextualType.Type.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
+                   contextualType.Type.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
 #if !LEGACY
-                   typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+                   contextualType.Type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
 #else
-                   typeWithContext.Type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
+                   contextualType.Type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
 #endif
         }
 
 #if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(ContextualType typeWithContext)
+        protected virtual bool IsArrayType(ContextualType contextualType)
         {
-            if (IsDictionaryType(typeWithContext))
+            if (IsDictionaryType(contextualType))
                 return false;
 
             // TODO: Improve these checks
-            if (typeWithContext.Type.Name == "ObservableCollection`1")
+            if (contextualType.Type.Name == "ObservableCollection`1")
                 return true;
 
-            return typeWithContext.Type.IsArray || (typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
-                (typeWithContext.Type.GetTypeInfo().BaseType == null ||
-                !typeWithContext.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
+            return contextualType.Type.IsArray || (contextualType.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
+                (contextualType.Type.GetTypeInfo().BaseType == null ||
+                !contextualType.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(ContextualType typeWithContext)
+        protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (typeWithContext.Type.Name == "IDictionary`2" || typeWithContext.Type.Name == "IReadOnlyDictionary`2")
+            if (contextualType.Type.Name == "IDictionary`2" || contextualType.Type.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
-                (typeWithContext.Type.GetTypeInfo().BaseType == null ||
-                !typeWithContext.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
+            return contextualType.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
+                (contextualType.Type.GetTypeInfo().BaseType == null ||
+                !contextualType.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
 #else
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(ContextualType typeWithContext)
+        protected virtual bool IsArrayType(ContextualType contextualType)
         {
-            if (IsDictionaryType(typeWithContext))
+            if (IsDictionaryType(contextualType))
                 return false;
 
             // TODO: Improve these checks
-            if (typeWithContext.OriginalType.Name == "ObservableCollection`1")
+            if (contextualType.OriginalType.Name == "ObservableCollection`1")
                 return true;
 
-            return typeWithContext.OriginalType.IsArray || (typeWithContext.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
-                                    (typeWithContext.OriginalType.GetTypeInfo().BaseType == null ||
-                                     !typeWithContext.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
+            return contextualType.OriginalType.IsArray || (contextualType.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
+                                    (contextualType.OriginalType.GetTypeInfo().BaseType == null ||
+                                     !contextualType.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="typeWithContext">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(ContextualType typeWithContext)
+        protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (typeWithContext.OriginalType.Name == "IDictionary`2" || typeWithContext.OriginalType.Name == "IReadOnlyDictionary`2")
+            if (contextualType.OriginalType.Name == "IDictionary`2" || contextualType.OriginalType.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return typeWithContext.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
-                   (typeWithContext.OriginalType.GetTypeInfo().BaseType == null ||
-                    !typeWithContext.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
+            return contextualType.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
+                   (contextualType.OriginalType.GetTypeInfo().BaseType == null ||
+                    !contextualType.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
         }
 
 #endif
