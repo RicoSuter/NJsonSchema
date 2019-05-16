@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -144,9 +145,7 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-#pragma warning disable 1998
-            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
-#pragma warning restore 1998
+            protected override Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
             {
                 if (reference.Reference != null)
                 {
@@ -166,7 +165,7 @@ namespace NJsonSchema
                     //return new JsonSchema4 { ReferencePath = reference.DocumentPath };
                 }
 
-                return reference;
+                return DynamicApis.FromResult<IJsonReference>(reference);
             }
         }
     }
