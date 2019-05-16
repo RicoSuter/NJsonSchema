@@ -22,10 +22,10 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The type of the JSON Schema.</param>
         public static void GenerateXmlObjectForType(this JsonSchema4 schema, Type type)
         {
-            var attributes = type.GetTypeWithoutContext().TypeAttributes;
+            var attributes = type.GetCachedType().TypeAttributes;
             if (attributes.Any())
             {
-                dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+                dynamic xmlTypeAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlTypeAttribute");
                 if (xmlTypeAttribute != null)
                     GenerateXmlObject(xmlTypeAttribute.TypeName, xmlTypeAttribute.Namespace, false, false, schema);
             }
@@ -48,8 +48,8 @@ namespace NJsonSchema.Infrastructure
         public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
         {
             // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
-            var attributes = type.GetTypeWithoutContext().TypeAttributes;
-            dynamic xmlTypeAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+            var attributes = type.GetCachedType().TypeAttributes;
+            dynamic xmlTypeAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlTypeAttribute");
 
             var itemName = GetXmlItemName(type);
             if (xmlTypeAttribute != null)
@@ -71,14 +71,14 @@ namespace NJsonSchema.Infrastructure
 
             if (propertySchema.IsArray)
             {
-                dynamic xmlArrayAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlArrayAttribute");
+                dynamic xmlArrayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlArrayAttribute");
                 if (xmlArrayAttribute != null)
                 {
                     xmlName = xmlArrayAttribute.ElementName;
                     xmlNamespace = xmlArrayAttribute.Namespace;
                 }
 
-                dynamic xmlArrayItemsAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlArrayItemAttribute");
+                dynamic xmlArrayItemsAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlArrayItemAttribute");
                 if (xmlArrayItemsAttribute != null)
                 {
                     var xmlItemName = xmlArrayItemsAttribute.ElementName;
@@ -90,14 +90,14 @@ namespace NJsonSchema.Infrastructure
                 xmlWrapped = true;
             }
 
-            dynamic xmlElementAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlElementAttribute");
+            dynamic xmlElementAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlElementAttribute");
             if (xmlElementAttribute != null)
             {
                 xmlName = xmlElementAttribute.ElementName;
                 xmlNamespace = xmlElementAttribute.Namespace;
             }
 
-            dynamic xmlAttribute = attributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlAttributeAttribute");
+            dynamic xmlAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlAttributeAttribute");
             if (xmlAttribute != null)
             {
                 if (!string.IsNullOrEmpty(xmlAttribute.AttributeName))
@@ -110,8 +110,8 @@ namespace NJsonSchema.Infrastructure
             // We need to ensure that the property name is preserved
             if (string.IsNullOrEmpty(xmlName) && propertySchema.Type == JsonObjectType.None)
             {
-                var referencedTypeAttributes = type.GetTypeWithoutContext().TypeAttributes;
-                dynamic xmlReferenceTypeAttribute = referencedTypeAttributes.TryGetIfAssignableTo("System.Xml.Serialization.XmlTypeAttribute");
+                var referencedTypeAttributes = type.GetCachedType().TypeAttributes;
+                dynamic xmlReferenceTypeAttribute = referencedTypeAttributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlTypeAttribute");
                 if (xmlReferenceTypeAttribute != null)
                 {
                     xmlName = propertyName;

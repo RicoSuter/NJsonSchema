@@ -137,7 +137,7 @@ namespace NJsonSchema
                     var ignoredProperties = _ignoredPropertyCache[type];
 
                     foreach (var member in obj.GetType()
-                        .GetPropertiesAndFieldsWithContext()
+                        .GetContextualPropertiesAndFields()
                         .Where(p => p.GetContextAttribute<JsonIgnoreAttribute>() == null))
                     {
                         var propertyName = member.GetName();

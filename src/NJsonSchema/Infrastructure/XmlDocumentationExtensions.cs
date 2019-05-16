@@ -20,11 +20,11 @@ namespace NJsonSchema.Infrastructure
     /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
     public static class XmlDocumentationExtensions
     {
-        private static Dictionary<MemberWithContext, string> _names = new Dictionary<MemberWithContext, string>();
+        private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        public static string GetName(this MemberWithContext member)
+        public static string GetName(this ContextualMemberInfo member)
         {
             if (!_names.ContainsKey(member))
             {
@@ -40,7 +40,7 @@ namespace NJsonSchema.Infrastructure
             return _names[member];
         }
 
-        private static string GetNameWithoutCache(MemberWithContext member)
+        private static string GetNameWithoutCache(ContextualMemberInfo member)
         {
             var jsonPropertyAttribute = member.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
@@ -49,7 +49,7 @@ namespace NJsonSchema.Infrastructure
             var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
-                var dataContractAttribute = member.MemberInfo.DeclaringType.GetTypeWithoutContext().GetTypeAttribute<DataContractAttribute>();
+                var dataContractAttribute = member.MemberInfo.DeclaringType.GetCachedType().GetTypeAttribute<DataContractAttribute>();
                 if (dataContractAttribute != null)
                 {
                     return dataMemberAttribute.Name;
@@ -65,12 +65,12 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static async Task<string> GetDescriptionAsync(this MemberInfo memberInfo, IEnumerable<Attribute> attributes)
         {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
                 return descriptionAttribute.Description;
             else
             {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
                     return displayAttribute.Description;
 
@@ -91,12 +91,12 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static async Task<string> GetDescriptionAsync(this ParameterInfo parameter, IEnumerable<Attribute> attributes)
         {
-            dynamic descriptionAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
                 return descriptionAttribute.Description;
             else
             {
-                dynamic displayAttribute = attributes.TryGetIfAssignableTo("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
                     return displayAttribute.Description;
 

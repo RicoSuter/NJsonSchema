@@ -19,18 +19,18 @@ namespace NJsonSchema.Generation
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        JsonTypeDescription GetDescription(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings);
+        JsonTypeDescription GetDescription(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="typeWithContext">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings);
+        JsonTypeDescription GetDescription(ContextualType typeWithContext, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Checks whether a type is nullable.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        bool IsNullable(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling);
+        bool IsNullable(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling);
     }
 }

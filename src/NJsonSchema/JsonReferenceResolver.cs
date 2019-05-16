@@ -242,7 +242,7 @@ namespace NJsonSchema
                         checkedObjects);
                 }
 
-                foreach (var member in obj.GetType().GetPropertiesAndFieldsWithContext()
+                foreach (var member in obj.GetType().GetContextualPropertiesAndFields()
                     .Where(p => p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var pathSegment = member.GetName();

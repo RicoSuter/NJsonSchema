@@ -20,7 +20,7 @@ namespace NJsonSchema
         /// <returns>The new name.</returns>
         public virtual string Generate(Type type)
         {
-            var jsonSchemaAttribute = type.GetTypeWithoutContext().GetTypeAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = type.GetCachedType().GetTypeAttribute<JsonSchemaAttribute>();
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
                 return jsonSchemaAttribute.Name;
 
@@ -28,7 +28,7 @@ namespace NJsonSchema
             //if (!string.IsNullOrEmpty(jsonObjectAttribute.Title) && Regex.IsMatch(jsonObjectAttribute.Title, "^[a-zA-Z0-9_]*$"))
             //    return jsonObjectAttribute.Title;
 
-            return type.GetSafeTypeName();
+            return type.GetDisplayName();
         }
     }
 }

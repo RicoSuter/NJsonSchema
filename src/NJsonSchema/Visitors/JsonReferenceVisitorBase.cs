@@ -195,7 +195,7 @@ namespace NJsonSchema.Visitors
             }
             else
             {
-                foreach (var member in type.GetPropertiesAndFieldsWithContext().Where(p =>
+                foreach (var member in type.GetContextualPropertiesAndFields().Where(p =>
                     p.MemberInfo is PropertyInfo &&
                     p.GetTypeAttribute<JsonIgnoreAttribute>() == null &&
                     (!(obj is JsonSchema4) || !_jsonSchemaPropertyCache.Contains(p.Name)) &&

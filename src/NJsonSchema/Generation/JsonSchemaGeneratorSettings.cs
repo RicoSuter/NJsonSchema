@@ -207,7 +207,7 @@ namespace NJsonSchema.Generation
         public bool GetActualGenerateAbstractSchema(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
+                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
 
             return (GenerateAbstractSchemas && attribute == null) || attribute?.TryGetPropertyValue("IsAbstract", true) == true;
         }
@@ -218,7 +218,7 @@ namespace NJsonSchema.Generation
         public bool GetActualFlattenInheritanceHierarchy(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
 
             return (FlattenInheritanceHierarchy && attribute == null) || attribute?.TryGetPropertyValue("Flatten", true) == true;
         }

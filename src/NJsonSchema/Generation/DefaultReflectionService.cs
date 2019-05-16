@@ -27,7 +27,7 @@ namespace NJsonSchema.Generation
         /// <param name="typeWithContext">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(TypeWithContext typeWithContext, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(ContextualType typeWithContext, JsonSchemaGeneratorSettings settings)
         {
             return GetDescription(typeWithContext, settings.DefaultReferenceTypeNullHandling, settings);
         }
@@ -37,7 +37,7 @@ namespace NJsonSchema.Generation
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        public virtual JsonTypeDescription GetDescription(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
         {
             var isNullable = IsNullable(typeWithContext, defaultReferenceTypeNullHandling);
 
@@ -49,7 +49,7 @@ namespace NJsonSchema.Generation
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;
-                typeWithContext = type.GetTypeWithContext();
+                typeWithContext = type.GetContextualType();
 
                 if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
@@ -130,10 +130,10 @@ namespace NJsonSchema.Generation
             if (type == typeof(byte[]))
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
 
-            if (type.IsAssignableTo(nameof(JArray), TypeNameStyle.Name))
+            if (type.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name))
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
-            if (type.IsAssignableTo(nameof(JToken), TypeNameStyle.Name) ||
+            if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
                 type == typeof(object))
             {
@@ -176,20 +176,28 @@ namespace NJsonSchema.Generation
         /// <param name="typeWithContext">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(TypeWithContext typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
+        public virtual bool IsNullable(ContextualType typeWithContext, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             var jsonPropertyAttribute = typeWithContext.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
+            {
                 return false;
+            }
 
-            if (typeWithContext.ContextAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (typeWithContext.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
+            {
                 return false;
+            }
 
-            if (typeWithContext.ContextAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (typeWithContext.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            {
                 return true;
+            }
 
-            if (typeWithContext.OriginalType.Name == "Nullable`1")
-                return true;
+            if (typeWithContext.Nullability != Nullability.Unknown)
+            {
+                return typeWithContext.Nullability == Nullability.Nullable;
+            }
 
             var isValueType = typeWithContext.Type != typeof(string) && typeWithContext.Type.GetTypeInfo().IsValueType;
             return isValueType == false && defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
@@ -198,14 +206,14 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether the given type is a file/binary type.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsBinary(TypeWithContext typeWithContext)
+        protected virtual bool IsBinary(ContextualType typeWithContext)
         {
             // TODO: Move all file handling to NSwag. How?
 
             var parameterTypeName = typeWithContext.Type.Name;
             return parameterTypeName == "IFormFile" ||
-                   typeWithContext.Type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
-                   typeWithContext.Type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
+                   typeWithContext.Type.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
+                   typeWithContext.Type.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
 #if !LEGACY
                    typeWithContext.Type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
 #else
@@ -218,7 +226,7 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether the given type is an array type.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(TypeWithContext typeWithContext)
+        protected virtual bool IsArrayType(ContextualType typeWithContext)
         {
             if (IsDictionaryType(typeWithContext))
                 return false;
@@ -235,7 +243,7 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether the given type is a dictionary type.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(TypeWithContext typeWithContext)
+        protected virtual bool IsDictionaryType(ContextualType typeWithContext)
         {
             if (typeWithContext.Type.Name == "IDictionary`2" || typeWithContext.Type.Name == "IReadOnlyDictionary`2")
                 return true;
@@ -250,7 +258,7 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether the given type is an array type.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(TypeWithContext typeWithContext)
+        protected virtual bool IsArrayType(ContextualType typeWithContext)
         {
             if (IsDictionaryType(typeWithContext))
                 return false;
@@ -267,7 +275,7 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether the given type is a dictionary type.</summary>
         /// <param name="typeWithContext">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(TypeWithContext typeWithContext)
+        protected virtual bool IsDictionaryType(ContextualType typeWithContext)
         {
             if (typeWithContext.OriginalType.Name == "IDictionary`2" || typeWithContext.OriginalType.Name == "IReadOnlyDictionary`2")
                 return true;
@@ -279,7 +287,7 @@ namespace NJsonSchema.Generation
 
 #endif
 
-        private bool IsStringEnum(TypeWithContext type, JsonSchemaGeneratorSettings settings)
+        private bool IsStringEnum(ContextualType type, JsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
             var hasStringEnumConverterOnType = HasStringEnumConverter(type.TypeAttributes);
@@ -297,7 +305,7 @@ namespace NJsonSchema.Generation
             if (ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                return converterType.IsAssignableTo("StringEnumConverter", TypeNameStyle.Name);
+                return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name);
             }
 
             return false;
