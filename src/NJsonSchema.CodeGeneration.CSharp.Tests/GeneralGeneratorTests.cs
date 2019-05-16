@@ -1724,8 +1724,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var types = generator.GenerateTypes(schema, "MyEnum");
 
             //// Assert
-            Assert.Contains("_1 = 1", types.Artifacts.First().Code);
-            Assert.Contains("__1 = -1", types.Artifacts.First().Code);
+            Assert.Contains("_1 = 1", types.First().Code);
+            Assert.Contains("__1 = -1", types.First().Code);
         }
 
         private static void AssertCompile(string code)
