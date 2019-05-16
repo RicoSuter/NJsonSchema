@@ -49,7 +49,7 @@ namespace NJsonSchema.Generation
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;
-                typeWithContext = type.GetContextualType();
+                typeWithContext = type.ToContextualType();
 
                 if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;

@@ -49,7 +49,7 @@ namespace NJsonSchema.Infrastructure
             var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
-                var dataContractAttribute = member.MemberInfo.DeclaringType.GetCachedType().GetTypeAttribute<DataContractAttribute>();
+                var dataContractAttribute = member.MemberInfo.DeclaringType.ToCachedType().GetTypeAttribute<DataContractAttribute>();
                 if (dataContractAttribute != null)
                 {
                     return dataMemberAttribute.Name;
