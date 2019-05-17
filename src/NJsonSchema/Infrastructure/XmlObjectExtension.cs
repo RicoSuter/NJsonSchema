@@ -33,8 +33,7 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Generates an XML object for a JSON Schema definition.</summary>
         /// <param name="schema">The JSON Schema</param>
-        /// <param name="type">The array type</param>
-        public static void GenerateXmlObjectForArrayType(this JsonSchema4 schema, Type type)
+        public static void GenerateXmlObjectForArrayType(this JsonSchema4 schema)
         {
             if (schema.IsArray && schema.ParentSchema == null)
             {
@@ -45,15 +44,17 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Generates XMLObject structure for an array with primitive types</summary>
         /// <param name="schema">The JSON Schema of the item.</param>
         /// <param name="type">The item type.</param>
-        public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, Type type)
+        public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, CachedType type)
         {
             // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
-            var attributes = type.ToCachedType().TypeAttributes;
+            var attributes = type.TypeAttributes;
             dynamic xmlTypeAttribute = attributes.TryGetAssignableToTypeName("System.Xml.Serialization.XmlTypeAttribute");
 
-            var itemName = GetXmlItemName(type);
+            var itemName = GetXmlItemName(type.OriginalType);
             if (xmlTypeAttribute != null)
+            {
                 itemName = xmlTypeAttribute.TypeName;
+            }
 
             GenerateXmlObject(itemName, null, false, false, schema);
         }

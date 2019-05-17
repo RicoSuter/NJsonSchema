@@ -358,7 +358,7 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = await ((CachedType)type).GetDescriptionAsync().ConfigureAwait(false);
+            schema.Description = await type.ToCachedType().GetDescriptionAsync().ConfigureAwait(false);
 
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
@@ -470,21 +470,22 @@ namespace NJsonSchema.Generation
             var itemType = jsonSchemaAttribute?.ArrayItem ?? contextualType.OriginalType.GetEnumerableItemType();
             if (itemType != null)
             {
-                var itemIsNullable = contextualType.GetContextAttributes<ItemsCanBeNullAttribute>().Any() == true ||
-                    itemType.Name == "Nullable`1";
+                var contextualItemType = itemType.ToContextualType();
+                var itemIsNullable = contextualType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
+                                     contextualItemType.Nullability == Nullability.Nullable;
 
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-                    itemType.ToContextualType(), itemIsNullable, schemaResolver, async (itemSchema, typeSchema) =>
+                    contextualItemType, itemIsNullable, schemaResolver, async (itemSchema, typeSchema) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
-                            itemSchema.GenerateXmlObjectForItemType(itemType);
+                            itemSchema.GenerateXmlObjectForItemType(contextualItemType);
                         }
                     }).ConfigureAwait(false);
 
                 if (Settings.GenerateXmlObjects)
                 {
-                    schema.GenerateXmlObjectForArrayType(contextualType.OriginalType);
+                    schema.GenerateXmlObjectForArrayType();
                 }
             }
             else
