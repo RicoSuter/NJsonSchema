@@ -27,9 +27,13 @@ namespace NJsonSchema.Infrastructure
                 {
                     var enumerable = instance != null ? property.ValueProvider.GetValue(instance) as IEnumerable : null;
                     if (enumerable != null)
+                    {
                         return enumerable.GetEnumerator().MoveNext();
+                    }
                     else
+                    {
                         return true;
+                    }
                 };
             }
 

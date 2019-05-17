@@ -121,20 +121,7 @@ namespace NJsonSchema
                 var contract = contractResolver.ResolveContract(type) as JsonObjectContract;
                 if (contract != null)
                 {
-                    if (!_ignoredPropertyCache.ContainsKey(type))
-                    {
-                        lock (_ignoredPropertyCache)
-                        {
-                            if (!_ignoredPropertyCache.ContainsKey(type))
-                            {
-                                _ignoredPropertyCache[type] = new HashSet<string>(contract.Properties
-                                    .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false)
-                                    .Select(p => p.UnderlyingName));
-                            }
-                        }
-                    }
-
-                    var ignoredProperties = _ignoredPropertyCache[type];
+                    var ignoredProperties = GetIgnoredProperties(type, contract);
 
                     foreach (var member in obj.GetType()
                         .GetContextualPropertiesAndFields()
@@ -165,6 +152,25 @@ namespace NJsonSchema
             }
 
             return false;
+        }
+
+        private static HashSet<string> GetIgnoredProperties(Type type, JsonObjectContract contract)
+        {
+            if (!_ignoredPropertyCache.ContainsKey(type))
+            {
+                lock (_ignoredPropertyCache)
+                {
+                    if (!_ignoredPropertyCache.ContainsKey(type))
+                    {
+                        _ignoredPropertyCache[type] = new HashSet<string>(contract.Properties
+                            .Where(p => p.Ignored)
+                            .Select(p => p.UnderlyingName));
+                    }
+                }
+            }
+
+            var ignoredProperties = _ignoredPropertyCache[type];
+            return ignoredProperties;
         }
     }
 }
