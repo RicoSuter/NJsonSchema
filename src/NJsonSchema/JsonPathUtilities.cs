@@ -10,19 +10,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Namotion.Reflection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
-        private static Dictionary<Type, HashSet<string>> _ignoredPropertyCache =
-            new Dictionary<Type, HashSet<string>>();
-
         /// <summary>Gets the $ref replacement string.</summary>
         public const string ReferenceReplaceString = "__referencePath";
 
@@ -121,30 +117,27 @@ namespace NJsonSchema
                 var contract = contractResolver.ResolveContract(type) as JsonObjectContract;
                 if (contract != null)
                 {
-                    var ignoredProperties = GetIgnoredProperties(type, contract);
-
-                    foreach (var member in obj.GetType()
-                        .GetContextualPropertiesAndFields()
-                        .Where(p => p.GetContextAttribute<JsonIgnoreAttribute>() == null))
+                    foreach (var jsonProperty in contract.Properties.Where(p => !p.Ignored))
                     {
-                        var propertyName = member.GetName();
-
-                        var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
-                        if (isExtensionDataProperty || !ignoredProperties.Contains(member.Name))
+                        var value = jsonProperty.ValueProvider.GetValue(obj);
+                        if (value != null)
                         {
-                            var value = member.GetValue(obj);
-                            if (value != null)
+                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + jsonProperty.PropertyName, checkedObjects, contractResolver))
                             {
-                                if (isExtensionDataProperty)
-                                {
-                                    if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
-                                        return true;
-                                }
-                                else
-                                {
-                                    if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, contractResolver))
-                                        return true;
-                                }
+                                return true;
+                            }
+                        }
+                    }
+
+                    if (obj is IJsonExtensionObject)
+                    {
+                        var extensionDataProperty = type.GetRuntimeProperty(nameof(IJsonExtensionObject.ExtensionData));
+                        if (extensionDataProperty != null)
+                        {
+                            var value = extensionDataProperty.GetValue(obj);
+                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
+                            {
+                                return true;
                             }
                         }
                     }
@@ -152,25 +145,6 @@ namespace NJsonSchema
             }
 
             return false;
-        }
-
-        private static HashSet<string> GetIgnoredProperties(Type type, JsonObjectContract contract)
-        {
-            if (!_ignoredPropertyCache.ContainsKey(type))
-            {
-                lock (_ignoredPropertyCache)
-                {
-                    if (!_ignoredPropertyCache.ContainsKey(type))
-                    {
-                        _ignoredPropertyCache[type] = new HashSet<string>(contract.Properties
-                            .Where(p => p.Ignored)
-                            .Select(p => p.UnderlyingName));
-                    }
-                }
-            }
-
-            var ignoredProperties = _ignoredPropertyCache[type];
-            return ignoredProperties;
         }
     }
 }
