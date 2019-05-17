@@ -8,9 +8,7 @@
 
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -60,25 +58,42 @@ namespace NJsonSchema.Infrastructure
         }
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
-        /// <param name="memberInfo">The member info</param>
-        /// <param name="attributes">The attributes.</param>
+        /// <param name="type">The member info</param>
+        /// <param name="attributeType">The attribute type to check.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this MemberInfo memberInfo, IEnumerable<Attribute> attributes)
+        public static async Task<string> GetDescriptionAsync(this CachedType type, DescriptionAttributeType attributeType = DescriptionAttributeType.Context)
         {
-            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
+            var attributes = type is ContextualType contextualType && attributeType == DescriptionAttributeType.Context ?
+                contextualType.ContextAttributes : type.TypeAttributes;
+
+            dynamic descriptionAttribute = attributes.TryGetAssignableToTypeName("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+            {
                 return descriptionAttribute.Description;
+            }
             else
             {
-                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = attributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
-                    return displayAttribute.Description;
-
-                if (memberInfo != null)
                 {
-                    var summary = await memberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
+                    return displayAttribute.Description;
+                }
+
+                if (type is ContextualMemberInfo contextualMember)
+                {
+                    var summary = await contextualMember.MemberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
+                    {
                         return summary;
+                    }
+                }
+                else if (type != null)
+                {
+                    var summary = await type.Type.GetXmlSummaryAsync().ConfigureAwait(false);
+                    if (summary != string.Empty)
+                    {
+                        return summary;
+                    }
                 }
             }
 
@@ -87,22 +102,21 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="parameter">The parameter.</param>
-        /// <param name="attributes">The attributes.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this ParameterInfo parameter, IEnumerable<Attribute> attributes)
+        public static async Task<string> GetDescriptionAsync(this ContextualParameterInfo parameter)
         {
-            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
                 return descriptionAttribute.Description;
             else
             {
-                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
                     return displayAttribute.Description;
 
                 if (parameter != null)
                 {
-                    var summary = await parameter.GetXmlDocumentationAsync().ConfigureAwait(false);
+                    var summary = await parameter.ParameterInfo.GetXmlDocumentationAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
                         return summary;
                 }
