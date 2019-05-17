@@ -16,7 +16,7 @@ namespace NJsonSchema.Demo.Performance
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 500; i++)
             {
                 var schema = await JsonSchema4.FromTypeAsync<Container>();
                 var json = schema.ToJson();

@@ -67,7 +67,7 @@ namespace NJsonSchema.Generation
 
             if (type.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(contextualType, settings);
+                var isStringEnum = IsStringEnum(contextualType, settings.ActualSerializerSettings);
                 return JsonTypeDescription.CreateForEnumeration(type,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
@@ -296,9 +296,9 @@ namespace NJsonSchema.Generation
 
 #endif
 
-        private bool IsStringEnum(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
+        private bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
         {
-            var hasGlobalStringEnumConverter = settings.ActualSerializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            var hasGlobalStringEnumConverter = serializerSettings.Converters.OfType<StringEnumConverter>().Any();
             return hasGlobalStringEnumConverter || HasStringEnumConverter(contextualType);
         }
 
