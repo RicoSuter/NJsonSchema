@@ -269,11 +269,7 @@ namespace NJsonSchema
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonProperty> PropertiesRaw
         {
-            get
-            {
-                return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => p.Value) : null;
-            }
+            get => Properties != null && Properties.Count > 0 ? Properties : null;
             set
             {
                 Properties = value != null ?
