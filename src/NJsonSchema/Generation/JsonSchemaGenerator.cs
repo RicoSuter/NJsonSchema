@@ -394,7 +394,7 @@ namespace NJsonSchema.Generation
 
         private async Task ApplySchemaProcessorsAsync(ContextualType contextualType, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(contextualType.Type, schema, schemaResolver, this, Settings);
+            var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
             {
                 await processor.ProcessAsync(context).ConfigureAwait(false);
