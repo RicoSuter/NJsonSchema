@@ -41,11 +41,9 @@ namespace NJsonSchema.Generation
         {
             var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
 
-            var jsonSchemaTypeAttribute = contextualType.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
-                                          contextualType.GetContextAttribute<JsonSchemaTypeAttribute>();
-
             var type = contextualType.OriginalType;
 
+            var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;
@@ -55,9 +53,7 @@ namespace NJsonSchema.Generation
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
             }
 
-            var jsonSchemaAttribute = contextualType.GetTypeAttribute<JsonSchemaAttribute>() ??
-                                      contextualType.GetContextAttribute<JsonSchemaAttribute>();
-
+            var jsonSchemaAttribute = contextualType.GetAttribute<JsonSchemaAttribute>();
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
@@ -165,7 +161,7 @@ namespace NJsonSchema.Generation
             if (IsArrayType(contextualType) && contract is JsonArrayContract)
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
 
-            if (type.Name == "Nullable`1")
+            if (contextualType.IsNullableType)
             {
                 var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
                 typeDescription.IsNullable = true;
@@ -205,10 +201,10 @@ namespace NJsonSchema.Generation
                 return contextualType.Nullability == Nullability.Nullable;
             }
 
-            var isValueType = contextualType.Type != typeof(string) && 
+            var isValueType = contextualType.Type != typeof(string) &&
                               contextualType.TypeInfo.IsValueType;
 
-            return isValueType == false && 
+            return isValueType == false &&
                    defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
@@ -244,9 +240,10 @@ namespace NJsonSchema.Generation
             if (contextualType.Type.Name == "ObservableCollection`1")
                 return true;
 
-            return contextualType.Type.IsArray || (contextualType.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
-                (contextualType.Type.GetTypeInfo().BaseType == null ||
-                !contextualType.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
+            return contextualType.Type.IsArray ||
+                (contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
@@ -257,9 +254,9 @@ namespace NJsonSchema.Generation
             if (contextualType.Type.Name == "IDictionary`2" || contextualType.Type.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return contextualType.Type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
-                (contextualType.Type.GetTypeInfo().BaseType == null ||
-                !contextualType.Type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
+            return contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IDictionary)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
 #else
@@ -276,9 +273,10 @@ namespace NJsonSchema.Generation
             if (contextualType.OriginalType.Name == "ObservableCollection`1")
                 return true;
 
-            return contextualType.OriginalType.IsArray || (contextualType.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
-                (contextualType.OriginalType.GetTypeInfo().BaseType == null ||
-                !contextualType.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
+            return contextualType.Type.IsArray || 
+                (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
@@ -289,9 +287,9 @@ namespace NJsonSchema.Generation
             if (contextualType.OriginalType.Name == "IDictionary`2" || contextualType.OriginalType.Name == "IReadOnlyDictionary`2")
                 return true;
 
-            return contextualType.OriginalType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
-                (contextualType.OriginalType.GetTypeInfo().BaseType == null ||
-                !contextualType.OriginalType.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
+            return contextualType.Type.GetInterfaces().Contains(typeof(IDictionary)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
         }
 
 #endif
