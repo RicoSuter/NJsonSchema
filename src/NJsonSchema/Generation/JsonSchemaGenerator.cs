@@ -585,7 +585,7 @@ namespace NJsonSchema.Generation
                 .ToList();
 #endif
 
-            var memberInfos = members.Select(m => m.ToContextualMember());
+            var contextualMembers = members.Select(m => m.ToContextualMember());
             var contract = Settings.ResolveContract(type);
 
             var allowedProperties = GetTypeProperties(type);
@@ -606,7 +606,7 @@ namespace NJsonSchema.Generation
 
                     if (shouldSerialize)
                     {
-                        var memberInfo = memberInfos.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
+                        var memberInfo = contextualMembers.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
                         var propertyInfo = memberInfo as ContextualPropertyInfo;
 
                         if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
@@ -624,7 +624,7 @@ namespace NJsonSchema.Generation
             else
             {
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-                foreach (var memberInfo in memberInfos.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
+                foreach (var memberInfo in contextualMembers.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
                     var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??

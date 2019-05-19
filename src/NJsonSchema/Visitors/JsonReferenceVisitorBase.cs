@@ -11,13 +11,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Namotion.Reflection;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors
@@ -26,10 +22,6 @@ namespace NJsonSchema.Visitors
     public abstract class JsonReferenceVisitorBase
     {
         private readonly IContractResolver _contractResolver;
-        private readonly string[] _jsonSchemaPropertyCache = typeof(JsonSchema4)
-            .GetRuntimeProperties()
-            .Select(p => p.Name)
-            .ToArray();
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
         protected JsonReferenceVisitorBase()
