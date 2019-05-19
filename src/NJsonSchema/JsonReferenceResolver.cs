@@ -151,16 +151,21 @@ namespace NJsonSchema
                 var filePath = DynamicApis.GetFullPath(arr[0]);
                 if (!_resolvedObjects.ContainsKey(filePath))
                 {
-                    var schema = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);
-                    schema.DocumentPath = jsonPath;
-                    if (schema is JsonSchema4 && append)
-                        _schemaResolver.AppendSchema((JsonSchema4)schema, filePath.Split('/', '\\').Last().Split('.').First());
-
-                    _resolvedObjects[filePath] = schema;
+                    var loadedFile = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);
+                    loadedFile.DocumentPath = jsonPath;
+                    _resolvedObjects[filePath] = loadedFile;
                 }
 
-                var result = _resolvedObjects[filePath];
-                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, arr[1]).ConfigureAwait(false);
+                var referencedFile = _resolvedObjects[filePath];
+                var resolvedSchema = arr.Length == 1 ? referencedFile : await ResolveReferenceAsync(referencedFile, arr[1]).ConfigureAwait(false);
+                if (resolvedSchema is JsonSchema4 && append &&
+                    (_schemaResolver.RootObject as JsonSchema4)?.Definitions.Values.Contains(referencedFile) != true)
+                {
+                    var key = jsonPath.Split('/', '\\').Last().Split('.').First();
+                    _schemaResolver.AppendSchema((JsonSchema4)resolvedSchema, key);
+                }
+
+                return resolvedSchema;
             }
             catch (Exception exception)
             {
