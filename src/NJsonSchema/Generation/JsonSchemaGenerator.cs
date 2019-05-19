@@ -114,9 +114,8 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema4, new()
         {
             var type = contextualType.OriginalType;
-            var jsonSchemaTypeAttribute = contextualType.GetTypeAttribute<JsonSchemaTypeAttribute>() ??
-                                          contextualType.GetContextAttribute<JsonSchemaTypeAttribute>();
 
+            var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;

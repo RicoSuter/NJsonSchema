@@ -234,11 +234,15 @@ namespace NJsonSchema.Generation
         protected virtual bool IsArrayType(ContextualType contextualType)
         {
             if (IsDictionaryType(contextualType))
+            {
                 return false;
+            }
 
             // TODO: Improve these checks
-            if (contextualType.Type.Name == "ObservableCollection`1")
+            if (contextualType.TypeName == "ObservableCollection`1")
+            {
                 return true;
+            }
 
             return contextualType.Type.IsArray ||
                 (contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
@@ -251,8 +255,10 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.Type.Name == "IDictionary`2" || contextualType.Type.Name == "IReadOnlyDictionary`2")
+            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
+            {
                 return true;
+            }
 
             return contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IDictionary)) &&
                 (contextualType.TypeInfo.BaseType == null ||
@@ -267,11 +273,15 @@ namespace NJsonSchema.Generation
         protected virtual bool IsArrayType(ContextualType contextualType)
         {
             if (IsDictionaryType(contextualType))
+            {
                 return false;
+            }
 
             // TODO: Improve these checks
-            if (contextualType.OriginalType.Name == "ObservableCollection`1")
+            if (contextualType.TypeName == "ObservableCollection`1")
+            {
                 return true;
+            }
 
             return contextualType.Type.IsArray || 
                 (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
@@ -284,8 +294,10 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.OriginalType.Name == "IDictionary`2" || contextualType.OriginalType.Name == "IReadOnlyDictionary`2")
+            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
+            {
                 return true;
+            }
 
             return contextualType.Type.GetInterfaces().Contains(typeof(IDictionary)) &&
                 (contextualType.TypeInfo.BaseType == null ||
