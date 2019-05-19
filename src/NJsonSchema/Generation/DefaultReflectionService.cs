@@ -39,9 +39,8 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         public virtual JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
         {
-            var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
-
             var type = contextualType.OriginalType;
+            var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
 
             var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
             if (jsonSchemaTypeAttribute != null)

@@ -722,7 +722,9 @@ namespace NJsonSchema.Generation
             var isIntegerEnum = typeDescription.Type == JsonObjectType.Integer;
 
             if (!schemaResolver.HasSchema(type, isIntegerEnum))
+            {
                 await GenerateAsync(type, schemaResolver).ConfigureAwait(false);
+            }
         }
 
         private async Task<JsonSchema4> GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
