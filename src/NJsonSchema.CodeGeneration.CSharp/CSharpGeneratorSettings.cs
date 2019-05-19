@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             GenerateDataAnnotations = true;
             TypeAccessModifier = "public";
             PropertySetterAccessModifier = string.Empty;
-            GenerateJsonMethods = true;
+            GenerateJsonMethods = false;
             EnforceFlagEnums = false;
 
             ValueGenerator = new CSharpValueGenerator(this);
