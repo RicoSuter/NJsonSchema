@@ -84,10 +84,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
-        public bool IsArray => _property.ActualTypeSchema.IsArray;
+        public bool IsArray => _resolver.GetResolvableSchema(_property).IsArray;
 
         /// <summary>Gets a value indicating whether the property type is a dictionary.</summary>
-        public bool IsDictionary => _property.ActualTypeSchema.IsDictionary;
+        public bool IsDictionary => _resolver.GetResolvableSchema(_property).IsDictionary;
 
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualTypeSchema?.Item, PropertyName) ?? "any";
@@ -129,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
                         Value = "data[\"" + _property.Name + "\"]",
-                        Schema = _property.ActualSchema,
+                        Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
@@ -154,7 +154,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
-                        Schema = _property.ActualSchema,
+                        Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,

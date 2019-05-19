@@ -55,7 +55,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The result.</returns>
         public bool SupportsConstructorConversion(JsonSchema4 schema)
         {
-            return schema?.ActualSchema.BaseDiscriminator == null;
+            return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
+        }
+
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected override bool IsDefinitionTypeSchema(JsonSchema4 schema)
+        {
+            if (schema.IsDictionary && !Settings.InlineNamedDictionaries)
+            {
+                return true;
+            }
+
+            return base.IsDefinitionTypeSchema(schema);
         }
 
         private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
@@ -65,34 +78,41 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             schema = GetResolvableSchema(schema);
 
-            if (schema.IsAnyType)
+            // Primitive schemas (no new type)
+
+            if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
                 return "any";
 
-            var type = schema.Type;
-            if (type == JsonObjectType.None && schema.IsEnumeration)
+            var type = schema.ActualTypeSchema.Type;
+            if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
             {
-                type = schema.Enumeration.All(v => v is int) ?
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
-
             if (type.HasFlag(JsonObjectType.Number))
                 return "number";
 
-            if (type.HasFlag(JsonObjectType.Integer))
-                return ResolveInteger(schema, typeNameHint);
+            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+                return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
 
             if (type.HasFlag(JsonObjectType.Boolean))
                 return "boolean";
 
-            if (type.HasFlag(JsonObjectType.String))
-                return ResolveString(schema, typeNameHint);
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+                return ResolveString(schema.ActualTypeSchema, typeNameHint);
 
-            if (type.HasFlag(JsonObjectType.File))
+            if (schema.IsBinary)
                 return "any";
+
+            // Type generating schemas
+
+            if (schema.ActualTypeSchema.IsEnumeration)
+                return GetOrGenerateTypeName(schema, typeNameHint);
+
+            if (schema.Type.HasFlag(JsonObjectType.Array))
+                return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
 
             if (schema.IsDictionary)
             {
@@ -112,7 +132,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: {keyType}] : {valueType}; }}";
             }
 
-            return (addInterfacePrefix && SupportsConstructorConversion(schema) ? "I" : "") +
+            return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
                 GetOrGenerateTypeName(schema, typeNameHint);
         }
 
@@ -149,17 +169,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Duration";
             }
 
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
-
             return "string";
         }
 
         private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
         {
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
-
             return "number";
         }
 
@@ -169,20 +183,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
+
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
-                return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
+                var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
+
+                return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
             {
                 var tupleTypes = schema.Items
-                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .Select(s => GetNullableItemType(s, Resolve(s, false, null)))
                     .ToArray();
 
                 return string.Format("[" + string.Join(", ", tupleTypes) + "]");
             }
 
             return "any[]";
+        }
+
+        private string GetNullableItemType(JsonSchema4 schema, string itemType)
+        {
+            if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
+            {
+                return string.Format("({0} | {1})", itemType, Settings.NullValue.ToString().ToLowerInvariant());
+            }
+
+            return itemType;
         }
     }
 }

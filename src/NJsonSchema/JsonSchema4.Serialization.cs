@@ -60,7 +60,11 @@ namespace NJsonSchema
             Initialize();
         }
 
-        /// <summary>Gets or sets the discriminator property (Swagger only).</summary>
+        /// <summary>Gets the discriminator property (Swagger only).</summary>
+        [JsonIgnore]
+        public string ActualDiscriminator => ActualTypeSchema.Discriminator;
+
+        /// <summary>Gets or sets the discriminator property (Swagger only, should not be used in internal tooling).</summary>
         [JsonIgnore]
         public string Discriminator
         {
@@ -75,11 +79,17 @@ namespace NJsonSchema
                     };
                 }
                 else
+                {
                     DiscriminatorObject = null;
+                }
             }
         }
 
-        /// <summary>Gets or sets the discriminator (OpenApi only).</summary>
+        /// <summary>Gets the actual resolved discriminator of this schema (no inheritance, OpenApi only).</summary>
+        [JsonIgnore]
+        public OpenApiDiscriminator ActualDiscriminatorObject => DiscriminatorObject ?? ActualTypeSchema.DiscriminatorObject;
+
+        /// <summary>Gets or sets the discriminator of this schema (OpenApi only).</summary>
         [JsonIgnore]
         public OpenApiDiscriminator DiscriminatorObject { get; set; }
 
@@ -96,7 +106,7 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is String)
+                if (value is string)
                     Discriminator = (string)value;
                 else if (value != null)
                     DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
@@ -157,7 +167,7 @@ namespace NJsonSchema
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                     AllowAdditionalItems = value.Equals("true");
                 else if (value != null)
-                    AdditionalItemsSchema = FromJsonWithoutReferenceHandling(value.ToString());
+                    AdditionalItemsSchema = FromJsonWithCurrentSettings(value);
             }
         }
 
@@ -179,7 +189,7 @@ namespace NJsonSchema
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                     AllowAdditionalProperties = value.Equals("true");
                 else if (value != null)
-                    AdditionalPropertiesSchema = FromJsonWithoutReferenceHandling(value.ToString());
+                    AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value);
             }
         }
 
@@ -197,9 +207,9 @@ namespace NJsonSchema
             set
             {
                 if (value is JArray)
-                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJsonWithoutReferenceHandling(t.ToString())));
+                    Items = new ObservableCollection<JsonSchema4>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t)));
                 else if (value != null)
-                    Item = FromJsonWithoutReferenceHandling(value.ToString());
+                    Item = FromJsonWithCurrentSettings(value);
             }
         }
 
@@ -254,34 +264,34 @@ namespace NJsonSchema
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> PropertiesRaw
+        internal IDictionary<string, JsonProperty> PropertiesRaw
         {
             get
             {
                 return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
+                    Properties.ToDictionary(p => p.Key, p => p.Value) : null;
             }
             set
             {
                 Properties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value.ToDictionary(p => p.Key, p => JsonProperty.FromJsonSchema(p.Key, p.Value))) :
+                    new ObservableDictionary<string, JsonProperty>(value) :
                     new ObservableDictionary<string, JsonProperty>();
             }
         }
 
         [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema4> PatternPropertiesRaw
+        internal IDictionary<string, JsonProperty> PatternPropertiesRaw
         {
             get
             {
                 return PatternProperties != null && PatternProperties.Count > 0 ?
-                    PatternProperties.ToDictionary(p => p.Key, p => (JsonSchema4)p.Value) : null;
+                    PatternProperties.ToDictionary(p => p.Key, p => p.Value) : null;
             }
             set
             {
                 PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonSchema4>(value.ToDictionary(p => p.Key, p => p.Value)) :
-                    new ObservableDictionary<string, JsonSchema4>();
+                    new ObservableDictionary<string, JsonProperty>(value) :
+                    new ObservableDictionary<string, JsonProperty>();
             }
         }
 
@@ -340,14 +350,15 @@ namespace NJsonSchema
             }
         }
 
-        private void RegisterSchemaDictionary(IDictionary<string, JsonSchema4> oldCollection, IDictionary<string, JsonSchema4> newCollection)
+        private void RegisterSchemaDictionary<T>(IDictionary<string, T> oldCollection, IDictionary<string, T> newCollection)
+            where T : JsonSchema4
         {
             if (oldCollection != null)
-                ((ObservableDictionary<string, JsonSchema4>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+                ((ObservableDictionary<string, T>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
 
             if (newCollection != null)
             {
-                ((ObservableDictionary<string, JsonSchema4>)newCollection).CollectionChanged += InitializeSchemaCollection;
+                ((ObservableDictionary<string, T>)newCollection).CollectionChanged += InitializeSchemaCollection;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
@@ -384,8 +395,18 @@ namespace NJsonSchema
             else if (sender is ObservableDictionary<string, JsonSchema4>)
             {
                 var collection = (ObservableDictionary<string, JsonSchema4>)sender;
-                foreach (var item in collection.Values)
-                    item.Parent = this;
+
+                foreach (var pair in collection.ToArray())
+                {
+                    if (pair.Value == null)
+                    {
+                        collection.Remove(pair.Key);
+                    }
+                    else
+                    {
+                        pair.Value.Parent = this;
+                    }
+                }
             }
         }
     }

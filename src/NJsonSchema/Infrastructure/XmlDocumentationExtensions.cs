@@ -381,15 +381,20 @@ namespace NJsonSchema.Infrastructure
             var name = GetMemberElementName(parameter.Member);
             var result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']");
 
-            var element = result.OfType<XElement>().First();
-            await ReplaceInheritdocElementsAsync(parameter.Member, element).ConfigureAwait(false);
+            var element = result.OfType<XElement>().FirstOrDefault();
+            if (element != null)
+            {
+                await ReplaceInheritdocElementsAsync(parameter.Member, element).ConfigureAwait(false);
 
-            if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
-                result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
-            else
-                result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
+                if (parameter.IsRetval || string.IsNullOrEmpty(parameter.Name))
+                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/returns");
+                else
+                    result = (IEnumerable)DynamicApis.XPathEvaluate(xml, $"/doc/members/member[@name='{name}']/param[@name='{parameter.Name}']");
 
-            return result.OfType<XElement>().FirstOrDefault();
+                return result.OfType<XElement>().FirstOrDefault();
+            }
+
+            return null;
         }
 
         private static async Task ReplaceInheritdocElementsAsync(this MemberInfo member, XElement element)
@@ -516,12 +521,10 @@ namespace NJsonSchema.Infrastructure
 
         private static async Task<string> GetXmlDocumentationPathAsync(dynamic assembly)
         {
+            string path;
             try
             {
                 if (assembly == null)
-                    return null;
-
-                if (string.IsNullOrEmpty(assembly.Location))
                     return null;
 
                 var assemblyName = assembly.GetName();
@@ -531,30 +534,53 @@ namespace NJsonSchema.Infrastructure
                 if (Cache.ContainsKey(assemblyName.FullName))
                     return null;
 
-                var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
-                var path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
-                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
-                    return path;
-
-                if (ReflectionExtensions.HasProperty(assembly, "CodeBase"))
+                if (!string.IsNullOrEmpty(assembly.Location))
                 {
-                    path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(assembly.CodeBase
-                        .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
-                        .Replace("file:\\", string.Empty);
-
+                    var assemblyDirectory = DynamicApis.PathGetDirectoryName((string)assembly.Location);
+                    path = DynamicApis.PathCombine(assemblyDirectory, (string)assemblyName.Name + ".xml");
                     if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
                         return path;
                 }
 
-                var currentDomain = Type.GetType("System.AppDomain").GetRuntimeProperty("CurrentDomain").GetValue(null);
-                if (currentDomain.HasProperty("BaseDirectory"))
+                if (ReflectionExtensions.HasProperty(assembly, "CodeBase"))
+                {
+                    var codeBase = (string)assembly.CodeBase;
+                    if (!string.IsNullOrEmpty(codeBase))
+                    {
+                        path = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(codeBase
+                            .Replace("file:///", string.Empty)), assemblyName.Name + ".xml")
+                            .Replace("file:\\", string.Empty);
+
+                        if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                            return path;
+                    }
+                }
+
+                var currentDomain = Type.GetType("System.AppDomain")?.GetRuntimeProperty("CurrentDomain").GetValue(null);
+                if (currentDomain?.HasProperty("BaseDirectory") == true)
                 {
                     var baseDirectory = currentDomain.TryGetPropertyValue("BaseDirectory", "");
-                    path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
-                    if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
-                        return path;
+                    if (!string.IsNullOrEmpty(baseDirectory))
+                    {
+                        path = DynamicApis.PathCombine(baseDirectory, assemblyName.Name + ".xml");
+                        if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                            return path;
 
-                    return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                        return DynamicApis.PathCombine(baseDirectory, "bin\\" + assemblyName.Name + ".xml");
+                    }
+                }
+
+                var currentDirectory = await DynamicApis.DirectoryGetCurrentDirectoryAsync();
+                path = DynamicApis.PathCombine(currentDirectory, assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                {
+                    return path;
+                }
+
+                path = DynamicApis.PathCombine(currentDirectory, "bin\\" + assembly.GetName().Name + ".xml");
+                if (await DynamicApis.FileExistsAsync(path).ConfigureAwait(false))
+                {
+                    return path;
                 }
 
                 return null;

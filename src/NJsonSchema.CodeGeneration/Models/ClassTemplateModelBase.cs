@@ -32,6 +32,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the class.</summary>
         public abstract string ClassName { get; }
 
+        /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
+        public bool IsObject => _schema.ActualTypeSchema.IsObject;
+
         /// <summary>Gets or sets a value indicating whether the type is abstract.</summary>
         public bool IsAbstract => _schema.ActualTypeSchema.IsAbstract;
 
@@ -41,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)
-            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualSchema.BaseDiscriminator, _resolver))
+            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualSchema.ResponsibleDiscriminatorObject, _resolver))
             .ToList();
 
         /// <summary>The model of a derived class.</summary>

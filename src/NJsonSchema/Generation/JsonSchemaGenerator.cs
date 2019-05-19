@@ -138,7 +138,7 @@ namespace NJsonSchema.Generation
                 if (typeDescription.IsDictionary)
                 {
                     typeDescription.ApplyType(schema);
-                    await GenerateDictionaryAsync(schema, type, schemaResolver).ConfigureAwait(false);
+                    await GenerateDictionaryAsync(schema, type, parentAttributes, schemaResolver).ConfigureAwait(false);
                 }
                 else
                 {
@@ -159,7 +159,7 @@ namespace NJsonSchema.Generation
             else if (typeDescription.IsEnum)
                 await GenerateEnum(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
             else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
-                await GenerateArray(schema, type, typeDescription, schemaResolver).ConfigureAwait(false);
+                await GenerateArray(schema, type, parentAttributes, typeDescription, schemaResolver).ConfigureAwait(false);
             else
                 typeDescription.ApplyType(schema);
 
@@ -238,9 +238,11 @@ namespace NJsonSchema.Generation
                                 schema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
                             }
                             else
+                            {
                                 schema.Type = schema.Type | JsonObjectType.Null;
+                            }
                         }
-                        else if (Settings.SchemaType == SchemaType.OpenApi3)
+                        else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                         {
                             schema.IsNullableRaw = isNullable;
                         }
@@ -265,9 +267,13 @@ namespace NJsonSchema.Generation
             if (isNullable)
             {
                 if (Settings.SchemaType == SchemaType.JsonSchema)
+                {
                     referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
-                else if (Settings.SchemaType == SchemaType.OpenApi3)
+                }
+                else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
+                {
                     referencingSchema.IsNullableRaw = true;
+                }
             }
 
             // See https://github.com/RSuter/NJsonSchema/issues/531
@@ -330,8 +336,8 @@ namespace NJsonSchema.Generation
             JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
-            var rootSchema = schema;
 
+            var rootSchema = schema;
             var actualSchema = await GenerateInheritanceAsync(type, schema, schemaResolver).ConfigureAwait(false);
             if (actualSchema != null)
             {
@@ -343,17 +349,25 @@ namespace NJsonSchema.Generation
                 await ApplyAdditionalPropertiesAsync(type, schema, schemaResolver).ConfigureAwait(false);
             }
 
-            typeDescription.ApplyType(schema);
+            if (!schema.Type.HasFlag(JsonObjectType.Array))
+            {
+                typeDescription.ApplyType(schema);
+            }
 
             schema.Description = await type.GetTypeInfo().GetDescriptionAsync(type.GetTypeInfo().GetCustomAttributes()).ConfigureAwait(false);
-            schema.IsAbstract = type.GetTypeInfo().IsAbstract;
 
-            GenerateInheritanceDiscriminator(type, rootSchema);
+            if (Settings.GetActualGenerateAbstractSchema(type))
+            {
+                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+            }
 
+            GenerateInheritanceDiscriminator(type, rootSchema, schema);
             await GenerateKnownTypesAsync(type, schemaResolver).ConfigureAwait(false);
 
             if (Settings.GenerateXmlObjects)
+            {
                 schema.GenerateXmlObjectForType(type);
+            }
         }
 
         private async Task ApplyAdditionalPropertiesAsync<TSchemaType>(Type type, TSchemaType schema,
@@ -437,28 +451,39 @@ namespace NJsonSchema.Generation
         }
 
         private async Task GenerateArray<TSchemaType>(
-            TSchemaType schema, Type type, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
+            TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
+#pragma warning disable 1998
+
             typeDescription.ApplyType(schema);
 
             var itemType = type.GetEnumerableItemType();
             if (itemType != null)
             {
+                var itemIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
+                    itemType.Name == "Nullable`1";
+
                 schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
-#pragma warning disable 1998
-                    itemType, null, false, schemaResolver, async (s, r) =>
-#pragma warning restore 1998
+                    itemType, null, itemIsNullable, schemaResolver, async (s, r) =>
                     {
                         if (Settings.GenerateXmlObjects)
+                        {
                             s.GenerateXmlObjectForItemType(itemType);
+                        }
                     }).ConfigureAwait(false);
 
                 if (Settings.GenerateXmlObjects)
+                {
                     schema.GenerateXmlObjectForArrayType(type);
+                }
             }
             else
+            {
                 schema.Item = JsonSchema4.CreateAnySchema();
+            }
+
+#pragma warning restore 1998
         }
 
         private async Task GenerateEnum<TSchemaType>(
@@ -477,10 +502,10 @@ namespace NJsonSchema.Generation
                 schema.Reference = schemaResolver.GetSchema(type, isIntegerEnumeration);
             else if (schema.GetType() == typeof(JsonSchema4))
             {
-                LoadEnumerations(type, schema, typeDescription);
-
                 typeDescription.ApplyType(schema);
                 schema.Description = await type.GetXmlSummaryAsync().ConfigureAwait(false);
+
+                LoadEnumerations(type, schema, typeDescription);
 
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
@@ -489,7 +514,7 @@ namespace NJsonSchema.Generation
         }
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        private async Task GenerateDictionaryAsync<TSchemaType>(TSchemaType schema, Type type, JsonSchemaResolver schemaResolver)
+        private async Task GenerateDictionaryAsync<TSchemaType>(TSchemaType schema, Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema4, new()
         {
             var genericTypeArguments = type.GetGenericTypeArguments();
@@ -497,20 +522,8 @@ namespace NJsonSchema.Generation
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string);
             if (keyType.GetTypeInfo().IsEnum)
             {
-                var keySchema = await GenerateAsync(keyType, schemaResolver).ConfigureAwait(false);
-
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(keyType, null, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.DictionaryKey = new JsonSchema4
-                    {
-                        Reference = keySchema
-                    };
-                }
-                else
-                {
-                    schema.DictionaryKey = keySchema;
-                }
+                schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
+                    keyType, null, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object);
@@ -520,20 +533,18 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var additionalPropertiesSchema = await GenerateAsync(valueType, schemaResolver).ConfigureAwait(false);
+                var valueIsNullable = parentAttributes?.OfType<ItemsCanBeNullAttribute>().Any() == true ||
+                    valueType.Name == "Nullable`1";
 
-                var valueTypeDescription = Settings.ReflectionService.GetDescription(valueType, null, Settings);
-                if (valueTypeDescription.RequiresSchemaReference(Settings.TypeMappers))
-                {
-                    schema.AdditionalPropertiesSchema = new JsonSchema4
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                    valueType, null, valueIsNullable, schemaResolver/*, async (s, r) =>
                     {
-                        Reference = additionalPropertiesSchema
-                    };
-                }
-                else
-                {
-                    schema.AdditionalPropertiesSchema = additionalPropertiesSchema;
-                }
+                        // TODO: Generate xml for key
+                        if (Settings.GenerateXmlObjects)
+                        {
+                            s.GenerateXmlObjectForItemType(keyType);
+                        }
+                    }*/).ConfigureAwait(false);
             }
 
             schema.AllowAdditionalProperties = true;
@@ -589,10 +600,10 @@ namespace NJsonSchema.Generation
                         var info = propertiesAndFields.FirstOrDefault(p => p.Name == property.UnderlyingName);
                         var propertyInfo = info as PropertyInfo;
 #if !LEGACY
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
                             (propertyInfo.GetMethod?.IsAbstract != true && propertyInfo.SetMethod?.IsAbstract != true))
 #else
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null ||
+                        if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
                             (propertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.GetSetMethod()?.IsAbstract != true))
 #endif
                         {
@@ -716,9 +727,9 @@ namespace NJsonSchema.Generation
                         if (!typeDescription.IsDictionary && !type.IsArray)
                         {
                             await GeneratePropertiesAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
-                            await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
+                            var actualSchema = await GenerateInheritanceAsync(baseType, schema, schemaResolver).ConfigureAwait(false);
 
-                            GenerateInheritanceDiscriminator(baseType, schema);
+                            GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema);
                         }
                     }
                     else
@@ -781,9 +792,9 @@ namespace NJsonSchema.Generation
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
                         await GeneratePropertiesAsync(i, schema, schemaResolver).ConfigureAwait(false);
-                        await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
+                        var actualSchema = await GenerateInheritanceAsync(i, schema, schemaResolver).ConfigureAwait(false);
 
-                        GenerateInheritanceDiscriminator(i, schema);
+                        GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
                     }
                 }
             }
@@ -791,7 +802,7 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema)
+        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema, JsonSchema4 typeSchema)
         {
             if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
@@ -801,7 +812,7 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (schema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
                         throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -813,8 +824,8 @@ namespace NJsonSchema.Generation
                         PropertyName = discriminatorName
                     };
 
-                    schema.DiscriminatorObject = discriminator;
-                    schema.Properties[discriminatorName] = new JsonProperty
+                    typeSchema.DiscriminatorObject = discriminator;
+                    typeSchema.Properties[discriminatorName] = new JsonProperty
                     {
                         Type = JsonObjectType.String,
                         IsRequired = true
@@ -822,7 +833,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    var baseDiscriminator = schema.BaseDiscriminator;
+                    var baseDiscriminator = schema.ResponsibleDiscriminatorObject ?? schema.ActualTypeSchema.ResponsibleDiscriminatorObject;
                     baseDiscriminator?.AddMapping(type, schema);
                 }
             }
@@ -891,6 +902,12 @@ namespace NJsonSchema.Generation
                 }
 
                 schema.EnumerationNames.Add(enumName);
+            }
+
+            if (typeDescription.Type == JsonObjectType.Integer && Settings.GenerateEnumMappingDescription)
+            {
+                schema.Description = (schema.Description + "\n\n" +
+                    string.Join("\n", schema.Enumeration.Select((e, i) => e + " = " + schema.EnumerationNames[i]))).Trim();
             }
         }
 

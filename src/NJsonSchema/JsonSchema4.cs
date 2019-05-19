@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +30,7 @@ namespace NJsonSchema
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
 
         private IDictionary<string, JsonProperty> _properties;
-        private IDictionary<string, JsonSchema4> _patternProperties;
+        private IDictionary<string, JsonProperty> _patternProperties;
         private IDictionary<string, JsonSchema4> _definitions;
 
         private ICollection<JsonSchema4> _allOf;
@@ -137,7 +138,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromFileAsync(string filePath, Func<JsonSchema4, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.FileReadAllTextAsync(filePath);
+            var data = await DynamicApis.FileReadAllTextAsync(filePath).ConfigureAwait(false);
             return await FromJsonAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 
@@ -190,16 +191,21 @@ namespace NJsonSchema
             return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
         }
 
-        internal static JsonSchema4 FromJsonWithoutReferenceHandling(string data)
+        internal static JsonSchema4 FromJsonWithCurrentSettings(object obj)
         {
-            var schema = JsonConvert.DeserializeObject<JsonSchema4>(data, new JsonSerializerSettings
-            {
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            });
+            var json = JsonConvert.SerializeObject(obj, JsonSchemaSerialization.CurrentSerializerSettings);
+            return JsonConvert.DeserializeObject<JsonSchema4>(json, JsonSchemaSerialization.CurrentSerializerSettings);
+        }
 
-            return schema;
+        /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>
+        [JsonIgnore]
+        public bool IsBinary
+        {
+            get
+            {
+                return Type.HasFlag(JsonObjectType.File) ||
+                    (Type.HasFlag(JsonObjectType.String) && Format == JsonFormatStrings.Binary);
+            }
         }
 
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
@@ -233,7 +239,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray)
+                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple)
                     return ActualTypeSchema;
 
                 return InheritedSchema;
@@ -270,7 +276,8 @@ namespace NJsonSchema
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
         [JsonIgnore]
-        public OpenApiDiscriminator BaseDiscriminator => DiscriminatorObject ?? InheritedSchema?.ActualSchema.BaseDiscriminator;
+        public OpenApiDiscriminator ResponsibleDiscriminatorObject =>
+            ActualDiscriminatorObject ?? InheritedSchema?.ActualSchema.ResponsibleDiscriminatorObject;
 
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
@@ -316,6 +323,10 @@ namespace NJsonSchema
         /// <summary>Gets or sets the title. </summary>
         [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
         public string Title { get; set; }
+
+        /// <summary>Gets a value indicating whether the schema title can be used as type name.</summary>
+        [JsonIgnore]
+        public bool HasTypeNameTitle => !string.IsNullOrEmpty(Title) && Regex.IsMatch(Title, "^[a-zA-Z0-9_]*$");
 
         /// <summary>Gets or sets the description. </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -409,7 +420,7 @@ namespace NJsonSchema
         [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool IsAbstract { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the schema is nullable (Open API only).</summary>
+        /// <summary>Gets or sets a value indicating whether the schema is nullable (native in Open API 'nullable', custom in Swagger 'x-nullable').</summary>
         [JsonProperty("x-nullable", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool? IsNullableRaw { get; set; }
 
@@ -483,7 +494,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the pattern properties of the type. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonSchema4> PatternProperties
+        public IDictionary<string, JsonProperty> PatternProperties
         {
             get { return _patternProperties; }
             internal set
@@ -674,6 +685,10 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Gets a value indicating whether the schema describes an object.</summary>
+        [JsonIgnore]
+        public bool IsObject => Type.HasFlag(JsonObjectType.Object);
+
         /// <summary>Gets a value indicating whether the schema represents an array type (an array where each item has the same type).</summary>
         [JsonIgnore]
         public bool IsArray => Type.HasFlag(JsonObjectType.Array) && (Items == null || Items.Count == 0);
@@ -708,16 +723,25 @@ namespace NJsonSchema
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(SchemaType schemaType)
         {
-            if (schemaType == SchemaType.OpenApi3 && IsNullableRaw.HasValue)
-                return IsNullableRaw.Value;
+            if (IsNullableRaw == true)
+                return true;
 
             if (IsEnumeration && Enumeration.Contains(null))
                 return true;
 
-            if (Type.HasFlag(JsonObjectType.Null) && OneOf.Count == 0)
+            if (Type.HasFlag(JsonObjectType.Null))
                 return true;
 
-            return (Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType));
+            if ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType)))
+                return true;
+
+            if (ActualSchema != this && ActualSchema.IsNullable(schemaType))
+                return true;
+
+            if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
+                return true;
+
+            return false;
         }
 
         /// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string.</summary>
@@ -822,7 +846,7 @@ namespace NJsonSchema
                 Properties = new ObservableDictionary<string, JsonProperty>();
 
             if (PatternProperties == null)
-                PatternProperties = new ObservableDictionary<string, JsonSchema4>();
+                PatternProperties = new ObservableDictionary<string, JsonProperty>();
 
             if (Definitions == null)
                 Definitions = new ObservableDictionary<string, JsonSchema4>();

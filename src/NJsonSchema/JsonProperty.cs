@@ -16,14 +16,6 @@ namespace NJsonSchema
     {
         private object _parent;
 
-        internal static JsonProperty FromJsonSchema(string name, JsonSchema4 type)
-        {
-            var data = JsonConvert.SerializeObject(type);
-            var property = JsonConvert.DeserializeObject<JsonProperty>(data);
-            property.Name = name;
-            return property;
-        }
-
         /// <summary>Gets or sets the name of the property. </summary>
         [JsonIgnore]
         public string Name { get; internal set; }
@@ -84,18 +76,15 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         [JsonIgnore]
-        public bool IsInheritanceDiscriminator => ParentSchema.Discriminator == Name;
+        public bool IsInheritanceDiscriminator => ParentSchema.ActualDiscriminator == Name;
 
         /// <summary>Determines whether the specified property null handling is nullable.</summary>
         /// <param name="schemaType">The schema type.</param>
         /// <returns>true if the type can be null.</returns>
         public override bool IsNullable(SchemaType schemaType)
         {
-            if (IsEnumeration && Enumeration.Contains(null))
+            if (schemaType == SchemaType.Swagger2 && IsRequired == false)
                 return true;
-
-            if (schemaType == SchemaType.Swagger2)
-                return IsRequired == false;
 
             return base.IsNullable(schemaType);
         }

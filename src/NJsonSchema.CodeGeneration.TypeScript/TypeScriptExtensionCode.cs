@@ -12,8 +12,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="baseClasses">The base classes.</param>
         public TypeScriptExtensionCode(string code, string[] extendedClasses, string[] baseClasses = null)
         {
-            code = code
+            code = "\n" + code
                 .Replace("\r", string.Empty)
+                .Replace("\t", "    ")
                 .Replace("generated.", string.Empty) + "\n";
 
             code = Regex.Replace(code, "(.*?)// ignore(.*?)\\n", string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
@@ -26,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return string.Empty;
             }, RegexOptions.Multiline);
 
-            code = Regex.Replace(code, "(@.*\n)?((export )?[^\n]*?class ([\\S]*)(.*?)\n ([\\s\\S]*?)\n})", match =>
+            code = Regex.Replace(code, "\n(@.*\n)?((export )?[^/\n]*?class ([\\S]*)(.*?)\n([\\s\\S]*?)\n})", match =>
             {
                 var hasExport = match.Groups[3].Success;
                 var className = match.Groups[4].Value;

@@ -8,6 +8,21 @@ namespace NJsonSchema.Tests.Serialization
     public class ExtensionDataTests
     {
         [Fact]
+        public async Task When_definition_entry_is_null_then_it_is_deserialized_correctly()
+        {
+            //// Arrange
+            var json = @"{ ""definitions"": { ""abc"": null } }";
+
+            //// Act
+            var schema = await JsonSchema4.FromJsonAsync(json);
+            var json2 = schema.ToJson();
+
+            //// Assert
+            Assert.False(schema.Definitions.ContainsKey("abc"));
+            Assert.DoesNotContain("abc", json2);
+        }
+
+        [Fact]
         public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
             //// Arrange

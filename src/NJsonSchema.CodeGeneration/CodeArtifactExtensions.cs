@@ -12,35 +12,20 @@ using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
-    /// <summary></summary>
-    public class CodeArtifactCollection
+    /// <summary>Code artifact extensions.</summary>
+    public static class CodeArtifactExtensions
     {
-        /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
-        /// <param name="artifacts">The artifacts.</param>
-        /// <param name="extensionCode">The extension code.</param>
-        public CodeArtifactCollection(IEnumerable<CodeArtifact> artifacts, ExtensionCode extensionCode)
-        {
-            Artifacts = OrderByBaseDependency(artifacts);
-            ExtensionCode = extensionCode;
-        }
-
-        /// <summary>Gets the artifacts.</summary>
-        public IEnumerable<CodeArtifact> Artifacts { get; }
-
-        /// <summary> Gets the extension code.</summary>
-        public ExtensionCode ExtensionCode { get; }
-
         /// <summary>Concatenates the results.</summary>
         /// <returns>The result.</returns>
-        public string Concatenate()
+        public static string Concatenate(this IEnumerable<CodeArtifact> artifacts)
         {
-            return ConversionUtilities.TrimWhiteSpaces(string.Join("\n\n", Artifacts.Select(p => p.Code)));
+            return ConversionUtilities.TrimWhiteSpaces(string.Join("\n\n", artifacts.Select(p => p.Code)));
         }
 
         /// <summary>Reorders the results so that base classes are always before child classes.</summary>
         /// <param name="results">The results.</param>
         /// <returns>The reordered results.</returns>
-        public static IEnumerable<CodeArtifact> OrderByBaseDependency(IEnumerable<CodeArtifact> results)
+        public static IEnumerable<CodeArtifact> OrderByBaseDependency(this IEnumerable<CodeArtifact> results)
         {
             var newResults = new List<CodeArtifact>(results);
             foreach (var result in newResults.ToArray())
@@ -70,11 +55,15 @@ namespace NJsonSchema.CodeGeneration
         private static string GetActualBaseName(string baseTypeName)
         {
             if (baseTypeName == null)
+            {
                 return null;
+            }
 
             // resolve arrays
             if (baseTypeName.EndsWith("[]"))
+            {
                 return baseTypeName.Substring(0, baseTypeName.Length - 2);
+            }
 
             // resolve lists
             return Regex.Replace(baseTypeName, ".*\\<(.*)\\>", m => m.Groups[1].Value);

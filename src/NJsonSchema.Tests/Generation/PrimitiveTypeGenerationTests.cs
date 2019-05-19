@@ -27,6 +27,8 @@ namespace NJsonSchema.Tests.Generation
 
             public OffsetDateTime OffsetDateTime { get; set; }
 
+            public Instant Instant { get; set; }
+
             public Duration Duration { get; set; }
         }
 
@@ -126,6 +128,20 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["OffsetDateTime"].Type);
             Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["OffsetDateTime"].Format);
+        }
+
+        [Fact]
+        public async Task When_property_is_instant_then_schema_type_is_string()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+
+            //// Assert
+            Assert.Equal(JsonObjectType.String, schema.Properties["Instant"].Type);
+            Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["Instant"].Format);
         }
 
         [Fact]

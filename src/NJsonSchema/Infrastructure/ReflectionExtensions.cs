@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -128,9 +129,13 @@ namespace NJsonSchema.Infrastructure
                 foreach (var iface in type.GetTypeInfo().GetInterfaces())
 #endif
                 {
-                    itemType = GetEnumerableItemType(iface);
-                    if (itemType != null)
-                        return itemType;
+                    if (typeof(IEnumerable).GetTypeInfo()
+                        .IsAssignableFrom(iface.GetTypeInfo()))
+                    {
+                        itemType = GetEnumerableItemType(iface);
+                        if (itemType != null)
+                            return itemType;
+                    }
                 }
             }
             return itemType;

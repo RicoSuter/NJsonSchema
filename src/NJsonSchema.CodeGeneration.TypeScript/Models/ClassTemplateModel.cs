@@ -37,6 +37,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             DiscriminatorName = discriminatorName;
+
+            Properties = _schema.ActualProperties.Values
+                .Where(v => v.IsInheritanceDiscriminator == false)
+                .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
+                .ToList();
         }
 
         /// <summary>Gets the class name.</summary>
@@ -46,19 +51,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string DiscriminatorName { get; }
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.Discriminator);
+        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
 
         /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
-        public bool HasBaseDiscriminator => _schema.BaseDiscriminator != null;
+        public bool HasBaseDiscriminator => _schema.ResponsibleDiscriminatorObject != null;
 
         /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
-        public string BaseDiscriminator => _schema.BaseDiscriminator?.PropertyName;
+        public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonProperty) &&
+            (!string.IsNullOrEmpty(_schema.Description) ||
+             !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
         /// <summary>Gets the description.</summary>
-        public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
+        public string Description => ConversionUtilities.RemoveLineBreaks(
+            !string.IsNullOrEmpty(_schema.Description) ?
+                _schema.Description : _schema.ActualTypeSchema.Description);
 
         /// <summary>Gets a value indicating whether this class has a parent class.</summary>
         public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
@@ -86,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
-        public bool HasIndexerProperty => _schema.InheritedSchema?.IsDictionary == true;
+        public bool HasIndexerProperty => _schema.IsDictionary || _schema.InheritedSchema?.IsDictionary == true;
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
@@ -95,7 +104,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
 
         /// <summary>Gets or sets a value indicating whether POJO objects in the constructor data are converted to DTO instances (default: true).</summary>
-        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData;
+        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData && Properties.Any(p => p.SupportsConstructorConversion);
 
         /// <summary>Gets the null value.</summary>
         public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
@@ -105,9 +114,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                var valueType = InheritedSchema?.AdditionalPropertiesSchema != null
-                    ? _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty)
-                    : "any";
+                var valueType =
+                    _schema?.AdditionalPropertiesSchema != null ?
+                        _resolver.Resolve(_schema.AdditionalPropertiesSchema, true, string.Empty) :
+                    InheritedSchema?.AdditionalPropertiesSchema != null ?
+                        _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) :
+                    "any";
 
                 // TODO: Find solution to avoid using union with any
                 return valueType != "any" ? valueType + " | any" : valueType;
@@ -117,10 +129,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether to handle JSON references.</summary>
         public bool HandleReferences => _settings.HandleReferences;
 
+        /// <summary>Gets a value indicating whether the type has properties.</summary>
+        public bool HasProperties => Properties.Any();
+
         /// <summary>Gets the property models.</summary>
-        public List<PropertyModel> Properties => _schema.ActualProperties.Values
-            .Where(v => v.IsInheritanceDiscriminator == false)
-            .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings)).ToList();
+        public List<PropertyModel> Properties { get; }
 
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
         public bool HasDefaultValues => Properties.Any(p => p.HasDefaultValue);

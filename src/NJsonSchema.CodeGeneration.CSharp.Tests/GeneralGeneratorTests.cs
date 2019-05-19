@@ -24,6 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var json = @"{
+                'required': [ 'emptySchema' ],
                 'properties': {
                     'emptySchema': { 'type': 'array' }
                 }
@@ -367,6 +368,36 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
+        [Theory]
+        [InlineData("foo@bar", "Foobar")]
+        [InlineData("foo$bar", "Foobar")]
+        [InlineData("foobars[]", "Foobars")]
+        [InlineData("foo.bar", "FooBar")]
+        [InlineData("foo=bar", "FooBar")]
+        [InlineData("foo+bar", "Fooplusbar")]
+        [InlineData("foo*bar", "FooStarbar")]
+        [InlineData("foo:bar", "Foo_bar")]
+        public void When_name_contains_unallowed_characters_then_they_are_converted_to_valid_csharp(string jsonPropertyName, string expectedCSharpName)
+        {
+            // Arrange
+            var schema = new JsonSchema4();
+            schema.Properties[jsonPropertyName] = new JsonProperty
+            {
+                Type = JsonObjectType.String
+            };
+            
+            var generator = new CSharpGenerator(schema);
+            
+            // Act
+            var output = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains($@"[Newtonsoft.Json.JsonProperty(""{jsonPropertyName}"", ", output);
+            Assert.Contains($@"public string {expectedCSharpName}", output);
+
+            AssertCompile(output);
+        }
+
         [Fact]
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {
@@ -560,6 +591,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schemaJson = @"{
+                ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 
@@ -1159,6 +1191,38 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_definition_contains_both_min_items_and_max_items_a_min_length_and_max_length_attributes_are_added_only_for_type_array()
+        {
+            //// Arrange
+            var json =
+                @"{
+	""type"": ""object"", 
+	""properties"": {
+		""foo"": {
+		  ""type"": ""array"",
+		  ""minItems"": ""10"",
+		  ""maxItems"": ""20""
+        }
+	}
+}";
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("System.ComponentModel.DataAnnotations.MinLength(10)", code);
+            Assert.Contains("System.ComponentModel.DataAnnotations.MaxLength(20)", code);
+
+            AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_definition_contains_pattern_a_regular_expression_attribute_is_added()
         {
             //// Arrange
@@ -1377,8 +1441,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(code);
         }
 
-        [Fact]
-        public async Task When_tuple_types_has_ints_then_it_is_generated_correctly()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_tuple_types_has_ints_then_it_is_generated_correctly(bool inlineNamedTuples)
         {
             //// Arrange
             var json = @"
@@ -1426,13 +1492,23 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 SchemaType = SchemaType.Swagger2,
-                DateType = "System.DateTime"
+                DateType = "System.DateTime",
+                InlineNamedTuples = inlineNamedTuples
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.DoesNotContain("System.Linq.Enumerable+SelectIListIterator", code);
-            Assert.Contains("Collection<System.Tuple<int, int>>", code);
+
+            if (inlineNamedTuples)
+            {
+                Assert.Contains("Collection<System.Tuple<int, int>>", code);
+            }
+            else
+            {
+                Assert.Contains("Collection<InnerList>", code);
+                Assert.Contains("partial class InnerList : System.Tuple<int, int>", code);
+            }
 
             AssertCompile(code);
         }
@@ -1622,6 +1698,34 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Assert
             Assert.Contains("JsonExtensionData", output);
+        }
+
+        [Fact]
+        public void When_schema_has_negative_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
+        {
+            //// Arrange
+            var settings = new CSharpGeneratorSettings { EnumNameGenerator = new DefaultEnumNameGenerator() };
+            var generator = new CSharpGenerator(null, settings);
+
+            //// Act
+            var schema = new JsonSchema4()
+            {
+                Type = JsonObjectType.Integer,
+                Enumeration =
+                {
+                    0,
+                    1,
+                    2,
+                    -1,
+                },
+                Default = "-1"
+            };
+
+            var types = generator.GenerateTypes(schema, "MyEnum");
+
+            //// Assert
+            Assert.Contains("_1 = 1", types.First().Code);
+            Assert.Contains("__1 = -1", types.First().Code);
         }
 
         private static void AssertCompile(string code)

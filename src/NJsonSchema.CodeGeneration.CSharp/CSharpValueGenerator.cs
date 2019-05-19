@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -15,6 +16,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
     public class CSharpValueGenerator : ValueGeneratorBase
     {
         private readonly CSharpGeneratorSettings _settings;
+        private readonly List<string> _typesWithStringConstructor = new List<string>()
+        {
+            "System.Guid",
+            "System.Uri"
+        }; 
 
         /// <summary>Initializes a new instance of the <see cref="CSharpValueGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -37,8 +43,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
+                if (schema.Default != null && useSchemaDefault)
+                {
+                    if (_typesWithStringConstructor.Contains(targetType))
+                    {
+                        var stringLiteral = GetDefaultAsStringLiteral(schema);
+                        return $"new {targetType}({stringLiteral})";
+                    }
+                }
+
+                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+
                 schema = schema.ActualSchema;
-                if (schema != null && allowsNull == false)
+                if (schema != null && allowsNull == false && isOptional == false)
                 {
                     if (schema.Type.HasFlag(JsonObjectType.Array) ||
                         schema.Type.HasFlag(JsonObjectType.Object))
@@ -51,7 +68,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                             ? targetType.Replace(_settings.ArrayType + "<", _settings.ArrayInstanceType + "<")
                             : targetType;
 
-                        return "new " + targetType + "()";
+                        return $"new {targetType}()";
                     }
                 }
             }

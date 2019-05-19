@@ -8,6 +8,7 @@
 
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace NJsonSchema
 {
@@ -151,9 +152,14 @@ namespace NJsonSchema
         /// <param name="input">The input.</param>
         /// <param name="tabCount">The tab count.</param>
         /// <returns>The output.</returns>
-        public static string ConvertCSharpDocBreaks(string input, int tabCount)
+        public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            return input?.Replace("\r", string.Empty).Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ") ?? string.Empty;
+            input = input?
+                .Replace("\r", string.Empty)
+                .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
+                ?? string.Empty;
+
+            return new XText(input).ToString();
         }
 
         private static string ConvertDashesToCamelCase(string input)

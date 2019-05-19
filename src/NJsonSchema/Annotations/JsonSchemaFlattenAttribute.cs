@@ -14,5 +14,20 @@ namespace NJsonSchema.Annotations
     [AttributeUsage(AttributeTargets.Class)]
     public class JsonSchemaFlattenAttribute : Attribute
     {
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaFlattenAttribute"/> class.</summary>
+        public JsonSchemaFlattenAttribute()
+        {
+            Flatten = true;
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaAbstractAttribute"/> class.</summary>
+        /// <param name="flatten">The explicit flag to override the global setting (i.e. disable the generation for a type).</param>
+        public JsonSchemaFlattenAttribute(bool flatten)
+        {
+            Flatten = flatten;
+        }
+
+        /// <summary>Gets or sets a value indicating whether to flatten the given type.</summary>
+        public bool Flatten { get; }
     }
 }

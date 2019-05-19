@@ -47,7 +47,7 @@ namespace NJsonSchema
         /// <param name="schema">The referenced schema.</param>
         public void AddDocumentReference(string documentPath, IJsonReference schema)
         {
-            _resolvedObjects[documentPath] = schema;
+            _resolvedObjects[documentPath.Contains("://") ? documentPath : DynamicApis.GetFullPath(documentPath)] = schema;
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -146,7 +146,7 @@ namespace NJsonSchema
             try
             {
                 var arr = Regex.Split(fullJsonPath, @"(?=#)");
-                var filePath = arr[0];
+                var filePath = DynamicApis.GetFullPath(arr[0]);
                 if (!_resolvedObjects.ContainsKey(filePath))
                 {
                     var schema = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);

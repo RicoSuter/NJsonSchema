@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": [
+    "signalPaths"
+  ],
+  "description": "This is the class A",
+  "properties": {
+    "type": {
+      "$ref": "./C.json",
+      "description": "This is the type of A"
+    },
+    "signalPaths": {
+      "children": "array",
+      "items": {
+        "$ref": "./B.json",
+        "description": "This is a list of children"
+      }
+    }
+  }
+}

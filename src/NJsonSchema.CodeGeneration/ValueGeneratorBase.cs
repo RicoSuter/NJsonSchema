@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -15,7 +17,21 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-
+        private readonly List<string> _unsupportedFormatStrings = new List<string>()
+        {
+            JsonFormatStrings.Date,
+            JsonFormatStrings.DateTime,
+            JsonFormatStrings.Time,
+            JsonFormatStrings.TimeSpan,
+            JsonFormatStrings.Uri,
+            JsonFormatStrings.Guid,
+            JsonFormatStrings.Byte,
+#pragma warning disable CS0618 // Type or member is obsolete
+            JsonFormatStrings.Uuid,
+            JsonFormatStrings.Base64,
+#pragma warning restore CS0618 // Type or member is obsolete
+        };
+        
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
         protected ValueGeneratorBase(CodeGeneratorSettingsBase settings)
@@ -38,15 +54,26 @@ namespace NJsonSchema.CodeGeneration
 
             var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
+            {
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+            }
 
-            if (schema.Type.HasFlag(JsonObjectType.String))
-                return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
+            if (schema.Type.HasFlag(JsonObjectType.String) && _unsupportedFormatStrings.Contains(schema.Format) == false)
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+            // TODO: Add conversion for format string, e.g. in C# DateTime.Parse()
+
             if (schema.Type.HasFlag(JsonObjectType.Boolean))
+            {
                 return schema.Default.ToString().ToLowerInvariant();
+            }
+
             if (schema.Type.HasFlag(JsonObjectType.Integer) ||
                 schema.Type.HasFlag(JsonObjectType.Number))
+            {
                 return GetNumericValue(schema.Type, schema.Default, schema.Format);
+            }
 
             return null;
         }
@@ -74,6 +101,14 @@ namespace NJsonSchema.CodeGeneration
                 : schema.Default.ToString();
 
             return typeName + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+        }
+
+        /// <summary>Gets the default value as string literal.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The string literal.</returns>
+        protected string GetDefaultAsStringLiteral(JsonSchema4 schema)
+        {
+            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
         }
 
         /// <summary>Converts a number to its string representation.</summary>

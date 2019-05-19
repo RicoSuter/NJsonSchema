@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NJsonSchema.Generation;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -17,6 +18,8 @@ namespace NJsonSchema.Tests.Generation
             public Dictionary<PropertyName, string> Mapping { get; set; }
 
             public IDictionary<PropertyName, string> Mapping2 { get; set; }
+
+            public IDictionary<PropertyName, int?> Mapping3 { get; set; }
         }
 
         [Fact]
@@ -32,6 +35,37 @@ namespace NJsonSchema.Tests.Generation
 
             Assert.True(schema.Properties["Mapping2"].IsDictionary);
             Assert.True(schema.Properties["Mapping2"].DictionaryKey.ActualSchema.IsEnumeration);
+
+            Assert.False(schema.Properties["Mapping2"].DictionaryKey.IsNullable(SchemaType.JsonSchema));
+            Assert.False(schema.Properties["Mapping2"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
+        }
+
+        [Fact]
+        public async Task When_value_type_is_nullable_then_json_schema_is_nullable()
+        {
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>();
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Properties["Mapping3"].IsDictionary);
+            Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
+        }
+
+        [Fact]
+        public async Task When_value_type_is_nullable_then_json_schema_is_nullable_Swagger2()
+        {
+            //// Act
+            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.Swagger2,
+                GenerateCustomNullableProperties = true
+            });
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Properties["Mapping3"].IsDictionary);
+            Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.Swagger2));
         }
     }
 }

@@ -6,11 +6,22 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
     public class TypeScriptValueGenerator : ValueGeneratorBase
     {
+        private readonly List<string> _supportedFormatStrings = new List<string>()
+        {
+            JsonFormatStrings.Uri,
+            JsonFormatStrings.Guid,
+#pragma warning disable CS0618 // Type or member is obsolete
+            JsonFormatStrings.Uuid
+#pragma warning restore CS0618 // Type or member is obsolete
+        };
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
         public TypeScriptValueGenerator(TypeScriptGeneratorSettings settings)
@@ -31,20 +42,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
-                schema = schema.ActualSchema;
-                if (schema != null && allowsNull == false)
+                if (schema.Default != null && useSchemaDefault)
                 {
-                    if (schema.IsArray)
-                        return "[]";
+                    if (schema.Type.HasFlag(JsonObjectType.String) && 
+                        _supportedFormatStrings.Contains(schema.Format))
+                    {
+                        return GetDefaultAsStringLiteral(schema);
+                    }
+                }
 
-                    if (schema.IsDictionary)
-                        return "{}";
-
-                    if (schema.Type.HasFlag(JsonObjectType.Object) &&
-                        !schema.IsAbstract &&
-                        !schema.IsAnyType)
+                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+                if (schema != null && allowsNull == false && isOptional == false)
+                {
+                    if (typeResolver.GeneratesType(schema) && 
+                        !schema.ActualTypeSchema.IsEnumeration &&
+                        !schema.ActualTypeSchema.IsAbstract)
                     {
                         return "new " + targetType + "()";
+                    }
+
+                    if (schema.ActualTypeSchema.IsArray)
+                    {
+                        return "[]";
+                    }
+
+                    if (schema.ActualTypeSchema.IsDictionary)
+                    {
+                        return "{}";
                     }
                 }
             }

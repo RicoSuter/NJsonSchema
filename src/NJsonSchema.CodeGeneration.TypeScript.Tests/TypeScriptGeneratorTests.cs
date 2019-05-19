@@ -239,6 +239,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var schemaJson = @"{
+                ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 
@@ -261,6 +262,96 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.Contains("dict: { [key: string] : string; };", code); // property not nullable
             Assert.Contains("this.dict = {};", code); // must be initialized with {}
+        }
+
+        [Fact]
+        public async Task When_default_is_generated_then_no_liquid_error_is_in_output()
+        {
+            var json = @"{
+""type"": ""object"",
+""properties"": {
+  ""foo"": {
+    ""$ref"": ""#/definitions/Person""
+  }
+},
+""definitions"": {
+    ""Person"": {
+      ""type"": ""object"",
+      ""discriminator"": ""discriminator"",
+      ""additionalProperties"": false,
+      ""required"": [
+        ""Id"",
+        ""FirstName"",
+        ""LastName"",
+        ""Gender"",
+        ""DateOfBirth"",
+        ""Weight"",
+        ""Height"",
+        ""Age"",
+        ""AverageSleepTime"",
+        ""Address"",
+        ""Children"",
+        ""discriminator""
+      ],
+      ""properties"": {
+        ""Id"": {
+          ""type"": ""string"",
+          ""format"": ""guid""
+        },
+        ""FirstName"": {
+          ""type"": ""string"",
+          ""description"": ""Gets or sets the first name."",
+          ""minLength"": 2
+        },
+        ""LastName"": {
+          ""type"": ""string"",
+          ""description"": ""Gets or sets the last name."",
+          ""minLength"": 1
+        },
+        ""DateOfBirth"": {
+          ""type"": ""string"",
+          ""format"": ""date-time""
+        },
+        ""Weight"": {
+          ""type"": ""number"",
+          ""format"": ""decimal""
+        },
+        ""Height"": {
+          ""type"": ""number"",
+          ""format"": ""double""
+        },
+        ""Age"": {
+          ""type"": ""integer"",
+          ""format"": ""int32"",
+          ""maximum"": 99.0,
+          ""minimum"": 5.0
+        },
+        ""AverageSleepTime"": {
+          ""type"": ""string"",
+          ""format"": ""time-span""
+        },
+        ""Children"": {
+          ""type"": ""array"",
+          ""items"": {
+            ""$ref"": ""#/definitions/Person""
+          }
+        },
+        ""discriminator"": {
+          ""type"": ""string""
+        }
+      }
+    }
+  }
+}";
+
+            var schema = await JsonSchema4.FromJsonAsync(json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain("Liquid error: ", code);
         }
     }
 }

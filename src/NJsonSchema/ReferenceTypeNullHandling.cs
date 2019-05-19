@@ -8,10 +8,10 @@
 
 namespace NJsonSchema
 {
-    /// <summary>Specifies the default null handling for reference types.</summary>
+    /// <summary>Specifies the default null handling for reference types when no nullability information is available.</summary>
     public enum ReferenceTypeNullHandling
     {
-        /// <summary>Reference types can be null by default (C# default).</summary>
+        /// <summary>Reference types are nullable by default (C# default).</summary>
         Null,
 
         /// <summary>Reference types cannot be null by default.</summary>

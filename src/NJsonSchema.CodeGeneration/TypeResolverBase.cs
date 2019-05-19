@@ -49,7 +49,8 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The type name.</returns>
         public virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
         {
-            schema = schema.ActualSchema;
+            schema = RemoveNullability(schema).ActualSchema;
+
             RegisterSchemaDefinitions(schema.Definitions);
 
             if (!_generatedTypeNames.ContainsKey(schema))
@@ -71,7 +72,7 @@ namespace NJsonSchema.CodeGeneration
                 {
                     var schema = pair.Value.ActualSchema;
 
-                    if (IsTypeSchema(schema))
+                    if (IsDefinitionTypeSchema(schema))
                     {
                         GetOrGenerateTypeName(schema, pair.Key);
                     }
@@ -79,20 +80,43 @@ namespace NJsonSchema.CodeGeneration
             }
         }
 
-        /// <summary>Gets the actual schema and removes a nullable oneOf reference if available.</summary>
+        /// <summary>Removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
-        protected JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
+        public JsonSchema4 RemoveNullability(JsonSchema4 schema)
         {
-            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? schema.ActualSchema;
+            // TODO: Method on JsonSchema4?
+            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
         }
 
-        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <summary>Gets the actual schema (i.e. when not referencing a type schema or it is inlined) 
+        /// and removes a nullable oneOf reference if available.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>The actually resolvable schema</returns>
+        public JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
+        {
+            schema = RemoveNullability(schema);
+            return IsDefinitionTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
+        }
+
+        /// <summary>Checks whether the given schema generates a new type (e.g. class, enum, class with dictionary inheritance, etc.) 
+        /// or is an inline type (e.g. string, number, etc.). Warning: Enum will also return true.</summary>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        public bool GeneratesType(JsonSchema4 schema)
+        {
+            schema = GetResolvableSchema(schema);
+            return schema.HasReference || (schema.IsObject && !schema.IsDictionary && !schema.IsAnyType);
+        }
+
+        /// <summary>Checks whether the given schema from definitions should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>
-        protected virtual bool IsTypeSchema(JsonSchema4 schema)
+        protected virtual bool IsDefinitionTypeSchema(JsonSchema4 schema)
         {
-            return !schema.IsDictionary &&
+            return !schema.IsTuple &&
+                   !schema.IsDictionary &&
+                   !schema.IsArray &&
                    !schema.IsAnyType &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||

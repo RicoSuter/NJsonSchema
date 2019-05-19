@@ -38,6 +38,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             ClassTypes = new string[0];
             ExtendedClasses = new string[0];
+
+            InlineNamedDictionaries = false;
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
@@ -87,6 +89,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether the export keyword should be added to all classes and enums (default: true).</summary>
         public bool ExportTypes { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with an indexer.</summary>
+        public bool InlineNamedDictionaries { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

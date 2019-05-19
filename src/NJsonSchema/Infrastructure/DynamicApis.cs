@@ -65,9 +65,9 @@ namespace NJsonSchema.Infrastructure
 
             using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType))
             {
-                var response = await client.GetAsync(url);
+                var response = await client.GetAsync(url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
         }
 
@@ -112,45 +112,45 @@ namespace NJsonSchema.Infrastructure
         /// <param name="filePath">The file path.</param>
         /// <returns>true or false</returns>
         /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
-        public static async Task<bool> DirectoryExistsAsync(string filePath)
+        public static Task<bool> DirectoryExistsAsync(string filePath)
         {
             if (!SupportsDirectoryApis)
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
 
             if (string.IsNullOrEmpty(filePath))
-                return false;
+                return FromResult(false);
 
-            return await FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
+            return FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
         }
 
         /// <summary>Checks whether a file exists.</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>true or false</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static async Task<bool> FileExistsAsync(string filePath)
+        public static Task<bool> FileExistsAsync(string filePath)
         {
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
             if (string.IsNullOrEmpty(filePath))
-                return false;
+                return FromResult(false);
 
-            return await FromResult((bool)FileType.GetRuntimeMethod("Exists",
-                new[] { typeof(string) }).Invoke(null, new object[] { filePath })).ConfigureAwait(false);
+            return FromResult((bool)FileType.GetRuntimeMethod("Exists",
+                new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
         }
 
         /// <summary>Reads all content of a file (UTF8).</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The file content.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static Task<string> FileReadAllTextAsync(string filePath)
+        public static async Task<string> FileReadAllTextAsync(string filePath)
         {
             if (!SupportsFileApis)
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
 
-            return Task.Factory.StartNew(() => (string)FileType.GetRuntimeMethod("ReadAllText",
-                new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 }));
+            return await Task.Factory.StartNew(() => (string)FileType.GetRuntimeMethod("ReadAllText",
+                new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 })).ConfigureAwait(false);
         }
 
         /// <summary>Writes text to a file (UTF8).</summary>
@@ -178,6 +178,18 @@ namespace NJsonSchema.Infrastructure
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
 
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
+        }
+
+        /// <summary>Gets the full path from a given path</summary>
+        /// <param name="path">The path</param>
+        /// <returns>The full path</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
+        public static string GetFullPath(string path)
+        {
+            if (!SupportsPathApis)
+                throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+
+            return (string)PathType.GetRuntimeMethod("GetFullPath", new[] { typeof(string) }).Invoke(null, new object[] { path });
         }
 
         /// <summary>Gets the directory path of a file path.</summary>

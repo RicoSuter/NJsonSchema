@@ -19,6 +19,7 @@ using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 using System.Linq;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 namespace NJsonSchema.Generation
 {
     /// <summary>The JSON Schema generator settings.</summary>
@@ -27,10 +28,14 @@ namespace NJsonSchema.Generation
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
-            DefaultEnumHandling = EnumHandling.Integer;
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
-            DefaultPropertyNameHandling = PropertyNameHandling.Default;
             SchemaType = SchemaType.JsonSchema;
+            GenerateAbstractSchemas = true;
+
+            // Obsolete, use SerializerSettings instead
+            DefaultEnumHandling = EnumHandling.Integer;
+            DefaultPropertyNameHandling = PropertyNameHandling.Default;
+            ContractResolver = null;
 
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
@@ -39,20 +44,17 @@ namespace NJsonSchema.Generation
             ExcludedTypeNames = new string[0];
         }
 
-        /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
-        public EnumHandling DefaultEnumHandling { get; set; }
-
-        /// <summary>Gets or sets the default null handling (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
+        /// <summary>Gets or sets the default reference type null handling when no nullability information is available (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
         public ReferenceTypeNullHandling DefaultReferenceTypeNullHandling { get; set; }
-
-        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
-        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to generate abstract properties (i.e. interface and abstract properties. Properties may defined multiple times in a inheritance hierarchy, default: false).</summary>
         public bool GenerateAbstractProperties { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate the x-abstract flag on schemas (default: true).</summary>
+        public bool GenerateAbstractSchemas { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to generate schemas for types in <see cref="KnownTypeAttribute"/> attributes (default: true).</summary>
         public bool GenerateKnownTypes { get; set; } = true;
@@ -67,13 +69,11 @@ namespace NJsonSchema.Generation
         /// defined on the object (otherwise allOf/oneOf with $ref is used, default: false).</summary>
         public bool AllowReferencesWithProperties { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to generate a description with number to enum name mappings (for integer enums only, default: false).</summary>
+        public bool GenerateEnumMappingDescription { get; set; }
+
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
-
-        /// <summary>Gets or sets the contract resolver.</summary>
-        /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
-        [JsonIgnore]
-        public IContractResolver ContractResolver { get; set; }
 
         /// <summary>Gets or sets the serializer settings.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
@@ -102,6 +102,23 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
         public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
+
+        /// <summary>Gets or sets a value indicating whether to generate x-nullable properties (Swagger 2 only).</summary>
+        public bool GenerateCustomNullableProperties { get; set; }
+
+        /// <summary>Gets or sets the contract resolver.</summary>
+        /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
+        [JsonIgnore]
+        [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
+        public IContractResolver ContractResolver { get; set; }
+
+        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
+        [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
+        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
+
+        /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
+        [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
+        public EnumHandling DefaultEnumHandling { get; set; }
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
@@ -183,13 +200,26 @@ namespace NJsonSchema.Generation
                 null;
         }
 
+        /// <summary>Gets the actual computed <see cref="GenerateAbstractSchemas"/> setting based on the global setting and the JsonSchemaAbstractAttribute attribute.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The result.</returns>
+        public bool GetActualGenerateAbstractSchema(Type type)
+        {
+            var attribute = type.GetTypeInfo().GetCustomAttributes(false)
+                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
+
+            return (GenerateAbstractSchemas && attribute == null) || attribute?.TryGetPropertyValue("IsAbstract", true) == true;
+        }
+
         /// <summary>Gets the actual computed <see cref="FlattenInheritanceHierarchy"/> setting based on the global setting and the JsonSchemaFlattenAttribute attribute.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The result.</returns>
         public bool GetActualFlattenInheritanceHierarchy(Type type)
         {
-            return FlattenInheritanceHierarchy || type.GetTypeInfo().GetCustomAttributes(false)
-                .Any(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+            var attribute = type.GetTypeInfo().GetCustomAttributes(false)
+                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+
+            return (FlattenInheritanceHierarchy && attribute == null) || attribute?.TryGetPropertyValue("Flatten", true) == true;
         }
     }
 }

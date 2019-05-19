@@ -49,14 +49,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(typeSchema,
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
-                DefaultValue = valueGenerator.GetDefaultValue(typeSchema,
+                DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 
-                IsNewableObject = IsNewableObject(typeSchema),
+                IsNewableObject = IsNewableObject(parameters.Schema, parameters),
                 IsDate = IsDate(typeSchema.Format, parameters.Settings.DateTimeType),
                 IsDateTime = IsDateTime(typeSchema.Format, parameters.Settings.DateTimeType),
 
@@ -65,19 +65,21 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 DictionaryValueDefaultValue = dictionaryValueDefaultValue,
                 HasDictionaryValueDefaultValue = dictionaryValueDefaultValue != null,
 
-                IsDictionaryValueNewableObject = typeSchema.AdditionalPropertiesSchema != null && IsNewableObject(typeSchema.AdditionalPropertiesSchema),
+                IsDictionaryValueNewableObject = typeSchema.AdditionalPropertiesSchema != null && IsNewableObject(typeSchema.AdditionalPropertiesSchema, parameters),
                 IsDictionaryValueDate = IsDate(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
                 IsDictionaryValueDateTime = IsDateTime(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
                 IsDictionaryValueNewableArray = typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
-                    IsNewableObject(typeSchema.AdditionalPropertiesSchema.Item),
+                    IsNewableObject(typeSchema.AdditionalPropertiesSchema.Item, parameters),
                 DictionaryValueArrayItemType = typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
                     parameters.Resolver.TryResolve(typeSchema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : "any",
 
                 IsArray = typeSchema.IsArray,
                 ArrayItemType = parameters.Resolver.TryResolve(typeSchema.Item, parameters.TypeNameHint) ?? "any",
-                IsArrayItemNewableObject = typeSchema.Item != null && IsNewableObject(typeSchema.Item),
+                IsArrayItemNewableObject = typeSchema.Item != null && IsNewableObject(typeSchema.Item, parameters),
                 IsArrayItemDate = IsDate(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
                 IsArrayItemDateTime = IsDateTime(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
+
+                RequiresStrictPropertyInitialization = parameters.Settings.TypeScriptVersion >= 2.7m,
 
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
@@ -143,11 +145,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return false;
         }
 
-        private static bool IsNewableObject(JsonSchema4 schema)
+        private static bool IsNewableObject(JsonSchema4 schema, DataConversionParameters parameters)
         {
-            schema = schema.ActualSchema;
-            return (schema.Type.HasFlag(JsonObjectType.Object) || schema.Type == JsonObjectType.None)
-                && !schema.IsAnyType && !schema.IsDictionary && !schema.IsEnumeration;
+            if (schema.ActualTypeSchema.IsEnumeration)
+                return false;
+
+            return parameters.Resolver.GeneratesType(schema);
         }
     }
 }

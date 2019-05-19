@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public CodeArtifactCollection GenerateTypes(JsonSchema4 schema, string typeNameHint)
+        public IEnumerable<CodeArtifact> GenerateTypes(JsonSchema4 schema, string typeNameHint)
         {
             _resolver.Resolve(schema, false, typeNameHint); // register root type
             return GenerateTypes();
@@ -62,13 +62,13 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code</returns>
         public string GenerateFile(JsonSchema4 schema, string typeNameHint)
         {
-            var collection = GenerateTypes(schema, typeNameHint);
-            return GenerateFile(collection);
+            var artifacts = GenerateTypes(schema, typeNameHint);
+            return GenerateFile(artifacts);
         }
 
         /// <summary>Generates all types from the resolver.</summary>
         /// <returns>The code.</returns>
-        public virtual CodeArtifactCollection GenerateTypes()
+        public virtual IEnumerable<CodeArtifact> GenerateTypes()
         {
             var processedTypes = new List<string>();
             var types = new Dictionary<string, CodeArtifact>();
@@ -82,15 +82,15 @@ namespace NJsonSchema.CodeGeneration
                 }
             }
 
-            var artifacts = types.Values.Where(p =>
-                !_settings.ExcludedTypeNames.Contains(p.TypeName));
+            var artifacts = types.Values
+                .Where(p => !_settings.ExcludedTypeNames.Contains(p.TypeName));
 
-            return new CodeArtifactCollection(artifacts, null);
+            return artifacts;
         }
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <returns>The code</returns>
-        protected abstract string GenerateFile(CodeArtifactCollection artifactCollection);
+        protected abstract string GenerateFile(IEnumerable<CodeArtifact> artifacts);
 
         /// <summary>Generates the type.</summary>
         /// <param name="schema">The schema.</param>

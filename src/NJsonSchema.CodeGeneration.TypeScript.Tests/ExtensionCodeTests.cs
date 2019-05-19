@@ -5,6 +5,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class ExtensionCodeTests
     {
+        // Important: Line 18 has a \t
         private const string Code =
 @"/// <reference path=""../../typings/angularjs/angular.d.ts"" />
 
@@ -14,7 +15,8 @@ import bar = require(""foo/bar"");
 import 'rxjs/add/operator/map';
 
 export class Bar extends generated.Bar {
-    get title() {
+
+	get title() {
         return this.firstName + ' ' + this.lastName;
     }
 }
@@ -26,6 +28,7 @@ for (var clientClass in clientClasses) {
     } 
 }
 
+// Imported class for ...
 class Foo extends generated.Foo {
     get title() {
         ignore(); // ignore

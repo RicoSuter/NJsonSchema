@@ -46,6 +46,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
             });
+
+            InlineNamedArrays = false;
+            InlineNamedDictionaries = false;
+            InlineNamedTuples = true;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
@@ -117,5 +121,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
         public bool EnforceFlagEnums { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.</summary>
+        public bool InlineNamedDictionaries { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced tuples should be inlined or generated as class with tuple inheritance.</summary>
+        public bool InlineNamedTuples { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.</summary>
+        public bool InlineNamedArrays { get; set; }
     }
 }

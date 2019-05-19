@@ -28,9 +28,21 @@ namespace NJsonSchema.Generation
         /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
         {
-            var isNullable = IsNullable(type, parentAttributes, settings);
+            return GetDescription(type, parentAttributes, settings.DefaultReferenceTypeNullHandling, settings);
+        }
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="type">The type. </param>
+        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes,
+            ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        {
+            var isNullable = IsNullable(type, parentAttributes, defaultReferenceTypeNullHandling);
 
             var jsonSchemaTypeAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaTypeAttribute>() ??
                                           parentAttributes?.OfType<JsonSchemaTypeAttribute>().SingleOrDefault();
@@ -95,7 +107,8 @@ namespace NJsonSchema.Generation
                 type == typeof(DateTimeOffset) ||
                 type.FullName == "NodaTime.OffsetDateTime" ||
                 type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime")
+                type.FullName == "NodaTime.ZonedDateTime" ||
+                type.FullName == "NodaTime.Instant")
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
 
             if (type == typeof(TimeSpan) ||
@@ -127,8 +140,17 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
             }
 
-            if (IsFileType(type, parentAttributes))
-                return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
+            if (IsBinary(type, parentAttributes))
+            {
+                if (settings.SchemaType == SchemaType.Swagger2)
+                {
+                    return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
+                }
+                else
+                {
+                    return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Binary);
+                }
+            }
 
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(type, parentAttributes) && contract is JsonDictionaryContract)
@@ -141,9 +163,9 @@ namespace NJsonSchema.Generation
             {
 #if !LEGACY
                 // Remove JsonSchemaTypeAttributes to avoid stack overflows
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
+                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), defaultReferenceTypeNullHandling, settings);
 #else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), settings);
+                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes?.Where(a => !(a is JsonSchemaTypeAttribute)), defaultReferenceTypeNullHandling, settings);
 #endif
                 typeDescription.IsNullable = true;
                 return typeDescription;
@@ -158,9 +180,9 @@ namespace NJsonSchema.Generation
         /// <summary>Checks whether a type is nullable.</summary>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
-        /// <param name="settings">The settings</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
@@ -176,14 +198,14 @@ namespace NJsonSchema.Generation
                 return true;
 
             var isValueType = type != typeof(string) && type.GetTypeInfo().IsValueType;
-            return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
+            return isValueType == false && defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
-        /// <summary>Checks whether the given type is a file type.</summary>
+        /// <summary>Checks whether the given type is a file/binary type.</summary>
         /// <param name="type">The type.</param>
         /// <param name="parentAttributes">The parent attributes.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsBinary(Type type, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Move all file handling to NSwag. How?
 

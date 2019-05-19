@@ -34,17 +34,12 @@ namespace NJsonSchema.Tests.Generation
                 { typeof(Dictionary<string, string>), true },
             };
 
-            var settings = new JsonSchemaGeneratorSettings
-            {
-                DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null
-            };
-
             //// Act
             var svc = new DefaultReflectionService();
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
+                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, ReferenceTypeNullHandling.Null));
         }
 
         [Fact]
@@ -74,17 +69,12 @@ namespace NJsonSchema.Tests.Generation
                 { typeof(Dictionary<string, string>), false },
             };
 
-            var settings = new JsonSchemaGeneratorSettings
-            {
-                DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull
-            };
-
             //// Act
             var svc = new DefaultReflectionService();
 
             //// Assert
             foreach (var check in checks)
-                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, settings));
+                Assert.Equal(check.Value, svc.IsNullable(check.Key, null, ReferenceTypeNullHandling.NotNull));
         }
     }
 }

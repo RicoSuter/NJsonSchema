@@ -1,6 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using NJsonSchema.Converters;
+using NJsonSchema.Generation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -311,6 +316,46 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.DoesNotContain("let firstName_ = data[\"FirstName\"];", code);
+        }
+
+        [Fact]
+        public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
+        {
+            // Assert
+            var schema = JsonSchema4.FromTypeAsync(
+                typeof(MyDerivedClass),
+                new JsonSchemaGeneratorSettings
+                {
+                    GenerateAbstractProperties = true
+                }).Result;
+
+            var generator = new TypeScriptGenerator(schema);
+            generator.Settings.GenerateConstructorInterface = false;
+            generator.Settings.MarkOptionalProperties = true;
+            generator.Settings.TypeStyle = TypeScriptTypeStyle.Class;
+
+            // Act
+            var output = generator.GenerateFile();
+
+            // Assert
+            Assert.DoesNotContain("if (!data) {", output);
+        }
+
+        [JsonConverter(typeof(JsonInheritanceConverter))]
+        [KnownType(typeof(MyDerivedClass))]
+        public abstract class MyBaseClass
+        {
+            [Required]
+            public MyPropertyClass MyProperty { get; set; }
+        }
+
+        public sealed class MyDerivedClass : MyBaseClass
+        {
+        }
+
+        public sealed class MyPropertyClass
+        {
+            public string MyStringProperty { get; set; }
         }
     }
 }
