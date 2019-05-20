@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<object> EmptySchema { get; set; } = ", output);
+            Assert.Contains("public System.Collections.Generic.ICollection<object> EmptySchema { get; set; } = ", output);
 
             AssertCompile(output);
         }
@@ -172,7 +172,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = gen.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<PRef>", output);
+            Assert.Contains("public System.Collections.Generic.ICollection<PRef>", output);
 
             AssertCompile(output);
         }
@@ -252,7 +252,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("Teacher");
 
             //// Assert
-            Assert.Contains(@"class Teacher : Person, ", output);
+            Assert.Contains(@"class Teacher : Person", output);
 
             AssertCompile(output);
         }
@@ -612,7 +612,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.Generic.Dictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Dict { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
 
             AssertCompile(code);
         }
@@ -739,8 +739,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<string> A { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();", code);
-            Assert.DoesNotContain("public System.Collections.ObjectModel.ObservableCollection<string> B { get; set; } = new System.Collections.ObjectModel.ObservableCollection<string>();", code);
+            Assert.Contains("public System.Collections.Generic.ICollection<string> A { get; set; } = new System.Collections.ObjectModel.Collection<string>();", code);
+            Assert.DoesNotContain("public System.Collections.Generic.ICollection<string> B { get; set; } = new System.Collections.ObjectModel.Collection<string>();", code);
 
             AssertCompile(code);
         }
@@ -785,8 +785,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.Generic.Dictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
-            Assert.DoesNotContain("public System.Collections.Generic.Dictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> A { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
+            Assert.DoesNotContain("public System.Collections.Generic.IDictionary<string, string> B { get; set; } = new System.Collections.Generic.Dictionary<string, string>();", code);
 
             AssertCompile(code);
         }
@@ -890,7 +890,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schema = await JsonSchema4.FromTypeAsync<ObsClass>();
-            var settings = new CSharpGeneratorSettings();
+            var settings = new CSharpGeneratorSettings { ArrayType = "ObservableCollection" };
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
@@ -1502,11 +1502,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             if (inlineNamedTuples)
             {
-                Assert.Contains("ObservableCollection<System.Tuple<int, int>>", code);
+                Assert.Contains("Collection<System.Tuple<int, int>>", code);
             }
             else
             {
-                Assert.Contains("ObservableCollection<InnerList>", code);
+                Assert.Contains("Collection<InnerList>", code);
                 Assert.Contains("partial class InnerList : System.Tuple<int, int>", code);
             }
 

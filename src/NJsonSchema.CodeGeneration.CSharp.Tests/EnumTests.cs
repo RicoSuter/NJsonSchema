@@ -257,7 +257,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("private MyClassStatus? _status;", code);
+            Assert.Contains("public MyClassStatus? Status { get; set; }", code);
         }
 
         [Fact]
