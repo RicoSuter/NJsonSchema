@@ -14,15 +14,14 @@ using System.Threading.Tasks;
 
 namespace NJsonSchema.Infrastructure
 {
-    /// <summary>Provides extension methods for reading XML comments from reflected members.</summary>
-    /// <remarks>This class currently works only on the desktop .NET framework.</remarks>
-    public static class XmlDocumentationExtensions
+    /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
+    public static class TypeExtensions
     {
         private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        public static string GetName(this ContextualMemberInfo member)
+        internal static string GetName(this ContextualMemberInfo member)
         {
             if (!_names.ContainsKey(member))
             {
@@ -30,7 +29,6 @@ namespace NJsonSchema.Infrastructure
                 {
                     if (!_names.ContainsKey(member))
                     {
-                        // TODO: Move somewhere else as this is not XML docs related
                         _names[member] = GetNameWithoutCache(member);
                     }
                 }
@@ -42,7 +40,9 @@ namespace NJsonSchema.Infrastructure
         {
             var jsonPropertyAttribute = member.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
+            {
                 return jsonPropertyAttribute.PropertyName;
+            }
 
             var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
@@ -107,12 +107,16 @@ namespace NJsonSchema.Infrastructure
         {
             dynamic descriptionAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+            {
                 return descriptionAttribute.Description;
+            }
             else
             {
                 dynamic displayAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
+                {
                     return displayAttribute.Description;
+                }
 
                 if (parameter != null)
                 {
