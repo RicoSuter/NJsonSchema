@@ -312,7 +312,7 @@ namespace NJsonSchema.Generation
         /// <param name="jsonProperty">The property.</param>
         /// <param name="memberInfo">The member info.</param>
         /// <returns>The property name.</returns>
-        public virtual string GetPropertyName(Newtonsoft.Json.Serialization.JsonProperty jsonProperty, MemberInfo memberInfo)
+        public virtual string GetPropertyName(JsonProperty jsonProperty, MemberInfo memberInfo)
         {
             try
             {
@@ -636,7 +636,7 @@ namespace NJsonSchema.Generation
                     var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
                                      (memberInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
 
-                    var property = new Newtonsoft.Json.Serialization.JsonProperty
+                    var jsonProperty = new JsonProperty
                     {
                         AttributeProvider = new ReflectionAttributeProvider(memberInfo),
                         PropertyType = memberType,
@@ -645,19 +645,19 @@ namespace NJsonSchema.Generation
 
                     if (attribute != null)
                     {
-                        property.PropertyName = attribute.PropertyName ?? memberInfo.Name;
-                        property.Required = attribute.Required;
-                        property.DefaultValueHandling = attribute.DefaultValueHandling;
-                        property.TypeNameHandling = attribute.TypeNameHandling;
-                        property.NullValueHandling = attribute.NullValueHandling;
-                        property.TypeNameHandling = attribute.TypeNameHandling;
+                        jsonProperty.PropertyName = attribute.PropertyName ?? memberInfo.Name;
+                        jsonProperty.Required = attribute.Required;
+                        jsonProperty.DefaultValueHandling = attribute.DefaultValueHandling;
+                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
+                        jsonProperty.NullValueHandling = attribute.NullValueHandling;
+                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
                     }
                     else
                     {
-                        property.PropertyName = memberInfo.Name;
+                        jsonProperty.PropertyName = memberInfo.Name;
                     }
 
-                    await LoadPropertyOrFieldAsync(property, memberInfo, type, schema, schemaResolver).ConfigureAwait(false);
+                    await LoadPropertyOrFieldAsync(jsonProperty, memberInfo, type, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
         }
@@ -934,7 +934,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty jsonProperty, ContextualMemberInfo memberInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
+        private async Task LoadPropertyOrFieldAsync(JsonProperty jsonProperty, ContextualMemberInfo memberInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = Settings.ReflectionService.GetDescription(memberInfo, Settings);
             if (jsonProperty.Ignored == false && IsPropertyIgnoredBySettings(memberInfo) == false)
@@ -1192,23 +1192,23 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private object ConvertDefaultValue(Newtonsoft.Json.Serialization.JsonProperty property)
+        private object ConvertDefaultValue(JsonProperty jsonProperty)
         {
-            if (property.DefaultValue != null && property.DefaultValue.GetType().GetTypeInfo().IsEnum)
+            if (jsonProperty.DefaultValue != null && jsonProperty.DefaultValue.GetType().GetTypeInfo().IsEnum)
             {
-                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(property.Converter?.GetType().GetTypeInfo());
+                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(jsonProperty.Converter?.GetType().GetTypeInfo());
                 if (hasStringEnumConverter)
                 {
-                    return property.DefaultValue.ToString();
+                    return jsonProperty.DefaultValue.ToString();
                 }
                 else
                 {
-                    return (int)property.DefaultValue;
+                    return (int)jsonProperty.DefaultValue;
                 }
             }
             else
             {
-                return property.DefaultValue;
+                return jsonProperty.DefaultValue;
             }
         }
     }

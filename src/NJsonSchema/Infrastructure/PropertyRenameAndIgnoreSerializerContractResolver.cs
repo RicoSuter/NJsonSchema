@@ -51,11 +51,11 @@ namespace NJsonSchema.Infrastructure
             _renames[type.FullName][propertyName] = newJsonPropertyName;
         }
 
-        /// <summary>Creates a Newtonsoft.Json.Serialization.JsonProperty for the given System.Reflection.MemberInfo.</summary>
+        /// <summary>Creates a JsonProperty for the given System.Reflection.MemberInfo.</summary>
         /// <param name="member">The member's parent Newtonsoft.Json.MemberSerialization.</param>
-        /// <param name="memberSerialization">The member to create a Newtonsoft.Json.Serialization.JsonProperty for.</param>
-        /// <returns>A created Newtonsoft.Json.Serialization.JsonProperty for the given System.Reflection.MemberInfo.</returns>
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        /// <param name="memberSerialization">The member to create a JsonProperty for.</param>
+        /// <returns>A created JsonProperty for the given System.Reflection.MemberInfo.</returns>
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
 

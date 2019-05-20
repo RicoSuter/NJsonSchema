@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Generation
         /// </summary>
         public class CustomContractResolver : CamelCasePropertyNamesContractResolver
         {
-            protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
                 var prop = base.CreateProperty(member, memberSerialization);
                 if (!prop.Writable && member.GetCustomAttribute<JsonPropertyAttribute>(true) == null)
@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Generation
             {
                 JsonContract contract = base.CreateContract(objectType);
                 // by default a type that can convert to string and that is also an enum will have an array contract, but serialize to a string!. fix  this
-                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType) 
+                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType)
                     && CanNonSystemTypeDescriptorConvertString(objectType))
                     contract = CreateStringContract(objectType);
 
@@ -84,7 +84,9 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string FirstName { get; set; }
+
             public int NameLength => FirstName.Length;
+
             public LocationPath Location { get; set; }
         }
 
