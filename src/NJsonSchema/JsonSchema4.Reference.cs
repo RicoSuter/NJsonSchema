@@ -88,20 +88,6 @@ namespace NJsonSchema
                                                MultipleOf == null &&
                                                IsEnumeration == false;
 
-        /// <summary>Gets or sets the type reference.</summary>
-        [JsonIgnore]
-        [Obsolete("Use the Reference property instead.")]
-        public JsonSchema4 SchemaReference
-        {
-            get => Reference;
-            set => Reference = value;
-        }
-
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref, <see cref="HasAllOfSchemaReference"/>, <see cref="HasOneOfSchemaReference"/> or <see cref="HasAnyOfSchemaReference"/>).</summary>
-        [JsonIgnore]
-        [Obsolete("Use the HasReference property instead.")]
-        public bool HasSchemaReference => HasReference;
-
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         private JsonSchema4 GetActualSchema(IList<JsonSchema4> checkedSchemas)

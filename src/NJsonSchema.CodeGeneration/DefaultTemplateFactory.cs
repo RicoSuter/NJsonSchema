@@ -168,7 +168,7 @@ namespace NJsonSchema.CodeGeneration
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}.", exception);
+                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}: \n" + exception, exception);
                 }
             }
         }
