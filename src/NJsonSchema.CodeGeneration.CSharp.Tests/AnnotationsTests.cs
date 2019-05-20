@@ -36,8 +36,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.Contains("public System.Collections.ObjectModel.ObservableCollection<string> Collection { get; } = new System.Collections.ObjectModel.ObservableCollection<string>();", code);
-            Assert.Contains("public System.Collections.Generic.Dictionary<string, object> Dictionary { get; } = new System.Collections.Generic.Dictionary<string, object>();", code);
+            Assert.Contains("public System.Collections.Generic.ICollection<string> Collection { get; } = new System.Collections.ObjectModel.Collection<string>();", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, object> Dictionary { get; } = new System.Collections.Generic.Dictionary<string, object>();", code);
         }
     }
 }

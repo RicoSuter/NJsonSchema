@@ -33,8 +33,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.Generic.Dictionary<PropertyName, string> EnumDictionary\n", code);
-            Assert.Contains("public System.Collections.Generic.Dictionary<PropertyName, string> EnumInterfaceDictionary\n", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumDictionary ", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumInterfaceDictionary ", code);
         }
 
         [Fact]

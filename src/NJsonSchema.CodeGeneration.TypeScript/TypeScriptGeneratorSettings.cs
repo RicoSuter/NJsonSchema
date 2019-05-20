@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
             ExtensionCode = string.Empty;
-            TypeScriptVersion = 1.8m;
+            TypeScriptVersion = 2.7m;
             GenerateConstructorInterface = true;
             ConvertConstructorInterfaceData = false;
             ExportTypes = true;

@@ -59,7 +59,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_default_value_is_available_then_variable_is_initialized()
         {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 1.8m
+            });
 
             //// Assert
             Assert.Contains("name: string;", code);
@@ -121,7 +125,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -166,7 +171,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -219,7 +225,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 

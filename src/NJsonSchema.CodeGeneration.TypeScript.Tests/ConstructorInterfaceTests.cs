@@ -61,7 +61,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 GenerateConstructorInterface = true,
-                ConvertConstructorInterfaceData = true
+                ConvertConstructorInterfaceData = true,
+                TypeScriptVersion = 1.8m
             });
 
             var output = generator.GenerateFile("MyClass");
