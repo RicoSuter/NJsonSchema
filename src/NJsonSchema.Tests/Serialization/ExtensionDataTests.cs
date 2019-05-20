@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -90,7 +91,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -103,7 +104,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);

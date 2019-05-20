@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -18,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_is_abstract_then_is_abstract_TypeScript_keyword_is_generated()
         {
             /// Arrange
-            var schema = await JsonSchema.FromTypeAsync<AbstractClass>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<AbstractClass>();
             var json = schema.ToJson();
 
             /// Act
@@ -43,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_required_and_abstract_then_it_is_not_instantiated()
         {
             /// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ContainerClass>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ContainerClass>();
             var json = schema.ToJson();
 
             /// Act
@@ -72,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_abstract_class_is_in_inheritance_hierarchy_then_it_is_newer_instantiated()
         {
             /// Arrange
-            var schema = await JsonSchema.FromTypeAsync<AbstractClass>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<AbstractClass>();
 
             /// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });

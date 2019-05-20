@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_string_and_integer_enum_used_then_two_enums_are_generated_in_typescript()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchemaGenerator.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_export_types_is_true_add_export_before_enum_in_typescript()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var schema = await JsonSchemaGenerator.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_add_export_keyword_is_false_dont_add_export_before_enum_in_typescript()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var schema = await JsonSchemaGenerator.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_string_and_integer_enum_used_then_one_enum_is_generated_in_CSharp()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchemaGenerator.FromTypeAsync<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -118,7 +118,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_byte_enum_is_generated_then_no_exception_occurs()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<DifferentEnumTypeTestClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchemaGenerator.FromTypeAsync<DifferentEnumTypeTestClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -148,7 +148,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_enum_has_string_value_then_CS_code_has_EnumMember_attribute()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ClassWithStringEnum>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithStringEnum>();
             var schemaData = schema.ToJson();
             
             //// Act
@@ -166,7 +166,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_enum_has_string_value_then_TS_code_has_string_value()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ClassWithStringEnum>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithStringEnum>();
             var schemaData = schema.ToJson();
 
             //// Act
@@ -198,7 +198,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_enum_has_integer_value_then_CS_code_has_EnumMember_attribute()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ClassWithIntegerEnum>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithIntegerEnum>();
             var schemaData = schema.ToJson();
 
             //// Act
@@ -216,7 +216,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_enum_has_integer_value_then_TS_code_has_string_value()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ClassWithIntegerEnum>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithIntegerEnum>();
             var schemaData = schema.ToJson();
 
             //// Act

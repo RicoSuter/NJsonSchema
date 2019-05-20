@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using NJsonSchema.Generation;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -17,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<MyTest>();
             var json = schema.ToJson();
 
             //// Assert

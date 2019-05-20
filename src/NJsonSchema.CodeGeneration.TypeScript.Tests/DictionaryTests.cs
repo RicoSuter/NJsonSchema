@@ -213,7 +213,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<DictionaryContainer>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act

@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             //// Act

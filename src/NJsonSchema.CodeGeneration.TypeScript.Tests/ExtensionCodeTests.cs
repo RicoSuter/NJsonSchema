@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using NJsonSchema.Generation;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -96,7 +97,7 @@ var x = 10;";
         public async Task When_classes_have_extension_code_then_class_body_is_copied()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<Foo>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Foo>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

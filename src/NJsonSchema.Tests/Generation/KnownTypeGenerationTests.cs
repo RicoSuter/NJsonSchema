@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NJsonSchema.Generation;
+using System;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -61,7 +62,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<Container>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -75,7 +76,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<Container>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert

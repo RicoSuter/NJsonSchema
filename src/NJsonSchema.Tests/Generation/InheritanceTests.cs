@@ -86,7 +86,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<Teacher>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Teacher>();
 
             //// Assert
             Assert.NotNull(schema.ActualProperties["Class"]);
@@ -112,7 +112,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<CC>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchemaGenerator.FromTypeAsync<CC>(new JsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             });
@@ -164,7 +164,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<Animal>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Animal>();
             var data = schema.ToJson();
 
             //// Assert
@@ -202,7 +202,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<ViewModelThing>(settings);
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ViewModelThing>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -275,7 +275,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<BaseClass_WithStringDiscriminant>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<BaseClass_WithStringDiscriminant>();
 
             //// Assert
             Assert.NotNull(schema.Properties["Kind"]);
@@ -299,7 +299,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            Task<JsonSchema> GetSchema() => JsonSchema.FromTypeAsync<BaseClass_WithIntDiscriminant>();
+            Task<JsonSchema> GetSchema() => JsonSchemaGenerator.FromTypeAsync<BaseClass_WithIntDiscriminant>();
 
             //// Assert
             await Assert.ThrowsAsync<InvalidOperationException>(GetSchema);
@@ -325,7 +325,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<Foo>(settings);
+            var schema = await JsonSchemaGenerator.FromTypeAsync<Foo>(settings);
             var json = schema.ToJson();
 
             //// Assert
@@ -367,7 +367,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<ExceptionContainer>(settings);
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ExceptionContainer>(settings);
             var json = schema.ToJson();
 
             //// Assert

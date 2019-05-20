@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Converters;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -28,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<MyContainer>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
@@ -73,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ExceptionContainer>();
+            var schema = await JsonSchemaGenerator.FromTypeAsync<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
