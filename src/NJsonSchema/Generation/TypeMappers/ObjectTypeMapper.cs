@@ -57,7 +57,9 @@ namespace NJsonSchema.Generation.TypeMappers
 #pragma warning restore 1998
         {
             if (!context.JsonSchemaResolver.HasSchema(MappedType, false))
+            {
                 context.JsonSchemaResolver.AddSchema(MappedType, false, await _schemaFactory(context.JsonSchemaGenerator, context.JsonSchemaResolver));
+            }
 
             schema.Reference = context.JsonSchemaResolver.GetSchema(MappedType, false);
         }

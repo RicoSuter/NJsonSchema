@@ -26,7 +26,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromYamlAsync(string data)
         {
-            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await JsonSchemaYaml.FromYamlAsync(data, null, factory).ConfigureAwait(false);
         }
 
@@ -36,7 +36,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromYamlAsync(string data, string documentPath)
         {
-            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromYamlAsync(data, documentPath, factory).ConfigureAwait(false);
         }
 
@@ -74,7 +74,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema4" />.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromFileAsync(filePath, factory).ConfigureAwait(false);
         }
 

@@ -8,6 +8,7 @@
 
 using System.Collections;
 using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.Infrastructure
@@ -26,9 +27,13 @@ namespace NJsonSchema.Infrastructure
                 {
                     var enumerable = instance != null ? property.ValueProvider.GetValue(instance) as IEnumerable : null;
                     if (enumerable != null)
+                    {
                         return enumerable.GetEnumerator().MoveNext();
+                    }
                     else
+                    {
                         return true;
+                    }
                 };
             }
 

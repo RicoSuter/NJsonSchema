@@ -22,6 +22,11 @@ namespace NJsonSchema
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema4 : IJsonExtensionObject
     {
+        private static JsonObjectType[] _jsonObjectTypeValues = Enum.GetValues(typeof(JsonObjectType))
+            .OfType<JsonObjectType>()
+            .Where(v => v != JsonObjectType.None)
+            .ToArray();
+
         /// <summary>Creates the serializer contract resolver based on the <see cref="SchemaType"/>.</summary>
         /// <param name="schemaType">The schema type.</param>
         /// <returns>The settings.</returns>
@@ -240,10 +245,8 @@ namespace NJsonSchema
         {
             _typeRaw = new Lazy<object>(() =>
             {
-                var flags = Enum.GetValues(Type.GetType())
-                    .OfType<JsonObjectType>()
+                var flags = _jsonObjectTypeValues
                     .Where(v => Type.HasFlag(v))
-                    .Where(v => v != JsonObjectType.None)
                     .ToArray();
 
                 if (flags.Length > 1)
@@ -266,11 +269,7 @@ namespace NJsonSchema
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonProperty> PropertiesRaw
         {
-            get
-            {
-                return Properties != null && Properties.Count > 0 ?
-                    Properties.ToDictionary(p => p.Key, p => p.Value) : null;
-            }
+            get => Properties != null && Properties.Count > 0 ? Properties : null;
             set
             {
                 Properties = value != null ?
