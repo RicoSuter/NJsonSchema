@@ -21,7 +21,7 @@ namespace NJsonSchema.Converters
     public class JsonInheritanceConverter : JsonConverter
     {
         /// <summary>Gets the default discriminiator name.</summary>
-        public static readonly string DefaultDiscriminatorName = "discriminator";
+        public static string DefaultDiscriminatorName { get; } = "discriminator";
 
         private readonly Type _baseType;
         private readonly string _discriminator;

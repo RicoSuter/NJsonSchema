@@ -882,7 +882,9 @@ namespace NJsonSchema.Generation
         private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
         {
             if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
+            {
                 return jsonInheritanceConverter.DiscriminatorName;
+            }
 
             return JsonInheritanceConverter.DefaultDiscriminatorName;
         }
