@@ -20,7 +20,8 @@ namespace NJsonSchema.Converters
     /// <summary>Defines the class as inheritance base class and adds a discriminator property to the serialized object.</summary>
     public class JsonInheritanceConverter : JsonConverter
     {
-        internal static readonly string DefaultDiscriminatorName = "discriminator";
+        /// <summary>Gets the default discriminiator name.</summary>
+        public static readonly string DefaultDiscriminatorName = "discriminator";
 
         private readonly Type _baseType;
         private readonly string _discriminator;

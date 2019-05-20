@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using NJsonSchema.Generation;
 
 namespace NJsonSchema.Annotations
 {
@@ -17,7 +16,7 @@ namespace NJsonSchema.Annotations
     public class JsonSchemaProcessorAttribute : Attribute
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaProcessorAttribute"/> class.</summary>
-        /// <param name="type">The schema processor type (must implement <see cref="ISchemaProcessor"/>).</param>
+        /// <param name="type">The schema processor type (must implement ISchemaProcessor).</param>
         /// <param name="parameters">The parameters.</param>
         public JsonSchemaProcessorAttribute(Type type, params object[] parameters)
         {

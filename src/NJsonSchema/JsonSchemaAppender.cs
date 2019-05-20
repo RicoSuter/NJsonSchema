@@ -15,7 +15,7 @@ namespace NJsonSchema
     {
         private readonly ITypeNameGenerator _typeNameGenerator;
 
-        /// <summary>Initializes a new instance of the <see cref="JsonSchemaResolver" /> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaAppender" /> class.</summary>
         /// <param name="rootObject">The root schema.</param>
         /// <param name="typeNameGenerator">The type name generator.</param>
         public JsonSchemaAppender(object rootObject, ITypeNameGenerator typeNameGenerator)
