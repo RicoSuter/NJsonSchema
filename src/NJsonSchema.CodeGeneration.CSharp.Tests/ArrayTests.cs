@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
-            Assert.Contains("System.Collections.ObjectModel.ObservableCollection<int?> Items", output);
+            Assert.Contains("System.Collections.Generic.ICollection<int?> Items", output);
         }
     }
 }
