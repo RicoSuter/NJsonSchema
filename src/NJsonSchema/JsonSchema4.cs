@@ -128,7 +128,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromFileAsync(string filePath)
         {
-            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromFileAsync(filePath, factory).ConfigureAwait(false);
         }
 
@@ -149,7 +149,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema4> FromUrlAsync(string url)
         {
-            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromUrlAsync(url, factory).ConfigureAwait(false);
         }
 
@@ -178,7 +178,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema4> FromJsonAsync(string data, string documentPath)
         {
-            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new JsonSchemaGeneratorSettings());
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromJsonAsync(data, documentPath, factory).ConfigureAwait(false);
         }
 

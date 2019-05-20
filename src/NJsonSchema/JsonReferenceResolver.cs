@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
@@ -23,23 +22,23 @@ namespace NJsonSchema
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
-        private readonly JsonSchemaResolver _schemaResolver;
+        private readonly JsonSchemaAppender _schemaAppender;
         private readonly Dictionary<string, IJsonReference> _resolvedObjects = new Dictionary<string, IJsonReference>();
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        public JsonReferenceResolver(JsonSchemaResolver schemaResolver)
+        /// <param name="schemaAppender">The schema appender.</param>
+        public JsonReferenceResolver(JsonSchemaAppender schemaAppender)
         {
-            _schemaResolver = schemaResolver;
+            _schemaAppender = schemaAppender;
         }
 
         /// <summary>Creates the factory to be used in the FromJsonAsync method.</summary>
-        /// <param name="settings">The generator settings.</param>
+        /// <param name="typeNameGenerator">The type name generator.</param>
         /// <returns>The factory.</returns>
-        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonReferenceResolverFactory(JsonSchemaGeneratorSettings settings)
+        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
             JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
-                new JsonReferenceResolver(new JsonSchemaResolver(schema, settings));
+                new JsonReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
 
             return ReferenceResolverFactory;
         }
@@ -159,10 +158,10 @@ namespace NJsonSchema
                 var referencedFile = _resolvedObjects[filePath];
                 var resolvedSchema = arr.Length == 1 ? referencedFile : await ResolveReferenceAsync(referencedFile, arr[1]).ConfigureAwait(false);
                 if (resolvedSchema is JsonSchema4 && append &&
-                    (_schemaResolver.RootObject as JsonSchema4)?.Definitions.Values.Contains(referencedFile) != true)
+                    (_schemaAppender.RootObject as JsonSchema4)?.Definitions.Values.Contains(referencedFile) != true)
                 {
                     var key = jsonPath.Split('/', '\\').Last().Split('.').First();
-                    _schemaResolver.AppendSchema((JsonSchema4)resolvedSchema, key);
+                    _schemaAppender.AppendSchema((JsonSchema4)resolvedSchema, key);
                 }
 
                 return resolvedSchema;
@@ -183,7 +182,9 @@ namespace NJsonSchema
                     var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
                     schema.DocumentPath = jsonPath;
                     if (schema is JsonSchema4 && append)
-                        _schemaResolver.AppendSchema((JsonSchema4)schema, null);
+                    {
+                        _schemaAppender.AppendSchema((JsonSchema4)schema, null);
+                    }
 
                     _resolvedObjects[arr[0]] = schema;
                 }
