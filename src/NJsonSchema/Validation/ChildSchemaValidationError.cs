@@ -22,9 +22,9 @@ namespace NJsonSchema.Validation
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
 #if !LEGACY
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonSchema, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
 #else
-        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema4, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
+        public ChildSchemaValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonSchema, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
 #endif
             : base(kind, property, path, token, schema)
         {
@@ -33,9 +33,9 @@ namespace NJsonSchema.Validation
 
         /// <summary>Gets the errors for each validated subschema. </summary>
 #if !LEGACY
-        public IReadOnlyDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
+        public IReadOnlyDictionary<JsonSchema, ICollection<ValidationError>> Errors { get; private set; }
 #else
-        public IDictionary<JsonSchema4, ICollection<ValidationError>> Errors { get; private set; }
+        public IDictionary<JsonSchema, ICollection<ValidationError>> Errors { get; private set; }
 #endif
 
         /// <summary>Returns a string that represents the current object.</summary>

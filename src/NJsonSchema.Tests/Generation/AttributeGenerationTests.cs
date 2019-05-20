@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Items"];
 
             //// Assert
@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["String"];
 
             //// Assert
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Double"];
 
             //// Assert
@@ -59,7 +59,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["DoubleOnlyMin"];
 
             //// Assert
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Integer"];
 
             //// Assert
@@ -88,7 +88,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Display"];
 
             //// Assert
@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -117,7 +117,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Required"];
 
             //// Assert
@@ -131,7 +131,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -146,7 +146,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<AttributeTestClass>();
             var property = schema.Properties["ReadOnly"];
 
             //// Assert
@@ -201,7 +201,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithTypedRange>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithTypedRange>();
             var property = schema.Properties["Foo"];
 
             //// Assert

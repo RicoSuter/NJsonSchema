@@ -316,7 +316,7 @@ namespace NJsonSchema.Tests.Validation
 }
 
 ";
-            var schema = await JsonSchema4.FromJsonAsync(schemaData);
+            var schema = await JsonSchema.FromJsonAsync(schemaData);
 
             //// Act
             var errors = schema.Validate(@"{""Key"": ""Value""}");
@@ -372,7 +372,7 @@ namespace NJsonSchema.Tests.Validation
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
             var errors = schema.Validate(json);
 
             //// Assert
@@ -405,7 +405,7 @@ namespace NJsonSchema.Tests.Validation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
             var errors = schema.Validate(json);
 
             //// Assert

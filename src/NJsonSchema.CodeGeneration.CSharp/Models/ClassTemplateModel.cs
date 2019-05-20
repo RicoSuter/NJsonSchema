@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly CSharpTypeResolver _resolver;
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
         private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel"/> class.</summary>
@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings,
-            CSharpTypeResolver resolver, JsonSchema4 schema, object rootObject)
+            CSharpTypeResolver resolver, JsonSchema schema, object rootObject)
             : base(resolver, schema, rootObject)
         {
             _resolver = resolver;
@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) &&
+        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 

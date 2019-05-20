@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_incorrect_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_positive_offset_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
@@ -49,7 +49,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_has_negative_offset_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_is_utc_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
@@ -83,7 +83,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_secfrac_correct_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
@@ -104,7 +104,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_is_not_utc_or_offset_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 

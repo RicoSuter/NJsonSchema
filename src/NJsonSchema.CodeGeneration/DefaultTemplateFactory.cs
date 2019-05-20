@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The toolchain version.</returns>
         protected virtual string GetToolchainVersion()
         {
-            return JsonSchema4.ToolchainVersion;
+            return JsonSchema.ToolchainVersion;
         }
 
         /// <summary>Gets a Liquid template by name.</summary>
@@ -168,7 +168,7 @@ namespace NJsonSchema.CodeGeneration
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}.", exception);
+                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}: \n" + exception, exception);
                 }
             }
         }

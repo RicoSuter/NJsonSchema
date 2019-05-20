@@ -17,19 +17,19 @@ namespace NJsonSchema.Yaml
     public class JsonAndYamlReferenceResolver : JsonReferenceResolver
     {
         /// <summary>Initializes a new instance of the <see cref="JsonAndYamlReferenceResolver"/> class.</summary>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        public JsonAndYamlReferenceResolver(JsonSchemaResolver schemaResolver)
-            : base(schemaResolver)
+        /// <param name="schemaAppender">The schema appender.</param>
+        public JsonAndYamlReferenceResolver(JsonSchemaAppender schemaAppender)
+            : base(schemaAppender)
         {
         }
 
         /// <summary>Creates the factory to be used in the FromJsonAsync method.</summary>
-        /// <param name="settings">The generator settings.</param>
+        /// <param name="typeNameGenerator">The type name generator.</param>
         /// <returns>The factory.</returns>
-        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(JsonSchemaGeneratorSettings settings)
+        public static Func<JsonSchema, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
-                new JsonAndYamlReferenceResolver(new JsonSchemaResolver(schema, settings));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
+                new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
 
             return ReferenceResolverFactory;
         }

@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code</returns>
         public string GenerateFile(string typeNameHint)
         {
-            var schema = (JsonSchema4)RootObject;
+            var schema = (JsonSchema)RootObject;
             return GenerateFile(schema, typeNameHint);
         }
 
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code</returns>
         public string GenerateFile()
         {
-            var schema = (JsonSchema4)RootObject;
+            var schema = (JsonSchema)RootObject;
             return GenerateFile(schema, schema.Title != null && Regex.IsMatch(schema.Title, "^[a-zA-Z0-9_]*$") ? schema.Title : null);
         }
 
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public IEnumerable<CodeArtifact> GenerateTypes(JsonSchema4 schema, string typeNameHint)
+        public IEnumerable<CodeArtifact> GenerateTypes(JsonSchema schema, string typeNameHint)
         {
             _resolver.Resolve(schema, false, typeNameHint); // register root type
             return GenerateTypes();
@@ -60,7 +60,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <returns>The code</returns>
-        public string GenerateFile(JsonSchema4 schema, string typeNameHint)
+        public string GenerateFile(JsonSchema schema, string typeNameHint)
         {
             var artifacts = GenerateTypes(schema, typeNameHint);
             return GenerateFile(artifacts);
@@ -96,6 +96,6 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        protected abstract CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint);
+        protected abstract CodeArtifact GenerateType(JsonSchema schema, string typeNameHint);
     }
 }

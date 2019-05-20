@@ -16,11 +16,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ObjectTest>();
+            var schema = await JsonSchema.FromTypeAsync<ObjectTest>();
             var data = schema.ToJson();
 
             //// Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                TypeScriptVersion = 1.8m
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
@@ -36,11 +40,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DictionaryObjectTest>();
+            var schema = await JsonSchema.FromTypeAsync<DictionaryObjectTest>();
             var data = schema.ToJson();
 
             //// Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                TypeScriptVersion = 1.8m
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert

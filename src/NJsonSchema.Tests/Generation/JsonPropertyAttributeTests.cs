@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["NewName"];
@@ -23,7 +23,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = await JsonSchema.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["Required"];

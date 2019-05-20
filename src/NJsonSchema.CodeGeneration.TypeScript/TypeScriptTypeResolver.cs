@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public string ResolveConstructorInterfaceName(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public string ResolveConstructorInterfaceName(JsonSchema schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, true);
         }
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public override string Resolve(JsonSchema schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, false);
         }
@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets a value indicating whether the schema supports constructor conversion.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The result.</returns>
-        public bool SupportsConstructorConversion(JsonSchema4 schema)
+        public bool SupportsConstructorConversion(JsonSchema schema)
         {
             return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
         }
@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Checks whether the given schema should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>
-        protected override bool IsDefinitionTypeSchema(JsonSchema4 schema)
+        protected override bool IsDefinitionTypeSchema(JsonSchema schema)
         {
             if (schema.IsDictionary && !Settings.InlineNamedDictionaries)
             {
@@ -71,7 +71,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return base.IsDefinitionTypeSchema(schema);
         }
 
-        private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
+        private string Resolve(JsonSchema schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));
@@ -136,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 GetOrGenerateTypeName(schema, typeNameHint);
         }
 
-        private string ResolveString(JsonSchema4 schema, string typeNameHint)
+        private string ResolveString(JsonSchema schema, string typeNameHint)
         {
             // TODO: Make this more generic (see DataConversionGenerator.IsDate)
             if (Settings.DateTimeType == TypeScriptDateTimeType.Date)
@@ -172,12 +172,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "string";
         }
 
-        private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
+        private string ResolveInteger(JsonSchema schema, string typeNameHint)
         {
             return "number";
         }
 
-        private string ResolveArrayOrTuple(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
+        private string ResolveArrayOrTuple(JsonSchema schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema.Item != null)
             {
@@ -202,7 +202,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "any[]";
         }
 
-        private string GetNullableItemType(JsonSchema4 schema, string itemType)
+        private string GetNullableItemType(JsonSchema schema, string itemType)
         {
             if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
             {

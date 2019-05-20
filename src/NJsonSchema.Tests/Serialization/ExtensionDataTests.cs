@@ -14,7 +14,7 @@ namespace NJsonSchema.Tests.Serialization
             var json = @"{ ""definitions"": { ""abc"": null } }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
             //// Assert
@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Serialization
         public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.ExtensionData = new Dictionary<string, object>
             {
                 { "Test", 123 }
@@ -53,7 +53,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.Equal((long)123, schema.ExtensionData["Test"]);
@@ -69,7 +69,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.Null(schema.ExtensionData);
@@ -90,7 +90,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
+            var schema = await JsonSchema.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
+            var schema = await JsonSchema.FromTypeAsync<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
@@ -165,7 +165,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
             //// Assert

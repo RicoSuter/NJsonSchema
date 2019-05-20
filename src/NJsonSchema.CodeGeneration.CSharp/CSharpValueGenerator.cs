@@ -38,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public override string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     }
                 }
 
-                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
 
                 schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false && isOptional == false)
@@ -115,7 +115,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="typeNameHint">The type name hint.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The enum default value.</returns>
-        protected override string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint, TypeResolverBase typeResolver)
+        protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
         {
             return _settings.Namespace + "." + base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
         }

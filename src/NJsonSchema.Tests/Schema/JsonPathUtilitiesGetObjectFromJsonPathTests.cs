@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Schema
         public async Task When_object_is_in_property_then_path_should_be_built_correctly()
         {
             //// Arrange
-            var objectToSearch = new JsonSchema4();
+            var objectToSearch = new JsonSchema();
             var obj = new
             {
                 Property = new
@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Schema
         public async Task When_object_is_in_list_then_path_should_be_built_correctly()
         {
             //// Arrange
-            var objectToSearch = new JsonSchema4();
+            var objectToSearch = new JsonSchema();
             var obj = new
             {
                 Property = new
@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Schema
         public async Task When_object_is_in_dictionary_then_path_should_be_built_correctly()
         {
             //// Arrange
-            var objectToSearch = new JsonSchema4();
+            var objectToSearch = new JsonSchema();
             var obj = new
             {
                 Property = new
@@ -84,7 +84,7 @@ namespace NJsonSchema.Tests.Schema
         public async Task When_object_is_root_then_path_should_be_built_correctly()
         {
             //// Arrange
-            var objectToSearch = new JsonSchema4();
+            var objectToSearch = new JsonSchema();
 
             //// Act
             var resolver = new JsonReferenceResolver(null);

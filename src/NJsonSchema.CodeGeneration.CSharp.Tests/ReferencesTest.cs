@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var path = GetTestDirectory() + "/References/E.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var path = GetTestDirectory() + "/References/A.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema);
 
             //// Act

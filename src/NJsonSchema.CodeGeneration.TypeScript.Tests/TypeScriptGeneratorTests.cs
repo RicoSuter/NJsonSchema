@@ -33,8 +33,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 1.8m
+            });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
@@ -71,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("Foo");
 
@@ -123,7 +127,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = await JsonSchema.FromTypeAsync<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -138,7 +142,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = await JsonSchema.FromTypeAsync<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -153,7 +157,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = await JsonSchema.FromTypeAsync<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var json = schema.ToJson();
 
@@ -170,7 +174,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = await JsonSchema.FromTypeAsync<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -188,8 +192,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["foo-bar"] = new JsonProperty
+            var schema = new JsonSchema();
+            schema.Properties["foo-bar"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };
@@ -207,7 +211,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             var generator = new TypeScriptGenerator(schema);
 
@@ -220,9 +224,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = await JsonSchema.FromTypeAsync<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                TypeScriptVersion = 1.8m
+            });
             return generator;
         }
 
@@ -245,7 +253,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             }";
 
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
@@ -336,7 +344,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
   }
 }";
 
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });

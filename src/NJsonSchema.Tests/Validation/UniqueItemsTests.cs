@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Validation
 }]";
             
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(jsonSchema);
+            var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var errors = schema.Validate(jsonData).ToList();
 
             //// Assert

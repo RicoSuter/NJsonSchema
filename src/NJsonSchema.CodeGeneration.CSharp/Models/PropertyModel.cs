@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
 
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="settings">The settings.</param>
         public PropertyModel(
             ClassTemplateModel classTemplateModel,
-            JsonProperty property,
+            JsonSchemaProperty property,
             CSharpTypeResolver typeResolver,
             CSharpGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)

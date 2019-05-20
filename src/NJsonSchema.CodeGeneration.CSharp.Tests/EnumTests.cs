@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                     }
                 }
             }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 }
             }";
 
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlagEnums = true });
 
             //// Act
@@ -109,7 +109,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 }
             }";
 
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -137,7 +137,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<MyStringEnumListTest>();
+            var schema = await JsonSchema.FromTypeAsync<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -152,7 +152,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<MyStringEnumListTest>();
+            var schema = await JsonSchema.FromTypeAsync<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -175,7 +175,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<SomeClass>(new JsonSchemaGeneratorSettings());
+            var schema = await JsonSchema.FromTypeAsync<SomeClass>(new JsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             //// Act
@@ -216,7 +216,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     }
 }";
             /// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
             var generator = new CSharpGenerator(schema, settings);
@@ -250,14 +250,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("private MyClassStatus? _status;", code);
+            Assert.Contains("public MyClassStatus? Status { get; set; }", code);
         }
 
         [Fact]
@@ -298,7 +298,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     }
 }";
             /// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
             var generator = new CSharpGenerator(schema, settings);

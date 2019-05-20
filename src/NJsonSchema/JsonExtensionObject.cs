@@ -77,7 +77,7 @@ namespace NJsonSchema
                 {
                     try
                     {
-                        return obj.ToObject<JsonSchema4>(serializer);
+                        return obj.ToObject<JsonSchema>(serializer);
                     }
                     catch
                     {

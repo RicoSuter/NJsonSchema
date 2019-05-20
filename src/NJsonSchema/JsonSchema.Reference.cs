@@ -16,19 +16,19 @@ using NJsonSchema.References;
 
 namespace NJsonSchema
 {
-    public partial class JsonSchema4 : JsonReferenceBase<JsonSchema4>, IJsonReference
+    public partial class JsonSchema : JsonReferenceBase<JsonSchema>, IJsonReference
     {
         /// <summary>Gets the actual schema, either this or the referenced schema.</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema4 ActualSchema => GetActualSchema(new List<JsonSchema4>());
+        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>());
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema4 ActualTypeSchema
+        public virtual JsonSchema ActualTypeSchema
         {
             get
             {
@@ -88,23 +88,9 @@ namespace NJsonSchema
                                                MultipleOf == null &&
                                                IsEnumeration == false;
 
-        /// <summary>Gets or sets the type reference.</summary>
-        [JsonIgnore]
-        [Obsolete("Use the Reference property instead.")]
-        public JsonSchema4 SchemaReference
-        {
-            get => Reference;
-            set => Reference = value;
-        }
-
-        /// <summary>Gets a value indicating whether this is a schema reference ($ref, <see cref="HasAllOfSchemaReference"/>, <see cref="HasOneOfSchemaReference"/> or <see cref="HasAnyOfSchemaReference"/>).</summary>
-        [JsonIgnore]
-        [Obsolete("Use the HasReference property instead.")]
-        public bool HasSchemaReference => HasReference;
-
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        private JsonSchema4 GetActualSchema(IList<JsonSchema4> checkedSchemas)
+        private JsonSchema GetActualSchema(IList<JsonSchema> checkedSchemas)
         {
             if (checkedSchemas.Contains(this))
                 throw new InvalidOperationException("Cyclic references detected.");
@@ -143,7 +129,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]
-        public override JsonSchema4 Reference
+        public override JsonSchema Reference
         {
             get { return base.Reference; }
             set

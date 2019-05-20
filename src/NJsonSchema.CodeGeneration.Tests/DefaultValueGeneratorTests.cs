@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Integer,
                 Default = (int)6
@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Integer,
                 Format = JsonFormatStrings.Long,
@@ -73,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
                 Format = JsonFormatStrings.Double,
@@ -96,7 +96,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
                 Default = 1234.567F
@@ -118,7 +118,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
                 Format = JsonFormatStrings.Float,
@@ -141,7 +141,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Boolean,
                 Default = true
@@ -163,7 +163,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.String,
                 Default = "test\\test\"test\r\ntest"
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         public class MyEnumNameGenerator : IEnumNameGenerator
         {
-            public string Generate(int index, string name, object value, JsonSchema4 schema)
+            public string Generate(int index, string name, object value, JsonSchema schema)
             {
                 return name.ToLowerInvariant();
             }
@@ -196,7 +196,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpTypeResolver = new CSharpTypeResolver(csharpSettings);
 
             //// Act
-            var schema = new JsonSchema4()
+            var schema = new JsonSchema()
             {
                 Type = JsonObjectType.String,
                 Enumeration =

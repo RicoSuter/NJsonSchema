@@ -19,7 +19,7 @@ namespace NJsonSchema.Generation
         /// <param name="resolver">The resolver.</param>
         /// <param name="generator">The generator.</param>
         /// <param name="settings">The settings.</param>
-        public SchemaProcessorContext(Type type, JsonSchema4 schema, JsonSchemaResolver resolver, JsonSchemaGenerator generator, JsonSchemaGeneratorSettings settings)
+        public SchemaProcessorContext(Type type, JsonSchema schema, JsonSchemaResolver resolver, JsonSchemaGenerator generator, JsonSchemaGeneratorSettings settings)
         {
             Type = type;
             Schema = schema;
@@ -32,7 +32,7 @@ namespace NJsonSchema.Generation
         public Type Type { get; }
 
         /// <summary>The JSON Schema to process.</summary>
-        public JsonSchema4 Schema { get; }
+        public JsonSchema Schema { get; }
 
         /// <summary>The JSON Schema resolver.</summary>
         public JsonSchemaResolver Resolver { get; }

@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_dictionary_key_is_enum_then_csharp_has_enum_key()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -33,15 +33,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public System.Collections.Generic.Dictionary<PropertyName, string> EnumDictionary\n", code);
-            Assert.Contains("public System.Collections.Generic.Dictionary<PropertyName, string> EnumInterfaceDictionary\n", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumDictionary ", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumInterfaceDictionary ", code);
         }
 
         [Fact]
         public async Task When_dictionary_property_is_required_then_dictionary_instance_can_be_changed()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act

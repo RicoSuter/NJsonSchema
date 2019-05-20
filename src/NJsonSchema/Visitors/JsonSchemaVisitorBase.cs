@@ -11,15 +11,15 @@ using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors
 {
-    /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
+    /// <summary>Visitor to transform an object with <see cref="JsonSchema"/> objects.</summary>
     public abstract class JsonSchemaVisitorBase : JsonReferenceVisitorBase
     {
-        /// <summary>Called when a <see cref="JsonSchema4"/> is visited.</summary>
+        /// <summary>Called when a <see cref="JsonSchema"/> is visited.</summary>
         /// <param name="schema">The visited schema.</param>
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-        protected abstract Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint);
+        protected abstract Task<JsonSchema> VisitSchemaAsync(JsonSchema schema, string path, string typeNameHint);
 
         /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
         /// <param name="reference">The visited schema.</param>
@@ -28,7 +28,7 @@ namespace NJsonSchema.Visitors
         /// <returns>The task.</returns>
         protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
         {
-            if (reference is JsonSchema4 schema)
+            if (reference is JsonSchema schema)
                 return await VisitSchemaAsync(schema, path, typeNameHint).ConfigureAwait(false);
 
             return reference;

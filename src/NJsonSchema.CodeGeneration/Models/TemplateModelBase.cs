@@ -12,6 +12,6 @@ namespace NJsonSchema.CodeGeneration.Models
     public class TemplateModelBase
     {
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public string ToolchainVersion => JsonSchema4.ToolchainVersion;
+        public string ToolchainVersion => JsonSchema.ToolchainVersion;
     }
 }

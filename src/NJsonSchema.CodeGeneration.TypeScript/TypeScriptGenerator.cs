@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
-        public TypeScriptGenerator(JsonSchema4 schema)
+        public TypeScriptGenerator(JsonSchema schema)
             : this(schema, new TypeScriptGeneratorSettings())
         {
         }
@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The fallback type name.</param>
         /// <returns>The code.</returns>
-        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema schema, string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 

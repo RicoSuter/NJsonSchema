@@ -11,14 +11,14 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task Ensure_NJS_does_not_run_in_legacy_mode()
         { 
-            Assert.DoesNotContain("NET40", JsonSchema4.ToolchainVersion);
+            Assert.DoesNotContain("NET40", JsonSchema.ToolchainVersion);
         }
 
         [Fact]
         public void When_creating_schema_without_setting_properties_then_it_is_empty()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             //// Act
             var data = schema.ToJson();
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Schema
 ";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
 
             //// Assert
             Assert.NotNull(schema.Definitions["diskDevice"]);
@@ -105,7 +105,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
             var x = schema.ToJson();
 
             //// Assert
@@ -126,7 +126,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
 
             //// Assert
             Assert.True(schema.Type.HasFlag(JsonObjectType.String));
@@ -143,7 +143,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
 
             //// Assert
             Assert.True(schema.Type.HasFlag(JsonObjectType.String));
@@ -160,7 +160,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
             var x = schema.ToJson();
 
             //// Assert
@@ -171,7 +171,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             //// Act
             schema.Type = JsonObjectType.Integer;
@@ -185,7 +185,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             //// Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
@@ -202,10 +202,10 @@ namespace NJsonSchema.Tests.Schema
         public void When_adding_property_to_schema_then_parent_should_be_set()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             //// Act
-            schema.Properties.Add("test", new JsonProperty());
+            schema.Properties.Add("test", new JsonSchemaProperty());
 
             //// Assert
             Assert.True(schema.Properties.ContainsKey("test"));
@@ -216,8 +216,8 @@ namespace NJsonSchema.Tests.Schema
         public void When_setting_property_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["test"] = new JsonProperty();
+            var schema = new JsonSchema();
+            schema.Properties["test"] = new JsonSchemaProperty();
 
             //// Act
             schema.Properties["test"].IsRequired = true;
@@ -230,8 +230,8 @@ namespace NJsonSchema.Tests.Schema
         public void When_setting_property_not_required_then_the_key_should_be_added()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["test"] = new JsonProperty();
+            var schema = new JsonSchema();
+            schema.Properties["test"] = new JsonSchemaProperty();
             schema.RequiredProperties.Add("test");
 
             //// Act
@@ -245,8 +245,8 @@ namespace NJsonSchema.Tests.Schema
         public void When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["test"] = new JsonProperty
+            var schema = new JsonSchema();
+            schema.Properties["test"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number,
                 IsRequired = false
@@ -263,9 +263,9 @@ namespace NJsonSchema.Tests.Schema
         public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number | JsonObjectType.Null
             };
@@ -284,10 +284,10 @@ namespace NJsonSchema.Tests.Schema
         public void When_property_type_not_specified_then_anything_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Bar"] = new JsonProperty();
+            schema.Properties["Foo"] = new JsonSchemaProperty();
+            schema.Properties["Bar"] = new JsonSchemaProperty();
 
             var token = new JObject();
             token["Foo"] = new JValue(5);
@@ -303,7 +303,7 @@ namespace NJsonSchema.Tests.Schema
         public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Type = JsonObjectType.String
             };
@@ -338,7 +338,7 @@ namespace NJsonSchema.Tests.Schema
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 //// Act
-                var schema = await JsonSchema4.FromJsonAsync(json);
+                var schema = await JsonSchema.FromJsonAsync(json);
                 var data = schema.ToJson();
 
                 //// Assert
@@ -374,7 +374,7 @@ namespace NJsonSchema.Tests.Schema
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var data = schema.ToJson();
 
             //// Assert
@@ -390,7 +390,7 @@ namespace NJsonSchema.Tests.Schema
 
 
             //// Act
-            var schema = await JsonSchema4.FromUrlAsync("http://schemas.sportradar.com/bsa/json/v1/endpoints/soccer/team_profile.json");
+            var schema = await JsonSchema.FromUrlAsync("http://schemas.sportradar.com/bsa/json/v1/endpoints/soccer/team_profile.json");
             var json = schema.ToJson();
 
             //// Assert
@@ -406,7 +406,7 @@ namespace NJsonSchema.Tests.Schema
                 ""format"": ""guid"" }, ""Name"": { ""type"": ""string"" } }, ""required"": [ ""$type"", ""Id"", ""Name"" ] }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             // No exception

@@ -122,13 +122,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Null
+                NullValue = TypeScriptNullValue.Null,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 
@@ -147,7 +148,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -182,13 +183,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Undefined
+                NullValue = TypeScriptNullValue.Undefined,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 
@@ -213,7 +215,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DictionaryContainer>();
+            var schema = await JsonSchema.FromTypeAsync<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act
@@ -222,7 +224,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullValue = TypeScriptNullValue.Undefined,
                 ConvertConstructorInterfaceData = convertConstructorInterfaceData,
-                InlineNamedDictionaries = inlineNamedDictionaries
+                InlineNamedDictionaries = inlineNamedDictionaries,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 

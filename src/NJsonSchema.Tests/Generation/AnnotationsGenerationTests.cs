@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
+            var schema = await JsonSchema.FromTypeAsync<AnnotationClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<AnnotationClass>();
+            var schema = await JsonSchema.FromTypeAsync<AnnotationClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_DateTime_property_has_JsonSchemaDate_attribute_then_format_and_type_is_correct()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DateAttributeClass>();
+            var schema = await JsonSchema.FromTypeAsync<DateAttributeClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -89,7 +89,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MultipleOfClass>();
+            var schema = await JsonSchema.FromTypeAsync<MultipleOfClass>();
             var property = schema.Properties["Number"];
 
             //// Assert
@@ -118,7 +118,7 @@ namespace NJsonSchema.Tests.Generation
             }
 
             string jsonData = JsonConvert.SerializeObject(testClasses, Formatting.Indented);
-            var schema = await JsonSchema4.FromJsonAsync(@"{
+            var schema = await JsonSchema.FromJsonAsync(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""type"": ""array"",
   ""items"": {
@@ -162,7 +162,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ArrayModel>();
+            var schema = await JsonSchema.FromTypeAsync<ArrayModel>();
 
             //// Act
             var data = schema.ToJson();
@@ -180,7 +180,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ArrayModel<string>>();
+            var schema = await JsonSchema.FromTypeAsync<ArrayModel<string>>();
 
             //// Act
             var data = schema.ToJson();
@@ -205,7 +205,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_struct_then_it_is_not_nullable()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<MyStructContainer>();
+            var schema = await JsonSchema.FromTypeAsync<MyStructContainer>();
 
             //// Act
             var data = schema.ToJson();
@@ -227,7 +227,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<StringLengthAttributeClass>();
+            var schema = await JsonSchema.FromTypeAsync<StringLengthAttributeClass>();
 
             //// Assert
             var property = schema.Properties["Foo"];
@@ -248,7 +248,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_MinLengthAttribute_is_set_then_minItems_or_minLength_is_set()
         {
-            var schema = await JsonSchema4.FromTypeAsync<MinLengthAttributeClass>();
+            var schema = await JsonSchema.FromTypeAsync<MinLengthAttributeClass>();
 
             var arrayProperty = schema.Properties["Items"];
             Assert.Equal(1, arrayProperty.MinItems);
@@ -269,7 +269,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_MaxLengthAttribute_is_set_then_maxItems_or_maxLength_is_set()
         {
-            var schema = await JsonSchema4.FromTypeAsync<MaxLengthAttributeClass>();
+            var schema = await JsonSchema.FromTypeAsync<MaxLengthAttributeClass>();
 
             var arrayProperty = schema.Properties["Items"];
             Assert.Equal(100, arrayProperty.MaxItems);
@@ -290,7 +290,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<StringRequiredClass>();
+            var schema = await JsonSchema.FromTypeAsync<StringRequiredClass>();
 
             //// Assert
             var property = schema.Properties["Foo"];
@@ -311,7 +311,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<DtoRequiredClass>();
+            var schema = await JsonSchema.FromTypeAsync<DtoRequiredClass>();
             var json = schema.ToJson();
 
             //// Assert
@@ -362,7 +362,7 @@ namespace NJsonSchema.Tests.Generation
         [InlineData(nameof(DataTypeAttributeClass.Url2), "uri")]
         public async Task When_DataTypeAttribute_is_set_then_the_format_property_should_come_from_the_attribute(string propertyName, string expectedFormat)
         {
-            var schema = await JsonSchema4.FromTypeAsync<DataTypeAttributeClass>();
+            var schema = await JsonSchema.FromTypeAsync<DataTypeAttributeClass>();
             var property = schema.Properties[propertyName];
 
             Assert.Equal(expectedFormat, property.Format);
@@ -388,7 +388,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_is_ignored_then_it_is_not_in_definitions()
         {
             /// Act
-            var schema = await JsonSchema4.FromTypeAsync<Student>();
+            var schema = await JsonSchema.FromTypeAsync<Student>();
             var json = schema.ToJson();
 
             /// Assert

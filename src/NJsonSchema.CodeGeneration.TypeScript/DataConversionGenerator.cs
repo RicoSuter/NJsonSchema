@@ -145,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return false;
         }
 
-        private static bool IsNewableObject(JsonSchema4 schema, DataConversionParameters parameters)
+        private static bool IsNewableObject(JsonSchema schema, DataConversionParameters parameters)
         {
             if (schema.ActualTypeSchema.IsEnumeration)
                 return false;

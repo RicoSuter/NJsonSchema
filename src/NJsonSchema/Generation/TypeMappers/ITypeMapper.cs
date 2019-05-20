@@ -23,6 +23,6 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
-        Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context);
+        Task GenerateSchemaAsync(JsonSchema schema, TypeMapperContext context);
     }
 }

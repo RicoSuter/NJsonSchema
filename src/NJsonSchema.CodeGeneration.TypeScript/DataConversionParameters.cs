@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public string Value { get; set; }
 
         /// <summary>Gets the schema.</summary>
-        public JsonSchema4 Schema { get; set; }
+        public JsonSchema Schema { get; set; }
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public bool IsPropertyNullable { get; set; }

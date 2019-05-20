@@ -8,13 +8,15 @@
 
 using System.Collections;
 using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.Infrastructure
 {
     internal class IgnoreEmptyCollectionsContractResolver : PropertyRenameAndIgnoreSerializerContractResolver
     {
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
 
@@ -26,9 +28,13 @@ namespace NJsonSchema.Infrastructure
                 {
                     var enumerable = instance != null ? property.ValueProvider.GetValue(instance) as IEnumerable : null;
                     if (enumerable != null)
+                    {
                         return enumerable.GetEnumerator().MoveNext();
+                    }
                     else
+                    {
                         return true;
+                    }
                 };
             }
 

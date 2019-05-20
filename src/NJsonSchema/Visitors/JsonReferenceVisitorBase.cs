@@ -11,20 +11,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors
 {
-    /// <summary>Visitor to transform an object with <see cref="JsonSchema4"/> objects.</summary>
+    /// <summary>Visitor to transform an object with <see cref="JsonSchema"/> objects.</summary>
     public abstract class JsonReferenceVisitorBase
     {
         private readonly IContractResolver _contractResolver;
-        private readonly string[] _jsonSchemaProperties = typeof(JsonSchema4).GetRuntimeProperties().Select(p => p.Name).ToArray();
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
         protected JsonReferenceVisitorBase()
@@ -77,59 +74,59 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (obj is JsonSchema4 schema)
+            if (obj is JsonSchema schema)
             {
                 if (schema.Reference != null)
-                    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema4)o).ConfigureAwait(false);
+                    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o).ConfigureAwait(false);
 
                 if (schema.AdditionalItemsSchema != null)
-                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema4)o).ConfigureAwait(false);
+                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o).ConfigureAwait(false);
 
                 if (schema.AdditionalPropertiesSchema != null)
-                    await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema4)o).ConfigureAwait(false);
+                    await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o).ConfigureAwait(false);
 
                 if (schema.Item != null)
-                    await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema4)o).ConfigureAwait(false);
+                    await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o).ConfigureAwait(false);
 
                 for (var i = 0; i < schema.Items.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema4)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o)).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.AllOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema4)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o)).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.AnyOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema4)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o)).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.OneOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema4)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o)).ConfigureAwait(false);
                 }
 
                 if (schema.Not != null)
-                    await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema4)o).ConfigureAwait(false);
+                    await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o).ConfigureAwait(false);
 
                 foreach (var p in schema.Properties.ToArray())
-                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
 
                 foreach (var p in schema.PatternProperties.ToArray())
-                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
 
                 foreach (var p in schema.Definitions.ToArray())
                 {
                     await VisitAsync(p.Value, path + "/definitions/" + p.Key, p.Key, checkedObjects, o =>
                     {
                         if (o != null)
-                            schema.Definitions[p.Key] = (JsonSchema4)o;
+                            schema.Definitions[p.Key] = (JsonSchema)o;
                         else
                             schema.Definitions.Remove(p.Key);
                     }).ConfigureAwait(false);
@@ -139,17 +136,32 @@ namespace NJsonSchema.Visitors
             if (!(obj is string) && !(obj is JToken))
             {
                 // Reflection fallback
-                if (obj is IDictionary dictionary)
+                if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    await VisitPropertiesAsync(obj, path, checkedObjects).ConfigureAwait(false);
+                    foreach (var property in contract.Properties
+                        .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                    {
+                        var value = property.ValueProvider.GetValue(obj);
+                        if (value != null)
+                        {
+                            await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o)).ConfigureAwait(false);
+                        }
+                    }
+                }
+                else if (obj is IDictionary dictionary)
+                {
                     foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
                         await VisitAsync(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
                         {
                             if (o != null)
-                                dictionary[key] = (JsonSchema4)o;
+                            {
+                                dictionary[key] = (JsonSchema)o;
+                            }
                             else
+                            {
                                 dictionary.Remove(key);
+                            }
                         }).ConfigureAwait(false);
                     }
                 }
@@ -166,39 +178,9 @@ namespace NJsonSchema.Visitors
                 {
                     var items = enumerable.OfType<object>().ToArray();
                     for (var i = 0; i < items.Length; i++)
+                    {
                         await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item.")).ConfigureAwait(false);
-                }
-                else
-                {
-                    await VisitPropertiesAsync(obj, path, checkedObjects).ConfigureAwait(false);
-                }
-            }
-        }
-
-        private async Task VisitPropertiesAsync(object obj, string path, ISet<object> checkedObjects)
-        {
-            if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
-            {
-                foreach (var property in contract.Properties.Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
-                {
-                    var value = property.ValueProvider.GetValue(obj);
-                    if (value != null)
-                        await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o)).ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType()).Where(p =>
-                    p.MemberInfo is PropertyInfo &&
-                    (!(obj is JsonSchema4) || !_jsonSchemaProperties.Contains(p.MemberInfo.Name)) &&
-                    (!(obj is IDictionary) || (p.MemberInfo.DeclaringType == obj.GetType())) && // only check additional properties of dictionary
-                    p.CanRead &&
-                    p.IsIndexer == false &&
-                    p.CustomAttributes.JsonIgnoreAttribute == null))
-                {
-                    var value = member.GetValue(obj);
-                    if (value != null)
-                        await VisitAsync(value, path + "/" + member.GetName(), member.GetName(), checkedObjects, o => member.SetValue(obj, o)).ConfigureAwait(false);
+                    }
                 }
             }
         }
