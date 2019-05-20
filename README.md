@@ -27,9 +27,9 @@ CI NuGet Feed: https://www.myget.org/gallery/njsonschema-ci
 
 **Features:**
 
-- [Read existing JSON Schemas](https://github.com/RSuter/NJsonSchema/wiki/JsonSchema4) and [validate JSON data](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema4.FromJsonAsync()`)
-- [Generate JSON Schema from .NET type via reflection](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema4.FromTypeAsync<MyType>()`)
-- [Generate JSON Schema from sample JSON data](https://github.com/RSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema4.FromSampleJson()`)
+- [Read existing JSON Schemas](https://github.com/RSuter/NJsonSchema/wiki/JsonSchema) and [validate JSON data](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema.FromJsonAsync()`)
+- [Generate JSON Schema from .NET type via reflection](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromTypeAsync<MyType>()`)
+- [Generate JSON Schema from sample JSON data](https://github.com/RSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 - Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
@@ -41,17 +41,17 @@ The project is developed and maintained by [Rico Suter](http://rsuter.com) and o
 
 ## NJsonSchema usage
 
-The [JsonSchema4](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema4) class can be used as follows: 
+The [JsonSchema](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema) class can be used as follows: 
 
 ```csharp
-var schema = await JsonSchema4.FromTypeAsync<Person>();
+var schema = await JsonSchema.FromTypeAsync<Person>();
 var schemaData = schema.ToJson();
 var errors = schema.Validate("{...}");
 
 foreach (var error in errors)
     Console.WriteLine(error.Path + ": " + error.Kind);
 
-schema = await JsonSchema4.FromJsonAsync(schemaData);
+schema = await JsonSchema.FromJsonAsync(schemaData);
 ```
 
 The `Person` class: 
