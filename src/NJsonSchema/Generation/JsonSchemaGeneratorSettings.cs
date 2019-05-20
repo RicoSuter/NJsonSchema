@@ -18,6 +18,7 @@ using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 using System.Linq;
+using Namotion.Reflection;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace NJsonSchema.Generation
@@ -25,6 +26,13 @@ namespace NJsonSchema.Generation
     /// <summary>The JSON Schema generator settings.</summary>
     public class JsonSchemaGeneratorSettings
     {
+        private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
+
+        private EnumHandling _defaultEnumHandling;
+        private PropertyNameHandling _defaultPropertyNameHandling;
+        private JsonSerializerSettings _serializerSettings;
+        private IContractResolver _contractResolver;
+
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
@@ -78,7 +86,14 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the serializer settings.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
         [JsonIgnore]
-        public JsonSerializerSettings SerializerSettings { get; set; }
+        public JsonSerializerSettings SerializerSettings
+        {
+            get => _serializerSettings; set
+            {
+                _serializerSettings = value;
+                UpdateActualContractResolverAndSerializerSettings();
+            }
+        }
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
         public string[] ExcludedTypeNames { get; set; }
@@ -110,94 +125,73 @@ namespace NJsonSchema.Generation
         /// <remarks><see cref="DefaultPropertyNameHandling"/> will be ignored.</remarks>
         [JsonIgnore]
         [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
-        public IContractResolver ContractResolver { get; set; }
+        public IContractResolver ContractResolver
+        {
+            get => _contractResolver; set
+            {
+                _contractResolver = value;
+                UpdateActualContractResolverAndSerializerSettings();
+            }
+        }
 
         /// <summary>Gets or sets the default property name handling (default: Default).</summary>
         [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
-        public PropertyNameHandling DefaultPropertyNameHandling { get; set; }
+        public PropertyNameHandling DefaultPropertyNameHandling
+        {
+            get => _defaultPropertyNameHandling; set
+            {
+                _defaultPropertyNameHandling = value;
+                UpdateActualContractResolverAndSerializerSettings();
+            }
+        }
 
         /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
         [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
-        public EnumHandling DefaultEnumHandling { get; set; }
+        public EnumHandling DefaultEnumHandling
+        {
+            get => _defaultEnumHandling; set
+            {
+                _defaultEnumHandling = value;
+                UpdateActualSerializerSettings();
+            }
+        }
 
         /// <summary>Gets the contract resolver.</summary>
         /// <returns>The contract resolver.</returns>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
         [JsonIgnore]
-        public IContractResolver ActualContractResolver
-        {
-            get
-            {
-                if (SerializerSettings != null)
-                {
-                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
-                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
-
-                    if (ContractResolver != null)
-                        throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
-
-                    return SerializerSettings.ContractResolver;
-                }
-
-                if (ContractResolver != null)
-                {
-                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
-                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
-
-                    return ContractResolver;
-                }
-
-                if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
-                    return new CamelCasePropertyNamesContractResolver();
-
-                if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
-                    return new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
-
-                return new DefaultContractResolver();
-            }
-        }
+        public IContractResolver ActualContractResolver { get; internal set; }
 
         /// <summary>Gets the serializer settings.</summary>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
         [JsonIgnore]
-        public JsonSerializerSettings ActualSerializerSettings
-        {
-            get
-            {
-                if (SerializerSettings != null)
-                {
-                    if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
-                        throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
-
-                    if (ContractResolver != null)
-                        throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
-
-                    if (DefaultEnumHandling != EnumHandling.Integer)
-                        throw new InvalidOperationException("The setting DefaultEnumHandling cannot be used when SerializerSettings is set.");
-
-                    return SerializerSettings;
-                }
-
-                var settings = new JsonSerializerSettings();
-                settings.ContractResolver = ActualContractResolver;
-
-                if (DefaultEnumHandling == EnumHandling.String)
-                    settings.Converters.Add(new StringEnumConverter());
-                else if (DefaultEnumHandling == EnumHandling.CamelCaseString)
-                    settings.Converters.Add(new StringEnumConverter(true));
-
-                return settings;
-            }
-        }
+        public JsonSerializerSettings ActualSerializerSettings { get; internal set; }
 
         /// <summary>Gets the contract for the given type.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contract.</returns>
         public JsonContract ResolveContract(Type type)
         {
-            return !type.GetTypeInfo().IsGenericTypeDefinition ?
-                ActualContractResolver.ResolveContract(type) :
-                null;
+            var key = type.FullName;
+            if (key == null)
+            {
+                return null;
+            }
+
+            if (!_cachedContracts.ContainsKey(key))
+            {
+                lock (_cachedContracts)
+                {
+                    if (!_cachedContracts.ContainsKey(key))
+                    {
+                        _cachedContracts[key] = !type.GetTypeInfo().IsGenericTypeDefinition ?
+                            ActualContractResolver.ResolveContract(type) :
+                            null;
+                    }
+                }
+            }
+
+            return _cachedContracts[key];
         }
 
         /// <summary>Gets the actual computed <see cref="GenerateAbstractSchemas"/> setting based on the global setting and the JsonSchemaAbstractAttribute attribute.</summary>
@@ -206,7 +200,7 @@ namespace NJsonSchema.Generation
         public bool GetActualGenerateAbstractSchema(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
+                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
 
             return (GenerateAbstractSchemas && attribute == null) || attribute?.TryGetPropertyValue("IsAbstract", true) == true;
         }
@@ -217,9 +211,75 @@ namespace NJsonSchema.Generation
         public bool GetActualFlattenInheritanceHierarchy(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableTo("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
 
             return (FlattenInheritanceHierarchy && attribute == null) || attribute?.TryGetPropertyValue("Flatten", true) == true;
+        }
+
+        private void UpdateActualContractResolverAndSerializerSettings()
+        {
+            _cachedContracts = new Dictionary<string, JsonContract>();
+
+            if (SerializerSettings != null)
+            {
+                if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                    throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
+                if (ContractResolver != null)
+                    throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+
+                ActualContractResolver = SerializerSettings.ContractResolver;
+            }
+            else if (ContractResolver != null)
+            {
+                if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                    throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
+                ActualContractResolver = ContractResolver;
+            }
+            else if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
+            {
+                ActualContractResolver = new CamelCasePropertyNamesContractResolver();
+            }
+            else if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
+            {
+                ActualContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+            }
+            else
+            {
+                ActualContractResolver = new DefaultContractResolver();
+            }
+
+            UpdateActualSerializerSettings();
+        }
+
+        private void UpdateActualSerializerSettings()
+        {
+            if (SerializerSettings != null)
+            {
+                if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                    throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+
+                if (ContractResolver != null)
+                    throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+
+                if (DefaultEnumHandling != EnumHandling.Integer)
+                    throw new InvalidOperationException("The setting DefaultEnumHandling cannot be used when SerializerSettings is set.");
+
+                ActualSerializerSettings = SerializerSettings;
+            }
+            else
+            {
+                var settings = new JsonSerializerSettings();
+                settings.ContractResolver = ActualContractResolver;
+
+                if (DefaultEnumHandling == EnumHandling.String)
+                    settings.Converters.Add(new StringEnumConverter());
+                else if (DefaultEnumHandling == EnumHandling.CamelCaseString)
+                    settings.Converters.Add(new StringEnumConverter(true));
+
+                ActualSerializerSettings = settings;
+            }
         }
     }
 }

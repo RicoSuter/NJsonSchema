@@ -52,17 +52,6 @@ namespace NJsonSchema.Infrastructure
         /// <param name="obj">The object to serialize.</param>
         /// <param name="schemaType">The schema type.</param>
         /// <param name="contractResolver">The contract resolver.</param>
-        /// <returns></returns>
-        [Obsolete("This overload will be removed soon.")]
-        public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver)
-        {
-            return ToJson(obj, schemaType, contractResolver, Formatting.Indented);
-        }
-
-        /// <summary>Serializes an object to a JSON string with reference handling.</summary>
-        /// <param name="obj">The object to serialize.</param>
-        /// <param name="schemaType">The schema type.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="formatting">The formatting.</param>
         /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver, Formatting formatting)
@@ -71,17 +60,7 @@ namespace NJsonSchema.Infrastructure
             CurrentSchemaType = schemaType;
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false, contractResolver);
-            var json = FromJson(obj, contractResolver, formatting);
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
-        }
 
-        /// <summary>Serializes an object to a JSON string.</summary>
-        /// <param name="obj">The object to serialize.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        /// <param name="formatting">The formatting.</param>
-        /// <returns>The JSON.</returns>
-        public static string FromJson(object obj, IContractResolver contractResolver, Formatting formatting)
-        {
             IsWriting = false;
             CurrentSerializerSettings = new JsonSerializerSettings
             {
@@ -91,7 +70,7 @@ namespace NJsonSchema.Infrastructure
             var json = JsonConvert.SerializeObject(obj, formatting, CurrentSerializerSettings);
             CurrentSerializerSettings = null;
 
-            return json;
+            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
