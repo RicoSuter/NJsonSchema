@@ -44,7 +44,4 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Namotion.Reflection\src\Namotion.Reflection\Namotion.Reflection.csproj" />
-  </ItemGroup>
 </Project>
