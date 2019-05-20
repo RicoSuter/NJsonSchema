@@ -13,7 +13,7 @@ namespace NJsonSchema.Tests.Infrastructure
             //// Arrange
             var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
-            resolver.RenameProperty(typeof(JsonSchema4), "x-nullable", "nullable");
+            resolver.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
 
             var json = "{ \"readOnly\": true, \"nullable\": true, \"additionalProperties\": { \"nullable\": true } }";
 
@@ -54,13 +54,13 @@ namespace NJsonSchema.Tests.Infrastructure
         public class ClassWithDoubleProperties
         {
             [JsonProperty("schema")]
-            public JsonSchema4 Schema { get; set; }
+            public JsonSchema Schema { get; set; }
 
             [JsonProperty("definitions1")]
-            public Dictionary<string, JsonSchema4> Definitions1 => Definitions2;
+            public Dictionary<string, JsonSchema> Definitions1 => Definitions2;
 
             [JsonProperty("definitions2")]
-            public Dictionary<string, JsonSchema4> Definitions2 { get; set; } = new Dictionary<string, JsonSchema4>();
+            public Dictionary<string, JsonSchema> Definitions2 { get; set; } = new Dictionary<string, JsonSchema>();
         }
 
         [Fact]
@@ -70,13 +70,13 @@ namespace NJsonSchema.Tests.Infrastructure
             var contractResolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             contractResolver.IgnoreProperty(typeof(ClassWithDoubleProperties), "definitions1");
 
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Type = JsonObjectType.Object
             };
             var foo = new ClassWithDoubleProperties
             {
-                Schema = new JsonSchema4 { Reference = schema },
+                Schema = new JsonSchema { Reference = schema },
                 Definitions1 =
                 {
                     { "Bar", schema }

@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly TypeScriptGeneratorSettings _settings;
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="rootObject">The root object.</param>
         public ClassTemplateModel(string typeName, string discriminatorName,
             TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver,
-            JsonSchema4 schema, object rootObject)
+            JsonSchema schema, object rootObject)
             : base(resolver, schema, rootObject)
         {
             _settings = settings;
@@ -145,6 +145,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool ExportTypes => _settings.ExportTypes;
 
         /// <summary>Gets the inherited schema.</summary>
-        private JsonSchema4 InheritedSchema => _schema.InheritedSchema?.ActualSchema;
+        private JsonSchema InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
 }

@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_array_property_is_required_then_array_instance_can_be_changed()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ArrayTest>();
+            var schema = await JsonSchema.FromTypeAsync<ArrayTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_array_item_is_nullable_then_generated_CSharp_is_correct()
         {
             // Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithNullableArrayItems>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithNullableArrayItems>();
             var json = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
 

@@ -14,12 +14,12 @@ namespace NJsonSchema.Generation.TypeMappers
     /// <summary>Maps .NET type to a generated JSON Schema describing an object.</summary>
     public class ObjectTypeMapper : ITypeMapper
     {
-        private readonly Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema4>> _schemaFactory;
+        private readonly Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema>> _schemaFactory;
 
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schema">The schema.</param>
-        public ObjectTypeMapper(Type mappedType, JsonSchema4 schema)
+        public ObjectTypeMapper(Type mappedType, JsonSchema schema)
             : this(mappedType, (schemaGenerator, schemaResolver) => schema)
         {
         }
@@ -27,7 +27,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schemaFactory">The schema factory.</param>
-        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, JsonSchema4> schemaFactory)
+        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, JsonSchema> schemaFactory)
 #pragma warning disable 1998
             : this(mappedType, async (schemaGenerator, schemaResolver) => schemaFactory(schemaGenerator, schemaResolver))
 #pragma warning restore 1998
@@ -37,7 +37,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Initializes a new instance of the <see cref="ObjectTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="schemaFactory">The schema factory.</param>
-        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema4>> schemaFactory)
+        public ObjectTypeMapper(Type mappedType, Func<JsonSchemaGenerator, JsonSchemaResolver, Task<JsonSchema>> schemaFactory)
         {
             _schemaFactory = schemaFactory;
             MappedType = mappedType;
@@ -53,7 +53,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
 #pragma warning disable 1998
-        public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
+        public async Task GenerateSchemaAsync(JsonSchema schema, TypeMapperContext context)
 #pragma warning restore 1998
         {
             if (!context.JsonSchemaResolver.HasSchema(MappedType, false))

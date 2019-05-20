@@ -12,7 +12,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_token_is_not_object_then_validation_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty();
 
@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_required_property_is_missing_then_it_should_be_in_error_list()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_optional_property_is_missing_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_property_is_available_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -115,7 +115,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_property_required_but_integer_provided_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonProperty
             {
@@ -139,7 +139,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_type_property_has_integer_type_then_it_is_validated_correctly()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromJsonAsync(
+            var schema = await JsonSchema.FromJsonAsync(
                 @"{
               ""$schema"": ""http://json-schema.org/draft-06/schema#"",
               ""type"": ""object"",

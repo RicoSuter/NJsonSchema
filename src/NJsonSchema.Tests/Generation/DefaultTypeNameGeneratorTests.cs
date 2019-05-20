@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Generation
             foreach (var p in tests)
             {
                 //// Act
-                var name = generator.Generate(new JsonSchema4(), p.Key, new List<string>());
+                var name = generator.Generate(new JsonSchema(), p.Key, new List<string>());
 
                 //// Assert
                 Assert.Equal(p.Value, name);

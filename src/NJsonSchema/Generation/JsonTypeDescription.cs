@@ -101,7 +101,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>Applies the type and format to the given schema.</summary>
         /// <param name="schema">The JSON schema.</param>
-        public void ApplyType(JsonSchema4 schema)
+        public void ApplyType(JsonSchema schema)
         {
             schema.Type = Type;
             schema.Format = Format;

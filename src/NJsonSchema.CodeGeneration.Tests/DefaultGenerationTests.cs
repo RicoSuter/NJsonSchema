@@ -20,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
             
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<DefaultPropertyGenerationClass>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

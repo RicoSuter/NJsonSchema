@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.References
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var j = schema.ToJson();
 
             //// Assert
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_collection_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
@@ -76,7 +76,7 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
@@ -87,7 +87,7 @@ namespace NJsonSchema.Tests.References
         public async Task When_reference_is_registered_in_custom_resolver_it_should_not_try_to_access_file()
         {
             //// Arrange
-            var externalSchema = await JsonSchema4.FromJsonAsync(
+            var externalSchema = await JsonSchema.FromJsonAsync(
             @"{
                 ""type"": ""object"", 
                 ""properties"": {
@@ -97,7 +97,7 @@ namespace NJsonSchema.Tests.References
                 }
             }");
 
-            Func<JsonSchema4, JsonReferenceResolver> factory = schema4 =>
+            Func<JsonSchema, JsonReferenceResolver> factory = schema4 =>
             {
                 var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
                 var resolver = new JsonReferenceResolver(schemaResolver);
@@ -117,7 +117,7 @@ namespace NJsonSchema.Tests.References
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson, ".", factory);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson, ".", factory);
 
             //// Assert
             Assert.NotNull(schema);

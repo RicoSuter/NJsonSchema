@@ -26,9 +26,9 @@ namespace NJsonSchema.Yaml
         /// <summary>Creates the factory to be used in the FromJsonAsync method.</summary>
         /// <param name="typeNameGenerator">The type name generator.</param>
         /// <returns>The factory.</returns>
-        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
+        public static Func<JsonSchema, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
                 new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
 
             return ReferenceResolverFactory;

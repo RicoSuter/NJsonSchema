@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                                  }
                              }}";
 
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
             var settings = new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                                  }
                              }}";
 
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
             var settings = new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                                  }
                              }}";
 
-            var schema = await JsonSchema4.FromJsonAsync(data);
+            var schema = await JsonSchema.FromJsonAsync(data);
             var settings = new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,

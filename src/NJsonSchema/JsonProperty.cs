@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 namespace NJsonSchema
 {
     /// <summary>A description of a JSON property of a JSON object. </summary>
-    public class JsonProperty : JsonSchema4 // TODO: Rename to JsonSchemaProperty
+    public class JsonProperty : JsonSchema // TODO: Rename to JsonSchemaProperty
     {
         private object _parent;
 

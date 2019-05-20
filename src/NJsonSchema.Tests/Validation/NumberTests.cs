@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Validation
                 'UpperLimit': 1.1111111111111111E+101
             }";
 
-            var validationSchema = JsonSchema4.FromJsonAsync(json).Result;
+            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
 
             /// Act
             var errors = validationSchema.Validate(data);
@@ -60,7 +60,7 @@ namespace NJsonSchema.Tests.Validation
                 ""property1"": 34545734242323232423434
             }";
 
-            var validationSchema = JsonSchema4.FromJsonAsync(json).Result;
+            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
 
             /// Act
             var errors = validationSchema.Validate(data);

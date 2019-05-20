@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_required_then_required_attribute_is_rendered()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithRequiredObject>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithRequiredObject>();
             var schemaData = schema.ToJson();
 
             //// Act
@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithoutRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<ClassWithoutRequiredObject>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_not_required_then_required_attribute_is_not_rendered()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithoutRequiredObject>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithoutRequiredObject>();
             var schemaData = schema.ToJson();
 
             //// Act

@@ -24,7 +24,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_primitive_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappers =
                 {
@@ -44,11 +44,11 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_object_type_mapping_is_available_for_type_then_it_is_called()
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappers =
                 {
-                    new ObjectTypeMapper(typeof(Bar), new JsonSchema4
+                    new ObjectTypeMapper(typeof(Bar), new JsonSchema
                         {
                             Type = JsonObjectType.Object,
                             Properties =
@@ -102,7 +102,7 @@ namespace NJsonSchema.Tests.Generation
 
             public bool UseReference => true;
 
-            public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
+            public async Task GenerateSchemaAsync(JsonSchema schema, TypeMapperContext context)
             {
                 schema.Reference = await context.JsonSchemaGenerator.GenerateAsync(context.Type.GenericTypeArguments[0], context.JsonSchemaResolver);
             }
@@ -112,7 +112,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_generic_type_mapper_is_defined_then_it_is_called_and_the_refs_are_correct()
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyFoo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<MyFoo>(new JsonSchemaGeneratorSettings
             {
                 TypeMappers =
                 {

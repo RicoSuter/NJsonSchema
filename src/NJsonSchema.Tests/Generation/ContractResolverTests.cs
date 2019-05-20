@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
 #endif
         public async Task Properties_should_match_custom_resolver()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings
             {
                 ContractResolver = new CustomContractResolver()
             });

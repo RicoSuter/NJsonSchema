@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_schema_processor_attribute_then_it_is_processed()
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithSchemaProcessor>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<ClassWithSchemaProcessor>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

@@ -38,7 +38,7 @@ namespace NJsonSchema.Benchmark
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 100)]
         public void GenerateSchema()
         {
-            var schema = JsonSchema4.FromTypeAsync<Container>().GetAwaiter().GetResult();
+            var schema = JsonSchema.FromTypeAsync<Container>().GetAwaiter().GetResult();
             _counter.Increment();
         }
 

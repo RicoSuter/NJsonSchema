@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<BusinessCategory>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<BusinessCategory>(new JsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true
             });

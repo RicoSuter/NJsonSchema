@@ -15,7 +15,7 @@ namespace NJsonSchema
     {
         /// <summary>Gets the parent schema of the XML object schema. </summary>
         [JsonIgnore]
-        public JsonSchema4 ParentSchema { get; internal set; }
+        public JsonSchema ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the name of the xml object. </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

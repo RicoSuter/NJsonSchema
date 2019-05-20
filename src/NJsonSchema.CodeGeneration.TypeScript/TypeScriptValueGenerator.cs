@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public override string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)

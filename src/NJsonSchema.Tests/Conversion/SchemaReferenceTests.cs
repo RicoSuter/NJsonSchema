@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Conversion
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schema = await JsonSchema.FromTypeAsync<Person>();
             var json = schema.ToJson();
 
             //// Assert
@@ -24,7 +24,7 @@ namespace NJsonSchema.Tests.Conversion
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Car>();
+            var schema = await JsonSchema.FromTypeAsync<Car>();
 
             //// Assert
             Assert.Equal(schema, schema.Properties["Person"].ActualTypeSchema.Properties["Car"].ActualTypeSchema);
@@ -34,7 +34,7 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_a_referencing_type_then_path_is_in_json()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schema = await JsonSchema.FromTypeAsync<Person>();
 
             //// Act
             var json = schema.ToJson();
@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<House>();
+            var schema = await JsonSchema.FromTypeAsync<House>();
 
             //// Act
             var json = schema.ToJson();
@@ -85,7 +85,7 @@ namespace NJsonSchema.Tests.Conversion
 }";
 
             /// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             /// Assert
             var jsonOutput = schema.ToJson();

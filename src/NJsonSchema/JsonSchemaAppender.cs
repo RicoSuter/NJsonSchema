@@ -28,14 +28,14 @@ namespace NJsonSchema
         public object RootObject { get; }
 
         /// <summary>Gets the root schema.</summary>
-        protected JsonSchema4 RootSchema => (JsonSchema4)RootObject;
+        protected JsonSchema RootSchema => (JsonSchema)RootObject;
 
         /// <summary>Appends the schema to the root object.</summary>
         /// <param name="schema">The schema to append.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentException">The root schema cannot be appended.</exception>
-        public virtual void AppendSchema(JsonSchema4 schema, string typeNameHint)
+        public virtual void AppendSchema(JsonSchema schema, string typeNameHint)
         {
             if (schema == null)
                 throw new ArgumentNullException(nameof(schema));

@@ -15,7 +15,7 @@ namespace NJsonSchema
     /// <summary>Manager which resolves types to schemas and appends missing schemas to the root object.</summary>
     public class JsonSchemaResolver : JsonSchemaAppender
     {
-        private readonly Dictionary<string, JsonSchema4> _mappings = new Dictionary<string, JsonSchema4>();
+        private readonly Dictionary<string, JsonSchema> _mappings = new Dictionary<string, JsonSchema>();
         private readonly JsonSchemaGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaResolver" /> class.</summary>
@@ -40,7 +40,7 @@ namespace NJsonSchema
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
         /// <returns>The schema.</returns>
-        public JsonSchema4 GetSchema(Type type, bool isIntegerEnumeration)
+        public JsonSchema GetSchema(Type type, bool isIntegerEnumeration)
         {
             return _mappings[GetKey(type, isIntegerEnumeration)];
         }
@@ -50,9 +50,9 @@ namespace NJsonSchema
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>
         /// <param name="schema">The schema.</param>
         /// <exception cref="InvalidOperationException">Added schema is not a JsonSchema4 instance.</exception>
-        public virtual void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema4 schema)
+        public virtual void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema schema)
         {
-            if (schema.GetType() != typeof(JsonSchema4))
+            if (schema.GetType() != typeof(JsonSchema))
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
 
             if (schema != RootObject)
@@ -62,7 +62,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets all the schemas.</summary>
-        public IEnumerable<JsonSchema4> Schemas => _mappings.Values;
+        public IEnumerable<JsonSchema> Schemas => _mappings.Values;
 
         private string GetKey(Type type, bool isIntegerEnum)
         {

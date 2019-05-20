@@ -12,12 +12,12 @@ namespace NJsonSchema.Tests.Serialization
         public async Task When_discriminator_object_is_set_then_schema_is_correctly_serialized()
         {
             //// Arrange
-            var childSchema = new JsonSchema4
+            var childSchema = new JsonSchema
             {
                 Type = JsonObjectType.Object,
             };
 
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Definitions["Foo"] = childSchema;
             schema.DiscriminatorObject = new OpenApiDiscriminator
             {
@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Serialization
                 {
                     {
                         "Bar",
-                        new JsonSchema4
+                        new JsonSchema
                         {
                             Reference = childSchema
                         }
@@ -36,7 +36,7 @@ namespace NJsonSchema.Tests.Serialization
 
             //// Act
             var json = schema.ToJson();
-            var schema2 = await JsonSchema4.FromJsonAsync(json);
+            var schema2 = await JsonSchema.FromJsonAsync(json);
             var json2 = schema2.ToJson();
 
             //// Assert
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Serialization
         public void When_discriminator_is_set_then_discriminator_object_is_created()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Discriminator = "discr";
 
             //// Act
@@ -66,12 +66,12 @@ namespace NJsonSchema.Tests.Serialization
         public void When_schema_is_serialized_for_Swagger_then_discriminator_is_string()
         {
             //// Arrange
-            var childSchema = new JsonSchema4
+            var childSchema = new JsonSchema
             {
                 Type = JsonObjectType.Object,
             };
 
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Definitions["Foo"] = childSchema;
             schema.DiscriminatorObject = new OpenApiDiscriminator
             {
@@ -80,7 +80,7 @@ namespace NJsonSchema.Tests.Serialization
                 {
                     {
                         "Bar",
-                        new JsonSchema4
+                        new JsonSchema
                         {
                             Reference = childSchema
                         }

@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_schema_contains_range_then_code_is_correctly_generated()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<RangeClass>();
+            var schema = await JsonSchema.FromTypeAsync<RangeClass>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 	                }
                 }
             }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             /// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_span_incorrect_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.TimeSpan;
 
@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_time_span_correct_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.TimeSpan;
 
