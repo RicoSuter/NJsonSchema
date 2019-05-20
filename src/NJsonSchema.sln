@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema", "NJsonSchema\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Demo", "NJsonSchema.Demo\NJsonSchema.Demo.csproj", "{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Demo", "NJsonSchema.Demo\NJsonSchema.Demo.csproj", "{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration", "NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj", "{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}"
 EndProject
@@ -30,8 +30,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Benchmark", "NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj", "{E59CE32B-181F-4AAE-BF62-772AEEFC3177}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Yaml.Tests", "NJsonSchema.Yaml.Tests\NJsonSchema.Yaml.Tests.csproj", "{990EF464-C967-4E08-8C3D-0568A47B6D2A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Namotion.Reflection", "..\..\Namotion.Reflection\src\Namotion.Reflection\Namotion.Reflection.csproj", "{924107A5-9B0A-496D-851B-313E71A7E6EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -229,22 +227,6 @@ Global
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x64.Build.0 = Release|Any CPU
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x86.ActiveCfg = Release|Any CPU
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x86.Build.0 = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|ARM.Build.0 = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|x64.Build.0 = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Debug|x86.Build.0 = Debug|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|ARM.ActiveCfg = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|ARM.Build.0 = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|x64.ActiveCfg = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|x64.Build.0 = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|x86.ActiveCfg = Release|Any CPU
-		{924107A5-9B0A-496D-851B-313E71A7E6EA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
