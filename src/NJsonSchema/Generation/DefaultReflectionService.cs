@@ -49,7 +49,9 @@ namespace NJsonSchema.Generation
                 contextualType = type.ToContextualType();
 
                 if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
+                {
                     isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
+                }
             }
 
             var jsonSchemaAttribute = contextualType.GetAttribute<JsonSchemaAttribute>();
@@ -155,10 +157,14 @@ namespace NJsonSchema.Generation
 
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
+            {
                 return JsonTypeDescription.CreateForDictionary(type, JsonObjectType.Object, isNullable);
+            }
 
             if (IsArrayType(contextualType) && contract is JsonArrayContract)
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+            }
 
             if (contextualType.IsNullableType)
             {
@@ -168,7 +174,9 @@ namespace NJsonSchema.Generation
             }
 
             if (contract is JsonStringContract)
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
+            }
 
             return JsonTypeDescription.Create(type, JsonObjectType.Object, isNullable, null);
         }
@@ -195,9 +203,14 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (contextualType.Nullability != Nullability.Unknown)
+            if (defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Default && 
+                contextualType.Nullability != Nullability.Unknown)
             {
                 return contextualType.Nullability == Nullability.Nullable;
+            }
+            else if (contextualType.IsNullableType)
+            {
+                return true;
             }
 
             var isValueType = contextualType.Type != typeof(string) &&

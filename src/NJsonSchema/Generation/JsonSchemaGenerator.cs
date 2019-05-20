@@ -228,7 +228,9 @@ namespace NJsonSchema.Generation
                 if (!schema.HasReference)
                 {
                     if (transformation != null)
+                    {
                         await transformation(schema, schema).ConfigureAwait(false);
+                    }
 
                     if (isNullable)
                     {
@@ -264,7 +266,9 @@ namespace NJsonSchema.Generation
 
             var referencingSchema = new TSchemaType();
             if (transformation != null)
+            {
                 await transformation(referencingSchema, referencedSchema).ConfigureAwait(false);
+            }
 
             if (isNullable)
             {
@@ -388,7 +392,9 @@ namespace NJsonSchema.Generation
                     extensionDataPropertyType, schemaResolver).ConfigureAwait(false);
             }
             else
+            {
                 schema.AllowAdditionalProperties = false;
+            }
         }
 
         private async Task ApplySchemaProcessorsAsync(ContextualType contextualType, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
@@ -942,7 +948,9 @@ namespace NJsonSchema.Generation
 
                 var hasRequiredAttribute = requiredAttribute != null;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
+                {
                     parentSchema.RequiredProperties.Add(propertyName);
+                }
 
                 var isNullable = propertyTypeDescription.IsNullable &&
                     hasRequiredAttribute == false &&
@@ -1022,7 +1030,9 @@ namespace NJsonSchema.Generation
         private dynamic GetDataMemberAttribute(ContextualMemberInfo property, Type parentType)
         {
             if (!HasDataContractAttribute(parentType))
+            {
                 return null;
+            }
 
             return property.ContextAttributes.TryGetAssignableToTypeName("DataMemberAttribute", TypeNameStyle.Name);
         }
@@ -1043,7 +1053,9 @@ namespace NJsonSchema.Generation
 
             dynamic displayAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null && displayAttribute.Name != null)
+            {
                 schema.Title = displayAttribute.Name;
+            }
 
             dynamic defaultValueAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
@@ -1063,9 +1075,13 @@ namespace NJsonSchema.Generation
             if (regexAttribute != null)
             {
                 if (typeDescription.IsDictionary)
+                {
                     schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
+                }
                 else
+                {
                     schema.Pattern = regexAttribute.Pattern;
+                }
             }
 
             if (typeDescription.Type == JsonObjectType.Number ||
@@ -1075,25 +1091,35 @@ namespace NJsonSchema.Generation
 
                 var multipleOfAttribute = parentAttributes.OfType<MultipleOfAttribute>().SingleOrDefault();
                 if (multipleOfAttribute != null)
+                {
                     schema.MultipleOf = multipleOfAttribute.MultipleOf;
+                }
             }
 
             dynamic minLengthAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.MinLengthAttribute");
             if (minLengthAttribute != null && minLengthAttribute.Length != null)
             {
                 if (typeDescription.Type == JsonObjectType.String)
+                {
                     schema.MinLength = minLengthAttribute.Length;
+                }
                 else if (typeDescription.Type == JsonObjectType.Array)
+                {
                     schema.MinItems = minLengthAttribute.Length;
+                }
             }
 
             dynamic maxLengthAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
             if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
             {
                 if (typeDescription.Type == JsonObjectType.String)
+                {
                     schema.MaxLength = maxLengthAttribute.Length;
+                }
                 else if (typeDescription.Type == JsonObjectType.Array)
+                {
                     schema.MaxItems = maxLengthAttribute.Length;
+                }
             }
 
             dynamic stringLengthAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.StringLengthAttribute");
@@ -1111,7 +1137,9 @@ namespace NJsonSchema.Generation
             {
                 var dataType = dataTypeAttribute.DataType.ToString();
                 if (DataTypeFormats.ContainsKey(dataType))
+                {
                     schema.Format = DataTypeFormats[dataType];
+                }
             }
         }
 
@@ -1168,12 +1196,18 @@ namespace NJsonSchema.Generation
             {
                 var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(property.Converter?.GetType().GetTypeInfo());
                 if (hasStringEnumConverter)
+                {
                     return property.DefaultValue.ToString();
+                }
                 else
+                {
                     return (int)property.DefaultValue;
+                }
             }
             else
+            {
                 return property.DefaultValue;
+            }
         }
     }
 }
