@@ -30,8 +30,8 @@ namespace NJsonSchema
         private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
 
-        private IDictionary<string, JsonProperty> _properties;
-        private IDictionary<string, JsonProperty> _patternProperties;
+        private IDictionary<string, JsonSchemaProperty> _properties;
+        private IDictionary<string, JsonSchemaProperty> _patternProperties;
         private IDictionary<string, JsonSchema> _definitions;
 
         private ICollection<JsonSchema> _allOf;
@@ -285,9 +285,9 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
         [JsonIgnore]
 #if !LEGACY
-        public IReadOnlyDictionary<string, JsonProperty> ActualProperties
+        public IReadOnlyDictionary<string, JsonSchemaProperty> ActualProperties
 #else
-        public IDictionary<string, JsonProperty> ActualProperties
+        public IDictionary<string, JsonSchemaProperty> ActualProperties
 #endif
         {
             get
@@ -306,9 +306,9 @@ namespace NJsonSchema
                     throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
 
 #if !LEGACY
-                return new ReadOnlyDictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+                return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
 #else
-                return new Dictionary<string, JsonProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+                return new Dictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
 #endif
             }
         }
@@ -442,7 +442,7 @@ namespace NJsonSchema
         public bool IsEnumeration => Enumeration.Count > 0;
 
         /// <summary>Gets the collection of required properties. </summary>
-        /// <remarks>This collection can also be changed through the <see cref="JsonProperty.IsRequired"/> property. </remarks>>
+        /// <remarks>This collection can also be changed through the <see cref="JsonSchemaProperty.IsRequired"/> property. </remarks>>
         [JsonIgnore]
         public ICollection<string> RequiredProperties { get; internal set; }
 
@@ -463,7 +463,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the properties of the type. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonProperty> Properties
+        public IDictionary<string, JsonSchemaProperty> Properties
         {
             get { return _properties; }
             internal set
@@ -495,7 +495,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the pattern properties of the type. </summary>
         [JsonIgnore]
-        public IDictionary<string, JsonProperty> PatternProperties
+        public IDictionary<string, JsonSchemaProperty> PatternProperties
         {
             get { return _patternProperties; }
             internal set
@@ -844,10 +844,10 @@ namespace NJsonSchema
                 Items = new ObservableCollection<JsonSchema>();
 
             if (Properties == null)
-                Properties = new ObservableDictionary<string, JsonProperty>();
+                Properties = new ObservableDictionary<string, JsonSchemaProperty>();
 
             if (PatternProperties == null)
-                PatternProperties = new ObservableDictionary<string, JsonProperty>();
+                PatternProperties = new ObservableDictionary<string, JsonSchemaProperty>();
 
             if (Definitions == null)
                 Definitions = new ObservableDictionary<string, JsonSchema>();

@@ -205,7 +205,7 @@ namespace NJsonSchema.Tests.Schema
             var schema = new JsonSchema();
 
             //// Act
-            schema.Properties.Add("test", new JsonProperty());
+            schema.Properties.Add("test", new JsonSchemaProperty());
 
             //// Assert
             Assert.True(schema.Properties.ContainsKey("test"));
@@ -217,7 +217,7 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var schema = new JsonSchema();
-            schema.Properties["test"] = new JsonProperty();
+            schema.Properties["test"] = new JsonSchemaProperty();
 
             //// Act
             schema.Properties["test"].IsRequired = true;
@@ -231,7 +231,7 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var schema = new JsonSchema();
-            schema.Properties["test"] = new JsonProperty();
+            schema.Properties["test"] = new JsonSchemaProperty();
             schema.RequiredProperties.Add("test");
 
             //// Act
@@ -246,7 +246,7 @@ namespace NJsonSchema.Tests.Schema
         {
             //// Arrange
             var schema = new JsonSchema();
-            schema.Properties["test"] = new JsonProperty
+            schema.Properties["test"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number,
                 IsRequired = false
@@ -265,7 +265,7 @@ namespace NJsonSchema.Tests.Schema
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number | JsonObjectType.Null
             };
@@ -286,8 +286,8 @@ namespace NJsonSchema.Tests.Schema
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
-            schema.Properties["Bar"] = new JsonProperty();
+            schema.Properties["Foo"] = new JsonSchemaProperty();
+            schema.Properties["Bar"] = new JsonSchemaProperty();
 
             var token = new JObject();
             token["Foo"] = new JValue(5);

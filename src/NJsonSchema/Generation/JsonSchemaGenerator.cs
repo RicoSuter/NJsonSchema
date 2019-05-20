@@ -833,7 +833,7 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
                         throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -846,7 +846,7 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonProperty
+                    typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
                     {
                         Type = JsonObjectType.String,
                         IsRequired = true
@@ -959,7 +959,7 @@ namespace NJsonSchema.Generation
                     (bool)isDataContractMemberRequired == false &&
                     (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
 
-                Func<JsonProperty, JsonSchema, Task> TransformSchema = async (propertySchema, typeSchema) =>
+                Func<JsonSchemaProperty, JsonSchema, Task> TransformSchema = async (propertySchema, typeSchema) =>
                 {
                     if (Settings.GenerateXmlObjects)
                     {

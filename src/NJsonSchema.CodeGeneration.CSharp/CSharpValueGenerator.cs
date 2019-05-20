@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     }
                 }
 
-                var isOptional = (schema as JsonProperty)?.IsRequired == false;
+                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
 
                 schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false && isOptional == false)

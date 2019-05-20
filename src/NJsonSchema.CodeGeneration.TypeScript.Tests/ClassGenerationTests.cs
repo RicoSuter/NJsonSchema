@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
                             Item = new JsonSchema
@@ -104,7 +104,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
                             Item = new JsonSchema
@@ -139,7 +139,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             AdditionalPropertiesSchema = new JsonSchema
@@ -149,7 +149,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             AdditionalPropertiesSchema = new JsonSchema
@@ -184,12 +184,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -198,12 +198,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }

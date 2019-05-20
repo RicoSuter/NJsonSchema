@@ -60,7 +60,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) &&
+        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 

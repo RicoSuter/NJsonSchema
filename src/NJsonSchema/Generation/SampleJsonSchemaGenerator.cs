@@ -137,7 +137,7 @@ namespace NJsonSchema.Generation
             schema.Type = JsonObjectType.Object;
             foreach (var property in ((JObject)token).Properties())
             {
-                var propertySchema = new JsonProperty();
+                var propertySchema = new JsonSchemaProperty();
                 var propertyName = property.Value.Type == JTokenType.Array ? ConversionUtilities.Singularize(property.Name) : property.Name;
                 var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(propertyName, true);
 

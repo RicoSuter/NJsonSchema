@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Generation
                             {
                                 {
                                     "Prop",
-                                    new JsonProperty
+                                    new JsonSchemaProperty
                                     {
                                         IsRequired = true,
                                         Type = JsonObjectType.String

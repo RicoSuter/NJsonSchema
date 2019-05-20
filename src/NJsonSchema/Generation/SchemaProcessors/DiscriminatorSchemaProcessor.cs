@@ -37,7 +37,7 @@ namespace NJsonSchema.Generation.SchemaProcessors
             {
                 var schema = context.Schema;
                 schema.Discriminator = Discriminator;
-                schema.Properties[Discriminator] = new JsonProperty
+                schema.Properties[Discriminator] = new JsonSchemaProperty
                 {
                     Type = JsonObjectType.String,
                     IsRequired = true

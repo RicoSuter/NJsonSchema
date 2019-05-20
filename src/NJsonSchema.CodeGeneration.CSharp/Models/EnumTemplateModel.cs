@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name { get; }
 
         /// <summary>Gets a value indicating whether the enum has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
         public string Description => _schema.Description;

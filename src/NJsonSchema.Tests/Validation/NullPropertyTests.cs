@@ -10,11 +10,11 @@ namespace NJsonSchema.Tests.Validation
         {
             //// Arrange
             var schema = new JsonSchema();
-            schema.Properties["test"] = new JsonProperty
+            schema.Properties["test"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Null | JsonObjectType.Object
             };
-            schema.Properties["test"].Properties["foo"] = new JsonProperty
+            schema.Properties["test"].Properties["foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };

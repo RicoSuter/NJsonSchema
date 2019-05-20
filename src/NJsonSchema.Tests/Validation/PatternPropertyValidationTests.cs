@@ -14,7 +14,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("123", new JObject());
@@ -38,7 +38,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("qwerty", new JArray());
@@ -59,7 +59,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("qwerty", new JObject());

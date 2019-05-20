@@ -14,7 +14,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty();
+            schema.Properties["Foo"] = new JsonSchemaProperty();
 
             var token = new JValue(10);
 
@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 IsRequired = true,
             };
@@ -54,7 +54,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number | JsonObjectType.Null
             };
@@ -75,7 +75,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 IsRequired = false,
             };
@@ -95,7 +95,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 IsRequired = true,
                 Type = JsonObjectType.String
@@ -117,7 +117,7 @@ namespace NJsonSchema.Tests.Validation
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["Foo"] = new JsonProperty
+            schema.Properties["Foo"] = new JsonSchemaProperty
             {
                 IsRequired = true,
                 Type = JsonObjectType.String

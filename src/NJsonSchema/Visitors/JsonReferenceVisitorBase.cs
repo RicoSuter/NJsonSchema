@@ -116,10 +116,10 @@ namespace NJsonSchema.Visitors
                     await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o).ConfigureAwait(false);
 
                 foreach (var p in schema.Properties.ToArray())
-                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
 
                 foreach (var p in schema.PatternProperties.ToArray())
-                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
 
                 foreach (var p in schema.Definitions.ToArray())
                 {

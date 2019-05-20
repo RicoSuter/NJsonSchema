@@ -36,20 +36,20 @@ namespace NJsonSchema
 
             if (schemaType == SchemaType.OpenApi3)
             {
-                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
-                resolver.RenameProperty(typeof(JsonProperty), "x-writeOnly", "writeOnly");
+                resolver.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonSchemaProperty), "x-writeOnly", "writeOnly");
 
                 resolver.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
                 resolver.RenameProperty(typeof(JsonSchema), "x-example", "example");
             }
             else if (schemaType == SchemaType.Swagger2)
             {
-                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readOnly");
+                resolver.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readOnly");
                 resolver.RenameProperty(typeof(JsonSchema), "x-example", "example");
             }
             else
             {
-                resolver.RenameProperty(typeof(JsonProperty), "x-readOnly", "readonly");
+                resolver.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readonly");
             }
 
             return resolver;
@@ -267,19 +267,19 @@ namespace NJsonSchema
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonProperty> PropertiesRaw
+        internal IDictionary<string, JsonSchemaProperty> PropertiesRaw
         {
             get => Properties != null && Properties.Count > 0 ? Properties : null;
             set
             {
                 Properties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value) :
-                    new ObservableDictionary<string, JsonProperty>();
+                    new ObservableDictionary<string, JsonSchemaProperty>(value) :
+                    new ObservableDictionary<string, JsonSchemaProperty>();
             }
         }
 
         [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonProperty> PatternPropertiesRaw
+        internal IDictionary<string, JsonSchemaProperty> PatternPropertiesRaw
         {
             get
             {
@@ -289,8 +289,8 @@ namespace NJsonSchema
             set
             {
                 PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonProperty>(value) :
-                    new ObservableDictionary<string, JsonProperty>();
+                    new ObservableDictionary<string, JsonSchemaProperty>(value) :
+                    new ObservableDictionary<string, JsonSchemaProperty>();
             }
         }
 
@@ -337,14 +337,14 @@ namespace NJsonSchema
             set { OneOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
         }
 
-        private void RegisterProperties(IDictionary<string, JsonProperty> oldCollection, IDictionary<string, JsonProperty> newCollection)
+        private void RegisterProperties(IDictionary<string, JsonSchemaProperty> oldCollection, IDictionary<string, JsonSchemaProperty> newCollection)
         {
             if (oldCollection != null)
-                ((ObservableDictionary<string, JsonProperty>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+                ((ObservableDictionary<string, JsonSchemaProperty>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
 
             if (newCollection != null)
             {
-                ((ObservableDictionary<string, JsonProperty>)newCollection).CollectionChanged += InitializeSchemaCollection;
+                ((ObservableDictionary<string, JsonSchemaProperty>)newCollection).CollectionChanged += InitializeSchemaCollection;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
@@ -376,9 +376,9 @@ namespace NJsonSchema
 
         private void InitializeSchemaCollection(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (sender is ObservableDictionary<string, JsonProperty>)
+            if (sender is ObservableDictionary<string, JsonSchemaProperty>)
             {
-                var properties = (ObservableDictionary<string, JsonProperty>)sender;
+                var properties = (ObservableDictionary<string, JsonSchemaProperty>)sender;
                 foreach (var property in properties)
                 {
                     property.Value.Name = property.Key;

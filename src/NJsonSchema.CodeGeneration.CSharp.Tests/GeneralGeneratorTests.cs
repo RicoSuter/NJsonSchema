@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
         class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
-            public string Generate(JsonProperty property)
+            public string Generate(JsonSchemaProperty property)
             {
                 return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name, true);
             }
@@ -351,7 +351,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             //// Arrange
             var schema = new JsonSchema();
-            schema.Properties["foo-bar"] = new JsonProperty
+            schema.Properties["foo-bar"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };
@@ -381,7 +381,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             // Arrange
             var schema = new JsonSchema();
-            schema.Properties[jsonPropertyName] = new JsonProperty
+            schema.Properties[jsonPropertyName] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };
@@ -623,7 +623,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
-            schema.Properties["foo"] = new JsonProperty
+            schema.Properties["foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number
             };
@@ -707,7 +707,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
                             Item = new JsonSchema
@@ -717,7 +717,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
                             Item = new JsonSchema
@@ -753,7 +753,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             AdditionalPropertiesSchema = new JsonSchema
@@ -763,7 +763,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             AdditionalPropertiesSchema = new JsonSchema
@@ -799,12 +799,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -813,12 +813,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }

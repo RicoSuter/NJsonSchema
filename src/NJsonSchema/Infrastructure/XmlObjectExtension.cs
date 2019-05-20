@@ -63,7 +63,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="propertySchema">The JSON Schema for the property</param>
         /// <param name="type">The type.</param>
         /// <param name="propertyName">The property name.</param>
-        public static void GenerateXmlObjectForProperty(this JsonProperty propertySchema, ContextualType type, string propertyName)
+        public static void GenerateXmlObjectForProperty(this JsonSchemaProperty propertySchema, ContextualType type, string propertyName)
         {
             string xmlName = null;
             string xmlNamespace = null;
