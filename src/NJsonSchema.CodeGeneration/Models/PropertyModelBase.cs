@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Models
     public abstract class PropertyModelBase
     {
         private readonly ClassTemplateModelBase _classTemplateModel;
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly TypeResolverBase _typeResolver;
         private readonly CodeGeneratorSettingsBase _settings;
 
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
         protected PropertyModelBase(
-            JsonProperty property,
+            JsonSchemaProperty property,
             ClassTemplateModelBase classTemplateModel,
             TypeResolverBase typeResolver,
             CodeGeneratorSettingsBase settings)

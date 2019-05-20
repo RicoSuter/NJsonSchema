@@ -26,7 +26,7 @@ namespace NJsonSchema
         /// <summary>Gets or sets the discriminator mappings.</summary>
         [JsonProperty("mapping", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [JsonConverter(typeof(DiscriminatorMappingConverter))]
-        public IDictionary<string, JsonSchema4> Mapping { get; } = new Dictionary<string, JsonSchema4>();
+        public IDictionary<string, JsonSchema> Mapping { get; } = new Dictionary<string, JsonSchema>();
 
         /// <summary>The currently used <see cref="JsonInheritanceConverter"/>.</summary>
         [JsonIgnore]
@@ -35,7 +35,7 @@ namespace NJsonSchema
         /// <summary>Adds a discriminator mapping for the given type and schema based on the used <see cref="JsonInheritanceConverter"/>.</summary>
         /// <param name="type">The type.</param>
         /// <param name="schema">The schema.</param>
-        public void AddMapping(Type type, JsonSchema4 schema)
+        public void AddMapping(Type type, JsonSchema schema)
         {
             dynamic converter = JsonInheritanceConverter;
 
@@ -49,10 +49,10 @@ namespace NJsonSchema
             if (getDiscriminatorValueMethod != null)
             {
                 var discriminatorValue = converter.GetDiscriminatorValue(type);
-                Mapping[discriminatorValue] = new JsonSchema4 { Reference = schema.ActualSchema };
+                Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else
-                Mapping[type.Name] = new JsonSchema4 { Reference = schema.ActualSchema };
+                Mapping[type.Name] = new JsonSchema { Reference = schema.ActualSchema };
         }
 
         /// <summary>
@@ -72,12 +72,12 @@ namespace NJsonSchema
                 var openApiMapping = serializer.Deserialize<Dictionary<string, string>>(reader);
                 if (openApiMapping != null && existingValue != null)
                 {
-                    var internalMapping = (IDictionary<string, JsonSchema4>)existingValue;
+                    var internalMapping = (IDictionary<string, JsonSchema>)existingValue;
                     internalMapping.Clear();
 
                     foreach (var tuple in openApiMapping)
                     {
-                        var schema = new JsonSchema4();
+                        var schema = new JsonSchema();
                         ((IJsonReferenceBase)schema).ReferencePath = tuple.Value;
                         internalMapping[tuple.Key] = schema;
                     }
@@ -88,7 +88,7 @@ namespace NJsonSchema
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
-                var internalMapping = value as IDictionary<string, JsonSchema4>;
+                var internalMapping = value as IDictionary<string, JsonSchema>;
                 if (internalMapping != null)
                 {
                     var openApiMapping = new Dictionary<string, string>();

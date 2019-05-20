@@ -8,12 +8,12 @@
 
 namespace NJsonSchema.CodeGeneration
 {
-    /// <summary>Generates the property name for a given <see cref="JsonProperty"/>.</summary>
+    /// <summary>Generates the property name for a given <see cref="JsonSchemaProperty"/>.</summary>
     public interface IPropertyNameGenerator
     {
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
-        string Generate(JsonProperty property);
+        string Generate(JsonSchemaProperty property);
     }
 }

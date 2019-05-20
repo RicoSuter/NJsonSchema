@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation
 {
-    /// <summary>Generates a <see cref="JsonSchema4"/> object for a given type. </summary>
+    /// <summary>Generates a <see cref="JsonSchema"/> object for a given type. </summary>
     public class JsonSchemaGenerator
     {
         private static readonly Dictionary<string, string> DataTypeFormats = new Dictionary<string, string>
@@ -47,63 +47,63 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the settings.</summary>
         public JsonSchemaGeneratorSettings Settings { get; }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        public async Task<JsonSchema4> GenerateAsync(Type type)
+        public async Task<JsonSchema> GenerateAsync(Type type)
         {
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             var schemaResolver = new JsonSchemaResolver(schema, Settings);
             await GenerateAsync(type.ToContextualType(), schema, schemaResolver).ConfigureAwait(false);
             return schema;
         }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        public Task<JsonSchema4> GenerateAsync(Type type, JsonSchemaResolver schemaResolver)
+        public Task<JsonSchema> GenerateAsync(Type type, JsonSchemaResolver schemaResolver)
         {
-            return GenerateAsync<JsonSchema4>(type, schemaResolver);
+            return GenerateAsync<JsonSchema>(type, schemaResolver);
         }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="type">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public Task<TSchemaType> GenerateAsync<TSchemaType>(Type type, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             return GenerateAsync<TSchemaType>(type.ToContextualType(), schemaResolver);
         }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="contextualType">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
-        public async Task<JsonSchema4> GenerateAsync(ContextualType contextualType, JsonSchemaResolver schemaResolver)
+        public async Task<JsonSchema> GenerateAsync(ContextualType contextualType, JsonSchemaResolver schemaResolver)
         {
-            return await GenerateAsync<JsonSchema4>(contextualType, schemaResolver).ConfigureAwait(false);
+            return await GenerateAsync<JsonSchema>(contextualType, schemaResolver).ConfigureAwait(false);
         }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <param name="contextualType">The type.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public async Task<TSchemaType> GenerateAsync<TSchemaType>(ContextualType contextualType, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var schema = new TSchemaType();
             await GenerateAsync(contextualType, schema, schemaResolver).ConfigureAwait(false);
             return schema;
         }
 
-        /// <summary>Generates a <see cref="JsonSchema4" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema.</typeparam>
         /// <param name="contextualType">The type.</param>
         /// <param name="schema">The schema.</param>
@@ -111,7 +111,7 @@ namespace NJsonSchema.Generation
         /// <returns>The schema.</returns>
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         public virtual async Task GenerateAsync<TSchemaType>(ContextualType contextualType, TSchemaType schema, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var type = contextualType.OriginalType;
 
@@ -148,7 +148,7 @@ namespace NJsonSchema.Generation
                     {
                         schema.Reference = schemaResolver.GetSchema(type, false);
                     }
-                    else if (schema.GetType() == typeof(JsonSchema4))
+                    else if (schema.GetType() == typeof(JsonSchema))
                     {
                         await GenerateObjectAsync(type, typeDescription, schema, schemaResolver).ConfigureAwait(false);
                     }
@@ -184,8 +184,8 @@ namespace NJsonSchema.Generation
         public async Task<TSchemaType> GenerateWithReferenceAsync<TSchemaType>(
             ContextualType contextualType,
             JsonSchemaResolver schemaResolver,
-            Func<TSchemaType, JsonSchema4, Task> transformation = null)
-            where TSchemaType : JsonSchema4, new()
+            Func<TSchemaType, JsonSchema, Task> transformation = null)
+            where TSchemaType : JsonSchema, new()
         {
             return await GenerateWithReferenceAndNullabilityAsync(contextualType, false, schemaResolver, transformation).ConfigureAwait(false);
         }
@@ -199,8 +199,8 @@ namespace NJsonSchema.Generation
         /// <returns>The requested schema object.</returns>
         public async Task<TSchemaType> GenerateWithReferenceAndNullabilityAsync<TSchemaType>(
             ContextualType contextualType, JsonSchemaResolver schemaResolver,
-            Func<TSchemaType, JsonSchema4, Task> transformation = null)
-            where TSchemaType : JsonSchema4, new()
+            Func<TSchemaType, JsonSchema, Task> transformation = null)
+            where TSchemaType : JsonSchema, new()
         {
             var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
             return await GenerateWithReferenceAndNullabilityAsync(contextualType, typeDescription.IsNullable, schemaResolver, transformation).ConfigureAwait(false);
@@ -215,13 +215,13 @@ namespace NJsonSchema.Generation
         /// <returns>The requested schema object.</returns>
         public virtual async Task<TSchemaType> GenerateWithReferenceAndNullabilityAsync<TSchemaType>(
             ContextualType contextualType, bool isNullable, JsonSchemaResolver schemaResolver,
-            Func<TSchemaType, JsonSchema4, Task> transformation = null)
-            where TSchemaType : JsonSchema4, new()
+            Func<TSchemaType, JsonSchema, Task> transformation = null)
+            where TSchemaType : JsonSchema, new()
         {
             var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
             var requiresSchemaReference = typeDescription.RequiresSchemaReference(Settings.TypeMappers);
 
-            JsonSchema4 referencedSchema;
+            JsonSchema referencedSchema;
             if (!requiresSchemaReference)
             {
                 var schema = await GenerateAsync<TSchemaType>(contextualType, schemaResolver).ConfigureAwait(false);
@@ -238,8 +238,8 @@ namespace NJsonSchema.Generation
                         {
                             if (schema.Type == JsonObjectType.None)
                             {
-                                schema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.None });
-                                schema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                                schema.OneOf.Add(new JsonSchema { Type = JsonObjectType.None });
+                                schema.OneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
                             }
                             else
                             {
@@ -261,7 +261,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                referencedSchema = await GenerateAsync<JsonSchema4>(contextualType, schemaResolver).ConfigureAwait(false);
+                referencedSchema = await GenerateAsync<JsonSchema>(contextualType, schemaResolver).ConfigureAwait(false);
             }
 
             var referencingSchema = new TSchemaType();
@@ -274,7 +274,7 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.SchemaType == SchemaType.JsonSchema)
                 {
-                    referencingSchema.OneOf.Add(new JsonSchema4 { Type = JsonObjectType.Null });
+                    referencingSchema.OneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
                 }
                 else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                 {
@@ -292,14 +292,14 @@ namespace NJsonSchema.Generation
             }
             else if (Settings.SchemaType != SchemaType.Swagger2)
             {
-                referencingSchema.OneOf.Add(new JsonSchema4
+                referencingSchema.OneOf.Add(new JsonSchema
                 {
                     Reference = referencedSchema.ActualSchema
                 });
             }
             else
             {
-                referencingSchema.AllOf.Add(new JsonSchema4
+                referencingSchema.AllOf.Add(new JsonSchema
                 {
                     Reference = referencedSchema.ActualSchema
                 });
@@ -312,7 +312,7 @@ namespace NJsonSchema.Generation
         /// <param name="jsonProperty">The property.</param>
         /// <param name="memberInfo">The member info.</param>
         /// <returns>The property name.</returns>
-        public virtual string GetPropertyName(Newtonsoft.Json.Serialization.JsonProperty jsonProperty, MemberInfo memberInfo)
+        public virtual string GetPropertyName(JsonProperty jsonProperty, MemberInfo memberInfo)
         {
             try
             {
@@ -340,7 +340,7 @@ namespace NJsonSchema.Generation
         /// <param name="schemaResolver">The schema resolver.</param>
         /// <returns>The task.</returns>
         protected virtual async Task GenerateObjectAsync(Type type,
-            JsonTypeDescription typeDescription, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+            JsonTypeDescription typeDescription, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
             schemaResolver.AddSchema(type, false, schema);
 
@@ -378,7 +378,7 @@ namespace NJsonSchema.Generation
         }
 
         private async Task ApplyAdditionalPropertiesAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var extensionDataProperty = type.GetContextualRuntimeProperties()
                 .FirstOrDefault(p => p.GetContextAttribute<JsonExtensionDataAttribute>() != null);
@@ -388,7 +388,7 @@ namespace NJsonSchema.Generation
                 var genericTypeArguments = extensionDataProperty.GenericArguments;
                 var extensionDataPropertyType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
 
-                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema>(
                     extensionDataPropertyType, schemaResolver).ConfigureAwait(false);
             }
             else
@@ -397,7 +397,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task ApplySchemaProcessorsAsync(ContextualType contextualType, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task ApplySchemaProcessorsAsync(ContextualType contextualType, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
             var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
@@ -417,7 +417,7 @@ namespace NJsonSchema.Generation
         }
 
         private void ApplyExtensionDataAttributes<TSchemaType>(ContextualType contextualType, TSchemaType schema)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             // class
             var extensionDataAttributes = contextualType.GetAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
@@ -437,7 +437,7 @@ namespace NJsonSchema.Generation
         }
 
         private async Task<bool> TryHandleSpecialTypesAsync<TSchemaType>(ContextualType contextualType, TSchemaType schema, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == contextualType.OriginalType);
             if (typeMapper == null && contextualType.OriginalType.GetTypeInfo().IsGenericType)
@@ -465,7 +465,7 @@ namespace NJsonSchema.Generation
 
         private async Task GenerateArray<TSchemaType>(
             TSchemaType schema, ContextualType contextualType, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
 #pragma warning disable 1998
 
@@ -479,7 +479,7 @@ namespace NJsonSchema.Generation
                 var itemIsNullable = contextualType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
                                      contextualItemType.Nullability == Nullability.Nullable;
 
-                schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                schema.Item = await GenerateWithReferenceAndNullabilityAsync<JsonSchema>(
                     contextualItemType, itemIsNullable, schemaResolver, async (itemSchema, typeSchema) =>
                     {
                         if (Settings.GenerateXmlObjects)
@@ -495,7 +495,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                schema.Item = JsonSchema4.CreateAnySchema();
+                schema.Item = JsonSchema.CreateAnySchema();
             }
 
 #pragma warning restore 1998
@@ -503,7 +503,7 @@ namespace NJsonSchema.Generation
 
         private async Task GenerateEnum<TSchemaType>(
             TSchemaType schema, ContextualType contextualType, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var type = contextualType.Type;
 
@@ -512,7 +512,7 @@ namespace NJsonSchema.Generation
             {
                 schema.Reference = schemaResolver.GetSchema(type, isIntegerEnumeration);
             }
-            else if (schema.GetType() == typeof(JsonSchema4))
+            else if (schema.GetType() == typeof(JsonSchema))
             {
                 typeDescription.ApplyType(schema);
                 schema.Description = await type.GetXmlSummaryAsync().ConfigureAwait(false);
@@ -529,28 +529,28 @@ namespace NJsonSchema.Generation
 
         /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
         private async Task GenerateDictionaryAsync<TSchemaType>(TSchemaType schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
-            where TSchemaType : JsonSchema4, new()
+            where TSchemaType : JsonSchema, new()
         {
             var genericTypeArguments = contextualType.GenericArguments;
 
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string).ToContextualType();
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
-                schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema4>(
+                schema.DictionaryKey = await GenerateWithReferenceAsync<JsonSchema>(
                     keyType, schemaResolver).ConfigureAwait(false);
             }
 
             var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
             if (valueType.OriginalType == typeof(object))
             {
-                schema.AdditionalPropertiesSchema = JsonSchema4.CreateAnySchema();
+                schema.AdditionalPropertiesSchema = JsonSchema.CreateAnySchema();
             }
             else
             {
                 var valueIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
                     valueType.OriginalType.Name == "Nullable`1";
 
-                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema4>(
+                schema.AdditionalPropertiesSchema = await GenerateWithReferenceAndNullabilityAsync<JsonSchema>(
                     valueType, valueIsNullable, schemaResolver/*, async (s, r) =>
                     {
                         // TODO: Generate xml for key
@@ -564,7 +564,7 @@ namespace NJsonSchema.Generation
             schema.AllowAdditionalProperties = true;
         }
 
-        private async Task GeneratePropertiesAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task GeneratePropertiesAsync(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
 #if !LEGACY
             var members = type.GetTypeInfo()
@@ -636,7 +636,7 @@ namespace NJsonSchema.Generation
                     var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
                                      (memberInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
 
-                    var property = new Newtonsoft.Json.Serialization.JsonProperty
+                    var jsonProperty = new JsonProperty
                     {
                         AttributeProvider = new ReflectionAttributeProvider(memberInfo),
                         PropertyType = memberType,
@@ -645,19 +645,19 @@ namespace NJsonSchema.Generation
 
                     if (attribute != null)
                     {
-                        property.PropertyName = attribute.PropertyName ?? memberInfo.Name;
-                        property.Required = attribute.Required;
-                        property.DefaultValueHandling = attribute.DefaultValueHandling;
-                        property.TypeNameHandling = attribute.TypeNameHandling;
-                        property.NullValueHandling = attribute.NullValueHandling;
-                        property.TypeNameHandling = attribute.TypeNameHandling;
+                        jsonProperty.PropertyName = attribute.PropertyName ?? memberInfo.Name;
+                        jsonProperty.Required = attribute.Required;
+                        jsonProperty.DefaultValueHandling = attribute.DefaultValueHandling;
+                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
+                        jsonProperty.NullValueHandling = attribute.NullValueHandling;
+                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
                     }
                     else
                     {
-                        property.PropertyName = memberInfo.Name;
+                        jsonProperty.PropertyName = memberInfo.Name;
                     }
 
-                    await LoadPropertyOrFieldAsync(property, memberInfo, type, schema, schemaResolver).ConfigureAwait(false);
+                    await LoadPropertyOrFieldAsync(jsonProperty, memberInfo, type, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
         }
@@ -733,7 +733,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task<JsonSchema4> GenerateInheritanceAsync(Type type, JsonSchema4 schema, JsonSchemaResolver schemaResolver)
+        private async Task<JsonSchema> GenerateInheritanceAsync(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
             var baseType = type.GetTypeInfo().BaseType;
             if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
@@ -755,7 +755,7 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
-                        var actualSchema = new JsonSchema4();
+                        var actualSchema = new JsonSchema();
 
                         await GeneratePropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
                         await ApplyAdditionalPropertiesAsync(type, actualSchema, schemaResolver).ConfigureAwait(false);
@@ -776,7 +776,7 @@ namespace NJsonSchema.Generation
                                     schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
                                 }
 
-                                schema.AllOf.Add(new JsonSchema4
+                                schema.AllOf.Add(new JsonSchema
                                 {
                                     Reference = baseSchema.ActualSchema
                                 });
@@ -823,7 +823,7 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private void GenerateInheritanceDiscriminator(Type type, JsonSchema4 schema, JsonSchema4 typeSchema)
+        private void GenerateInheritanceDiscriminator(Type type, JsonSchema schema, JsonSchema typeSchema)
         {
             if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
@@ -833,7 +833,7 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonProperty existingProperty) &&
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
                         throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -846,7 +846,7 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonProperty
+                    typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
                     {
                         Type = JsonObjectType.String,
                         IsRequired = true
@@ -889,7 +889,7 @@ namespace NJsonSchema.Generation
             return JsonInheritanceConverter.DefaultDiscriminatorName;
         }
 
-        private void LoadEnumerations(Type type, JsonSchema4 schema, JsonTypeDescription typeDescription)
+        private void LoadEnumerations(Type type, JsonSchema schema, JsonTypeDescription typeDescription)
         {
             schema.Type = typeDescription.Type;
             schema.Enumeration.Clear();
@@ -934,7 +934,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private async Task LoadPropertyOrFieldAsync(Newtonsoft.Json.Serialization.JsonProperty jsonProperty, ContextualMemberInfo memberInfo, Type parentType, JsonSchema4 parentSchema, JsonSchemaResolver schemaResolver)
+        private async Task LoadPropertyOrFieldAsync(JsonProperty jsonProperty, ContextualMemberInfo memberInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = Settings.ReflectionService.GetDescription(memberInfo, Settings);
             if (jsonProperty.Ignored == false && IsPropertyIgnoredBySettings(memberInfo) == false)
@@ -959,7 +959,7 @@ namespace NJsonSchema.Generation
                     (bool)isDataContractMemberRequired == false &&
                     (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
 
-                Func<JsonProperty, JsonSchema4, Task> TransformSchema = async (propertySchema, typeSchema) =>
+                Func<JsonSchemaProperty, JsonSchema, Task> TransformSchema = async (propertySchema, typeSchema) =>
                 {
                     if (Settings.GenerateXmlObjects)
                     {
@@ -1049,7 +1049,7 @@ namespace NJsonSchema.Generation
         /// <param name="schema">The schema.</param>
         /// <param name="typeDescription">The property type description.</param>
         /// <param name="parentAttributes">The attributes.</param>
-        public virtual void ApplyDataAnnotations(JsonSchema4 schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
+        public virtual void ApplyDataAnnotations(JsonSchema schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
         {
             // TODO: Refactor out
 
@@ -1145,7 +1145,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void ApplyRangeAttribute(JsonSchema4 schema, IEnumerable<Attribute> parentAttributes)
+        private void ApplyRangeAttribute(JsonSchema schema, IEnumerable<Attribute> parentAttributes)
         {
             dynamic rangeAttribute = parentAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.RangeAttribute");
             if (rangeAttribute != null)
@@ -1192,23 +1192,23 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private object ConvertDefaultValue(Newtonsoft.Json.Serialization.JsonProperty property)
+        private object ConvertDefaultValue(JsonProperty jsonProperty)
         {
-            if (property.DefaultValue != null && property.DefaultValue.GetType().GetTypeInfo().IsEnum)
+            if (jsonProperty.DefaultValue != null && jsonProperty.DefaultValue.GetType().GetTypeInfo().IsEnum)
             {
-                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(property.Converter?.GetType().GetTypeInfo());
+                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(jsonProperty.Converter?.GetType().GetTypeInfo());
                 if (hasStringEnumConverter)
                 {
-                    return property.DefaultValue.ToString();
+                    return jsonProperty.DefaultValue.ToString();
                 }
                 else
                 {
-                    return (int)property.DefaultValue;
+                    return (int)jsonProperty.DefaultValue;
                 }
             }
             else
             {
-                return property.DefaultValue;
+                return jsonProperty.DefaultValue;
             }
         }
     }

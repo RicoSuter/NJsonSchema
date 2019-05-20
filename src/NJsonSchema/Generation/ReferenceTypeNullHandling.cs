@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-namespace NJsonSchema
+namespace NJsonSchema.Generation
 {
     /// <summary>Specifies the default null handling for reference types when no nullability information is available.</summary>
     public enum ReferenceTypeNullHandling

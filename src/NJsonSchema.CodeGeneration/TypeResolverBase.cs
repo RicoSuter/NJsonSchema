@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class TypeResolverBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly Dictionary<JsonSchema4, string> _generatedTypeNames = new Dictionary<JsonSchema4, string>();
+        private readonly Dictionary<JsonSchema, string> _generatedTypeNames = new Dictionary<JsonSchema, string>();
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -25,13 +25,13 @@ namespace NJsonSchema.CodeGeneration
         }
 
         /// <summary>Gets the registered schemas and with their type names.</summary>
-        public IDictionary<JsonSchema4, string> Types => _generatedTypeNames.ToDictionary(p => p.Key, p => p.Value);
+        public IDictionary<JsonSchema, string> Types => _generatedTypeNames.ToDictionary(p => p.Key, p => p.Value);
 
         /// <summary>Tries to resolve the schema and returns null if there was a problem.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        public string TryResolve(JsonSchema4 schema, string typeNameHint)
+        public string TryResolve(JsonSchema schema, string typeNameHint)
         {
             return schema != null ? Resolve(schema, false, typeNameHint) : null;
         }
@@ -41,13 +41,13 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public abstract string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint);
+        public abstract string Resolve(JsonSchema schema, bool isNullable, string typeNameHint);
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        public virtual string GetOrGenerateTypeName(JsonSchema4 schema, string typeNameHint)
+        public virtual string GetOrGenerateTypeName(JsonSchema schema, string typeNameHint)
         {
             schema = RemoveNullability(schema).ActualSchema;
 
@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Adds all schemas to the resolver.</summary>
         /// <param name="definitions">The schema definitions.</param>
-        public void RegisterSchemaDefinitions(IDictionary<string, JsonSchema4> definitions)
+        public void RegisterSchemaDefinitions(IDictionary<string, JsonSchema> definitions)
         {
             if (definitions != null)
             {
@@ -83,7 +83,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
-        public JsonSchema4 RemoveNullability(JsonSchema4 schema)
+        public JsonSchema RemoveNullability(JsonSchema schema)
         {
             // TODO: Method on JsonSchema4?
             return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
@@ -93,7 +93,7 @@ namespace NJsonSchema.CodeGeneration
         /// and removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
-        public JsonSchema4 GetResolvableSchema(JsonSchema4 schema)
+        public JsonSchema GetResolvableSchema(JsonSchema schema)
         {
             schema = RemoveNullability(schema);
             return IsDefinitionTypeSchema(schema.ActualSchema) ? schema : schema.ActualSchema;
@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration
         /// or is an inline type (e.g. string, number, etc.). Warning: Enum will also return true.</summary>
         /// <param name="schema"></param>
         /// <returns></returns>
-        public bool GeneratesType(JsonSchema4 schema)
+        public bool GeneratesType(JsonSchema schema)
         {
             schema = GetResolvableSchema(schema);
             return schema.HasReference || (schema.IsObject && !schema.IsDictionary && !schema.IsAnyType);
@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Checks whether the given schema from definitions should generate a type.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>True if the schema should generate a type.</returns>
-        protected virtual bool IsDefinitionTypeSchema(JsonSchema4 schema)
+        protected virtual bool IsDefinitionTypeSchema(JsonSchema schema)
         {
             return !schema.IsTuple &&
                    !schema.IsDictionary &&
@@ -127,7 +127,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
         /// <returns>The type.</returns>
-        protected string ResolveDictionaryValueType(JsonSchema4 schema, string fallbackType)
+        protected string ResolveDictionaryValueType(JsonSchema schema, string fallbackType)
         {
             if (schema.AdditionalPropertiesSchema != null)
             {
@@ -154,7 +154,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="fallbackType">The fallback type (e.g. 'object').</param>
         /// <returns>The type.</returns>
-        protected string ResolveDictionaryKeyType(JsonSchema4 schema, string fallbackType)
+        protected string ResolveDictionaryKeyType(JsonSchema schema, string fallbackType)
         {
             if (schema.DictionaryKey != null)
             {

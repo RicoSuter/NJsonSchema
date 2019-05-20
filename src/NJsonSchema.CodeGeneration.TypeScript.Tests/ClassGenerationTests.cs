@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
-            var schema = await JsonSchema4.FromTypeAsync<MyClassTest>();
+            var schema = await JsonSchema.FromTypeAsync<MyClassTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -94,24 +94,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
-                            Item = new JsonSchema4
+                            Item = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
-                            Item = new JsonSchema4
+                            Item = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
@@ -140,24 +140,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
-                            AdditionalPropertiesSchema = new JsonSchema4
+                            AdditionalPropertiesSchema = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
-                            AdditionalPropertiesSchema = new JsonSchema4
+                            AdditionalPropertiesSchema = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
@@ -186,16 +186,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -204,12 +204,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -322,7 +322,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
         {
             // Assert
-            var schema = JsonSchema4.FromTypeAsync(
+            var schema = JsonSchema.FromTypeAsync(
                 typeof(MyDerivedClass),
                 new JsonSchemaGeneratorSettings
                 {

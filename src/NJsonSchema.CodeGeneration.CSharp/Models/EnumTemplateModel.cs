@@ -17,14 +17,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp enum template model.</summary>
     public class EnumTemplateModel : TemplateModelBase
     {
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
         private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="EnumTemplateModel" /> class.</summary>
         /// <param name="typeName">Name of the type.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="settings">The settings.</param>
-        public EnumTemplateModel(string typeName, JsonSchema4 schema, CSharpGeneratorSettings settings)
+        public EnumTemplateModel(string typeName, JsonSchema schema, CSharpGeneratorSettings settings)
         {
             _schema = schema;
             _settings = settings;
@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name { get; }
 
         /// <summary>Gets a value indicating whether the enum has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
         public string Description => _schema.Description;

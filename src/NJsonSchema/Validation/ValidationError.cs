@@ -20,7 +20,7 @@ namespace NJsonSchema.Validation
         /// <param name="propertyPath">The property path. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-        public ValidationError(ValidationErrorKind errorKind, string propertyName, string propertyPath, JToken token, JsonSchema4 schema)
+        public ValidationError(ValidationErrorKind errorKind, string propertyName, string propertyPath, JToken token, JsonSchema schema)
         {
             Kind = errorKind;
             Property = propertyName;
@@ -61,7 +61,7 @@ namespace NJsonSchema.Validation
         public int LinePosition { get; private set; }
 
         /// <summary>Gets the schema element that contains the validation rule. </summary>
-        public JsonSchema4 Schema { get; private set; }
+        public JsonSchema Schema { get; private set; }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

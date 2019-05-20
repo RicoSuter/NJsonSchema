@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="settings">The settings.</param>
         public PropertyModel(
             ClassTemplateModel classTemplateModel,
-            JsonProperty property, string parentTypeName,
+            JsonSchemaProperty property, string parentTypeName,
             TypeScriptTypeResolver typeResolver,
             TypeScriptGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)

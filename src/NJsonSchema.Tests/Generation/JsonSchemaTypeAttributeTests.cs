@@ -24,7 +24,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassPrimitiveJsonSchemaTypeAttributes>();
+            var schema = await JsonSchema.FromTypeAsync<ClassPrimitiveJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassArrayJsonSchemaTypeAttributes>();
+            var schema = await JsonSchema.FromTypeAsync<ClassArrayJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassComplexJsonSchemaTypeAttributes>();
+            var schema = await JsonSchema.FromTypeAsync<ClassComplexJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -128,7 +128,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithReference>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithReference>();
             var json = schema.ToJson();
 
             //// Assert

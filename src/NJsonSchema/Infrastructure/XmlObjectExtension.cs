@@ -20,7 +20,7 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Generate XML object for a JSON Schema definition.</summary>
         /// <param name="schema">The JSON Schema.</param>
         /// <param name="type">The type of the JSON Schema.</param>
-        public static void GenerateXmlObjectForType(this JsonSchema4 schema, Type type)
+        public static void GenerateXmlObjectForType(this JsonSchema schema, Type type)
         {
             var attributes = type.ToCachedType().TypeAttributes;
             if (attributes.Any())
@@ -33,7 +33,7 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Generates an XML object for a JSON Schema definition.</summary>
         /// <param name="schema">The JSON Schema</param>
-        public static void GenerateXmlObjectForArrayType(this JsonSchema4 schema)
+        public static void GenerateXmlObjectForArrayType(this JsonSchema schema)
         {
             if (schema.IsArray && schema.ParentSchema == null)
             {
@@ -44,7 +44,7 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Generates XMLObject structure for an array with primitive types</summary>
         /// <param name="schema">The JSON Schema of the item.</param>
         /// <param name="type">The item type.</param>
-        public static void GenerateXmlObjectForItemType(this JsonSchema4 schema, CachedType type)
+        public static void GenerateXmlObjectForItemType(this JsonSchema schema, CachedType type)
         {
             // Is done all the time for XML to be able to get type name as the element name if not there was an attribute defined since earlier
             var attributes = type.TypeAttributes;
@@ -63,7 +63,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="propertySchema">The JSON Schema for the property</param>
         /// <param name="type">The type.</param>
         /// <param name="propertyName">The property name.</param>
-        public static void GenerateXmlObjectForProperty(this JsonProperty propertySchema, ContextualType type, string propertyName)
+        public static void GenerateXmlObjectForProperty(this JsonSchemaProperty propertySchema, ContextualType type, string propertyName)
         {
             string xmlName = null;
             string xmlNamespace = null;
@@ -121,7 +121,7 @@ namespace NJsonSchema.Infrastructure
                 GenerateXmlObject(xmlName, xmlNamespace, xmlWrapped, xmlAttribute != null ? true : false, propertySchema);
         }
 
-        private static void GenerateXmlObject(string name, string @namespace, bool wrapped, bool isAttribute, JsonSchema4 schema)
+        private static void GenerateXmlObject(string name, string @namespace, bool wrapped, bool isAttribute, JsonSchema schema)
         {
             schema.Xml = new JsonXmlObject
             {

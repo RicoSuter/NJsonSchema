@@ -11,10 +11,10 @@ namespace NJsonSchema.Tests.Validation
         public void When_there_are_no_properties_matching_pattern_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("123", new JObject());
@@ -35,10 +35,10 @@ namespace NJsonSchema.Tests.Validation
         public void When_there_are_properties_matching_pattern_but_types_doesnt_match_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("qwerty", new JArray());
@@ -56,10 +56,10 @@ namespace NJsonSchema.Tests.Validation
         public void When_there_are_properties_matching_pattern_and_types_matches_then_validation_succeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
-            schema.PatternProperties.Add("^[a-z]+$", new JsonProperty() { Type = JsonObjectType.Object});
+            schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
             var token = new JObject();
             token.Add("qwerty", new JObject());

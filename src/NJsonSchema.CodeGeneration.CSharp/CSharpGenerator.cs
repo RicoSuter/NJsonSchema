@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema schema, string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
@@ -107,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return GenerateClass(schema, typeName);
         }
 
-        private CodeArtifact GenerateClass(JsonSchema4 schema, string typeName)
+        private CodeArtifact GenerateClass(JsonSchema schema, string typeName)
         {
             var model = new ClassTemplateModel(typeName, Settings, _resolver, schema, RootObject);
 
@@ -130,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
         }
 
-        private CodeArtifact GenerateEnum(JsonSchema4 schema, string typeName)
+        private CodeArtifact GenerateEnum(JsonSchema schema, string typeName)
         {
             var model = new EnumTemplateModel(typeName, schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);

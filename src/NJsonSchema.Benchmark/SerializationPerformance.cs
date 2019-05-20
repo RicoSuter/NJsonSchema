@@ -7,7 +7,7 @@ namespace NJsonSchema.Benchmark
     public class SerializationPerformance
     {
         private readonly string _json;
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
 
         public SerializationPerformance()
         {
@@ -22,7 +22,7 @@ namespace NJsonSchema.Benchmark
                 _json = reader.ReadToEnd();
             }
 
-            _schema = JsonSchema4.FromJsonAsync(_json).Result;
+            _schema = JsonSchema.FromJsonAsync(_json).Result;
         }
 
         [Benchmark]
@@ -32,9 +32,9 @@ namespace NJsonSchema.Benchmark
         }
 
         [Benchmark]
-        public JsonSchema4 FromJson()
+        public JsonSchema FromJson()
         {
-            return JsonSchema4.FromJsonAsync(_json).Result;
+            return JsonSchema.FromJsonAsync(_json).Result;
         }
     }
 }

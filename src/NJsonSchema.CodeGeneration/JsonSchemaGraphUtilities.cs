@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns></returns>
-        public static IDictionary<JsonSchema4, string> GetDerivedSchemas(this JsonSchema4 schema, object rootObject)
+        public static IDictionary<JsonSchema, string> GetDerivedSchemas(this JsonSchema schema, object rootObject)
         {
             var visitor = new DerivedSchemaVisitor(schema);
             visitor.VisitAsync(rootObject).GetAwaiter().GetResult();
@@ -28,17 +28,17 @@ namespace NJsonSchema.CodeGeneration
 
         private class DerivedSchemaVisitor : JsonSchemaVisitorBase
         {
-            private readonly JsonSchema4 _baseSchema;
+            private readonly JsonSchema _baseSchema;
 
-            public Dictionary<JsonSchema4, string> DerivedSchemas { get; } = new Dictionary<JsonSchema4, string>();
+            public Dictionary<JsonSchema, string> DerivedSchemas { get; } = new Dictionary<JsonSchema, string>();
 
-            public DerivedSchemaVisitor(JsonSchema4 baseSchema)
+            public DerivedSchemaVisitor(JsonSchema baseSchema)
             {
                 _baseSchema = baseSchema;
             }
 
 #pragma warning disable 1998
-            protected override async Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint)
+            protected override async Task<JsonSchema> VisitSchemaAsync(JsonSchema schema, string path, string typeNameHint)
 #pragma warning restore 1998
             {
                 if (schema.Inherits(_baseSchema) && _baseSchema != schema)

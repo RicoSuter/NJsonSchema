@@ -24,7 +24,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultPropertyNameHandling = PropertyNameHandling.Default
             });
@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
             });
@@ -64,7 +64,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
             });

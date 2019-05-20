@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());

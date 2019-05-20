@@ -43,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
@@ -95,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
@@ -150,7 +150,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
             var generator = new CSharpGenerator(schema, settings);
             var output = generator.GenerateFile("Foo");
@@ -188,7 +188,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
@@ -231,7 +231,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile("Foo");
 

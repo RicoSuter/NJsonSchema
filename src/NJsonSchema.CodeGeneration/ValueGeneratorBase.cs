@@ -47,12 +47,12 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema4 schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public virtual string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             if (schema.Default == null || !useSchemaDefault)
                 return null;
 
-            var actualSchema = schema is JsonProperty ? ((JsonProperty)schema).ActualTypeSchema : schema.ActualSchema;
+            var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
             {
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="typeNameHint">The type name hint.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The enum default value.</returns>
-        protected virtual string GetEnumDefaultValue(JsonSchema4 schema, JsonSchema4 actualSchema, string typeNameHint, TypeResolverBase typeResolver)
+        protected virtual string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
         {
             var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
@@ -106,7 +106,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the default value as string literal.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The string literal.</returns>
-        protected string GetDefaultAsStringLiteral(JsonSchema4 schema)
+        protected string GetDefaultAsStringLiteral(JsonSchema schema)
         {
             return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
         }

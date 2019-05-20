@@ -21,23 +21,23 @@ namespace NJsonSchema.Generation
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
         /// <returns>The JSON Schema.</returns>
-        public JsonSchema4 Generate(string json)
+        public JsonSchema Generate(string json)
         {
             var token = JsonConvert.DeserializeObject<JToken>(json, new JsonSerializerSettings
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat
             });
 
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             Generate(token, schema, schema, "Anonymous");
             return schema;
         }
 
-        private void Generate(JToken token, JsonSchema4 schema, JsonSchema4 rootSchema, string typeNameHint)
+        private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)
             {
-                JsonSchema4 referencedSchema = null;
+                JsonSchema referencedSchema = null;
                 if (token is JObject obj)
                 {
                     var properties = obj.Properties();
@@ -51,7 +51,7 @@ namespace NJsonSchema.Generation
                 
                 if (referencedSchema == null)
                 {
-                    referencedSchema = new JsonSchema4();
+                    referencedSchema = new JsonSchema();
                     AddSchemaDefinition(rootSchema, referencedSchema, typeNameHint);
                 }
 
@@ -63,7 +63,7 @@ namespace NJsonSchema.Generation
             GenerateWithoutReference(token, schema, rootSchema, typeNameHint);
         }
 
-        private void GenerateWithoutReference(JToken token, JsonSchema4 schema, JsonSchema4 rootSchema, string typeNameHint)
+        private void GenerateWithoutReference(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             if (token == null)
                 return;
@@ -132,12 +132,12 @@ namespace NJsonSchema.Generation
                 schema.Format = JsonFormatStrings.TimeSpan;
         }
 
-        private void GenerateObject(JToken token, JsonSchema4 schema, JsonSchema4 rootSchema)
+        private void GenerateObject(JToken token, JsonSchema schema, JsonSchema rootSchema)
         {
             schema.Type = JsonObjectType.Object;
             foreach (var property in ((JObject)token).Properties())
             {
-                var propertySchema = new JsonProperty();
+                var propertySchema = new JsonSchemaProperty();
                 var propertyName = property.Value.Type == JTokenType.Array ? ConversionUtilities.Singularize(property.Name) : property.Name;
                 var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(propertyName, true);
 
@@ -146,29 +146,29 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void GenerateArray(JToken token, JsonSchema4 schema, JsonSchema4 rootSchema, string typeNameHint)
+        private void GenerateArray(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             schema.Type = JsonObjectType.Array;
 
             var itemSchemas = ((JArray)token).Select(item =>
             {
-                var itemSchema = new JsonSchema4();
+                var itemSchema = new JsonSchema();
                 GenerateWithoutReference(item, itemSchema, rootSchema, typeNameHint);
                 return itemSchema;
             }).ToList();
 
             if (itemSchemas.Count == 0)
-                schema.Item = new JsonSchema4();
+                schema.Item = new JsonSchema();
             else if (itemSchemas.GroupBy(s => s.Type).Count() == 1)
                 MergeAndAssignItemSchemas(rootSchema, schema, itemSchemas, typeNameHint);
             else
                 schema.Item = itemSchemas.First();
         }
 
-        private void MergeAndAssignItemSchemas(JsonSchema4 rootSchema, JsonSchema4 schema, List<JsonSchema4> itemSchemas, string typeNameHint)
+        private void MergeAndAssignItemSchemas(JsonSchema rootSchema, JsonSchema schema, List<JsonSchema> itemSchemas, string typeNameHint)
         {
             var firstItemSchema = itemSchemas.First();
-            var itemSchema = new JsonSchema4
+            var itemSchema = new JsonSchema
             {
                 Type = firstItemSchema.Type
             };
@@ -180,10 +180,10 @@ namespace NJsonSchema.Generation
             }
 
             AddSchemaDefinition(rootSchema, itemSchema, typeNameHint);
-            schema.Item = new JsonSchema4 { Reference = itemSchema };
+            schema.Item = new JsonSchema { Reference = itemSchema };
         }
 
-        private void AddSchemaDefinition(JsonSchema4 rootSchema, JsonSchema4 schema, string typeNameHint)
+        private void AddSchemaDefinition(JsonSchema rootSchema, JsonSchema schema, string typeNameHint)
         {
             if (string.IsNullOrEmpty(typeNameHint) || rootSchema.Definitions.ContainsKey(typeNameHint))
             {
