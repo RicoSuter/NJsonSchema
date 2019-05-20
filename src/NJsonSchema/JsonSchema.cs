@@ -79,6 +79,42 @@ namespace NJsonSchema
                                                  " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 #endif
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static async Task<JsonSchema> FromTypeAsync<TType>()
+        {
+            return await FromTypeAsync<TType>(new JsonSchemaGeneratorSettings()).ConfigureAwait(false);
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static async Task<JsonSchema> FromTypeAsync(Type type)
+        {
+            return await FromTypeAsync(type, new JsonSchemaGeneratorSettings()).ConfigureAwait(false);
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static async Task<JsonSchema> FromTypeAsync<TType>(JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return await generator.GenerateAsync(typeof(TType)).ConfigureAwait(false);
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static async Task<JsonSchema> FromTypeAsync(Type type, JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return await generator.GenerateAsync(type).ConfigureAwait(false);
+        }
+
         /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
         /// <returns>The JSON Schema.</returns>
         public static JsonSchema FromSampleJson(string data)

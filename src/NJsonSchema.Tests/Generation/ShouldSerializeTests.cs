@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Generation;
-using Xunit;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -19,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_ShouldSerialize_method_exists_then_schema_is_generated()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromTypeAsync<Test>();
+            var schema = JsonSchema.FromTypeAsync<Test>();
 
             //// Act
 

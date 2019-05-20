@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.Samples
@@ -54,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo()
         {
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Person>();
+            var schema = await JsonSchema.FromTypeAsync<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m });
@@ -64,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo2()
         {
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Person>();
+            var schema = await JsonSchema.FromTypeAsync<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });

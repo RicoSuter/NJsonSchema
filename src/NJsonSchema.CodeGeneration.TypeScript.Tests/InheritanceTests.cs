@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NJsonSchema.Converters;
-using NJsonSchema.Generation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -31,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<MyContainer>();
+            var schema = await JsonSchema.FromTypeAsync<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -98,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<ExceptionContainer>();
+            var schema = await JsonSchema.FromTypeAsync<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });

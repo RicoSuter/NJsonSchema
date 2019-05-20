@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync(typeof(Teacher), settings);
+            var schema = await JsonSchema.FromTypeAsync(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -69,7 +69,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<IFoo>(settings);
+            var schema = await JsonSchema.FromTypeAsync<IFoo>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -99,7 +99,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Test>(settings);
+            var schema = await JsonSchema.FromTypeAsync<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -115,7 +115,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Test>(settings);
+            var schema = await JsonSchema.FromTypeAsync<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -144,7 +144,7 @@ namespace NJsonSchema.Tests.Generation
             var settings = new JsonSchemaGeneratorSettings();
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<A>(settings);
+            var schema = await JsonSchema.FromTypeAsync<A>(settings);
             var data = schema.ToJson();
 
             //// Assert

@@ -26,7 +26,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_dictionary_key_is_enum_then_csharp_has_enum_key()
         {
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Assert
@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable()
         {
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Assert
@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable_Swagger2()
         {
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2,
                 GenerateCustomNullableProperties = true

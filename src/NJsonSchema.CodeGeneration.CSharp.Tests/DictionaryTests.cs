@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Generation;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Xunit;
@@ -26,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_dictionary_key_is_enum_then_csharp_has_enum_key()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -42,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_dictionary_property_is_required_then_dictionary_instance_can_be_changed()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<EnumKeyDictionaryTest>();
+            var schema = await JsonSchema.FromTypeAsync<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act

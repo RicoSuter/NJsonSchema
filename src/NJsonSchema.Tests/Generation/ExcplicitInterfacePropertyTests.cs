@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -39,7 +38,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Foo>();
+            var schema = await JsonSchema.FromTypeAsync<Foo>();
 
             //// Assert
             Assert.Equal(1, schema.Properties.Count);

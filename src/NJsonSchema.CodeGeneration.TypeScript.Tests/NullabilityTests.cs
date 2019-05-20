@@ -12,7 +12,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task Strict_nullability_in_TypeScript2()
         {
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Person>(
+            var schema = await JsonSchema.FromTypeAsync<Person>(
                 new JsonSchemaGeneratorSettings
                 {
                     DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull
@@ -173,7 +173,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_array_item_is_nullable_then_generated_TypeScript_is_correct()
         {
             // Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithNullableArrayItems>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithNullableArrayItems>();
             var json = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {

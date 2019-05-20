@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -16,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
         public async Task When_class_is_abstract_then_is_abstract_CSharp_keyword_is_generated()
         {
             /// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<AbstractClass>();
+            var schema = await JsonSchema.FromTypeAsync<AbstractClass>();
 
             /// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());

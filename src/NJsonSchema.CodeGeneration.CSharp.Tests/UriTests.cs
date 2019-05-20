@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
@@ -17,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_uri_then_csharp_output_is_also_uri()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<ClassWithUri>();
+            var schema = await JsonSchema.FromTypeAsync<ClassWithUri>();
             var json = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 

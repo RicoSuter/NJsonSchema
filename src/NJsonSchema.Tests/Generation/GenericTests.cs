@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Generation;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_IEnumerable_then_it_should_become_a_json_array_type()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<Smth>();
+            var schema = await JsonSchema.FromTypeAsync<Smth>();
 
             //// Act
             var json = schema.ToJson();
@@ -45,7 +44,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_open_generic_type_is_generated_then_no_exception_is_thrown()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync(typeof(A<>));
+            var schema = await JsonSchema.FromTypeAsync(typeof(A<>));
 
             //// Act
             var json = schema.ToJson();

@@ -1,4 +1,3 @@
-using NJsonSchema.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -42,7 +41,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_property_can_be_null_then_null_is_allowed2()
         {
             //// Arrange
-            var schema = await JsonSchemaGenerator.FromTypeAsync<NullablePropertyClass>();
+            var schema = await JsonSchema.FromTypeAsync<NullablePropertyClass>();
             var schemaData = schema.ToJson();
 
             //// Act

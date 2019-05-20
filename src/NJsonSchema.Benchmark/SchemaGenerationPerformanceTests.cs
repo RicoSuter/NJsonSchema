@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using NBench;
-using NJsonSchema.Generation;
 using Pro.NBench.xUnit.XunitExtensions;
 using Xunit.Abstractions;
 
@@ -39,7 +38,7 @@ namespace NJsonSchema.Benchmark
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 100)]
         public void GenerateSchema()
         {
-            var schema = JsonSchemaGenerator.FromTypeAsync<Container>().GetAwaiter().GetResult();
+            var schema = JsonSchema.FromTypeAsync<Container>().GetAwaiter().GetResult();
             _counter.Increment();
         }
 
