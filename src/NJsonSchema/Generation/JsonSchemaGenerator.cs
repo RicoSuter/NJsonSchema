@@ -105,6 +105,20 @@ namespace NJsonSchema.Generation
 
         /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
         /// <typeparam name="TSchemaType">The type of the schema.</typeparam>
+        /// <param name="type">The type.</param>
+        /// <param name="schema">The schema.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        /// <returns>The schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not find value type of dictionary type.</exception>
+        public Task GenerateAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
+            where TSchemaType : JsonSchema, new()
+        {
+            // This overload should not be used in this library directly
+            return GenerateAsync(type.ToContextualType(), schema, schemaResolver);
+        }
+
+        /// <summary>Generates a <see cref="JsonSchema" /> object for the given type and adds the mapping to the given resolver.</summary>
+        /// <typeparam name="TSchemaType">The type of the schema.</typeparam>
         /// <param name="contextualType">The type.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="schemaResolver">The schema resolver.</param>
