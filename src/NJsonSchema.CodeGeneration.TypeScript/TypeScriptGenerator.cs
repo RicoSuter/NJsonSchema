@@ -110,7 +110,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             var model = new FileTemplateModel(Settings)
             {
-                Types = artifacts.Concatenate(),
+                Types = artifacts.OrderByBaseDependency().Concatenate(),
                 ExtensionCode = _extensionCode
             };
 

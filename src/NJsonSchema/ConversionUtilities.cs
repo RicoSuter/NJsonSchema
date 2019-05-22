@@ -22,17 +22,23 @@ namespace NJsonSchema
         public static string ConvertToLowerCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+            {
                 return "_" + input;
+            }
 
             return input;
         }
@@ -44,14 +50,18 @@ namespace NJsonSchema
         public static string ConvertToUpperCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+            {
                 return "_" + input;
+            }
 
             return input;
         }
@@ -101,7 +111,9 @@ namespace NJsonSchema
         public static string ConvertToCamelCase(string input)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             return ConvertDashesToCamelCase(input.Replace(" ", "_").Replace("/", "_"));
         }
@@ -134,7 +146,9 @@ namespace NJsonSchema
         public static string Singularize(string word)
         {
             if (word == "people")
+            {
                 return "Person";
+            }
 
             return word.EndsWith("s") ? word.Substring(0, word.Length - 1) : word;
         }
@@ -169,14 +183,18 @@ namespace NJsonSchema
             foreach (char c in input)
             {
                 if (c == '-')
+                {
                     caseFlag = true;
+                }
                 else if (caseFlag)
                 {
                     sb.Append(char.ToUpperInvariant(c));
                     caseFlag = false;
                 }
                 else
+                {
                     sb.Append(c);
+                }
             }
             return sb.ToString();
         }

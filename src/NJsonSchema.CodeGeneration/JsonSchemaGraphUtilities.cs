@@ -42,7 +42,9 @@ namespace NJsonSchema.CodeGeneration
 #pragma warning restore 1998
             {
                 if (schema.Inherits(_baseSchema) && _baseSchema != schema)
+                {
                     DerivedSchemas.Add(schema, typeNameHint);
+                }
 
                 return schema;
             }

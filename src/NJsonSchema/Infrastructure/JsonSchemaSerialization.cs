@@ -87,13 +87,17 @@ namespace NJsonSchema.Infrastructure
 
             var schema = FromJson<T>(json, contractResolver);
             if (schema is IDocumentPathProvider documentPathProvider)
+            {
                 documentPathProvider.DocumentPath = documentPath;
+            }
 
             var referenceResolver = referenceResolverFactory.Invoke(schema);
             if (schema is IJsonReference referenceSchema)
             {
                 if (!string.IsNullOrEmpty(documentPath))
+                {
                     referenceResolver.AddDocumentReference(documentPath, referenceSchema);
+                }
             }
 
             await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);

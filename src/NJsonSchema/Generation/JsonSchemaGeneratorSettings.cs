@@ -200,7 +200,7 @@ namespace NJsonSchema.Generation
         public bool GetActualGenerateAbstractSchema(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaAbstractAttribute", TypeNameStyle.Name));
+                .FirstAssignableToTypeNameOrDefault("JsonSchemaAbstractAttribute", TypeNameStyle.Name);
 
             return (GenerateAbstractSchemas && attribute == null) || attribute?.TryGetPropertyValue("IsAbstract", true) == true;
         }
@@ -211,7 +211,7 @@ namespace NJsonSchema.Generation
         public bool GetActualFlattenInheritanceHierarchy(Type type)
         {
             var attribute = type.GetTypeInfo().GetCustomAttributes(false)
-                .FirstOrDefault(a => a.GetType().IsAssignableToTypeName("JsonSchemaFlattenAttribute", TypeNameStyle.Name));
+                .FirstAssignableToTypeNameOrDefault("JsonSchemaFlattenAttribute", TypeNameStyle.Name);
 
             return (FlattenInheritanceHierarchy && attribute == null) || attribute?.TryGetPropertyValue("Flatten", true) == true;
         }
@@ -223,17 +223,23 @@ namespace NJsonSchema.Generation
             if (SerializerSettings != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                {
                     throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+                }
 
                 if (ContractResolver != null)
+                {
                     throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+                }
 
                 ActualContractResolver = SerializerSettings.ContractResolver;
             }
             else if (ContractResolver != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                {
                     throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+                }
 
                 ActualContractResolver = ContractResolver;
             }
@@ -258,13 +264,19 @@ namespace NJsonSchema.Generation
             if (SerializerSettings != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
+                {
                     throw new InvalidOperationException("The setting DefaultPropertyNameHandling cannot be used when ContractResolver or SerializerSettings is set.");
+                }
 
                 if (ContractResolver != null)
+                {
                     throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
+                }
 
                 if (DefaultEnumHandling != EnumHandling.Integer)
+                {
                     throw new InvalidOperationException("The setting DefaultEnumHandling cannot be used when SerializerSettings is set.");
+                }
 
                 ActualSerializerSettings = SerializerSettings;
             }
@@ -274,9 +286,13 @@ namespace NJsonSchema.Generation
                 settings.ContractResolver = ActualContractResolver;
 
                 if (DefaultEnumHandling == EnumHandling.String)
+                {
                     settings.Converters.Add(new StringEnumConverter());
+                }
                 else if (DefaultEnumHandling == EnumHandling.CamelCaseString)
+                {
                     settings.Converters.Add(new StringEnumConverter(true));
+                }
 
                 ActualSerializerSettings = settings;
             }

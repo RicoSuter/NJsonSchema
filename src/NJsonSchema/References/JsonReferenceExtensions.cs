@@ -16,17 +16,23 @@ namespace NJsonSchema.References
         public static object FindParentDocument(this IJsonReference obj)
         {
             if (obj.DocumentPath != null)
+            {
                 return obj;
+            }
 
             var parent = obj.PossibleRoot;
             if (parent == null)
+            {
                 return obj;
+            }
 
             while ((parent as IJsonReference)?.PossibleRoot != null)
             {
                 parent = ((IJsonReference)parent).PossibleRoot;
                 if (parent is IDocumentPathProvider pathProvider && pathProvider.DocumentPath != null)
+                {
                     return parent;
+                }
             }
 
             return parent;

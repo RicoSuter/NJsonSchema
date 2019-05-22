@@ -52,7 +52,9 @@ namespace NJsonSchema
                 Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else
+            {
                 Mapping[type.Name] = new JsonSchema { Reference = schema.ActualSchema };
+            }
         }
 
         /// <summary>

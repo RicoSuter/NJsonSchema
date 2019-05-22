@@ -53,10 +53,14 @@ namespace NJsonSchema.Generation
         public virtual void AddSchema(Type type, bool isIntegerEnumeration, JsonSchema schema)
         {
             if (schema.GetType() != typeof(JsonSchema))
+            {
                 throw new InvalidOperationException("Added schema is not a JsonSchema4 instance.");
+            }
 
             if (schema != RootObject)
+            {
                 AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
+            }
 
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
         }

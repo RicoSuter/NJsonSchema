@@ -217,16 +217,24 @@ namespace NJsonSchema
             get
             {
                 if (AllOf == null || AllOf.Count == 0 || HasReference)
+                {
                     return null;
+                }
 
                 if (AllOf.Count == 1)
+                {
                     return AllOf.First().ActualSchema;
+                }
 
                 if (AllOf.Any(s => s.HasReference && !s.ActualSchema.IsAnyType))
+                {
                     return AllOf.First(s => s.HasReference && !s.ActualSchema.IsAnyType).ActualSchema;
+                }
 
                 if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
+                {
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
+                }
 
                 return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
             }
@@ -241,7 +249,9 @@ namespace NJsonSchema
             get
             {
                 if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple)
+                {
                     return ActualTypeSchema;
+                }
 
                 return InheritedSchema;
             }
@@ -303,7 +313,9 @@ namespace NJsonSchema
                     .ToList();
 
                 if (duplicatedProperties.Any())
+                {
                     throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
+                }
 
 #if !LEGACY
                 return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
@@ -457,7 +469,9 @@ namespace NJsonSchema
             {
                 _dictionaryKey = value;
                 if (_dictionaryKey != null)
+                {
                     _dictionaryKey.Parent = this;
+                }
             }
         }
 
@@ -486,7 +500,9 @@ namespace NJsonSchema
                 _xmlObject = value;
 
                 if (_xmlObject != null)
+                {
                     _xmlObject.ParentSchema = this;
+                }
             }
         }
 
@@ -540,7 +556,9 @@ namespace NJsonSchema
                     _items = value;
 
                     if (_items != null)
+                    {
                         Item = null;
+                    }
                 }
             }
         }
@@ -554,7 +572,9 @@ namespace NJsonSchema
             {
                 _not = value;
                 if (_not != null)
+                {
                     _not.Parent = this;
+                }
             }
         }
 
@@ -630,7 +650,9 @@ namespace NJsonSchema
                 {
                     _allowAdditionalItems = value;
                     if (!_allowAdditionalItems)
+                    {
                         AdditionalItemsSchema = null;
+                    }
                 }
             }
         }
@@ -647,7 +669,9 @@ namespace NJsonSchema
                 {
                     _additionalItemsSchema = value;
                     if (_additionalItemsSchema != null)
+                    {
                         AllowAdditionalItems = true;
+                    }
                 }
             }
         }
@@ -664,7 +688,9 @@ namespace NJsonSchema
                 {
                     _allowAdditionalProperties = value;
                     if (!_allowAdditionalProperties)
+                    {
                         AdditionalPropertiesSchema = null;
+                    }
                 }
             }
         }
@@ -681,7 +707,9 @@ namespace NJsonSchema
                 {
                     _additionalPropertiesSchema = value;
                     if (_additionalPropertiesSchema != null)
+                    {
                         AllowAdditionalProperties = true;
+                    }
                 }
             }
         }
@@ -725,22 +753,34 @@ namespace NJsonSchema
         public virtual bool IsNullable(SchemaType schemaType)
         {
             if (IsNullableRaw == true)
+            {
                 return true;
+            }
 
             if (IsEnumeration && Enumeration.Contains(null))
+            {
                 return true;
+            }
 
             if (Type.HasFlag(JsonObjectType.Null))
+            {
                 return true;
+            }
 
             if ((Type == JsonObjectType.None || Type.HasFlag(JsonObjectType.Null)) && OneOf.Any(o => o.IsNullable(schemaType)))
+            {
                 return true;
+            }
 
             if (ActualSchema != this && ActualSchema.IsNullable(schemaType))
+            {
                 return true;
+            }
 
             if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -841,34 +881,54 @@ namespace NJsonSchema
         private void Initialize()
         {
             if (Items == null)
+            {
                 Items = new ObservableCollection<JsonSchema>();
+            }
 
             if (Properties == null)
+            {
                 Properties = new ObservableDictionary<string, JsonSchemaProperty>();
+            }
 
             if (PatternProperties == null)
+            {
                 PatternProperties = new ObservableDictionary<string, JsonSchemaProperty>();
+            }
 
             if (Definitions == null)
+            {
                 Definitions = new ObservableDictionary<string, JsonSchema>();
+            }
 
             if (RequiredProperties == null)
+            {
                 RequiredProperties = new ObservableCollection<string>();
+            }
 
             if (AllOf == null)
+            {
                 AllOf = new ObservableCollection<JsonSchema>();
+            }
 
             if (AnyOf == null)
+            {
                 AnyOf = new ObservableCollection<JsonSchema>();
+            }
 
             if (OneOf == null)
+            {
                 OneOf = new ObservableCollection<JsonSchema>();
+            }
 
             if (Enumeration == null)
+            {
                 Enumeration = new Collection<object>();
+            }
 
             if (EnumerationNames == null)
+            {
                 EnumerationNames = new Collection<string>();
+            }
         }
     }
 }

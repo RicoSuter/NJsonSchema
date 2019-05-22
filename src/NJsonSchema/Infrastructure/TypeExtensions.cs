@@ -66,14 +66,14 @@ namespace NJsonSchema.Infrastructure
             var attributes = type is ContextualType contextualType && attributeType == DescriptionAttributeType.Context ?
                 contextualType.ContextAttributes : type.TypeAttributes;
 
-            dynamic descriptionAttribute = attributes.TryGetAssignableToTypeName("System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
             {
                 return descriptionAttribute.Description;
             }
             else
             {
-                dynamic displayAttribute = attributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
                 {
                     return displayAttribute.Description;
@@ -81,7 +81,7 @@ namespace NJsonSchema.Infrastructure
 
                 if (type is ContextualMemberInfo contextualMember)
                 {
-                    var summary = await contextualMember.MemberInfo.GetXmlSummaryAsync().ConfigureAwait(false);
+                    var summary = await contextualMember.GetXmlDocsSummaryAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
                     {
                         return summary;
@@ -89,7 +89,7 @@ namespace NJsonSchema.Infrastructure
                 }
                 else if (type != null)
                 {
-                    var summary = await type.Type.GetXmlSummaryAsync().ConfigureAwait(false);
+                    var summary = await type.GetXmlDocsSummaryAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
                     {
                         return summary;
@@ -105,14 +105,14 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static async Task<string> GetDescriptionAsync(this ContextualParameterInfo parameter)
         {
-            dynamic descriptionAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DescriptionAttribute");
+            dynamic descriptionAttribute = parameter.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
             {
                 return descriptionAttribute.Description;
             }
             else
             {
-                dynamic displayAttribute = parameter.ContextAttributes.TryGetAssignableToTypeName("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic displayAttribute = parameter.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
                 {
                     return displayAttribute.Description;
@@ -120,9 +120,11 @@ namespace NJsonSchema.Infrastructure
 
                 if (parameter != null)
                 {
-                    var summary = await parameter.ParameterInfo.GetXmlDocumentationAsync().ConfigureAwait(false);
+                    var summary = await parameter.GetXmlDocsAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
+                    {
                         return summary;
+                    }
                 }
             }
 

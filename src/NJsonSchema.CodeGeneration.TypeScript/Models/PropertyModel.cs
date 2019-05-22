@@ -64,7 +64,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (Type == ConstructorInterfaceType)
+                {
                     return false;
+                }
 
                 if (IsArray)
                 {
@@ -101,9 +103,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (IsNullable && _settings.SupportsStrictNullChecks)
+                {
                     return " | " + _settings.NullValue.ToString().ToLowerInvariant();
+                }
                 else
+                {
                     return string.Empty;
+                }
             }
         }
 

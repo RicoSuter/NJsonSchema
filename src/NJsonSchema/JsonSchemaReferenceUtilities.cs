@@ -78,7 +78,9 @@ namespace NJsonSchema
             var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
 
             foreach (var p in schemaReferences)
+            {
                 p.Key.ReferencePath = result[p.Value];
+            }
         }
 
         private class JsonReferenceUpdater : JsonReferenceVisitorBase
@@ -150,7 +152,9 @@ namespace NJsonSchema
                 if (reference.Reference != null)
                 {
                     if (!_removeExternalReferences || reference.Reference.DocumentPath == null)
+                    {
                         _schemaReferences[reference] = reference.Reference.ActualObject;
+                    }
                     else
                     {
                         var externalReference = reference.Reference;

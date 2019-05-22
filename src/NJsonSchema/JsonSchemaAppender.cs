@@ -38,17 +38,26 @@ namespace NJsonSchema
         public virtual void AppendSchema(JsonSchema schema, string typeNameHint)
         {
             if (schema == null)
+            {
                 throw new ArgumentNullException(nameof(schema));
+            }
+
             if (schema == RootObject)
+            {
                 throw new ArgumentException("The root schema cannot be appended.");
+            }
 
             if (!RootSchema.Definitions.Values.Contains(schema))
             {
                 var typeName = _typeNameGenerator.Generate(schema, typeNameHint, RootSchema.Definitions.Keys);
                 if (!string.IsNullOrEmpty(typeName) && !RootSchema.Definitions.ContainsKey(typeName))
+                {
                     RootSchema.Definitions[typeName] = schema;
+                }
                 else
+                {
                     RootSchema.Definitions["ref_" + Guid.NewGuid().ToString().Replace("-", "_")] = schema;
+                }
             }
         }
     }

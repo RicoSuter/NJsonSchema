@@ -55,11 +55,12 @@ namespace NJsonSchema.Demo
             var expectedFails = 11;
             var expectedExceptions = 14;
             if (fails != expectedFails || exceptions != expectedExceptions)
+            {
                 Console.WriteLine("========================\n" +
                                   "Unexpected result => Some commits changed the outcome! Please check. \n" +
                                   "Expected fails: " + expectedFails + "\n" +
                                   "Expected exceptions: " + expectedExceptions);
-
+            }
 
             Console.ReadLine();
 
@@ -86,17 +87,25 @@ namespace NJsonSchema.Demo
                 var success = expectedResult ? errors.Count == 0 : errors.Count > 0;
 
                 if (!success)
+                {
                     Console.ForegroundColor = ConsoleColor.Red;
+                }
 
                 Console.WriteLine("      Result: " + success);
 
                 if (!success)
+                {
                     Console.ForegroundColor = ConsoleColor.Gray;
+                }
 
                 if (!success)
+                {
                     fails++;
+                }
                 else
+                {
                     passes++;
+                }
             }
             catch (Exception ex)
             {

@@ -158,7 +158,9 @@ namespace NJsonSchema.Converters
         {
             var jObject = serializer.Deserialize<JObject>(reader);
             if (jObject == null)
+            {
                 return null;
+            }
 
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
@@ -190,22 +192,30 @@ namespace NJsonSchema.Converters
         protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
         {
             if (objectType.Name == discriminatorValue)
+            {
                 return objectType;
+            }
 
             var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminatorValue);
             if (knownTypeAttributesSubtype != null)
+            {
                 return knownTypeAttributesSubtype;
+            }
 
             var typeName = objectType.Namespace + "." + discriminatorValue;
             var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
             if (subtype != null)
+            {
                 return subtype;
+            }
 
             if (_readTypeProperty)
             {
                 var typeInfo = jObject.GetValue("$type");
                 if (typeInfo != null)
+                {
                     return Type.GetType(typeInfo.Value<string>());
+                }
             }
 
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
@@ -221,7 +231,9 @@ namespace NJsonSchema.Converters
                 foreach (dynamic attribute in knownTypeAttributes)
                 {
                     if (attribute.Type != null && attribute.Type.Name == discriminator)
+                    {
                         return attribute.Type;
+                    }
                     else if (attribute.MethodName != null)
                     {
                         var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
@@ -231,7 +243,9 @@ namespace NJsonSchema.Converters
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminator)
+                                {
                                     return knownType;
+                                }
                             }
                             return null;
                         }

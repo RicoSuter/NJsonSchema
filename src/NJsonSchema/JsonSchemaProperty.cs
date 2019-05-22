@@ -31,7 +31,9 @@ namespace NJsonSchema
                 _parent = value;
 
                 if (initialize && InitialIsRequired)
+                {
                     IsRequired = InitialIsRequired;
+                }
             }
         }
 
@@ -43,18 +45,24 @@ namespace NJsonSchema
             set
             {
                 if (ParentSchema == null)
+                {
                     InitialIsRequired = value;
+                }
                 else
                 {
                     if (value)
                     {
                         if (!ParentSchema.RequiredProperties.Contains(Name))
+                        {
                             ParentSchema.RequiredProperties.Add(Name);
+                        }
                     }
                     else
                     {
                         if (ParentSchema.RequiredProperties.Contains(Name))
+                        {
                             ParentSchema.RequiredProperties.Remove(Name);
+                        }
                     }
                 }
             }
@@ -84,7 +92,9 @@ namespace NJsonSchema
         public override bool IsNullable(SchemaType schemaType)
         {
             if (schemaType == SchemaType.Swagger2 && IsRequired == false)
+            {
                 return true;
+            }
 
             return base.IsNullable(schemaType);
         }

@@ -45,7 +45,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
             }
             else
+            {
                 AllProperties = Properties;
+            }
         }
 
         /// <summary>Gets or sets the class name.</summary>

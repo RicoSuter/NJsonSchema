@@ -105,16 +105,24 @@ namespace NJsonSchema
             get
             {
                 if (JsonSchemaSerialization.CurrentSchemaType != SchemaType.Swagger2)
+                {
                     return DiscriminatorObject;
+                }
                 else
+                {
                     return Discriminator;
+                }
             }
             set
             {
                 if (value is string)
+                {
                     Discriminator = (string)value;
+                }
                 else if (value != null)
+                {
                     DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
+                }
             }
         }
 
@@ -130,11 +138,17 @@ namespace NJsonSchema
             set
             {
                 if (value is bool)
+                {
                     IsExclusiveMaximum = (bool)value;
+                }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
+                {
                     IsExclusiveMaximum = value.Equals("true");
+                }
                 else if (value != null)
+                {
                     ExclusiveMaximum = Convert.ToDecimal(value);
+                }
             }
         }
 
@@ -146,11 +160,17 @@ namespace NJsonSchema
             set
             {
                 if (value is bool)
+                {
                     IsExclusiveMinimum = (bool)value;
+                }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
+                {
                     IsExclusiveMinimum = value.Equals("true");
+                }
                 else if (value != null)
+                {
                     ExclusiveMinimum = Convert.ToDecimal(value);
+                }
             }
         }
 
@@ -160,19 +180,31 @@ namespace NJsonSchema
             get
             {
                 if (AdditionalItemsSchema != null)
+                {
                     return AdditionalItemsSchema;
+                }
+
                 if (!AllowAdditionalItems)
+                {
                     return false;
+                }
+
                 return null;
             }
             set
             {
                 if (value is bool)
+                {
                     AllowAdditionalItems = (bool)value;
+                }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
+                {
                     AllowAdditionalItems = value.Equals("true");
+                }
                 else if (value != null)
+                {
                     AdditionalItemsSchema = FromJsonWithCurrentSettings(value);
+                }
             }
         }
 
@@ -182,19 +214,31 @@ namespace NJsonSchema
             get
             {
                 if (AdditionalPropertiesSchema != null)
+                {
                     return AdditionalPropertiesSchema;
+                }
+
                 if (!AllowAdditionalProperties)
+                {
                     return false;
+                }
+
                 return null;
             }
             set
             {
                 if (value is bool)
+                {
                     AllowAdditionalProperties = (bool)value;
+                }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
+                {
                     AllowAdditionalProperties = value.Equals("true");
+                }
                 else if (value != null)
+                {
                     AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value);
+                }
             }
         }
 
@@ -204,17 +248,27 @@ namespace NJsonSchema
             get
             {
                 if (Item != null)
+                {
                     return Item;
+                }
+
                 if (Items.Count > 0)
+                {
                     return Items;
+                }
+
                 return null;
             }
             set
             {
                 if (value is JArray)
+                {
                     Items = new ObservableCollection<JsonSchema>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t)));
+                }
                 else if (value != null)
+                {
                     Item = FromJsonWithCurrentSettings(value);
+                }
             }
         }
 
@@ -226,16 +280,22 @@ namespace NJsonSchema
             get
             {
                 if (_typeRaw == null)
+                {
                     ResetTypeRaw();
+                }
 
                 return _typeRaw.Value;
             }
             set
             {
                 if (value is JArray)
+                {
                     Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
+                }
                 else
+                {
                     Type = ConvertStringToJsonObjectType(value as string);
+                }
 
                 ResetTypeRaw();
             }
@@ -250,10 +310,14 @@ namespace NJsonSchema
                     .ToArray();
 
                 if (flags.Length > 1)
+                {
                     return new JArray(flags.Select(f => new JValue(f.ToString().ToLowerInvariant())));
+                }
 
                 if (flags.Length == 1)
+                {
                     return new JValue(flags[0].ToString().ToLowerInvariant());
+                }
 
                 return null;
             });
@@ -340,7 +404,9 @@ namespace NJsonSchema
         private void RegisterProperties(IDictionary<string, JsonSchemaProperty> oldCollection, IDictionary<string, JsonSchemaProperty> newCollection)
         {
             if (oldCollection != null)
+            {
                 ((ObservableDictionary<string, JsonSchemaProperty>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+            }
 
             if (newCollection != null)
             {
@@ -353,7 +419,9 @@ namespace NJsonSchema
             where T : JsonSchema
         {
             if (oldCollection != null)
+            {
                 ((ObservableDictionary<string, T>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+            }
 
             if (newCollection != null)
             {
@@ -365,7 +433,9 @@ namespace NJsonSchema
         private void RegisterSchemaCollection(ICollection<JsonSchema> oldCollection, ICollection<JsonSchema> newCollection)
         {
             if (oldCollection != null)
+            {
                 ((ObservableCollection<JsonSchema>)oldCollection).CollectionChanged -= InitializeSchemaCollection;
+            }
 
             if (newCollection != null)
             {
@@ -389,7 +459,9 @@ namespace NJsonSchema
             {
                 var collection = (ObservableCollection<JsonSchema>)sender;
                 foreach (var item in collection)
+                {
                     item.Parent = this;
+                }
             }
             else if (sender is ObservableDictionary<string, JsonSchema>)
             {

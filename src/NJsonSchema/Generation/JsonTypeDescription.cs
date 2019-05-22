@@ -94,7 +94,9 @@ namespace NJsonSchema.Generation
         {
             var typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == _type);
             if (typeMapper != null)
+            {
                 return typeMapper.UseReference;
+            }
 
             return !IsDictionary && (Type.HasFlag(JsonObjectType.Object) || IsEnum);
         }

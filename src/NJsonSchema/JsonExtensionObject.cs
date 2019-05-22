@@ -64,7 +64,9 @@ namespace NJsonSchema
             if (extensionObject.ExtensionData != null)
             {
                 foreach (var pair in extensionObject.ExtensionData.ToArray())
+                {
                     extensionObject.ExtensionData[pair.Key] = TryDeserializeValueSchemas(pair.Value, serializer);
+                }
             }
         }
 
@@ -87,16 +89,22 @@ namespace NJsonSchema
 
                 var dictionary = new Dictionary<string, object>();
                 foreach (var property in obj.Properties())
+                {
                     dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);
+                }
 
                 return dictionary;
             }
 
             if (value is JArray array)
+            {
                 return array.Select(i => TryDeserializeValueSchemas(i, serializer)).ToArray();
+            }
 
             if (value is JValue token)
+            {
                 return token.Value;
+            }
 
             return value;
         }

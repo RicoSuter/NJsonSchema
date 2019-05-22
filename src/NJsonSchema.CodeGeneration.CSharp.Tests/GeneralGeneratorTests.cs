@@ -1737,7 +1737,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             var sb = new StringBuilder();
             foreach (var e in errors)
+            {
                 sb.AppendLine($"{e.Id} at {e.Location}: {e.GetMessage()}");
+            }
 
             Assert.Empty(sb.ToString());
         }

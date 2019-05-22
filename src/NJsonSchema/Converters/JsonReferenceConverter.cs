@@ -56,9 +56,13 @@ namespace NJsonSchema.Converters
                 json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
 
                 if (writer.WriteState == WriteState.Property)
+                {
                     writer.WriteRawValue(json);
+                }
                 else
+                {
                     writer.WriteRaw(json);
+                }
             }
             finally
             {

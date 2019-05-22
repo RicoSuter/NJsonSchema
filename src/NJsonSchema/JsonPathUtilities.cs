@@ -62,7 +62,9 @@ namespace NJsonSchema
 #endif
         {
             if (rootObject == null)
+            {
                 throw new ArgumentNullException(nameof(rootObject));
+            }
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
             FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
@@ -81,13 +83,17 @@ namespace NJsonSchema
             string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
+            {
                 return false;
+            }
 
             if (searchedObjects.ContainsKey(obj))
             {
                 searchedObjects[obj] = basePath;
                 if (searchedObjects.All(p => p.Value != null))
+                {
                     return true;
+                }
             }
 
             checkedObjects.Add(obj);
@@ -97,7 +103,9 @@ namespace NJsonSchema
                 foreach (var key in ((IDictionary)obj).Keys)
                 {
                     if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects, contractResolver))
+                    {
                         return true;
+                    }
                 }
             }
             else if (obj is IEnumerable)
@@ -106,7 +114,9 @@ namespace NJsonSchema
                 foreach (var item in (IEnumerable)obj)
                 {
                     if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects, contractResolver))
+                    {
                         return true;
+                    }
 
                     i++;
                 }
