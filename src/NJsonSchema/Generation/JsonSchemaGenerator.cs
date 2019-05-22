@@ -916,7 +916,10 @@ namespace NJsonSchema.Generation
                 var propertyName = GetPropertyName(property, propertyInfo);
                 if (parentSchema.Properties.ContainsKey(propertyName))
                 {
-                    if (Settings.GenerateAbstractProperties && Settings.FlattenInheritanceHierarchy) return; // accept first instance of the duplicate
+                    // False positives can be generated with both settings set true.
+                    if (Settings.GenerateAbstractProperties && Settings.GetActualFlattenInheritanceHierarchy(parentType)) {
+                        return; // accept first instance of the duplicate
+                    }
 
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
                 }
