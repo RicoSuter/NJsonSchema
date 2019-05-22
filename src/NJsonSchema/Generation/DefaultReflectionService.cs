@@ -193,12 +193,12 @@ namespace NJsonSchema.Generation
                 return false;
             }
 
-            if (contextualType.ContextAttributes.TryGetAssignableToTypeName("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
             {
                 return false;
             }
 
-            if (contextualType.ContextAttributes.TryGetAssignableToTypeName("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
             {
                 return true;
             }
