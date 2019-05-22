@@ -75,14 +75,20 @@ namespace NJsonSchema.CodeGeneration.Models
         {
             var propertyName = PropertyName;
             if (_property.IsEnumeration == false)
+            {
                 return propertyName;
+            }
 
             var className = _classTemplateModel.ClassName;
             if (className.Contains("Anonymous"))
+            {
                 return propertyName;
+            }
 
             if (propertyName.StartsWith(className, StringComparison.OrdinalIgnoreCase))
+            {
                 return propertyName;
+            }
 
             return className + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
         }

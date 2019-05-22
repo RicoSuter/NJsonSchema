@@ -27,7 +27,9 @@ namespace NJsonSchema.Infrastructure
             {
                 dynamic xmlTypeAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Xml.Serialization.XmlTypeAttribute");
                 if (xmlTypeAttribute != null)
+                {
                     GenerateXmlObject(xmlTypeAttribute.TypeName, xmlTypeAttribute.Namespace, false, false, schema);
+                }
             }
         }
 
@@ -101,9 +103,14 @@ namespace NJsonSchema.Infrastructure
             if (xmlAttribute != null)
             {
                 if (!string.IsNullOrEmpty(xmlAttribute.AttributeName))
+                {
                     xmlName = xmlAttribute.AttributeName;
+                }
+
                 if (!string.IsNullOrEmpty(xmlAttribute.Namespace))
+                {
                     xmlNamespace = xmlAttribute.Namespace;
+                }
             }
 
             // Due to that the JSON Reference is used, the xml name from the referenced type will be copied to the property.
@@ -118,7 +125,9 @@ namespace NJsonSchema.Infrastructure
             }
 
             if (!string.IsNullOrEmpty(xmlName) || xmlWrapped)
+            {
                 GenerateXmlObject(xmlName, xmlNamespace, xmlWrapped, xmlAttribute != null ? true : false, propertySchema);
+            }
         }
 
         private static void GenerateXmlObject(string name, string @namespace, bool wrapped, bool isAttribute, JsonSchema schema)
@@ -138,15 +147,25 @@ namespace NJsonSchema.Infrastructure
         private static string GetXmlItemName(Type type)
         {
             if (type == typeof(int))
+            {
                 return "int";
+            }
             else if (type == typeof(string))
+            {
                 return "string";
+            }
             else if (type == typeof(double))
+            {
                 return "double";
+            }
             else if (type == typeof(decimal))
+            {
                 return "decimal";
+            }
             else
+            {
                 return type.Name;
+            }
         }
     }
 }

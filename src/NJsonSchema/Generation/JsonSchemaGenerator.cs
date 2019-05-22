@@ -704,7 +704,9 @@ namespace NJsonSchema.Generation
                 foreach (dynamic attribute in knownTypeAttributes)
                 {
                     if (attribute.Type != null)
+                    {
                         await AddKnownTypeAsync(attribute.Type, schemaResolver).ConfigureAwait(false);
+                    }
                     else if (attribute.MethodName != null)
                     {
                         var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
@@ -714,12 +716,16 @@ namespace NJsonSchema.Generation
                             if (knownTypes != null)
                             {
                                 foreach (var knownType in knownTypes)
+                                {
                                     await AddKnownTypeAsync(knownType, schemaResolver).ConfigureAwait(false);
+                                }
                             }
                         }
                     }
                     else
+                    {
                         throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
+                    }
                 }
             }
 
@@ -914,7 +920,9 @@ namespace NJsonSchema.Generation
 
             var converters = Settings.ActualSerializerSettings.Converters.ToList();
             if (!converters.OfType<StringEnumConverter>().Any())
+            {
                 converters.Add(new StringEnumConverter());
+            }
 
             foreach (var enumName in Enum.GetNames(type))
             {
@@ -929,7 +937,9 @@ namespace NJsonSchema.Generation
                     var attributes = type.GetTypeInfo().GetDeclaredField(enumName).GetCustomAttributes();
                     dynamic enumMemberAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Runtime.Serialization.EnumMemberAttribute");
                     if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
+                    {
                         schema.Enumeration.Add((string)enumMemberAttribute.Value);
+                    }
                     else
                     {
                         var value = Enum.Parse(type, enumName);
@@ -955,7 +965,9 @@ namespace NJsonSchema.Generation
             {
                 var propertyName = GetPropertyName(jsonProperty, memberInfo.MemberInfo);
                 if (parentSchema.Properties.ContainsKey(propertyName))
+                {
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+                }
 
                 var requiredAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
@@ -990,7 +1002,9 @@ namespace NJsonSchema.Generation
                     if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
                     {
                         if (!parentSchema.RequiredProperties.Contains(propertyName))
+                        {
                             parentSchema.RequiredProperties.Add(propertyName);
+                        }
                     }
 
                     dynamic readOnlyAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");

@@ -30,7 +30,9 @@ namespace NJsonSchema
         public virtual string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
         {
             if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
+            {
                 typeNameHint = schema.DocumentPath.Replace("\\", "/").Split('/').Last();
+            }
 
             typeNameHint = (typeNameHint ?? "")
                 .Replace("[", " Of ")
@@ -45,7 +47,9 @@ namespace NJsonSchema
 
             var typeName = Generate(schema, typeNameHint);
             if (string.IsNullOrEmpty(typeName) || reservedTypeNames.Contains(typeName))
+            {
                 typeName = GenerateAnonymousTypeName(typeNameHint, reservedTypeNames);
+            }
 
             return typeName;
         }
@@ -70,12 +74,16 @@ namespace NJsonSchema
             if (!string.IsNullOrEmpty(typeNameHint))
             {
                 if (TypeNameMappings.ContainsKey(typeNameHint))
+                {
                     typeNameHint = TypeNameMappings[typeNameHint];
+                }
 
                 typeNameHint = typeNameHint.Split('.').Last();
 
                 if (!reservedTypeNames.Contains(typeNameHint) && !ReservedTypeNames.Contains(typeNameHint))
+                {
                     return typeNameHint;
+                }
 
                 var count = 1;
                 do

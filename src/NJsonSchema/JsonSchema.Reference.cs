@@ -93,23 +93,33 @@ namespace NJsonSchema
         private JsonSchema GetActualSchema(IList<JsonSchema> checkedSchemas)
         {
             if (checkedSchemas.Contains(this))
+            {
                 throw new InvalidOperationException("Cyclic references detected.");
+            }
 
             if (((IJsonReferenceBase)this).ReferencePath != null && Reference == null)
+            {
                 throw new InvalidOperationException("The schema reference path '" + ((IJsonReferenceBase)this).ReferencePath + "' has not been resolved.");
+            }
 
             if (HasReference)
             {
                 checkedSchemas.Add(this);
 
                 if (HasAllOfSchemaReference)
+                {
                     return AllOf.First().GetActualSchema(checkedSchemas);
+                }
 
                 if (HasOneOfSchemaReference)
+                {
                     return OneOf.First().GetActualSchema(checkedSchemas);
+                }
 
                 if (HasAnyOfSchemaReference)
+                {
                     return AnyOf.First().GetActualSchema(checkedSchemas);
+                }
 
                 return Reference.GetActualSchema(checkedSchemas);
             }

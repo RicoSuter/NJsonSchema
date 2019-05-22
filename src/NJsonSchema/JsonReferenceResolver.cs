@@ -83,7 +83,10 @@ namespace NJsonSchema
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
             var schema = ResolveDocumentReference(rootObject, allSegments, new HashSet<object>());
             if (schema == null)
+            {
                 throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
+            }
+
             return schema;
         }
 
@@ -109,7 +112,9 @@ namespace NJsonSchema
             if (jsonPath == "#")
             {
                 if (rootObject is IJsonReference)
+                {
                     return (IJsonReference)rootObject;
+                }
 
                 throw new InvalidOperationException("Could not resolve the JSON path '#' because the root object is not a JsonSchema4.");
             }
@@ -118,7 +123,9 @@ namespace NJsonSchema
                 return ResolveDocumentReference(rootObject, jsonPath);
             }
             else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
+            {
                 return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, append).ConfigureAwait(false);
+            }
             else
             {
                 var documentPathProvider = rootObject as IDocumentPathProvider;
@@ -138,7 +145,9 @@ namespace NJsonSchema
                     }
                 }
                 else
+                {
                     throw new NotSupportedException("Could not resolve the JSON path '" + jsonPath + "' because no document path is available.");
+                }
             }
         }
 
@@ -201,15 +210,21 @@ namespace NJsonSchema
         private IJsonReference ResolveDocumentReference(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
+            {
                 return null;
+            }
 
             if (obj is IJsonReference reference && reference.Reference != null)
             {
                 var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, checkedObjects);
                 if (result == null)
+                {
                     return ResolveDocumentReferenceWithoutDereferencing(obj, segments, checkedObjects);
+                }
                 else
+                {
                     return result;
+                }
             }
 
             return ResolveDocumentReferenceWithoutDereferencing(obj, segments, checkedObjects);
@@ -218,7 +233,9 @@ namespace NJsonSchema
         private IJsonReference ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, HashSet<object> checkedObjects)
         {
             if (segments.Count == 0)
+            {
                 return obj as IJsonReference;
+            }
 
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
@@ -226,8 +243,10 @@ namespace NJsonSchema
             if (obj is IDictionary)
             {
                 if (((IDictionary)obj).Contains(firstSegment))
+                {
                     return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(),
                         checkedObjects);
+                }
             }
             else if (obj is IEnumerable)
             {
@@ -236,7 +255,9 @@ namespace NJsonSchema
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
+                    {
                         return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), checkedObjects);
+                    }
                 }
             }
             else

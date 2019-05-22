@@ -61,7 +61,10 @@ namespace NJsonSchema.Visitors
         protected virtual async Task VisitAsync(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
         {
             if (obj == null || checkedObjects.Contains(obj))
+            {
                 return;
+            }
+
             checkedObjects.Add(obj);
 
             if (obj is IJsonReference reference)
@@ -77,16 +80,24 @@ namespace NJsonSchema.Visitors
             if (obj is JsonSchema schema)
             {
                 if (schema.Reference != null)
+                {
                     await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o).ConfigureAwait(false);
+                }
 
                 if (schema.AdditionalItemsSchema != null)
+                {
                     await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o).ConfigureAwait(false);
+                }
 
                 if (schema.AdditionalPropertiesSchema != null)
+                {
                     await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o).ConfigureAwait(false);
+                }
 
                 if (schema.Item != null)
+                {
                     await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o).ConfigureAwait(false);
+                }
 
                 for (var i = 0; i < schema.Items.Count; i++)
                 {
@@ -113,22 +124,32 @@ namespace NJsonSchema.Visitors
                 }
 
                 if (schema.Not != null)
+                {
                     await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o).ConfigureAwait(false);
+                }
 
                 foreach (var p in schema.Properties.ToArray())
+                {
                     await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
+                }
 
                 foreach (var p in schema.PatternProperties.ToArray())
+                {
                     await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
+                }
 
                 foreach (var p in schema.Definitions.ToArray())
                 {
                     await VisitAsync(p.Value, path + "/definitions/" + p.Key, p.Key, checkedObjects, o =>
                     {
                         if (o != null)
+                        {
                             schema.Definitions[p.Key] = (JsonSchema)o;
+                        }
                         else
+                        {
                             schema.Definitions.Remove(p.Key);
+                        }
                     }).ConfigureAwait(false);
                 }
             }
@@ -189,14 +210,18 @@ namespace NJsonSchema.Visitors
         {
             ((Collection<T>)collection).RemoveAt(index);
             if (obj != null)
+            {
                 ((Collection<T>)collection).Insert(index, obj);
+            }
         }
 
         private void ReplaceOrDelete(IList collection, int index, object obj)
         {
             collection.RemoveAt(index);
             if (obj != null)
+            {
                 collection.Insert(index, obj);
+            }
         }
     }
 }

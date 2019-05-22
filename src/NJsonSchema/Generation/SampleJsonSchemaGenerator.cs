@@ -66,7 +66,9 @@ namespace NJsonSchema.Generation
         private void GenerateWithoutReference(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             if (token == null)
+            {
                 return;
+            }
 
             switch (token.Type)
             {
@@ -123,13 +125,19 @@ namespace NJsonSchema.Generation
             }
 
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
+            {
                 schema.Format = JsonFormatStrings.Date;
+            }
 
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+            {
                 schema.Format = JsonFormatStrings.DateTime;
+            }
 
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+            {
                 schema.Format = JsonFormatStrings.TimeSpan;
+            }
         }
 
         private void GenerateObject(JToken token, JsonSchema schema, JsonSchema rootSchema)
@@ -158,11 +166,17 @@ namespace NJsonSchema.Generation
             }).ToList();
 
             if (itemSchemas.Count == 0)
+            {
                 schema.Item = new JsonSchema();
+            }
             else if (itemSchemas.GroupBy(s => s.Type).Count() == 1)
+            {
                 MergeAndAssignItemSchemas(rootSchema, schema, itemSchemas, typeNameHint);
+            }
             else
+            {
                 schema.Item = itemSchemas.First();
+            }
         }
 
         private void MergeAndAssignItemSchemas(JsonSchema rootSchema, JsonSchema schema, List<JsonSchema> itemSchemas, string typeNameHint)
@@ -176,7 +190,9 @@ namespace NJsonSchema.Generation
             if (firstItemSchema.Type == JsonObjectType.Object)
             {
                 foreach (var property in itemSchemas.SelectMany(s => s.Properties).GroupBy(p => p.Key))
+                {
                     itemSchema.Properties[property.Key] = property.First().Value;
+                }
             }
 
             AddSchemaDefinition(rootSchema, itemSchema, typeNameHint);

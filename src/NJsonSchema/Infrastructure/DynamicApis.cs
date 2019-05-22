@@ -62,7 +62,9 @@ namespace NJsonSchema.Infrastructure
         public static async Task<string> HttpGetAsync(string url)
         {
             if (!SupportsHttpClientApis)
+            {
                 throw new NotSupportedException("The System.Net.Http.HttpClient API is not available on this platform.");
+            }
 
             using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType))
             {
@@ -78,7 +80,9 @@ namespace NJsonSchema.Infrastructure
         public static Task<string> DirectoryGetCurrentDirectoryAsync()
         {
             if (!SupportsDirectoryApis)
+            {
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
 
             return FromResult((string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { }));
         }
@@ -91,7 +95,9 @@ namespace NJsonSchema.Infrastructure
         public static Task<string[]> DirectoryGetFilesAsync(string directory, string filter)
         {
             if (!SupportsDirectoryApis)
+            {
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
 
             return FromResult((string[])DirectoryType.GetRuntimeMethod("GetFiles",
                 new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { directory, filter }));
@@ -103,7 +109,9 @@ namespace NJsonSchema.Infrastructure
         public static Task DirectoryCreateDirectoryAsync(string directory)
         {
             if (!SupportsDirectoryApis)
+            {
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
 
             return FromResult(DirectoryType.GetRuntimeMethod("CreateDirectory",
                 new[] { typeof(string) }).Invoke(null, new object[] { directory }));
@@ -116,10 +124,14 @@ namespace NJsonSchema.Infrastructure
         public static Task<bool> DirectoryExistsAsync(string filePath)
         {
             if (!SupportsDirectoryApis)
+            {
                 throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
 
             if (string.IsNullOrEmpty(filePath))
+            {
                 return FromResult(false);
+            }
 
             return FromResult((bool)DirectoryType.GetRuntimeMethod("Exists",
                 new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
@@ -132,10 +144,14 @@ namespace NJsonSchema.Infrastructure
         public static Task<bool> FileExistsAsync(string filePath)
         {
             if (!SupportsFileApis)
+            {
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
+            }
 
             if (string.IsNullOrEmpty(filePath))
+            {
                 return FromResult(false);
+            }
 
             return FromResult((bool)FileType.GetRuntimeMethod("Exists",
                 new[] { typeof(string) }).Invoke(null, new object[] { filePath }));
@@ -148,7 +164,9 @@ namespace NJsonSchema.Infrastructure
         public static async Task<string> FileReadAllTextAsync(string filePath)
         {
             if (!SupportsFileApis)
+            {
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
+            }
 
             return await Task.Factory.StartNew(() => (string)FileType.GetRuntimeMethod("ReadAllText",
                 new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 })).ConfigureAwait(false);
@@ -162,7 +180,9 @@ namespace NJsonSchema.Infrastructure
         public static Task FileWriteAllTextAsync(string filePath, string text)
         {
             if (!SupportsFileApis)
+            {
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
+            }
 
             return FromResult(FileType.GetRuntimeMethod("WriteAllText",
                 new[] { typeof(string), typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, text, Encoding.UTF8 }));
@@ -176,7 +196,9 @@ namespace NJsonSchema.Infrastructure
         public static string PathCombine(string path1, string path2)
         {
             if (!SupportsPathApis)
+            {
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+            }
 
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
         }
@@ -188,7 +210,9 @@ namespace NJsonSchema.Infrastructure
         public static string GetFullPath(string path)
         {
             if (!SupportsPathApis)
+            {
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+            }
 
             return (string)PathType.GetRuntimeMethod("GetFullPath", new[] { typeof(string) }).Invoke(null, new object[] { path });
         }
@@ -200,7 +224,9 @@ namespace NJsonSchema.Infrastructure
         public static string PathGetDirectoryName(string filePath)
         {
             if (!SupportsPathApis)
+            {
                 throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+            }
 
             return (string)PathType.GetRuntimeMethod("GetDirectoryName", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
         }
@@ -213,7 +239,9 @@ namespace NJsonSchema.Infrastructure
         public static object XPathEvaluate(XDocument document, string path)
         {
             if (!SupportsXPathApis)
+            {
                 throw new NotSupportedException("The System.Xml.XPath.Extensions API is not available on this platform.");
+            }
 
             return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
         }
@@ -239,7 +267,9 @@ namespace NJsonSchema.Infrastructure
                 {
                     var type = Type.GetType(typeName, false);
                     if (type != null)
+                    {
                         return type;
+                    }
                 }
                 catch
                 {

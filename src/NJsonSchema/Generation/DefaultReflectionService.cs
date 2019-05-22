@@ -74,33 +74,51 @@ namespace NJsonSchema.Generation
             if (type == typeof(short) ||
                 type == typeof(uint) ||
                 type == typeof(ushort))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
+            }
 
             if (type == typeof(int))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
+            }
 
             if (type == typeof(long) ||
                 type == typeof(ulong))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
+            }
 
             if (type == typeof(double) ||
                 type == typeof(float))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Double);
+            }
 
             if (type == typeof(decimal))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
+            }
 
             if (type == typeof(bool))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Boolean, false, null);
+            }
 
             if (type == typeof(string) || type == typeof(Type))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
+            }
 
             if (type == typeof(char))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, null);
+            }
 
             if (type == typeof(Guid))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
+            }
 
             // Date & time types
 
@@ -110,31 +128,47 @@ namespace NJsonSchema.Generation
                 type.FullName == "NodaTime.LocalDateTime" ||
                 type.FullName == "NodaTime.ZonedDateTime" ||
                 type.FullName == "NodaTime.Instant")
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
+            }
 
             if (type == typeof(TimeSpan) ||
                 type.FullName == "NodaTime.Duration")
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
+            }
 
             if (type.FullName == "NodaTime.LocalDate")
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Date);
+            }
 
             if (type.FullName == "NodaTime.LocalTime")
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Time);
+            }
 
             // Special types
 
             if (type == typeof(Uri))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
+            }
 
             if (type == typeof(byte))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
+            }
 
             if (type == typeof(byte[]))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
+            }
 
             if (type.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name))
+            {
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+            }
 
             if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||

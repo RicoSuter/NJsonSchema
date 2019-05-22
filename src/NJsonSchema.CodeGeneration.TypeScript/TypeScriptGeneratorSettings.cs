@@ -96,7 +96,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         internal ITemplate CreateTemplate(string typeName, object model)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
+            {
                 return TemplateFactory.CreateTemplate("TypeScript", "Class", model);
+            }
 
             return TemplateFactory.CreateTemplate("TypeScript", TypeStyle.ToString(), model);
         }
@@ -107,7 +109,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeStyle GetTypeStyle(string typeName)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
+            {
                 return TypeScriptTypeStyle.Class;
+            }
 
             return TypeStyle;
         }

@@ -60,7 +60,9 @@ namespace NJsonSchema.CodeGeneration
         {
             var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
             if (assembly != null)
+            {
                 return assembly;
+            }
 
             throw new InvalidOperationException("The assembly '" + name + "' containting liquid templates could not be found.");
         }
@@ -79,7 +81,9 @@ namespace NJsonSchema.CodeGeneration
             if (resource != null)
             {
                 using (var reader = new StreamReader(resource))
+                {
                     return reader.ReadToEnd();
+                }
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
@@ -92,7 +96,9 @@ namespace NJsonSchema.CodeGeneration
             {
                 var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
+                {
                     return File.ReadAllText(templateFilePath);
+                }
             }
 
             return GetEmbeddedLiquidTemplate(language, template);
@@ -238,14 +244,18 @@ namespace NJsonSchema.CodeGeneration
                     var output = template.Render().Trim();
 
                     if (string.IsNullOrEmpty(output))
+                    {
                         result.Write("");
+                    }
                     else if (_tabCount >= 0)
                     {
                         result.Write(string.Join("", Enumerable.Repeat("    ", _tabCount)) +
                             ConversionUtilities.Tab(output, _tabCount) + "\r\n");
                     }
                     else
+                    {
                         result.Write(output);
+                    }
                 }
                 catch (InvalidOperationException)
                 {
@@ -257,9 +267,15 @@ namespace NJsonSchema.CodeGeneration
                 var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
                 model.Merge(context.Registers);
                 foreach (var scope in Enumerable.Reverse(context.Scopes))
+                {
                     model.Merge(scope);
+                }
+
                 foreach (var environment in Enumerable.Reverse(context.Environments))
+                {
                     model.Merge(environment);
+                }
+
                 return model;
             }
         }

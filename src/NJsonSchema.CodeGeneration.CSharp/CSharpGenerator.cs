@@ -102,9 +102,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.IsEnumeration)
+            {
                 return GenerateEnum(schema, typeName);
+            }
             else
+            {
                 return GenerateClass(schema, typeName);
+            }
         }
 
         private CodeArtifact GenerateClass(JsonSchema schema, string typeName)
@@ -124,7 +128,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var number = 1;
                 while (properties.Any(p => p.PropertyName == typeName + number))
+                {
                     number++;
+                }
 
                 propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
             }

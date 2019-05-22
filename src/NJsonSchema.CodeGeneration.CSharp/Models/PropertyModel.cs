@@ -70,16 +70,24 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
                     if (!_property.IsNullable(_settings.SchemaType))
+                    {
                         return "Newtonsoft.Json.Required.Always";
+                    }
                     else
+                    {
                         return "Newtonsoft.Json.Required.AllowNull";
+                    }
                 }
                 else
                 {
                     if (!_property.IsNullable(_settings.SchemaType))
+                    {
                         return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
+                    }
                     else
+                    {
                         return "Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
+                    }
                 }
             }
         }
@@ -90,7 +98,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.SchemaType))
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.IsAnyType ||
                        _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Object) ||
@@ -105,10 +115,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 if (!_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer))
+                {
                     return false;
+                }
 
                 return _property.Maximum.HasValue || _property.Minimum.HasValue;
             }
@@ -164,10 +178,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 if (_property.IsRequired && _property.MinLength == 1 && _property.MaxLength == null)
+                {
                     return false; // handled by RequiredAttribute
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
                        (_property.MinLength.HasValue || _property.MaxLength.HasValue);
@@ -186,7 +204,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MinItems > 0;
             }
@@ -201,7 +221,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MaxItems > 0;
             }
@@ -216,7 +238,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
                        !string.IsNullOrEmpty(_property.Pattern);

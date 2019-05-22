@@ -50,7 +50,9 @@ namespace NJsonSchema.CodeGeneration
         public virtual string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             if (schema.Default == null || !useSchemaDefault)
+            {
                 return null;
+            }
 
             var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.HasFlag(JsonObjectType.Object) && actualSchema.Type != JsonObjectType.None)
@@ -117,37 +119,59 @@ namespace NJsonSchema.CodeGeneration
         protected string ConvertNumberToString(object value)
         {
             if (value is byte)
+            {
                 return ((byte)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is sbyte)
+            {
                 return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is short)
+            {
                 return ((short)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is ushort)
+            {
                 return ((ushort)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is int)
+            {
                 return ((int)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is uint)
+            {
                 return ((uint)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is long)
+            {
                 return ((long)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is ulong)
+            {
                 return ((ulong)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             if (value is float)
+            {
                 return ((float)value).ToString("r", CultureInfo.InvariantCulture);
+            }
 
             if (value is double)
+            {
                 return ((double)value).ToString("r", CultureInfo.InvariantCulture);
+            }
 
             if (value is decimal)
+            {
                 return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+            }
 
             return null;
         }

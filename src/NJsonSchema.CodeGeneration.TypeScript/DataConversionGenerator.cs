@@ -104,25 +104,37 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type == TypeScriptDateTimeType.Date)
             {
                 if (format == JsonFormatStrings.DateTime)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.Time)
+                {
                     return false;
+                }
 
                 if (format == JsonFormatStrings.TimeSpan)
+                {
                     return false;
+                }
             }
             else if (type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.Time)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.TimeSpan)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -134,13 +146,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type == TypeScriptDateTimeType.Date)
             {
                 if (format == JsonFormatStrings.Date)
+                {
                     return true;
+                }
             }
             else if (type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -148,7 +164,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static bool IsNewableObject(JsonSchema schema, DataConversionParameters parameters)
         {
             if (schema.ActualTypeSchema.IsEnumeration)
+            {
                 return false;
+            }
 
             return parameters.Resolver.GeneratesType(schema);
         }

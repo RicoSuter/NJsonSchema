@@ -74,14 +74,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private string Resolve(JsonSchema schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)
+            {
                 throw new ArgumentNullException(nameof(schema));
+            }
 
             schema = GetResolvableSchema(schema);
 
             // Primitive schemas (no new type)
 
             if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
+            {
                 return "any";
+            }
 
             var type = schema.ActualTypeSchema.Type;
             if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
@@ -92,27 +96,41 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
 
             if (type.HasFlag(JsonObjectType.Number))
+            {
                 return "number";
+            }
 
             if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+            {
                 return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
+            }
 
             if (type.HasFlag(JsonObjectType.Boolean))
+            {
                 return "boolean";
+            }
 
             if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+            {
                 return ResolveString(schema.ActualTypeSchema, typeNameHint);
+            }
 
             if (schema.IsBinary)
+            {
                 return "any";
+            }
 
             // Type generating schemas
 
             if (schema.ActualTypeSchema.IsEnumeration)
+            {
                 return GetOrGenerateTypeName(schema, typeNameHint);
+            }
 
             if (schema.Type.HasFlag(JsonObjectType.Array))
+            {
                 return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
+            }
 
             if (schema.IsDictionary)
             {
@@ -142,31 +160,47 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (Settings.DateTimeType == TypeScriptDateTimeType.Date)
             {
                 if (schema.Format == JsonFormatStrings.Date)
+                {
                     return "Date";
+                }
 
                 if (schema.Format == JsonFormatStrings.DateTime)
+                {
                     return "Date";
+                }
 
                 if (schema.Format == JsonFormatStrings.Time)
+                {
                     return "string";
+                }
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
                     return "string";
+                }
             }
             else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                      Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.DateTime)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.Time)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
                     return "moment.Duration";
+                }
             }
 
             return "string";

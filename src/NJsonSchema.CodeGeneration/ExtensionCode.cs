@@ -34,7 +34,9 @@ namespace NJsonSchema.CodeGeneration
 		public string GetExtensionClassBody(string className)
         {
 			if (!ExtensionClasses.ContainsKey(className))
-				throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
+            {
+                throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
+            }
 
             var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
             return match.Groups[3].Value;

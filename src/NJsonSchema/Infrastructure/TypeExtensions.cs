@@ -122,7 +122,9 @@ namespace NJsonSchema.Infrastructure
                 {
                     var summary = await parameter.GetXmlDocsAsync().ConfigureAwait(false);
                     if (summary != string.Empty)
+                    {
                         return summary;
+                    }
                 }
             }
 
