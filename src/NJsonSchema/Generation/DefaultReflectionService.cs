@@ -254,6 +254,21 @@ namespace NJsonSchema.Generation
                    defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
         }
 
+        /// <summary>Checks whether the give type is a string enum.</summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="serializerSettings">The serializer settings.</param>
+        /// <returns>The result.</returns>
+        public bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
+        {
+            if (!contextualType.TypeInfo.IsEnum)
+            {
+                return false;
+            }
+
+            var hasGlobalStringEnumConverter = serializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            return hasGlobalStringEnumConverter || HasStringEnumConverter(contextualType);
+        }
+
         /// <summary>Checks whether the given type is a file/binary type.</summary>
         /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
@@ -351,12 +366,6 @@ namespace NJsonSchema.Generation
         }
 
 #endif
-
-        private bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
-        {
-            var hasGlobalStringEnumConverter = serializerSettings.Converters.OfType<StringEnumConverter>().Any();
-            return hasGlobalStringEnumConverter || HasStringEnumConverter(contextualType);
-        }
 
         private bool HasStringEnumConverter(ContextualType contextualType)
         {
