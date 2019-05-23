@@ -189,6 +189,13 @@ namespace NJsonSchema.Generation
                 }
             }
 
+            if (contextualType.IsNullableType)
+            {
+                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
+                typeDescription.IsNullable = true;
+                return typeDescription;
+            }
+
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
             {
@@ -198,13 +205,6 @@ namespace NJsonSchema.Generation
             if (IsArrayType(contextualType) && contract is JsonArrayContract)
             {
                 return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
-            }
-
-            if (contextualType.IsNullableType)
-            {
-                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
-                typeDescription.IsNullable = true;
-                return typeDescription;
             }
 
             if (contract is JsonStringContract)
