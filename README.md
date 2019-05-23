@@ -3,7 +3,7 @@ NJsonSchema for .NET
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/NJsonSchema/17/master.svg)](https://rsuter.visualstudio.com/NJsonSchema/_build?definitionId=17)
 [![Nuget](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages/NJsonSchema/)
-[![MyGet](https://img.shields.io/myget/namotion-reflection/v/NJsonSchema.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/njsonschema)
+[![MyGet](https://img.shields.io/myget/njsonschema/v/NJsonSchema.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/njsonschema)
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/rsuter/njsonschema/wiki)
