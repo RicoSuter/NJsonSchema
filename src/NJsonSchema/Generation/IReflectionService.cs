@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
+using Newtonsoft.Json;
 using System;
 
 namespace NJsonSchema.Generation
@@ -32,5 +33,11 @@ namespace NJsonSchema.Generation
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
         bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling);
+
+        /// <summary>Checks whether the give type is a string enum.</summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="serializerSettings">The serializer settings.</param>
+        /// <returns>The result.</returns>
+        bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings);
     }
 }

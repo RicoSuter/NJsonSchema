@@ -347,6 +347,130 @@ namespace NJsonSchema.Generation
             }
         }
 
+        /// <summary>Applies the property annotations to the JSON property.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="typeDescription">The property type description.</param>
+        /// <param name="parentAttributes">The attributes.</param>
+        public virtual void ApplyDataAnnotations(JsonSchema schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
+        {
+            // TODO: Refactor out
+
+            dynamic displayAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+            if (displayAttribute != null && displayAttribute.Name != null)
+            {
+                schema.Title = displayAttribute.Name;
+            }
+
+            dynamic defaultValueAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
+            if (defaultValueAttribute != null)
+            {
+                if (typeDescription.IsEnum &&
+                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                {
+                    schema.Default = defaultValueAttribute.Value?.ToString();
+                }
+                else
+                {
+                    schema.Default = defaultValueAttribute.Value;
+                }
+            }
+
+            dynamic regexAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            if (regexAttribute != null)
+            {
+                if (typeDescription.IsDictionary)
+                {
+                    schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
+                }
+                else
+                {
+                    schema.Pattern = regexAttribute.Pattern;
+                }
+            }
+
+            if (typeDescription.Type == JsonObjectType.Number ||
+                typeDescription.Type == JsonObjectType.Integer)
+            {
+                ApplyRangeAttribute(schema, parentAttributes);
+
+                var multipleOfAttribute = parentAttributes.OfType<MultipleOfAttribute>().SingleOrDefault();
+                if (multipleOfAttribute != null)
+                {
+                    schema.MultipleOf = multipleOfAttribute.MultipleOf;
+                }
+            }
+
+            dynamic minLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MinLengthAttribute");
+            if (minLengthAttribute != null && minLengthAttribute.Length != null)
+            {
+                if (typeDescription.Type == JsonObjectType.String)
+                {
+                    schema.MinLength = minLengthAttribute.Length;
+                }
+                else if (typeDescription.Type == JsonObjectType.Array)
+                {
+                    schema.MinItems = minLengthAttribute.Length;
+                }
+            }
+
+            dynamic maxLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+            if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+            {
+                if (typeDescription.Type == JsonObjectType.String)
+                {
+                    schema.MaxLength = maxLengthAttribute.Length;
+                }
+                else if (typeDescription.Type == JsonObjectType.Array)
+                {
+                    schema.MaxItems = maxLengthAttribute.Length;
+                }
+            }
+
+            dynamic stringLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.StringLengthAttribute");
+            if (stringLengthAttribute != null)
+            {
+                if (typeDescription.Type == JsonObjectType.String)
+                {
+                    schema.MinLength = stringLengthAttribute.MinimumLength;
+                    schema.MaxLength = stringLengthAttribute.MaximumLength;
+                }
+            }
+
+            dynamic dataTypeAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DataTypeAttribute");
+            if (dataTypeAttribute != null)
+            {
+                var dataType = dataTypeAttribute.DataType.ToString();
+                if (DataTypeFormats.ContainsKey(dataType))
+                {
+                    schema.Format = DataTypeFormats[dataType];
+                }
+            }
+        }
+
+        /// <summary>Gets the actual default value for the given object (e.g. correctly converts enums).</summary>
+        /// <param name="type">The value type.</param>
+        /// <param name="defaultValue">The default value.</param>
+        /// <returns>The converted default value.</returns>
+        public virtual object ConvertDefaultValue(ContextualType type, object defaultValue)
+        {
+            if (defaultValue != null && defaultValue.GetType().GetTypeInfo().IsEnum)
+            {
+                var hasStringEnumConverter = Settings.ReflectionService.IsStringEnum(type, Settings.ActualSerializerSettings);
+                if (hasStringEnumConverter)
+                {
+                    return defaultValue.ToString();
+                }
+                else
+                {
+                    return (int)defaultValue;
+                }
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
         /// <summary>Generates the properties for the given type and schema.</summary>
         /// <param name="type">The type.</param>
         /// <param name="typeDescription">The type description.</param>
@@ -389,6 +513,19 @@ namespace NJsonSchema.Generation
             {
                 schema.GenerateXmlObjectForType(type);
             }
+        }
+
+        /// <summary>Gets the properties of the given type or null to take all properties.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The property names or null for all.</returns>
+        protected virtual string[] GetTypeProperties(Type type)
+        {
+            if (type == typeof(Exception))
+            {
+                return new[] { "InnerException", "Message", "Source", "StackTrace" };
+            }
+
+            return null;
         }
 
         private async Task ApplyAdditionalPropertiesAsync<TSchemaType>(Type type, TSchemaType schema, JsonSchemaResolver schemaResolver)
@@ -674,19 +811,6 @@ namespace NJsonSchema.Generation
                     await LoadPropertyOrFieldAsync(jsonProperty, memberInfo, type, schema, schemaResolver).ConfigureAwait(false);
                 }
             }
-        }
-
-        /// <summary>Gets the properties of the given type or null to take all properties.</summary>
-        /// <param name="type">The type.</param>
-        /// <returns>The property names or null for all.</returns>
-        protected virtual string[] GetTypeProperties(Type type)
-        {
-            if (type == typeof(Exception))
-            {
-                return new[] { "InnerException", "Message", "Source", "StackTrace" };
-            }
-
-            return null;
         }
 
         private async Task GenerateKnownTypesAsync(Type type, JsonSchemaResolver schemaResolver)
@@ -1018,7 +1142,7 @@ namespace NJsonSchema.Generation
                         propertySchema.Description = await memberInfo.GetDescriptionAsync().ConfigureAwait(false);
                     }
 
-                    propertySchema.Default = ConvertDefaultValue(jsonProperty);
+                    propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
 
                     ApplyDataAnnotations(propertySchema, propertyTypeDescription, memberInfo.ContextAttributes);
                 };
@@ -1073,106 +1197,6 @@ namespace NJsonSchema.Generation
                 .FirstAssignableToTypeNameOrDefault("DataContractAttribute", TypeNameStyle.Name) != null;
         }
 
-        /// <summary>Applies the property annotations to the JSON property.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="typeDescription">The property type description.</param>
-        /// <param name="parentAttributes">The attributes.</param>
-        public virtual void ApplyDataAnnotations(JsonSchema schema, JsonTypeDescription typeDescription, IEnumerable<Attribute> parentAttributes)
-        {
-            // TODO: Refactor out
-
-            dynamic displayAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
-            if (displayAttribute != null && displayAttribute.Name != null)
-            {
-                schema.Title = displayAttribute.Name;
-            }
-
-            dynamic defaultValueAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
-            if (defaultValueAttribute != null)
-            {
-                if (typeDescription.IsEnum &&
-                    typeDescription.Type.HasFlag(JsonObjectType.String))
-                {
-                    schema.Default = defaultValueAttribute.Value?.ToString();
-                }
-                else
-                {
-                    schema.Default = defaultValueAttribute.Value;
-                }
-            }
-
-            dynamic regexAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
-            if (regexAttribute != null)
-            {
-                if (typeDescription.IsDictionary)
-                {
-                    schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
-                }
-                else
-                {
-                    schema.Pattern = regexAttribute.Pattern;
-                }
-            }
-
-            if (typeDescription.Type == JsonObjectType.Number ||
-                typeDescription.Type == JsonObjectType.Integer)
-            {
-                ApplyRangeAttribute(schema, parentAttributes);
-
-                var multipleOfAttribute = parentAttributes.OfType<MultipleOfAttribute>().SingleOrDefault();
-                if (multipleOfAttribute != null)
-                {
-                    schema.MultipleOf = multipleOfAttribute.MultipleOf;
-                }
-            }
-
-            dynamic minLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MinLengthAttribute");
-            if (minLengthAttribute != null && minLengthAttribute.Length != null)
-            {
-                if (typeDescription.Type == JsonObjectType.String)
-                {
-                    schema.MinLength = minLengthAttribute.Length;
-                }
-                else if (typeDescription.Type == JsonObjectType.Array)
-                {
-                    schema.MinItems = minLengthAttribute.Length;
-                }
-            }
-
-            dynamic maxLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
-            if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
-            {
-                if (typeDescription.Type == JsonObjectType.String)
-                {
-                    schema.MaxLength = maxLengthAttribute.Length;
-                }
-                else if (typeDescription.Type == JsonObjectType.Array)
-                {
-                    schema.MaxItems = maxLengthAttribute.Length;
-                }
-            }
-
-            dynamic stringLengthAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.StringLengthAttribute");
-            if (stringLengthAttribute != null)
-            {
-                if (typeDescription.Type == JsonObjectType.String)
-                {
-                    schema.MinLength = stringLengthAttribute.MinimumLength;
-                    schema.MaxLength = stringLengthAttribute.MaximumLength;
-                }
-            }
-
-            dynamic dataTypeAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DataTypeAttribute");
-            if (dataTypeAttribute != null)
-            {
-                var dataType = dataTypeAttribute.DataType.ToString();
-                if (DataTypeFormats.ContainsKey(dataType))
-                {
-                    schema.Format = DataTypeFormats[dataType];
-                }
-            }
-        }
-
         private void ApplyRangeAttribute(JsonSchema schema, IEnumerable<Attribute> parentAttributes)
         {
             dynamic rangeAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RangeAttribute");
@@ -1217,26 +1241,6 @@ namespace NJsonSchema.Generation
                         }
                     }
                 }
-            }
-        }
-
-        private object ConvertDefaultValue(JsonProperty jsonProperty)
-        {
-            if (jsonProperty.DefaultValue != null && jsonProperty.DefaultValue.GetType().GetTypeInfo().IsEnum)
-            {
-                var hasStringEnumConverter = typeof(StringEnumConverter).GetTypeInfo().IsAssignableFrom(jsonProperty.Converter?.GetType().GetTypeInfo());
-                if (hasStringEnumConverter)
-                {
-                    return jsonProperty.DefaultValue.ToString();
-                }
-                else
-                {
-                    return (int)jsonProperty.DefaultValue;
-                }
-            }
-            else
-            {
-                return jsonProperty.DefaultValue;
             }
         }
     }
