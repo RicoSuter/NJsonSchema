@@ -12,7 +12,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using YamlDotNet.Serialization;
 
@@ -84,7 +83,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema" />.</returns>
         public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.FileReadAllTextAsync(filePath).ConfigureAwait(false);
+            var data = DynamicApis.FileReadAllText(filePath);
             return await FromYamlAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 

@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
+            var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
+            var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
+            var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
+            var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -215,7 +215,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<DictionaryContainer>();
+            var schema = JsonSchema.FromType<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act

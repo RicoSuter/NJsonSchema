@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo()
         {
-            var schema = await JsonSchema.FromTypeAsync<Person>();
+            var schema = JsonSchema.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m });
@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo2()
         {
-            var schema = await JsonSchema.FromTypeAsync<Person>();
+            var schema = JsonSchema.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });

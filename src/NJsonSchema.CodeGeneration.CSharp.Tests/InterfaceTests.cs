@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_interface_has_properties_then_properties_are_included_in_schema()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_implements_interface_then_properties_are_included_in_schema()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Threading.Tasks;
-
 namespace NJsonSchema.Generation
 {
     /// <summary>The schema processor interface.</summary>
@@ -15,6 +13,6 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Processes the specified JSON Schema.</summary>
         /// <param name="context">The schema context.</param>
-        Task ProcessAsync(SchemaProcessorContext context);
+        void Process(SchemaProcessorContext context);
     }
 }

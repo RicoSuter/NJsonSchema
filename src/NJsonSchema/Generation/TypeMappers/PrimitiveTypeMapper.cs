@@ -34,9 +34,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
-#pragma warning disable 1998
-        public async Task GenerateSchemaAsync(JsonSchema schema, TypeMapperContext context)
-#pragma warning restore 1998
+        public void GenerateSchema(JsonSchema schema, TypeMapperContext context)
         {
             _transformer(schema);
         }

@@ -21,12 +21,13 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '2.2.203'
+
+# Patch preview project versions (only when on master branch)
 - task: CmdLine@2
   displayName: 'Install DNT'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'npm i -g dotnettools'
-
-# Patch project versions (on master only)
 - task: CmdLine@2
   displayName: 'Update project version patch'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

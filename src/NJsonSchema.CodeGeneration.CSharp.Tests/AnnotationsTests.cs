@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_array_property_is_not_nullable_then_it_does_not_have_a_setter()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<MyRequiredTest>();
+            var schema = JsonSchema.FromType<MyRequiredTest>();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco, 
