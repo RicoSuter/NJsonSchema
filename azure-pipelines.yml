@@ -21,22 +21,25 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '2.2.203'
+
+# Patch preview project versions (only when on master branch)
 - task: CmdLine@2
   displayName: 'Install DNT'
-  inputs:
-    script: 'npm i -g dotnettools'
-
-# Patch project versions (on master only)
-- task: CmdLine@2
-  displayName: 'Update project version revision'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
-    script: 'dnt bump-versions revision "$(Build.BuildId)"'
+    script: 'npm i -g dotnettools'
+- task: CmdLine@2
+  displayName: 'Update project version patch'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    script: 'dnt bump-versions patch'
+    failOnStderr: true
 - task: CmdLine@2
   displayName: 'Patch project version preview'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     script: 'dnt bump-versions preview "$(Build.BuildNumber)"'
+    failOnStderr: true
 
 # Build and test
 - task: DotNetCoreCLI@2
@@ -59,14 +62,14 @@ steps:
 # Publish artifacts
 - task: CopyFiles@2
   displayName: 'Copy packages'
-#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     Contents: '**/*.nupkg'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     flattenFolders: true
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
-#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
