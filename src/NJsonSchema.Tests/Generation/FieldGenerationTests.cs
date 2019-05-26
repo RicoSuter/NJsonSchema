@@ -17,7 +17,7 @@ namespace NJsonSchema.Tests.Generation
             
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = JsonSchema.FromType<MyTest>();
             var json = schema.ToJson();
 
             //// Assert

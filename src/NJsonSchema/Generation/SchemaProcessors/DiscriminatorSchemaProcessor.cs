@@ -10,7 +10,6 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 using NJsonSchema.Converters;
 using System;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.SchemaProcessors
 {
@@ -31,7 +30,7 @@ namespace NJsonSchema.Generation.SchemaProcessors
 
         public string Discriminator { get; }
 
-        public async Task ProcessAsync(SchemaProcessorContext context)
+        public void Process(SchemaProcessorContext context)
         {
             if (context.Type == BaseType)
             {

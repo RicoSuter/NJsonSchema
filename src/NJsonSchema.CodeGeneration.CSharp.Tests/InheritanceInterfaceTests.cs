@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_schema_has_base_schema_then_it_is_referenced()
         {
             //// Arrange
-            var json = await JsonSchema.FromTypeAsync<MyContainer>();
+            var json = JsonSchema.FromType<MyContainer>();
             var data = json.ToJson();
 
             var generator = new CSharpGenerator(json, new CSharpGeneratorSettings());

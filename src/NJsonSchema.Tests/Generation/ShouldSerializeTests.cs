@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_ShouldSerialize_method_exists_then_schema_is_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromTypeAsync<Test>();
+            var schema = JsonSchema.FromType<Test>();
 
             //// Act
 

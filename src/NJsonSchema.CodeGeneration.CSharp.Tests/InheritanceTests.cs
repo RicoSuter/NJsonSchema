@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<MyContainer>();
+            var schema = JsonSchema.FromType<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
@@ -73,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ExceptionContainer>();
+            var schema = JsonSchema.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });

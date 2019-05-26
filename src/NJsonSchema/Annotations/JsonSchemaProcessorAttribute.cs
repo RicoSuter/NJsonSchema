@@ -24,7 +24,7 @@ namespace NJsonSchema.Annotations
             Parameters = parameters;
         }
 
-        /// <summary>Gets or sets the type of the operation processor (must implement IOperationProcessor).</summary>
+        /// <summary>Gets or sets the type of the operation processor (must implement ISchemaProcessor).</summary>
         public Type Type { get; set; }
 
         /// <summary>Gets or sets the type of the constructor parameters.</summary>

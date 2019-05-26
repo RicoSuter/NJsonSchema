@@ -10,7 +10,6 @@ using Namotion.Reflection;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Infrastructure
 {
@@ -61,7 +60,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The member info</param>
         /// <param name="attributeType">The attribute type to check.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this CachedType type, DescriptionAttributeType attributeType = DescriptionAttributeType.Context)
+        public static string GetDescription(this CachedType type, DescriptionAttributeType attributeType = DescriptionAttributeType.Context)
         {
             var attributes = type is ContextualType contextualType && attributeType == DescriptionAttributeType.Context ?
                 contextualType.ContextAttributes : type.TypeAttributes;
@@ -81,7 +80,7 @@ namespace NJsonSchema.Infrastructure
 
                 if (type is ContextualMemberInfo contextualMember)
                 {
-                    var summary = await contextualMember.GetXmlDocsSummaryAsync().ConfigureAwait(false);
+                    var summary = contextualMember.GetXmlDocsSummary();
                     if (summary != string.Empty)
                     {
                         return summary;
@@ -89,7 +88,7 @@ namespace NJsonSchema.Infrastructure
                 }
                 else if (type != null)
                 {
-                    var summary = await type.GetXmlDocsSummaryAsync().ConfigureAwait(false);
+                    var summary = type.GetXmlDocsSummary();
                     if (summary != string.Empty)
                     {
                         return summary;
@@ -103,7 +102,7 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static async Task<string> GetDescriptionAsync(this ContextualParameterInfo parameter)
+        public static string GetDescription(this ContextualParameterInfo parameter)
         {
             dynamic descriptionAttribute = parameter.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
@@ -120,7 +119,7 @@ namespace NJsonSchema.Infrastructure
 
                 if (parameter != null)
                 {
-                    var summary = await parameter.GetXmlDocsAsync().ConfigureAwait(false);
+                    var summary = parameter.GetXmlDocs();
                     if (summary != string.Empty)
                     {
                         return summary;

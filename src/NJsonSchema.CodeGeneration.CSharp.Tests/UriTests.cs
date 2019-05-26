@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_uri_then_csharp_output_is_also_uri()
         {
             //// Arrange
-            var schema = await JsonSchema.FromTypeAsync<ClassWithUri>();
+            var schema = JsonSchema.FromType<ClassWithUri>();
             var json = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 

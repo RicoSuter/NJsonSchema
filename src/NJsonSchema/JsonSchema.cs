@@ -82,37 +82,37 @@ namespace NJsonSchema
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static async Task<JsonSchema> FromTypeAsync<TType>()
+        public static JsonSchema FromType<TType>()
         {
-            return await FromTypeAsync<TType>(new JsonSchemaGeneratorSettings()).ConfigureAwait(false);
+            return FromType<TType>(new JsonSchemaGeneratorSettings());
         }
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
         /// <param name="type">The type to create the schema for.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static async Task<JsonSchema> FromTypeAsync(Type type)
+        public static JsonSchema FromType(Type type)
         {
-            return await FromTypeAsync(type, new JsonSchemaGeneratorSettings()).ConfigureAwait(false);
+            return FromType(type, new JsonSchemaGeneratorSettings());
         }
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static async Task<JsonSchema> FromTypeAsync<TType>(JsonSchemaGeneratorSettings settings)
+        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return await generator.GenerateAsync(typeof(TType)).ConfigureAwait(false);
+            return generator.Generate(typeof(TType));
         }
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
         /// <param name="type">The type to create the schema for.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static async Task<JsonSchema> FromTypeAsync(Type type, JsonSchemaGeneratorSettings settings)
+        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
-            return await generator.GenerateAsync(type).ConfigureAwait(false);
+            return generator.Generate(type);
         }
 
         /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
@@ -139,7 +139,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
         {
-            var data = await DynamicApis.FileReadAllTextAsync(filePath).ConfigureAwait(false);
+            var data = DynamicApis.FileReadAllText(filePath);
             return await FromJsonAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
         }
 

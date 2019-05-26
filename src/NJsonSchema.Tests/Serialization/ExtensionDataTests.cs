@@ -90,7 +90,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = JsonSchema.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema.FromTypeAsync<MyTest>();
+            var schema = JsonSchema.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
