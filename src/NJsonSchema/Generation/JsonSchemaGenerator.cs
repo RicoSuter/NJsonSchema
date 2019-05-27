@@ -1110,7 +1110,6 @@ namespace NJsonSchema.Generation
 
                 var isNullable = propertyTypeDescription.IsNullable &&
                     hasRequiredAttribute == false &&
-                    (bool)isDataContractMemberRequired == false &&
                     (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
 
                 Action<JsonSchemaProperty, JsonSchema> TransformSchema = (propertySchema, typeSchema) =>
