@@ -72,7 +72,7 @@ namespace NJsonSchema
             var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
 
             var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences, contractResolver);
-            updater.VisitAsync(rootObject).GetAwaiter().GetResult();
+            updater.Visit(rootObject);
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
             var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
@@ -83,7 +83,7 @@ namespace NJsonSchema
             }
         }
 
-        private class JsonReferenceUpdater : JsonReferenceVisitorBase
+        private class JsonReferenceUpdater : AsyncJsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
@@ -147,7 +147,7 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-            protected override Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
+            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint)
             {
                 if (reference.Reference != null)
                 {
@@ -169,7 +169,7 @@ namespace NJsonSchema
                     //return new JsonSchema4 { ReferencePath = reference.DocumentPath };
                 }
 
-                return DynamicApis.FromResult<IJsonReference>(reference);
+                return reference;
             }
         }
     }
