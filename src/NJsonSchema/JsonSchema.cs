@@ -26,6 +26,8 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema : IDocumentPathProvider
     {
+        internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
+
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
         private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
