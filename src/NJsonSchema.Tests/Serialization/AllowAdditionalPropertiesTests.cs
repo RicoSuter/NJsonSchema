@@ -35,6 +35,8 @@ namespace NJsonSchema.Tests.Serialization
         [InlineData(SchemaType.Swagger2, "{\"additionalProperties\":{}}")]
         public void When_default_schema_is_serialized_then_AllowAdditionalProperties_is_correct(SchemaType schemaType, string expectedJson)
         {
+            // default schema (new JsonSchema) has always AllowAdditionalProperties = true
+
             //// Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var json = JsonSchemaSerialization.ToJson(new JsonSchema(), schemaType, new DefaultContractResolver(), Formatting.None);
