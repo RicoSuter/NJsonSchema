@@ -167,8 +167,12 @@ namespace NJsonSchema.Visitors
             {
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    foreach (var property in contract.Properties
-                        .Where(p => !JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName) && !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                    foreach (var property in contract.Properties.Where(p =>
+                    {
+                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+                        return !isJsonSchemaProperty && !p.Ignored &&
+                                p.ShouldSerialize?.Invoke(obj) != false;
+                    }))
                     {
                         var value = property.ValueProvider.GetValue(obj);
                         if (value != null)
