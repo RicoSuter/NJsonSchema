@@ -55,6 +55,11 @@ namespace NJsonSchema
         public JsonSchema()
         {
             Initialize();
+
+            if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
+            {
+                _allowAdditionalProperties = false; // the default for Swagger2 is false (change required when deserializing)
+            }
         }
 
         /// <summary>Creates a schema which matches any data.</summary>
