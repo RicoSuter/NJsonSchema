@@ -68,7 +68,9 @@ namespace NJsonSchema.Infrastructure
             };
 
             var json = JsonConvert.SerializeObject(obj, formatting, CurrentSerializerSettings);
+
             CurrentSerializerSettings = null;
+            CurrentSchemaType = SchemaType.JsonSchema;
 
             return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
         }
@@ -101,6 +103,8 @@ namespace NJsonSchema.Infrastructure
             }
 
             await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);
+            CurrentSchemaType = SchemaType.JsonSchema;
+
             return schema;
         }
 

@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -30,13 +31,34 @@ namespace NJsonSchema.Generation
                 return jsonSchemaAttribute.Name;
             }
 
-            //var jsonObjectAttribute = cachedType.GetTypeAttribute<JsonObjectAttribute>();
-            //if (!string.IsNullOrEmpty(jsonObjectAttribute.Title) && Regex.IsMatch(jsonObjectAttribute.Title, "^[a-zA-Z0-9_]*$"))
-            //{
-            //    return jsonObjectAttribute.Title;
-            //}
+            var nType = type.ToCachedType();
 
-            return type.GetDisplayName();
+#if !NET40
+            if (nType.Type.IsConstructedGenericType)
+#else
+            if (nType.Type.IsGenericType)
+#endif
+            {
+                return GetName(nType).Split('`').First() + "Of" + 
+                       string.Join("And", nType.GenericArguments
+                                               .Select(a => Generate(a.OriginalType)));
+            }
+
+            return GetName(nType);
+        }
+
+        private static string GetName(CachedType cType)
+        {
+            return
+                cType.TypeName == "Int16" ? GetNullableDisplayName(cType, "Short") :
+                cType.TypeName == "Int32" ? GetNullableDisplayName(cType, "Integer") :
+                cType.TypeName == "Int64" ? GetNullableDisplayName(cType, "Long") :
+                GetNullableDisplayName(cType, cType.TypeName);
+        }
+
+        private static string GetNullableDisplayName(CachedType type, string actual)
+        {
+            return (type.IsNullableType ? "Nullable" : "") + actual;
         }
     }
 }

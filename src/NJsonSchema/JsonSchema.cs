@@ -26,6 +26,8 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema : IDocumentPathProvider
     {
+        internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
+
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
         private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
@@ -53,6 +55,11 @@ namespace NJsonSchema
         public JsonSchema()
         {
             Initialize();
+
+            if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
+            {
+                _allowAdditionalProperties = false; // the default for Swagger2 is false (change required when deserializing)
+            }
         }
 
         /// <summary>Creates a schema which matches any data.</summary>

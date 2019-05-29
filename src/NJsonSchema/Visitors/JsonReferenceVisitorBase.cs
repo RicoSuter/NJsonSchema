@@ -127,6 +127,16 @@ namespace NJsonSchema.Visitors
                     Visit(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o);
                 }
 
+                if (schema.DictionaryKey != null)
+                {
+                    Visit(schema.DictionaryKey, path + "/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o);
+                }
+
+                if (schema.DiscriminatorRaw != null)
+                {
+                    Visit(schema.DiscriminatorRaw, path + "/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o);
+                }
+
                 foreach (var p in schema.Properties.ToArray())
                 {
                     Visit(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o);
@@ -153,13 +163,16 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (!(obj is string) && !(obj is JToken))
+            if (!(obj is string) && !(obj is JToken) && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
-                // Reflection fallback
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    foreach (var property in contract.Properties
-                        .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                    foreach (var property in contract.Properties.Where(p =>
+                    {
+                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+                        return !isJsonSchemaProperty && !p.Ignored &&
+                                p.ShouldSerialize?.Invoke(obj) != false;
+                    }))
                     {
                         var value = property.ValueProvider.GetValue(obj);
                         if (value != null)
