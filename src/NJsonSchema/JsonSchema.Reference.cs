@@ -8,10 +8,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
-using NJsonSchema.Collections;
 using NJsonSchema.References;
 
 namespace NJsonSchema
@@ -55,7 +53,6 @@ namespace NJsonSchema
                                                OneOf.Count == 0 &&
                                                Properties.Count == 0 &&
                                                PatternProperties.Count == 0 &&
-                                               AllowAdditionalProperties &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
@@ -69,7 +66,6 @@ namespace NJsonSchema
                                                AllOf.Count == 0 &&
                                                Properties.Count == 0 &&
                                                PatternProperties.Count == 0 &&
-                                               AllowAdditionalProperties &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
@@ -83,7 +79,6 @@ namespace NJsonSchema
                                                OneOf.Count == 0 &&
                                                Properties.Count == 0 &&
                                                PatternProperties.Count == 0 &&
-                                               AllowAdditionalProperties &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
