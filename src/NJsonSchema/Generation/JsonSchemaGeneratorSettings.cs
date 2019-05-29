@@ -81,7 +81,7 @@ namespace NJsonSchema.Generation
         public bool GenerateEnumMappingDescription { get; set; }
 
         /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
-        public bool AllowAdditionalProperties { get; set;}
+        public bool AlwaysAllowAdditionalObjectProperties { get; set;}
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }

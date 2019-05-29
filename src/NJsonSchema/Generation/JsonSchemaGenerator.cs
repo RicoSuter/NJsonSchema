@@ -672,7 +672,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                schema.AllowAdditionalProperties = Settings.AllowAdditionalProperties;
+                schema.AllowAdditionalProperties = Settings.AlwaysAllowAdditionalObjectProperties;
             }
         }
 
