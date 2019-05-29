@@ -225,7 +225,7 @@ namespace NJsonSchema
                         !AllOf.Any() &&
                         (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None))
                     {
-                        return new JsonSchema { AllowAdditionalProperties = false }; // bool is not allowed in Swagger2
+                        return new JObject(); // bool is not allowed in Swagger2
                     }
                     else
                     {

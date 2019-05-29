@@ -742,6 +742,7 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+                                 Reference == null &&
                                  AllOf.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  OneOf.Count == 0 &&
