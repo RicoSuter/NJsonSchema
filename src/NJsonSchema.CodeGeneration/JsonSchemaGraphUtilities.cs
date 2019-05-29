@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using NJsonSchema.Visitors;
 
 namespace NJsonSchema.CodeGeneration
@@ -22,7 +21,7 @@ namespace NJsonSchema.CodeGeneration
         public static IDictionary<JsonSchema, string> GetDerivedSchemas(this JsonSchema schema, object rootObject)
         {
             var visitor = new DerivedSchemaVisitor(schema);
-            visitor.VisitAsync(rootObject).GetAwaiter().GetResult();
+            visitor.Visit(rootObject);
             return visitor.DerivedSchemas;
         }
 
@@ -37,9 +36,7 @@ namespace NJsonSchema.CodeGeneration
                 _baseSchema = baseSchema;
             }
 
-#pragma warning disable 1998
-            protected override async Task<JsonSchema> VisitSchemaAsync(JsonSchema schema, string path, string typeNameHint)
-#pragma warning restore 1998
+            protected override JsonSchema VisitSchema(JsonSchema schema, string path, string typeNameHint)
             {
                 if (schema.Inherits(_baseSchema) && _baseSchema != schema)
                 {

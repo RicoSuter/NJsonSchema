@@ -251,7 +251,7 @@ namespace NJsonSchema.Generation
                               contextualType.TypeInfo.IsValueType;
 
             return isValueType == false &&
-                   defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
+                   defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
         }
 
         /// <summary>Checks whether the give type is a string enum.</summary>

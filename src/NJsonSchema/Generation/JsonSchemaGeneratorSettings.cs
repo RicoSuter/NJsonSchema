@@ -36,7 +36,7 @@ namespace NJsonSchema.Generation
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
-            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
+            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Default;
             SchemaType = SchemaType.JsonSchema;
             GenerateAbstractSchemas = true;
 
