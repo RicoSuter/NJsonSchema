@@ -16,6 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            AnyType = "object";
             Namespace = "MyNamespace";
 
             DateType = "System.DateTimeOffset";
@@ -61,6 +62,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to generated data annotation attributes (default: true).</summary>
         public bool GenerateDataAnnotations { get; set; }
+
+        /// <summary>Gets or sets the any type (default: "object").</summary>
+        public string AnyType { get; set; }
 
         /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
         public string DateType { get; set; }
