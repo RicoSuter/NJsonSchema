@@ -18,9 +18,7 @@ namespace NJsonSchema.Benchmark
         }
 
         [PerfSetup]
-#pragma warning disable xUnit1013 // Public method should be marked as test
         public void Setup(BenchmarkContext context)
-#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             _counter = context.GetCounter("Iterations");
         }

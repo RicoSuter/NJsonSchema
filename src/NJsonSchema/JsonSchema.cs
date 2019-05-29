@@ -243,7 +243,7 @@ namespace NJsonSchema
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
                 }
 
-                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+                return AllOf.FirstOrDefault(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
             }
         }
 
@@ -747,7 +747,6 @@ namespace NJsonSchema
                                  OneOf.Count == 0 &&
                                  ActualProperties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
-                                 AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
                                  IsEnumeration == false;
