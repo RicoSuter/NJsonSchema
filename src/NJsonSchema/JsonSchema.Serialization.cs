@@ -220,9 +220,10 @@ namespace NJsonSchema
 
                 if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
                 {
-                    if (AllowAdditionalProperties && (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None))
+                    if (AllowAdditionalProperties && !HasReference &&
+                        (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None))
                     {
-                        return CreateAnySchema(); // bool is not allowed in Swagger2
+                        return new JsonSchema { AllowAdditionalProperties = false }; // bool is not allowed in Swagger2
                     }
                     else
                     {
