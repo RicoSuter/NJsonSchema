@@ -741,6 +741,11 @@ namespace NJsonSchema.Generation
                 (contextualType.OriginalType.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) == true ||
                  contextualType.OriginalType == typeof(object)))
             {
+                if (Settings.SchemaType == SchemaType.Swagger2)
+                {
+                    schema.AllowAdditionalProperties = false;
+                }
+
                 return true;
             }
 
