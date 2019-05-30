@@ -583,6 +583,11 @@ namespace NJsonSchema.Generation
             if (valueType.OriginalType == typeof(object))
             {
                 schema.AdditionalPropertiesSchema = JsonSchema.CreateAnySchema();
+
+                if (Settings.SchemaType == SchemaType.Swagger2)
+                {
+                    schema.AdditionalPropertiesSchema.AllowAdditionalProperties = false;
+                }
             }
             else
             {
