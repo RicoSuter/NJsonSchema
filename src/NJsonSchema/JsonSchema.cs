@@ -243,7 +243,7 @@ namespace NJsonSchema
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
                 }
 
-                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+                return AllOf.FirstOrDefault(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
             }
         }
 
@@ -742,12 +742,12 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+                                 Reference == null &&
                                  AllOf.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  OneOf.Count == 0 &&
                                  ActualProperties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
-                                 AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
                                  IsEnumeration == false;

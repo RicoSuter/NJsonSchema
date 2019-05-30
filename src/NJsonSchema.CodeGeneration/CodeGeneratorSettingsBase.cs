@@ -51,5 +51,8 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets or sets the output language specific value generator.</summary>
         [JsonIgnore]
         public ValueGeneratorBase ValueGenerator { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.</summary>
+        public bool InlineNamedAny { get; set; }
     }
 }

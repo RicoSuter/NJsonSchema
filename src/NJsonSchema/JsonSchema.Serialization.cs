@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
@@ -220,10 +221,13 @@ namespace NJsonSchema
 
                 if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
                 {
-                    if (AllowAdditionalProperties && !HasReference &&
-                        (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None))
+                    if (AllowAdditionalProperties &&
+                        (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+                        !HasReference &&
+                        !AllOf.Any() &&
+                        !GetType().IsAssignableToTypeName("OpenApiParameter", TypeNameStyle.Name))
                     {
-                        return new JsonSchema { AllowAdditionalProperties = false }; // bool is not allowed in Swagger2
+                        return new JObject(); // bool is not allowed in Swagger2
                     }
                     else
                     {

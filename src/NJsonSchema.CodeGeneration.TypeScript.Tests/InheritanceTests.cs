@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Converters;
+using NJsonSchema.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -111,6 +113,183 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.Contains("class ExceptionBase extends Exception", code);
             Assert.Contains("class MyException extends ExceptionBase", code);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.Swagger2)]
+        [InlineData(SchemaType.OpenApi3)]
+        public async Task When_schema_with_inheritance_to_object_type_is_generated_then_the_object_type_is_generated(SchemaType schemaType)
+        {
+            var json = @"{
+    ""type"": ""object"",
+    ""properties"": {
+        ""request1"": {
+            ""$ref"": ""#/definitions/GenericRequest1""
+        },
+        ""request2"": {
+            ""$ref"": ""#/definitions/GenericRequest2""
+        }
+    },
+    ""definitions"": {
+        ""GenericRequest1"": {
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/GenericRequestBaseOfRequestBodyBase""
+                },
+                {
+                    ""type"": ""object""
+                }
+            ]
+        },
+        ""GenericRequestBaseOfRequestBodyBase"": {
+            ""type"": ""object"",
+            ""required"": [
+                ""Request""
+            ],
+            ""properties"": {
+                ""Request"": {
+                    ""$ref"": ""#/definitions/RequestBodyBase""
+                }
+            }
+        },
+        ""RequestBodyBase"": {
+            ""type"": ""object""
+        },
+        ""GenericRequest2"": {
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/GenericRequestBaseOfRequestBody""
+                },
+                {
+                    ""type"": ""object""
+                }
+            ]
+        },
+        ""GenericRequestBaseOfRequestBody"": {
+            ""type"": ""object"",
+            ""required"": [
+                ""Request""
+            ],
+            ""properties"": {
+                ""Request"": {
+                    ""$ref"": ""#/definitions/RequestBody""
+                }
+            }
+        },
+        ""RequestBody"": {
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/RequestBodyBase""
+                },
+                {
+                    ""type"": ""object""
+                }
+            ]
+        }
+    }
+}";
+
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.DoesNotContain("request!: any;", code);
+            Assert.DoesNotContain("request: any;", code);
+            Assert.Contains("this.request = new RequestBodyBase()", code);
+            Assert.Contains("this.request = new RequestBody()", code);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.Swagger2)]
+        [InlineData(SchemaType.OpenApi3)]
+        public async Task When_schema_with_inheritance_and_references_is_generated_then_there_are_no_duplicates(SchemaType schemaType)
+        {
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""foo"": {
+            ""$ref"": ""#/definitions/Teacher""
+        }
+    },
+    ""definitions"": {
+        ""Person"": {
+            ""type"": ""object"",
+            ""discriminator"": ""discriminator"",
+            ""required"": [
+                ""discriminator""
+            ],
+            ""properties"": {
+                ""Skills"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": {
+                        ""$ref"": ""#/definitions/SkillLevel""
+                    }
+                },
+                ""discriminator"": {
+                    ""type"": ""string""
+                }
+            }
+        },
+        ""SkillLevel"": {
+            ""type"": ""integer"",
+            ""description"": """",
+            ""x-enumNames"": [
+                ""Low"",
+                ""Medium"",
+                ""Height""
+            ],
+            ""enum"": [
+                0,
+                1,
+                2
+            ]
+        },
+        ""Teacher"": {
+            ""allOf"": [
+                {
+                    ""$ref"": ""#/definitions/Person""
+                },
+                {
+                    ""type"": ""object"",
+                    ""required"": [
+                        ""SkillLevel""
+                    ],
+                    ""properties"": {
+                        ""Course"": {
+                            ""type"": ""string""
+                        },
+                        ""SkillLevel"": {
+                            ""default"": 1,
+                            ""allOf"": [
+                                {
+                                    ""$ref"": ""#/definitions/SkillLevel""
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+";
+
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.DoesNotContain("SkillLevel2", code);
         }
     }
 }

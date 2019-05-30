@@ -870,7 +870,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                InlineNamedAny = true
             });
             var code = generator.GenerateFile("MyClass");
 
