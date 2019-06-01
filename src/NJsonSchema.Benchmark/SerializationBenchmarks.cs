@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using NBench;
 using Pro.NBench.xUnit.XunitExtensions;
 using Xunit;
@@ -8,12 +10,13 @@ using Xunit.Abstractions;
 
 namespace NJsonSchema.Benchmark
 {
-    public class SerializationPerformanceTests
+    public class SerializationBenchmarks
     {
-        private readonly SerializationPerformance _serializationPerformance = new SerializationPerformance();
+        private JsonSchema _schema;
         private Counter _counter;
+        private string _json;
 
-        public SerializationPerformanceTests(ITestOutputHelper output)
+        public SerializationBenchmarks(ITestOutputHelper output)
         {
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new XunitTraceListener(output));
@@ -22,6 +25,16 @@ namespace NJsonSchema.Benchmark
         [PerfSetup]
         public void Setup(BenchmarkContext context)
         {
+            var executingAssembly = Assembly.GetExecutingAssembly();
+
+            using (var reader = new StreamReader(
+                executingAssembly.GetManifestResourceStream(
+                    executingAssembly.GetName().Name + ".Schema.json")))
+            {
+                _json = reader.ReadToEnd();
+            }
+
+            _schema = JsonSchema.FromJsonAsync(_json).Result;
             _counter = context.GetCounter("Iterations");
         }
 
@@ -38,7 +51,7 @@ namespace NJsonSchema.Benchmark
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 200)]
         public void ToJson()
         {
-            _serializationPerformance.ToJson();
+            _schema.ToJson();
             _counter.Increment();
         }
 
@@ -55,7 +68,7 @@ namespace NJsonSchema.Benchmark
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 200)]
         public void FromJson()
         {
-            _serializationPerformance.FromJson();
+            JsonSchema.FromJsonAsync(_json).GetAwaiter().GetResult();
             _counter.Increment();
         }
     }

@@ -13,12 +13,6 @@ namespace NJsonSchema.Demo
     {
         static void Main(string[] args)
         {
-            for (int i = 0; i < 10000; i++)
-            {
-                var serializationPerformance = new SerializationPerformance();
-                serializationPerformance.FromJson();
-            }
-
             Console.BufferHeight = 2000;
 
             var passes = 0;
