@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
-    public class AlwaysAllowAdditionalObjectPropertiesTests
+    public class AdditionalPropertiesTests
     {
         [Fact]
         public async Task When_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered()
@@ -43,31 +43,39 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
         }
 
-
         public class Page
         {
-            int Number{get;set;}
-            string Content {get;set;}
         }
 
         public class Book
         {
-            public Dictionary<string, string> Index {get; set;}
-            public Page Page {get;set;}
+            public Dictionary<string, string> Index { get; set; }
+
+            public Page Page { get; set; }
         }
 
         [Fact]
-        public void AllowAdditionalProperties_DictionaryAndNoObjectAreNotSame()
+        public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_dictionary_and_no_object_are_not_same()
         {
+            // Arrange
             var schema = JsonSchema.FromType<Book>(new JsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
-            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var json = schema.ToJson();
+
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns",
+                InlineNamedAny = true
+            };
             var generator = new CSharpGenerator(schema, settings);
 
+            // Act
             var code = generator.GenerateFile("Library");
 
+            // Assert
             Assert.Contains("public object Page", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Index", code);
         }
