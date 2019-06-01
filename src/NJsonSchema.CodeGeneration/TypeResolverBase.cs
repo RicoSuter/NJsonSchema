@@ -114,10 +114,14 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>True if the schema should generate a type.</returns>
         protected virtual bool IsDefinitionTypeSchema(JsonSchema schema)
         {
+            if (schema.IsAnyType && _settings.InlineNamedAny)
+            {
+                return false;
+            }
+
             return !schema.IsTuple &&
                    !schema.IsDictionary &&
                    !schema.IsArray &&
-                   !schema.IsAnyType &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||
                     schema.Type.HasFlag(JsonObjectType.Object));
