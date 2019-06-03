@@ -677,7 +677,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                schema.AllowAdditionalProperties = false;
+                schema.AllowAdditionalProperties = Settings.AlwaysAllowAdditionalObjectProperties;
             }
         }
 
@@ -963,7 +963,7 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var actualSchema = new JsonSchema();
-
+                        
                         GenerateProperties(type, actualSchema, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 
