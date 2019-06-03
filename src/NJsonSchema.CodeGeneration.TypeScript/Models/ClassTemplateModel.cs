@@ -94,9 +94,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the base class name.</summary>
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
-        /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
-        public bool HasIndexerProperty => _schema.IsDictionary || _schema.InheritedSchema?.IsDictionary == true;
-
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
 
@@ -109,16 +106,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the null value.</summary>
         public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
 
+        /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
+        public bool HasIndexerProperty => _schema.IsDictionary ||
+                                          _schema.InheritedSchema?.IsDictionary == true;
+
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
         {
             get
             {
                 var valueType =
-                    _schema?.AdditionalPropertiesSchema != null ?
-                        _resolver.Resolve(_schema.AdditionalPropertiesSchema, true, string.Empty) :
-                    InheritedSchema?.AdditionalPropertiesSchema != null ?
-                        _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) :
+                    _schema?.AdditionalPropertiesSchema != null ? _resolver.Resolve(_schema.AdditionalPropertiesSchema, true, string.Empty) :
+                    InheritedSchema?.AdditionalPropertiesSchema != null ? _resolver.Resolve(InheritedSchema.AdditionalPropertiesSchema, true, string.Empty) :
                     "any";
 
                 // TODO: Find solution to avoid using union with any
