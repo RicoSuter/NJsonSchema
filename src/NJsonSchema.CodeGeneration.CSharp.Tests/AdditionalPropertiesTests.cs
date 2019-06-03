@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -39,6 +41,69 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
+        }
+
+        public class Page
+        {
+        }
+
+        public class Book
+        {
+            public Dictionary<string, string> Index { get; set; }
+
+            public Page Page { get; set; }
+        }
+
+        [Fact]
+        public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_dictionary_and_no_object_are_not_same()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Book>(new JsonSchemaGeneratorSettings
+            {
+                AlwaysAllowAdditionalObjectProperties = true
+            });
+            var json = schema.ToJson();
+
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns",
+                InlineNamedAny = true
+            };
+            var generator = new CSharpGenerator(schema, settings);
+
+            // Act
+            var code = generator.GenerateFile("Library");
+
+            // Assert
+            Assert.Contains("public object Page", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Index", code);
+        }
+
+        [Fact]
+        public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_any_page_has_additional_properties()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Book>(new JsonSchemaGeneratorSettings
+            {
+                AlwaysAllowAdditionalObjectProperties = true
+            });
+            var json = schema.ToJson();
+
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var generator = new CSharpGenerator(schema, settings);
+
+            // Act
+            var code = generator.GenerateFile("Library");
+
+            // Assert
+            Assert.Contains("public Page Page", code);
+            Assert.Contains("IDictionary<string, object> AdditionalProperties", code);
+            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Index", code);
         }
     }
 }

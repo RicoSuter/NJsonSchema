@@ -12,6 +12,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Namotion.Reflection;
+using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.Converters
 {
@@ -164,6 +165,12 @@ namespace NJsonSchema.Converters
 
             var discriminator = jObject.GetValue(_discriminator).Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
+
+            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
+            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+            {
+                jObject.Remove(_discriminator);
+            }
 
             try
             {
