@@ -1,7 +1,7 @@
 ﻿{% if IsNewableObject -%}
 {{ Variable }} = {{ Value }} ? {{ Value }}.toJSON() : <any>{{ NullValue }};
 {% elseif IsArray -%}
-if ({{ Value }} && Array.isArray({{ Value }})) {
+if (Array.isArray({{ Value }})) {
     {{ Variable }} = [];
     for (let item of {{ Value }})
 {%     if IsArrayItemNewableObject -%}
