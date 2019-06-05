@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -207,6 +209,61 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.Equal(0.0m, property.Minimum);
             Assert.Equal(1.0m, property.Maximum);
+        }
+
+        public class ClassWithDictionary
+        {
+            [RegularExpression(".*"), MinLength(2), MaxLength(3)]
+            public Dictionary<string, string> Dict { get; set; }
+        }
+
+        [Fact]
+        public void When_dictionary_property_has_attributes_then_they_are_generated_correctly()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithDictionary>();
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(2, schema.Properties["Dict"].MinProperties);
+            Assert.Equal(3, schema.Properties["Dict"].MaxProperties);
+            Assert.Equal(".*", schema.Properties["Dict"].PatternProperties.First().Key);
+        }
+
+        public class ClassWithArray
+        {
+            [MinLength(2), MaxLength(3)]
+            public List<string> Array { get; set; }
+        }
+
+        [Fact]
+        public void When_array_property_has_attributes_then_they_are_generated_correctly()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithArray>();
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(2, schema.Properties["Array"].MinItems);
+            Assert.Equal(3, schema.Properties["Array"].MaxItems);
+        }
+
+        public class ClassWithRegexDictionaryProperty
+        {
+            [RegularExpression("^\\d+\\.\\d+\\.\\d+\\.\\d+$")]
+            public Dictionary<string, string> Versions { get; set; }
+        }
+
+        [Fact]
+        public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<ClassWithRegexDictionaryProperty>();
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Null(schema.Properties["Versions"].Pattern);
+            Assert.NotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
         }
     }
 }

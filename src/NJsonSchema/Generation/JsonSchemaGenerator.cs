@@ -370,11 +370,7 @@ namespace NJsonSchema.Generation
             dynamic regexAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
             {
-                if (typeDescription.IsDictionary)
-                {
-                    schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
-                }
-                else
+                if (!typeDescription.IsDictionary)
                 {
                     schema.Pattern = regexAttribute.Pattern;
                 }
@@ -557,6 +553,18 @@ namespace NJsonSchema.Generation
             {
                 schema.Item = JsonSchema.CreateAnySchema();
             }
+
+            dynamic minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
+            if (minLengthAttribute != null && ObjectExtensions.HasProperty(minLengthAttribute, "Length"))
+            {
+                schema.MinItems = minLengthAttribute.Length;
+            }
+
+            dynamic maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
+            if (maxLengthAttribute != null && ObjectExtensions.HasProperty(maxLengthAttribute, "Length"))
+            {
+                schema.MaxItems = maxLengthAttribute.Length;
+            }
         }
 
         /// <summary>Generates an array in the given schema.</summary>
@@ -579,33 +587,29 @@ namespace NJsonSchema.Generation
                     keyType, schemaResolver);
             }
 
-            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
-            if (valueType.OriginalType == typeof(object))
+            dynamic regularExpressionAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("RegularExpressionAttribute", TypeNameStyle.Name);
+            if (regularExpressionAttribute != null && ObjectExtensions.HasProperty(regularExpressionAttribute, "Pattern"))
             {
-                schema.AdditionalPropertiesSchema = JsonSchema.CreateAnySchema();
-
-                if (Settings.SchemaType == SchemaType.Swagger2)
-                {
-                    schema.AdditionalPropertiesSchema.AllowAdditionalProperties = false;
-                }
+                schema.PatternProperties.Add(regularExpressionAttribute.Pattern, CreateAdditionalPropertiesSchema<JsonSchemaProperty>(schemaResolver, genericTypeArguments));
+                schema.AllowAdditionalProperties = false;
             }
             else
             {
-                var valueIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
-                    valueType.OriginalType.Name == "Nullable`1";
-
-                schema.AdditionalPropertiesSchema = GenerateWithReferenceAndNullability<JsonSchema>(
-                    valueType, valueIsNullable, schemaResolver/*, (s, r) =>
-                    {
-                        // TODO: Generate xml for key
-                        if (Settings.GenerateXmlObjects)
-                        {
-                            s.GenerateXmlObjectForItemType(keyType);
-                        }
-                    }*/);
+                schema.AdditionalPropertiesSchema = CreateAdditionalPropertiesSchema<JsonSchema>(schemaResolver, genericTypeArguments);
+                schema.AllowAdditionalProperties = true;
             }
 
-            schema.AllowAdditionalProperties = true;
+            dynamic minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
+            if (minLengthAttribute != null && ObjectExtensions.HasProperty(minLengthAttribute, "Length"))
+            {
+                schema.MinProperties = minLengthAttribute.Length;
+            }
+
+            dynamic maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
+            if (maxLengthAttribute != null && ObjectExtensions.HasProperty(maxLengthAttribute, "Length"))
+            {
+                schema.MaxProperties = maxLengthAttribute.Length;
+            }
         }
 
         /// <summary>Generates an enumeration in the given schema.</summary>
@@ -658,6 +662,38 @@ namespace NJsonSchema.Generation
             {
                 schema.Description = (schema.Description + "\n\n" +
                     string.Join("\n", schema.Enumeration.Select((e, i) => e + " = " + schema.EnumerationNames[i]))).Trim();
+            }
+        }
+
+        private TSchema CreateAdditionalPropertiesSchema<TSchema>(JsonSchemaResolver schemaResolver, ContextualType[] genericTypeArguments)
+            where TSchema : JsonSchema, new()
+        {
+            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
+            if (valueType.OriginalType == typeof(object))
+            {
+                var additionalPropertiesSchema = new TSchema();
+
+                if (Settings.SchemaType == SchemaType.Swagger2)
+                {
+                    additionalPropertiesSchema.AllowAdditionalProperties = false;
+                }
+
+                return additionalPropertiesSchema;
+            }
+            else
+            {
+                var valueIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
+                    valueType.Nullability == Nullability.Nullable;
+
+                return GenerateWithReferenceAndNullability<TSchema>(
+                    valueType, valueIsNullable, schemaResolver/*, (s, r) =>
+                    {
+                        // TODO: Generate xml for key
+                        if (Settings.GenerateXmlObjects)
+                        {
+                            s.GenerateXmlObjectForItemType(keyType);
+                        }
+                    }*/);
             }
         }
 
@@ -963,7 +999,7 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var actualSchema = new JsonSchema();
-                        
+
                         GenerateProperties(type, actualSchema, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 

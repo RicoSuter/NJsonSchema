@@ -2,10 +2,11 @@
 using NJsonSchema.Generation;
 using System.Collections.Generic;
 using Xunit;
+using System.ComponentModel.DataAnnotations;
 
 namespace NJsonSchema.Tests.Generation
 {
-    public class AlwaysAllowAdditionalObjectPropertiesTests
+    public class AllowAdditionalPropertiesTests
     {
         public class Person
         {
