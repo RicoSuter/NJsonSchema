@@ -1,3 +1,4 @@
+using NJsonSchema.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -213,7 +214,7 @@ namespace NJsonSchema.Tests.Generation
 
         public class ClassWithDictionary
         {
-            [RegularExpression(".*"), MinLength(2), MaxLength(3)]
+            [JsonSchemaPatternProperties(".*"), MinLength(2), MaxLength(3)]
             public Dictionary<string, string> Dict { get; set; }
         }
 

@@ -370,7 +370,11 @@ namespace NJsonSchema.Generation
             dynamic regexAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
             {
-                if (!typeDescription.IsDictionary)
+                if (typeDescription.IsDictionary)
+                {
+                    schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
+                }
+                else
                 {
                     schema.Pattern = regexAttribute.Pattern;
                 }
@@ -583,19 +587,25 @@ namespace NJsonSchema.Generation
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string).ToContextualType();
             if (keyType.OriginalType.GetTypeInfo().IsEnum)
             {
-                schema.DictionaryKey = GenerateWithReference<JsonSchema>(
-                    keyType, schemaResolver);
+                schema.DictionaryKey = GenerateWithReference<JsonSchema>(keyType, schemaResolver);
             }
 
-            dynamic regularExpressionAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("RegularExpressionAttribute", TypeNameStyle.Name);
-            if (regularExpressionAttribute != null && ObjectExtensions.HasProperty(regularExpressionAttribute, "Pattern"))
+            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
+
+            var patternPropertiesAttributes = contextualType.ContextAttributes.OfType<JsonSchemaPatternPropertiesAttribute>();
+            if (patternPropertiesAttributes.Any())
             {
-                schema.PatternProperties.Add(regularExpressionAttribute.Pattern, CreateAdditionalPropertiesSchema<JsonSchemaProperty>(schemaResolver, genericTypeArguments));
                 schema.AllowAdditionalProperties = false;
+                foreach (var patternPropertiesAttribute in patternPropertiesAttributes)
+                {
+                    var property = GenerateDictionaryValueSchema<JsonSchemaProperty>(
+                        schemaResolver, patternPropertiesAttribute.Type?.ToContextualType() ?? valueType);
+                    schema.PatternProperties.Add(patternPropertiesAttribute.RegularExpression, property);
+                }
             }
             else
             {
-                schema.AdditionalPropertiesSchema = CreateAdditionalPropertiesSchema<JsonSchema>(schemaResolver, genericTypeArguments);
+                schema.AdditionalPropertiesSchema = GenerateDictionaryValueSchema<JsonSchema>(schemaResolver, valueType);
                 schema.AllowAdditionalProperties = true;
             }
 
@@ -665,10 +675,9 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private TSchema CreateAdditionalPropertiesSchema<TSchema>(JsonSchemaResolver schemaResolver, ContextualType[] genericTypeArguments)
+        private TSchema GenerateDictionaryValueSchema<TSchema>(JsonSchemaResolver schemaResolver, ContextualType valueType)
             where TSchema : JsonSchema, new()
         {
-            var valueType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
             if (valueType.OriginalType == typeof(object))
             {
                 var additionalPropertiesSchema = new TSchema();
@@ -682,18 +691,13 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var valueIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
-                    valueType.Nullability == Nullability.Nullable;
+                var valueTypeInfo = Settings.ReflectionService.GetDescription(
+                    valueType, Settings.DefaultDictionaryValueReferenceTypeNullHandling, Settings);
 
-                return GenerateWithReferenceAndNullability<TSchema>(
-                    valueType, valueIsNullable, schemaResolver/*, (s, r) =>
-                    {
-                        // TODO: Generate xml for key
-                        if (Settings.GenerateXmlObjects)
-                        {
-                            s.GenerateXmlObjectForItemType(keyType);
-                        }
-                    }*/);
+                var valueTypeIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
+                                          valueTypeInfo.IsNullable;
+
+                return GenerateWithReferenceAndNullability<TSchema>(valueType, valueTypeIsNullable, schemaResolver);
             }
         }
 

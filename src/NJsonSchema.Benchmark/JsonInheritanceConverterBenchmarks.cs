@@ -31,7 +31,7 @@ namespace NJsonSchema.Benchmark
             RunMode = RunMode.Throughput,
             TestMode = TestMode.Test)]
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 100)]
-        public void Write()
+        public void Serialize()
         {
             _tests.When_serializing_discriminator_property_is_set();
             _tests.When_serializing_discriminator_property_is_overwritten_if_already_present();
@@ -45,7 +45,7 @@ namespace NJsonSchema.Benchmark
             RunMode = RunMode.Throughput,
             TestMode = TestMode.Test)]
         [CounterThroughputAssertion("Iterations", MustBe.GreaterThan, 100)]
-        public void Read()
+        public void Deserialize()
         {
             _tests.When_deserializing_type_is_resolved_using_discriminator_value();
             _tests.When_deserializing_existing_property_is_populated_with_discriminator_value();
