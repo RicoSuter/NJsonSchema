@@ -36,7 +36,9 @@ namespace NJsonSchema.Generation
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
-            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Default;
+            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
+            DefaultDictionaryValueReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
+
             SchemaType = SchemaType.JsonSchema;
             GenerateAbstractSchemas = true;
 
@@ -52,8 +54,11 @@ namespace NJsonSchema.Generation
             ExcludedTypeNames = new string[0];
         }
 
-        /// <summary>Gets or sets the default reference type null handling when no nullability information is available (if NotNullAttribute and CanBeNullAttribute are missing, default: Null).</summary>
+        /// <summary>Gets or sets the default reference type null handling when no nullability information is available (default: Null).</summary>
         public ReferenceTypeNullHandling DefaultReferenceTypeNullHandling { get; set; }
+
+        /// <summary>Gets or sets the default reference type null handling of dictionary value types when no nullability information is available (default: NotNull).</summary>
+        public ReferenceTypeNullHandling DefaultDictionaryValueReferenceTypeNullHandling { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to generate abstract properties (i.e. interface and abstract properties. Properties may defined multiple times in a inheritance hierarchy, default: false).</summary>
         public bool GenerateAbstractProperties { get; set; }
@@ -81,7 +86,7 @@ namespace NJsonSchema.Generation
         public bool GenerateEnumMappingDescription { get; set; }
 
         /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
-        public bool AlwaysAllowAdditionalObjectProperties { get; set;}
+        public bool AlwaysAllowAdditionalObjectProperties { get; set; }
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
