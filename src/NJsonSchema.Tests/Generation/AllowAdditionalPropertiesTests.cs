@@ -5,7 +5,7 @@ using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
-    public class AlwaysAllowAdditionalObjectPropertiesTests
+    public class AllowAdditionalPropertiesTests
     {
         public class Person
         {

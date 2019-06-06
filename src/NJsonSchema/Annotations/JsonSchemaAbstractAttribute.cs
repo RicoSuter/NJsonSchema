@@ -11,7 +11,7 @@ using System;
 namespace NJsonSchema.Annotations
 {
     /// <summary>Annotation to merge all inherited properties into this class/schema.</summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class JsonSchemaAbstractAttribute : Attribute
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAbstractAttribute"/> class.</summary>

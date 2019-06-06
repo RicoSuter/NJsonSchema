@@ -237,14 +237,9 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (defaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Default && 
-                contextualType.Nullability != Nullability.Unknown)
+            if (contextualType.Nullability != Nullability.Unknown)
             {
                 return contextualType.Nullability == Nullability.Nullable;
-            }
-            else if (contextualType.IsNullableType)
-            {
-                return true;
             }
 
             var isValueType = contextualType.Type != typeof(string) &&
