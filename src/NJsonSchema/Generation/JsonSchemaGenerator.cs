@@ -1142,10 +1142,17 @@ namespace NJsonSchema.Generation
             if (jsonProperty.Ignored == false && IsPropertyIgnoredBySettings(memberInfo) == false)
             {
                 var propertyName = GetPropertyName(jsonProperty, memberInfo);
-                if (parentSchema.Properties.ContainsKey(propertyName))
+                var propExistsInParent = parentSchema.Properties.ContainsKey(propertyName);
+
+                if (schemaResolver.ShouldIgnoreDuplicateSchemaProperties && propExistsInParent)
+                {
+                   parentSchema.Properties.Remove(propertyName);
+                }
+                else if (!schemaResolver.ShouldIgnoreDuplicateSchemaProperties && propExistsInParent)
                 {
                     throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
                 }
+
 
                 var requiredAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
