@@ -26,6 +26,8 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema : IDocumentPathProvider
     {
+        internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
+
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
         private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
@@ -53,6 +55,11 @@ namespace NJsonSchema
         public JsonSchema()
         {
             Initialize();
+
+            if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
+            {
+                _allowAdditionalProperties = false; // the default for Swagger2 is false (change required when deserializing)
+            }
         }
 
         /// <summary>Creates a schema which matches any data.</summary>
@@ -236,7 +243,7 @@ namespace NJsonSchema
                     return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
                 }
 
-                return AllOf.First(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+                return AllOf.FirstOrDefault(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
             }
         }
 
@@ -735,12 +742,12 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&
+                                 Reference == null &&
                                  AllOf.Count == 0 &&
                                  AnyOf.Count == 0 &&
                                  OneOf.Count == 0 &&
                                  ActualProperties.Count == 0 &&
                                  PatternProperties.Count == 0 &&
-                                 AllowAdditionalProperties &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
                                  IsEnumeration == false;

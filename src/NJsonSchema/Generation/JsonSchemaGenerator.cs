@@ -583,6 +583,11 @@ namespace NJsonSchema.Generation
             if (valueType.OriginalType == typeof(object))
             {
                 schema.AdditionalPropertiesSchema = JsonSchema.CreateAnySchema();
+
+                if (Settings.SchemaType == SchemaType.Swagger2)
+                {
+                    schema.AdditionalPropertiesSchema.AllowAdditionalProperties = false;
+                }
             }
             else
             {
@@ -672,7 +677,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                schema.AllowAdditionalProperties = false;
+                schema.AllowAdditionalProperties = Settings.AlwaysAllowAdditionalObjectProperties;
             }
         }
 
@@ -736,6 +741,11 @@ namespace NJsonSchema.Generation
                 (contextualType.OriginalType.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) == true ||
                  contextualType.OriginalType == typeof(object)))
             {
+                if (Settings.SchemaType == SchemaType.Swagger2)
+                {
+                    schema.AllowAdditionalProperties = false;
+                }
+
                 return true;
             }
 
@@ -953,7 +963,7 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var actualSchema = new JsonSchema();
-
+                        
                         GenerateProperties(type, actualSchema, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 

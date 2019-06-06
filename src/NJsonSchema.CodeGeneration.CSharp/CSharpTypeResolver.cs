@@ -71,7 +71,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
             {
-                return "object";
+                return Settings.AnyType;
             }
 
             var type = schema.ActualTypeSchema.Type;

@@ -62,7 +62,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             !_schema.ActualTypeSchema.IsDictionary &&
             !_schema.IsArray &&
             !_schema.ActualTypeSchema.IsArray &&
-            (_schema.AdditionalPropertiesSchema != null ||
+            (_schema.AllowAdditionalProperties ||
+             _schema.ActualTypeSchema.AllowAdditionalProperties ||
+             _schema.AdditionalPropertiesSchema != null ||
              _schema.ActualTypeSchema.AdditionalPropertiesSchema != null);
 
         /// <summary>Gets the type of the additional properties.</summary>

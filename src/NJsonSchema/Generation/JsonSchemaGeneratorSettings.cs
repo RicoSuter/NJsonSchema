@@ -36,7 +36,7 @@ namespace NJsonSchema.Generation
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
         {
-            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
+            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Default;
             SchemaType = SchemaType.JsonSchema;
             GenerateAbstractSchemas = true;
 
@@ -79,6 +79,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to generate a description with number to enum name mappings (for integer enums only, default: false).</summary>
         public bool GenerateEnumMappingDescription { get; set; }
+
+        /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
+        public bool AlwaysAllowAdditionalObjectProperties { get; set;}
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }

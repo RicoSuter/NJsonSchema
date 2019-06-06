@@ -128,6 +128,16 @@ namespace NJsonSchema.Visitors
                     await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o).ConfigureAwait(false);
                 }
 
+                if (schema.DictionaryKey != null)
+                {
+                    await VisitAsync(schema.DictionaryKey, path + "/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o).ConfigureAwait(false);
+                }
+
+                if (schema.DiscriminatorRaw != null)
+                {
+                    await VisitAsync(schema.DiscriminatorRaw, path + "/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o).ConfigureAwait(false);
+                }
+
                 foreach (var p in schema.Properties.ToArray())
                 {
                     await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
@@ -154,13 +164,16 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (!(obj is string) && !(obj is JToken))
+            if (!(obj is string) && !(obj is JToken) && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
-                // Reflection fallback
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    foreach (var property in contract.Properties
-                        .Where(p => !p.Ignored && p.ShouldSerialize?.Invoke(obj) != false))
+                    foreach (var property in contract.Properties.Where(p =>
+                    {
+                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+                        return !isJsonSchemaProperty && !p.Ignored &&
+                                p.ShouldSerialize?.Invoke(obj) != false;
+                    }))
                     {
                         var value = property.ValueProvider.GetValue(obj);
                         if (value != null)
