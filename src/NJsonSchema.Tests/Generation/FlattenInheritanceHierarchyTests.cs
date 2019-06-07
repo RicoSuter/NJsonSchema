@@ -11,7 +11,6 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
-
             public List<string> Schedule { get; set; }
         }
 
@@ -174,14 +173,21 @@ namespace NJsonSchema.Tests.Generation
                 FlattenInheritanceHierarchy = true,
             };
 
-            //// Act & Assertion
-            var schema = JsonSchema.FromType(typeof(Teacher), settings);
-            var data = schema.ToJson();
+            //// Act 
+            var TeacherSchema = JsonSchema.FromType(typeof(Teacher), settings);
+            var TacherData = TeacherSchema.ToJson();
 
-            // if there's a definition it correctly parsed the data
-            Assert.True(schema.Definitions.ContainsKey("Schedule"));
-            Assert.True(schema.Properties["Schedule"].Type.HasFlag(JsonObjectType.Null));
-            Assert.True(schema.Properties["Schedule"].Type.HasFlag(JsonObjectType.Array));
+            var PersonSchema = JsonSchema.FromType(typeof(Person), settings);
+            var PersonData = PersonSchema.ToJson();
+
+            //// Assert
+            // Teacher correct schema
+            Assert.True(TeacherSchema.Definitions.ContainsKey("Schedule"));
+            Assert.True(TeacherSchema.Properties["Schedule"].Item.HasReference);
+
+            // Person correct schema
+            Assert.False(PersonSchema.Properties["Schedule"].Item.HasReference);
+            Assert.True(PersonSchema.Properties["Schedule"].Item.Type == JsonObjectType.String);
         }
     }
 }
