@@ -165,7 +165,6 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
         }
 
-
         [Fact]
         public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
         {
