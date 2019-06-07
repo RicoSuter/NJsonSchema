@@ -11,11 +11,19 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
+            public List<string> Schedule { get; set; }
         }
 
         public class Teacher : Person
         {
             public string Class { get; set; }
+            public List<Schedule> Schedule { get; set; }
+        }
+
+        public class Schedule
+        {
+            int a { get; set; }
+            int b { get; set; }
         }
 
         [Fact]
@@ -154,6 +162,32 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.ActualProperties.ContainsKey("Aaa"));
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Bbb"));
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
+        }
+
+        [Fact]
+        public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true,
+            };
+
+            //// Act 
+            var TeacherSchema = JsonSchema.FromType(typeof(Teacher), settings);
+            var TacherData = TeacherSchema.ToJson();
+
+            var PersonSchema = JsonSchema.FromType(typeof(Person), settings);
+            var PersonData = PersonSchema.ToJson();
+
+            //// Assert
+            // Teacher correct schema
+            Assert.True(TeacherSchema.Definitions.ContainsKey("Schedule"));
+            Assert.True(TeacherSchema.Properties["Schedule"].Item.HasReference);
+
+            // Person correct schema
+            Assert.False(PersonSchema.Properties["Schedule"].Item.HasReference);
+            Assert.True(PersonSchema.Properties["Schedule"].Item.Type == JsonObjectType.String);
         }
     }
 }
