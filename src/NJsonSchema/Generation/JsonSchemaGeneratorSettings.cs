@@ -66,9 +66,6 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to flatten the inheritance hierarchy instead of using allOf to describe inheritance (default: false).</summary>
         public bool FlattenInheritanceHierarchy { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to remove duplicates.</summary>
-        public bool IgnoreInhertianceDuplicates { get; set; }
-
         /// <summary>Gets or sets a value indicating whether to generate the x-abstract flag on schemas (default: true).</summary>
         public bool GenerateAbstractSchemas { get; set; }
 

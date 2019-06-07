@@ -27,11 +27,6 @@ namespace NJsonSchema.Generation
             _settings = settings;
         }
 
-        /// <summary>
-        /// Determines whether a schema will overwrite same property names from child inheritance
-        /// </summary>
-        public bool ShouldIgnoreDuplicateSchemaProperties => _settings.IgnoreInhertianceDuplicates;
-
         /// <summary>Determines whether the specified type has a schema.</summary>
         /// <param name="type">The type.</param>
         /// <param name="isIntegerEnumeration">Specifies whether the type is an integer enum.</param>

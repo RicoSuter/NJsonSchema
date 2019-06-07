@@ -11,11 +11,20 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
+
+            public List<string> Schedule { get; set; }
         }
 
         public class Teacher : Person
         {
             public string Class { get; set; }
+            public List<Schedule> Schedule { get; set; }
+        }
+
+        public class Schedule
+        {
+            int a { get; set; }
+            int b { get; set; }
         }
 
         [Fact]
@@ -154,6 +163,26 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.ActualProperties.ContainsKey("Aaa"));
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Bbb"));
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
+        }
+
+
+        [Fact]
+        public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true,
+            };
+
+            //// Act & Assertion
+            var schema = JsonSchema.FromType(typeof(Teacher), settings);
+            var data = schema.ToJson();
+
+            // if there's a definition it correctly parsed the data
+            Assert.True(schema.Definitions.ContainsKey("Schedule"));
+            Assert.True(schema.Properties["Schedule"].Type.HasFlag(JsonObjectType.Null));
+            Assert.True(schema.Properties["Schedule"].Type.HasFlag(JsonObjectType.Array));
         }
     }
 }
