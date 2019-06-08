@@ -59,7 +59,7 @@ namespace NJsonSchema.Generation
 
             if (schema != RootObject)
             {
-                AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
+                AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type), type);
             }
 
             _mappings.Add(GetKey(type, isIntegerEnumeration), schema);

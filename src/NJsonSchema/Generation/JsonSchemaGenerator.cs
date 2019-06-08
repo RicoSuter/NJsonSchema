@@ -1020,7 +1020,7 @@ namespace NJsonSchema.Generation
                             {
                                 if (schemaResolver.RootObject != baseSchema.ActualSchema)
                                 {
-                                    schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
+                                    schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType), type);
                                 }
 
                                 schema.AllOf.Add(new JsonSchema
