@@ -72,6 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.ActualTypeSchema.IsAnyType &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
+                !Types.Keys.Contains(schema) &&
                 !schema.HasReference)
             {
                 return Settings.AnyType;
