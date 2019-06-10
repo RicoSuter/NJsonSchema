@@ -69,7 +69,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             // Primitive schemas (no new type)
 
-            if (schema.ActualTypeSchema.IsAnyType && !schema.HasReference)
+            if (schema.ActualTypeSchema.IsAnyType &&
+                schema.InheritedSchema == null && // not in inheritance hierarchy
+                schema.AllOf.Count == 0 &&
+                !schema.HasReference)
             {
                 return Settings.AnyType;
             }
