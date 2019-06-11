@@ -11,6 +11,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Namotion.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
@@ -196,6 +198,22 @@ namespace NJsonSchema.Visitors
                                 dictionary.Remove(key);
                             }
                         });
+                    }
+
+                    // Custom dictionary type with additional properties (OpenApiPathItem)
+                    var contextualType = obj.GetType().ToContextualType();
+                    if (contextualType.TypeAttributes.OfType<JsonConverterAttribute>().Any())
+                    {
+                        foreach (var property in contextualType.Type.GetContextualProperties()
+                            .Where(p => p.MemberInfo.DeclaringType == contextualType.Type &&
+                                        !p.ContextAttributes.OfType<JsonIgnoreAttribute>().Any()))
+                        {
+                            var value = property.GetValue(obj);
+                            if (value != null)
+                            {
+                                Visit(value, path + "/" + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o));
+                            }
+                        }
                     }
                 }
                 else if (obj is IList list)
