@@ -49,13 +49,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
                 DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 
+                CheckNewableObject = parameters.CheckNewableObject,
                 IsNewableObject = IsNewableObject(parameters.Schema, parameters),
                 IsDate = IsDate(typeSchema.Format, parameters.Settings.DateTimeType),
                 IsDateTime = IsDateTime(typeSchema.Format, parameters.Settings.DateTimeType),

@@ -1,5 +1,9 @@
 ﻿{% if IsNewableObject -%}
+{%   if CheckNewableObject -%}
 {{ Variable }} = {{ Value }} ? {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %}) : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%   else -%}
+{{ Variable }} = {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %});
+{%   endif -%}
 {% elseif IsArray -%}
 if (Array.isArray({{ Value }})) {
     {{ Variable }} = [] as any;

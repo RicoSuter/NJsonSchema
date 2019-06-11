@@ -23,6 +23,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public bool IsPropertyNullable { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether to check the newable data object for null.</summary>
+        public bool CheckNewableObject { get; set; } = true;
+
         /// <summary>Gets the type name hint.</summary>
         public string TypeNameHint { get; set; }
 
