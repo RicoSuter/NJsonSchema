@@ -491,6 +491,7 @@ namespace NJsonSchema.Generation
             }
 
             schema.Description = type.ToCachedType().GetDescription();
+            schema.Example = GenerateExample(type.ToContextualType());
 
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
@@ -1207,6 +1208,11 @@ namespace NJsonSchema.Generation
                         propertySchema.Description = memberInfo.GetDescription();
                     }
 
+                    if (propertySchema.Example == null)
+                    {
+                        propertySchema.Example = GenerateExample(memberInfo);
+                    }
+
                     propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
 
                     ApplyDataAnnotations(propertySchema, propertyTypeDescription);
@@ -1217,6 +1223,28 @@ namespace NJsonSchema.Generation
 
                 parentSchema.Properties.Add(propertyName, referencingProperty);
             }
+        }
+
+        private object GenerateExample(ContextualType type)
+        {
+            if (Settings.GenerateExamples)
+            {
+                try
+                {
+                    var docs = type is ContextualMemberInfo member ?
+                        member.GetXmlDocsTag("example") :
+                        type.GetXmlDocsTag("example");
+
+                    return !string.IsNullOrEmpty(docs) ?
+                        JsonConvert.DeserializeObject<JToken>(docs) :
+                        null;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return null;
         }
 
         private bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
