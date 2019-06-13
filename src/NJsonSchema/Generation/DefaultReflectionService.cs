@@ -59,13 +59,13 @@ namespace NJsonSchema.Generation
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return JsonTypeDescription.Create(type, classType, isNullable, format);
+                return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
             }
 
             if (type.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(contextualType, settings.ActualSerializerSettings);
-                return JsonTypeDescription.CreateForEnumeration(type,
+                return JsonTypeDescription.CreateForEnumeration(contextualType,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
@@ -75,49 +75,49 @@ namespace NJsonSchema.Generation
                 type == typeof(uint) ||
                 type == typeof(ushort))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, null);
             }
 
             if (type == typeof(int))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
             }
 
             if (type == typeof(long) ||
                 type == typeof(ulong))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
 
             if (type == typeof(double) ||
                 type == typeof(float))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Double);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
             }
 
             if (type == typeof(decimal))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
             }
 
             if (type == typeof(bool))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Boolean, false, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Boolean, false, null);
             }
 
             if (type == typeof(string) || type == typeof(Type))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
             }
 
             if (type == typeof(char))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, null);
             }
 
             if (type == typeof(Guid))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Guid);
             }
 
             // Date & time types
@@ -129,63 +129,63 @@ namespace NJsonSchema.Generation
                 type.FullName == "NodaTime.ZonedDateTime" ||
                 type.FullName == "NodaTime.Instant")
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.DateTime);
             }
 
             if (type == typeof(TimeSpan) ||
                 type.FullName == "NodaTime.Duration")
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
             }
 
             if (type.FullName == "NodaTime.LocalDate")
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Date);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
             if (type.FullName == "NodaTime.LocalTime")
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Time);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
 
             // Special types
 
             if (type == typeof(Uri))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
             }
 
             if (type == typeof(byte))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
             }
 
             if (type == typeof(byte[]))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
             }
 
             if (type.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
             if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
                 type == typeof(object))
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.None, isNullable, null);
             }
 
             if (IsBinary(contextualType))
             {
                 if (settings.SchemaType == SchemaType.Swagger2)
                 {
-                    return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
+                    return JsonTypeDescription.Create(contextualType, JsonObjectType.File, isNullable, null);
                 }
                 else
                 {
-                    return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Binary);
+                    return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Binary);
                 }
             }
 
@@ -199,20 +199,20 @@ namespace NJsonSchema.Generation
             var contract = settings.ResolveContract(type);
             if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
             {
-                return JsonTypeDescription.CreateForDictionary(type, JsonObjectType.Object, isNullable);
+                return JsonTypeDescription.CreateForDictionary(contextualType, JsonObjectType.Object, isNullable);
             }
 
             if (IsArrayType(contextualType) && contract is JsonArrayContract)
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
             if (contract is JsonStringContract)
             {
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
             }
 
-            return JsonTypeDescription.Create(type, JsonObjectType.Object, isNullable, null);
+            return JsonTypeDescription.Create(contextualType, JsonObjectType.Object, isNullable, null);
         }
 
         /// <summary>Checks whether a type is nullable.</summary>
