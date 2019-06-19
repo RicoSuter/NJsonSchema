@@ -233,17 +233,17 @@ namespace NJsonSchema
                     return AllOf.First().ActualSchema;
                 }
 
-                if (AllOf.Any(s => s.HasReference && !s.ActualSchema.IsAnyType))
+                if (AllOf.Any(s => s.HasReference))
                 {
-                    return AllOf.First(s => s.HasReference && !s.ActualSchema.IsAnyType).ActualSchema;
+                    return AllOf.First(s => s.HasReference).ActualSchema;
                 }
 
-                if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType))
+                if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object)))
                 {
-                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object) && !s.ActualSchema.IsAnyType).ActualSchema;
+                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object)).ActualSchema;
                 }
 
-                return AllOf.FirstOrDefault(s => !s.ActualSchema.IsAnyType)?.ActualSchema;
+                return AllOf.FirstOrDefault()?.ActualSchema;
             }
         }
 

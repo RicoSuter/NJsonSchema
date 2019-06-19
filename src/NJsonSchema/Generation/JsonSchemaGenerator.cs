@@ -462,6 +462,31 @@ namespace NJsonSchema.Generation
             }
         }
 
+        /// <summary>Generates the example from the type's xml docs.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The JToken or null.</returns>
+        public virtual object GenerateExample(ContextualType type)
+        {
+            if (Settings.GenerateExamples)
+            {
+                try
+                {
+                    var docs = type is ContextualMemberInfo member ?
+                        member.GetXmlDocsTag("example") :
+                        type.GetXmlDocsTag("example");
+
+                    return !string.IsNullOrEmpty(docs) ?
+                        JsonConvert.DeserializeObject<JToken>(docs) :
+                        null;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+
         /// <summary>Generates the properties for the given type and schema.</summary>
         /// <param name="schema">The properties</param>
         /// <param name="typeDescription">The type description.</param>
@@ -491,6 +516,7 @@ namespace NJsonSchema.Generation
             }
 
             schema.Description = type.ToCachedType().GetDescription();
+            schema.Example = GenerateExample(type.ToContextualType());
 
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
@@ -1205,6 +1231,11 @@ namespace NJsonSchema.Generation
                     if (propertySchema.Description == null)
                     {
                         propertySchema.Description = memberInfo.GetDescription();
+                    }
+
+                    if (propertySchema.Example == null)
+                    {
+                        propertySchema.Example = GenerateExample(memberInfo);
                     }
 
                     propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
