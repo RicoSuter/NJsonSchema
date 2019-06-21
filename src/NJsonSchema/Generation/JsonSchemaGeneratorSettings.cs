@@ -41,6 +41,7 @@ namespace NJsonSchema.Generation
 
             SchemaType = SchemaType.JsonSchema;
             GenerateAbstractSchemas = true;
+            GenerateExamples = true;
 
             // Obsolete, use SerializerSettings instead
             DefaultEnumHandling = EnumHandling.Integer;
@@ -87,6 +88,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
         public bool AlwaysAllowAdditionalObjectProperties { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether tho generate the example property of the schemas based on the the &lt;example&gt; xml docs entry as JSON.</summary>
+        public bool GenerateExamples { get; set; }
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
