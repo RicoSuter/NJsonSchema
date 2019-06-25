@@ -287,23 +287,23 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var json = @"{  
-   ""type"":""object"",
-   ""properties"":{  
-      ""paataenktHandling"":{  
-         ""title"":""paataenktHandling"",
-         ""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
-         ""type"":[  
-            ""string"",
-            ""null""
-         ],
-         ""enum"":[  
-            ""Ændring"",
-            ""Nyoprettelse"",
-            ""Udgår"",
-            null
-         ]
-      }
-   }
+   ""type"":""object"",
+   ""properties"":{  
+      ""paataenktHandling"":{  
+         ""title"":""paataenktHandling"",
+         ""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
+         ""type"":[  
+            ""string"",
+            ""null""
+         ],
+         ""enum"":[  
+            ""Ændring"",
+            ""Nyoprettelse"",
+            ""Udgår"",
+            null
+         ]
+      }
+   }
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
