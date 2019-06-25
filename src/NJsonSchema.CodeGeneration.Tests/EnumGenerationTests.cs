@@ -174,8 +174,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("_0562 = <any>\"0562\", ", code);
-            Assert.Contains("_0532 = <any>\"0532\", ", code);
+            Assert.Contains("_0562 = <any>\"0562\",", code);
+            Assert.Contains("_0532 = <any>\"0532\",", code);
         }
 
         public class ClassWithStringEnum
@@ -224,8 +224,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("_0562 = 10, ", code);
-            Assert.Contains("_0532 = 15, ", code);
+            Assert.Contains("_0562 = 10,", code);
+            Assert.Contains("_0532 = 15,", code);
         }
 
         public class ClassWithIntegerEnum
@@ -287,23 +287,23 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var json = @"{  
-   ""type"":""object"",
-   ""properties"":{  
-      ""paataenktHandling"":{  
-         ""title"":""paataenktHandling"",
-         ""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
-         ""type"":[  
-            ""string"",
-            ""null""
-         ],
-         ""enum"":[  
-            ""Ændring"",
-            ""Nyoprettelse"",
-            ""Udgår"",
-            null
-         ]
-      }
-   }
+ï¿½ï¿½ï¿½""type"":""object"",
+ï¿½ï¿½ï¿½""properties"":{  
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""paataenktHandling"":{  
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""title"":""paataenktHandling"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""type"":[  
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""string"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""null""
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½],
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""enum"":[  
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""ï¿½ndring"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""Nyoprettelse"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½""Udgï¿½r"",
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½null
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}
+ï¿½ï¿½ï¿½}
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
