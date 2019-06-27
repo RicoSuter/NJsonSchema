@@ -66,10 +66,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the any type (default: "object").</summary>
         public string AnyType { get; set; }
 
-        /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
+        /// <summary>Gets or sets the date .NET type (default: 'DateTimeOffset').</summary>
         public string DateType { get; set; }
 
-        /// <summary>Gets or sets the date time .NET type (default: 'DateTime').</summary>
+        /// <summary>Gets or sets the date time .NET type (default: 'DateTimeOffset').</summary>
         public string DateTimeType { get; set; }
 
         /// <summary>Gets or sets the time .NET type (default: 'TimeSpan').</summary>
@@ -78,19 +78,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
         public string TimeSpanType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type (default: 'ObservableCollection').</summary>
+        /// <summary>Gets or sets the generic array .NET type (default: 'ICollection').</summary>
         public string ArrayType { get; set; }
 
-        /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
+        /// <summary>Gets or sets the generic dictionary .NET type (default: 'IDictionary').</summary>
         public string DictionaryType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type which is used for ArrayType instances (default: empty = use ArrayType).</summary>
+        /// <summary>Gets or sets the generic array .NET type which is used for ArrayType instances (default: 'Collection').</summary>
         public string ArrayInstanceType { get; set; }
 
-        /// <summary>Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: empty = use DictionaryType).</summary>
+        /// <summary>Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').</summary>
         public string DictionaryInstanceType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'ObservableCollection').</summary>
+        /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'Collection').</summary>
         public string ArrayBaseType { get; set; }
 
         /// <summary>Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').</summary>

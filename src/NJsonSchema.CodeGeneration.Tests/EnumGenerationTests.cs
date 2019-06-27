@@ -174,8 +174,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("_0562 = <any>\"0562\", ", code);
-            Assert.Contains("_0532 = <any>\"0532\", ", code);
+            Assert.Contains("_0562 = <any>\"0562\",", code);
+            Assert.Contains("_0532 = <any>\"0532\",", code);
         }
 
         public class ClassWithStringEnum
@@ -224,8 +224,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("_0562 = 10, ", code);
-            Assert.Contains("_0532 = 15, ", code);
+            Assert.Contains("_0562 = 10,", code);
+            Assert.Contains("_0532 = 15,", code);
         }
 
         public class ClassWithIntegerEnum
@@ -287,23 +287,23 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var json = @"{  
-   ""type"":""object"",
-   ""properties"":{  
-      ""paataenktHandling"":{  
-         ""title"":""paataenktHandling"",
-         ""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
-         ""type"":[  
-            ""string"",
-            ""null""
-         ],
-         ""enum"":[  
-            ""Ændring"",
-            ""Nyoprettelse"",
-            ""Udgår"",
-            null
-         ]
-      }
-   }
+Â Â Â ""type"":""object"",
+Â Â Â ""properties"":{  
+Â Â Â Â Â Â ""paataenktHandling"":{  
+Â Â Â Â Â Â Â Â Â ""title"":""paataenktHandling"",
+Â Â Â Â Â Â Â Â Â ""description"":""EAID_D38C4D27_B57C_4356_89E1_05E8DA0250B6"",
+Â Â Â Â Â Â Â Â Â ""type"":[  
+Â Â Â Â Â Â Â Â Â Â Â Â ""string"",
+Â Â Â Â Â Â Â Â Â Â Â Â ""null""
+Â Â Â Â Â Â Â Â Â ],
+Â Â Â Â Â Â Â Â Â ""enum"":[  
+Â Â Â Â Â Â Â Â Â Â Â Â ""Ã†ndring"",
+Â Â Â Â Â Â Â Â Â Â Â Â ""Nyoprettelse"",
+Â Â Â Â Â Â Â Â Â Â Â Â ""UdgÃ¥r"",
+Â Â Â Â Â Â Â Â Â Â Â Â null
+Â Â Â Â Â Â Â Â Â ]
+Â Â Â Â Â Â }
+Â Â Â }
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 

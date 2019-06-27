@@ -896,14 +896,7 @@ namespace NJsonSchema.Generation
                     if (shouldSerialize)
                     {
                         var memberInfo = contextualMembers.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
-                        var propertyInfo = memberInfo as ContextualPropertyInfo;
-
-                        if (Settings.GenerateAbstractProperties || propertyInfo == null || propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface ||
-#if !LEGACY
-                            (propertyInfo.PropertyInfo.GetMethod?.IsAbstract != true && propertyInfo.PropertyInfo.SetMethod?.IsAbstract != true))
-#else
-                            (propertyInfo.PropertyInfo.GetGetMethod()?.IsAbstract != true && propertyInfo.PropertyInfo.GetSetMethod()?.IsAbstract != true))
-#endif
+                        if (memberInfo != null && (Settings.GenerateAbstractProperties || !IsAbstractProperty(memberInfo)))
                         {
                             LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
                         }
@@ -943,6 +936,17 @@ namespace NJsonSchema.Generation
                     LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
                 }
             }
+        }
+
+        private bool IsAbstractProperty(ContextualMemberInfo memberInfo)
+        {
+            return memberInfo is ContextualPropertyInfo propertyInfo &&
+                   !propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface &&
+#if !LEGACY
+                   (propertyInfo.PropertyInfo.GetMethod?.IsAbstract == true || propertyInfo.PropertyInfo.SetMethod?.IsAbstract == true);
+#else
+                   (propertyInfo.PropertyInfo.GetGetMethod()?.IsAbstract == true || propertyInfo.PropertyInfo.GetSetMethod()?.IsAbstract == true);
+#endif
         }
 
         private void GenerateKnownTypes(Type type, JsonSchemaResolver schemaResolver)
