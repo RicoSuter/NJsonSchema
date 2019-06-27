@@ -2,7 +2,7 @@
 // <copyright file="OpenApiDiscriminator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ namespace NJsonSchema
         /// <summary>
         /// Used to convert from Dictionary{string, JsonSchema4} (NJsonSchema model) to Dictionary{string, string} (OpenAPI).
         /// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#discriminator-object and
-        /// issue https://github.com/RSuter/NSwag/issues/1684
+        /// issue https://github.com/RicoSuter/NSwag/issues/1684
         /// </summary>
         private class DiscriminatorMappingConverter : JsonConverter
         {
