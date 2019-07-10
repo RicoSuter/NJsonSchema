@@ -286,9 +286,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             //// Arrange
             var json = await JsonSchema4.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
-            var data = json.ToJson();
+            var _ = json.ToJson();
 
-            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
 
             //// Act
             var code = generator.GenerateFile();
@@ -297,13 +297,13 @@ namespace NJsonSchema.CodeGeneration.Tests
             var type = assembly.GetType("foo.Foo");
             if (type == null)
             {
-                throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
+                throw new Exception("Foo not found in " + string.Join(", ", assembly.GetTypes().Select(t => t.Name)));
             }
 
             var bar = JsonConvert.DeserializeObject(@"{""discriminator"":""bar""}", type);
 
             //// Assert
-            Assert.Contains(@"""bar""", JsonConvert.SerializeObject(bar));
+            Assert.Contains("\"bar\"", JsonConvert.SerializeObject(bar));
         }
 
         private Assembly Compile(string code)

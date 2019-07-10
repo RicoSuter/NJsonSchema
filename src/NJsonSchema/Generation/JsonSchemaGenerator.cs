@@ -928,6 +928,7 @@ namespace NJsonSchema.Generation
 
                 var hasJsonNetAttributeRequired = property.Required == Required.Always || property.Required == Required.AllowNull;
                 var isDataContractMemberRequired = GetDataMemberAttribute(parentType, propertyAttributes)?.IsRequired == true;
+                if (HasNotNullAttribute(propertyAttributes)) isDataContractMemberRequired = true;
 
                 var hasRequiredAttribute = requiredAttribute != null;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
@@ -973,6 +974,11 @@ namespace NJsonSchema.Generation
             }
         }
 
+        private bool HasNotNullAttribute(Attribute[] propertyAttributes)
+        {
+            return propertyAttributes.Any(a=>a.GetType().Name.Contains("NotNull"));
+        }
+
         private bool IsPropertyIgnored(Type propertyType, Type parentType, Attribute[] propertyAttributes)
         {
             if (propertyAttributes.Any(a => a is JsonIgnoreAttribute))
@@ -994,9 +1000,6 @@ namespace NJsonSchema.Generation
 
         private static dynamic GetDataMemberAttribute(Type parentType, Attribute[] propertyAttributes)
         {
-            if (!HasDataContractAttribute(parentType))
-                return null;
-
             return propertyAttributes.TryGetIfAssignableTo("DataMemberAttribute", TypeNameStyle.Name);
         }
 
