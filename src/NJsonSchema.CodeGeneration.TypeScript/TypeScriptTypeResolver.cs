@@ -148,10 +148,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + ResolveDictionaryKeyType(schema, defaultType) : defaultType;
                 if (keyType != defaultType)
                 {
-                    return $"{{ [key in keyof typeof {keyType}] : {valueType}; }}";
+                    return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
                 }
 
-                return $"{{ [key: {keyType}] : {valueType}; }}";
+                return $"{{ [key: {keyType}]: {valueType}; }}";
             }
 
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
