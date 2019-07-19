@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             if (inlineNamedDictionaries)
             {
-                Assert.Contains("customDictionary: { [key: string] : any; } | undefined;", code);
+                Assert.Contains("customDictionary: { [key: string]: any; } | undefined;", code);
                 Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
             }
             else

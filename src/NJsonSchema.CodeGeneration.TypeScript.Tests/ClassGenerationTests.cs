@@ -177,9 +177,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("a: { [key: string] : string; };", code);
+            Assert.Contains("a: { [key: string]: string; };", code);
             Assert.Contains("this.a = {};", code);
-            Assert.Contains("b: { [key: string] : string; };", code);
+            Assert.Contains("b: { [key: string]: string; };", code);
         }
 
         [Fact]
