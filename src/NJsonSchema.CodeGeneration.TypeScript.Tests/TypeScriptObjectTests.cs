@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("Test: { [key: string] : any; };", code);
+            Assert.Contains("Test: { [key: string]: any; };", code);
         }
     }
 }

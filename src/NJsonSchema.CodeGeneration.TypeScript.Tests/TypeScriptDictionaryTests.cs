@@ -38,8 +38,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("Mapping: { [key: string] : string; };", code);
-            Assert.Contains("Mapping2: { [key: string] : string; };", code);
+            Assert.Contains("Mapping: { [key: string]: string; };", code);
+            Assert.Contains("Mapping2: { [key: string]: string; };", code);
         }
 
         [Fact]
@@ -54,8 +54,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("Mapping: { [key in keyof typeof PropertyName] : string; } | undefined;", code);
-            Assert.Contains("Mapping2: { [key in keyof typeof PropertyName] : string; } | undefined;", code);
+            Assert.Contains("Mapping: { [key in keyof typeof PropertyName]: string; } | undefined;", code);
+            Assert.Contains("Mapping2: { [key in keyof typeof PropertyName]: string; } | undefined;", code);
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -88,8 +88,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("Mapping: { [key: string] : Gender; };", code);
-            Assert.Contains("Mapping2: { [key: string] : Gender; };", code);
+            Assert.Contains("Mapping: { [key: string]: Gender; };", code);
+            Assert.Contains("Mapping2: { [key: string]: Gender; };", code);
         }
     }
 }
