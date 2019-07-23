@@ -33,7 +33,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = typeResolver;
+            
+            Id = property.Id;
+            if (property.Reference != null && string.IsNullOrEmpty(Id))
+                Id = property.Reference.Id;
         }
+
+        /// <summary>
+        /// Id for the property
+        /// </summary>
+        public string Id { get;  }
 
         /// <summary>Gets the name of the property.</summary>
         public string Name => _property.Name;
