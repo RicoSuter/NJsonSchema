@@ -188,15 +188,27 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
-                       (_property.MinLength.HasValue || _property.MaxLength.HasValue);
+                       (_property.MinLength.HasValue || _property.MaxLength.HasValue ||
+                       _property.ActualTypeSchema.MinLength.HasValue || _property.ActualTypeSchema.MaxLength.HasValue);
             }
         }
 
         /// <summary>Gets the minimum value of the string length attribute.</summary>
-        public int StringLengthMinimumValue => _property.MinLength ?? 0;
+        public int StringLengthMinimumValue => _property.MinLength ?? _property.ActualTypeSchema.MinLength ?? 0;
 
         /// <summary>Gets the maximum value of the string length attribute.</summary>
-        public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+        public string StringLengthMaximumValue
+        {
+            get
+            {
+                if (_property.MaxLength.HasValue)
+                    return _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture);
+                if (_property.ActualTypeSchema.MaxLength.HasValue)
+                    return _property.ActualTypeSchema.MaxLength.Value.ToString(CultureInfo.InvariantCulture);
+
+                return $"int.{nameof(int.MaxValue)}";
+            }
+        }
 
         /// <summary>Gets a value indicating whether to render the min length attribute.</summary>
         public bool RenderMinLengthAttribute
