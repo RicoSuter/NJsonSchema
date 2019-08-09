@@ -1278,6 +1278,11 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
+            if (property.GetContextAttribute<JsonPropertyIgnoreAttribute>() != null)
+            {
+                return true;
+            }
+
             return false;
         }
 
