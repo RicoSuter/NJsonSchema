@@ -84,9 +84,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
     supervisor: MyClass;
     address: IAddress;
     cars: ICar[];
-    skills: { [key: string] : ISkill; };
+    skills: { [key: string]: ISkill; };
     foo: Car[][];
-    bar: { [key: string] : Skill[]; };
+    bar: { [key: string]: Skill[]; };
 }".Replace("\r", "").Replace("\n", ""), output.Replace("\r", "").Replace("\n", ""));
         }
 
@@ -120,9 +120,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
 
             var output = generator.GenerateFile("MyClass");
-            
+
             //// Assert
-            Assert.Contains("custom4: { [key: string] : string; }[];", output);
+            Assert.Contains("custom4: { [key: string]: string; }[];", output);
         }
     }
 }

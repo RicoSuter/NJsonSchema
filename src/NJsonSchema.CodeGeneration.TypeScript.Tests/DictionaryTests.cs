@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.DoesNotContain("extends { [key: string]: any; }", code);
             Assert.Contains("[key: string]: any; ", code);
         }
 
@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.DoesNotContain("extends { [key: string]: any; }", code);
             Assert.DoesNotContain("super()", code);
             Assert.Contains("[key: string]: any; ", code);
         }
@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.DoesNotContain("extends { [key: string]: string; }", code);
             Assert.Contains("[key: string]: string | any; ", code);
         }
 
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.DoesNotContain("extends { [key: string]: string; }", code);
             Assert.DoesNotContain("super()", code);
             Assert.Contains("[key: string]: string | any; ", code);
         }
@@ -232,7 +232,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             if (inlineNamedDictionaries)
             {
-                Assert.Contains("foo: { [key: string] : string; };", code);
+                Assert.Contains("foo: { [key: string]: string; };", code);
                 Assert.Contains(@"data[""Foo""] = {};", code);
                 Assert.Contains(@"this.foo = {} as any;", code);
 

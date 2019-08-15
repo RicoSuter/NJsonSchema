@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains(@"lastName: string;", output);
-            Assert.Contains(@"Dictionary: { [key: string] : number; };", output);
+            Assert.Contains(@"Dictionary: { [key: string]: number; };", output);
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("dict: { [key: string] : string; };", code); // property not nullable
+            Assert.Contains("dict: { [key: string]: string; };", code); // property not nullable
             Assert.Contains("this.dict = {};", code); // must be initialized with {}
         }
 

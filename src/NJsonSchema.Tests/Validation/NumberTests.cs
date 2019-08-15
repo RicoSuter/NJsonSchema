@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Validation
         // [Fact]
         public async Task When_integer_is_big_integer_then_validation_works()
         {
-            // See https://github.com/RSuter/NJsonSchema/issues/568
+            // See https://github.com/RicoSuter/NJsonSchema/issues/568
 
             /// Arrange
             const string json = @"{

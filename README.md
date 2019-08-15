@@ -6,7 +6,7 @@ NJsonSchema for .NET
 [![MyGet](https://img.shields.io/myget/njsonschema/v/NJsonSchema.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/njsonschema)
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
-[![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/rsuter/njsonschema/wiki)
+[![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
 
@@ -27,9 +27,9 @@ Preview NuGet Feed: https://www.myget.org/gallery/njsonschema
 
 **Features:**
 
-- [Read existing JSON Schemas](https://github.com/RSuter/NJsonSchema/wiki/JsonSchema) and [validate JSON data](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema.FromJsonAsync()`)
-- [Generate JSON Schema from .NET type via reflection](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromTypeAsync<MyType>()`)
-- [Generate JSON Schema from sample JSON data](https://github.com/RSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
+- [Read existing JSON Schemas](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchema) and [validate JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema.FromJsonAsync()`)
+- [Generate JSON Schema from .NET type via reflection](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromTypeAsync<MyType>()`)
+- [Generate JSON Schema from sample JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 - Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
@@ -425,4 +425,4 @@ Applications which use the library:
 
 - [VisualJsonEditor](http://visualjsoneditor.org), a JSON schema based file editor for Windows. 
 - [NSwag](http://nswag.org): The Swagger API toolchain for .NET
-- [SigSpec for SignalR Core](https://github.com/RSuter/SigSpec): Specification and code generator for SignalR Core. 
+- [SigSpec for SignalR Core](https://github.com/RicoSuter/SigSpec): Specification and code generator for SignalR Core. 

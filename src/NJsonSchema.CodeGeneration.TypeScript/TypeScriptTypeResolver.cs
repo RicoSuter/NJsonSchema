@@ -2,7 +2,7 @@
 // <copyright file="CSharpTypeResolver.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -148,10 +148,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + ResolveDictionaryKeyType(schema, defaultType) : defaultType;
                 if (keyType != defaultType)
                 {
-                    return $"{{ [key in keyof typeof {keyType}] : {valueType}; }}";
+                    return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
                 }
 
-                return $"{{ [key: {keyType}] : {valueType}; }}";
+                return $"{{ [key: {keyType}]: {valueType}; }}";
             }
 
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
