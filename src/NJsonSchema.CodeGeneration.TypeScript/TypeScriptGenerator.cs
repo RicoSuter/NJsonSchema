@@ -134,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             }
             else
             {
-                var model = new ClassTemplateModel(typeName, typeNameHint, Settings, _resolver, schema, RootObject);
+                var model = new ClassTemplateModel(typeName, Settings, _resolver, schema, RootObject);
                 var template = Settings.CreateTemplate(typeName, model);
 
                 var type = Settings.TypeStyle == TypeScriptTypeStyle.Interface
