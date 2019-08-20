@@ -50,6 +50,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
+        /// <summary>Gets a value indicating whether the property is nullable.</summary>
+        public override bool IsNullable => _settings.GenerateNullableOptionalProperties && !_property.IsRequired ? true : base.IsNullable;
+
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
             _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
