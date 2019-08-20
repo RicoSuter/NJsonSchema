@@ -136,6 +136,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             //// Assert
+            Assert.Contains("class ExceptionBase extends Exception", code);
+            Assert.Contains("class MyException extends ExceptionBase", code);
+
             Assert.Contains("this._discriminator = \"FooBar\";", code);
             Assert.Contains("if (data[\"kind\"] === \"FooBar\") {", code);
         }
