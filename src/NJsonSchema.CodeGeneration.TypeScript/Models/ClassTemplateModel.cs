@@ -18,14 +18,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonSchema _schema;
         private readonly TypeScriptTypeResolver _resolver;
+        private readonly string _discriminatorName;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
         /// <param name="typeName">The type name.</param>
+        /// <param name="discriminatorName">The name to compare the discriminator against.</param>
         /// <param name="settings">The settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, 
+        public ClassTemplateModel(string typeName, string discriminatorName,
             TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver,
             JsonSchema schema, object rootObject)
             : base(resolver, schema, rootObject)
@@ -33,9 +35,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _settings = settings;
             _schema = schema;
             _resolver = resolver;
+            _discriminatorName = discriminatorName;
 
             ClassName = typeName;
-
             Properties = _schema.ActualProperties.Values
                 .Where(v => v.IsInheritanceDiscriminator == false)
                 .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
@@ -46,10 +48,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public override string ClassName { get; }
 
         /// <summary>Gets the name for the discriminator check.</summary>
-        public string DiscriminatorName => HasBaseDiscriminator ? 
-            (_schema.ResponsibleDiscriminatorObject.Mapping.Any(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema) ?
-             _schema.ResponsibleDiscriminatorObject.Mapping.First(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key : ClassName) : 
-            string.Empty;
+        public string DiscriminatorName => HasBaseDiscriminator ?
+            (_schema.ResponsibleDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
+            _discriminatorName;
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
