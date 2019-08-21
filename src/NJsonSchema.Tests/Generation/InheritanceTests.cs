@@ -300,9 +300,10 @@ namespace NJsonSchema.Tests.Generation
 
             //// Act
             JsonSchema GetSchema() => JsonSchema.FromType<BaseClass_WithIntDiscriminant>();
+            Action getSchemaAction = () => GetSchema();
 
             //// Assert
-            Assert.Throws<InvalidOperationException>(GetSchema);
+            Assert.Throws<InvalidOperationException>(getSchemaAction);
         }
 
         public class Foo
