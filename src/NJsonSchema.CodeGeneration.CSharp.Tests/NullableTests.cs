@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 SchemaType = SchemaType.OpenApi3,
-                GenerateNullableOptionalProperties = true
+                GenerateOptionalPropertiesAsNullable = true
             });
             var code = generator.GenerateFile("MyClass");
 

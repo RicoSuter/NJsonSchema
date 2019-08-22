@@ -136,6 +136,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool InlineNamedArrays { get; set; }
 
         /// <summary>Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false).</summary>
-        public bool GenerateNullableOptionalProperties { get; set; }
+        public bool GenerateOptionalPropertiesAsNullable { get; set; }
     }
 }
