@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
-        public override bool IsNullable => _settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired ? true : base.IsNullable;
+        public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
 
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
