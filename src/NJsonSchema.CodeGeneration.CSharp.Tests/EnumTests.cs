@@ -309,5 +309,68 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.DoesNotContain("public enum Anonymous", code);
             Assert.Contains("public enum Status", code);
         }
+
+        [Fact]
+        public async Task When_enum_is_integer_flags_it_should_use_declared_values()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""properties"": {
+        ""foo"": {
+            ""$ref"": ""#/definitions/FlagsTestEnum""
+        }
+    },
+    ""definitions"": {
+       ""FlagsTestEnum"": {
+           ""type"": ""integer"",
+           ""description"": """",
+           ""x-enumFlags"": true,
+           ""x-enumNames"": [
+             ""None"",
+             ""FirstBit"",
+             ""SecondBit"",
+             ""ThirdBit"",
+             ""FirstAndSecondBits"",
+             ""All""
+           ],
+        ""enum"": [
+          0,
+          1,
+          2,
+          4,
+          3,
+          7
+        ]
+      }
+    }
+}";
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            //// Assert
+            Assert.DoesNotContain("public enum Anonymous", code);
+            // Verify previous incorrect logic wasn't used to determine enum values (and doesn't generate duplicate incorrect values):
+            Assert.DoesNotContain("None = 1,", code);
+            Assert.DoesNotContain("FirstBit = 2,", code);
+            Assert.DoesNotContain("SecondBit = 4,", code);
+            Assert.DoesNotContain("ThirdBit = 8,", code);
+            Assert.DoesNotContain("FirstAndSecondBits = 16,", code);
+            Assert.DoesNotContain("All = 16,", code);
+            Assert.DoesNotContain("All = 32,", code);
+            // Verify correct logic:
+            Assert.Contains("public enum FlagsTestEnum", code);
+            Assert.Contains("None = 0,", code);
+            Assert.Contains("FirstBit = 1,", code);
+            Assert.Contains("SecondBit = 2,", code);
+            Assert.Contains("ThirdBit = 4,", code);
+            Assert.Contains("FirstAndSecondBits = 3,", code);
+            Assert.Contains("All = 7,", code);
+        }
     }
 }
