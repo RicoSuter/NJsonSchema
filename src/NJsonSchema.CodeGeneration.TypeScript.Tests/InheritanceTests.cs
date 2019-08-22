@@ -4,6 +4,7 @@ using NJsonSchema.Converters;
 using NJsonSchema.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Xunit;
@@ -113,6 +114,33 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.Contains("class ExceptionBase extends Exception", code);
             Assert.Contains("class MyException extends ExceptionBase", code);
+
+            Assert.Contains("this._discriminator = \"MyException\";", code);
+            Assert.Contains("if (data[\"kind\"] === \"MyException\") {", code);
+        }
+
+        [Fact]
+        public async Task When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<ExceptionContainer>();
+
+            schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping["FooBar"] =
+                schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping["MyException"];
+            schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping.Remove("MyException");
+
+            var data = schema.ToJson();
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("class ExceptionBase extends Exception", code);
+            Assert.Contains("class MyException extends ExceptionBase", code);
+
+            Assert.Contains("this._discriminator = \"FooBar\";", code);
+            Assert.Contains("if (data[\"kind\"] === \"FooBar\") {", code);
         }
 
         [Theory]
