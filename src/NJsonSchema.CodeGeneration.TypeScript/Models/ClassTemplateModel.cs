@@ -18,6 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonSchema _schema;
         private readonly TypeScriptTypeResolver _resolver;
+        private readonly string _discriminatorName;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
         /// <param name="typeName">The type name.</param>
@@ -34,10 +35,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             _settings = settings;
             _schema = schema;
             _resolver = resolver;
+            _discriminatorName = discriminatorName;
 
             ClassName = typeName;
-            DiscriminatorName = discriminatorName;
-
             Properties = _schema.ActualProperties.Values
                 .Where(v => v.IsInheritanceDiscriminator == false)
                 .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
@@ -48,7 +48,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public override string ClassName { get; }
 
         /// <summary>Gets the name for the discriminator check.</summary>
-        public string DiscriminatorName { get; }
+        public string DiscriminatorName => HasBaseDiscriminator ?
+            (_schema.ResponsibleDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
+            _discriminatorName;
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
