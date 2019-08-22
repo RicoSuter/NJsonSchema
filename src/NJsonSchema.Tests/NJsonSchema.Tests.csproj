@@ -8,6 +8,7 @@
 
   <PropertyGroup>
     <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Tests.xml</DocumentationFile>
+    <NoWarn>1998,1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
