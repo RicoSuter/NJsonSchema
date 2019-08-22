@@ -68,6 +68,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             // Primitive schemas (no new type)
+            if (Settings.GenerateOptionalPropertiesAsNullable &&
+                schema is JsonSchemaProperty property &&
+                !property.IsRequired)
+            {
+                isNullable = true;
+            }
 
             if (schema.ActualTypeSchema.IsAnyType &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy

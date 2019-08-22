@@ -134,5 +134,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.</summary>
         public bool InlineNamedArrays { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false).</summary>
+        public bool GenerateOptionalPropertiesAsNullable { get; set; }
     }
 }
