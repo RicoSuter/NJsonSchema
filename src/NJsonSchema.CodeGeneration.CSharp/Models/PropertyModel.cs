@@ -127,7 +127,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     return false;
                 }
 
-                return _property.Maximum.HasValue || _property.Minimum.HasValue;
+                return _property.ActualSchema.Maximum.HasValue || _property.ActualSchema.Minimum.HasValue;
             }
         }
 
@@ -147,8 +147,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     _property.Format == JsonFormatStrings.Decimal ?
                         "double" : "int";
 
-                return _property.Minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Minimum.Value, format)
+                return _property.ActualSchema.Minimum.HasValue
+                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -169,8 +169,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     _property.Format == JsonFormatStrings.Decimal ?
                         "double" : "int";
 
-                return _property.Maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Maximum.Value, format)
+                return _property.ActualSchema.Maximum.HasValue
+                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Maximum.Value, format)
                     : type + "." + nameof(double.MaxValue);
             }
         }
@@ -191,15 +191,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
-                       (_property.MinLength.HasValue || _property.MaxLength.HasValue);
+                       (_property.ActualSchema.MinLength.HasValue || _property.ActualSchema.MaxLength.HasValue);
             }
         }
 
         /// <summary>Gets the minimum value of the string length attribute.</summary>
-        public int StringLengthMinimumValue => _property.MinLength ?? 0;
+        public int StringLengthMinimumValue => _property.ActualSchema.MinLength ?? 0;
 
         /// <summary>Gets the maximum value of the string length attribute.</summary>
-        public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+        public string StringLengthMaximumValue => _property.ActualSchema.MaxLength.HasValue ? _property.ActualSchema.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
 
         /// <summary>Gets a value indicating whether to render the min length attribute.</summary>
         public bool RenderMinLengthAttribute
@@ -211,12 +211,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     return false;
                 }
 
-                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MinItems > 0;
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.ActualSchema.MinItems > 0;
             }
         }
 
         /// <summary>Gets the value of the min length attribute.</summary>
-        public int MinLengthAttribute => _property.MinItems;
+        public int MinLengthAttribute => _property.ActualSchema.MinItems;
 
         /// <summary>Gets a value indicating whether to render the max length attribute.</summary>
         public bool RenderMaxLengthAttribute
@@ -228,12 +228,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     return false;
                 }
 
-                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.MaxItems > 0;
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.ActualSchema.MaxItems > 0;
             }
         }
 
         /// <summary>Gets the value of the max length attribute.</summary>
-        public int MaxLengthAttribute => _property.MaxItems;
+        public int MaxLengthAttribute => _property.ActualSchema.MaxItems;
 
         /// <summary>Gets a value indicating whether to render a regular expression attribute.</summary>
         public bool RenderRegularExpressionAttribute
@@ -246,12 +246,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
-                       !string.IsNullOrEmpty(_property.Pattern);
+                       !string.IsNullOrEmpty(_property.ActualSchema.Pattern);
             }
         }
 
         /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
-        public string RegularExpressionValue => _property.Pattern?.Replace("\"", "\"\"");
+        public string RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type == JsonObjectType.String;
