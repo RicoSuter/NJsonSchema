@@ -33,8 +33,8 @@ namespace NJsonSchema.CodeGeneration
                 name = "__" + name.Substring(2);
             }
 
-            return ConversionUtilities.ConvertToUpperCamelCase(_invalidNameCharactersPattern.Replace(name, "_")
-                .Replace(":", "-").Replace(@"""", @""), true);
+            return _invalidNameCharactersPattern.Replace(ConversionUtilities.ConvertToUpperCamelCase(name
+                .Replace(":", "-").Replace(@"""", @""), true), "_");
         }
     }
 }
