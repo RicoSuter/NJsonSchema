@@ -107,14 +107,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return ResolveBoolean(isNullable);
             }
 
-            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
-            {
-                return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
-            }
-
             if (schema.IsBinary)
             {
                 return "byte[]";
+            }
+
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+            {
+                return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
             }
 
             // Type generating schemas
