@@ -206,6 +206,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Duration";
                 }
             }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.Luxon)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "Duration";
+                }
+            }
 
             return "string";
         }
