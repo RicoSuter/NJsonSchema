@@ -388,7 +388,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public Collection<string> EnumerationNamesRaw
+        internal Collection<string> EnumerationNamesRaw
         {
             get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
             set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
