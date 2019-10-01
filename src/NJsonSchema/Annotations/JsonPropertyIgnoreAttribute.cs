@@ -12,7 +12,7 @@ namespace NJsonSchema.Annotations
 {
     /// <summary>Indicates that the marked property is ignored during the JSON Schema generation.</summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class JsonPropertyIgnoreAttribute : Attribute
+    public class JsonSchemaIgnoreAttribute : Attribute
     {
     }
 }
