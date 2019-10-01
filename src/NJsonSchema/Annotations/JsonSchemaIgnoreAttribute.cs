@@ -11,7 +11,7 @@ using System;
 namespace NJsonSchema.Annotations
 {
     /// <summary>Indicates that the marked class is ignored during the JSON Schema generation.</summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
     public class JsonSchemaIgnoreAttribute : Attribute
     {
     }

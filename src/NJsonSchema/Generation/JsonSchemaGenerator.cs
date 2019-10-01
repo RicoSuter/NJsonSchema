@@ -1278,7 +1278,7 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (property.GetContextAttribute<JsonPropertyIgnoreAttribute>() != null)
+            if (property.GetContextAttribute<JsonSchemaIgnoreAttribute>() != null)
             {
                 return true;
             }
