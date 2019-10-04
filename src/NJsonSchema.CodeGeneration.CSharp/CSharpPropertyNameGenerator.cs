@@ -27,7 +27,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace("+", "plus"), true)
                 .Replace("*", "Star")
                 .Replace(":", "_")
-                .Replace("-", "_");
+                .Replace("-", "_")
+                .Replace("#", "_");
         }
     }
 }
