@@ -924,6 +924,25 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_enum_has_special_char_questionmark_then_it_should_be_converted()
+        {
+            //// Arrange
+            var schemaJson = @"{ ""type"": ""string"", ""enum"": [""application/json"",""application/vnd.ms-excel?2""] }";
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("Application_vnd_msExcel_2 = 1,", output);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
         public async Task When_property_has_not_supported_characters_then_they_are_removed()
         {
             //// Arrange

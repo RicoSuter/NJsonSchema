@@ -6,11 +6,16 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Text.RegularExpressions;
+
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The default enumeration name generator.</summary>
     public class DefaultEnumNameGenerator : IEnumNameGenerator
     {
+        private readonly static Regex _invalidNameCharactersPattern = new Regex(@"[^\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]");
+        private const string _defaultReplacementCharacter = "_";
+
         /// <summary>Generates the enumeration name/key of the given enumeration entry.</summary>
         /// <param name="index">The index of the enumeration value (check <see cref="JsonSchema.Enumeration" /> and <see cref="JsonSchema.EnumerationNames" />).</param>
         /// <param name="name">The name/key.</param>
@@ -29,18 +34,8 @@ namespace NJsonSchema.CodeGeneration
                 name = "__" + name.Substring(2);
             }
 
-            return ConversionUtilities.ConvertToUpperCamelCase(name
-                .Replace(":", "-").Replace(@"""", @""), true)
-                .Replace(".", "_")
-                .Replace(",", "_")
-                .Replace("#", "_")
-                .Replace("&", "_")
-                .Replace("-", "_")
-                .Replace("'", "_")
-                .Replace("(", "_")
-                .Replace(")", "_")
-                .Replace("+", "_")
-                .Replace("\\", "_");
+            return _invalidNameCharactersPattern.Replace(ConversionUtilities.ConvertToUpperCamelCase(name
+                .Replace(":", "-").Replace(@"""", @""), true), "_");
         }
     }
 }
