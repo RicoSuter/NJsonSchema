@@ -74,16 +74,16 @@
     }
 {% endif -%}
 
-    init(data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+    init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
 {% if HasInheritance -%}
-        super.init(data);
+        super.init(_data);
 {% endif -%}
 {% if HasIndexerProperty or HasProperties -%}
-        if (data) {
+        if (_data) {
 {%     if HasIndexerProperty -%}
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    this[property] = data[property];
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
             }
 {%     endif -%}
 {%     for property in Properties -%}
