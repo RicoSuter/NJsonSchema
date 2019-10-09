@@ -214,6 +214,38 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal("discriminator", baseSchema.ActualDiscriminator);
         }
 
+        public class ViewModelThingWithTwoProperties
+        {
+            public ACommonThing CommonThingA { get; set; }
+
+            public CommonThingBase CommonThing { get; set; }
+        }
+
+        [Fact]
+        public async Task When_discriminator_is_externally_defined_then_it_is_generated_without_exception()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaProcessors =
+                {
+                    new DiscriminatorSchemaProcessor(typeof(CommonThingBase), "discriminator")
+                }
+            };
+
+            //// Act
+            var schema = JsonSchema.FromType<ViewModelThingWithTwoProperties>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey(nameof(CommonThingBase)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(ACommonThing)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
+
+            var baseSchema = schema.Definitions[nameof(CommonThingBase)];
+            Assert.Equal("discriminator", baseSchema.ActualDiscriminator);
+        }
+
         [Fact]
         public async Task When_serializing_object_with_inheritance_then_discriminator_is_added()
         {
