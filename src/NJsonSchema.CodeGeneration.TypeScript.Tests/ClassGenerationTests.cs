@@ -233,10 +233,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.Contains("a: A;", code);
             Assert.Contains("this.a = new A();", code);
-            Assert.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();", code);
+            Assert.Contains("this.a = _data[\"A\"] ? A.fromJS(_data[\"A\"]) : new A();", code);
 
             Assert.Contains("b: B;", code);
-            Assert.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : <any>undefined;", code);
+            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : <any>undefined;", code);
         }
 
         [Fact]
