@@ -134,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
-                        Value = "data[\"" + _property.Name + "\"]",
+                        Value = "_data[\"" + _property.Name + "\"]",
                         Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,

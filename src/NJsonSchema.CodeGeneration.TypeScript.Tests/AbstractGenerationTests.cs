@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             /// Assert
             Assert.Contains("foo: AbstractClass", code);
-            Assert.Contains("this.foo = data[\"Foo\"] ? AbstractClass.fromJS(data[\"Foo\"]) : <any>undefined;", code);
+            Assert.Contains("this.foo = _data[\"Foo\"] ? AbstractClass.fromJS(_data[\"Foo\"]) : <any>undefined;", code);
         }
 
         [KnownType(typeof(SuperClass))]

@@ -32,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDate: string", code);
-            Assert.Contains("this.myDate = data[\"myDate\"];", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"];", code);
             Assert.Contains("data[\"myDate\"] = this.myDate;", code);
         }
 
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDate: moment.Moment", code);
-            Assert.Contains("this.myDate = data[\"myDate\"] ? moment(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment(_data[\"myDate\"].toString()) : <any>undefined;", code);
             Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
         }
 
@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myTimeSpan: moment.Duration", code);
-            Assert.Contains("this.myTimeSpan = data[\"myTimeSpan\"] ? moment.duration(data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
+            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? moment.duration(_data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
             Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('d.hh:mm:ss.SS', { trim: false }) : <any>undefined;", code);
         }
 
@@ -92,7 +92,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDate: Date", code);
-            Assert.Contains("this.myDate = data[\"myDate\"] ? new Date(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? new Date(_data[\"myDate\"].toString()) : <any>undefined;", code);
             Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
             Assert.Contains("function formatDate(", code);
         }
@@ -113,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDate: moment.Moment", code);
-            Assert.Contains("this.myDate = data[\"myDate\"] ? moment.parseZone(data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment.parseZone(_data[\"myDate\"].toString()) : <any>undefined;", code);
             Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
         }
 
