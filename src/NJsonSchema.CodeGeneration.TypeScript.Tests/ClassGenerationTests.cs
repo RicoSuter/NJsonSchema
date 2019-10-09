@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.Contains("init(data?: any) {", code);
+            Assert.Contains("init(_data?: any) {", code);
         }
 
         [Fact]
