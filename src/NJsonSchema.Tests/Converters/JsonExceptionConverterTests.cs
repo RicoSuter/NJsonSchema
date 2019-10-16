@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -106,7 +107,11 @@ namespace NSwag.Core.Tests.Converters
             var settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                {
+                    IgnoreSerializableAttribute = true,
+                    IgnoreSerializableInterface = true
+                },
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Converters =
                 {
