@@ -20,6 +20,7 @@ using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
+using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema
 {
@@ -839,20 +840,22 @@ namespace NJsonSchema
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
+        /// <param name="customValidators">Custom validators to validate the JSON.</param>
         /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(string jsonData)
+        public ICollection<ValidationError> Validate(string jsonData, params IFormatValidator[] customValidators)
         {
-            var validator = new JsonSchemaValidator();
+            var validator = new JsonSchemaValidator(customValidators);
             return validator.Validate(jsonData, ActualSchema);
         }
 
         /// <summary>Validates the given JSON token against this schema.</summary>
         /// <param name="token">The token to validate. </param>
+        /// <param name="customValidators">Custom validators to validate the token.</param>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(JToken token)
+        public ICollection<ValidationError> Validate(JToken token, params IFormatValidator[] customValidators)
         {
-            var validator = new JsonSchemaValidator();
+            var validator = new JsonSchemaValidator(customValidators);
             return validator.Validate(token, ActualSchema);
         }
 

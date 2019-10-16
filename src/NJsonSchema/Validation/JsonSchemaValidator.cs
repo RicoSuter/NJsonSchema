@@ -36,14 +36,14 @@ namespace NJsonSchema.Validation
             new Base64FormatValidator()
         };
 
-        private readonly IDictionary<string, IFormatValidator> _formatValidatorsMap;
+        private readonly IDictionary<string, IFormatValidator[]> _formatValidatorsMap;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
-        public JsonSchemaValidator()
+        public JsonSchemaValidator(params IFormatValidator[] customValidators)
         {
-            _formatValidatorsMap = _formatValidators.ToDictionary(v => v.Format, v => v);
+            _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
         }
 
         /// <summary>Validates the given JSON data.</summary>
@@ -234,17 +234,11 @@ namespace NJsonSchema.Validation
                     }
 
                     if (!string.IsNullOrEmpty(schema.Format)
-                        && _formatValidatorsMap.TryGetValue(schema.Format, out var formatValidator)
-                        && !formatValidator.IsValid(value, token.Type))
+                        && _formatValidatorsMap.TryGetValue(schema.Format, out var formatValidators)
+                        && !formatValidators.Any(x => x.IsValid(value, token.Type)))
                     {
-                        var error = new ValidationError(
-                            formatValidator.ValidationErrorKind,
-                            propertyName,
-                            propertyPath,
-                            token,
-                            schema);
-
-                        errors.Add(error);
+                        errors.AddRange(formatValidators.Select(x => x.ValidationErrorKind).Distinct()
+                            .Select(validationErrorKind => new ValidationError(validationErrorKind, propertyName, propertyPath, token, schema)));
                     }
                 }
             }
