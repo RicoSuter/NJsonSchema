@@ -163,19 +163,28 @@ namespace NJsonSchema.Converters
                 return null;
             }
 
-            var discriminator = jObject.GetValue(_discriminator).Value<string>();
-            var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
-
-            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
-            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+            Type deserializeType = null;
+            if (_baseType!=null&&objectType != _baseType)
             {
-                jObject.Remove(_discriminator);
+                deserializeType = objectType;
             }
+            else
+            {
+                var discriminator = jObject.GetValue(_discriminator).Value<string>();
+                var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
+                var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
+                if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+                {
+                    jObject.Remove(_discriminator);
+                }
+
+                deserializeType = subtype;
+            }
             try
             {
                 _isReading = true;
-                return serializer.Deserialize(jObject.CreateReader(), subtype);
+                return serializer.Deserialize(jObject.CreateReader(), deserializeType);
             }
             finally
             {

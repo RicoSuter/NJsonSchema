@@ -306,6 +306,29 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Contains(@"""bar""", JsonConvert.SerializeObject(bar));
         }
 
+
+        [JsonConverter(typeof(JsonInheritanceConverter), typeof(ParentClass), "discriminator")]
+        public class ParentClass
+        {
+            public string Foo { get; set; }
+        }
+
+        public class ChildClass : ParentClass
+        {
+            public string Bar { get; set; }
+        }
+
+
+        [Fact]
+        public async Task Direct_deserialize_class_without_discriminator()
+        {
+            var json = @"{
+                ""Bar"":""Test""
+                }";
+            var child = JsonConvert.DeserializeObject<ChildClass>(json);
+            Assert.Equal("Test",child.Bar);
+        }
+
         private Assembly Compile(string code)
         {
 #if NETCOREAPP2_0
