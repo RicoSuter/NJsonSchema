@@ -257,11 +257,11 @@ namespace NJsonSchema.Generation
             }
             else if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
             {
-                ActualContractResolver = new CamelCasePropertyNamesContractResolver();
+                ActualContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
             }
             else if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
             {
-                ActualContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+                ActualContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy(false, true) };
             }
             else
             {
