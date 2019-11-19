@@ -135,6 +135,7 @@ namespace NJsonSchema.Tests.Serialization
     ""Bar"": {},
     ""Id"": {
       ""type"": ""integer"",
+      ""format"": ""int64"",
       ""maximum"": 4294967295.0,
       ""minimum"": 0.0
     },
