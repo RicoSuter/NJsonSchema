@@ -189,7 +189,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(10L, long.MaxValue)]\n" +
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(10D, double.MaxValue)]\n" +
                             "        public long Value { get; set; }\n", code);
         }
 
@@ -202,11 +202,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 'required': [ 'value' ],
                 'properties': {
                     'value': {
-                        '$ref': '#/definitions/int10'
+                        '$ref': '#/definitions/int10000000000'
                     }
                 },
                 'definitions': {
-                    'int10': {
+                    'int10000000000': {
                         'type': 'integer',
                         'minimum': -10000000000,
                         'maximum': 10000000000,
@@ -229,7 +229,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10000000000m, schema.Properties["value"].ActualSchema.Maximum);
 
             // expect the integer to be converted to an int64
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-10000000000L, 10000000000L)]\n" +
+            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-10000000000D, 10000000000D)]\n" +
                             "        public long Value { get; set; }\n", code);
         }
 
@@ -242,11 +242,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 'required': [ 'value' ],
                 'properties': {
                     'value': {
-                        '$ref': '#/definitions/int10'
+                        '$ref': '#/definitions/int100000000'
                     }
                 },
                 'definitions': {
-                    'int10': {
+                    'int100000000': {
                         'type': 'integer',
                         'minimum': -100000000,
                         'exclusiveMinimum': true,
@@ -278,7 +278,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_number_property_has_minimum_and_maximum_with_exclusive_true_then_range_attribute_is_rendered_in_Swagger_mode()
+        public async Task When_number_property_has_minimum_and_maximum_with_exclusive_true_and_multipleof_then_range_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
             const string json = @"{
@@ -286,11 +286,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 'required': [ 'value' ],
                 'properties': {
                     'value': {
-                        '$ref': '#/definitions/int10'
+                        '$ref': '#/definitions/number'
                     }
                 },
                 'definitions': {
-                    'int10': {
+                    'number': {
                         'type': 'number',
                         'multipleOf': '0.0001',
                         'minimum': -100000000.5,
@@ -331,11 +331,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 'required': [ 'value' ],
                 'properties': {
                     'value': {
-                        '$ref': '#/definitions/int10'
+                        '$ref': '#/definitions/int10000000000'
                     }
                 },
                 'definitions': {
-                    'int10': {
+                    'int10000000000': {
                         'type': 'number',
                         'minimum': -10000000000,
                         'maximum': 10000000000,

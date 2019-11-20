@@ -151,24 +151,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                 }
 
-                var format =
-                    propertyFormat == JsonFormatStrings.Double ||
-                    propertyFormat == JsonFormatStrings.Float ||
-                    propertyFormat == JsonFormatStrings.Decimal
-                        ? JsonFormatStrings.Double
-                        : propertyFormat == JsonFormatStrings.Long
-                            ? JsonFormatStrings.Long
-                            : JsonFormatStrings.Integer;
-                var type = format == JsonFormatStrings.Double
-                    ? "double"
-                    : format == JsonFormatStrings.Long
-                        ? "long"
-                        : "int";
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
                 var minimum = schema.Minimum;
                 if (minimum.HasValue && schema.IsExclusiveMinimum)
                 {
-                    if (format == JsonFormatStrings.Integer || format == JsonFormatStrings.Long)
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
                     {
                         minimum++;
                     }
@@ -178,7 +167,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                     else
                     {
-                        // TODO - add support for other data types here
+                        // TODO - add support for doubles, singles and decimals here
                     }
                 }
                 return minimum.HasValue
@@ -207,24 +196,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                 }
 
-                var format =
-                    propertyFormat == JsonFormatStrings.Double ||
-                    propertyFormat == JsonFormatStrings.Float ||
-                    propertyFormat == JsonFormatStrings.Decimal
-                     ? JsonFormatStrings.Double
-                     : propertyFormat == JsonFormatStrings.Long
-                         ? JsonFormatStrings.Long
-                         : JsonFormatStrings.Integer;
-                var type = format == JsonFormatStrings.Double
-                    ? "double"
-                    : format == JsonFormatStrings.Long
-                        ? "long"
-                        : "int";
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
                 var maximum = schema.Maximum;
                 if (maximum.HasValue && schema.IsExclusiveMaximum)
                 {
-                    if (format == JsonFormatStrings.Integer || format == JsonFormatStrings.Long)
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
                     {
                         maximum--;
                     }
@@ -234,7 +212,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                     else
                     {
-                        // TODO - add support for other data types here
+                        // TODO - add support for doubles, singles and decimals here
                     }
                 }
 
