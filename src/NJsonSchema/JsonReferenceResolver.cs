@@ -234,7 +234,14 @@ namespace NJsonSchema
         {
             if (segments.Count == 0)
             {
-                return obj as IJsonReference;
+                if (obj is IDictionary)
+                {
+                    return JsonSchema.FromJsonWithCurrentSettings(obj);
+                }
+                else
+                {
+                    return (IJsonReference)obj;
+                }
             }
 
             checkedObjects.Add(obj);
