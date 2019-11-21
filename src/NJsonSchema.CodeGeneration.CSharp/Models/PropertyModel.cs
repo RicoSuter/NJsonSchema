@@ -33,6 +33,34 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = typeResolver;
+
+            if (_property.ActualSchema.Minimum.HasValue || _property.ActualSchema.Maximum.HasValue)
+            {
+                if (string.IsNullOrEmpty(_property.ActualSchema.Format))
+                {
+                    if (_property.ActualSchema.Type == JsonObjectType.Integer)
+                    {
+                        // If an integer with no format is specified and then test Minimum and Maximum values are compatible with int32 and if not then explicitly set format to int64
+                        if (IsOutOfRange<int>(_property.ActualSchema.Minimum.GetValueOrDefault()) || IsOutOfRange<int>(_property.ActualSchema.Maximum.GetValueOrDefault()))
+                        {
+                            _property.ActualSchema.Format = JsonFormatStrings.Long;
+                        }
+                    }
+                }
+            }
+
+            bool IsOutOfRange<T>(decimal num)
+            {
+                try
+                {
+                    System.Convert.ChangeType(num, typeof(T));
+                    return false;
+                }
+                catch (System.OverflowException)
+                {
+                    return true;
+                }
+            }
         }
 
         /// <summary>Gets the name of the property.</summary>

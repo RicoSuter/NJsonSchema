@@ -890,34 +890,6 @@ namespace NJsonSchema
 
         private void Initialize()
         {
-            bool IsOutOfRange<T>(decimal num)
-            {
-                try
-                {
-                    Convert.ChangeType(num, typeof(T));
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    return true;
-                }
-            }
-
-            if (Minimum.HasValue || Maximum.HasValue)
-            {
-                if (string.IsNullOrEmpty(Format))
-                {
-                    if (Type == JsonObjectType.Integer)
-                    {
-                        // If an integer with no format is specified and then test Minimum and Maximum values are compatible with int32 and if not then explicitly set format to int64
-                        if (IsOutOfRange<int>(Minimum.GetValueOrDefault()) || IsOutOfRange<int>(Maximum.GetValueOrDefault()))
-                        {
-                            Format = JsonFormatStrings.Long;
-                        }
-                    }
-                }
-            }
-
             if (Items == null)
             {
                 Items = new ObservableCollection<JsonSchema>();
