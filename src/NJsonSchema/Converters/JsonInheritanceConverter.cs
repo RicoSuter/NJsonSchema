@@ -164,7 +164,7 @@ namespace NJsonSchema.Converters
             }
 
             Type deserializeType = null;
-            if (_baseType!=null&&objectType != _baseType)
+            if (_baseType != null && objectType != _baseType)
             {
                 deserializeType = objectType;
             }
