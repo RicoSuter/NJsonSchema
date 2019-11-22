@@ -1212,6 +1212,7 @@ namespace NJsonSchema.Generation
                     }
 
                     if (hasRequiredAttribute &&
+                        propertyTypeDescription.IsEnum == false &&
                         propertyTypeDescription.Type == JsonObjectType.String &&
                         requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
                     {
