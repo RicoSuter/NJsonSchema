@@ -45,7 +45,17 @@ namespace NJsonSchema.References
         IJsonReference IJsonReferenceBase.Reference
         {
             get => Reference;
-            set => Reference = (T)value;
+            set
+            {
+                if (value is T)
+                {
+                    Reference = (T)value;
+                }
+                else
+                {
+                    Reference = (T)value.Reference;
+                }
+            }
         }
     }
 }
