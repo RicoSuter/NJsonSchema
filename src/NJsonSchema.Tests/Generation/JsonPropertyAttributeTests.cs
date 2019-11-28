@@ -42,6 +42,22 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task Use_JsonSchemaGeneratorSettings_ContractResolver_For_JsonPropertyName()
+        {
+            var settings = new NJsonSchema.Generation.JsonSchemaGeneratorSettings();
+            settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+
+            //// Arrange
+            var schema = JsonSchema.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>(settings);
+
+            //// Act
+            var property = schema.Properties["newName"];
+
+            //// Assert
+            Assert.Equal("newName", property.Name);
+        }
+
+        [Fact]
         public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
             //// Arrange
