@@ -32,8 +32,8 @@ namespace NJsonSchema.Yaml.Tests.References
         }
 
         [Theory]
-        [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml")]
-        public async Task When_yaml_spec_has_external_schema_refs_they_are_resolved(string relativePath)
+        [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
+        public async Task When_yaml_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
         {
             var path = GetTestDirectory() + relativePath;
 
@@ -41,17 +41,26 @@ namespace NJsonSchema.Yaml.Tests.References
             Task<OpenApiDocument> docTask = OpenApiYamlDocument.FromFileAsync(path);
             OpenApiDocument doc = docTask.Result;
             IDictionary<string, OpenApiPathItem> docPaths = doc.Paths;
-            OpenApiPathItem docPath = docPaths["/custom-queries"];
-            OpenApiOperation getOp = docPath["get"];
-            IDictionary<string, OpenApiResponse> responses = getOp.Responses;
+            OpenApiPathItem pathItem = docPaths[docPath];
+            OpenApiOperation operation = pathItem["get"];
+            IDictionary<string, OpenApiResponse> responses = operation.Responses;
 
-            OpenApiResponse OK = responses["200"];
+            OpenApiResponse OK = responses["200"].ActualResponse;
             OpenApiHeaders OKheaders = OK.Headers;
 
-            OpenApiResponse Bad = responses["401"];
+            OpenApiResponse Bad = responses["401"].ActualResponse;
 
-            Assert.NotNull(doc);
-            Assert.IsType<JsonSchema>(OKheaders[""]);
+            ////Assert
+            
+            // Header schemas loaded correctly from headers.yaml
+            Assert.True(OKheaders.ContainsKey(header));
+            Assert.NotNull(OKheaders[header]);
+
+            //Response data loaded correctly from responses.yaml
+            string problemType = "application/problem+json";
+            Assert.True(Bad.Content.ContainsKey(problemType));
+            Assert.NotNull(Bad.Content[problemType]);
+            Assert.NotNull(Bad.Schema);
         }
 
         private string GetTestDirectory()
