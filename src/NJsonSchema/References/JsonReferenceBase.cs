@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Infrastructure;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.References
@@ -53,7 +54,8 @@ namespace NJsonSchema.References
                 }
                 else
                 {
-                    Reference = (T)value.Reference;
+                    string refText = JsonConvert.SerializeObject(value);
+                    Reference = JsonConvert.DeserializeObject<T>(refText, JsonSchemaSerialization.CurrentSerializerSettings);
                 }
             }
         }
