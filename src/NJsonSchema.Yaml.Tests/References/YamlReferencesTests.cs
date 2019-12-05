@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using NSwag;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -26,6 +29,29 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
             Assert.Equal(1, schema.Definitions.Count);
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
+        }
+
+        [Theory]
+        [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml")]
+        public async Task When_yaml_spec_has_external_schema_refs_they_are_resolved(string relativePath)
+        {
+            var path = GetTestDirectory() + relativePath;
+
+            //// Act
+            Task<OpenApiDocument> docTask = OpenApiYamlDocument.FromFileAsync(path);
+            OpenApiDocument doc = docTask.Result;
+            IDictionary<string, OpenApiPathItem> docPaths = doc.Paths;
+            OpenApiPathItem docPath = docPaths["/custom-queries"];
+            OpenApiOperation getOp = docPath["get"];
+            IDictionary<string, OpenApiResponse> responses = getOp.Responses;
+
+            OpenApiResponse OK = responses["200"];
+            OpenApiHeaders OKheaders = OK.Headers;
+
+            OpenApiResponse Bad = responses["401"];
+
+            Assert.NotNull(doc);
+            Assert.IsType<JsonSchema>(OKheaders[""]);
         }
 
         private string GetTestDirectory()
