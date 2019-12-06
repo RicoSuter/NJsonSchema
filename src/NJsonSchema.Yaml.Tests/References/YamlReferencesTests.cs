@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -48,19 +47,19 @@ namespace NJsonSchema.Yaml.Tests.References
             OpenApiResponse OK = responses["200"].ActualResponse;
             OpenApiHeaders OKheaders = OK.Headers;
 
-            OpenApiResponse Bad = responses["401"].ActualResponse;
+            OpenApiResponse Unauthorized = responses["401"].ActualResponse;
 
             ////Assert
             
-            // Header schemas loaded correctly from headers.yaml
+            // Header schema loaded correctly from headers.yaml
             Assert.True(OKheaders.ContainsKey(header));
             Assert.NotNull(OKheaders[header]);
 
             //Response data loaded correctly from responses.yaml
             string problemType = "application/problem+json";
-            Assert.True(Bad.Content.ContainsKey(problemType));
-            Assert.NotNull(Bad.Content[problemType]);
-            Assert.NotNull(Bad.Schema);
+            Assert.True(Unauthorized.Content.ContainsKey(problemType));
+            Assert.NotNull(Unauthorized.Content[problemType]);
+            Assert.NotNull(Unauthorized.Schema);
         }
 
         private string GetTestDirectory()
