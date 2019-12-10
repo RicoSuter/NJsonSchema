@@ -145,13 +145,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var valueType = prefix + ResolveDictionaryValueType(schema, "any");
 
                 var defaultType = "string";
-                var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + ResolveDictionaryKeyType(schema, defaultType) : defaultType;
-                if (keyType != defaultType)
+                var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
+
+                if (resolvedType != defaultType)
                 {
-                    return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
+                    var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
+                    if (keyType != defaultType)
+                    {
+                        return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
+                    }
+
+                    return $"{{ [key: {keyType}]: {valueType}; }}";
                 }
 
-                return $"{{ [key: {keyType}]: {valueType}; }}";
+                return $"{{ [key: {resolvedType}]: {valueType}; }}";
             }
 
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
