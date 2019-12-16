@@ -33,6 +33,34 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = typeResolver;
+
+            if (_property.ActualSchema.Minimum.HasValue || _property.ActualSchema.Maximum.HasValue)
+            {
+                if (string.IsNullOrEmpty(_property.ActualSchema.Format))
+                {
+                    if (_property.ActualSchema.Type == JsonObjectType.Integer)
+                    {
+                        // If an integer with no format is specified and then test Minimum and Maximum values are compatible with int32 and if not then explicitly set format to int64
+                        if (IsOutOfRange<int>(_property.ActualSchema.Minimum.GetValueOrDefault()) || IsOutOfRange<int>(_property.ActualSchema.Maximum.GetValueOrDefault()))
+                        {
+                            _property.ActualSchema.Format = JsonFormatStrings.Long;
+                        }
+                    }
+                }
+            }
+
+            bool IsOutOfRange<T>(decimal num)
+            {
+                try
+                {
+                    System.Convert.ChangeType(num, typeof(T));
+                    return false;
+                }
+                catch (System.OverflowException)
+                {
+                    return true;
+                }
+            }
         }
 
         /// <summary>Gets the name of the property.</summary>
@@ -136,19 +164,42 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = schema.Format;
+                if (propertyFormat == null)
+                {
+                    switch (schema.Type)
+                    {
+                        case JsonObjectType.Integer:
+                            propertyFormat = JsonFormatStrings.Integer;
+                            break;
+                        case JsonObjectType.Number:
+                            propertyFormat = JsonFormatStrings.Double;
+                            break;
+                    }
+                }
 
-                return _property.ActualSchema.Minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Minimum.Value, format)
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
+
+                var minimum = schema.Minimum;
+                if (minimum.HasValue && schema.IsExclusiveMinimum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        minimum++;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        minimum += schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+                return minimum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -158,19 +209,43 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = schema.Format;
+                if (propertyFormat == null)
+                {
+                    switch (schema.Type)
+                    {
+                        case JsonObjectType.Integer:
+                            propertyFormat = JsonFormatStrings.Integer;
+                            break;
+                        case JsonObjectType.Number:
+                            propertyFormat = JsonFormatStrings.Double;
+                            break;
+                    }
+                }
 
-                return _property.ActualSchema.Maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Maximum.Value, format)
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
+
+                var maximum = schema.Maximum;
+                if (maximum.HasValue && schema.IsExclusiveMaximum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        maximum--;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        maximum -= schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+
+                return maximum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, maximum.Value, format)
                     : type + "." + nameof(double.MaxValue);
             }
         }
