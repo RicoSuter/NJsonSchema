@@ -143,10 +143,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
 
                 var valueType = prefix + ResolveDictionaryValueType(schema, "any");
-
                 var defaultType = "string";
-                var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
 
+                var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
                 if (resolvedType != defaultType)
                 {
                     var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
