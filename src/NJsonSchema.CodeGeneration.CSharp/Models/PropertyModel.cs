@@ -33,34 +33,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _property = property;
             _settings = settings;
             _resolver = typeResolver;
-
-            if (_property.ActualSchema.Minimum.HasValue || _property.ActualSchema.Maximum.HasValue)
-            {
-                if (string.IsNullOrEmpty(_property.ActualSchema.Format))
-                {
-                    if (_property.ActualSchema.Type == JsonObjectType.Integer)
-                    {
-                        // If an integer with no format is specified and then test Minimum and Maximum values are compatible with int32 and if not then explicitly set format to int64
-                        if (IsOutOfRange<int>(_property.ActualSchema.Minimum.GetValueOrDefault()) || IsOutOfRange<int>(_property.ActualSchema.Maximum.GetValueOrDefault()))
-                        {
-                            _property.ActualSchema.Format = JsonFormatStrings.Long;
-                        }
-                    }
-                }
-            }
-
-            bool IsOutOfRange<T>(decimal num)
-            {
-                try
-                {
-                    System.Convert.ChangeType(num, typeof(T));
-                    return false;
-                }
-                catch (System.OverflowException)
-                {
-                    return true;
-                }
-            }
         }
 
         /// <summary>Gets the name of the property.</summary>
@@ -165,20 +137,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 var schema = _property.ActualSchema;
-                var propertyFormat = schema.Format;
-                if (propertyFormat == null)
-                {
-                    switch (schema.Type)
-                    {
-                        case JsonObjectType.Integer:
-                            propertyFormat = JsonFormatStrings.Integer;
-                            break;
-                        case JsonObjectType.Number:
-                            propertyFormat = JsonFormatStrings.Double;
-                            break;
-                    }
-                }
-
+                var propertyFormat = GetSchemaFormat(schema);
                 var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
                 var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
@@ -210,20 +169,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 var schema = _property.ActualSchema;
-                var propertyFormat = schema.Format;
-                if (propertyFormat == null)
-                {
-                    switch (schema.Type)
-                    {
-                        case JsonObjectType.Integer:
-                            propertyFormat = JsonFormatStrings.Integer;
-                            break;
-                        case JsonObjectType.Number:
-                            propertyFormat = JsonFormatStrings.Double;
-                            break;
-                    }
-                }
-
+                var propertyFormat = GetSchemaFormat(schema);
                 var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
                 var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
@@ -333,5 +279,27 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.Format == JsonFormatStrings.Date;
+
+        private string GetSchemaFormat(JsonSchema schema)
+        {
+            if (Type == "long" || Type == "long?")
+            {
+                return JsonFormatStrings.Long;
+            }
+
+            if (schema.Format == null)
+            {
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Integer:
+                        return JsonFormatStrings.Integer;
+
+                    case JsonObjectType.Number:
+                        return JsonFormatStrings.Double;
+                }
+            }
+
+            return schema.Format;
+        }
     }
 }
