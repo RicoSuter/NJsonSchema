@@ -294,8 +294,8 @@ namespace NJsonSchema.Generation
                 return false;
             }
 
-            // TODO: Improve these checks
-            if (contextualType.TypeName == "ObservableCollection`1")
+            if (contextualType.TypeName == "ObservableCollection`1" ||
+                contextualType.TypeName == "IAsyncEnumerable`1")
             {
                 return true;
             }

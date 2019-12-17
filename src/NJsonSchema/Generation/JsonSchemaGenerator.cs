@@ -322,7 +322,12 @@ namespace NJsonSchema.Generation
         {
             try
             {
-                return jsonProperty.PropertyName;
+                var propertyName = jsonProperty?.PropertyName != null ?
+                                   jsonProperty.PropertyName :
+                                   contextualMember.MemberInfo.DeclaringType.GetContextualPropertiesAndFields()
+                                       .First(p => p.Name == contextualMember.Name).GetName();
+
+                return propertyName;
             }
             catch (Exception e)
             {
