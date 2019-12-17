@@ -320,14 +320,22 @@ namespace NJsonSchema.Generation
         /// <returns>The property name.</returns>
         public virtual string GetPropertyName(JsonProperty jsonProperty, ContextualMemberInfo contextualMember)
         {
+            if (jsonProperty?.PropertyName != null)
+            {
+                return jsonProperty.PropertyName;
+            }
+
             try
             {
-                var propertyName = jsonProperty?.PropertyName != null ?
-                                   jsonProperty.PropertyName :
-                                   contextualMember.MemberInfo.DeclaringType.GetContextualPropertiesAndFields()
-                                       .First(p => p.Name == contextualMember.Name).GetName();
+                var propertyName = contextualMember.MemberInfo.DeclaringType
+                    .GetContextualPropertiesAndFields()
+                    .First(p => p.Name == contextualMember.Name)
+                    .GetName();
 
-                return propertyName;
+                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
+                return contractResolver != null
+                    ? contractResolver.GetResolvedPropertyName(propertyName)
+                    : propertyName;
             }
             catch (Exception e)
             {
