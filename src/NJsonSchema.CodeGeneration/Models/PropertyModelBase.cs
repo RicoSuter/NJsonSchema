@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.Models
 {
@@ -36,6 +37,7 @@ namespace NJsonSchema.CodeGeneration.Models
             _typeResolver = typeResolver;
 
             PropertyName = _settings.PropertyNameGenerator.Generate(_property);
+            ExtensionData = _property.ExtensionData?.Select(p => new ExtensionDataItemModel(p.Key, p.Value))?.ToArray();
         }
 
         /// <summary>Gets the type of the property.</summary>
@@ -68,7 +70,7 @@ namespace NJsonSchema.CodeGeneration.Models
             _property.ActualTypeSchema.Item.ActualSchema.Type.HasFlag(JsonObjectType.String);
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _property.ExtensionData;
+        public IList<ExtensionDataItemModel> ExtensionData { get; }
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()
