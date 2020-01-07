@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Models
             _rootObject = rootObject;
             _resolver = resolver;
 
-            ExtensionData = schema.ExtensionData?.Select(p => new ExtensionDataItemModel(p.Key, p.Value))?.ToArray();
+            ExtensionDataKeys = schema.ExtensionData?.Keys;
         }
 
         /// <summary>Gets the class.</summary>
@@ -41,7 +41,10 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool IsAbstract => _schema.ActualTypeSchema.IsAbstract;
 
         /// <summary>Gets the property extension data.</summary>
-        public IList<ExtensionDataItemModel> ExtensionData { get; }
+        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+
+        /// <summary>Gets the keys for the <see cref="ExtensionData"/>.</summary>
+        public ICollection<string> ExtensionDataKeys { get; }
 
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
