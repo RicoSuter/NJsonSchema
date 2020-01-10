@@ -273,7 +273,11 @@ namespace NJsonSchema.Generation
                 referencedSchema = Generate<JsonSchema>(typeDescription.ContextualType, schemaResolver);
             }
 
-            var referencingSchema = new TSchemaType();
+            var referencingSchema = new TSchemaType() {
+                ExtensionData = referencedSchema.ExtensionData
+            };
+            referencedSchema.ExtensionData = null;
+
             transformation?.Invoke(referencingSchema, referencedSchema);
 
             if (isNullable)
