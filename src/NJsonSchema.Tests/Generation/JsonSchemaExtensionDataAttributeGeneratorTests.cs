@@ -9,7 +9,6 @@ namespace NJsonSchema.Tests.Generation
 {
     public class JsonSchemaExtensionDataAttributeGeneratorTests
     {
-
         public class MyType
         {
             public int Id { get; set; }
@@ -126,15 +125,15 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(0, result);
         }
 
-
         [Fact]
         public async Task When_class_has_property_with_JsonSchemaExtensionDataAttribute_on_property_then_extensiondata_is_set_to_property()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithExtensionData>(
-                new JsonSchemaGeneratorSettings {
-                    SchemaType = SchemaType.OpenApi3 
-                });
+            var schema = JsonSchema.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3
+            });
+
             var json = schema.ToJson();
 
             var expectedJSON = @"{
