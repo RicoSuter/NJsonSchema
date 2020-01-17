@@ -33,6 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Yaml.Tests", "N
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{863B2D88-A0BD-4466-8583-AAD0B8D3F182}"
 	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
