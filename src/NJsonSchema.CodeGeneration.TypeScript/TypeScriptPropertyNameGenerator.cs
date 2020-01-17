@@ -25,6 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             var name = ConversionUtilities.ConvertToLowerCamelCase(property.Name
                     .Replace("\"", string.Empty)
                     .Replace("@", string.Empty)
+                    .Replace("?", string.Empty)
                     .Replace(".", "-")
                     .Replace("=", "-")
                     .Replace("+", "plus"), true)
