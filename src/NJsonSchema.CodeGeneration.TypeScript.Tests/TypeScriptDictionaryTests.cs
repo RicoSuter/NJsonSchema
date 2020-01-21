@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -54,8 +53,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("Mapping: { [key in keyof typeof PropertyName]: string; } | undefined;", code);
-            Assert.Contains("Mapping2: { [key in keyof typeof PropertyName]: string; } | undefined;", code);
+            Assert.Contains("Mapping: { [key in keyof typeof PropertyName]?: string; } | undefined;", code);
+            Assert.Contains("Mapping2: { [key in keyof typeof PropertyName]?: string; } | undefined;", code);
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
