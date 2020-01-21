@@ -238,6 +238,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable ? "decimal?" : "decimal";
             }
 
+            if (schema.Format == JsonFormatStrings.Float)
+            {
+                return isNullable ? "float?" : "float";
+            }
+
             return isNullable ? "double?" : "double";
         }
 
