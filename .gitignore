@@ -8,6 +8,7 @@ src/packages/Newtonsoft.Json**
 
 **.sln.ide/**
 **.vs/**
+.vscode/
 
 /src/NJsonSchema.sln.GhostDoc.xml
 
