@@ -89,10 +89,14 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
 
-            if (type == typeof(double) ||
-                type == typeof(float))
+            if (type == typeof(double))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
+            }
+
+            if (type == typeof(float))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Float);
             }
 
             if (type == typeof(decimal))
