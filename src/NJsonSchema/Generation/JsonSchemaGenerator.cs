@@ -844,6 +844,12 @@ namespace NJsonSchema.Generation
                                 (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false))
                 )
                 .ToList();
+            var allMembers = 
+                type.GetTypeInfo().DeclaredFields.OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo().DeclaredProperties
+                )
+                .ToList();
 #else
             var members = type.GetTypeInfo()
                 .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
@@ -856,16 +862,19 @@ namespace NJsonSchema.Generation
                                 (p.GetSetMethod()?.IsPrivate != true && p.GetSetMethod()?.IsStatic == false))
                 )
                 .ToList();
+            var allMembers = 
+                type.GetTypeInfo()
+                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo()
+                    .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                )
+                .ToList();
 #endif
 
             var publicContextualMembers = members.Select(m => m.ToContextualMember());
-            var allContextualMembers =
-                type.GetTypeInfo().DeclaredFields.OfType<MemberInfo>()
-                .Concat(
-                    type.GetTypeInfo().DeclaredProperties
-                )
-                .Select(m => m.ToContextualMember())
-                .ToList();
+            var allContextualMembers = allMembers.Select(m => m.ToContextualMember());
             var contract = Settings.ResolveContract(type);
 
             var allowedProperties = GetTypeProperties(type);
