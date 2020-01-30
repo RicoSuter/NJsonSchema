@@ -151,7 +151,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
                     if (keyType != defaultType)
                     {
-                        return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
+                        return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
                     }
 
                     return $"{{ [key: {keyType}]: {valueType}; }}";

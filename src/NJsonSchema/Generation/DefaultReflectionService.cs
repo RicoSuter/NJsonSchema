@@ -89,10 +89,14 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
 
-            if (type == typeof(double) ||
-                type == typeof(float))
+            if (type == typeof(double))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
+            }
+
+            if (type == typeof(float))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Float);
             }
 
             if (type == typeof(decimal))
@@ -202,7 +206,8 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.CreateForDictionary(contextualType, JsonObjectType.Object, isNullable);
             }
 
-            if (IsArrayType(contextualType) && contract is JsonArrayContract)
+            // TODO: Don't trust JsonArrayContract when contextualType is IAsyncEnumerable<T> until it is fixed
+            if (IsIAsyncEnumerableType(contextualType) || (IsArrayType(contextualType) && contract is JsonArrayContract))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
@@ -282,6 +287,17 @@ namespace NJsonSchema.Generation
 #endif
         }
 
+        /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
+        /// <remarks>
+        /// See this issue: https://github.com/RicoSuter/NSwag/issues/2582#issuecomment-576165669
+        /// </remarks>
+        /// <param name="contextualType">The type.</param>
+        /// <returns>true or false.</returns>
+        private bool IsIAsyncEnumerableType(ContextualType contextualType)
+        {
+            return contextualType.TypeName == "IAsyncEnumerable`1";
+        }
+
 #if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
@@ -294,8 +310,7 @@ namespace NJsonSchema.Generation
                 return false;
             }
 
-            if (contextualType.TypeName == "ObservableCollection`1" ||
-                contextualType.TypeName == "IAsyncEnumerable`1")
+            if (contextualType.TypeName == "ObservableCollection`1")
             {
                 return true;
             }
