@@ -53,8 +53,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
+            Assert.Contains("export enum PropertyName {\n    Name = 0,\n    Gender = 1,\n}", code);
             Assert.Contains("Mapping: { [key in keyof typeof PropertyName]?: string; } | undefined;", code);
             Assert.Contains("Mapping2: { [key in keyof typeof PropertyName]?: string; } | undefined;", code);
+        }
+        
+        [Fact]
+        public async Task When_dictionary_key_is_string_literal_then_typescript_has_string_literal_key_ts_2_1()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<EnumKeyDictionaryTest>();
+            var data = schema.ToJson();
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                EnumNameGenerator = new DefaultEnumNameGenerator(),
+                EnumStyle = TypeScriptEnumStyle.StringLiteral, 
+                TypeScriptVersion = 2.1m,
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("export type PropertyName = 0 | 1;", code);
+            Assert.Contains("Mapping: { [key in PropertyName]?: string; } | undefined;", code);
+            Assert.Contains("Mapping2: { [key in PropertyName]?: string; } | undefined;", code);
         }
 
         [JsonConverter(typeof(StringEnumConverter))]

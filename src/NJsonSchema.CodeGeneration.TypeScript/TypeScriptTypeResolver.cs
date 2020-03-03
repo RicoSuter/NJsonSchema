@@ -149,9 +149,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (resolvedType != defaultType)
                 {
                     var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
-                    if (keyType != defaultType)
+                    if (keyType != defaultType && schema.DictionaryKey.ActualTypeSchema.IsEnumeration)
                     {
-                        return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
+                        if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                        {
+                            return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
+                        }
+
+                        if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                        {
+                            return $"{{ [key in {keyType}]?: {valueType}; }}";
+                        }
+                        
+                        throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
                     }
 
                     return $"{{ [key: {keyType}]: {valueType}; }}";
