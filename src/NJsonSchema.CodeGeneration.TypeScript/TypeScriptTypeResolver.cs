@@ -155,8 +155,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         {
                             return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
                         }
-
-                        if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                        else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
                         {
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
