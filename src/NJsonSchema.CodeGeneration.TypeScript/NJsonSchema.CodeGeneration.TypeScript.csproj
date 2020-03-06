@@ -25,6 +25,7 @@
     <EmbeddedResource Include="Templates\ConvertToClass.liquid" />
     <EmbeddedResource Include="Templates\ConvertToJavaScript.liquid" />
     <EmbeddedResource Include="Templates\Enum.liquid" />
+    <EmbeddedResource Include="Templates\Enum.StringLiteral.liquid" />
     <EmbeddedResource Include="Templates\File.FormatDate.liquid" />
     <EmbeddedResource Include="Templates\File.liquid" />
     <EmbeddedResource Include="Templates\Interface.liquid" />

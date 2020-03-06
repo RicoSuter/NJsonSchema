@@ -129,7 +129,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.IsEnumeration)
             {
                 var model = new EnumTemplateModel(typeName, schema, Settings);
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
+
+                string templateName;
+                if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                {
+                    templateName = nameof(TypeScriptEnumStyle.Enum);
+                }
+                else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                {
+                    templateName = $"{nameof(TypeScriptEnumStyle.Enum)}.{nameof(TypeScriptEnumStyle.StringLiteral)}";
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+                }
+
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);
                 return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
             else
