@@ -23,6 +23,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             NullValue = TypeScriptNullValue.Undefined;
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
+            EnumStyle = TypeScriptEnumStyle.Enum;
             ExtensionCode = string.Empty;
             TypeScriptVersion = 2.7m;
             GenerateConstructorInterface = true;
@@ -56,6 +57,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
         public TypeScriptDateTimeType DateTimeType { get; set; }
+        
+        /// <summary>Gets or sets the enum style (default: Enum).</summary>
+        public TypeScriptEnumStyle EnumStyle { get; set; }
 
         /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
         public string ModuleName { get; set; }
