@@ -24,8 +24,28 @@
   <ItemGroup>
     <None Remove="Templates\Class.Body.liquid" />
     <None Remove="Templates\Class.Constructor.Record.liquid" />
+    <None Remove="Templates\OneOfAnonymous.liquid" />
+    <None Remove="Templates\OneOfBase.liquid" />
+    <None Remove="Templates\OneOfConverter.liquid" />
+    <None Remove="Templates\OneOfNamed.liquid" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Templates\OneOfConverter.liquid">
+      <CustomToolNamespace>
+      </CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\OneOfNamed.liquid">
+      <CustomToolNamespace>
+      </CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\OneOfAnonymous.liquid">
+      <CustomToolNamespace>
+      </CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\OneOfBase.liquid">
+      <CustomToolNamespace>
+      </CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="Templates\Class.Annotations.liquid">
       <CustomToolNamespace>
       </CustomToolNamespace>

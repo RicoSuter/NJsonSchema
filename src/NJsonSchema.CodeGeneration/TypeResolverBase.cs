@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration
         public JsonSchema RemoveNullability(JsonSchema schema)
         {
             // TODO: Method on JsonSchema4?
-            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
+            return schema.IsUnionType ? schema : schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
         }
 
         /// <summary>Gets the actual schema (i.e. when not referencing a type schema or it is inlined) 
@@ -124,7 +124,8 @@ namespace NJsonSchema.CodeGeneration
                    !schema.IsArray &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||
-                    schema.Type.HasFlag(JsonObjectType.Object));
+                    schema.Type.HasFlag(JsonObjectType.Object) ||
+                    schema.IsUnionType && schema.HasTypeNameTitle);
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>

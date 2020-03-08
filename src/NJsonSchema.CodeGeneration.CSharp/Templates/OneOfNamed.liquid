@@ -1,0 +1,12 @@
+﻿{% assign nd = NamedDetails %}
+{% assign skipComma = true -%}
+{% if nd.HasDescription -%}
+/// <summary>{{ nd.Description | csharpdocs }}</summary>
+{% endif -%}
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{{ TypeAccessModifier }} sealed class {{ nd.Name }} : OneOfBase<{% for type in nd.TypeArguments -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}{{ type }}{% endfor -%}>
+{
+{% for type in nd.TypeArguments -%}
+    public {{ nd.Name }}({{ type }} case{{ forloop.index }}) : base(case{{ forloop.index }}) { }
+{% endfor -%}
+}

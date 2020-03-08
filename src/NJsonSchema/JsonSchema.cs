@@ -740,6 +740,17 @@ namespace NJsonSchema
                                     ActualProperties.Count == 0 &&
                                     (AdditionalPropertiesSchema != null || PatternProperties.Any());
 
+        /// <summary>Gets a value indicating whether the schema represents a union type (no properties or AdditionalProperties and multiple OneOf schemas).</summary>
+        [JsonIgnore]
+        public bool IsUnionType => Properties.Count == 0 &&
+                                   AdditionalPropertiesSchema == null &&
+                                   (Items == null || !Items.Any()) &&
+                                   !IsEnumeration &&
+                                   Reference == null &&
+                                   AllOf.Count == 0 &&
+                                   AnyOf.Count == 0 &&
+                                   OneOf.Count > 1;
+
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.HasFlag(JsonObjectType.Object) || Type == JsonObjectType.None) &&

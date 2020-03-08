@@ -1,0 +1,12 @@
+﻿/// <summary>
+/// A value which can take exactly one of {{ Arity }} distinct types
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{% assign skipComma = true -%}
+{% capture typeParamList -%}{% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}T{{ n }}{% endfor -%}{% endcapture -%}
+{{ TypeAccessModifier }} sealed class OneOf<{{ typeParamList }}> : OneOfBase<{{ typeParamList }}>
+{
+{% for n in CaseNumbers -%}
+    public OneOf(T{{ n }} case{{ n }}) : base(case{{ n }}) { }
+{% endfor -%}
+}
