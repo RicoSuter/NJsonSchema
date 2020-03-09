@@ -814,6 +814,14 @@ namespace NJsonSchema
             return json;
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
+        /// <returns>The JSON Schema.</returns>
+        public JToken ToSampleJson()
+        {
+            var generator = new SampleJsonDataGenerator();
+            return generator.Generate(this);
+        }
+
         ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>
         ///// <returns>The JSON string.</returns>
         //[Obsolete("Not ready yet as it has side-effects on the schema.")]
