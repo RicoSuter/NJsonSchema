@@ -192,7 +192,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     typeName,
                     !(schema is JsonSchemaProperty) && !string.IsNullOrEmpty(schema.Description),
                     schema.Description,
-                    schema.OneOf.Select((t,i) => _resolver.Resolve(t, t.IsNullable(Settings.SchemaType), $"{typeName}Case{i+1}")).ToList()
+                    schema.OneOf.Select((t,i) => _resolver.Resolve(t, t.IsNullable(Settings.SchemaType), t.HasTypeNameTitle ? t.Title : $"{typeName}Case{i+1}")).ToList()
                 );
 
             var model = new OneOfTemplateModel(schema.OneOf.Count, namedDetails, Settings);

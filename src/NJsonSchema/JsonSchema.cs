@@ -743,10 +743,12 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether the schema represents a union type (no properties or AdditionalProperties and multiple OneOf schemas).</summary>
         [JsonIgnore]
         public bool IsUnionType => Properties.Count == 0 &&
-                                   AdditionalPropertiesSchema == null &&
+                                   !AllowAdditionalProperties &&
                                    (Items == null || !Items.Any()) &&
+                                   AdditionalItemsSchema == null &&
                                    !IsEnumeration &&
                                    Reference == null &&
+                                   Not == null &&
                                    AllOf.Count == 0 &&
                                    AnyOf.Count == 0 &&
                                    OneOf.Count > 1;
