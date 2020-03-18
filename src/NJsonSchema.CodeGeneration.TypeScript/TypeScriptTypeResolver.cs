@@ -169,6 +169,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: {resolvedType}]: {valueType}; }}";
             }
 
+            if (
+                Settings.UseLeafType
+                && schema.DiscriminatorObject == null
+                && schema.ActualTypeSchema.DiscriminatorObject != null
+            )
+            {
+                var types = schema.ActualTypeSchema.ActualDiscriminatorObject.Mapping
+                    .Select(x => Resolve(
+                        x.Value,
+                        typeNameHint,
+                        addInterfacePrefix
+                    ));
+
+                return string.Join(" | ", types);
+            }
+
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
                 GetOrGenerateTypeName(schema, typeNameHint);
         }
