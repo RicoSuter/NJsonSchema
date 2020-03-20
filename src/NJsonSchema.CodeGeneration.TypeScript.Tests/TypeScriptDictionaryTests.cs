@@ -114,5 +114,59 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("Mapping: { [key: string]: Gender; };", code);
             Assert.Contains("Mapping2: { [key: string]: Gender; };", code);
         }
+
+        public class ObjectValueDictionaryTest
+        {
+            public Dictionary<string, object> Mapping { get; set; }
+
+            public IDictionary<string, object> Mapping2 { get; set; }
+        }
+
+        [Fact]
+        public async Task When_dictionary_value_is_object_then_typescript_has_any_value()
+        {
+            //// Arrange
+            var json = @"
+{
+   ""required"": [ ""resource"" ],
+    ""properties"": {
+        ""resource"": {
+            ""$ref"": ""#/definitions/myItem""
+        }
+    },
+    ""definitions"": {
+      ""myItem"": {
+        ""type"": ""object"",
+        ""properties"": {
+          ""extensions"": {
+            ""type"": ""object"",
+            ""additionalProperties"": {
+              ""type"": ""object"",
+              ""additionalProperties"": false
+            },
+            ""nullable"": true,
+            ""readOnly"": true
+          }
+        },
+        ""additionalProperties"": false
+      }
+    }
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 2.7m,
+                ConvertConstructorInterfaceData = true,
+                GenerateConstructorInterface = true
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("extensions: { [key: string]: any; };", code);
+            Assert.DoesNotContain("extensions?: { [key: string]: Iany; } | null;", code);
+            Assert.DoesNotContain("this.extensions[key] = item && !(<any>item).toJSON ? new any(item) : <any>item;", code);
+        }
     }
 }
