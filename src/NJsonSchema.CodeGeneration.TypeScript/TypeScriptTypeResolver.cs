@@ -256,14 +256,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
-
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
 
-                return string.Join(UnionPipe,
-                    Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x)))
-                );
+                if (Settings.UseLeafType)
+                {
+                    return string.Join(UnionPipe,
+                        Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
+                            .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x))));
+                }
+                else
+                {
+                    var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
+                    return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                }
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
