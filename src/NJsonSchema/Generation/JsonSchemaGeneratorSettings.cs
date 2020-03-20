@@ -244,7 +244,7 @@ namespace NJsonSchema.Generation
                     throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
                 }
 
-                ActualContractResolver = SerializerSettings.ContractResolver;
+                ActualContractResolver = SerializerSettings.ContractResolver ?? new DefaultContractResolver();
             }
             else if (ContractResolver != null)
             {
