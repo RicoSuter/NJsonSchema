@@ -14,6 +14,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>
     public class TypeScriptTypeResolver : TypeResolverBase
     {
+        private const string UnionPipe = " | ";
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="settings">The settings.</param>
         public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
@@ -184,7 +186,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         addInterfacePrefix
                     ));
 
-                return string.Join(" | ", types);
+                return string.Join(UnionPipe, types);
             }
 
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
@@ -256,9 +258,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
 
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
-                var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
 
-                return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                return string.Join(UnionPipe,
+                    Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
+                        .Split(new[] {UnionPipe}, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x)))
+                );
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
