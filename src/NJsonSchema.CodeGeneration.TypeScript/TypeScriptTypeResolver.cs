@@ -169,15 +169,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return $"{{ [key: {resolvedType}]: {valueType}; }}";
             }
 
-            if (
-                Settings.UseLeafType
-                && schema.DiscriminatorObject == null
-                && schema.ActualTypeSchema.DiscriminatorObject != null
-            )
+            if (Settings.UseLeafType &&
+                schema.DiscriminatorObject == null &&
+                schema.ActualTypeSchema.DiscriminatorObject != null)
             {
                 var types = schema.ActualTypeSchema.ActualDiscriminatorObject.Mapping
-                    .Select(x => Resolve(
-                        x.Value,
+                    .Select(m => Resolve(
+                        m.Value,
                         typeNameHint,
                         addInterfacePrefix
                     ));
