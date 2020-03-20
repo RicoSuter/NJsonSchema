@@ -261,7 +261,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 return string.Join(UnionPipe,
                     Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                        .Split(new[] {UnionPipe}, StringSplitOptions.RemoveEmptyEntries)
+                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x)))
                 );
             }
