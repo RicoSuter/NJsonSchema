@@ -6,6 +6,7 @@ namespace NJsonSchema.Tests.Generation
 {
     public class XmlDocsTests
     {
+        /// <summary>Foobar.</summary>
         /// <example>
         /// { "foo": "bar" }
         /// </example>
@@ -25,6 +26,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson(Formatting.None);
 
             /// Assert
+            Assert.Contains(@"Foobar.", json);
             Assert.Contains(@"""x-example"":{""foo"":""bar""}", json);
             Assert.Contains(@"""x-example"":{""abc"":""def""}", json);
         }
