@@ -142,9 +142,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
 
-                var valueType = prefix + ResolveDictionaryValueType(schema, "any");
-                var defaultType = "string";
+                var valueType = ResolveDictionaryValueType(schema, "any");
+                if (valueType != "any")
+                {
+                    valueType = prefix + valueType;
+                }
 
+                var defaultType = "string";
                 var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
                 if (resolvedType != defaultType)
                 {
