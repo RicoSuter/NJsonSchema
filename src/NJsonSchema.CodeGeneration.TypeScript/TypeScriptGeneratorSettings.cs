@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the enum style (default: Enum).</summary>
         public TypeScriptEnumStyle EnumStyle { get; set; }
 
-        /// <summary>Generate leaf types for an object with discriminator.</summary>
+        /// <summary>Generate leaf types for an object with discriminator (default: false).</summary>
         public bool UseLeafType { get; set; }
 
         /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
