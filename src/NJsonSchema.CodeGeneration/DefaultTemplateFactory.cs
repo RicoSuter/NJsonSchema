@@ -74,6 +74,7 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
         protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
+            template = template.TrimEnd('!');
             var assembly = GetLiquidAssembly("NJsonSchema.CodeGeneration." + language);
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
