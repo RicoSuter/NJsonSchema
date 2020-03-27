@@ -43,7 +43,7 @@ namespace NJsonSchema
         private JsonSchema _not;
         private JsonSchema _dictionaryKey;
 
-        private JsonObjectType type;
+        private JsonObjectType _type;
         private JsonSchema _item;
         private ICollection<JsonSchema> _items;
 
@@ -358,9 +358,9 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type
         {
-            get => type; set
+            get => _type; set
             {
-                type = value;
+                _type = value;
                 ResetTypeRaw();
             }
         }
