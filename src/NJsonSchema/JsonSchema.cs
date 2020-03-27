@@ -43,6 +43,7 @@ namespace NJsonSchema
         private JsonSchema _not;
         private JsonSchema _dictionaryKey;
 
+        private JsonObjectType _type;
         private JsonSchema _item;
         private ICollection<JsonSchema> _items;
 
@@ -355,7 +356,14 @@ namespace NJsonSchema
 
         /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
-        public JsonObjectType Type { get; set; }
+        public JsonObjectType Type
+        {
+            get => _type; set
+            {
+                _type = value;
+                ResetTypeRaw();
+            }
+        }
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
