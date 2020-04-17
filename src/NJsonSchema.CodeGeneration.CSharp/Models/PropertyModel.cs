@@ -275,7 +275,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
-        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type == JsonObjectType.String;
+        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && (_property.ActualTypeSchema.Type == JsonObjectType.String ||
+                                                                                 _property.ActualTypeSchema.Type == (JsonObjectType.String | JsonObjectType.Null));
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.Format == JsonFormatStrings.Date;
