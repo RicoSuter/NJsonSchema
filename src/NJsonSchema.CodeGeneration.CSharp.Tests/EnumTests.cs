@@ -372,5 +372,81 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("FirstAndSecondBits = 3,", code);
             Assert.Contains("All = 7,", code);
         }
+
+
+        [Fact]
+        public async Task When_enum_is_nullable_not_required_it_should_be_nullable_with_converter()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""myProperty"": {
+              ""type"": [
+                ""string"",
+                ""null""
+              ],
+              ""enum"": [
+                ""value1"",
+                ""value2"",
+                ""value3"",
+                ""NONE"",
+                null
+              ]
+        }
+    }
+}";
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            //Assert
+            Assert.Contains("StringEnumConverter", code);
+            Assert.Contains("public FooMyProperty?", code);
+            Assert.Contains("Value3 = 4", code);
+        }
+
+        [Fact]
+        public async Task When_enum_is_nullable_required_it_should_be_nullable_with_converter()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""type"": ""object"",
+    ""required"": [ ""myProperty"" ],
+    ""properties"": {
+        ""myProperty"": {
+              ""type"": [
+                ""string"",
+                ""null""
+              ],
+              ""enum"": [
+                ""value1"",
+                ""value2"",
+                ""value3"",
+                ""NONE"",
+                null
+              ]
+        }
+    }
+}";
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            //Assert
+            Assert.Contains("StringEnumConverter", code);
+            Assert.Contains("public FooMyProperty?", code);
+            Assert.Contains("Value3 = 4", code);
+        }
     }
 }
