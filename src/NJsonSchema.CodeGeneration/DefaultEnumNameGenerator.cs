@@ -24,9 +24,40 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The enumeration name.</returns>
         public string Generate(int index, string name, object value, JsonSchema schema)
         {
+
             if (string.IsNullOrEmpty(name))
             {
                 return "Empty";
+            }
+
+            switch (name)
+            {
+                case ("="):
+                    name = "eq";
+                    break;
+                case ("!="):
+                    name = "ne";
+                    break;
+                case (">"):
+                    name = "gt";
+                    break;
+                case ("<"):
+                    name = "lt";
+                    break;
+                case (">="):
+                    name = "ge";
+                    break;
+                case ("<="):
+                    name = "le";
+                    break;
+                case ("~="):
+                    name = "approx";
+                    break;
+            }
+
+            if (name.StartsWith("-"))
+            {
+                name = "minus_" + name.Substring(1);
             }
 
             if (name.StartsWith("_-"))
