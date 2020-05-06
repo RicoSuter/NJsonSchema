@@ -60,6 +60,11 @@ namespace NJsonSchema.CodeGeneration
                 name = "minus_" + name.Substring(1);
             }
 
+            if (name.StartsWith("+"))
+            {
+                name = "plus_" + name.Substring(1);
+            }
+
             if (name.StartsWith("_-"))
             {
                 name = "__" + name.Substring(2);
