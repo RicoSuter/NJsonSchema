@@ -383,7 +383,8 @@ namespace NJsonSchema.Generation
             if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name);
+                return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||
+                       converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName);
             }
 
             return false;
