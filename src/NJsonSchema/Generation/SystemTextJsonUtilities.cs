@@ -12,6 +12,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 
 namespace NJsonSchema.Generation
 {
@@ -29,7 +30,7 @@ namespace NJsonSchema.Generation
         {
             var settings = new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = new SystemTextJsonContractResolver(serializerOptions)
             };
 
             if (((IEnumerable)serializerOptions.Converters).OfType<object>().Any(c =>
@@ -38,12 +39,37 @@ namespace NJsonSchema.Generation
                 settings.Converters.Add(new StringEnumConverter());
             }
 
-            if (serializerOptions.PropertyNamingPolicy == null)
+            return settings;
+        }
+
+        internal class SystemTextJsonContractResolver : DefaultContractResolver
+        {
+            private readonly dynamic _serializerOptions;
+
+            public SystemTextJsonContractResolver(dynamic serializerOptions)
             {
-                settings.ContractResolver = new DefaultContractResolver();
+                _serializerOptions = serializerOptions;
             }
 
-            return settings;
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                var property = base.CreateProperty(member, memberSerialization);
+
+                if (_serializerOptions.PropertyNamingPolicy != null)
+                {
+                    property.PropertyName = _serializerOptions.PropertyNamingPolicy.ConvertName(member.Name);
+                }
+
+                dynamic jsonPropertyNameAttribute = member.GetCustomAttributes(true)
+                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
+                
+                if (jsonPropertyNameAttribute != null && !string.IsNullOrEmpty(jsonPropertyNameAttribute.Name))
+                {
+                    property.PropertyName = jsonPropertyNameAttribute.Name;
+                }
+
+                return property;
+            }
         }
     }
 }

@@ -263,7 +263,7 @@ namespace NJsonSchema.Generation
                 }
 
                 ActualSerializerSettings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(SerializerOptions);
-                ActualContractResolver = SerializerSettings.ContractResolver ?? new DefaultContractResolver();
+                ActualContractResolver = ActualSerializerSettings.ContractResolver ?? new DefaultContractResolver();
                 return;
             }
             else if (SerializerSettings != null)
