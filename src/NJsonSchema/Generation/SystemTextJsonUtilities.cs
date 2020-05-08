@@ -6,15 +6,14 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-#if NETSTANDARD2_0
-
+using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using System.Collections;
 using System.Linq;
-using System.Text.Json;
 
-namespace NJsonSchema
+namespace NJsonSchema.Generation
 {
     /// <summary>
     /// Utility methods for dealing with System.Text.Json.
@@ -24,21 +23,22 @@ namespace NJsonSchema
         /// <summary>
         /// Converst System.Text.Json serializer options to Newtonsoft JSON settings.
         /// </summary>
-        /// <param name="SerializerOptions">The options.</param>
+        /// <param name="serializerOptions">The options.</param>
         /// <returns>The settings.</returns>
-        public static JsonSerializerSettings ConvertJsonOptionsToNewtonsoftSettings(JsonSerializerOptions SerializerOptions)
+        public static JsonSerializerSettings ConvertJsonOptionsToNewtonsoftSettings(dynamic serializerOptions)
         {
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
 
-            if (SerializerOptions.Converters.Any(c => c is System.Text.Json.Serialization.JsonStringEnumConverter))
+            if (((IEnumerable)serializerOptions.Converters).OfType<object>().Any(c =>
+                c.GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName)))
             {
                 settings.Converters.Add(new StringEnumConverter());
             }
 
-            if (SerializerOptions.PropertyNamingPolicy == null)
+            if (serializerOptions.PropertyNamingPolicy == null)
             {
                 settings.ContractResolver = new DefaultContractResolver();
             }
@@ -47,5 +47,3 @@ namespace NJsonSchema
         }
     }
 }
-
-#endif

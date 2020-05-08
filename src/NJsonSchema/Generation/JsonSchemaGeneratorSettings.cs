@@ -17,10 +17,6 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using Namotion.Reflection;
-#if NETSTANDARD2_0
-using System.Linq;
-using System.Text.Json;
-#endif
 
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace NJsonSchema.Generation
@@ -36,9 +32,7 @@ namespace NJsonSchema.Generation
         private IContractResolver _contractResolver;
 
         private JsonSerializerSettings _serializerSettings;
-#if NETSTANDARD2_0
-        private JsonSerializerOptions _serializerOptions;
-#endif
+        private object _serializerOptions;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
@@ -114,11 +108,10 @@ namespace NJsonSchema.Generation
             }
         }
 
-#if NETSTANDARD2_0
         /// <summary>Gets or sets the System.Text.Json serializer options.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
         [JsonIgnore]
-        public JsonSerializerOptions SerializerOptions
+        public object SerializerOptions
         {
             get => _serializerOptions; set
             {
@@ -126,7 +119,6 @@ namespace NJsonSchema.Generation
                 UpdateActualContractResolverAndSerializerSettings();
             }
         }
-#endif
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
         public string[] ExcludedTypeNames { get; set; }
@@ -253,7 +245,6 @@ namespace NJsonSchema.Generation
         {
             _cachedContracts = new Dictionary<string, JsonContract>();
 
-#if NETSTANDARD2_0
             if (SerializerOptions != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
@@ -275,9 +266,7 @@ namespace NJsonSchema.Generation
                 ActualContractResolver = SerializerSettings.ContractResolver ?? new DefaultContractResolver();
                 return;
             }
-            else
-#endif
-            if (SerializerSettings != null)
+            else if (SerializerSettings != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
                 {
@@ -289,12 +278,10 @@ namespace NJsonSchema.Generation
                     throw new InvalidOperationException("The setting ContractResolver cannot be used when SerializerSettings is set.");
                 }
 
-#if NETSTANDARD2_0
                 if (SerializerOptions != null)
                 {
                     throw new InvalidOperationException("The setting SerializerOptions cannot be used when SerializerSettings is set.");
                 }
-#endif
 
                 ActualContractResolver = SerializerSettings.ContractResolver ?? new DefaultContractResolver();
             }
