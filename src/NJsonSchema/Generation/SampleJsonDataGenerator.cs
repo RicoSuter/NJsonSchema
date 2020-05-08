@@ -50,7 +50,6 @@ namespace NJsonSchema.Generation
                 {
                     var array = new JArray();
                     array.Add(Generate(schema.Item, usedSchemas));
-                    array.Add(Generate(schema.Item, usedSchemas));
                     return array;
                 }
                 else if (schema.Items.Count > 0)
@@ -73,7 +72,7 @@ namespace NJsonSchema.Generation
                 {
                     return JToken.FromObject(schema.Enumeration.First());
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.Integer))
+                else if (schema.Type.HasFlag(JsonObjectType.Integer) || schema.Type.HasFlag(JsonObjectType.Number))
                 {
                     return JToken.FromObject(0);
                 }
@@ -87,9 +86,13 @@ namespace NJsonSchema.Generation
                     {
                         return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
                     }
-                    else
+                    else if (property != null)
                     {
                         return JToken.FromObject(property.Name);
+                    }
+                    else
+                    {
+                        return JToken.FromObject("");
                     }
                 }
                 else if (schema.Type.HasFlag(JsonObjectType.Boolean))
