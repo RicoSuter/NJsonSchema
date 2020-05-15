@@ -35,6 +35,9 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             public string FirstName { get; set; }
 
             public string LastName { get; set; }
+
+            [JsonIgnore]
+            public string Ignored { get; set; }
         }
 
         [Fact]
@@ -56,6 +59,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             // Assert
             Assert.True(schema.Properties.ContainsKey("firstName"));
             Assert.True(schema.Properties.ContainsKey("lastName"));
+            Assert.False(schema.Properties.ContainsKey("ignored"));
         }
 
         [Fact]

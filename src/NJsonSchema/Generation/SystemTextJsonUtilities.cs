@@ -53,14 +53,18 @@ namespace NJsonSchema.Generation
 
             protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
+                var attributes = member.GetCustomAttributes(true);
+
                 var property = base.CreateProperty(member, memberSerialization);
+                property.Ignored = attributes
+                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName) != null;
 
                 if (_serializerOptions.PropertyNamingPolicy != null)
                 {
                     property.PropertyName = _serializerOptions.PropertyNamingPolicy.ConvertName(member.Name);
                 }
 
-                dynamic jsonPropertyNameAttribute = member.GetCustomAttributes(true)
+                dynamic jsonPropertyNameAttribute = attributes
                     .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
                 
                 if (jsonPropertyNameAttribute != null && !string.IsNullOrEmpty(jsonPropertyNameAttribute.Name))
