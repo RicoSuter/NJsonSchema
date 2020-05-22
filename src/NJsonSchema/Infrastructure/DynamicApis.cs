@@ -164,7 +164,7 @@ namespace NJsonSchema.Infrastructure
                 new[] { typeof(string) }).Invoke(null, new object[] { filePath });
         }
 
-        /// <summary>Reads all content of a file (UTF8).</summary>
+        /// <summary>Reads all content of a file (UTF8 with or without BOM).</summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>The file content.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
@@ -179,7 +179,7 @@ namespace NJsonSchema.Infrastructure
                 new[] { typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, Encoding.UTF8 });
         }
 
-        /// <summary>Writes text to a file (UTF8).</summary>
+        /// <summary>Writes text to a file (UTF8 without BOM).</summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="text">The text.</param>
         /// <returns></returns>
@@ -191,8 +191,9 @@ namespace NJsonSchema.Infrastructure
                 throw new NotSupportedException("The System.IO.File API is not available on this platform.");
             }
 
+            // Default of encoding is StreamWriter.UTF8NoBOM
             FileType.GetRuntimeMethod("WriteAllText",
-                new[] { typeof(string), typeof(string), typeof(Encoding) }).Invoke(null, new object[] { filePath, text, Encoding.UTF8 });
+                new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { filePath, text });
         }
 
         /// <summary>Combines two paths.</summary>
