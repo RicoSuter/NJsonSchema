@@ -33,36 +33,36 @@ namespace NJsonSchema.CodeGeneration
             switch (name)
             {
                 case ("="):
-                    name = "eq";
+                    name = "Eq";
                     break;
                 case ("!="):
-                    name = "ne";
+                    name = "Ne";
                     break;
                 case (">"):
-                    name = "gt";
+                    name = "Gt";
                     break;
                 case ("<"):
-                    name = "lt";
+                    name = "Lt";
                     break;
                 case (">="):
-                    name = "ge";
+                    name = "Ge";
                     break;
                 case ("<="):
-                    name = "le";
+                    name = "Le";
                     break;
                 case ("~="):
-                    name = "approx";
+                    name = "Approx";
                     break;
             }
 
             if (name.StartsWith("-"))
             {
-                name = "minus_" + name.Substring(1);
+                name = "Minus" + name.Substring(1);
             }
 
             if (name.StartsWith("+"))
             {
-                name = "plus_" + name.Substring(1);
+                name = "Plus" + name.Substring(1);
             }
 
             if (name.StartsWith("_-"))
