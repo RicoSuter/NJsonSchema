@@ -29,6 +29,41 @@ namespace NJsonSchema.CodeGeneration
                 return "Empty";
             }
 
+            switch (name)
+            {
+                case ("="):
+                    name = "Eq";
+                    break;
+                case ("!="):
+                    name = "Ne";
+                    break;
+                case (">"):
+                    name = "Gt";
+                    break;
+                case ("<"):
+                    name = "Lt";
+                    break;
+                case (">="):
+                    name = "Ge";
+                    break;
+                case ("<="):
+                    name = "Le";
+                    break;
+                case ("~="):
+                    name = "Approx";
+                    break;
+            }
+
+            if (name.StartsWith("-"))
+            {
+                name = "Minus" + name.Substring(1);
+            }
+
+            if (name.StartsWith("+"))
+            {
+                name = "Plus" + name.Substring(1);
+            }
+
             if (name.StartsWith("_-"))
             {
                 name = "__" + name.Substring(2);
