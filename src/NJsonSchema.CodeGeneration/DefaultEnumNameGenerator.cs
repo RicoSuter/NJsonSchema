@@ -24,7 +24,6 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The enumeration name.</returns>
         public string Generate(int index, string name, object value, JsonSchema schema)
         {
-
             if (string.IsNullOrEmpty(name))
             {
                 return "Empty";
