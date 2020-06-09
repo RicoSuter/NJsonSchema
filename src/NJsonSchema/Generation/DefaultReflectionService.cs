@@ -258,7 +258,7 @@ namespace NJsonSchema.Generation
         /// <param name="contextualType">The type.</param>
         /// <param name="serializerSettings">The serializer settings.</param>
         /// <returns>The result.</returns>
-        public bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
+        public virtual bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
         {
             if (!contextualType.TypeInfo.IsEnum)
             {
