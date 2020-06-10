@@ -6,10 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -31,7 +31,7 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Base64,
 #pragma warning restore CS0618 // Type or member is obsolete
         };
-        
+
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
         protected ValueGeneratorBase(CodeGeneratorSettingsBase settings)
@@ -171,6 +171,11 @@ namespace NJsonSchema.CodeGeneration
             if (value is decimal)
             {
                 return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (value is string stringValue && Regex.IsMatch(stringValue, "^[0-9]+(\\.[0-9]+)?$"))
+            {
+                return (string)value;
             }
 
             return null;
