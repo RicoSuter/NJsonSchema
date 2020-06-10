@@ -117,7 +117,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The enum default value.</returns>
         protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
         {
-            return _settings.Namespace + "." + base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+            var defaultValue = base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+            return _settings.Namespace + "." + RemoveNullabilityFromDefaultEnumTypeIfPresent(defaultValue);
+        }
+
+        private string RemoveNullabilityFromDefaultEnumTypeIfPresent(string defaultValue)
+        {
+          return defaultValue.Replace("?", string.Empty);
         }
     }
 }
