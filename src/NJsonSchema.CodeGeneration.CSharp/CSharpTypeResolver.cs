@@ -70,7 +70,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             // Primitive schemas (no new type)
             if (Settings.GenerateOptionalPropertiesAsNullable &&
                 schema is JsonSchemaProperty property &&
-                !property.IsRequired)
+                !property.IsRequired &&
+                !schema.IsEnumeration)
             {
                 isNullable = true;
             }
