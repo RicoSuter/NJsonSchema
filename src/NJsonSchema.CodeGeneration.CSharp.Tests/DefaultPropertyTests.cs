@@ -75,5 +75,57 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains("public bool BoolWithDefault { get; set; }", output);
             Assert.DoesNotContain("public bool BoolWithDefault { get; set; } = false;", output);
         }
+
+        [Fact]
+        public async Task When_generating_CSharp_code_then_default_value_generates_expected_expression()
+        {
+            // Arrange
+            var document = await JsonSchema.FromJsonAsync(@"{
+              ""type"": ""object"",
+              ""properties"": {
+                ""someOptionalProperty"": {
+                  ""type"": ""number"",
+                  ""default"": ""123""
+                }
+              }
+            }");
+
+            //// Act
+            var settings = new CSharpGeneratorSettings();
+            settings.GenerateDefaultValues = true;
+
+            var generator = new CSharpGenerator(document, settings);
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.DoesNotContain("SomeOptionalProperty { get; set; } = D;", code);
+            Assert.Contains("double SomeOptionalProperty { get; set; } = 123D;", code);
+        }
+
+        [Fact]
+        public async Task When_generating_CSharp_code_then_default_value_with_decimal_generates_expected_expression()
+        {
+            // Arrange
+            var document = await JsonSchema.FromJsonAsync(@"{
+              ""type"": ""object"",
+              ""properties"": {
+                ""someOptionalProperty"": {
+                  ""type"": ""number"",
+                  ""default"": ""123.456""
+                }
+              }
+            }");
+
+            //// Act
+            var settings = new CSharpGeneratorSettings();
+            settings.GenerateDefaultValues = true;
+
+            var generator = new CSharpGenerator(document, settings);
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.DoesNotContain("SomeOptionalProperty { get; set; } = D;", code);
+            Assert.Contains("double SomeOptionalProperty { get; set; } = 123.456D;", code);
+        }
     }
 }
