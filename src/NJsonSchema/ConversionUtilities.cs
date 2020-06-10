@@ -26,7 +26,7 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1))
+            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
@@ -54,7 +54,7 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1))
+            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 

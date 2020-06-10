@@ -261,6 +261,91 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_enum_contains_operator_convert_to_string_equivalent()
+        {
+            ////Arrange
+            var json = @"{
+            ""type"": ""object"",
+                ""properties"": {
+                    ""foo"": {
+                        ""$ref"": ""#/definitions/OperatorTestEnum""
+                    }
+                },
+                ""definitions"": {
+                    ""OperatorTestEnum"": {
+                        ""type"": ""string"",
+                            ""description"": ""The operator between the field and operand."",
+                            ""enum"": [
+                                ""="",
+                                ""!="",
+                                "">"",
+                                ""<"",
+                                "">="",
+                                ""<="",
+                                ""in"",
+                                ""not in"",
+                                null,
+                                ""~="",
+                                ""is"",
+                                ""is not""
+                            ]
+                    }   
+                }
+            }";
+
+            /// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.DoesNotContain("__", code);
+            Assert.Contains("Eq = 0", code);
+
+        }
+
+        [Fact]
+        public async Task When_enum_starts_with_plus_or_minus_convert_to_string_equivalent()
+        {
+            ////Arrange
+            var json = @"{
+            ""type"": ""object"",
+                ""properties"": {
+                    ""foo"": {
+                        ""$ref"": ""#/definitions/PlusMinusTestEnum""
+                    }
+                },
+                ""definitions"": {
+                    ""PlusMinusTestEnum"": {
+                        ""type"": ""string"",
+                            ""description"": ""Add or subtract from property"",
+                            ""enum"": [
+                                ""-Foo"",
+                                ""+Foo""
+                            ]
+                    }   
+                }
+            }";
+
+            /// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.DoesNotContain("__", code);
+            Assert.Contains("MinusFoo = 0", code);
+            Assert.Contains("PlusFoo = 1", code);
+
+        }
+
+        [Fact]
         public async Task When_array_item_enum_is_not_referenced_then_type_name_hint_is_property_name()
         {
             /// Arrange
