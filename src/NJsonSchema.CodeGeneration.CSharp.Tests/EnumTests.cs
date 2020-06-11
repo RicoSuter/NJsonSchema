@@ -533,5 +533,39 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("public FooMyProperty?", code);
             Assert.Contains("Value3 = 4", code);
         }
+
+        [Fact]
+        public async Task When_enum_is_nullable_and_has_default_then_question_mark_is_omitted()
+        {
+            //// Arrange
+            var json =
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""category"" : {
+                        ""type"" : ""string"",
+                        ""x-nullable"" : true,
+                        ""default"" : ""commercial"",
+                        ""enum"" : [
+                            ""commercial"",
+                            ""residential""
+                        ]
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true,
+                GenerateOptionalPropertiesAsNullable = true,
+            });
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;", code);
+        }
     }
 }

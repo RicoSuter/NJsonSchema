@@ -102,7 +102,7 @@ namespace NJsonSchema.CodeGeneration
                 ? actualSchema.EnumerationNames.ElementAt(index)
                 : schema.Default.ToString();
 
-            return typeName + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+            return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }
 
         /// <summary>Gets the default value as string literal.</summary>
