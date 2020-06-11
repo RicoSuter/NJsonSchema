@@ -107,9 +107,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return ResolveBoolean(isNullable);
             }
 
+            var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
+
             if (schema.IsBinary)
             {
-                return "byte[]";
+                return "byte[]" + nullableReferenceType;
             }
 
             if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
@@ -121,12 +123,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.Type.HasFlag(JsonObjectType.Array))
             {
-                return ResolveArrayOrTuple(schema);
+                return ResolveArrayOrTuple(schema) + nullableReferenceType;
             }
 
             if (schema.IsDictionary)
             {
-                return ResolveDictionary(schema);
+                return ResolveDictionary(schema) + nullableReferenceType;
             }
 
             if (schema.ActualTypeSchema.IsEnumeration)
@@ -134,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return GetOrGenerateTypeName(schema, typeNameHint) + (isNullable ? "?" : string.Empty);
             }
 
-            return GetOrGenerateTypeName(schema, typeNameHint);
+            return GetOrGenerateTypeName(schema, typeNameHint) + nullableReferenceType;
         }
 
         /// <summary>Checks whether the given schema should generate a type.</summary>
@@ -174,9 +176,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
             }
 
+            var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
+
             if (schema.Format == JsonFormatStrings.Uri)
             {
-                return "System.Uri";
+                return "System.Uri" + nullableReferenceType;
             }
 
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
@@ -188,12 +192,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
             {
-                return "byte[]";
+                return "byte[]" + nullableReferenceType;
             }
 
 #pragma warning restore 618
 
-            return "string";
+            return "string" + nullableReferenceType;
         }
 
         private static string ResolveBoolean(bool isNullable)
