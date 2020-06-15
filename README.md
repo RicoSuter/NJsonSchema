@@ -7,7 +7,7 @@ NJsonSchema for .NET
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
-[![Apiverse](https://img.shields.io/badge/NJsonSchema%20API-apiverse-1dce73.svg)](https://apiverse.io/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
+[![Apiverse](https://img.shields.io/badge/NJsonSchema%20API-apiverse.io-1dce73.svg)](https://apiverse.io/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
 
