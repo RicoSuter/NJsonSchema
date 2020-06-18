@@ -56,6 +56,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
 
+        /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
+        public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
+
         /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
         public bool HasAdditionalPropertiesType =>
             !_schema.IsDictionary &&
