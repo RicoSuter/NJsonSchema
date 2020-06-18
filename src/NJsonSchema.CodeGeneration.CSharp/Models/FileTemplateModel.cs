@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Namespace { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
-        public bool GenerateNullReferenceTypes { get; set; }
+        public bool GenerateNullableReferenceTypes { get; set; }
 
         /// <summary>Gets or sets the types code.</summary>
         public string TypesCode { get; set; }

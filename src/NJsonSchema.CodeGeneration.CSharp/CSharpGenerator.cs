@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
-                GenerateNullReferenceTypes = Settings.GenerateNullableReferenceTypes,
+                GenerateNullableReferenceTypes = Settings.GenerateNullableReferenceTypes,
                 TypesCode = artifactCollection.Concatenate()
             };
 
