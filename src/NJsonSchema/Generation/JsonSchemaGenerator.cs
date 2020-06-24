@@ -522,6 +522,13 @@ namespace NJsonSchema.Generation
             schema.Description = type.ToCachedType().GetDescription();
             schema.Example = GenerateExample(type.ToContextualType());
 
+            dynamic obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            if (obsoleteAttribute != null)
+            {
+                schema.IsDeprecated = true;
+                schema.DeprecatedMessage = obsoleteAttribute.Message;
+            }
+
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
                 schema.IsAbstract = type.GetTypeInfo().IsAbstract;
@@ -1225,6 +1232,13 @@ namespace NJsonSchema.Generation
                     if (propertySchema.Example == null)
                     {
                         propertySchema.Example = GenerateExample(memberInfo);
+                    }
+
+                    dynamic obsoleteAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+                    if (obsoleteAttribute != null)
+                    {
+                        propertySchema.IsDeprecated = true;
+                        propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
                     }
 
                     propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
