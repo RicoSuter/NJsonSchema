@@ -24,7 +24,7 @@
 {% endif -%}
 {% if RenderInpc or RenderPrism -%}
 {% for property in Properties -%}
-    private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
+    private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% elsif GenerateNullableReferenceTypes -%} = default!{% endif -%};
 {% endfor -%}
 
 {% endif -%}
@@ -63,7 +63,7 @@
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%   endif -%}
     {% template Class.Property.Annotations %}
-    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false %} = {{ property.DefaultValue }};{% endif %}
+    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false -%} = default!;{% endif %}
 {% else %}
     {
         get { return {{ property.FieldName }}; }
