@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.Contains("[System.Obsolete(\"Reason property is obsolete\")]", code);
+            Assert.Contains("[System.Obsolete(\"Reason class is obsolete\")]", code);
             Assert.Contains("public partial class ObsoleteWithMessageTestClass", code);
         }
     }
