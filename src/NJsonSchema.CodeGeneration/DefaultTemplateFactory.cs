@@ -202,6 +202,11 @@ namespace NJsonSchema.CodeGeneration
                 return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
             }
 
+            public static string Literal(string input)
+            {
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(input) + "\"";
+            }
+
             public static IEnumerable<object> Concat(Context context, IEnumerable<object> input, IEnumerable<object> concat)
             {
                 return input.Concat(concat ?? Enumerable.Empty<object>()).ToList();

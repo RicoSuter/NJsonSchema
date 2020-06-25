@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
         public class ObsoletePropertyWithMessageTestClass
         {
-            [Obsolete("Reason property is obsolete")]
+            [Obsolete("Reason property is \"obsolete\"")]
             public string Property { get; set; }
         }
 
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             public string Property { get; set; }
         }
 
-        [Obsolete("Reason class is obsolete")]
+        [Obsolete(@"Reason class is ""obsolete""")]
         public class ObsoleteWithMessageTestClass
         {
             public string Property { get; set; }
@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.Contains("[System.Obsolete(\"Reason property is obsolete\")]", code);
+            Assert.Contains("[System.Obsolete(\"Reason property is \\\"obsolete\\\"\")]", code);
             Assert.Contains("public string Property { get; set; }", code);
         }
 
@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.Contains("[System.Obsolete(\"Reason class is obsolete\")]", code);
+            Assert.Contains("[System.Obsolete(\"Reason class is \\\"obsolete\\\"\")]", code);
             Assert.Contains("public partial class ObsoleteWithMessageTestClass", code);
         }
     }
