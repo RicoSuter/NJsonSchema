@@ -1,5 +1,5 @@
 ﻿{% if IsNewableObject -%}
-{{ Variable }} = {{ Value }} ? {{ Value }}.toJSON() : <any>{{ NullValue }};
+{{ Variable }} = {{ Value }} ? {{ Value }}.toJSON() : {{ Value }};
 {% elseif IsArray -%}
 if (Array.isArray({{ Value }})) {
     {{ Variable }} = [];
@@ -20,26 +20,20 @@ if ({{ Value }}) {
     for (let key in {{ Value }}) {
         if ({{ Value }}.hasOwnProperty(key))
 {%     if IsDictionaryValueNewableObject -%}
-            {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].toJSON() : <any>{{ NullValue }};
+            {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].toJSON() : {{ Variable }}[key];
 {%     elseif IsDictionaryValueDate -%}
-            {{ Variable }}[key] = {{ Value }}[key] ? {% if UseJsDate %}formatDate({{ Value }}[key]){% else %}{{ Value }}[key].format('YYYY-MM-DD'){% endif %} : <any>{{ NullValue }};
+            {{ Variable }}[key] = {{ Value }}[key] ? {% if UseJsDate %}formatDate({{ Value }}[key]){% else %}{{ Value }}[key].format('YYYY-MM-DD'){% endif %} : {{ Variable }}[key];
 {%     elseif IsDictionaryValueDateTime -%}
-            {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].{{ DateTimeToStringCode }} : <any>{{ NullValue }};
+            {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].{{ DateTimeToStringCode }} : {{ Variable }}[key];
 {%     else -%}
-{%         if NullValue != "undefined" -%}
-            {{ Variable }}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : <any>{{ NullValue }};
-{%         else -%}
             {{ Variable }}[key] = {{ Value }}[key];
-{%         endif -%}
 {%     endif -%}
     }
 }
 {% elseif IsDate -%}
-{{ Variable }} = {{ Value }} ? {% if UseJsDate %}formatDate({{ Value }}){% else %}{{ Value }}.format('YYYY-MM-DD'){% endif %} : {% if HasDefaultValue -%}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {% if UseJsDate %}formatDate({{ Value }}){% else %}{{ Value }}.format('YYYY-MM-DD'){% endif %} : {% if HasDefaultValue -%}{{ DefaultValue }}{% else %}{{ Value }}{% endif %};
 {% elseif IsDateTime -%}
-{{ Variable }} = {{ Value }} ? {{ Value }}.{{ DateTimeToStringCode }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
-{% elseif NullValue != "undefined" -%}
-{{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : <any>{{ NullValue }};
+{{ Variable }} = {{ Value }} ? {{ Value }}.{{ DateTimeToStringCode }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}{{ Value }}{% endif %};
 {% else -%}
 {{ Variable }} = {{ Value }};
 {% endif -%}

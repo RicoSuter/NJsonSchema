@@ -244,8 +244,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 Assert.DoesNotContain("this.foo = {};", code);
                 Assert.DoesNotContain("data[\"Foo\"] = {};", code);
 
-                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : <any>undefined;", code);
-                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : <any>undefined;", code);
+                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : _data[""Foo""];", code);
+                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : this.foo;", code);
 
                 Assert.Contains("foo: DisplayValueDictionary", code);
 

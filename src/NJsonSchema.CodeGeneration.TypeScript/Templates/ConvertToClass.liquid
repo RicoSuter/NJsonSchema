@@ -1,6 +1,6 @@
 ﻿{% if IsNewableObject -%}
 {%   if CheckNewableObject -%}
-{{ Variable }} = {{ Value }} ? {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %}) : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %}) : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}{{ Value }}{% endif %};
 {%   else -%}
 {{ Variable }} = {{ Type }}.fromJS({{ Value }}{% if HandleReferences -%}, _mappings{% endif %});
 {%   endif -%}
@@ -24,14 +24,14 @@ if ({{ Value }}) {
     for (let key in {{ Value }}) {
         if ({{ Value }}.hasOwnProperty(key))
 {%     if IsDictionaryValueNewableObject -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}{{ Value }}[key]{% endif %};
 {%     elseif IsDictionaryValueNewableArray -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}{{ Value }}[key]{% endif %};
 {%     elseif IsDictionaryValueDate or IsDictionaryValueDateTime -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}{{ Value }}[key]{% endif %};
 {%     else -%}
 {%         if(HasDictionaryValueDefaultValue || NullValue != "undefined"){ -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}{{ Value }}[key]{% endif %};
 {%         else -%}
             {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key];
 {%         endif -%}
@@ -40,10 +40,10 @@ if ({{ Value }}) {
 }
 {% else -%}
     {% if IsDate or IsDateTime -%}
-{{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}{{ Value }}{% endif %};
     {% else -%}
-{%       if HasDefaultValue or NullValue != "undefined" -%}
-{{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%       if HasDefaultValue -%}
+{{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : {{ DefaultValue }};
 {%       else -%}
 {{ Variable }} = {{ Value }};
 {%       endif -%}
