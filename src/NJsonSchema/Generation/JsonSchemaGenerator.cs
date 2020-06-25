@@ -1254,7 +1254,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
+        protected virtual bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
         {
             if (property.GetContextAttribute<JsonIgnoreAttribute>() != null)
             {
