@@ -42,6 +42,7 @@ namespace NJsonSchema
 
                 resolver.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
                 resolver.RenameProperty(typeof(JsonSchema), "x-example", "example");
+                resolver.RenameProperty(typeof(JsonSchema), "x-deprecated", "deprecated");
             }
             else if (schemaType == SchemaType.Swagger2)
             {
