@@ -280,6 +280,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.Format == JsonFormatStrings.Date;
 
+        /// <summary>Gets a value indicating whether the property is deprecated.</summary>
+        public bool IsDeprecated => _property.IsDeprecated;
+
+        /// <summary>Gets a value indicating whether the property has a deprecated message.</summary>
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_property.DeprecatedMessage);
+
+        /// <summary>Gets the deprecated message.</summary>
+        public string DeprecatedMessage => _property.DeprecatedMessage;
+
         private string GetSchemaFormat(JsonSchema schema)
         {
             if (Type == "long" || Type == "long?")
