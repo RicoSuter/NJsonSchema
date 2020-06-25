@@ -441,7 +441,7 @@ namespace NJsonSchema
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the schema is deprecated (native in Open API 'deprecated', custom in Swagger 'x-deprecated').</summary>
+        /// <summary>Gets or sets a value indicating whether the schema is deprecated (native in Open API 'deprecated', custom in Swagger/JSON Schema 'x-deprecated').</summary>
         [JsonProperty("x-deprecated", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsDeprecated { get; set; }
 
