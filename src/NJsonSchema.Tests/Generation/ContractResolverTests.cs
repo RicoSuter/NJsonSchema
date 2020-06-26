@@ -13,7 +13,7 @@ namespace NJsonSchema.Tests.Generation
 {
     public class ContractResolverTests
     {
-#if !NET45
+#if !NET452
         [Fact]
 #endif
         public async Task Properties_should_match_custom_resolver()

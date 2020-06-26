@@ -1,4 +1,4 @@
-﻿#if !NET46 && !NET45
+﻿#if !NET46 && !NET452
 
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
