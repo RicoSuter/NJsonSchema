@@ -74,3 +74,12 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+- task: PowerShell@2
+  displayName: 'Upload to Apiverse.io'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet tool install -g apiverse.cli
+      apiverse add-repository-changeset "namotion" "njsonschema" "$(Build.Repository.Name)" "$(Build.SourceBranchName)" "$(Build.SourceVersion)" "$(Build.SourcesDirectory)" --url "https://apiverse.io" --api-key "$(ApiverseApiKey)"
