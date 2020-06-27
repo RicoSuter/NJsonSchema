@@ -20,7 +20,7 @@ steps:
   displayName: 'Install .NET Core SDK'
   inputs:
     packageType: 'sdk'
-    version: '3.1.102'
+    version: '2.2.203'
 
 # Patch preview project versions (only when on master branch)
 - task: CmdLine@2
@@ -74,6 +74,13 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+# Upload to Apiverse.io
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.102'
 
 - task: PowerShell@2
   displayName: 'Upload to Apiverse.io'
