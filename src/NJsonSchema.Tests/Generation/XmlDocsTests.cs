@@ -16,6 +16,9 @@ namespace NJsonSchema.Tests.Generation
             /// { "abc": "def" }
             /// </example>
             public string Foo { get; set; }
+
+            /// <example>Bar.</example>
+            public string Bar { get; set; }
         }
 
         [Fact]
@@ -29,6 +32,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Contains(@"Foobar.", json);
             Assert.Contains(@"""x-example"":{""foo"":""bar""}", json);
             Assert.Contains(@"""x-example"":{""abc"":""def""}", json);
+            Assert.Contains(@"""x-example"":""Bar.""", json);
         }
     }
 }

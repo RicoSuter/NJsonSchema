@@ -479,9 +479,16 @@ namespace NJsonSchema.Generation
                         member.GetXmlDocsTag("example") :
                         type.GetXmlDocsTag("example");
 
-                    return !string.IsNullOrEmpty(docs) ?
-                        JsonConvert.DeserializeObject<JToken>(docs) :
-                        null;
+                    try
+                    {
+                        return !string.IsNullOrEmpty(docs) ?
+                            JsonConvert.DeserializeObject<JToken>(docs) :
+                            null;
+                    }
+                    catch
+                    {
+                        return docs;
+                    }
                 }
                 catch
                 {
