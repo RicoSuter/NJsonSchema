@@ -1261,6 +1261,10 @@ namespace NJsonSchema.Generation
             }
         }
 
+        /// <summary>Checks whether a property is ignored.</summary>
+        /// <param name="property">The property.</param>
+        /// <param name="parentType">The properties parent type.</param>
+        /// <returns>The result.</returns>
         protected virtual bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
         {
             if (property.GetContextAttribute<JsonIgnoreAttribute>() != null)
