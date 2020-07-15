@@ -23,6 +23,11 @@ namespace NJsonSchema.Tests.Generation
             public string Street { get; set; }
         }
 
+        public class Student : Person
+        {
+            public string Course { get; set; }
+        }
+
         [Fact]
         public void When_sample_data_is_generated_from_schema_then_properties_are_set()
         {
@@ -35,6 +40,25 @@ namespace NJsonSchema.Tests.Generation
             var obj = token as JObject;
 
             //// Assert
+            Assert.NotNull(obj.Property(nameof(Person.FirstName)));
+            Assert.NotNull(obj.Property(nameof(Person.LastName)));
+            Assert.NotNull(obj.Property(nameof(Person.MainAddress)));
+            Assert.NotNull(obj.Property(nameof(Person.Addresses)));
+        }
+
+        [Fact]
+        public void When_sample_data_is_generated_from_schema_with_base_then_properties_are_set()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<Student>();
+            var generator = new SampleJsonDataGenerator();
+
+            //// Act
+            var token = generator.Generate(schema);
+            var obj = token as JObject;
+
+            //// Assert
+            Assert.NotNull(obj.Property(nameof(Student.Course)));
             Assert.NotNull(obj.Property(nameof(Person.FirstName)));
             Assert.NotNull(obj.Property(nameof(Person.LastName)));
             Assert.NotNull(obj.Property(nameof(Person.MainAddress)));
