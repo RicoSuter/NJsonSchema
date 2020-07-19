@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -308,22 +310,33 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         private Assembly Compile(string code)
         {
-#if NETCOREAPP2_0
-            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);
 
-            Microsoft.CodeAnalysis.CSharp.CSharpCompilation compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create("assemblyName")
-             .WithOptions(new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary))
-             .AddReferences(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"))
-             .AddSyntaxTrees(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(code));
+            CSharpCompilation compilation = CSharpCompilation.Create("assemblyName")
+             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+             .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+
+#if NET452
+            compilation = compilation.AddReferences(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Linq.Expressions.Expression).Assembly.Location));
+#endif
+
+#if NETCOREAPP2_0            
+            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);            
+            compilation = compilation.AddReferences(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"));
+#endif
 
             using (var stream = new MemoryStream())
             {
@@ -332,26 +345,12 @@ namespace NJsonSchema.CodeGeneration.Tests
                 if (!result.Success)
                 {
                     throw new Exception(String.Join(", ", result.Diagnostics
-                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
+                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
                         .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
                 }
 
                 return Assembly.Load(stream.GetBuffer());
             }
-#endif
-
-#if NET451
-            var provider = new Microsoft.CSharp.CSharpCodeProvider();
-            var parameters = new CompilerParameters()
-            {
-                GenerateInMemory = true,
-                GenerateExecutable = false
-            };
-            var compilationResult = provider.CompileAssemblyFromSource(parameters, code);
-            Assert.False(compilationResult.Errors.HasErrors, String.Join(", ", compilationResult.Errors));
-
-            return compilationResult.CompiledAssembly;
-#endif
         }
     }
 }

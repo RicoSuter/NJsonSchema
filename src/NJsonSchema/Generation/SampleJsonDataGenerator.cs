@@ -33,12 +33,14 @@ namespace NJsonSchema.Generation
                 return null;
             }
 
-            if (schema.Type.HasFlag(JsonObjectType.Object))
+            if (schema.Type.HasFlag(JsonObjectType.Object) ||
+                schema.AllOf.Any(s => s.ActualProperties.Any()))
             {
                 usedSchemas.Add(schema);
 
+                var properties = schema.ActualProperties.Concat(schema.AllOf.SelectMany(s => s.ActualSchema.ActualProperties));
                 var obj = new JObject();
-                foreach (var p in schema.ActualProperties)
+                foreach (var p in properties)
                 {
                     obj[p.Key] = Generate(p.Value, usedSchemas);
                 }
@@ -49,7 +51,11 @@ namespace NJsonSchema.Generation
                 if (schema.Item != null)
                 {
                     var array = new JArray();
-                    array.Add(Generate(schema.Item, usedSchemas));
+                    var item = Generate(schema.Item, usedSchemas);
+                    if (item != null)
+                    {
+                        array.Add(item);
+                    }
                     return array;
                 }
                 else if (schema.Items.Count > 0)

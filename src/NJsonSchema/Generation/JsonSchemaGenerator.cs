@@ -479,9 +479,16 @@ namespace NJsonSchema.Generation
                         member.GetXmlDocsTag("example") :
                         type.GetXmlDocsTag("example");
 
-                    return !string.IsNullOrEmpty(docs) ?
-                        JsonConvert.DeserializeObject<JToken>(docs) :
-                        null;
+                    try
+                    {
+                        return !string.IsNullOrEmpty(docs) ?
+                            JsonConvert.DeserializeObject<JToken>(docs) :
+                            null;
+                    }
+                    catch
+                    {
+                        return docs;
+                    }
                 }
                 catch
                 {
@@ -1254,7 +1261,11 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
+        /// <summary>Checks whether a property is ignored.</summary>
+        /// <param name="property">The property.</param>
+        /// <param name="parentType">The properties parent type.</param>
+        /// <returns>The result.</returns>
+        protected virtual bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
         {
             if (property.GetContextAttribute<JsonIgnoreAttribute>() != null)
             {
