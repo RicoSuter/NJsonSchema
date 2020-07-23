@@ -8,6 +8,7 @@ NJsonSchema for .NET
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
 [![Apimundo](https://img.shields.io/badge/NJsonSchema%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
+[![Apimundo](https://img.shields.io/badge/Architecture-Apimundo-728199.svg)](https://apimundo.com/organizations/github/projects/ricosuter?tab=repositories)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
 
