@@ -41,6 +41,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the export keyword should be added to all enums.</summary>
         public bool ExportTypes => _settings.ExportTypes;
 
+        /// <summary>Gets the property extension data.</summary>
+        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+
         /// <summary>Gets the enum values.</summary>
         public List<EnumerationItemModel> Enums
         {
