@@ -317,14 +317,33 @@ namespace NJsonSchema
                     .Union(OneOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToList();
 
+                // Collapse all duplicated properties, checking that the duplicated ones are compatible
                 var duplicatedProperties = properties
                     .GroupBy(p => p.Key)
                     .Where(g => g.Count() > 1)
+                    .Select(g => g.ToList())
                     .ToList();
-
-                if (duplicatedProperties.Any())
+                var invalidDuplicates = new List<string>();
+                foreach (var duped in duplicatedProperties)
                 {
-                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
+                    // Make sure all the properties are the same type as each other so they are compatible primitive types
+                    var toKeep = duped[0].Value;
+                    if (duped.Any(dupe => dupe.Value.Type != toKeep.Type))
+                    {
+                        invalidDuplicates.Add(duped[0].Key);
+                        continue;
+                    }
+
+                    // All good, so remove the duplicates here
+                    foreach (var c in duped.Skip(1))
+                    {
+                        properties.Remove(c);
+                    }
+                }
+
+                if (invalidDuplicates.Count > 0)
+                {
+                    throw new InvalidOperationException("The properties " + string.Join(", ", invalidDuplicates.Select(key => "'" + key + "'")) + " are defined multiple times and are not the same type.");
                 }
 
 #if !LEGACY
