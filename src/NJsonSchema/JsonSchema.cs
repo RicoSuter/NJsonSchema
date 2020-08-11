@@ -302,6 +302,58 @@ namespace NJsonSchema
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
+#if !LEGACY
+        private IReadOnlyDictionary<string, JsonSchemaProperty> GetActualProperties(bool includeInherited)
+#else
+        private IDictionary<string, JsonSchemaProperty> GetActualProperties(bool includeInherited)
+#endif
+        {
+            var ignoredSchema = includeInherited ? null : InheritedSchema;
+            var properties = Properties
+                .Union(AllOf.Where(s => s.ActualSchema != ignoredSchema).SelectMany(s => s.ActualSchema.GetActualProperties(false)))
+                .Union(AnyOf.Where(s => s.ActualSchema != ignoredSchema).SelectMany(s => s.ActualSchema.GetActualProperties(true)))
+                .Union(OneOf.Where(s => s.ActualSchema != ignoredSchema).SelectMany(s => s.ActualSchema.GetActualProperties(true)))
+                .ToList();
+
+            // Collapse all duplicated properties, checking that the duplicated ones are compatible
+            var duplicatedProperties = properties
+                .GroupBy(p => p.Key)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.ToList())
+                .ToList();
+            var invalidDuplicates = new List<string>();
+            foreach (var duped in duplicatedProperties)
+            {
+                // Make sure all the properties are the same type as each other so they are compatible primitive types
+                var toKeep = duped[0].Value;
+                if (duped.Any(dupe => dupe.Value.Type != toKeep.Type))
+                {
+                    invalidDuplicates.Add(duped[0].Key);
+                    continue;
+                }
+
+                // All good, so remove the duplicates here
+                foreach (var c in duped.Skip(1))
+                {
+                    properties.Remove(c);
+                }
+            }
+
+            if (invalidDuplicates.Count > 0)
+            {
+                throw new InvalidOperationException("The properties " + string.Join(", ", invalidDuplicates.Select(key => "'" + key + "'")) + " are defined multiple times and are not the same type.");
+            }
+
+#if !LEGACY
+            return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+#else
+            return new Dictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
+#endif
+        }
+
+        /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
+        /// <remarks>Used for code generation.</remarks>
+        /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
         [JsonIgnore]
 #if !LEGACY
         public IReadOnlyDictionary<string, JsonSchemaProperty> ActualProperties
@@ -311,46 +363,7 @@ namespace NJsonSchema
         {
             get
             {
-                var properties = Properties
-                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
-                    .Union(AnyOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
-                    .Union(OneOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
-                    .ToList();
-
-                // Collapse all duplicated properties, checking that the duplicated ones are compatible
-                var duplicatedProperties = properties
-                    .GroupBy(p => p.Key)
-                    .Where(g => g.Count() > 1)
-                    .Select(g => g.ToList())
-                    .ToList();
-                var invalidDuplicates = new List<string>();
-                foreach (var duped in duplicatedProperties)
-                {
-                    // Make sure all the properties are the same type as each other so they are compatible primitive types
-                    var toKeep = duped[0].Value;
-                    if (duped.Any(dupe => dupe.Value.Type != toKeep.Type))
-                    {
-                        invalidDuplicates.Add(duped[0].Key);
-                        continue;
-                    }
-
-                    // All good, so remove the duplicates here
-                    foreach (var c in duped.Skip(1))
-                    {
-                        properties.Remove(c);
-                    }
-                }
-
-                if (invalidDuplicates.Count > 0)
-                {
-                    throw new InvalidOperationException("The properties " + string.Join(", ", invalidDuplicates.Select(key => "'" + key + "'")) + " are defined multiple times and are not the same type.");
-                }
-
-#if !LEGACY
-                return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#else
-                return new Dictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#endif
+                return GetActualProperties(false);
             }
         }
 
