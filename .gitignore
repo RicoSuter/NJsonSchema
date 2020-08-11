@@ -20,3 +20,6 @@ src/packages/Newtonsoft.Json**
 *.vspx
 /src/TestResults
 /src/.cr/*
+
+# Ignore files from JetBrainds Rider
+/src/.idea/

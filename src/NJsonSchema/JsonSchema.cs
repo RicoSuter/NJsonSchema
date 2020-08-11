@@ -249,7 +249,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets the inherited/parent schema which may also be inlined 
+        /// <summary>Gets the inherited/parent schema which may also be inlined
         /// (the schema itself if it is a dictionary or array, otherwise <see cref="InheritedSchema"/>).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
@@ -312,8 +312,9 @@ namespace NJsonSchema
             get
             {
                 var properties = Properties
-                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema)
-                    .SelectMany(s => s.ActualSchema.ActualProperties))
+                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
+                    .Union(AnyOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
+                    .Union(OneOf.Where(s => s.ActualSchema != InheritedSchema).SelectMany(s => s.ActualSchema.ActualProperties))
                     .ToList();
 
                 var duplicatedProperties = properties
