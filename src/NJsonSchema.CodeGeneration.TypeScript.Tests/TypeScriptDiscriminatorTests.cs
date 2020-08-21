@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [KnownType(typeof(SecondChild))]
         public abstract class Base
         {
-            public EBase Type { get; }
+            public abstract EBase Type { get; }
         }
 
         public enum EBase
@@ -26,11 +26,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public class OneChild : Base
         {
             public string A { get; }
+
+            public override EBase Type => EBase.OneChild;
         }
 
         public class SecondChild : Base
         {
             public string B { get; }
+
+            public override EBase Type => EBase.SecondChild;
         }
 
         public class Nested
