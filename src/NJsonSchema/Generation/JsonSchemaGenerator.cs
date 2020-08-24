@@ -1114,7 +1114,8 @@ namespace NJsonSchema.Generation
                     if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
                         if (
-                            (existingProperty.ActualTypeSchema.Type & (JsonObjectType.String | JsonObjectType.Integer)) == 0
+                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer)
+                            && !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String)
                         )
                         {
                             throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");

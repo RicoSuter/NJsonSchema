@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.Converters;
+using NJsonSchema.Generation;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Xunit;
@@ -48,7 +49,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>();
+            var schema = JsonSchema.FromType<Nested>(new JsonSchemaGeneratorSettings
+            {
+                GenerateAbstractProperties = true,
+            });
             var data = schema.ToJson();
 
             //// Act
@@ -67,7 +71,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>();
+            var schema = JsonSchema.FromType<Nested>(new JsonSchemaGeneratorSettings
+            {
+                GenerateAbstractProperties = true,
+            });
             var data = schema.ToJson();
 
             //// Act
