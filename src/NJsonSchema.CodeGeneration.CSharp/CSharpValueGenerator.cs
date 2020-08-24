@@ -50,6 +50,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         var stringLiteral = GetDefaultAsStringLiteral(schema);
                         return $"new {targetType}({stringLiteral})";
                     }
+
+                    if (targetType == "System.DateTime" || targetType == "System.DateTime?")
+                    {
+                        var stringLiteral = GetDefaultAsStringLiteral(schema);
+                        return $"System.DateTime.Parse({stringLiteral})";
+                    }
                 }
 
                 var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
