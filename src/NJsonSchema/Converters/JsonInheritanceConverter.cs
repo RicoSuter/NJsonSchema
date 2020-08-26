@@ -163,7 +163,7 @@ namespace NJsonSchema.Converters
                 return null;
             }
 
-            var discriminator = jObject.GetValue(_discriminator).Value<string>();
+            var discriminator = jObject.GetValue(this._discriminator, StringComparison.OrdinalIgnoreCase).Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
             var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
