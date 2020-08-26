@@ -1111,10 +1111,15 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
-                        (existingProperty.Type & JsonObjectType.String) == 0)
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) && 
+                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
+                        {
+                            throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        }
+
+                        existingProperty.IsRequired = true;
                     }
 
                     var discriminator = new OpenApiDiscriminator
@@ -1124,11 +1129,15 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+
+                    if (!typeSchema.Properties.ContainsKey(discriminatorName))
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true
-                    };
+                        typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = true
+                        };
+                    }
                 }
                 else
                 {
