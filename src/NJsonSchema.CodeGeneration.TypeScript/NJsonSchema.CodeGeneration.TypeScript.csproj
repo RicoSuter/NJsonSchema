@@ -13,7 +13,6 @@
     <Authors>Rico Suter</Authors>
     <PackageIconUrl>https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/NuGetIcon.png</PackageIconUrl>
     <Company />
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
