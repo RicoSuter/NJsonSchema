@@ -28,7 +28,7 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Namotion.Reflection" Version="1.0.11" />
+    <PackageReference Include="Namotion.Reflection" Version="1.0.13" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
