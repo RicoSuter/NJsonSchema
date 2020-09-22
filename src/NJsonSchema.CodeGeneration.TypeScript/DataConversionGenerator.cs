@@ -92,9 +92,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment",
                 DateTimeToStringCode =
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ||
-                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.DayJS) &&
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
                         typeSchema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS', { trim: false })" :
+                        (parameters.Settings.DateTimeType == TypeScriptDateTimeType.DayJS &&
+                        typeSchema.Format == JsonFormatStrings.TimeSpan) ? "format('d.hh:mm:ss.SSS')" : 
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
                 HandleReferences = parameters.Settings.HandleReferences
