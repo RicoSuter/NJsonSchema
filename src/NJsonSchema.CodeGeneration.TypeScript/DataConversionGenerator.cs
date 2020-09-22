@@ -85,13 +85,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" :
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.DayJS ? "dayjs" :
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                         parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
                         typeSchema.Format == JsonFormatStrings.TimeSpan ? "moment.duration" :
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment",
                 DateTimeToStringCode =
                         (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ||
+                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.DayJS) &&
                         typeSchema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS', { trim: false })" :
                     parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
 
@@ -119,7 +121,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return false;
                 }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
@@ -151,7 +154,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
                 }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)
