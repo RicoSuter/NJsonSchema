@@ -86,7 +86,6 @@ namespace NJsonSchema.Tests.Infrastructure
             //// Act
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(foo, false, contractResolver);
             var json = JsonConvert.SerializeObject(foo, Formatting.Indented, new JsonSerializerSettings { ContractResolver = contractResolver });
-            json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
 
             //// Assert
             Assert.Contains("#/definitions2/Bar", json);

@@ -319,5 +319,34 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.DoesNotContain("SkillLevel2", code);
         }
+
+
+        [Fact]
+        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved() {
+            //// Arrange
+            string extensionCode = @"
+import * as generated from ""./generated"";
+
+export class ExceptionBase extends generated.ExceptionBase {
+    xyz: boolean; 
+}
+            ";
+
+            var schema = JsonSchema.FromType<ExceptionContainer>();
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings {
+                ExtensionCode = extensionCode,
+                ExtendedClasses = new[] { "ExceptionBase" },
+            });
+
+            //// Act
+            var output = generator.GenerateTypes(schema, null);
+
+            //// Assert
+            var outputArray = output.ToArray();
+            Assert.Equal(4, outputArray.Length);
+
+            Assert.Equal("Exception", outputArray[0].BaseTypeName);
+            Assert.Contains("xyz: boolean", outputArray[0].Code);
+        }
     }
 }

@@ -315,9 +315,9 @@ namespace NJsonSchema.Tests.Generation
 
         [KnownType(typeof(InheritedClass_WithIntDiscriminant))]
         [JsonConverter(typeof(JsonInheritanceConverter), nameof(Kind))]
-        public class BaseClass_WithIntDiscriminant
+        public class BaseClass_WithObjectDiscriminant
         {
-            public int Kind { get; set; }
+            public object Kind { get; set; }
         }
 
         public class InheritedClass_WithIntDiscriminant : BaseClass_WithStringDiscriminant
@@ -331,7 +331,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            JsonSchema GetSchema() => JsonSchema.FromType<BaseClass_WithIntDiscriminant>();
+            JsonSchema GetSchema() => JsonSchema.FromType<BaseClass_WithObjectDiscriminant>();
             Action getSchemaAction = () => GetSchema();
 
             //// Assert
