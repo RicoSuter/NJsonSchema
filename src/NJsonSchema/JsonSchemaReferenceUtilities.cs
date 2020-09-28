@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -36,22 +35,6 @@ namespace NJsonSchema
         {
             var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
             await updater.VisitAsync(rootObject).ConfigureAwait(false);
-        }
-
-        /// <summary>Converts JSON references ($ref) to property references.</summary>
-        /// <param name="data">The data.</param>
-        /// <returns>The data.</returns>
-        public static string ConvertJsonReferences(string data)
-        {
-            return data.Replace("$ref", JsonPathUtilities.ReferenceReplaceString);
-        }
-
-        /// <summary>Converts property references to JSON references ($ref).</summary>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        public static string ConvertPropertyReferences(string data)
-        {
-            return data.Replace(JsonPathUtilities.ReferenceReplaceString, "$ref");
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties

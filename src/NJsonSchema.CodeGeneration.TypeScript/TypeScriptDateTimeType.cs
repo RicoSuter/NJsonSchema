@@ -23,6 +23,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Uses the Moment.js for date time with offset handling.</summary>
         OffsetMomentJS,
 
+        /// <summary>Uses Luxon for date time handling.</summary>
+        Luxon,
+
         /// <summary>Uses the DayJS.js for date time handling.</summary>
         DayJS,
     }
