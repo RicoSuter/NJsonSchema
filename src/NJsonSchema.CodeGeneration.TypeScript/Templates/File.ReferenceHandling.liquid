@@ -52,14 +52,9 @@ function createInstance<T>(data: any, mappings: any, type: any): T {
   const myKey = "item";
 
   if (data[myKey])
-  {
     return <T>mappings[data[myKey]].target;
-  }
-  data[myKey] = mappings.length;
 
-  //let mapping = mappings.filter((m: any) => m.source === data);
-  //if (mapping.length === 1)
-  //    return <T>mapping[0].target;
+  data[myKey] = mappings.length;
 
   let result: any = new type();
   mappings.push({ source: data, target: result });
