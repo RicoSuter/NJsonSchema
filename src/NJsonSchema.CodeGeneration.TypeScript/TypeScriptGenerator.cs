@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     if (index != -1)
                     {
                         var code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
-                        yield return new CodeArtifact(artifact.TypeName, artifact.Type, artifact.Language, artifact.Category, code);
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
                     }
                     else
                     {
@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
 
                         var code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
-                        yield return new CodeArtifact(artifact.TypeName, artifact.Type, artifact.Language, artifact.Category, code);
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
                     }
                 }
                 else
