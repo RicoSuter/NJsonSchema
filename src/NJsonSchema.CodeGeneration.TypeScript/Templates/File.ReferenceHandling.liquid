@@ -49,12 +49,11 @@ function createInstance<T>(data: any, mappings: any, type: any): T {
     return null;
   }
 
-  const myKey = "item";
+  const mappingIndexName = "__mappingIndex";
+  if (data[mappingIndexName])
+    return <T>mappings[data[mappingIndexName]].target;
 
-  if (data[myKey])
-    return <T>mappings[data[myKey]].target;
-
-  data[myKey] = mappings.length;
+  data[mappingIndexName] = mappings.length;
 
   let result: any = new type();
   mappings.push({ source: data, target: result });
