@@ -45,9 +45,7 @@ function createInstance<T>(data: any, mappings: any, type: any): T {
   if (!mappings)
     mappings = [];
   if (!data)
-  {
     return null;
-  }
 
   const mappingIndexName = "__mappingIndex";
   if (data[mappingIndexName])
