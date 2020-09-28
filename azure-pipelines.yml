@@ -89,4 +89,6 @@ steps:
     targetType: 'inline'
     script: |
       dotnet tool install -g apimundo.cli
-      apimundo add-repository-changeset "github" "ricosuter" "NJsonSchema" "master" "$(Build.SourceVersion)" "$(Build.SourcesDirectory)" --url "https://apimundo.com" --api-key "$(ApiverseApiKey)"
+      apimundo add-repository-changeset /organization:"github" /project:"ricosuter" `
+          /repository:"NJsonSchema" /branch:"master" `
+          /commit:"$(Build.SourceVersion)" /api-key:"$(ApimundoApiKey)"

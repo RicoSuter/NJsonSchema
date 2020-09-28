@@ -510,7 +510,7 @@ namespace NJsonSchema.Generation
             schemaResolver.AddSchema(type, false, schema);
 
             var rootSchema = schema;
-            var actualSchema = GenerateInheritance(type, schema, schemaResolver);
+            var actualSchema = GenerateInheritance(typeDescription.ContextualType, schema, schemaResolver);
             if (actualSchema != null)
             {
                 schema = actualSchema;
@@ -1011,19 +1011,19 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private JsonSchema GenerateInheritance(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
+        private JsonSchema GenerateInheritance(ContextualType type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
-            var baseType = type.GetTypeInfo().BaseType;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
+            var baseType = type.BaseType;
+            if (baseType != null && baseType.Type != typeof(object) && baseType.Type != typeof(ValueType))
             {
-                if (baseType.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
-                    baseType.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
-                    Settings.ExcludedTypeNames?.Contains(baseType.FullName) != true)
+                if (baseType.Attributes.FirstAssignableToTypeNameOrDefault("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    baseType.Attributes.FirstAssignableToTypeNameOrDefault("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    Settings.ExcludedTypeNames?.Contains(baseType.Type.FullName) != true)
                 {
                     if (Settings.GetActualFlattenInheritanceHierarchy(type))
                     {
-                        var typeDescription = Settings.ReflectionService.GetDescription(baseType.ToContextualType(), Settings);
-                        if (!typeDescription.IsDictionary && !type.IsArray)
+                        var typeDescription = Settings.ReflectionService.GetDescription(baseType, Settings);
+                        if (!typeDescription.IsDictionary && !type.Type.IsArray)
                         {
                             GenerateProperties(baseType, schema, schemaResolver);
                             var actualSchema = GenerateInheritance(baseType, schema, schemaResolver);
@@ -1038,7 +1038,7 @@ namespace NJsonSchema.Generation
                         GenerateProperties(type, actualSchema, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 
-                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType.ToContextualType(), Settings);
+                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, Settings);
                         var requiresSchemaReference = baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers);
 
                         if (actualSchema.Properties.Any() || requiresSchemaReference)
@@ -1071,7 +1071,7 @@ namespace NJsonSchema.Generation
                         else
                         {
                             // Array and dictionary inheritance are not expressed with allOf but inline
-                            Generate(schema, baseType.ToContextualType(), schemaResolver);
+                            Generate(schema, baseType, schemaResolver);
                             return schema;
                         }
                     }
@@ -1081,17 +1081,17 @@ namespace NJsonSchema.Generation
             if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
 #if !LEGACY
-                foreach (var i in type.GetTypeInfo().ImplementedInterfaces)
+                foreach (var i in type.Type.GetTypeInfo().ImplementedInterfaces)
 #else
-                foreach (var i in type.GetTypeInfo().GetInterfaces())
+                foreach (var i in type.Type.GetTypeInfo().GetInterfaces())
 #endif
                 {
                     var typeDescription = Settings.ReflectionService.GetDescription(i.ToContextualType(), Settings);
-                    if (!typeDescription.IsDictionary && !type.IsArray &&
+                    if (!typeDescription.IsDictionary && !type.Type.IsArray &&
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
                         GenerateProperties(i, schema, schemaResolver);
-                        var actualSchema = GenerateInheritance(i, schema, schemaResolver);
+                        var actualSchema = GenerateInheritance(i.ToContextualType(), schema, schemaResolver);
 
                         GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
                     }
@@ -1111,10 +1111,15 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
-                        (existingProperty.Type & JsonObjectType.String) == 0)
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) && 
+                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
+                        {
+                            throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        }
+
+                        existingProperty.IsRequired = true;
                     }
 
                     var discriminator = new OpenApiDiscriminator
@@ -1124,11 +1129,15 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+
+                    if (!typeSchema.Properties.ContainsKey(discriminatorName))
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true
-                    };
+                        typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = true
+                        };
+                    }
                 }
                 else
                 {
