@@ -42,16 +42,19 @@
 }
 
 function createInstance<T>(data: any, mappings: any, type: any): T {
-    if (!mappings)
-        mappings = [];
-    else {
-        let mapping = mappings.filter((m: any) => m.source === data);
-        if (mapping.length === 1)
-            return <T>mapping[0].target;
-    }
+  if (!mappings)
+    mappings = [];
+  if (!data)
+    return null;
 
-    let result: any = new type();
-    mappings.push({ source: data, target: result });
-    result.init(data, mappings);
-    return result;
+  const mappingIndexName = "__mappingIndex";
+  if (data[mappingIndexName])
+    return <T>mappings[data[mappingIndexName]].target;
+
+  data[mappingIndexName] = mappings.length;
+
+  let result: any = new type();
+  mappings.push({ source: data, target: result });
+  result.init(data, mappings);
+  return result;
 }
