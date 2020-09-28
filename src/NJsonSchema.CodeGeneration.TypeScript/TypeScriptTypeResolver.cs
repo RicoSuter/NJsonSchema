@@ -263,6 +263,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "Duration";
                 }
             }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.DayJS)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "dayjs.Dayjs";
+                }
+            }
 
             return "string";
         }

@@ -120,6 +120,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 case TypeScriptDateTimeType.Luxon:
                     return "DateTime.fromISO";
 
+                case TypeScriptDateTimeType.DayJS:
+                    return "dayjs";
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -151,6 +154,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 case TypeScriptDateTimeType.Luxon:
                     return "toString()";
 
+                case TypeScriptDateTimeType.DayJS:
+                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    {
+                        return "format('d.hh:mm:ss.SSS')";
+                    }
+
+                    return "toISOString()";
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -176,7 +187,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return false;
                 }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
@@ -225,7 +237,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
                 }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)

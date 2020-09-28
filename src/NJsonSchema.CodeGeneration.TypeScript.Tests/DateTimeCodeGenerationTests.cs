@@ -73,6 +73,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_date_handling_is_dayjs_then_dayjs_property_are_generated_in_class()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<ClassWithDateTimeProperty>();
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                DateTimeType = TypeScriptDateTimeType.DayJS
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("myDateTime: dayjs.Dayjs", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? dayjs(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+        }
+        
+        [Fact]
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_class()
         {
             //// Arrange

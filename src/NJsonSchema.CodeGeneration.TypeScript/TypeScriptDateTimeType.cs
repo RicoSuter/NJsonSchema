@@ -25,5 +25,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Uses Luxon for date time handling.</summary>
         Luxon,
+
+        /// <summary>Uses the DayJS.js for date time handling.</summary>
+        DayJS,
     }
 }
