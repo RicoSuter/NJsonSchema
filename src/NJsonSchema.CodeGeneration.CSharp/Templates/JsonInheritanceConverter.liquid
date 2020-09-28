@@ -75,7 +75,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             return null;
 
         var discriminatorValue = jObject.GetValue(_discriminator);
-        var discriminator = discriminatorValue != null ? Newtonsoft.Json.Linq.Extensions.Value<string>(jObject.GetValue(_discriminator)) : null;
+        var discriminator = discriminatorValue != null ? Newtonsoft.Json.Linq.Extensions.Value<string>(discriminatorValue) : null;
         var subtype = GetObjectSubtype(objectType, discriminator);
        
         var objectContract = serializer.ContractResolver.ResolveContract(subtype) as Newtonsoft.Json.Serialization.JsonObjectContract;
