@@ -140,8 +140,24 @@ namespace NJsonSchema
                     }
                     else
                     {
-                        var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), jsonPath);
-                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath, append).ConfigureAwait(false);
+                        // Split the file path and fragment before concatenating with
+                        // document path. If document path have `#` in it, doing this
+                        // later would not work.
+                        var arr = Regex.Split(jsonPath, @"(?=#)");
+                        string filePath, fragment;
+                        if (arr.Length == 1)
+                        {
+                            filePath = arr[0];
+                            fragment = null;
+                        }
+                        else
+                        {
+                            filePath = arr[0];
+                            fragment = arr[1];
+                        }
+
+                        filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), filePath);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, jsonPath, fragment, append).ConfigureAwait(false);
                     }
                 }
                 else
@@ -151,12 +167,11 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, bool append)
+        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, string jsonPath, string fragment, bool append)
         {
             try
             {
-                var arr = Regex.Split(fullJsonPath, @"(?=#)");
-                var filePath = DynamicApis.GetFullPath(arr[0]);
+                filePath = DynamicApis.GetFullPath(filePath);
                 if (!_resolvedObjects.ContainsKey(filePath))
                 {
                     var loadedFile = await ResolveFileReferenceAsync(filePath).ConfigureAwait(false);
@@ -165,7 +180,7 @@ namespace NJsonSchema
                 }
 
                 var referencedFile = _resolvedObjects[filePath];
-                var resolvedSchema = arr.Length == 1 ? referencedFile : await ResolveReferenceAsync(referencedFile, arr[1]).ConfigureAwait(false);
+                var resolvedSchema = fragment is null ? referencedFile : await ResolveReferenceAsync(referencedFile, fragment).ConfigureAwait(false);
                 if (resolvedSchema is JsonSchema && append &&
                     (_schemaAppender.RootObject as JsonSchema)?.Definitions.Values.Contains(referencedFile) != true)
                 {
@@ -177,7 +192,7 @@ namespace NJsonSchema
             }
             catch (Exception exception)
             {
-                throw new InvalidOperationException("Could not resolve the JSON path '" + jsonPath + "' with the full JSON path '" + fullJsonPath + "'.", exception);
+                throw new InvalidOperationException("Could not resolve the JSON path '" + jsonPath + "' with the full JSON path '" + filePath + fragment + "'.", exception);
             }
         }
 
