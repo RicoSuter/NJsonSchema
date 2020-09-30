@@ -100,13 +100,11 @@ namespace NJsonSchema
         }
 
         /// <summary>
-        /// replaces all characters that are not normals letters, numbers or underscore, with an underscore.
-        /// Will prepend an underscore if the first characters is a number
+        /// Replaces all characters that are not normals letters, numbers or underscore, with an underscore.
+        /// Will prepend an underscore if the first characters is a number.
         /// In case there are this would result in multiple underscores in a row, strips down to one underscore.
-        /// Will trim any underscores at the end of the typename
+        /// Will trim any underscores at the end of the type name.
         /// </summary>
-        /// <param name="typeName"></param>
-        /// <returns></returns>
         private string RemoveIllegalCharacters(string typeName)
         {
             // TODO: Find a way to support unicode characters up to 3.0
@@ -119,18 +117,25 @@ namespace NJsonSchema
             if (!regexValidStartChar.IsMatch(firstCharacter))
             {
                 if (!regexInvalidCharacters.IsMatch(firstCharacter))
+                {
                     legalTypeName.Insert(0, "_");
+                }
                 else
+                {
                     legalTypeName[0] = '_';
+                }
             }
 
             var illegalMatches = regexInvalidCharacters.Matches(legalTypeName.ToString());
+
             for (int i = illegalMatches.Count - 1; i >= 0; i--)
             {
                 var illegalMatchIndex = illegalMatches[i].Index;
                 legalTypeName[illegalMatchIndex] = '_';
             }
+
             var regexMoreThanOneUnderscore = new Regex("[_]{2,}");
+
             var legalTypeNameString = regexMoreThanOneUnderscore.Replace(legalTypeName.ToString(), "_");
             return legalTypeNameString.TrimEnd('_');
         }
