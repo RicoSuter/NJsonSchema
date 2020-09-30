@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Infrastructure;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.References
@@ -22,7 +23,7 @@ namespace NJsonSchema.References
         public string DocumentPath { get; set; }
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty(JsonPathUtilities.ReferenceReplaceString, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("$ref", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         string IJsonReferenceBase.ReferencePath { get; set; }
 
         /// <summary>Gets or sets the referenced object.</summary>

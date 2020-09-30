@@ -1,0 +1,85 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0-draft-draft12
+  title: Generic Document API
+servers:
+  - url: '{protocol}://{server}/{product}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      server:
+        default: api.generic.com/apiserver
+        description: |-
+          This is the server being used to host the API in the current environment.
+      product:
+        default: generic/core
+        description: |-
+          This is the portion of the url to add to each base-url before each path defined below.
+security:
+  - Bearer: []
+paths:
+  /custom-queries:
+    get:
+      summary: |-
+        Get the custom query metadata for all custom queries for the user.
+      description: |-
+        Get all the custom queries the logged in user has permissions to view.
+      operationId: GetCustomQueryCollection
+      tags:
+        - custom-queries
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: array
+            items:
+              type: string
+          description: The unique identifiers of custom queries. This parameter cannot be used in conjunction with the `systemName` parameter. Multiple values are supported and in a URL should be joined using the "&" character.  Ex:?item=12&item=13
+        - in: query
+          name: systemName
+          schema:
+            type: array
+            items:
+              type: string
+          description: The unique configured system names of custom queries. This parameter cannot be used in conjunction with the `id` parameter. Multiple values are supported and in a URL should be joined using the "&" character.  Ex:?item=12&item=13
+        - $ref: './common-items/parameters.yaml#/components/parameters/Accept-Language'
+      responses:
+        200:
+          description: |-
+            OK
+          headers:
+            Content-Language:
+              $ref: './common-items/headers.yaml#/components/headers/Content-Language'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomQueryCollection'
+        401:
+          $ref: './common-items/responses.yaml#/components/responses/401-GENERIC-RESPONSE'
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+  schemas:
+    CustomQuery:
+      description: |-
+        Custom query metadata
+      properties:
+        id:
+          description: |-
+            The unique identifier of the custom query.
+          type: string
+    CustomQueryCollection:
+      description: |-
+        An array of custom queries.
+      properties:
+        items:
+          description: |-
+            An array of custom queries.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomQuery'

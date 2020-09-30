@@ -53,8 +53,6 @@ namespace NJsonSchema.Converters
                 _isWriting = true;
 
                 var json = JsonConvert.SerializeObject(value, serializer.Formatting);
-                json = JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
-
                 if (writer.WriteState == WriteState.Property)
                 {
                     writer.WriteRawValue(json);

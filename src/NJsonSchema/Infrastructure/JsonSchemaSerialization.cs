@@ -72,7 +72,7 @@ namespace NJsonSchema.Infrastructure
             CurrentSerializerSettings = null;
             CurrentSchemaType = SchemaType.JsonSchema;
 
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
+            return json;
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -123,8 +123,6 @@ namespace NJsonSchema.Infrastructure
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.None
             };
-
-            json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
 
             var obj = JsonConvert.DeserializeObject<T>(json, CurrentSerializerSettings);
             CurrentSerializerSettings = null;

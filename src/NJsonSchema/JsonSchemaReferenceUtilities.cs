@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -36,22 +35,6 @@ namespace NJsonSchema
         {
             var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
             await updater.VisitAsync(rootObject).ConfigureAwait(false);
-        }
-
-        /// <summary>Converts JSON references ($ref) to property references.</summary>
-        /// <param name="data">The data.</param>
-        /// <returns>The data.</returns>
-        public static string ConvertJsonReferences(string data)
-        {
-            return data.Replace("$ref", JsonPathUtilities.ReferenceReplaceString);
-        }
-
-        /// <summary>Converts property references to JSON references ($ref).</summary>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        public static string ConvertPropertyReferences(string data)
-        {
-            return data.Replace(JsonPathUtilities.ReferenceReplaceString, "$ref");
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
@@ -87,6 +70,7 @@ namespace NJsonSchema
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
+            private readonly IContractResolver _contractResolver;
             private bool _replaceRefsRound;
 
             public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
@@ -94,6 +78,7 @@ namespace NJsonSchema
             {
                 _rootObject = rootObject;
                 _referenceResolver = referenceResolver;
+                _contractResolver = contractResolver;
             }
 
             public override async Task VisitAsync(object obj)
@@ -114,7 +99,7 @@ namespace NJsonSchema
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -122,7 +107,7 @@ namespace NJsonSchema
                     {
                         // load $refs and add them to "definitions"
                         reference.Reference = await _referenceResolver
-                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath)
+                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
                             .ConfigureAwait(false);
                     }
                 }

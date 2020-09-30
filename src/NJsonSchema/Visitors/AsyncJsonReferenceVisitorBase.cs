@@ -81,10 +81,13 @@ namespace NJsonSchema.Visitors
 
             if (obj is JsonSchema schema)
             {
-                if (schema.Reference != null)
-                {
-                    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o).ConfigureAwait(false);
-                }
+                // Do not follow as the root object might be different than _rootObject, fixes https://github.com/RicoSuter/NJsonSchema/issues/588
+                // i.e. we should only visit the objects which might be references but not resolve 
+                // because usually the resolved object is touched in another path (not via reference)
+                //if (schema.Reference != null)
+                //{
+                //    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o).ConfigureAwait(false);
+                //}
 
                 if (schema.AdditionalItemsSchema != null)
                 {

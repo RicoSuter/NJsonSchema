@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
+using NJsonSchema.Tests.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -108,6 +111,41 @@ namespace NJsonSchema.Tests.Serialization
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
             Assert.Equal(3, schema.Properties["Property"].ExtensionData["Bar"]);
+        }
+
+        public class MyCustomExtensionAttribute : ValidationAttribute, IJsonSchemaExtensionDataAttribute
+        {
+            public MyCustomExtensionAttribute()
+            {
+                this.Key = "My custom key";
+                this.Value = "My custom logic";
+            }
+
+            public string Key { get; }
+            public object Value { get; }
+
+            public override bool IsValid(object value)
+            {
+                return false;
+            }
+        }
+
+        [MyCustomExtension()]
+        public class MyCustomAttributeTest
+        {
+            [MyCustomExtension]
+            public string Property { get; set; }
+        }
+
+        [Fact]
+        public async Task When_extension_data_interface_is_used_on_property_then_extension_data_property_is_set()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<MyCustomAttributeTest>();
+
+            //// Assert
+            Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
+            Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
         }
 
         [Fact]
