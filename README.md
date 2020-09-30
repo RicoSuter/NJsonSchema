@@ -41,6 +41,8 @@ NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchai
 
 The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. 
 
+**Some code generators can directly be used via the [Apimundo service](https://apimundo.com/tools).**
+
 ## NJsonSchema usage
 
 The [JsonSchema](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema) class can be used as follows: 
