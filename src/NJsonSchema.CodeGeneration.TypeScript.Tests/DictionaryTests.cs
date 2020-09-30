@@ -259,5 +259,50 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             }
         }
+
+        [Fact]
+        public async Task When_dictionary_has_arbitrary_nonenum_key_then_generated_typescript_uses_plain_string_key()
+        {
+            //// Arrange
+            var json = @"{
+    ""properties"": {
+        ""myDict"": {
+            ""type"": ""object"",
+            ""additionalProperties"": {
+                ""$ref"": ""#/definitions/myItem""
+            }
+        }
+    },
+    ""definitions"": {
+        ""myItem"": {
+            ""type"": ""object"",
+            ""additionalProperties"": false,
+            ""properties"": {
+                ""name"": {
+                    ""type"": ""string""
+                },
+                ""age"": {
+                    ""type"": ""integer""
+                }
+            }
+        }
+    }
+}";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                ConvertConstructorInterfaceData = true,
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 2.7m
+            });
+
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            Assert.DoesNotContain("[key in keyof typeof Istring]", code);
+        }
     }
 }

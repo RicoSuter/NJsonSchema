@@ -43,6 +43,7 @@ namespace NJsonSchema
         private JsonSchema _not;
         private JsonSchema _dictionaryKey;
 
+        private JsonObjectType _type;
         private JsonSchema _item;
         private ICollection<JsonSchema> _items;
 
@@ -355,7 +356,14 @@ namespace NJsonSchema
 
         /// <summary>Gets the object types (as enum flags). </summary>
         [JsonIgnore]
-        public JsonObjectType Type { get; set; }
+        public JsonObjectType Type
+        {
+            get => _type; set
+            {
+                _type = value;
+                ResetTypeRaw();
+            }
+        }
 
         /// <summary>Gets the parent schema of this schema. </summary>
         [JsonIgnore]
@@ -433,9 +441,13 @@ namespace NJsonSchema
         [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public int MinProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether the schema is deprecated (Swagger and Open API only).</summary>
+        /// <summary>Gets or sets a value indicating whether the schema is deprecated (native in Open API 'deprecated', custom in Swagger/JSON Schema 'x-deprecated').</summary>
         [JsonProperty("x-deprecated", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsDeprecated { get; set; }
+
+        /// <summary>Gets or sets a message indicating why the schema is deprecated (custom extension, sets 'x-deprecatedMessage').</summary>
+        [JsonProperty("x-deprecatedMessage", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string DeprecatedMessage { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the type is abstract, i.e. cannot be instantiated directly (x-abstract).</summary>
         [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -812,6 +824,14 @@ namespace NJsonSchema
 
             SchemaVersion = oldSchema;
             return json;
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
+        /// <returns>The JSON Schema.</returns>
+        public JToken ToSampleJson()
+        {
+            var generator = new SampleJsonDataGenerator();
+            return generator.Generate(this);
         }
 
         ///// <summary>Serializes the <see cref="JsonSchema4" /> to a JSON string and removes externally loaded schemas.</summary>

@@ -2,9 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;netstandard2.0;net45</TargetFrameworks>
     <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.0.27</Version>
+    <Version>10.2.0</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
-    <Copyright>Copyright © Rico Suter, 2018</Copyright>
+    <Copyright>Copyright © Rico Suter, 2020</Copyright>
     <PackageLicenseUrl>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
     <SignAssembly>True</SignAssembly>
@@ -19,6 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-    <PackageReference Include="YamlDotNet.Signed" Version="5.1.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 </Project>

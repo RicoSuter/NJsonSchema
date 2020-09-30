@@ -56,6 +56,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
 
+        /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
+        public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
+
         /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
         public bool HasAdditionalPropertiesType =>
             !_schema.IsDictionary &&
@@ -139,5 +142,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
+
+        /// <summary>Gets a value indicating whether the class is deprecated.</summary>
+        public bool IsDeprecated => _schema.IsDeprecated;
+
+        /// <summary>Gets a value indicating whether the class has a deprecated message.</summary>
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_schema.DeprecatedMessage);
+
+        /// <summary>Gets the deprecated message.</summary>
+        public string DeprecatedMessage => _schema.DeprecatedMessage;
     }
 }

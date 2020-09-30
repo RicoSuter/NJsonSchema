@@ -74,3 +74,21 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+# Upload to Apiverse.io
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.102'
+
+- task: PowerShell@2
+  displayName: 'Upload to Apiverse.io'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet tool install -g apimundo.cli
+      apimundo add-repository-changeset /organization:"github" /project:"ricosuter" `
+          /repository:"NJsonSchema" /branch:"master" `
+          /commit:"$(Build.SourceVersion)" /api-key:"$(ApimundoApiKey)"

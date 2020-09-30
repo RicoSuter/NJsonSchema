@@ -7,6 +7,8 @@ NJsonSchema for .NET
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
+[![Apimundo](https://img.shields.io/badge/NJsonSchema%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
+[![Apimundo](https://img.shields.io/badge/Architecture-Apimundo-728199.svg)](https://apimundo.com/organizations/github/projects/ricosuter?tab=repositories)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
 
@@ -38,6 +40,8 @@ Preview NuGet Feed: https://www.myget.org/gallery/njsonschema
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
 
 The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. 
+
+**Some code generators can directly be used via the [Apimundo service](https://apimundo.com/tools).**
 
 ## NJsonSchema usage
 

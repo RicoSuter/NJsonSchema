@@ -261,6 +261,91 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_enum_contains_operator_convert_to_string_equivalent()
+        {
+            ////Arrange
+            var json = @"{
+            ""type"": ""object"",
+                ""properties"": {
+                    ""foo"": {
+                        ""$ref"": ""#/definitions/OperatorTestEnum""
+                    }
+                },
+                ""definitions"": {
+                    ""OperatorTestEnum"": {
+                        ""type"": ""string"",
+                            ""description"": ""The operator between the field and operand."",
+                            ""enum"": [
+                                ""="",
+                                ""!="",
+                                "">"",
+                                ""<"",
+                                "">="",
+                                ""<="",
+                                ""in"",
+                                ""not in"",
+                                null,
+                                ""~="",
+                                ""is"",
+                                ""is not""
+                            ]
+                    }   
+                }
+            }";
+
+            /// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.DoesNotContain("__", code);
+            Assert.Contains("Eq = 0", code);
+
+        }
+
+        [Fact]
+        public async Task When_enum_starts_with_plus_or_minus_convert_to_string_equivalent()
+        {
+            ////Arrange
+            var json = @"{
+            ""type"": ""object"",
+                ""properties"": {
+                    ""foo"": {
+                        ""$ref"": ""#/definitions/PlusMinusTestEnum""
+                    }
+                },
+                ""definitions"": {
+                    ""PlusMinusTestEnum"": {
+                        ""type"": ""string"",
+                            ""description"": ""Add or subtract from property"",
+                            ""enum"": [
+                                ""-Foo"",
+                                ""+Foo""
+                            ]
+                    }   
+                }
+            }";
+
+            /// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings();
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            /// Assert
+            Assert.DoesNotContain("__", code);
+            Assert.Contains("MinusFoo = 0", code);
+            Assert.Contains("PlusFoo = 1", code);
+
+        }
+
+        [Fact]
         public async Task When_array_item_enum_is_not_referenced_then_type_name_hint_is_property_name()
         {
             /// Arrange
@@ -371,6 +456,116 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("ThirdBit = 4,", code);
             Assert.Contains("FirstAndSecondBits = 3,", code);
             Assert.Contains("All = 7,", code);
+        }
+
+
+        [Fact]
+        public async Task When_enum_is_nullable_not_required_it_should_be_nullable_with_converter()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""myProperty"": {
+              ""type"": [
+                ""string"",
+                ""null""
+              ],
+              ""enum"": [
+                ""value1"",
+                ""value2"",
+                ""value3"",
+                ""NONE"",
+                null
+              ]
+        }
+    }
+}";
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            //Assert
+            Assert.Contains("StringEnumConverter", code);
+            Assert.Contains("public FooMyProperty?", code);
+            Assert.Contains("Value3 = 4", code);
+        }
+
+        [Fact]
+        public async Task When_enum_is_nullable_required_it_should_be_nullable_with_converter()
+        {
+            //// Arrange
+            var json = @"
+{
+    ""type"": ""object"",
+    ""required"": [ ""myProperty"" ],
+    ""properties"": {
+        ""myProperty"": {
+              ""type"": [
+                ""string"",
+                ""null""
+              ],
+              ""enum"": [
+                ""value1"",
+                ""value2"",
+                ""value3"",
+                ""NONE"",
+                null
+              ]
+        }
+    }
+}";
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
+            var generator = new CSharpGenerator(schema, settings);
+
+            var code = generator.GenerateFile("Foo");
+
+            //Assert
+            Assert.Contains("StringEnumConverter", code);
+            Assert.Contains("public FooMyProperty?", code);
+            Assert.Contains("Value3 = 4", code);
+        }
+
+        [Fact]
+        public async Task When_enum_is_nullable_and_has_default_then_question_mark_is_omitted()
+        {
+            //// Arrange
+            var json =
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""category"" : {
+                        ""type"" : ""string"",
+                        ""x-nullable"" : true,
+                        ""default"" : ""commercial"",
+                        ""enum"" : [
+                            ""commercial"",
+                            ""residential""
+                        ]
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true,
+                GenerateOptionalPropertiesAsNullable = true,
+            });
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;", code);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -191,6 +192,34 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(schema.Properties.ContainsKey("EnumValue"));
             Assert.NotNull(json);
+        }
+
+        public class RequiredEnumProperty
+        {
+            [Required]
+            public Bar Bar { get; set; }
+
+            public Bar Bar2 { get; set; }
+        }
+
+        [Fact]
+        public async Task When_enum_property_is_required_then_MinLength_is_not_set()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = JsonSchema.FromType<RequiredEnumProperty>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3,
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.RequiredProperties.Contains("Bar"));
+            Assert.True(schema.Properties["Bar"].OneOf.Count == 0);
+            Assert.True(schema.Properties["Bar"].Reference != null);
         }
     }
 }

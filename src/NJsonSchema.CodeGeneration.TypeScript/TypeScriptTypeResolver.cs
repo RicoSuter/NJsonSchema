@@ -14,6 +14,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>
     public class TypeScriptTypeResolver : TypeResolverBase
     {
+        private const string UnionPipe = " | ";
+
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="settings">The settings.</param>
         public TypeScriptTypeResolver(TypeScriptGeneratorSettings settings)
@@ -142,16 +144,49 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
 
-                var valueType = prefix + ResolveDictionaryValueType(schema, "any");
-
-                var defaultType = "string";
-                var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + ResolveDictionaryKeyType(schema, defaultType) : defaultType;
-                if (keyType != defaultType)
+                var valueType = ResolveDictionaryValueType(schema, "any");
+                if (valueType != "any")
                 {
-                    return $"{{ [key in keyof typeof {keyType}]: {valueType}; }}";
+                    valueType = prefix + valueType;
                 }
 
-                return $"{{ [key: {keyType}]: {valueType}; }}";
+                var defaultType = "string";
+                var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
+                if (resolvedType != defaultType)
+                {
+                    var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
+                    if (keyType != defaultType && schema.DictionaryKey.ActualTypeSchema.IsEnumeration)
+                    {
+                        if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                        {
+                            return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
+                        }
+                        else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                        {
+                            return $"{{ [key in {keyType}]?: {valueType}; }}";
+                        }
+                        
+                        throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+                    }
+
+                    return $"{{ [key: {keyType}]: {valueType}; }}";
+                }
+
+                return $"{{ [key: {resolvedType}]: {valueType}; }}";
+            }
+
+            if (Settings.UseLeafType &&
+                schema.DiscriminatorObject == null &&
+                schema.ActualTypeSchema.DiscriminatorObject != null)
+            {
+                var types = schema.ActualTypeSchema.ActualDiscriminatorObject.Mapping
+                    .Select(m => Resolve(
+                        m.Value,
+                        typeNameHint,
+                        addInterfacePrefix
+                    ));
+
+                return string.Join(UnionPipe, types);
             }
 
             return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema) ? "I" : "") +
@@ -206,6 +241,50 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Duration";
                 }
             }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.Luxon)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "Duration";
+                }
+            }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.DayJS)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "dayjs.Dayjs";
+                }
+            }
 
             return "string";
         }
@@ -221,11 +300,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
-
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
-                var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
 
-                return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                if (Settings.UseLeafType)
+                {
+                    return string.Join(UnionPipe,
+                        Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
+                            .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x))));
+                }
+                else
+                {
+                    var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
+                    return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                }
             }
 
             if (schema.Items != null && schema.Items.Count > 0)

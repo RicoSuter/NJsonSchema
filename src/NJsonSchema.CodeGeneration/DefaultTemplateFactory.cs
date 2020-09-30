@@ -74,6 +74,7 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
         protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
+            template = template.TrimEnd('!');
             var assembly = GetLiquidAssembly("NJsonSchema.CodeGeneration." + language);
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
@@ -199,6 +200,11 @@ namespace NJsonSchema.CodeGeneration
             public static string Uppercamelcase(Context context, string input, bool firstCharacterMustBeAlpha = true)
             {
                 return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
+            }
+
+            public static string Literal(string input)
+            {
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(input) + "\"";
             }
 
             public static IEnumerable<object> Concat(Context context, IEnumerable<object> input, IEnumerable<object> concat)

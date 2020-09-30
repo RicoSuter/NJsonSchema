@@ -128,9 +128,7 @@ namespace NJsonSchema.Generation
         {
             var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
 
-
-
-            ApplyExtensionDataAttributes(schema, typeDescription.ContextualType);
+            ApplyTypeExtensionDataAttributes(schema, contextualType);
 
             if (TryHandleSpecialTypes(schema, typeDescription.ContextualType, schemaResolver))
             {
@@ -320,11 +318,17 @@ namespace NJsonSchema.Generation
         /// <returns>The property name.</returns>
         public virtual string GetPropertyName(JsonProperty jsonProperty, ContextualMemberInfo contextualMember)
         {
+            if (jsonProperty?.PropertyName != null)
+            {
+                return jsonProperty.PropertyName;
+            }
+
             try
             {
-                var propertyName = contextualMember?.MemberInfo != null ?
-                    contextualMember.MemberInfo.DeclaringType.GetContextualPropertiesAndFields().First(p => p.Name == contextualMember.Name).GetName() :
-                    jsonProperty.PropertyName;
+                var propertyName = contextualMember.MemberInfo.DeclaringType
+                    .GetContextualPropertiesAndFields()
+                    .First(p => p.Name == contextualMember.Name)
+                    .GetName();
 
                 var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
                 return contractResolver != null
@@ -475,9 +479,16 @@ namespace NJsonSchema.Generation
                         member.GetXmlDocsTag("example") :
                         type.GetXmlDocsTag("example");
 
-                    return !string.IsNullOrEmpty(docs) ?
-                        JsonConvert.DeserializeObject<JToken>(docs) :
-                        null;
+                    try
+                    {
+                        return !string.IsNullOrEmpty(docs) ?
+                            JsonConvert.DeserializeObject<JToken>(docs) :
+                            null;
+                    }
+                    catch
+                    {
+                        return docs;
+                    }
                 }
                 catch
                 {
@@ -499,7 +510,7 @@ namespace NJsonSchema.Generation
             schemaResolver.AddSchema(type, false, schema);
 
             var rootSchema = schema;
-            var actualSchema = GenerateInheritance(type, schema, schemaResolver);
+            var actualSchema = GenerateInheritance(typeDescription.ContextualType, schema, schemaResolver);
             if (actualSchema != null)
             {
                 schema = actualSchema;
@@ -517,6 +528,13 @@ namespace NJsonSchema.Generation
 
             schema.Description = type.ToCachedType().GetDescription();
             schema.Example = GenerateExample(type.ToContextualType());
+
+            dynamic obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            if (obsoleteAttribute != null)
+            {
+                schema.IsDeprecated = true;
+                schema.DeprecatedMessage = obsoleteAttribute.Message;
+            }
 
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
@@ -769,26 +787,6 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void ApplyExtensionDataAttributes<TSchemaType>(TSchemaType schema, ContextualType contextualType)
-            where TSchemaType : JsonSchema, new()
-        {
-            // class
-            var extensionDataAttributes = contextualType.GetAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
-            if (extensionDataAttributes.Any())
-            {
-                schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
-            }
-            else
-            {
-                // property or parameter
-                extensionDataAttributes = contextualType.GetAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
-                if (extensionDataAttributes.Any())
-                {
-                    schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
-                }
-            }
-        }
-
         private bool TryHandleSpecialTypes<TSchemaType>(TSchemaType schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
             where TSchemaType : JsonSchema, new()
         {
@@ -1013,19 +1011,19 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private JsonSchema GenerateInheritance(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
+        private JsonSchema GenerateInheritance(ContextualType type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
-            var baseType = type.GetTypeInfo().BaseType;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(ValueType))
+            var baseType = type.BaseType;
+            if (baseType != null && baseType.Type != typeof(object) && baseType.Type != typeof(ValueType))
             {
-                if (baseType.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
-                    baseType.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
-                    Settings.ExcludedTypeNames?.Contains(baseType.FullName) != true)
+                if (baseType.Attributes.FirstAssignableToTypeNameOrDefault("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    baseType.Attributes.FirstAssignableToTypeNameOrDefault("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    Settings.ExcludedTypeNames?.Contains(baseType.Type.FullName) != true)
                 {
                     if (Settings.GetActualFlattenInheritanceHierarchy(type))
                     {
-                        var typeDescription = Settings.ReflectionService.GetDescription(baseType.ToContextualType(), Settings);
-                        if (!typeDescription.IsDictionary && !type.IsArray)
+                        var typeDescription = Settings.ReflectionService.GetDescription(baseType, Settings);
+                        if (!typeDescription.IsDictionary && !type.Type.IsArray)
                         {
                             GenerateProperties(baseType, schema, schemaResolver);
                             var actualSchema = GenerateInheritance(baseType, schema, schemaResolver);
@@ -1040,7 +1038,7 @@ namespace NJsonSchema.Generation
                         GenerateProperties(type, actualSchema, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 
-                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType.ToContextualType(), Settings);
+                        var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, Settings);
                         var requiresSchemaReference = baseTypeInfo.RequiresSchemaReference(Settings.TypeMappers);
 
                         if (actualSchema.Properties.Any() || requiresSchemaReference)
@@ -1073,7 +1071,7 @@ namespace NJsonSchema.Generation
                         else
                         {
                             // Array and dictionary inheritance are not expressed with allOf but inline
-                            Generate(schema, baseType.ToContextualType(), schemaResolver);
+                            Generate(schema, baseType, schemaResolver);
                             return schema;
                         }
                     }
@@ -1083,17 +1081,17 @@ namespace NJsonSchema.Generation
             if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
 #if !LEGACY
-                foreach (var i in type.GetTypeInfo().ImplementedInterfaces)
+                foreach (var i in type.Type.GetTypeInfo().ImplementedInterfaces)
 #else
-                foreach (var i in type.GetTypeInfo().GetInterfaces())
+                foreach (var i in type.Type.GetTypeInfo().GetInterfaces())
 #endif
                 {
                     var typeDescription = Settings.ReflectionService.GetDescription(i.ToContextualType(), Settings);
-                    if (!typeDescription.IsDictionary && !type.IsArray &&
+                    if (!typeDescription.IsDictionary && !type.Type.IsArray &&
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
                         GenerateProperties(i, schema, schemaResolver);
-                        var actualSchema = GenerateInheritance(i, schema, schemaResolver);
+                        var actualSchema = GenerateInheritance(i.ToContextualType(), schema, schemaResolver);
 
                         GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
                     }
@@ -1113,10 +1111,15 @@ namespace NJsonSchema.Generation
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
                     // Existing property can be discriminator only if it has String type  
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
-                        (existingProperty.Type & JsonObjectType.String) == 0)
+                    if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) &&
+                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
+                        {
+                            throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                        }
+
+                        existingProperty.IsRequired = true;
                     }
 
                     var discriminator = new OpenApiDiscriminator
@@ -1126,11 +1129,15 @@ namespace NJsonSchema.Generation
                     };
 
                     typeSchema.DiscriminatorObject = discriminator;
-                    typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+
+                    if (!typeSchema.Properties.ContainsKey(discriminatorName))
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true
-                    };
+                        typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = true
+                        };
+                    }
                 }
                 else
                 {
@@ -1212,6 +1219,7 @@ namespace NJsonSchema.Generation
                     }
 
                     if (hasRequiredAttribute &&
+                        propertyTypeDescription.IsEnum == false &&
                         propertyTypeDescription.Type == JsonObjectType.String &&
                         requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
                     {
@@ -1242,9 +1250,17 @@ namespace NJsonSchema.Generation
                         propertySchema.Example = GenerateExample(memberInfo);
                     }
 
+                    dynamic obsoleteAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+                    if (obsoleteAttribute != null)
+                    {
+                        propertySchema.IsDeprecated = true;
+                        propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
+                    }
+
                     propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
 
                     ApplyDataAnnotations(propertySchema, propertyTypeDescription);
+                    ApplyPropertyExtensionDataAttributes(memberInfo, propertySchema);
                 };
 
                 var referencingProperty = GenerateWithReferenceAndNullability(
@@ -1254,7 +1270,11 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
+        /// <summary>Checks whether a property is ignored.</summary>
+        /// <param name="property">The property.</param>
+        /// <param name="parentType">The properties parent type.</param>
+        /// <returns>The result.</returns>
+        protected virtual bool IsPropertyIgnored(ContextualMemberInfo property, Type parentType)
         {
             if (property.GetContextAttribute<JsonIgnoreAttribute>() != null)
             {
@@ -1346,6 +1366,41 @@ namespace NJsonSchema.Generation
                         }
                     }
                 }
+            }
+        }
+
+        private void ApplyTypeExtensionDataAttributes<TSchemaType>(TSchemaType schema, ContextualType contextualType) where TSchemaType : JsonSchema, new()
+        {
+            Attribute[] extensionAttributes;
+
+#if NETSTANDARD1_0
+            extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes().Where(attribute =>
+                attribute.GetType().GetTypeInfo().ImplementedInterfaces.Contains(typeof(IJsonSchemaExtensionDataAttribute))).ToArray();
+#else
+            extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes().Where(attribute => 
+                typeof(IJsonSchemaExtensionDataAttribute).IsAssignableFrom(attribute.GetType())).ToArray();
+#endif
+
+            if (extensionAttributes.Any())
+            {
+                var extensionData = new Dictionary<string, object>();
+
+                foreach (var attribute in extensionAttributes)
+                {
+                    var extensionAttribute = (IJsonSchemaExtensionDataAttribute)attribute;
+                    extensionData.Add(extensionAttribute.Key, extensionAttribute.Value);
+                }
+
+                schema.ExtensionData = extensionData;
+            }
+        }
+
+        private void ApplyPropertyExtensionDataAttributes(ContextualMemberInfo memberInfo, JsonSchemaProperty propertySchema)
+        {
+            var extensionDataAttributes = memberInfo.GetContextAttributes<IJsonSchemaExtensionDataAttribute>().ToArray();
+            if (extensionDataAttributes.Any())
+            {
+                propertySchema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
             }
         }
     }

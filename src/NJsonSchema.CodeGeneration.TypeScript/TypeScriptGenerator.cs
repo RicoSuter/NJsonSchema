@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     if (index != -1)
                     {
                         var code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
-                        yield return new CodeArtifact(artifact.TypeName, artifact.Type, artifact.Language, artifact.Category, code);
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
                     }
                     else
                     {
@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
 
                         var code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
-                        yield return new CodeArtifact(artifact.TypeName, artifact.Type, artifact.Language, artifact.Category, code);
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
                     }
                 }
                 else
@@ -129,7 +129,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.IsEnumeration)
             {
                 var model = new EnumTemplateModel(typeName, schema, Settings);
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
+
+                string templateName;
+                if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                {
+                    templateName = nameof(TypeScriptEnumStyle.Enum);
+                }
+                else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                {
+                    templateName = $"{nameof(TypeScriptEnumStyle.Enum)}.{nameof(TypeScriptEnumStyle.StringLiteral)}";
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+                }
+
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);
                 return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
             else

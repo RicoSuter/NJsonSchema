@@ -136,19 +136,29 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = GetSchemaFormat(schema);
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
-                return _property.ActualSchema.Minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Minimum.Value, format)
+                var minimum = schema.Minimum;
+                if (minimum.HasValue && schema.IsExclusiveMinimum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        minimum++;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        minimum += schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+                return minimum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -158,19 +168,30 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = GetSchemaFormat(schema);
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
-                return _property.ActualSchema.Maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.ActualSchema.Maximum.Value, format)
+                var maximum = schema.Maximum;
+                if (maximum.HasValue && schema.IsExclusiveMaximum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        maximum--;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        maximum -= schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+
+                return maximum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, maximum.Value, format)
                     : type + "." + nameof(double.MaxValue);
             }
         }
@@ -254,9 +275,40 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
-        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type == JsonObjectType.String;
+        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String);
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
-        public bool IsDate => _property.Format == JsonFormatStrings.Date;
+        public bool IsDate => _property.ActualSchema.Format == JsonFormatStrings.Date;
+
+        /// <summary>Gets a value indicating whether the property is deprecated.</summary>
+        public bool IsDeprecated => _property.IsDeprecated;
+
+        /// <summary>Gets a value indicating whether the property has a deprecated message.</summary>
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_property.DeprecatedMessage);
+
+        /// <summary>Gets the deprecated message.</summary>
+        public string DeprecatedMessage => _property.DeprecatedMessage;
+
+        private string GetSchemaFormat(JsonSchema schema)
+        {
+            if (Type == "long" || Type == "long?")
+            {
+                return JsonFormatStrings.Long;
+            }
+
+            if (schema.Format == null)
+            {
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Integer:
+                        return JsonFormatStrings.Integer;
+
+                    case JsonObjectType.Number:
+                        return JsonFormatStrings.Double;
+                }
+            }
+
+            return schema.Format;
+        }
     }
 }

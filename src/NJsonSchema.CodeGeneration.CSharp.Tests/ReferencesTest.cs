@@ -111,5 +111,48 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("class ValidationException", code);
             Assert.DoesNotContain("AdditionalProperties", code);
         }
+        
+        [Fact]
+        public async Task When_date_reference_is_generated_from_swagger2_schema_then_generated_member_is_decorated_with_date_format_attribute()
+        {
+            // Arrange
+            var json = @"{
+  ""type"": ""object"",
+  ""properties"": {
+    ""MyType"": {
+      ""$ref"": ""#/definitions/MyType""
+    }
+  },
+  ""additionalProperties"": false,
+	""definitions"": {
+		""MyType"": {
+			""type"": ""object"",
+			""required"": [
+				""EntryDate"",
+			],
+			""properties"": {
+			    ""EntryDate"": {
+				    ""$ref"": ""#/definitions/EntryDate""
+				}
+			}
+		},
+		""EntryDate"": {
+			""example"": ""2020-08-28"",
+			""type"": ""string"",
+			""format"": ""date""
+		}
+	}
+}";
+
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.Swagger2, null, factory, new DefaultContractResolver());
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Act
+            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
+        }
     }
 }
