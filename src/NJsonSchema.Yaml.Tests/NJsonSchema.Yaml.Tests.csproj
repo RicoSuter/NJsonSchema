@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    <ProjectReference Include="..\NJsonSchema.Yaml\NJsonSchema.Yaml.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="References\YamlReferencesTest\collection.json">

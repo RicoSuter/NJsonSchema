@@ -32,7 +32,7 @@ namespace NJsonSchema.Yaml.Tests.References
 
         [Theory]
         [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
-        public async Task When_yaml_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
+        public async Task When_yaml_OpenAPI_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
         {
             var path = GetTestDirectory() + relativePath;
 
