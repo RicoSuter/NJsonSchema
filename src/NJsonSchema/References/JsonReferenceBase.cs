@@ -46,18 +46,7 @@ namespace NJsonSchema.References
         IJsonReference IJsonReferenceBase.Reference
         {
             get => Reference;
-            set
-            {
-                if (value is T)
-                {
-                    Reference = (T)value;
-                }
-                else
-                {
-                    string refText = JsonConvert.SerializeObject(value);
-                    Reference = JsonConvert.DeserializeObject<T>(refText, JsonSchemaSerialization.CurrentSerializerSettings);
-                }
-            }
+            set => Reference = (T)value;
         }
     }
 }
