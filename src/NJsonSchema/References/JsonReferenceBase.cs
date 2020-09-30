@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Infrastructure;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.References

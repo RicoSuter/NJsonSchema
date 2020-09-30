@@ -1,0 +1,15 @@
+components:
+  responses:
+    401-GENERIC-RESPONSE: 
+      description: |-
+        Response when the user does not supply valid authorization credentials.
+      content:
+        application/problem+json:
+          schema:
+            $ref: 'schemas.yaml#/components/schemas/Problem-Detail'
+          example: 
+            type: 'https://example.net/unauthorized'
+            title: 'Unauthorized'
+            status: 401
+            detail: 'Not authorized to perform this action.'
+            instance: '/example-resource'
