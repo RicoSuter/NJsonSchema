@@ -1,0 +1,31 @@
+components:
+  parameters:
+    Accept-Language:
+      name: Accept-Language
+      in: header
+      description: |-
+        The <a href="https://tools.ietf.org/html/rfc7231#section-5.3.5">Accept-Language</a>
+        header field can be used by user agents to
+        indicate the set of natural languages that are preferred in the
+        response.  Language tags are defined in RFC 5646. If none of the 
+        languages given are supported, a default language will be returned.
+      schema:
+        type: string
+      example: 'en-US'
+    Range:
+      name: Range
+      in: header
+      description: |-
+        The <a href="https://tools.ietf.org/html/rfc7233#section-3.1">Range</a>
+        header field on a request modifies the method semantics to request
+        transfer of only one or more subranges of the selected representation
+        data, rather than the entire selected representation data.
+
+        The Range unit `bytes` is supported to represent byte ranges of the
+        page or document of the specific rendition's content. 
+
+        For the cases where the Range header is omitted, the full document or page will be 
+        returned.
+      schema:
+        type: string
+      example: 'bytes 1-1000'

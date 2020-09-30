@@ -411,5 +411,19 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             // No exception
         }
+
+        [Fact(Skip = "Test takes too long.")]
+        public async Task When_azure_schema_is_loaded_then_no_exception()
+        {
+            // Issue: https://github.com/RicoSuter/NJsonSchema/issues/588
+
+            var schema = await JsonSchema.FromUrlAsync(
+                @"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json");
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.NotNull(schema);
+            Assert.Contains("The identity type.", json);
+        }
     }
 }
