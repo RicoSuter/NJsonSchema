@@ -8,6 +8,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema
 {
@@ -51,7 +53,7 @@ namespace NJsonSchema
                 typeName = GenerateAnonymousTypeName(typeNameHint, reservedTypeNames);
             }
 
-            return typeName;
+            return RemoveIllegalCharacters(typeName);
         }
 
         /// <summary>Generates the type name for the given schema.</summary>
@@ -95,6 +97,47 @@ namespace NJsonSchema
             }
 
             return GenerateAnonymousTypeName("Anonymous", reservedTypeNames);
+        }
+
+        /// <summary>
+        /// Replaces all characters that are not normals letters, numbers or underscore, with an underscore.
+        /// Will prepend an underscore if the first characters is a number.
+        /// In case there are this would result in multiple underscores in a row, strips down to one underscore.
+        /// Will trim any underscores at the end of the type name.
+        /// </summary>
+        private string RemoveIllegalCharacters(string typeName)
+        {
+            // TODO: Find a way to support unicode characters up to 3.0
+            var legalTypeName = new StringBuilder(typeName);
+
+            var firstCharacter = legalTypeName[0].ToString();
+            var regexValidStartChar = new Regex("[a-zA-Z_]");
+            var regexInvalidCharacters = new Regex("\\W");
+
+            if (!regexValidStartChar.IsMatch(firstCharacter))
+            {
+                if (!regexInvalidCharacters.IsMatch(firstCharacter))
+                {
+                    legalTypeName.Insert(0, "_");
+                }
+                else
+                {
+                    legalTypeName[0] = '_';
+                }
+            }
+
+            var illegalMatches = regexInvalidCharacters.Matches(legalTypeName.ToString());
+
+            for (int i = illegalMatches.Count - 1; i >= 0; i--)
+            {
+                var illegalMatchIndex = illegalMatches[i].Index;
+                legalTypeName[illegalMatchIndex] = '_';
+            }
+
+            var regexMoreThanOneUnderscore = new Regex("[_]{2,}");
+
+            var legalTypeNameString = regexMoreThanOneUnderscore.Replace(legalTypeName.ToString(), "_");
+            return legalTypeNameString.TrimEnd('_');
         }
     }
 }
