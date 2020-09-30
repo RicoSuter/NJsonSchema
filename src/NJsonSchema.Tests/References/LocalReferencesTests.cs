@@ -123,9 +123,51 @@ namespace NJsonSchema.Tests.References
             Assert.NotNull(schema);
         }
 
+        [Theory]
+        [InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
+        [InlineData("b#r")] // Non-escaped ill-formed JSON Pointer
+        public async Task When_definitions_have_sharp_in_type_name(string referenceTypeName)
+        {
+            //// Arrange
+            var json = $@"{{
+	""type"": ""object"", 
+	""properties"": {{
+		""foo"": {{
+			""$ref"": ""#/definitions/{referenceTypeName}""
+		}}
+	}},
+	""definitions"": {{
+		""b#r"": {{
+			""type"": ""integer""
+		}}
+	}}
+}}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var j = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
+        }
+
+        [Fact]
+        public async Task When_schema_references_external_schema_placed_in_directory_with_sharp_in_name()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/dir_with_#/first.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(JsonObjectType.Integer, schema.ActualTypeSchema.Type);
+        }
+
         private string GetTestDirectory()
         {
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase.Replace("#", "%23");
             var uri = new UriBuilder(codeBase);
             return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }
