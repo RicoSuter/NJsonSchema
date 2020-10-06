@@ -752,7 +752,8 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema, new()
         {
             var extensionDataProperty = type.GetContextualProperties()
-                .FirstOrDefault(p => p.ContextAttributes.Any(a => a.GetType().Name == "JsonExtensionDataAttribute"));
+                .FirstOrDefault(p => p.ContextAttributes.Any(a => 
+                    Namotion.Reflection.TypeExtensions.IsAssignableToTypeName(a.GetType(), "JsonExtensionDataAttribute", TypeNameStyle.Name)));
 
             if (extensionDataProperty != null)
             {
