@@ -46,6 +46,10 @@ namespace NJsonSchema.Generation
                 }
                 return obj;
             }
+            else if (schema.Default != null)
+            {
+                return JToken.FromObject(schema.Default);
+            }
             else if (schema.Type.HasFlag(JsonObjectType.Array))
             {
                 if (schema.Item != null)
@@ -70,11 +74,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                if (schema.Default != null)
-                {
-                    return JToken.FromObject(schema.Default);
-                }
-                else if (schema.IsEnumeration)
+                if (schema.IsEnumeration)
                 {
                     return JToken.FromObject(schema.Enumeration.First());
                 }
