@@ -39,6 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToArray();
 
+            Id = _schema.Id;
             if (schema.InheritedSchema != null)
             {
                 BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
@@ -49,6 +50,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 AllProperties = Properties;
             }
         }
+
+        /// <summary>
+        /// Id for the class instance
+        /// </summary>
+        public string Id { get; set; }
 
         /// <summary>Gets or sets the class name.</summary>
         public override string ClassName { get; }
