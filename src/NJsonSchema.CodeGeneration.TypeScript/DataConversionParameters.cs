@@ -2,7 +2,7 @@
 // <copyright file="DataConversionParameters.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -18,10 +18,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public string Value { get; set; }
 
         /// <summary>Gets the schema.</summary>
-        public JsonSchema4 Schema { get; set; }
+        public JsonSchema Schema { get; set; }
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public bool IsPropertyNullable { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to check the newable data object for null.</summary>
+        public bool CheckNewableObject { get; set; } = true;
 
         /// <summary>Gets the type name hint.</summary>
         public string TypeNameHint { get; set; }

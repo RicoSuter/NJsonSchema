@@ -1,7 +1,7 @@
 ﻿{% if HasDescription -%}
 /** {{ Description }} */
 {% endif -%}
-export interface {{ ClassName }}{{ Inheritance }} {
+{% if ExportTypes %}export {% endif %}interface {{ ClassName }}{{ Inheritance }} {
 {% for property in Properties -%}
 {%     if property.HasDescription -%}
     /** {{ property.Description }} */

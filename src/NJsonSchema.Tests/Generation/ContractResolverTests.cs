@@ -13,12 +13,12 @@ namespace NJsonSchema.Tests.Generation
 {
     public class ContractResolverTests
     {
-#if !NET45
+#if !NET452
         [Fact]
 #endif
         public async Task Properties_should_match_custom_resolver()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Person>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings
             {
                 ContractResolver = new CustomContractResolver()
             });
@@ -43,11 +43,14 @@ namespace NJsonSchema.Tests.Generation
         /// </summary>
         public class CustomContractResolver : CamelCasePropertyNamesContractResolver
         {
-            protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
                 var prop = base.CreateProperty(member, memberSerialization);
                 if (!prop.Writable && member.GetCustomAttribute<JsonPropertyAttribute>(true) == null)
+                {
                     prop.ShouldSerialize = o => false;
+                }
+
                 return prop;
             }
 
@@ -55,9 +58,11 @@ namespace NJsonSchema.Tests.Generation
             {
                 JsonContract contract = base.CreateContract(objectType);
                 // by default a type that can convert to string and that is also an enum will have an array contract, but serialize to a string!. fix  this
-                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType) 
+                if (contract is JsonArrayContract && typeof(IEnumerable).IsAssignableFrom(objectType)
                     && CanNonSystemTypeDescriptorConvertString(objectType))
+                {
                     contract = CreateStringContract(objectType);
+                }
 
                 return contract;
             }
@@ -75,7 +80,9 @@ namespace NJsonSchema.Tests.Generation
                 {
                     Type converterType = typeConverter.GetType();
                     if (!_systemConverters.Contains(converterType.FullName) && converterType != typeof(TypeConverter))
+                    {
                         return typeConverter.CanConvertTo(typeof(string));
+                    }
                 }
                 return false;
             }
@@ -84,7 +91,9 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string FirstName { get; set; }
+
             public int NameLength => FirstName.Length;
+
             public LocationPath Location { get; set; }
         }
 
@@ -123,7 +132,10 @@ namespace NJsonSchema.Tests.Generation
             public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
             {
                 if (value is string)
+                {
                     return new T() { StringValue = value.ToString() };
+                }
+
                 return base.ConvertFrom(context, culture, value);
             }
         }

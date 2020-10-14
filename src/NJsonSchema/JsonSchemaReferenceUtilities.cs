@@ -2,7 +2,7 @@
 // <copyright file="JsonSchemaReferenceUtilities.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -37,22 +37,6 @@ namespace NJsonSchema
             await updater.VisitAsync(rootObject).ConfigureAwait(false);
         }
 
-        /// <summary>Converts JSON references ($ref) to property references.</summary>
-        /// <param name="data">The data.</param>
-        /// <returns>The data.</returns>
-        public static string ConvertJsonReferences(string data)
-        {
-            return data.Replace("$ref", JsonPathUtilities.ReferenceReplaceString);
-        }
-
-        /// <summary>Converts property references to JSON references ($ref).</summary>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        public static string ConvertPropertyReferences(string data)
-        {
-            return data.Replace(JsonPathUtilities.ReferenceReplaceString, "$ref");
-        }
-
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
         /// from the available <see cref="IJsonReferenceBase.Reference" /> properties with inlining external references.</summary>
         /// <param name="rootObject">The root object.</param>
@@ -71,19 +55,22 @@ namespace NJsonSchema
             var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
 
             var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences, contractResolver);
-            updater.VisitAsync(rootObject).GetAwaiter().GetResult();
+            updater.Visit(rootObject);
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
             var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
 
             foreach (var p in schemaReferences)
+            {
                 p.Key.ReferencePath = result[p.Value];
+            }
         }
 
-        private class JsonReferenceUpdater : JsonReferenceVisitorBase
+        private class JsonReferenceUpdater : AsyncJsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
+            private readonly IContractResolver _contractResolver;
             private bool _replaceRefsRound;
 
             public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
@@ -91,14 +78,15 @@ namespace NJsonSchema
             {
                 _rootObject = rootObject;
                 _referenceResolver = referenceResolver;
+                _contractResolver = contractResolver;
             }
 
             public override async Task VisitAsync(object obj)
             {
                 _replaceRefsRound = true;
-                await base.VisitAsync(obj);
+                await base.VisitAsync(obj).ConfigureAwait(false);
                 _replaceRefsRound = false;
-                await base.VisitAsync(obj);
+                await base.VisitAsync(obj).ConfigureAwait(false);
             }
 
             protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
@@ -111,7 +99,7 @@ namespace NJsonSchema
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath)
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -119,7 +107,7 @@ namespace NJsonSchema
                     {
                         // load $refs and add them to "definitions"
                         reference.Reference = await _referenceResolver
-                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath)
+                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
                             .ConfigureAwait(false);
                     }
                 }
@@ -144,14 +132,14 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-#pragma warning disable 1998
-            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
-#pragma warning restore 1998
+            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint)
             {
                 if (reference.Reference != null)
                 {
                     if (!_removeExternalReferences || reference.Reference.DocumentPath == null)
+                    {
                         _schemaReferences[reference] = reference.Reference.ActualObject;
+                    }
                     else
                     {
                         var externalReference = reference.Reference;

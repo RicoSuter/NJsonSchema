@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.Benchmark;
 
 namespace NJsonSchema.Demo
 {
@@ -51,11 +52,12 @@ namespace NJsonSchema.Demo
             var expectedFails = 11;
             var expectedExceptions = 14;
             if (fails != expectedFails || exceptions != expectedExceptions)
+            {
                 Console.WriteLine("========================\n" +
                                   "Unexpected result => Some commits changed the outcome! Please check. \n" +
                                   "Expected fails: " + expectedFails + "\n" +
                                   "Expected exceptions: " + expectedExceptions);
-
+            }
 
             Console.ReadLine();
 
@@ -83,22 +85,30 @@ namespace NJsonSchema.Demo
         {
             try
             {
-                var schema = JsonSchema4.FromJsonAsync(suite["schema"].ToString(), Path.GetDirectoryName(file)).GetAwaiter().GetResult();
+                var schema = JsonSchema.FromJsonAsync(suite["schema"].ToString(), Path.GetDirectoryName(file)).GetAwaiter().GetResult();
                 var errors = schema.Validate(value);
                 var success = expectedResult ? errors.Count == 0 : errors.Count > 0;
 
                 if (!success)
+                {
                     Console.ForegroundColor = ConsoleColor.Red;
+                }
 
                 Console.WriteLine("      Result: " + success);
 
                 if (!success)
+                {
                     Console.ForegroundColor = ConsoleColor.Gray;
+                }
 
                 if (!success)
+                {
                     fails++;
+                }
                 else
+                {
                     passes++;
+                }
             }
             catch (Exception ex)
             {

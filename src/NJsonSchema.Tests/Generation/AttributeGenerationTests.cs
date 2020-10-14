@@ -1,5 +1,8 @@
+using NJsonSchema.Annotations;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Items"];
 
             //// Assert
@@ -29,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["String"];
 
             //// Assert
@@ -45,7 +48,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Double"];
 
             //// Assert
@@ -59,7 +62,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["DoubleOnlyMin"];
 
             //// Assert
@@ -73,7 +76,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Integer"];
 
             //// Assert
@@ -88,7 +91,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Display"];
 
             //// Assert
@@ -103,7 +106,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -117,7 +120,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Required"];
 
             //// Assert
@@ -131,7 +134,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -146,7 +149,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<AttributeTestClass>();
+            var schema = JsonSchema.FromType<AttributeTestClass>();
             var property = schema.Properties["ReadOnly"];
 
             //// Assert
@@ -187,6 +190,81 @@ namespace NJsonSchema.Tests.Generation
 
             [ReadOnly(true)]
             public bool ReadOnly { get; set; }
+        }
+
+        public class ClassWithTypedRange
+        {
+            [Range(typeof(decimal), "0", "1")]
+            public decimal Foo { get; set; }
+        }
+
+        [Fact]
+        public async Task When_range_has_type_and_strings_then_it_is_processed_correctly()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema.FromType<ClassWithTypedRange>();
+            var property = schema.Properties["Foo"];
+
+            //// Assert
+            Assert.Equal(0.0m, property.Minimum);
+            Assert.Equal(1.0m, property.Maximum);
+        }
+
+        public class ClassWithDictionary
+        {
+            [JsonSchemaPatternProperties(".*"), MinLength(2), MaxLength(3)]
+            public Dictionary<string, string> Dict { get; set; }
+        }
+
+        [Fact]
+        public void When_dictionary_property_has_attributes_then_they_are_generated_correctly()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithDictionary>();
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(2, schema.Properties["Dict"].MinProperties);
+            Assert.Equal(3, schema.Properties["Dict"].MaxProperties);
+            Assert.Equal(".*", schema.Properties["Dict"].PatternProperties.First().Key);
+        }
+
+        public class ClassWithArray
+        {
+            [MinLength(2), MaxLength(3)]
+            public List<string> Array { get; set; }
+        }
+
+        [Fact]
+        public void When_array_property_has_attributes_then_they_are_generated_correctly()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithArray>();
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(2, schema.Properties["Array"].MinItems);
+            Assert.Equal(3, schema.Properties["Array"].MaxItems);
+        }
+
+        public class ClassWithRegexDictionaryProperty
+        {
+            [RegularExpression("^\\d+\\.\\d+\\.\\d+\\.\\d+$")]
+            public Dictionary<string, string> Versions { get; set; }
+        }
+
+        [Fact]
+        public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<ClassWithRegexDictionaryProperty>();
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Null(schema.Properties["Versions"].Pattern);
+            Assert.NotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
         }
     }
 }

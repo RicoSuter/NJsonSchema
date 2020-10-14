@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -38,61 +39,140 @@ namespace NJsonSchema.Tests.Generation
             {
                 public string Name { get; set; }
             }
-
-            public static string CreateTestXML()
+            private static WithoutXmlAttributesDefined Data => new WithoutXmlAttributesDefined()
             {
-                var types = new System.Collections.Generic.List<System.Type>();
-                types.Add(typeof(WithoutXmlAttributesDefined));
-                var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
-                var testObject = new WithoutXmlAttributesDefined();
-                testObject.Foo = "stringvalue";
-                testObject.StringArray = new string[] { "S1" };
-                testObject.IntArray = new int[] { 1 };
-                testObject.DoubleArray = new double[] { 1 };
-                testObject.DecimalArray = new decimal[] { 1 };
-                testObject.InternalItem = new[] { new WithoutXmlAttributesDefined.WithoutXmlAttributeItem() { Name = "Test" } };
-                testObject.ShouldBeThisPropertyName = new WithXmlAttribute(){Name="Test2"};
-                var sio = new System.IO.StringWriter();
-                serializer.Serialize(sio, testObject);
-                return sio.ToString();
+                Foo = "stringvalue",
+                StringArray = new[] { "S1" },
+                IntArray = new[] { 1 },
+                DoubleArray = new double[] { 1 },
+                DecimalArray = new decimal[] { 1 },
+                InternalItem = new[] { new WithoutXmlAttributeItem() { Name = "Test" } },
+                ShouldBeThisPropertyName = new WithXmlAttribute() { Name = "Test2" }
+            };
+
+            public static string CreateTestXml()
+            {
+                return GetSerializedContent(Data);
             }
 
-            /*
-             * Class above is the XML outputted as presented below by the XMLSerializer 
-             *<?xml version="1.0" encoding="utf-16"?>
-             *<WithoutXmlAttributesDefined xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-             * <Foo>stringvalue</Foo>
-             * <StringArray>
-             *   <string>S1</string>
-             * </StringArray>
-             * <IntArray>
-             *   <int>1</int>
-             * </IntArray>
-             * <DoubleArray>
-             *  <double>1</double>
-             * </DoubleArray>
-             * <DecimalArray>
-             *  <decimal>1</decimal>
-             * </DecimalArray>
-             * <InternalItem>
-             *  <WithoutXmlAttributeItem>
-             *   <Name>Test</Name>
-             *  </WithoutXmlAttributeItem>
-             * </InternalItem>
-             * <ShouldBeThisPropertyName>
-             *  <Name>Test2</Name>
-             * </ShouldBeThisPropertyName>
-             *</WithoutXmlAttributesDefined>
-            */
+            public static string CreateTestArrayXml()
+            {
+                var list = new List<WithoutXmlAttributesDefined> {Data, Data};
+                return GetSerializedContent(list);
+            }
         }
 
+        /// <summary>
+        ///The test verfies that a plain C# class serialized with XML serializer is reflected in the Swagger spec correctly. Below is the example output from CreateTestXML()
+        /// 
+        ///<WithoutXmlAttributesDefined xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        /// <Foo>stringvalue</Foo>
+        /// <StringArray>
+        ///   <string>S1</string>
+        /// </StringArray>
+        /// <IntArray>
+        ///   <int>1</int>
+        /// </IntArray>
+        /// <DoubleArray>
+        ///  <double>1</double>
+        /// </DoubleArray>
+        /// <DecimalArray>
+        ///  <decimal>1</decimal>
+        /// </DecimalArray>
+        /// <InternalItem>
+        ///  <WithoutXmlAttributeItem>
+        ///  <Name>Test</Name>
+        ///  </WithoutXmlAttributeItem>
+        /// </InternalItem>
+        /// <ShouldBeThisPropertyName>
+        ///  <Name>Test2</Name>
+        /// </ShouldBeThisPropertyName>
+        ///</WithoutXmlAttributesDefined>
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
-            var schemaData = schema.ToJson();
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             
             //// Assert
+            AssertTypeWithoutXmlAttributes(schema);
+        }
+
+        /// <summary>
+        /// The test verfies that an array of plain C# class serialized with XML serializer is reflected in the Swagger spec correctly. Below is the example output from CreateTestArrayXML()
+        /// 
+        ///<ArrayOfWithoutXmlAttributesDefined xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        ///<WithoutXmlAttributesDefined>
+        ///<Foo>stringvalue</Foo>
+        ///<StringArray>
+        ///<string>S1</string>
+        ///</StringArray>
+        ///<IntArray>
+        ///<int>1</int>
+        ///</IntArray>
+        ///<DoubleArray>
+        ///<double>1</double>
+        ///</DoubleArray>
+        ///<DecimalArray>
+        ///<decimal>1</decimal>
+        ///</DecimalArray>
+        ///<InternalItem>
+        ///<WithoutXmlAttributeItem>
+        ///<Name>Test</Name>
+        ///</WithoutXmlAttributeItem>
+        ///</InternalItem>
+        ///<ShouldBeThisPropertyName>
+        ///<Name>Test2</Name>
+        ///</ShouldBeThisPropertyName>
+        ///</WithoutXmlAttributesDefined>
+        ///<WithoutXmlAttributesDefined>
+        ///<Foo>stringvalue</Foo>
+        ///<StringArray>
+        ///<string>S1</string>
+        ///</StringArray>
+        ///<IntArray>
+        ///<int>1</int>
+        ///</IntArray>
+        ///<DoubleArray>
+        ///<double>1</double>
+        ///</DoubleArray>
+        ///<DecimalArray>
+        ///<decimal>1</decimal>
+        ///</DecimalArray>
+        ///<InternalItem>
+        ///<WithoutXmlAttributeItem>
+        ///<Name>Test</Name>
+        ///</WithoutXmlAttributeItem>
+        ///</InternalItem>
+        ///<ShouldBeThisPropertyName>
+        ///<Name>Test2</Name>
+        ///</ShouldBeThisPropertyName>
+        ///</WithoutXmlAttributesDefined>
+        ///</ArrayOfWithoutXmlAttributesDefined>
+        ///</summary>
+        ///<returns></returns>
+        [Fact]
+        public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_without_xml_attributes_defined()
+        {
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schemaData = schema.ToJson();
+            var schemaObject = JObject.Parse(schemaData);
+
+            //// Assert
+            var propertyXml = schemaObject["xml"];
+            Assert.Equal("ArrayOfWithoutXmlAttributesDefined", propertyXml["name"]);
+            Assert.True(propertyXml["wrapped"].Value<bool>());
+
+            var itemsXml = schemaObject["items"]["xml"];
+            Assert.Equal("WithoutXmlAttributesDefined", itemsXml["name"]);
+
+            var definitionSchema = schema.Definitions["WithoutXmlAttributesDefined"];
+            AssertTypeWithoutXmlAttributes(definitionSchema);
+        }
+
+        private void AssertTypeWithoutXmlAttributes(JsonSchema schema)
+        {
             Assert.Null(schema.Xml);
             var fooProperty = schema.Properties[Foo];
             var stringArrayProperty = schema.Properties[StringArray];
@@ -110,16 +190,16 @@ namespace NJsonSchema.Tests.Generation
             Assert.Null(fooProperty.Xml);
 
             //https://github.com/swagger-api/swagger-ui/issues/2601
-            Assert.Equal(true, stringArrayProperty.Xml.Wrapped);
-            Assert.Equal(true, intArrayProperty.Xml.Wrapped);
-            Assert.Equal(true, doubleArrayProperty.Xml.Wrapped);
-            Assert.Equal(true, decimalArrayProperty.Xml.Wrapped);
-            Assert.Equal(true, internalItemProperty.Xml.Wrapped);
+            Assert.True(stringArrayProperty.Xml.Wrapped);
+            Assert.True(intArrayProperty.Xml.Wrapped);
+            Assert.True(doubleArrayProperty.Xml.Wrapped);
+            Assert.True(decimalArrayProperty.Xml.Wrapped);
+            Assert.True(internalItemProperty.Xml.Wrapped);
 
-            Assert.Equal(typeof(string).Name, stringArrayProperty.Item.Xml.Name);
-            Assert.Equal(typeof(int).Name, intArrayProperty.Item.Xml.Name);
-            Assert.Equal(typeof(double).Name, doubleArrayProperty.Item.Xml.Name);
-            Assert.Equal(typeof(decimal).Name, decimalArrayProperty.Item.Xml.Name);
+            Assert.Equal("string", stringArrayProperty.Item.Xml.Name);
+            Assert.Equal("int", intArrayProperty.Item.Xml.Name);
+            Assert.Equal("double", doubleArrayProperty.Item.Xml.Name);
+            Assert.Equal("decimal", decimalArrayProperty.Item.Xml.Name);
             Assert.NotNull(internalItemProperty.Item.Xml);
             //https://github.com/swagger-api/swagger-ui/issues/2610
             Assert.NotNull(shouldBeThisNameProperty.Xml); // Make sure that type reference properties have an xml object
@@ -129,23 +209,23 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes_and_serialized()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new NJsonSchema.Generation.JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
 
             var schemaObject = JObject.Parse(schemaData);
 
-            var definitionXML = schemaObject["xml"];
-            Assert.Null(definitionXML);
+            var definitionXml = schemaObject["xml"];
+            Assert.Null(definitionXml);
 
             var fooPropertyXml = schemaObject["properties"]["Foo"]["xml"];
             Assert.Null(fooPropertyXml);
 
             var arrayStringPropertyOuterXml = schemaObject["properties"][StringArray]["xml"];
-            Assert.Equal(true, arrayStringPropertyOuterXml["wrapped"].Value<bool>());
+            Assert.True(arrayStringPropertyOuterXml["wrapped"].Value<bool>());
             Assert.Null(arrayStringPropertyOuterXml["name"]);
 
             var arrayStringPropertyItemXml = schemaObject["properties"][StringArray]["items"]["xml"];
-            Assert.Equal(typeof(string).Name, arrayStringPropertyItemXml["name"]);
+            Assert.Equal("string", arrayStringPropertyItemXml["name"].Value<string>());
         }
 
         [XmlType(TypeName = "NotTheSameName", Namespace = "http://test.shema.org/type")]
@@ -189,83 +269,168 @@ namespace NJsonSchema.Tests.Generation
                 public string Name { get; set; }
             }
 
-            public static string CreateTestXML()
+            private static WithXmlAttributesDefined Data => new WithXmlAttributesDefined()
             {
-                var types = new System.Collections.Generic.List<System.Type>();
-                types.Add(typeof(WithXmlAttributesDefined));
-                var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
-                var testObject = new WithXmlAttributesDefined();
-                testObject.Foo = "stringvalue";
-                testObject.MightBeAAttribute = "stringvalue";
-                testObject.StringArray = new string[] { "S1" };
-                testObject.TheInts = new int[] { 1 };
-                testObject.InternalItems = new[] { new WithXmlAttributeItem() { Name = "Test" } };
-                testObject.ReferenceProperty = new WithXmlAttributeProperty() { Name = "Test" };
-                testObject.ExternalItems2 = new[] { new WithXmlAttributeItem2() { Name = "Test" } };
+                Foo = "stringvalue",
+                MightBeAAttribute = "stringvalue",
+                StringArray = new[] { "S1" },
+                TheInts = new[] { 1 },
+                InternalItems = new[] { new WithXmlAttributeItem() { Name = "Test" } },
+                ReferenceProperty = new WithXmlAttributeProperty() { Name = "Test" },
+                ExternalItems2 = new[] { new WithXmlAttributeItem2() { Name = "Test" } },
+            };
 
-                var sio = new System.IO.StringWriter();
-                serializer.Serialize(sio, testObject);
-                return sio.ToString();
+            public static string CreateTestXml()
+            {
+                return GetSerializedContent(Data);
             }
 
-            /*
-             * Class above is the XML outputted as presented below by the XMLSerializer 
-             *<?xml version="1.0" encoding="utf-16"?>
-             *<NotTheSameName xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" IsAnAttribute="stringValue2">
-             * <Bar xmlns="http://test.shema.org/type">stringvalue</Bar>
-             * <TheStrings xmlns="http://test.shema.org/type">
-             *  <TheString>S1</TheString>
-             * </TheStrings>
-             * <TheInts xmlns="http://test.shema.org/type">
-             *  <TheInt>1</TheInt>
-             * </TheInts>
-             * <ExternalItems xmlns="http://test.shema.org/type">
-             *  <ExternalItem>
-             *    <Name>Test</Name>
-             *  </ExternalItem>
-             * </ExternalItems>
-             * <ExternalItems2 xmlns="http://test.shema.org/type">
-             *  <ExternalItem2>
-             *    <Name>Test</Name>
-             *  </ExternalItem2>
-             * </ExternalItems2>
-             * <ReferenceProperty xmlns="http://test.shema.org/type">
-             *   <Name>Test</Name>
-             * </ReferenceProperty>
-             *</NotTheSameName>
-             * 
-             */
+            public static string CreateTestArrayXml()
+            {
+                var items = new List<WithXmlAttributesDefined>
+                {
+                    Data,
+                    Data
+                };
+                return GetSerializedContent(items);
+            }
         }
 
+        /// <summary>
+        /// The test verfies that a C# class with Xml* attributes serialized with XML serializer is reflected in the Swagger spec correctly. Below is the example output from CreateTestXML()
+        /// 
+        ///<NotTheSameName xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" IsAnAttribute="stringValue2">
+        /// <Bar xmlns = "http://test.shema.org/type">stringvalue </Bar>
+        /// <TheStrings xmlns="http://test.shema.org/type">
+        ///  <TheString>S1</TheString>
+        /// </TheStrings>
+        /// <TheInts xmlns = "http://test.shema.org/type">
+        ///   <TheInt>1</TheInt>
+        /// </TheInts>
+        /// <ExternalItems xmlns="http://test.shema.org/type">
+        ///   <ExternalItem>
+        ///    <Name>Test</Name>
+        ///  </ExternalItem>
+        /// </ExternalItems>
+        /// <ExternalItems2 xmlns = "http://test.shema.org/type">
+        ///   <ExternalItem2>
+        ///    <Name>Test</Name>
+        ///  </ExternalItem2>
+        /// </ExternalItems2>
+        /// <ReferenceProperty xmlns="http://test.shema.org/type">
+        ///   <Name>Test</Name>
+        /// </ReferenceProperty>
+        ///</NotTheSameName>
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
-            var schemaData = schema.ToJson();
-
+            
             //// Assert
-            Assert.Equal("NotTheSameName", schema.Xml.Name);
-            Assert.Equal("http://test.shema.org/type", schema.Xml.Namespace);
+            AssertTypeWithXmlAttributes(schema, schema);
+        }
 
-            var stringArrayProperty = schema.Properties[StringArray];
-            var intArrayProperty = schema.Properties["TheInts"];
-            var fooProperty = schema.Properties["Foo"];
-            var externalItemsProperty = schema.Properties["InternalItems"];
+        /// <summary>
+        /// The test verfies that an array of a C# class with Xml* attributes serialized with XML serializer is reflected in the Swagger spec correctly. Below is the example output from CreateTestArrayXML()
+        /// 
+        ///<ArrayOfNotTheSameName xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        ///<NotTheSameName IsAnAttribute = "stringvalue">
+        /// <Bar xmlns="http://test.shema.org/type">stringvalue</Bar>
+        ///  <TheStrings xmlns = "http://test.shema.org/type">
+        ///   <TheString>S1</TheString>
+        ///  </TheStrings>
+        ///  <TheInts xmlns="http://test.shema.org/type">
+        ///    <TheInt>1</TheInt>
+        ///  </TheInts>
+        ///  <ExternalItems xmlns = "http://test.shema.org/type">
+        ///    <ExternalItem>
+        ///    <Name>Test</Name>
+        ///   </ExternalItem>
+        ///  </ExternalItems>
+        ///  <ExternalItems2 xmlns="http://test.shema.org/type">
+        ///    <ExternalItem2>
+        ///     <Name>Test</Name>
+        ///    </ExternalItem2>
+        ///   </ExternalItems2>
+        ///   <ReferenceProperty xmlns = "http://test.shema.org/type">
+        ///     <Name>Test</Name>
+        ///   </ReferenceProperty>
+        ///</NotTheSameName>
+        ///<NotTheSameName IsAnAttribute="stringvalue">
+        /// <Bar xmlns = "http://test.shema.org/type">stringvalue</Bar>
+        /// <TheStrings xmlns="http://test.shema.org/type">
+        ///   <TheString>S1</TheString>
+        /// </TheStrings>
+        /// <TheInts xmlns = "http://test.shema.org/type">
+        ///   <TheInt>1</TheInt>
+        /// </TheInts>
+        /// <ExternalItems xmlns="http://test.shema.org/type">
+        ///  <ExternalItem>
+        ///    <Name>Test</Name>
+        ///  </ExternalItem>
+        /// </ExternalItems>
+        /// <ExternalItems2 xmlns = "http://test.shema.org/type">
+        ///   <ExternalItem2>
+        ///     <Name >Test</Name>
+        ///   </ExternalItem2>
+        /// </ExternalItems2>
+        /// <ReferenceProperty xmlns="http://test.shema.org/type">
+        ///   <Name>Test</Name>
+        /// </ReferenceProperty>
+        ///</NotTheSameName>
+        ///</ArrayOfNotTheSameName>
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_xml_attributes_defined()
+        {
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings
+            {
+                GenerateXmlObjects = true
+            });
+
+            var schemaData = schema.ToJson();
+            var schemaObject = JObject.Parse(schemaData);
+
+            //Assert
+            var propertyXml = schemaObject["xml"];
+            Assert.Equal("ArrayOfNotTheSameName", propertyXml["name"]);
+            Assert.True(propertyXml["wrapped"].Value<bool>());
+
+            var itemsXml = schemaObject["items"]["xml"];
+            Assert.Equal("NotTheSameName", itemsXml["name"]);
+
+            var definitionSchema = schema.Definitions["WithXmlAttributesDefined"];
+
+            AssertTypeWithXmlAttributes(schema, definitionSchema);
+        }
+
+        private void AssertTypeWithXmlAttributes(JsonSchema schema, JsonSchema rootDefinitionSchema)
+        {
+            Assert.Equal("NotTheSameName", rootDefinitionSchema.Xml.Name);
+            Assert.Equal("http://test.shema.org/type", rootDefinitionSchema.Xml.Namespace);
+
+            var stringArrayProperty = rootDefinitionSchema.Properties[StringArray];
+            var intArrayProperty = rootDefinitionSchema.Properties["TheInts"];
+            var fooProperty = rootDefinitionSchema.Properties["Foo"];
+            var externalItemsProperty = rootDefinitionSchema.Properties["InternalItems"];
             var externalItemType = schema.Definitions["WithXmlAttributeItem"];
-            var externalItems2Property = schema.Properties["ExternalItems2"];
+            var externalItems2Property = rootDefinitionSchema.Properties["ExternalItems2"];
             var externalItem2Type = schema.Definitions["WithXmlAttributeItem2"];
-            var attributeProperty = schema.Properties["MightBeAAttribute"];
-            var referenceProperty = schema.Properties["ReferenceProperty"];
+            var attributeProperty = rootDefinitionSchema.Properties["MightBeAAttribute"];
+            var referenceProperty = rootDefinitionSchema.Properties["ReferenceProperty"];
 
             Assert.Equal("Bar", fooProperty.Xml.Name);
 
             Assert.Equal("TheStrings", stringArrayProperty.Xml.Name);
             Assert.Null(intArrayProperty.Xml.Name);
-            //https://github.com/swagger-api/swagger-ui/issues/2601
-            Assert.Equal(true, stringArrayProperty.Xml.Wrapped);
+            // https://github.com/swagger-api/swagger-ui/issues/2601
+            Assert.True(stringArrayProperty.Xml.Wrapped);
 
             Assert.Equal("TheString", stringArrayProperty.Item.Xml.Name);
 
@@ -287,11 +452,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_and_serialized()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
-
+            
             var schemaData = schema.ToJson();
             var schemaObject = JObject.Parse(schemaData);
 
@@ -321,11 +486,10 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_that_are_incorrect()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
-            var schemaData = schema.ToJson();
 
             //// Assert
             var fooProperty = schema.Properties["Foo"];
@@ -334,10 +498,25 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
-        public async Task When_model_objects_are_created_with_the_example_model_make_sure_that_they_are_serializable()
+        public void When_model_objects_are_created_with_the_example_model_make_sure_that_they_are_serializable()
         {
-            WithXmlAttributesDefined.CreateTestXML();
-            WithoutXmlAttributesDefined.CreateTestXML();
+            WithXmlAttributesDefined.CreateTestXml();
+            WithXmlAttributesDefined.CreateTestArrayXml();
+            WithoutXmlAttributesDefined.CreateTestXml();
+            WithoutXmlAttributesDefined.CreateTestArrayXml();
+        }
+
+        private static string GetSerializedContent<T>(T data)
+        {
+            var types = new List<System.Type>
+            {
+                typeof(T)
+            };
+            var serializer = XmlSerializer.FromTypes(types.ToArray()).First();
+
+            var sio = new System.IO.StringWriter();
+            serializer.Serialize(sio, data);
+            return sio.ToString();
         }
     }
 }

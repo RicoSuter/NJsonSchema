@@ -1,27 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
+        <IsPackable>false</IsPackable>
+        <NoWarn>1998,1591</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+        <PackageReference Include="xunit" Version="2.3.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.6.1" Condition="'$(TargetFramework)' == 'netcoreapp2.0'" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.3.2" Condition="'$(TargetFramework)' == 'net452'" />
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net451</TargetFrameworks>
+        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
 
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.6.1" Condition="'$(TargetFramework)' == 'netcoreapp2.0'"/>
-
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net451'" Include="System.ComponentModel.DataAnnotations"></Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
-    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
-  </ItemGroup>
+        <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
+        <Reference Condition="'$(TargetFramework)' == 'net452'" Include="System.ComponentModel.DataAnnotations"></Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
+        <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
+        <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
+        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    </ItemGroup>
 </Project>

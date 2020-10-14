@@ -2,7 +2,7 @@
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -14,28 +14,32 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
         /// <param name="classTemplateModel">The class template model.</param>
         /// <param name="property">The property.</param>
-        /// <param name="resolver">The resolver.</param>
+        /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
-        public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, CSharpTypeResolver resolver, CSharpGeneratorSettings settings)
-            : base(property, classTemplateModel, new CSharpValueGenerator(resolver, settings), settings)
+        public PropertyModel(
+            ClassTemplateModel classTemplateModel,
+            JsonSchemaProperty property,
+            CSharpTypeResolver typeResolver,
+            CSharpGeneratorSettings settings)
+            : base(property, classTemplateModel, typeResolver, settings)
         {
             _property = property;
             _settings = settings;
-            _resolver = resolver;
+            _resolver = typeResolver;
         }
 
         /// <summary>Gets the name of the property.</summary>
         public string Name => _property.Name;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
@@ -46,9 +50,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
+        /// <summary>Gets a value indicating whether the property is nullable.</summary>
+        public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
+
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
-            _settings.SchemaType == SchemaType.JsonSchema &&
             _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
             (_property.MinLength == null || _property.MinLength == 0);
 
@@ -67,16 +73,24 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
                     if (!_property.IsNullable(_settings.SchemaType))
+                    {
                         return "Newtonsoft.Json.Required.Always";
+                    }
                     else
+                    {
                         return "Newtonsoft.Json.Required.AllowNull";
+                    }
                 }
                 else
                 {
                     if (!_property.IsNullable(_settings.SchemaType))
+                    {
                         return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
+                    }
                     else
+                    {
                         return "Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
+                    }
                 }
             }
         }
@@ -87,7 +101,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations || !_property.IsRequired || _property.IsNullable(_settings.SchemaType))
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.IsAnyType ||
                        _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Object) ||
@@ -102,12 +118,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 if (!_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Number) && !_property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer))
+                {
                     return false;
+                }
 
-                return _property.Maximum.HasValue || _property.Minimum.HasValue;
+                return _property.ActualSchema.Maximum.HasValue || _property.ActualSchema.Minimum.HasValue;
             }
         }
 
@@ -116,19 +136,29 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = GetSchemaFormat(schema);
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
-                return _property.Minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Minimum.Value, format)
+                var minimum = schema.Minimum;
+                if (minimum.HasValue && schema.IsExclusiveMinimum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        minimum++;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        minimum += schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+                return minimum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -138,19 +168,30 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         {
             get
             {
-                var format =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Float ||
-                    _property.Format == JsonFormatStrings.Decimal ||
-                    _property.Format == JsonFormatStrings.Long ?
-                        JsonFormatStrings.Double : JsonFormatStrings.Integer;
-                var type =
-                    _property.Format == JsonFormatStrings.Double ||
-                    _property.Format == JsonFormatStrings.Decimal ?
-                        "double" : "int";
+                var schema = _property.ActualSchema;
+                var propertyFormat = GetSchemaFormat(schema);
+                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
+                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
 
-                return _property.Maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(_property.Type, _property.Maximum.Value, format)
+                var maximum = schema.Maximum;
+                if (maximum.HasValue && schema.IsExclusiveMaximum)
+                {
+                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    {
+                        maximum--;
+                    }
+                    else if (schema.MultipleOf.HasValue)
+                    {
+                        maximum -= schema.MultipleOf;
+                    }
+                    else
+                    {
+                        // TODO - add support for doubles, singles and decimals here
+                    }
+                }
+
+                return maximum.HasValue
+                    ? ValueGenerator.GetNumericValue(schema.Type, maximum.Value, format)
                     : type + "." + nameof(double.MaxValue);
             }
         }
@@ -161,21 +202,59 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 if (_property.IsRequired && _property.MinLength == 1 && _property.MaxLength == null)
+                {
                     return false; // handled by RequiredAttribute
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
-                       (_property.MinLength.HasValue || _property.MaxLength.HasValue);
+                       (_property.ActualSchema.MinLength.HasValue || _property.ActualSchema.MaxLength.HasValue);
             }
         }
 
         /// <summary>Gets the minimum value of the string length attribute.</summary>
-        public int StringLengthMinimumValue => _property.MinLength ?? 0;
+        public int StringLengthMinimumValue => _property.ActualSchema.MinLength ?? 0;
 
         /// <summary>Gets the maximum value of the string length attribute.</summary>
-        public string StringLengthMaximumValue => _property.MaxLength.HasValue ? _property.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+        public string StringLengthMaximumValue => _property.ActualSchema.MaxLength.HasValue ? _property.ActualSchema.MaxLength.Value.ToString(CultureInfo.InvariantCulture) : $"int.{nameof(int.MaxValue)}";
+
+        /// <summary>Gets a value indicating whether to render the min length attribute.</summary>
+        public bool RenderMinLengthAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                {
+                    return false;
+                }
+
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.ActualSchema.MinItems > 0;
+            }
+        }
+
+        /// <summary>Gets the value of the min length attribute.</summary>
+        public int MinLengthAttribute => _property.ActualSchema.MinItems;
+
+        /// <summary>Gets a value indicating whether to render the max length attribute.</summary>
+        public bool RenderMaxLengthAttribute
+        {
+            get
+            {
+                if (!_settings.GenerateDataAnnotations)
+                {
+                    return false;
+                }
+
+                return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.Array) && _property.ActualSchema.MaxItems > 0;
+            }
+        }
+
+        /// <summary>Gets the value of the max length attribute.</summary>
+        public int MaxLengthAttribute => _property.ActualSchema.MaxItems;
 
         /// <summary>Gets a value indicating whether to render a regular expression attribute.</summary>
         public bool RenderRegularExpressionAttribute
@@ -183,20 +262,53 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             get
             {
                 if (!_settings.GenerateDataAnnotations)
+                {
                     return false;
+                }
 
                 return _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String) &&
-                       !string.IsNullOrEmpty(_property.Pattern);
+                       !string.IsNullOrEmpty(_property.ActualSchema.Pattern);
             }
         }
 
         /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
-        public string RegularExpressionValue => _property.Pattern?.Replace("\"", "\"\"");
+        public string RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
-        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type == JsonObjectType.String;
+        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type.HasFlag(JsonObjectType.String);
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
-        public bool IsDate => _property.Format == JsonFormatStrings.Date;
+        public bool IsDate => _property.ActualSchema.Format == JsonFormatStrings.Date;
+
+        /// <summary>Gets a value indicating whether the property is deprecated.</summary>
+        public bool IsDeprecated => _property.IsDeprecated;
+
+        /// <summary>Gets a value indicating whether the property has a deprecated message.</summary>
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_property.DeprecatedMessage);
+
+        /// <summary>Gets the deprecated message.</summary>
+        public string DeprecatedMessage => _property.DeprecatedMessage;
+
+        private string GetSchemaFormat(JsonSchema schema)
+        {
+            if (Type == "long" || Type == "long?")
+            {
+                return JsonFormatStrings.Long;
+            }
+
+            if (schema.Format == null)
+            {
+                switch (schema.Type)
+                {
+                    case JsonObjectType.Integer:
+                        return JsonFormatStrings.Integer;
+
+                    case JsonObjectType.Number:
+                        return JsonFormatStrings.Double;
+                }
+            }
+
+            return schema.Format;
+        }
     }
 }

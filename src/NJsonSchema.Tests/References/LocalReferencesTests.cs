@@ -6,6 +6,8 @@ using Xunit;
 
 namespace NJsonSchema.Tests.References
 {
+    using NJsonSchema.Generation;
+
     public class LocalReferencesTests
     {
         [Fact]
@@ -27,9 +29,9 @@ namespace NJsonSchema.Tests.References
 		}
 	}
 }";
-            
+
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var j = schema.ToJson();
 
             //// Assert
@@ -43,7 +45,7 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_collection_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
@@ -59,7 +61,7 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
@@ -74,16 +76,98 @@ namespace NJsonSchema.Tests.References
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
 
             //// Act
-            var schema = await JsonSchema4.FromFileAsync(path);
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
             //// Assert
             Assert.Equal(1, schema.Definitions.Count);
         }
 
+        [Fact]
+        public async Task When_reference_is_registered_in_custom_resolver_it_should_not_try_to_access_file()
+        {
+            //// Arrange
+            var externalSchema = await JsonSchema.FromJsonAsync(
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""foo"": {
+                        ""type"": ""string""
+                    }
+                }
+            }");
+
+            Func<JsonSchema, JsonReferenceResolver> factory = schema4 =>
+            {
+                var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
+                var resolver = new JsonReferenceResolver(schemaResolver);
+                resolver.AddDocumentReference("../dir/external.json", externalSchema);
+                return resolver;
+            };
+
+            string schemaJson =
+            @"{
+                ""$schema"": ""http://json-schema.org/draft-07/schema#"",
+                ""type"": ""object"",
+                ""properties"": {
+                    ""title"": {
+                        ""$ref"": ""../dir/external.json#""
+                    }
+                }
+            }";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(schemaJson, ".", factory);
+
+            //// Assert
+            Assert.NotNull(schema);
+        }
+
+        [Theory]
+        [InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
+        [InlineData("b#r")] // Non-escaped ill-formed JSON Pointer
+        public async Task When_definitions_have_sharp_in_type_name(string referenceTypeName)
+        {
+            //// Arrange
+            var json = $@"{{
+	""type"": ""object"", 
+	""properties"": {{
+		""foo"": {{
+			""$ref"": ""#/definitions/{referenceTypeName}""
+		}}
+	}},
+	""definitions"": {{
+		""b#r"": {{
+			""type"": ""integer""
+		}}
+	}}
+}}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var j = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
+        }
+
+        [Fact]
+        public async Task When_schema_references_external_schema_placed_in_directory_with_sharp_in_name()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/dir_with_#/first.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(JsonObjectType.Integer, schema.ActualTypeSchema.Type);
+        }
+
         private string GetTestDirectory()
         {
-            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase.Replace("#", "%23");
             var uri = new UriBuilder(codeBase);
             return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }

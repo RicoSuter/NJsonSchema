@@ -2,7 +2,7 @@
 // <copyright file="DefaultTemplateFactory.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -26,15 +26,6 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
         /// <param name="settings">The settings.</param>
-        [Obsolete("Use other ctor instead.")]
-        public DefaultTemplateFactory(CodeGeneratorSettingsBase settings)
-            : this(settings, new Assembly[0])
-        {
-            // TODO: Also remove Assembly.Load after ctor has been removed
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
-        /// <param name="settings">The settings.</param>
         /// <param name="assemblies">The assemblies containing embedded Liquid templates.</param>
         public DefaultTemplateFactory(CodeGeneratorSettingsBase settings, Assembly[] assemblies)
         {
@@ -47,7 +38,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="template">The template name.</param>
         /// <param name="model">The template model.</param>
         /// <returns>The template.</returns>
-        /// <exception cref="InvalidOperationException">Could not load template..</exception>
+        /// <exception cref="InvalidOperationException">Could not load template.</exception>
         public ITemplate CreateTemplate(string language, string template, object model)
         {
             var liquidTemplate = GetLiquidTemplate(language, template);
@@ -58,27 +49,32 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The toolchain version.</returns>
         protected virtual string GetToolchainVersion()
         {
-            return JsonSchema4.ToolchainVersion;
+            return JsonSchema.ToolchainVersion;
         }
 
         /// <summary>Gets a Liquid template by name.</summary>
         /// <param name="name">The assembly name.</param>
         /// <returns>The assembly.</returns>
+        /// <exception cref="InvalidOperationException">The assembly containting liquid templates could not be found.</exception>
         protected Assembly GetLiquidAssembly(string name)
         {
             var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
             if (assembly != null)
+            {
                 return assembly;
+            }
 
-            return Assembly.Load(new AssemblyName(name));
+            throw new InvalidOperationException("The assembly '" + name + "' containting liquid templates could not be found.");
         }
 
         /// <summary>Tries to load an embedded Liquid template.</summary>
         /// <param name="language">The language.</param>
         /// <param name="template">The template name.</param>
         /// <returns>The template.</returns>
+        /// <exception cref="InvalidOperationException">Could not load template.</exception>
         protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
+            template = template.TrimEnd('!');
             var assembly = GetLiquidAssembly("NJsonSchema.CodeGeneration." + language);
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
@@ -86,19 +82,24 @@ namespace NJsonSchema.CodeGeneration
             if (resource != null)
             {
                 using (var reader = new StreamReader(resource))
+                {
                     return reader.ReadToEnd();
+                }
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
         }
 
+        /// <exception cref="InvalidOperationException">Could not load template.</exception>
         private string GetLiquidTemplate(string language, string template)
         {
             if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
             {
                 var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
+                {
                     return File.ReadAllText(templateFilePath);
+                }
             }
 
             return GetEmbeddedLiquidTemplate(language, template);
@@ -107,7 +108,7 @@ namespace NJsonSchema.CodeGeneration
         internal class LiquidTemplate : ITemplate
         {
             private const string TemplateTagName = "__njs_template";
-            private readonly static ConcurrentDictionary<string, Template> _templates = new ConcurrentDictionary<string, Template>();
+            private static readonly ConcurrentDictionary<string, Template> Templates = new ConcurrentDictionary<string, Template>();
 
             static LiquidTemplate()
             {
@@ -133,39 +134,49 @@ namespace NJsonSchema.CodeGeneration
 
             public string Render()
             {
-                var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
-                hash[TemplateTag.LanguageKey] = _language;
-                hash[TemplateTag.TemplateKey] = _template;
-                hash[TemplateTag.SettingsKey] = _settings;
-                hash["ToolchainVersion"] = _toolchainVersion;
-
-                if (!_templates.ContainsKey(_data))
+                try
                 {
-                    var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
-                            "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
-                        RegexOptions.Singleline).Trim();
+                    var hash = _model is Hash ? (Hash)_model : new LiquidProxyHash(_model);
+                    hash[TemplateTag.LanguageKey] = _language;
+                    hash[TemplateTag.TemplateKey] = _template;
+                    hash[TemplateTag.SettingsKey] = _settings;
+                    hash["ToolchainVersion"] = _toolchainVersion;
 
-                    data = Regex.Replace("\n" + data, "\\{% template (.*?) %}", m =>
-                            "{% " + TemplateTagName + " " + m.Groups[1].Value + " -1 %}",
-                        RegexOptions.Singleline).Trim();
+                    if (!Templates.ContainsKey(_data))
+                    {
+                        var data = Regex.Replace("\n" + _data, "(\n( )*?)\\{% template (.*?) %}", m =>
+                                "\n{%- " + TemplateTagName + " " + m.Groups[3].Value + " " + m.Groups[1].Value.Length / 4 + " -%}",
+                            RegexOptions.Singleline).Trim();
 
-                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
-                        m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
-                        RegexOptions.Singleline);
+                        data = Regex.Replace("\n" + data, "\\{% template (.*?) %}", m =>
+                                "{% " + TemplateTagName + " " + m.Groups[1].Value + " -1 %}",
+                            RegexOptions.Singleline).Trim();
 
-                    data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
-                        m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
-                        RegexOptions.Singleline);
+                        data = data.Replace("{% template %}", "{% " + TemplateTagName + " %}");
 
-                    _templates[_data] = Template.Parse(data);
+                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
+                            RegexOptions.Singleline);
+
+                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
+                            RegexOptions.Singleline);
+
+                        Templates[_data] = Template.Parse(data);
+                    }
+
+                    var template = Templates[_data];
+                    return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
+                    {
+                        LocalVariables = hash,
+                        Filters = new[] { typeof(LiquidFilters) },
+                        ErrorsOutputMode = ErrorsOutputMode.Rethrow
+                    }).Replace("\r", "").Trim();
                 }
-
-                var template = _templates[_data];
-                return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
+                catch (Exception exception)
                 {
-                    LocalVariables = hash,
-                    Filters = new[] { typeof(LiquidFilters) }
-                }).Replace("\r", "").Trim();
+                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}: \n" + exception, exception);
+                }
             }
         }
 
@@ -173,7 +184,7 @@ namespace NJsonSchema.CodeGeneration
         {
             public static string Csharpdocs(string input, int tabCount)
             {
-                return ConversionUtilities.ConvertCSharpDocBreaks(input, tabCount);
+                return ConversionUtilities.ConvertCSharpDocs(input, tabCount);
             }
 
             public static string Tab(Context context, string input, int tabCount)
@@ -190,6 +201,21 @@ namespace NJsonSchema.CodeGeneration
             {
                 return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
             }
+
+            public static string Literal(string input)
+            {
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(input) + "\"";
+            }
+
+            public static IEnumerable<object> Concat(Context context, IEnumerable<object> input, IEnumerable<object> concat)
+            {
+                return input.Concat(concat ?? Enumerable.Empty<object>()).ToList();
+            }
+
+            public static IEnumerable<object> Empty(Context context, object input)
+            {
+                return Enumerable.Empty<object>();
+            }
         }
 
         internal class TemplateTag : Tag
@@ -203,8 +229,8 @@ namespace NJsonSchema.CodeGeneration
 
             public override void Initialize(string tagName, string markup, List<string> tokens)
             {
-                var parts = markup.Trim().Split(' ');
-                _template = parts[0];
+                var parts = markup.Trim().Split(' ').Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+                _template = parts.Length >= 1 ? parts[0] : null;
                 _tabCount = parts.Length >= 2 ? int.Parse(parts[1]) : 0;
                 base.Initialize(tagName, markup, tokens);
             }
@@ -224,14 +250,18 @@ namespace NJsonSchema.CodeGeneration
                     var output = template.Render().Trim();
 
                     if (string.IsNullOrEmpty(output))
+                    {
                         result.Write("");
+                    }
                     else if (_tabCount >= 0)
                     {
                         result.Write(string.Join("", Enumerable.Repeat("    ", _tabCount)) +
                             ConversionUtilities.Tab(output, _tabCount) + "\r\n");
                     }
                     else
+                    {
                         result.Write(output);
+                    }
                 }
                 catch (InvalidOperationException)
                 {
@@ -243,9 +273,15 @@ namespace NJsonSchema.CodeGeneration
                 var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
                 model.Merge(context.Registers);
                 foreach (var scope in Enumerable.Reverse(context.Scopes))
+                {
                     model.Merge(scope);
+                }
+
                 foreach (var environment in Enumerable.Reverse(context.Environments))
+                {
                     model.Merge(environment);
+                }
+
                 return model;
             }
         }

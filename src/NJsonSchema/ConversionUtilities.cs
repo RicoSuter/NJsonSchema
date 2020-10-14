@@ -2,12 +2,13 @@
 // <copyright file="ConversionUtilities.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace NJsonSchema
 {
@@ -21,17 +22,23 @@ namespace NJsonSchema
         public static string ConvertToLowerCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + input.Substring(1))
+            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+            {
                 return "_" + input;
+            }
 
             return input;
         }
@@ -43,18 +50,22 @@ namespace NJsonSchema
         public static string ConvertToUpperCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + input.Substring(1))
+            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+            {
                 return "_" + input;
+            }
 
             return input;
         }
-        
+
         /// <summary>Converts the string to a string literal which can be used in C# or TypeScript code.</summary>
         /// <param name="input">The input.</param>
         /// <returns>The literal.</returns>
@@ -100,7 +111,9 @@ namespace NJsonSchema
         public static string ConvertToCamelCase(string input)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return string.Empty;
+            }
 
             return ConvertDashesToCamelCase(input.Replace(" ", "_").Replace("/", "_"));
         }
@@ -127,6 +140,19 @@ namespace NJsonSchema
                 .Trim('\n', '\t', ' ');
         }
 
+        /// <summary>Singularizes the given noun in plural.</summary>
+        /// <param name="word">The plural noun.</param>
+        /// <returns>The singular noun.</returns>
+        public static string Singularize(string word)
+        {
+            if (word == "people")
+            {
+                return "Person";
+            }
+
+            return word.EndsWith("s") ? word.Substring(0, word.Length - 1) : word;
+        }
+
         /// <summary>Add tabs to the given string.</summary>
         /// <param name="input">The input.</param>
         /// <param name="tabCount">The tab count.</param>
@@ -140,9 +166,14 @@ namespace NJsonSchema
         /// <param name="input">The input.</param>
         /// <param name="tabCount">The tab count.</param>
         /// <returns>The output.</returns>
-        public static string ConvertCSharpDocBreaks(string input, int tabCount)
+        public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            return input?.Replace("\r", string.Empty).Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ") ?? string.Empty;
+            input = input?
+                .Replace("\r", string.Empty)
+                .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
+                ?? string.Empty;
+
+            return new XText(input).ToString();
         }
 
         private static string ConvertDashesToCamelCase(string input)
@@ -152,14 +183,18 @@ namespace NJsonSchema
             foreach (char c in input)
             {
                 if (c == '-')
+                {
                     caseFlag = true;
+                }
                 else if (caseFlag)
                 {
                     sb.Append(char.ToUpperInvariant(c));
                     caseFlag = false;
                 }
                 else
+                {
                     sb.Append(c);
+                }
             }
             return sb.ToString();
         }

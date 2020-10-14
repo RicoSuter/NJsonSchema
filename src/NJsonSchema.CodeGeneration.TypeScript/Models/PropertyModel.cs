@@ -2,7 +2,7 @@
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -28,14 +28,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="property">The property.</param>
         /// <param name="rootObject">The root object.</param>
         /// <param name="parentTypeName">Name of the parent type.</param>
-        /// <param name="resolver">The resolver.</param>
+        /// <param name="typeResolver">The resolver.</param>
         /// <param name="settings">The settings.</param>
-        public PropertyModel(ClassTemplateModel classTemplateModel, JsonProperty property, object rootObject, string parentTypeName, TypeScriptTypeResolver resolver, TypeScriptGeneratorSettings settings)
-            : base(property, classTemplateModel, new TypeScriptValueGenerator(resolver, settings), settings)
+        public PropertyModel(
+            ClassTemplateModel classTemplateModel,
+            JsonSchemaProperty property,
+            object rootObject,
+            string parentTypeName,
+            TypeScriptTypeResolver typeResolver,
+            TypeScriptGeneratorSettings settings)
+            : base(property, classTemplateModel, typeResolver, settings)
         {
             _property = property;
             _rootObject = rootObject;
-            _resolver = resolver;
+            _resolver = typeResolver;
             _parentTypeName = parentTypeName;
             _settings = settings;
         }
@@ -50,11 +56,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
-            _resolver.ResolveConstructorInterfaceName(_property.ActualTypeSchema, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
+            _resolver.ResolveConstructorInterfaceName(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) :
             Type;
 
         /// <summary>Gets a value indicating whether constructor conversion is supported.</summary>
@@ -63,7 +69,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (Type == ConstructorInterfaceType)
+                {
                     return false;
+                }
 
                 if (IsArray)
                 {
@@ -83,10 +91,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets a value indicating whether the property type is an array.</summary>
-        public bool IsArray => _property.ActualTypeSchema.IsArray;
+        public bool IsArray => _resolver.GetResolvableSchema(_property).IsArray;
 
         /// <summary>Gets a value indicating whether the property type is a dictionary.</summary>
-        public bool IsDictionary => _property.ActualTypeSchema.IsDictionary;
+        public bool IsDictionary => _resolver.GetResolvableSchema(_property).IsDictionary;
 
         /// <summary>Gets the type of the array item.</summary>
         public string ArrayItemType => _resolver.TryResolve(_property.ActualTypeSchema?.Item, PropertyName) ?? "any";
@@ -100,9 +108,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (IsNullable && _settings.SupportsStrictNullChecks)
+                {
                     return " | " + _settings.NullValue.ToString().ToLowerInvariant();
+                }
                 else
+                {
                     return string.Empty;
+                }
             }
         }
 
@@ -111,9 +123,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the property is optional.</summary>
         public bool IsOptional => !_property.IsRequired && _settings.MarkOptionalProperties;
-
-        /// <summary>Gets a value indicating whether the property is nullable.</summary>
-        public bool IsNullable => _property.IsNullable(_settings.SchemaType);
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         public bool IsDiscriminator => _property.IsInheritanceDiscriminator;
@@ -130,8 +139,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
-                        Value = "data[\"" + _property.Name + "\"]",
-                        Schema = _property.ActualTypeSchema,
+                        Value = "_data[\"" + _property.Name + "\"]",
+                        Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,
@@ -156,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = "data[\"" + _property.Name + "\"]",
                         Value = typeStyle == TypeScriptTypeStyle.Class ? "this." + PropertyName : PropertyName + "_",
-                        Schema = _property.ActualTypeSchema,
+                        Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,
                         Resolver = _resolver,

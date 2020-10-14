@@ -17,15 +17,15 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_exception_schema_is_generated_then_special_properties_are_generated_and_JsonProperty_attribute_used()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<MyException>();
+            var schema = JsonSchema.FromType<MyException>();
             var json = schema.ToJson();
 
             //// Act
             var exceptionSchema = schema.GetInheritedSchema(schema).ActualSchema;
 
             //// Assert
-            Assert.True(schema.Properties.ContainsKey("foo"));
-            Assert.True(exceptionSchema.Properties.ContainsKey("InnerException"));
+            Assert.True(schema.ActualProperties.ContainsKey("foo"));
+            Assert.True(exceptionSchema.ActualProperties.ContainsKey("InnerException"));
         }
     }
 }

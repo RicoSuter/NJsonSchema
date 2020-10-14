@@ -2,7 +2,7 @@
 // <copyright file="ValidationErrorKind.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -138,6 +138,9 @@ namespace NJsonSchema.Validation
         TooFewProperties,
 
         /// <summary>A Base64 string is expected. </summary>
-        Base64Expected
+        Base64Expected,
+
+        /// <summary>No type of the types does validate (check error details in <see cref="MultiTypeValidationError"/>). </summary>
+        NoTypeValidates
     }
 }

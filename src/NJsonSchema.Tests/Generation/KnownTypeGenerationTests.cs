@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -69,17 +69,13 @@ namespace NJsonSchema.Tests.Generation
             Assert.Contains(schema.Definitions, s => s.Key == "SpecialTeacher");
         }
 
-        public async Task ReproAsync()
-        {
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
-        }
         [Fact]
         public async Task When_KnownType_attribute_includes_method_name_then_specified_classes_are_also_generated()
         {
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert

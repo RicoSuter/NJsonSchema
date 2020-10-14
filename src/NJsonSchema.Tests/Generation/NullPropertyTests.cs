@@ -19,7 +19,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_nullable_then_property_schema_type_is_also_null()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<ClassRoom>();
+            var schema = JsonSchema.FromType<ClassRoom>();
             
             //// Act
             var json = schema.ToJson();
@@ -46,7 +46,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_NotNullAttribute_is_available_then_property_is_not_nullable()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<NotNullAttributeClass>();
+            var schema = JsonSchema.FromType<NotNullAttributeClass>();
 
             //// Act
             var json = schema.ToJson();

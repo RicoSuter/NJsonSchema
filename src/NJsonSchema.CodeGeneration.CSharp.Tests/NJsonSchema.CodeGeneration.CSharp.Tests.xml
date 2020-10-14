@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NJsonSchema.CodeGeneration.CSharp.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:NJsonSchema.CodeGeneration.Tests.CSharp.InheritanceTests.EmptyClassInheritingDictionary">
+            <summary>
+            Foobar.
+            </summary>
+        </member>
+        <member name="T:NJsonSchema.CodeGeneration.Tests.CSharp.InheritanceTests.MyException">
+            <summary>
+            Foobar.
+            </summary>
+        </member>
+    </members>
+</doc>

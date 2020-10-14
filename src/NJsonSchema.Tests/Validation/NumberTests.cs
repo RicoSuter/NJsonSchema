@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Validation
                 'UpperLimit': 1.1111111111111111E+101
             }";
 
-            var validationSchema = JsonSchema4.FromJsonAsync(json).Result;
+            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
 
             /// Act
             var errors = validationSchema.Validate(data);
@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Validation
         // [Fact]
         public async Task When_integer_is_big_integer_then_validation_works()
         {
-            // See https://github.com/RSuter/NJsonSchema/issues/568
+            // See https://github.com/RicoSuter/NJsonSchema/issues/568
 
             /// Arrange
             const string json = @"{
@@ -60,7 +60,7 @@ namespace NJsonSchema.Tests.Validation
                 ""property1"": 34545734242323232423434
             }";
 
-            var validationSchema = JsonSchema4.FromJsonAsync(json).Result;
+            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
 
             /// Act
             var errors = validationSchema.Validate(data);

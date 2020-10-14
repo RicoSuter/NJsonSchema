@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -38,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.NotNull(schema.GetInheritedSchema(schema));
@@ -70,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.NotNull(schema.GetInheritedSchema(schema));
@@ -84,12 +86,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = JsonSchema.FromType<Teacher>();
 
             //// Assert
-            Assert.NotNull(schema.Properties["Class"]);
+            Assert.NotNull(schema.ActualProperties["Class"]);
 
-            Assert.Equal(1, schema.AllOf.Count);
+            Assert.Equal(2, schema.AllOf.Count);
             Assert.Contains(schema.Definitions, d => d.Key == "Person");
             Assert.NotNull(schema.AllOf.First().ActualSchema.Properties["Name"]);
         }
@@ -110,7 +112,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<CC>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<CC>(new JsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             });
@@ -162,7 +164,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Animal>();
+            var schema = JsonSchema.FromType<Animal>();
             var data = schema.ToJson();
 
             //// Assert
@@ -200,7 +202,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ViewModelThing>(settings);
+            var schema = JsonSchema.FromType<ViewModelThing>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -209,7 +211,39 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
 
             var baseSchema = schema.Definitions[nameof(CommonThingBase)];
-            Assert.Equal("discriminator", baseSchema.Discriminator);
+            Assert.Equal("discriminator", baseSchema.ActualDiscriminator);
+        }
+
+        public class ViewModelThingWithTwoProperties
+        {
+            public ACommonThing CommonThingA { get; set; }
+
+            public CommonThingBase CommonThing { get; set; }
+        }
+
+        [Fact]
+        public async Task When_discriminator_is_externally_defined_then_it_is_generated_without_exception()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaProcessors =
+                {
+                    new DiscriminatorSchemaProcessor(typeof(CommonThingBase), "discriminator")
+                }
+            };
+
+            //// Act
+            var schema = JsonSchema.FromType<ViewModelThingWithTwoProperties>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey(nameof(CommonThingBase)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(ACommonThing)));
+            Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
+
+            var baseSchema = schema.Definitions[nameof(CommonThingBase)];
+            Assert.Equal("discriminator", baseSchema.ActualDiscriminator);
         }
 
         [Fact]
@@ -253,6 +287,128 @@ namespace NJsonSchema.Tests.Generation
 
             /// Assert
             Assert.Equal(typeof(ACommonThing), vm.CommonThing.GetType());
+        }
+
+        [KnownType(typeof(InheritedClass_WithStringDiscriminant))]
+        [JsonConverter(typeof(JsonInheritanceConverter), nameof(Kind))]
+        public class BaseClass_WithStringDiscriminant
+        {
+            public string Kind { get; set; }
+        }
+
+        public class InheritedClass_WithStringDiscriminant : BaseClass_WithStringDiscriminant
+        {
+
+        }
+
+        [Fact]
+        public async Task Existing_string_property_can_be_discriminant()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema.FromType<BaseClass_WithStringDiscriminant>();
+
+            //// Assert
+            Assert.NotNull(schema.Properties["Kind"]);
+        }
+
+        [KnownType(typeof(InheritedClass_WithIntDiscriminant))]
+        [JsonConverter(typeof(JsonInheritanceConverter), nameof(Kind))]
+        public class BaseClass_WithObjectDiscriminant
+        {
+            public object Kind { get; set; }
+        }
+
+        public class InheritedClass_WithIntDiscriminant : BaseClass_WithStringDiscriminant
+        {
+
+        }
+
+        [Fact]
+        public async Task Existing_non_string_property_cant_be_discriminant()
+        {
+            //// Arrange
+
+            //// Act
+            JsonSchema GetSchema() => JsonSchema.FromType<BaseClass_WithObjectDiscriminant>();
+            Action getSchemaAction = () => GetSchema();
+
+            //// Assert
+            Assert.Throws<InvalidOperationException>(getSchemaAction);
+        }
+
+        public class Foo
+        {
+            public Bar Bar { get; set; }
+        }
+
+        public class Bar : Dictionary<string, string>
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_inherits_from_dictionary_then_allOf_contains_base_dictionary_schema_and_actual_schema()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3
+            };
+
+            //// Act
+            var schema = JsonSchema.FromType<Foo>(settings);
+            var json = schema.ToJson();
+
+            //// Assert
+            var bar = schema.Definitions["Bar"];
+
+            Assert.Equal(2, bar.AllOf.Count);
+
+            Assert.Equal(bar.AllOf.Last(), bar.ActualTypeSchema);
+            Assert.Equal(bar.AllOf.First(), bar.InheritedSchema);
+
+            Assert.True(bar.AllOf.First().IsDictionary); // base class (dictionary)
+            Assert.True(bar.AllOf.Last().ActualProperties.Any()); // actual class
+        }
+
+        [KnownType(typeof(MyException))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "kind")]
+        public class ExceptionBase : Exception
+        {
+            public string Foo { get; set; }
+        }
+
+        public class MyException : ExceptionBase
+        {
+            public string Bar { get; set; }
+        }
+
+        public class ExceptionContainer
+        {
+            public ExceptionBase Exception { get; set; }
+        }
+
+        [Fact]
+        public async Task When_class_with_discriminator_has_base_class_then_mapping_is_placed_in_type_schema_and_not_root()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3
+            };
+
+            //// Act
+            var schema = JsonSchema.FromType<ExceptionContainer>(settings);
+            var json = schema.ToJson();
+
+            //// Assert
+            var exceptionBase = schema.Definitions["ExceptionBase"];
+
+            Assert.Null(exceptionBase.DiscriminatorObject);
+            Assert.NotNull(exceptionBase.ActualTypeSchema.DiscriminatorObject);
+            Assert.True(exceptionBase.ActualTypeSchema.DiscriminatorObject.Mapping.ContainsKey("MyException"));
         }
     }
 }

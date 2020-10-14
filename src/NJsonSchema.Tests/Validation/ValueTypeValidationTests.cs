@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_required_and_string_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
 
             var token = new JValue("test");
@@ -27,7 +27,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_required_but_integer_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
 
             var token = new JValue(10);
@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_number_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
 
             var token = new JValue(10);
@@ -60,7 +60,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_number_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
 
             var token = new JValue("foo");
@@ -77,7 +77,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_integer_required_and_integer_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
 
             var token = new JValue(10);
@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_integer_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
 
             var token = new JValue("foo");
@@ -110,7 +110,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_boolean_required_and_boolean_provided_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Boolean;
 
             var token = new JValue(true);
@@ -126,7 +126,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_boolean_required_but_string_provided_then_validation_fails()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Boolean;
 
             var token = new JValue("foo");
@@ -143,7 +143,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_pattern_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Pattern = "aa(.*)aa";
 
@@ -161,7 +161,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_min_length_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.MinLength = 2;
 
@@ -179,7 +179,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_string_max_length_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.MaxLength = 2;
 
@@ -197,7 +197,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_integer_minimum_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
             schema.Minimum = 2;
 
@@ -215,7 +215,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_integer_maximum_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
             schema.Maximum = 2;
 
@@ -233,7 +233,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_number_minimum_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
             schema.Minimum = 1.5m;
 
@@ -251,7 +251,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_number_maximum_does_not_match_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
             schema.Maximum = 1.5m;
 
@@ -269,7 +269,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_value_not_in_enumeration_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Enumeration.Add("Red");
             schema.Enumeration.Add("Green");
@@ -289,7 +289,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_value_in_enumeration_then_it_should_succeed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Enumeration.Add("Red");
             schema.Enumeration.Add("Green");
@@ -308,7 +308,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_value_is_wrong_type_in_enumeration_then_it_should_fail()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Enumeration.Add("1");
             schema.Enumeration.Add("2");

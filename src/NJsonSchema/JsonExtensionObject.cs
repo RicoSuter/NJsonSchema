@@ -2,7 +2,7 @@
 // <copyright file="JsonExtensionObject.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -32,10 +32,18 @@ namespace NJsonSchema
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType);
-            serializer.Populate(reader, obj);
-            DeserializeExtensionDataSchemas(obj, serializer);
-            return obj;
+            if (reader.TokenType != JsonToken.Null)
+            {
+                var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType);
+                serializer.Populate(reader, obj);
+                DeserializeExtensionDataSchemas(obj, serializer);
+                return obj;
+            }
+            else
+            {
+                reader.Skip();
+                return null;
+            }
         }
 
         public override bool CanConvert(Type objectType)
@@ -56,7 +64,9 @@ namespace NJsonSchema
             if (extensionObject.ExtensionData != null)
             {
                 foreach (var pair in extensionObject.ExtensionData.ToArray())
+                {
                     extensionObject.ExtensionData[pair.Key] = TryDeserializeValueSchemas(pair.Value, serializer);
+                }
             }
         }
 
@@ -69,7 +79,7 @@ namespace NJsonSchema
                 {
                     try
                     {
-                        return obj.ToObject<JsonSchema4>(serializer);
+                        return obj.ToObject<JsonSchema>(serializer);
                     }
                     catch
                     {
@@ -79,16 +89,22 @@ namespace NJsonSchema
 
                 var dictionary = new Dictionary<string, object>();
                 foreach (var property in obj.Properties())
+                {
                     dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);
+                }
 
                 return dictionary;
             }
 
             if (value is JArray array)
+            {
                 return array.Select(i => TryDeserializeValueSchemas(i, serializer)).ToArray();
+            }
 
             if (value is JValue token)
+            {
                 return token.Value;
+            }
 
             return value;
         }

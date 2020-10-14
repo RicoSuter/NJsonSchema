@@ -2,7 +2,7 @@
 // <copyright file="PrimitiveTypeMapper.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -14,12 +14,12 @@ namespace NJsonSchema.Generation.TypeMappers
     /// <summary>Maps .NET type to a generated JSON Schema describing a primitive value.</summary>
     public class PrimitiveTypeMapper : ITypeMapper
     {
-        private readonly Action<JsonSchema4> _transformer;
+        private readonly Action<JsonSchema> _transformer;
 
         /// <summary>Initializes a new instance of the <see cref="PrimitiveTypeMapper"/> class.</summary>
         /// <param name="mappedType">Type of the mapped.</param>
         /// <param name="transformer">The transformer.</param>
-        public PrimitiveTypeMapper(Type mappedType, Action<JsonSchema4> transformer)
+        public PrimitiveTypeMapper(Type mappedType, Action<JsonSchema> transformer)
         {
             _transformer = transformer;
             MappedType = mappedType;
@@ -34,9 +34,7 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
-#pragma warning disable 1998
-        public async Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context)
-#pragma warning restore 1998
+        public void GenerateSchema(JsonSchema schema, TypeMapperContext context)
         {
             _transformer(schema);
         }

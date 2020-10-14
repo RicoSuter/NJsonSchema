@@ -8,6 +8,7 @@ src/packages/Newtonsoft.Json**
 
 **.sln.ide/**
 **.vs/**
+.vscode/
 
 /src/NJsonSchema.sln.GhostDoc.xml
 
@@ -18,3 +19,4 @@ src/packages/Newtonsoft.Json**
 /src/NJsonSchema.CodeGeneration.Tests2
 *.vspx
 /src/TestResults
+/src/.cr/*

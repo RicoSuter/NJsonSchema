@@ -2,7 +2,7 @@
 // <copyright file="DefaultReflectionService.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -14,8 +14,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
-using NJsonSchema.Infrastructure;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
+using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
 {
@@ -23,253 +24,369 @@ namespace NJsonSchema.Generation
     public class DefaultReflectionService : IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="type">The type. </param>
-        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="contextualType">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
         {
-            if (type.GetTypeInfo().IsEnum)
+            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, settings);
+        }
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        public virtual JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        {
+            var type = contextualType.OriginalType;
+            var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
+
+            var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
+            if (jsonSchemaTypeAttribute != null)
             {
-                var isStringEnum = IsStringEnum(type, parentAttributes, settings.DefaultEnumHandling);
-                return JsonTypeDescription.CreateForEnumeration(type,
-                    isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
+                type = jsonSchemaTypeAttribute.Type;
+                contextualType = type.ToContextualType();
+
+                if (jsonSchemaTypeAttribute.IsNullableRaw.HasValue)
+                {
+                    isNullable = jsonSchemaTypeAttribute.IsNullableRaw.Value;
+                }
             }
 
-            if (type == typeof(short) || 
-                type == typeof(uint) || 
-                type == typeof(ushort))
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, null);
-
-            if (type == typeof(int))
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
-
-            if (type == typeof(long) || 
-                type == typeof(ulong))
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Long);
-
-            if (type == typeof(double) ||
-                type == typeof(float))
-                return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Double);
-
-            if (type == typeof(decimal))
-                return JsonTypeDescription.Create(type, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
-
-            if (type == typeof(bool))
-                return JsonTypeDescription.Create(type, JsonObjectType.Boolean, false, null);
-
-            var isNullable = IsNullable(type, parentAttributes, settings);
-            if (type == typeof(string) || type == typeof(Type))
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
-
-            if (type == typeof(char))
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, null);
-
-            if (type == typeof(Guid))
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Guid);
-
-            if (type == typeof(DateTime) || 
-                type == typeof(DateTimeOffset) || 
-                type.FullName == "NodaTime.OffsetDateTime" ||
-                type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime")
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.DateTime);
-
-            if (type == typeof(TimeSpan) || 
-                type.FullName == "NodaTime.Duration")
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
-
-            if (type.FullName == "NodaTime.LocalDate")
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Date);
-
-            if (type.FullName == "NodaTime.LocalTime")
-                return JsonTypeDescription.Create(type, JsonObjectType.String, false, JsonFormatStrings.Time);
-
-            if (type == typeof(Uri))
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
-
-            if (type == typeof(byte))
-                return JsonTypeDescription.Create(type, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
-
-            if (type == typeof(byte[]))
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
-
-            if (type == typeof(JObject) || 
-                type == typeof(JToken) ||
-                type.FullName == "System.Dynamic.ExpandoObject" ||
-                type == typeof(object))
-                return JsonTypeDescription.Create(type, JsonObjectType.None, isNullable, null);
-
-            if (IsFileType(type, parentAttributes))
-                return JsonTypeDescription.Create(type, JsonObjectType.File, isNullable, null);
-
-            var contract = settings.ResolveContract(type);
-            if (IsDictionaryType(type, parentAttributes) && contract is JsonDictionaryContract)
-                return JsonTypeDescription.CreateForDictionary(type, JsonObjectType.Object, isNullable);
-
-            if (IsArrayType(type, parentAttributes) && contract is JsonArrayContract)
-                return JsonTypeDescription.Create(type, JsonObjectType.Array, isNullable, null);
-
-            if (type.Name == "Nullable`1")
-            {
-#if !LEGACY
-                var typeDescription = GetDescription(type.GenericTypeArguments[0], parentAttributes, settings);
-#else
-                var typeDescription = GetDescription(type.GetGenericArguments()[0], parentAttributes, settings);
-#endif
-                typeDescription.IsNullable = true;
-                return typeDescription;
-            }
-
-            var jsonSchemaAttribute = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>() ??
-                                      parentAttributes?.OfType<JsonSchemaAttribute>().SingleOrDefault();
+            var jsonSchemaAttribute = contextualType.GetAttribute<JsonSchemaAttribute>();
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
-                return JsonTypeDescription.Create(type, classType, isNullable, format);
+                return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
+            }
+
+            if (type.GetTypeInfo().IsEnum)
+            {
+                var isStringEnum = IsStringEnum(contextualType, settings.ActualSerializerSettings);
+                return JsonTypeDescription.CreateForEnumeration(contextualType,
+                    isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
+            }
+
+            // Primitive types
+
+            if (type == typeof(short) ||
+                type == typeof(uint) ||
+                type == typeof(ushort))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, null);
+            }
+
+            if (type == typeof(int))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
+            }
+
+            if (type == typeof(long) ||
+                type == typeof(ulong))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
+            }
+
+            if (type == typeof(double))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
+            }
+
+            if (type == typeof(float))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Float);
+            }
+
+            if (type == typeof(decimal))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
+            }
+
+            if (type == typeof(bool))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Boolean, false, null);
+            }
+
+            if (type == typeof(string) || type == typeof(Type))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
+            }
+
+            if (type == typeof(char))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, null);
+            }
+
+            if (type == typeof(Guid))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Guid);
+            }
+
+            // Date & time types
+
+            if (type == typeof(DateTime) ||
+                type == typeof(DateTimeOffset) ||
+                type.FullName == "NodaTime.OffsetDateTime" ||
+                type.FullName == "NodaTime.LocalDateTime" ||
+                type.FullName == "NodaTime.ZonedDateTime" ||
+                type.FullName == "NodaTime.Instant")
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.DateTime);
+            }
+
+            if (type == typeof(TimeSpan) ||
+                type.FullName == "NodaTime.Duration")
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
+            }
+
+            if (type.FullName == "NodaTime.LocalDate")
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
+            }
+
+            if (type.FullName == "NodaTime.LocalTime")
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
+            }
+
+            // Special types
+
+            if (type == typeof(Uri))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
+            }
+
+            if (type == typeof(byte))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
+            }
+
+            if (type == typeof(byte[]))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
+            }
+
+            if (type.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
+            }
+
+            if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
+                type.FullName == "System.Dynamic.ExpandoObject" ||
+                type == typeof(object))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.None, isNullable, null);
+            }
+
+            if (IsBinary(contextualType))
+            {
+                if (settings.SchemaType == SchemaType.Swagger2)
+                {
+                    return JsonTypeDescription.Create(contextualType, JsonObjectType.File, isNullable, null);
+                }
+                else
+                {
+                    return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Binary);
+                }
+            }
+
+            if (contextualType.IsNullableType)
+            {
+                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
+                typeDescription.IsNullable = true;
+                return typeDescription;
+            }
+
+            var contract = settings.ResolveContract(type);
+            if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
+            {
+                return JsonTypeDescription.CreateForDictionary(contextualType, JsonObjectType.Object, isNullable);
+            }
+
+            // TODO: Don't trust JsonArrayContract when contextualType is IAsyncEnumerable<T> until it is fixed
+            if (IsIAsyncEnumerableType(contextualType) || (IsArrayType(contextualType) && contract is JsonArrayContract))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
             if (contract is JsonStringContract)
-                return JsonTypeDescription.Create(type, JsonObjectType.String, isNullable, null);
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
+            }
 
-            return JsonTypeDescription.Create(type, JsonObjectType.Object, isNullable, null);
+            return JsonTypeDescription.Create(contextualType, JsonObjectType.Object, isNullable, null);
         }
 
         /// <summary>Checks whether a type is nullable.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
-        /// <param name="settings">The settings</param>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        public virtual bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings)
+        public virtual bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            var jsonPropertyAttribute = parentAttributes?.OfType<JsonPropertyAttribute>().SingleOrDefault();
+            var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
+            {
                 return false;
+            }
 
-            if (parentAttributes.TryGetIfAssignableTo("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
+            {
                 return false;
+            }
 
-            if (parentAttributes.TryGetIfAssignableTo("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            {
                 return true;
+            }
 
-            if (type.Name == "Nullable`1")
-                return true;
+            if (contextualType.Nullability != Nullability.Unknown)
+            {
+                return contextualType.Nullability == Nullability.Nullable;
+            }
 
-            var isValueType = type != typeof(string) && type.GetTypeInfo().IsValueType;
-            return isValueType == false && settings.DefaultReferenceTypeNullHandling == ReferenceTypeNullHandling.Null;
+            var isValueType = contextualType.Type != typeof(string) &&
+                              contextualType.TypeInfo.IsValueType;
+
+            return isValueType == false &&
+                   defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
         }
 
-        /// <summary>Checks whether the given type is a file type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <summary>Checks whether the give type is a string enum.</summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="serializerSettings">The serializer settings.</param>
+        /// <returns>The result.</returns>
+        public virtual bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
+        {
+            if (!contextualType.TypeInfo.IsEnum)
+            {
+                return false;
+            }
+
+            var hasGlobalStringEnumConverter = serializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            return hasGlobalStringEnumConverter || HasStringEnumConverter(contextualType);
+        }
+
+        /// <summary>Checks whether the given type is a file/binary type.</summary>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsFileType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsBinary(ContextualType contextualType)
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = type.Name;
+            var parameterTypeName = contextualType.TypeName;
             return parameterTypeName == "IFormFile" ||
-                   type.IsAssignableTo("HttpPostedFile", TypeNameStyle.Name) ||
-                   type.IsAssignableTo("HttpPostedFileBase", TypeNameStyle.Name) ||
+                   contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
+                   contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
 #if !LEGACY
-                   type.GetTypeInfo().ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+                   contextualType.TypeInfo.ImplementedInterfaces.Any(i => i.Name == "IFormFile");
 #else
-                   type.GetTypeInfo().GetInterfaces().Any(i => i.Name == "IFormFile");
+                   contextualType.TypeInfo.GetInterfaces().Any(i => i.Name == "IFormFile");
 #endif
+        }
+
+        /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
+        /// <remarks>
+        /// See this issue: https://github.com/RicoSuter/NSwag/issues/2582#issuecomment-576165669
+        /// </remarks>
+        /// <param name="contextualType">The type.</param>
+        /// <returns>true or false.</returns>
+        private bool IsIAsyncEnumerableType(ContextualType contextualType)
+        {
+            return contextualType.TypeName == "IAsyncEnumerable`1";
         }
 
 #if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsArrayType(ContextualType contextualType)
         {
-            if (IsDictionaryType(type, parentAttributes))
+            if (IsDictionaryType(contextualType))
+            {
                 return false;
+            }
 
-            // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1")
+            if (contextualType.TypeName == "ObservableCollection`1")
+            {
                 return true;
+            }
 
-            return type.IsArray || (type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
-                (type.GetTypeInfo().BaseType == null ||
-                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
+            return contextualType.Type.IsArray ||
+                (contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IEnumerable)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
+            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
+            {
                 return true;
+            }
 
-            return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)) &&
-                (type.GetTypeInfo().BaseType == null ||
-                !type.GetTypeInfo().BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
+            return contextualType.TypeInfo.ImplementedInterfaces.Contains(typeof(IDictionary)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
 #else
 
         /// <summary>Checks whether the given type is an array type.</summary>
         /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsArrayType(ContextualType contextualType)
         {
-            if (IsDictionaryType(type, parentAttributes))
+            if (IsDictionaryType(contextualType))
+            {
                 return false;
+            }
 
             // TODO: Improve these checks
-            if (type.Name == "ObservableCollection`1")
+            if (contextualType.TypeName == "ObservableCollection`1")
+            {
                 return true;
+            }
 
-            return type.IsArray || (type.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable)) &&
-                                    (type.GetTypeInfo().BaseType == null ||
-                                     !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
+            return contextualType.Type.IsArray || 
+                (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
         }
 
         /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(Type type, IEnumerable<Attribute> parentAttributes)
+        protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (type.Name == "IDictionary`2" || type.Name == "IReadOnlyDictionary`2")
+            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
+            {
                 return true;
+            }
 
-            return type.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)) &&
-                   (type.GetTypeInfo().BaseType == null ||
-                    !type.GetTypeInfo().BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
+            return contextualType.Type.GetInterfaces().Contains(typeof(IDictionary)) &&
+                (contextualType.TypeInfo.BaseType == null ||
+                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
         }
 
 #endif
 
-        private bool IsStringEnum(Type type, IEnumerable<Attribute> propertyAttributes, EnumHandling defaultEnumHandling)
+        private bool HasStringEnumConverter(ContextualType contextualType)
         {
-            if (defaultEnumHandling == EnumHandling.String)
-                return true;
-
-            return HasStringEnumConverter(type.GetTypeInfo().GetCustomAttributes()) ||
-                (propertyAttributes != null && HasStringEnumConverter(propertyAttributes));
-        }
-
-        private bool HasStringEnumConverter(IEnumerable<Attribute> attributes)
-        {
-            if (attributes == null)
-                return false;
-
-            dynamic jsonConverterAttribute = attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
-            if (jsonConverterAttribute != null)
+            dynamic jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.Name == "StringEnumConverter")
-                    return true;
+                return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||
+                       converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName);
             }
+
             return false;
         }
     }

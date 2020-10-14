@@ -2,7 +2,7 @@
 // <copyright file="JsonFormatStrings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -60,6 +60,9 @@ namespace NJsonSchema
 
         /// <summary>Format for a byte if used with numeric type or for base64 encoded value otherwise.</summary>
         public const string Byte = "byte";
+        
+        /// <summary>Format for a binary value.</summary>
+        public const string Binary = "binary";
 
         /// <summary>Format for a hostname (DNS name).</summary>
         public const string Hostname = "hostname";

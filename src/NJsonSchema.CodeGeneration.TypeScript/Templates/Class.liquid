@@ -1,7 +1,7 @@
-﻿{% if HasDescription -%}
+{% if HasDescription -%}
 /** {{ Description }} */
 {% endif -%}
-export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
+{% if ExportTypes %}export {% endif %}{% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
@@ -17,16 +17,19 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
     protected _discriminator: string;
 {% endif -%}
 
-{% if GenerateConstructorInterface or Model.HasBaseDiscriminator -%}
+{% if GenerateConstructorInterface or HasBaseDiscriminator -%}
     constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
-{%     elseif GenerateConstructorInterface -%}
+{%     endif -%}
+{%     if GenerateConstructorInterface and (HasInheritance == false or ConvertConstructorInterfaceData) -%}
         if (data) {
+{%         if HasInheritance == false -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
+{%         endif -%}
 {%         if ConvertConstructorInterfaceData -%}
 {%             for property in Properties -%}
 {%                 if property.SupportsConstructorConversion -%}
@@ -57,7 +60,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
         }
 {%     endif -%}
 {%     if HasDefaultValues -%}
-        if (!data) {
+        {% if GenerateConstructorInterface %}if (!data) {% endif %}{
 {%         for property in Properties -%}
 {%             if property.HasDefaultValue -%}
             this.{{ property.PropertyName }} = {{ property.DefaultValue }};
@@ -71,21 +74,23 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
     }
 {% endif -%}
 
-    init(data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+    init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
 {% if HasInheritance -%}
-        super.init(data);
+        super.init(_data);
 {% endif -%}
-        if (data) {
-{% if HasIndexerProperty -%}
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    this[property] = data[property];
+{% if HasIndexerProperty or HasProperties -%}
+        if (_data) {
+{%     if HasIndexerProperty -%}
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
             }
-{% endif -%}
-{% for property in Properties -%}
+{%     endif -%}
+{%     for property in Properties -%}
             {{ property.ConvertToClassCode | tab }}
-{% endfor -%}
+{%     endfor -%}
         }
+{% endif -%}
     }
 
     static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
@@ -168,7 +173,7 @@ export {% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritanc
 {%   if HasDescription -%}
 /** {{ Description }} */
 {%   endif -%}
-export interface I{{ ClassName }}{{ InterfaceInheritance }} {
+{% if ExportTypes %}export {% endif %}interface I{{ ClassName }}{{ InterfaceInheritance }} {
 {%   for property in Properties -%}
 {%       if property.HasDescription -%}
     /** {{ property.Description }} */

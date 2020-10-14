@@ -8,19 +8,6 @@ namespace NJsonSchema.Tests.Validation
     public class SchemaTests
     {
         [Fact]
-        public async Task When_json_schem_is_loaded_via_url_then_it_works()
-        {
-            //// Arrange
-
-            //// Act
-            var schema = await JsonSchema4.FromUrlAsync("http://json-schema.org/card");
-            var json = schema.ToJson();
-
-            //// Assert
-            Assert.NotNull(json);
-        }
-
-        [Fact]
         public async Task When_no_additional_properties_are_allowed_then_this_error_is_returned()
         {
             //// Arrange
@@ -329,7 +316,7 @@ namespace NJsonSchema.Tests.Validation
 }
 
 ";
-            var schema = await JsonSchema4.FromJsonAsync(schemaData);
+            var schema = await JsonSchema.FromJsonAsync(schemaData);
 
             //// Act
             var errors = schema.Validate(@"{""Key"": ""Value""}");
@@ -339,6 +326,135 @@ namespace NJsonSchema.Tests.Validation
             Assert.NotNull(error);
             Assert.Equal("#/Key", error.Path);
             Assert.Same(schema, error.Schema);
+        }
+
+        [Fact]
+        public async Task When_multiple_types_fail_with_errors_take_the_best_group()
+        {
+            //// Arrange
+            var schemaJson = @"{
+        ""$schema"": ""http://json-schema.org/schema#"",
+        ""type"": ""object"",
+        ""properties"": {
+         ""name"": {
+           ""type"": ""string"",
+           ""maxLength"": 40
+         },
+         ""settings"": {
+           ""type"": [ ""object"", ""null"" ],
+           ""properties"": {
+            ""security"": {
+              ""type"": [ ""object"", ""null"" ],
+              ""properties"": {
+               ""timeout"": {
+                 ""type"": [ ""integer"", ""null"" ],
+                 ""minimum"": 1,
+                 ""maximum"": 10
+               }
+              },
+              ""additionalProperties"": false
+            }
+           },
+           ""additionalProperties"": false
+         }
+        },
+        ""required"": [ ""name"" ],
+        ""additionalProperties"": false
+      }";
+
+            var json = @"{
+   ""name"":""abc"",
+   ""settings"": {
+     ""security"":{
+      ""timeout"": 0
+     }
+   }
+}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+            var errors = schema.Validate(json);
+
+            //// Assert
+            Assert.Equal(1, errors.Count);
+            Assert.Contains(errors, e => e.Kind == ValidationErrorKind.NoTypeValidates);
+        }
+
+        [Fact]
+        public async Task When_datetime_with_regex_validation_then_datetime_is_not_altered()
+        {
+            //// Arrange
+            var schemaJson = @"
+            {
+              ""$schema"": ""http://json-schema.org/draft-07/schema#"",
+              ""type"": ""object"",
+              ""required"": [
+                ""my_datetime""
+              ],
+              ""properties"": {
+                ""my_datetime"": {
+                  ""type"": ""string"",
+                  ""pattern"": ""^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$""
+                }
+              }
+            }";
+
+            var json = @"
+            {
+              ""my_datetime"": ""2018-12-19T16:58:07.270Z""
+            }";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+            var errors = schema.Validate(json);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task When_property_name_is_ref_then_validation_works()
+        {
+            //// Arrange
+            var jsonSchema = @"{
+    ""$schema"": ""http://json-schema.org/draft-07/schema"",  
+    ""$ref"": ""#/definitions/reference_to_other_object"",
+    ""definitions"": {
+        ""reference_to_other_object"": {
+            ""type"": ""object"",
+            ""required"": [
+                ""$ref""
+            ],
+            ""additionalProperties"": false,
+            ""properties"": {
+                ""$ref"": {
+                    ""type"": ""string"",
+                    ""allOf"": [
+                        {
+                            ""format"": ""uri-reference""
+                        },
+                        {
+                            ""pattern"": ""^.*#/datatypes/.*$""
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}";
+
+            //// Act
+            var jsonContent = @"{
+  ""$ref"": ""#/datatypes/MyCustomDataType""
+}";
+
+            //// Arrange
+            var validator = new JsonSchemaValidator();
+            var schema = await JsonSchema.FromJsonAsync(jsonSchema);
+            var result = validator.Validate(jsonContent, schema);
+
+            //// Assert
+            Assert.Empty(result);
         }
     }
 }

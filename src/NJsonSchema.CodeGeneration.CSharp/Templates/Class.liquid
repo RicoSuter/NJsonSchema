@@ -4,19 +4,30 @@
 {% if HasDiscriminator -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {% for derivedClass in DerivedClasses -%}
+{% if derivedClass.IsAbstract != true -%}
 [JsonInheritanceAttribute("{{ derivedClass.Discriminator }}", typeof({{ derivedClass.ClassName }}))]
+{% endif -%}
 {% endfor -%}
 {% endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {% if InheritsExceptionSchema -%}
 [Newtonsoft.Json.JsonObjectAttribute]
 {% endif -%}
+{% if IsDeprecated -%}
+[System.Obsolete{% if HasDeprecatedMessage %}({{ DeprecatedMessage | literal }}){% endif %}]
+{% endif -%}
 {% template Class.Annotations %}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
+{% if IsTuple -%}
+    public {{ClassName}}({% for tupleType in TupleTypes -%}{{ tupleType }} item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%}) : base({% for tupleType in TupleTypes -%}item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%})
+    {
+    }
+
+{% endif -%}
 {% if RenderInpc or RenderPrism -%}
 {% for property in Properties -%}
-    private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% endif -%};
+    private {{ property.Type }} {{ property.FieldName }}{% if property.HasDefaultValue %} = {{ property.DefaultValue }}{% elsif GenerateNullableReferenceTypes -%} = default!{% endif -%};
 {% endfor -%}
 
 {% endif -%}
@@ -39,6 +50,12 @@
 {%   if property.RenderStringLengthAttribute -%}
     [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
 {%   endif -%}
+{%   if property.RenderMinLengthAttribute -%}
+    [System.ComponentModel.DataAnnotations.MinLength({{ property.MinLengthAttribute }})]
+{%   endif -%}
+{%   if property.RenderMaxLengthAttribute -%}
+    [System.ComponentModel.DataAnnotations.MaxLength({{ property.MaxLengthAttribute }})]
+{%   endif -%}
 {%   if property.RenderRegularExpressionAttribute -%}
     [System.ComponentModel.DataAnnotations.RegularExpression(@"{{ property.RegularExpressionValue }}")]
 {%   endif -%}
@@ -48,8 +65,11 @@
 {%   if property.IsDate and UseDateFormatConverter -%}
     [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
 {%   endif -%}
+{%   if property.IsDeprecated -%}
+    [System.Obsolete{% if property.HasDeprecatedMessage %}({{ property.DeprecatedMessage | literal }}){% endif %}]
+{%   endif -%}
     {% template Class.Property.Annotations %}
-    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% endif %}}{% if property.HasDefaultValue %} = {{ property.DefaultValue }};{% endif %}
+    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false -%} = default!;{% endif %}
 {% else %}
     {
         get { return {{ property.FieldName }}; }
@@ -80,10 +100,11 @@
         get { return _additionalProperties; }
         {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
     }
+
 {% endif -%}
 {% if GenerateJsonMethods -%}
     {% template Class.ToJson %}
-    
+
     {% template Class.FromJson %}
 {% endif -%}
 {% if RenderInpc -%}

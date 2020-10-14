@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
@@ -98,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var schemaJson = schema.ToJson();
             var errors = schema.Validate(json);
 
@@ -204,11 +206,11 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
 
             //// Act
             var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
-            var discriminator = baseSchema.Discriminator;
+            var discriminator = baseSchema.ActualDiscriminator;
             var property = baseSchema.Properties["discriminator"];
 
             var json = schema.ToJson();
@@ -223,24 +225,24 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_mappings_are_generated()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
             var baseSchema = schema.Definitions["SubClass"].ActualSchema;
 
             //// Assert
-            Assert.Equal(3, baseSchema.DiscriminatorObject.Mapping.Count);
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass1"));
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass2"));
-            Assert.True(baseSchema.DiscriminatorObject.Mapping.ContainsKey("SubClass3"));
+            Assert.Equal(3, baseSchema.ActualDiscriminatorObject.Mapping.Count);
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass1"));
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass2"));
+            Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass3"));
         }
 
         [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
@@ -256,7 +258,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
@@ -285,7 +287,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task Subtypes_are_serialized_with_correct_discriminator()
         {
             //// Arrange
-            var json = await JsonSchema4.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
+            var json = await JsonSchema.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
             var data = json.ToJson();
 
             var generator = new CSharpGenerator(json, new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
@@ -308,20 +310,33 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         private Assembly Compile(string code)
         {
-#if NETCOREAPP2_0
-            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);
 
-            Microsoft.CodeAnalysis.CSharp.CSharpCompilation compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create("assemblyName")
-             .WithOptions(new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary))
-             .AddReferences(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
-                            Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"))
-             .AddSyntaxTrees(Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(code));
+            CSharpCompilation compilation = CSharpCompilation.Create("assemblyName")
+             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+             .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+
+#if NET452
+            compilation = compilation.AddReferences(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Linq.Expressions.Expression).Assembly.Location));
+#endif
+
+#if NETCOREAPP2_0            
+            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);            
+            compilation = compilation.AddReferences(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
+                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"));
+#endif
 
             using (var stream = new MemoryStream())
             {
@@ -330,26 +345,12 @@ namespace NJsonSchema.CodeGeneration.Tests
                 if (!result.Success)
                 {
                     throw new Exception(String.Join(", ", result.Diagnostics
-                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
+                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
                         .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
                 }
 
                 return Assembly.Load(stream.GetBuffer());
             }
-#endif
-
-#if NET451
-            var provider = new Microsoft.CSharp.CSharpCodeProvider();
-            var parameters = new CompilerParameters()
-            {
-                GenerateInMemory = true,
-                GenerateExecutable = false
-            };
-            var compilationResult = provider.CompileAssemblyFromSource(parameters, code);
-            Assert.False(compilationResult.Errors.HasErrors, String.Join(", ", compilationResult.Errors));
-
-            return compilationResult.CompiledAssembly;
-#endif
         }
     }
 }

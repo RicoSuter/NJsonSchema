@@ -2,7 +2,7 @@
 // <copyright file="IJsonReferenceBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace NJsonSchema.References
     public interface IJsonReferenceBase : IDocumentPathProvider
     {
         /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty(JsonPathUtilities.ReferenceReplaceString, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("$ref", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         string ReferencePath { get; set; }
 
         /// <summary>Gets or sets the referenced object.</summary>

@@ -2,7 +2,7 @@
 // <copyright file="CSharpTypeResolver.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -15,6 +15,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptTypeResolver : TypeResolverBase
     {
         private readonly object _rootObject;
+
+        private const string UnionPipe = " | ";
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptTypeResolver" /> class.</summary>
         /// <param name="rootObject">The root object.</param>
@@ -38,7 +40,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public string ResolveConstructorInterfaceName(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public string ResolveConstructorInterfaceName(JsonSchema schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, true);
         }
@@ -49,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null" />.</exception>
-        public override string Resolve(JsonSchema4 schema, bool isNullable, string typeNameHint)
+        public override string Resolve(JsonSchema schema, bool isNullable, string typeNameHint)
         {
             return Resolve(schema, typeNameHint, false);
         }
@@ -63,122 +65,282 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return schema?.ActualSchema.GetBaseDiscriminator(rootObject) == null;
         }
 
-        private string Resolve(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
+        /// <summary>Checks whether the given schema should generate a type.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <returns>True if the schema should generate a type.</returns>
+        protected override bool IsDefinitionTypeSchema(JsonSchema schema)
+        {
+            if (schema.IsDictionary && !Settings.InlineNamedDictionaries)
+            {
+                return true;
+            }
+
+            return base.IsDefinitionTypeSchema(schema);
+        }
+
+        private string Resolve(JsonSchema schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema == null)
-                throw new ArgumentNullException(nameof(schema));
-
-            schema = schema.ActualSchema;
-
-            if (schema.IsAnyType)
-                return "any";
-
-            var type = schema.Type;
-            if (type == JsonObjectType.None && schema.IsEnumeration)
             {
-                type = schema.Enumeration.All(v => v is int) ?
+                throw new ArgumentNullException(nameof(schema));
+            }
+
+            schema = GetResolvableSchema(schema);
+
+            // Primitive schemas (no new type)
+
+            if (schema.ActualTypeSchema.IsAnyType &&
+                schema.InheritedSchema == null && // not in inheritance hierarchy
+                schema.AllOf.Count == 0 &&
+                !Types.Keys.Contains(schema) &&
+                !schema.HasReference)
+            {
+                return "any";
+            }
+
+            var type = schema.ActualTypeSchema.Type;
+            if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
+            {
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Array))
-                return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
-
             if (type.HasFlag(JsonObjectType.Number))
+            {
                 return "number";
+            }
 
-            if (type.HasFlag(JsonObjectType.Integer))
-                return ResolveInteger(schema, typeNameHint);
+            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+            {
+                return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
+            }
 
             if (type.HasFlag(JsonObjectType.Boolean))
+            {
                 return "boolean";
+            }
 
-            if (type.HasFlag(JsonObjectType.String))
-                return ResolveString(schema, typeNameHint);
+            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+            {
+                return ResolveString(schema.ActualTypeSchema, typeNameHint);
+            }
 
-            if (type.HasFlag(JsonObjectType.File))
+            if (schema.IsBinary)
+            {
                 return "any";
+            }
+
+            // Type generating schemas
+
+            if (schema.ActualTypeSchema.IsEnumeration)
+            {
+                return GetOrGenerateTypeName(schema, typeNameHint);
+            }
+
+            if (schema.Type.HasFlag(JsonObjectType.Array))
+            {
+                return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
+            }
 
             if (schema.IsDictionary)
             {
                 var prefix = addInterfacePrefix &&
                     SupportsConstructorConversion(schema.AdditionalPropertiesSchema, _rootObject) &&
                     schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
-                var valueType = prefix + ResolveDictionaryValueType(schema, "any", Settings.SchemaType);
-                return $"{{ [key: string] : {valueType}; }}";
+
+                var valueType = ResolveDictionaryValueType(schema, "any");
+                if (valueType != "any")
+                {
+                    valueType = prefix + valueType;
+                }
+
+                var defaultType = "string";
+                var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
+                if (resolvedType != defaultType)
+                {
+                    var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
+                    if (keyType != defaultType && schema.DictionaryKey.ActualTypeSchema.IsEnumeration)
+                    {
+                        if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                        {
+                            return $"{{ [key in keyof typeof {keyType}]?: {valueType}; }}";
+                        }
+                        else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                        {
+                            return $"{{ [key in {keyType}]?: {valueType}; }}";
+                        }
+                        
+                        throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+                    }
+
+                    return $"{{ [key: {keyType}]: {valueType}; }}";
+                }
+
+                return $"{{ [key: {resolvedType}]: {valueType}; }}";
             }
 
-            return (addInterfacePrefix && SupportsConstructorConversion(schema, _rootObject) ? "I" : "") +
+            if (Settings.UseLeafType &&
+                schema.DiscriminatorObject == null &&
+                schema.ActualTypeSchema.DiscriminatorObject != null)
+            {
+                var types = schema.ActualTypeSchema.ActualDiscriminatorObject.Mapping
+                    .Select(m => Resolve(
+                        m.Value,
+                        typeNameHint,
+                        addInterfacePrefix
+                    ));
+
+                return string.Join(UnionPipe, types);
+            }
+
+            return (addInterfacePrefix && !schema.ActualTypeSchema.IsEnumeration && SupportsConstructorConversion(schema, _rootObject) ? "I" : "") +
                 base.GetOrGenerateTypeName(schema, typeNameHint);
         }
 
-        private string ResolveString(JsonSchema4 schema, string typeNameHint)
+        private string ResolveString(JsonSchema schema, string typeNameHint)
         {
             // TODO: Make this more generic (see DataConversionGenerator.IsDate)
             if (Settings.DateTimeType == TypeScriptDateTimeType.Date)
             {
                 if (schema.Format == JsonFormatStrings.Date)
+                {
                     return "Date";
+                }
 
                 if (schema.Format == JsonFormatStrings.DateTime)
+                {
                     return "Date";
+                }
 
                 if (schema.Format == JsonFormatStrings.Time)
+                {
                     return "string";
+                }
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
                     return "string";
+                }
             }
             else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
                      Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.DateTime)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.Time)
+                {
                     return "moment.Moment";
+                }
 
                 if (schema.Format == JsonFormatStrings.TimeSpan)
-                    return "moment.Moment";
+                {
+                    return "moment.Duration";
+                }
             }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.Luxon)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "DateTime";
+                }
 
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "DateTime";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "Duration";
+                }
+            }
+            else if (Settings.DateTimeType == TypeScriptDateTimeType.DayJS)
+            {
+                if (schema.Format == JsonFormatStrings.Date)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.DateTime)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.Time)
+                {
+                    return "dayjs.Dayjs";
+                }
+
+                if (schema.Format == JsonFormatStrings.TimeSpan)
+                {
+                    return "dayjs.Dayjs";
+                }
+            }
 
             return "string";
         }
 
-        private string ResolveInteger(JsonSchema4 schema, string typeNameHint)
+        private string ResolveInteger(JsonSchema schema, string typeNameHint)
         {
-            if (schema.IsEnumeration)
-                return GetOrGenerateTypeName(schema, typeNameHint);
-
             return "number";
         }
 
-        private string ResolveArrayOrTuple(JsonSchema4 schema, string typeNameHint, bool addInterfacePrefix)
+        private string ResolveArrayOrTuple(JsonSchema schema, string typeNameHint, bool addInterfacePrefix)
         {
             if (schema.Item != null)
             {
                 var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item, _rootObject) && isObject && !isDictionary ? "I" : "";
-                return string.Format("{0}[]", prefix + Resolve(schema.Item, true, typeNameHint)); // TODO: Make typeNameHint singular if possible
+
+                if (Settings.UseLeafType)
+                {
+                    return string.Join(UnionPipe,
+                        Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
+                            .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x))));
+                }
+                else
+                {
+                    var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
+                    return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                }
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
             {
                 var tupleTypes = schema.Items
-                    .Select(i => Resolve(i.ActualSchema, false, null))
+                    .Select(s => GetNullableItemType(s, Resolve(s, false, null)))
                     .ToArray();
 
                 return string.Format("[" + string.Join(", ", tupleTypes) + "]");
             }
 
             return "any[]";
+        }
+
+        private string GetNullableItemType(JsonSchema schema, string itemType)
+        {
+            if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
+            {
+                return string.Format("({0} | {1})", itemType, Settings.NullValue.ToString().ToLowerInvariant());
+            }
+
+            return itemType;
         }
     }
 }

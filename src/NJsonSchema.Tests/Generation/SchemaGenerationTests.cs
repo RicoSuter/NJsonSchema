@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
             
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -70,7 +70,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -87,7 +87,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_default_value_is_set_on_property_then_default_is_set_in_schema()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DefaultTests>();
+            var schema = JsonSchema.FromType<DefaultTests>();
 
             //// Act
             var property = schema.Properties["Number"];
@@ -105,7 +105,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_dictionary_value_is_null_then_string_values_are_allowed()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DictTest>();
+            var schema = JsonSchema.FromType<DictTest>();
             var schemaData = schema.ToJson();
 
             var data = @"{
@@ -125,11 +125,50 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
             //// Generate JSON
-            var schema = await JsonSchema4.FromTypeAsync<IEnumerable<Tuple<string, string>>>();
+            var schema = JsonSchema.FromType<IEnumerable<Tuple<string, string>>>();
             var json = schema.ToJson();
 
             //// Should be reached and not StackOverflowed
             Assert.True(!string.IsNullOrEmpty(json));
+        }
+
+        public class FilterDto
+        {
+            public long FieldId { get; set; }
+
+            public object Value { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_is_object_then_it_should_not_be_a_dictonary_but_any()
+        {
+            /// Act
+            var schema = JsonSchema.FromType<FilterDto>();
+            var json = schema.ToJson();
+
+            /// Assert
+            var property = schema.Properties["Value"].ActualTypeSchema;
+            Assert.True(property.IsAnyType);
+            Assert.False(property.IsDictionary);
+        }
+
+        public class ClassWithStaticProperty
+        {
+            public static string Foo { get; set; }
+
+            public string Bar { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_is_static_then_it_is_ignored()
+        {
+            /// Act
+            var schema = JsonSchema.FromType<ClassWithStaticProperty>();
+            var json = schema.ToJson();
+
+            /// Assert
+            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.True(schema.ActualProperties.ContainsKey("Bar"));
         }
 
         // Used as demo for https://github.com/swagger-api/swagger-ui/issues/1056

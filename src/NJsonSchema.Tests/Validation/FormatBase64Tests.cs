@@ -12,7 +12,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_fail_if_string_is_not_base64_formatted()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = "base64"
@@ -32,7 +32,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_fail_if_string_is_not_byte_formatted()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = JsonFormatStrings.Byte
@@ -52,7 +52,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_succeed_if_string_is_base64_formatted_with_trailing_equals()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = "base64"
@@ -72,7 +72,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_succeed_if_string_is_byte_formatted_with_trailing_equals()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = JsonFormatStrings.Byte
@@ -92,7 +92,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_succeed_if_string_is_base64_formatted_without_trailing_equals()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = "base64"
@@ -112,7 +112,7 @@ namespace NJsonSchema.Tests.Validation
         public void Validation_should_succeed_if_string_is_byte_formatted_without_trailing_equals()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
                          {
                              Type = JsonObjectType.String,
                              Format = JsonFormatStrings.Byte
@@ -132,7 +132,7 @@ namespace NJsonSchema.Tests.Validation
         public void Numeric_type_should_not_trigger_validation_if_has_byte_format()
         {
             //// Arrange
-            var numericSchema = new JsonSchema4
+            var numericSchema = new JsonSchema
                                 {
                                     Type = JsonObjectType.Integer,
                                     Format = JsonFormatStrings.Byte

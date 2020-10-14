@@ -2,13 +2,15 @@
 // <copyright file="CSharpClassGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using System;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using System.Linq;
+using NJsonSchema.CodeGeneration.Models;
+using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -16,10 +18,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptGenerator : GeneratorBase
     {
         private readonly TypeScriptTypeResolver _resolver;
+        private TypeScriptExtensionCode _extensionCode;
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
-        public TypeScriptGenerator(JsonSchema4 schema)
+        public TypeScriptGenerator(JsonSchema schema)
             : this(schema, new TypeScriptGeneratorSettings())
         {
         }
@@ -48,19 +51,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Generates all types from the resolver with extension code from the settings.</summary>
         /// <returns>The code.</returns>
-        public override CodeArtifactCollection GenerateTypes()
+        public override IEnumerable<CodeArtifact> GenerateTypes()
         {
-            return GenerateTypes(new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses));
+            _extensionCode = _extensionCode ??
+                new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+
+            return GenerateTypes(_extensionCode);
         }
 
         /// <summary>Generates all types from the resolver with the given extension code.</summary>
         /// <returns>The code.</returns>
-        public CodeArtifactCollection GenerateTypes(ExtensionCode extensionCode)
+        public IEnumerable<CodeArtifact> GenerateTypes(TypeScriptExtensionCode extensionCode)
         {
-            var collection = base.GenerateTypes();
-            var artifacts = collection.Artifacts.ToList();
-
-            foreach (var artifact in collection.Artifacts)
+            var artifacts = base.GenerateTypes();
+            foreach (var artifact in artifacts)
             {
                 if (extensionCode?.ExtensionClasses.ContainsKey(artifact.TypeName) == true)
                 {
@@ -68,40 +72,46 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                     var index = classCode.IndexOf("constructor(", StringComparison.Ordinal);
                     if (index != -1)
-                        artifact.Code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
+                    {
+                        var code = classCode.Insert(index, extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n\n    ");
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
+                    }
                     else
                     {
                         index = classCode.IndexOf("class", StringComparison.Ordinal);
                         index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
 
-                        artifact.Code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
+                        var code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
+                        yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
                     }
+                }
+                else
+                {
+                    yield return artifact;
                 }
             }
 
             if (artifacts.Any(r => r.Code.Contains("formatDate(")))
             {
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", null);
-                artifacts.Add(new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", new TemplateModelBase());
+                yield return new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
             }
 
             if (Settings.HandleReferences)
             {
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", null);
-                artifacts.Add(new CodeArtifact("jsonParse", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, template));
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", new TemplateModelBase());
+                yield return new CodeArtifact("jsonParse", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
             }
-
-            return new CodeArtifactCollection(artifacts, extensionCode);
         }
 
         /// <summary>Generates the file.</summary>
         /// <returns>The file contents.</returns>
-        protected override string GenerateFile(CodeArtifactCollection artifactCollection)
+        protected override string GenerateFile(IEnumerable<CodeArtifact> artifacts)
         {
             var model = new FileTemplateModel(Settings)
             {
-                Types = artifactCollection.Concatenate(),
-                ExtensionCode = (TypeScriptExtensionCode)artifactCollection.ExtensionCode
+                Types = artifacts.OrderByBaseDependency().Concatenate(),
+                ExtensionCode = _extensionCode
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File", model);
@@ -112,15 +122,30 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The fallback type name.</param>
         /// <returns>The code.</returns>
-        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema schema, string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.IsEnumeration)
             {
                 var model = new EnumTemplateModel(typeName, schema, Settings);
-                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "Enum", model);
-                return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, template);
+
+                string templateName;
+                if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                {
+                    templateName = nameof(TypeScriptEnumStyle.Enum);
+                }
+                else if (Settings.EnumStyle == TypeScriptEnumStyle.StringLiteral)
+                {
+                    templateName = $"{nameof(TypeScriptEnumStyle.Enum)}.{nameof(TypeScriptEnumStyle.StringLiteral)}";
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+                }
+
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);
+                return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
             else
             {
@@ -131,7 +156,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     ? CodeArtifactType.Interface
                     : CodeArtifactType.Class;
 
-                return new CodeArtifact(typeName, model.BaseClass, type, CodeArtifactLanguage.TypeScript, template);
+                return new CodeArtifact(typeName, model.BaseClass, type, CodeArtifactLanguage.TypeScript, CodeArtifactCategory.Contract, template);
             }
         }
     }

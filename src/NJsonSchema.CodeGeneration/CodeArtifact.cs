@@ -2,9 +2,11 @@
 // <copyright file="TypeGeneratorResult.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
+
+using System;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -15,8 +17,21 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="typeName">The type name.</param>
         /// <param name="type">The artifact type.</param>
         /// <param name="language">The artifact language.</param>
-        public CodeArtifact(string typeName, CodeArtifactType type, CodeArtifactLanguage language)
-            : this(typeName, null, type, language, null)
+        /// <param name="category">The category.</param>
+        /// <param name="code">The code.</param>
+        public CodeArtifact(string typeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, string code)
+            : this(typeName, null, type, language, category, code)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="CodeArtifact"/> class.</summary>
+        /// <param name="typeName">The type name.</param>
+        /// <param name="type">The artifact type.</param>
+        /// <param name="language">The artifact language.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="template">The template to render the code.</param>
+        public CodeArtifact(string typeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, ITemplate template)
+            : this(typeName, null, type, language, category, template?.Render())
         {
         }
 
@@ -25,19 +40,10 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="baseTypeName">The base type name (e.g. base class).</param>
         /// <param name="type">The artifact type.</param>
         /// <param name="language">The artifact language.</param>
-        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language)
-            : this(typeName, baseTypeName, type, language, null)
-        {
-            BaseTypeName = baseTypeName;
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="CodeArtifact"/> class.</summary>
-        /// <param name="typeName">The type name.</param>
-        /// <param name="type">The artifact type.</param>
-        /// <param name="language">The artifact language.</param>
+        /// <param name="category">The category.</param>
         /// <param name="template">The template to render the code.</param>
-        public CodeArtifact(string typeName, CodeArtifactType type, CodeArtifactLanguage language, ITemplate template)
-            : this(typeName, null, type, language, template)
+        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, ITemplate template)
+            : this(typeName, baseTypeName, type, language, category, template?.Render())
         {
         }
 
@@ -46,16 +52,22 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="baseTypeName">The base type name (e.g. base class).</param>
         /// <param name="type">The artifact type.</param>
         /// <param name="language">The artifact language.</param>
-        /// <param name="template">The template to render the code.</param>
-        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, ITemplate template)
+        /// <param name="category">The category.</param>
+        /// <param name="code">The code.</param>
+        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, string code)
         {
+            if (typeName == baseTypeName)
+            {
+                throw new ArgumentException("The baseTypeName cannot equal typeName.", nameof(typeName));
+            }
+
             TypeName = typeName;
             BaseTypeName = baseTypeName;
 
             Type = type;
             Language = language;
-
-            Code = template?.Render();
+            Category = category;
+            Code = code;
         }
 
         /// <summary>Gets the type name.</summary>
@@ -70,7 +82,10 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Get the artifact language.</summary>
         public CodeArtifactLanguage Language { get; }
 
-        /// <summary>Gets or sets the generated code.</summary>
-        public string Code { get; set; }
+        /// <summary>Gets the category.</summary>
+        public CodeArtifactCategory Category { get; }
+
+        /// <summary>Gets the generated code.</summary>
+        public string Code { get; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -10,11 +11,19 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
+            public List<string> Schedule { get; set; }
         }
 
         public class Teacher : Person
         {
             public string Class { get; set; }
+            public List<Schedule> Schedule { get; set; }
+        }
+
+        public class Schedule
+        {
+            int a { get; set; }
+            int b { get; set; }
         }
 
         [Fact]
@@ -28,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync(typeof(Teacher), settings);
+            var schema = JsonSchema.FromType(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -68,7 +77,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<IFoo>(settings);
+            var schema = JsonSchema.FromType<IFoo>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -98,7 +107,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Test>(settings);
+            var schema = JsonSchema.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -114,10 +123,71 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Test>(settings);
+            var schema = JsonSchema.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
+        }
+
+        public class A : B
+        {
+            public string Aaa { get; set; }
+        }
+
+        [JsonSchemaFlatten]
+        public class B : C
+        {
+            public string Bbb { get; set; }
+        }
+
+        public class C
+        {
+            public string Ccc { get; set; }
+        }
+
+        [Fact]
+        public async Task When_JsonSchemaFlattenAttribute_is_used_on_class_then_inherited_classed_are_merged()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings();
+
+            //// Act
+            var schema = JsonSchema.FromType<A>(settings);
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey("B"));
+            Assert.False(schema.Definitions.ContainsKey("C"));
+
+            Assert.True(schema.ActualProperties.ContainsKey("Aaa"));
+            Assert.True(schema.Definitions["B"].Properties.ContainsKey("Bbb"));
+            Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
+        }
+
+        [Fact]
+        public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
+        {
+            //// Arrange
+            var settings = new JsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true,
+            };
+
+            //// Act 
+            var TeacherSchema = JsonSchema.FromType(typeof(Teacher), settings);
+            var TacherData = TeacherSchema.ToJson();
+
+            var PersonSchema = JsonSchema.FromType(typeof(Person), settings);
+            var PersonData = PersonSchema.ToJson();
+
+            //// Assert
+            // Teacher correct schema
+            Assert.True(TeacherSchema.Definitions.ContainsKey("Schedule"));
+            Assert.True(TeacherSchema.Properties["Schedule"].Item.HasReference);
+
+            // Person correct schema
+            Assert.False(PersonSchema.Properties["Schedule"].Item.HasReference);
+            Assert.True(PersonSchema.Properties["Schedule"].Item.Type == JsonObjectType.String);
         }
     }
 }

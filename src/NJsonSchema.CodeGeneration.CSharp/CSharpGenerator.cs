@@ -2,13 +2,14 @@
 // <copyright file="CSharpGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
+using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -36,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="rootObject">The root object to search for all JSON Schemas.</param>
         /// <param name="settings">The generator settings.</param>
         /// <param name="resolver">The resolver.</param>
-        public CSharpGenerator(object rootObject, CSharpGeneratorSettings settings, CSharpTypeResolver resolver) 
+        public CSharpGenerator(object rootObject, CSharpGeneratorSettings settings, CSharpTypeResolver resolver)
             : base(rootObject, resolver, settings)
         {
             _resolver = resolver;
@@ -47,44 +48,45 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public CSharpGeneratorSettings Settings { get; }
 
         /// <inheritdoc />
-        public override CodeArtifactCollection GenerateTypes()
+        public override IEnumerable<CodeArtifact> GenerateTypes()
         {
-            var collection = base.GenerateTypes();
-            var results = new List<CodeArtifact>();
+            var baseArtifacts = base.GenerateTypes();
+            var artifacts = new List<CodeArtifact>();
 
-            if (collection.Artifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
+            if (baseArtifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
             {
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", null);
-                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new TemplateModelBase());
+                    artifacts.Add(new CodeArtifact("JsonInheritanceAttribute", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
 
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", null);
-                    results.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", new TemplateModelBase());
+                    artifacts.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }
 
-            if (collection.Artifacts.Any(r => r.Code.Contains("DateFormatConverter")))
+            if (baseArtifacts.Any(r => r.Code.Contains("DateFormatConverter")))
             {
                 if (Settings.ExcludedTypeNames?.Contains("DateFormatConverter") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", null);
-                    results.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template));
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", new TemplateModelBase());
+                    artifacts.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }
 
-            return new CodeArtifactCollection(collection.Artifacts.Concat(results), collection.ExtensionCode);
+            return baseArtifacts.Concat(artifacts);
         }
 
         /// <inheritdoc />
-        protected override string GenerateFile(CodeArtifactCollection artifactCollection)
+        protected override string GenerateFile(IEnumerable<CodeArtifact> artifactCollection)
         {
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
+                GenerateNullableReferenceTypes = Settings.GenerateNullableReferenceTypes,
                 TypesCode = artifactCollection.Concatenate()
             };
 
@@ -96,24 +98,28 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        protected override CodeArtifact GenerateType(JsonSchema4 schema, string typeNameHint)
+        protected override CodeArtifact GenerateType(JsonSchema schema, string typeNameHint)
         {
             var typeName = _resolver.GetOrGenerateTypeName(schema, typeNameHint);
 
             if (schema.IsEnumeration)
+            {
                 return GenerateEnum(schema, typeName);
+            }
             else
+            {
                 return GenerateClass(schema, typeName);
+            }
         }
 
-        private CodeArtifact GenerateClass(JsonSchema4 schema, string typeName)
+        private CodeArtifact GenerateClass(JsonSchema schema, string typeName)
         {
             var model = new ClassTemplateModel(typeName, Settings, _resolver, schema, RootObject);
 
             RenamePropertyWithSameNameAsClass(typeName, model.Properties);
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
-            return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, template);
+            return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
 
         private void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
@@ -123,17 +129,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var number = 1;
                 while (properties.Any(p => p.PropertyName == typeName + number))
+                {
                     number++;
+                }
 
                 propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
             }
         }
 
-        private CodeArtifact GenerateEnum(JsonSchema4 schema, string typeName)
+        private CodeArtifact GenerateEnum(JsonSchema schema, string typeName)
         {
             var model = new EnumTemplateModel(typeName, schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
-            return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, template);
+            return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
     }
 }

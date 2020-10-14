@@ -1,7 +1,7 @@
 ﻿{% if HasDescription -%}
 /** {{ Description }} */
 {% endif -%}
-export class {{ ClassName }}{{ Inheritance }} {
+{% if ExportTypes %}export {% endif %}class {{ ClassName }}{{ Inheritance }} {
 {% for property in Properties -%}
 {%     if property.HasDescription -%}
     /** {{ property.Description }} */
@@ -39,28 +39,42 @@ export class {{ ClassName }}{{ Inheritance }} {
 
     static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
 {% if HandleReferences -%}
-{%     if HasBaseDiscriminator -%}
-{%         for derivedClass in DerivedClasses -%}
-        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Key }}")
-            return createInstance<{{ derivedClass.Value }}>(data, _mappings, {{ derivedClass.Value }});
-{%         endfor -%}
+{%   if HasBaseDiscriminator -%}
+{%     for derivedClass in DerivedClasses -%}
+        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Discriminator }}")
+{%       if derivedClass.IsAbstract -%}
+            throw new Error("The abstract class '{{ derivedClass.ClassName }}' cannot be instantiated.");
+{%       else -%}
+            return createInstance<{{ derivedClass.ClassName }}>(data, _mappings, {{ derivedClass.ClassName }});
+{%       endif -%}
+{%     endfor -%}
+{%   endif -%}
+{%   if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%   else -%}
         return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
-{%     else -%}
-        return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
-{%     endif -%}
+{%   endif -%}
 {% else -%}
-{%     if HasBaseDiscriminator -%}
-{%         for derivedClass in DerivedClasses -%}
-        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Key }}") {
-            let result = new {{ derivedClass.Value }}();
+{%   if HasBaseDiscriminator -%}
+{%     for derivedClass in DerivedClasses -%}
+        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Discriminator }}") {
+{%       if derivedClass.IsAbstract -%}
+            throw new Error("The abstract class '{{ derivedClass.ClassName }}' cannot be instantiated.");
+{%       else -%}
+            let result = new {{ derivedClass.ClassName }}();
             result.init(data);
             return result;
+{%       endif -%}
         }
-{%         endfor -%}
-{%     endif -%}
+{%     endfor -%}
+{%   endif -%}
+{%     if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%     else -%}
         let result = new {{ ClassName }}();
         result.init(data);
         return result;
+{%     endif -%}
 {% endif -%}
     }
 

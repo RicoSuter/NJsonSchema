@@ -2,7 +2,7 @@
 // <copyright file="JsonSchemaAttribute.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ using System;
 namespace NJsonSchema.Annotations
 {
     /// <summary>Annotation to specify the JSON Schema type for the given class.</summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Struct | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
     public class JsonSchemaAttribute : Attribute
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAttribute"/> class.</summary>

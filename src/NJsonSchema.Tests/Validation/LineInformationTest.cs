@@ -11,13 +11,13 @@ namespace NJsonSchema.Tests.Validation
 {
     public class LineInformationTest
     {
-        private JsonSchema4 Schema { get; set; }
+        private JsonSchema Schema { get; set; }
 
         private string Json { get; set; }
 
         public async Task InitAsync()
         {
-            Schema = await JsonSchema4.FromJsonAsync(@"{
+            Schema = await JsonSchema.FromJsonAsync(@"{
                 ""type"": ""object"",
                 ""required"": [""prop1"", ""prop3""],
                 ""additionalProperties"": false,

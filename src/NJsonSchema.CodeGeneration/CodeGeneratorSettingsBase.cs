@@ -2,7 +2,7 @@
 // <copyright file="CodeGeneratorSettingsBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration
         public CodeGeneratorSettingsBase()
         {
             GenerateDefaultValues = true;
-            ExcludedTypeNames = new string[] { };
+            ExcludedTypeNames = new string[0];
         }
 
         /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
         public bool GenerateDefaultValues { get; set; }
-        
+
         /// <summary>Gets or sets the excluded type names (must be defined in an import or other namespace).</summary>
         public string[] ExcludedTypeNames { get; set; }
 
@@ -47,5 +47,12 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets the template directory path.</summary>
         public string TemplateDirectory { get; set; }
+
+        /// <summary>Gets or sets the output language specific value generator.</summary>
+        [JsonIgnore]
+        public ValueGeneratorBase ValueGenerator { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.</summary>
+        public bool InlineNamedAny { get; set; }
     }
 }

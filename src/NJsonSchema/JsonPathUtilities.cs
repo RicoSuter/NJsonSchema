@@ -2,7 +2,7 @@
 // <copyright file="JsonPathUtilities.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -10,16 +10,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
     /// <summary>Utilities to work with JSON paths.</summary>
     public static class JsonPathUtilities
     {
-        internal const string ReferenceReplaceString = "__referencePath";
-
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="searchedObject">The object to search.</param>
@@ -60,7 +59,9 @@ namespace NJsonSchema
 #endif
         {
             if (rootObject == null)
+            {
                 throw new ArgumentNullException(nameof(rootObject));
+            }
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
             FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
@@ -79,13 +80,17 @@ namespace NJsonSchema
             string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
+            {
                 return false;
+            }
 
             if (searchedObjects.ContainsKey(obj))
             {
                 searchedObjects[obj] = basePath;
                 if (searchedObjects.All(p => p.Value != null))
+                {
                     return true;
+                }
             }
 
             checkedObjects.Add(obj);
@@ -95,7 +100,9 @@ namespace NJsonSchema
                 foreach (var key in ((IDictionary)obj).Keys)
                 {
                     if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects, contractResolver))
+                    {
                         return true;
+                    }
                 }
             }
             else if (obj is IEnumerable)
@@ -104,38 +111,40 @@ namespace NJsonSchema
                 foreach (var item in (IEnumerable)obj)
                 {
                     if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects, contractResolver))
+                    {
                         return true;
+                    }
 
                     i++;
                 }
             }
             else
             {
-                var contract = contractResolver.ResolveContract(obj.GetType()) as JsonObjectContract;
-                var ignoredProperties = contract?.Properties
-                    .Where(p => p.Ignored || p.ShouldSerialize?.Invoke(obj) == false).ToArray() ??
-                    new Newtonsoft.Json.Serialization.JsonProperty[0];
-
-                foreach (var member in ReflectionCache.GetPropertiesAndFields(obj.GetType())
-                    .Where(p => p.CustomAttributes.JsonIgnoreAttribute == null))
+                var type = obj.GetType();
+                var contract = contractResolver.ResolveContract(type) as JsonObjectContract;
+                if (contract != null)
                 {
-                    var propertyName = member.GetName();
-
-                    var isExtensionDataProperty = obj is IJsonExtensionObject && propertyName == nameof(IJsonExtensionObject.ExtensionData);
-                    if (isExtensionDataProperty || ignoredProperties.All(p2 => p2.UnderlyingName != member.MemberInfo.Name))
+                    foreach (var jsonProperty in contract.Properties.Where(p => !p.Ignored))
                     {
-                        var value = member.GetValue(obj);
+                        var value = jsonProperty.ValueProvider.GetValue(obj);
                         if (value != null)
                         {
-                            if (isExtensionDataProperty)
+                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + jsonProperty.PropertyName, checkedObjects, contractResolver))
                             {
-                                if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
-                                    return true;
+                                return true;
                             }
-                            else
+                        }
+                    }
+
+                    if (obj is IJsonExtensionObject)
+                    {
+                        var extensionDataProperty = type.GetRuntimeProperty(nameof(IJsonExtensionObject.ExtensionData));
+                        if (extensionDataProperty != null)
+                        {
+                            var value = extensionDataProperty.GetValue(obj);
+                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
                             {
-                                if (FindJsonPaths(value, searchedObjects, basePath + "/" + propertyName, checkedObjects, contractResolver))
-                                    return true;
+                                return true;
                             }
                         }
                     }

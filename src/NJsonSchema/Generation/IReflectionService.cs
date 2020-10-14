@@ -2,12 +2,13 @@
 // <copyright file="IReflectionService.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NJsonSchema.Generation
 {
@@ -15,17 +16,28 @@ namespace NJsonSchema.Generation
     public interface IReflectionService
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="type">The type. </param>
-        /// <param name="parentAttributes">The parent's attributes (i.e. parameter or property attributes).</param>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        JsonTypeDescription GetDescription(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
+        JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings);
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        JsonTypeDescription GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Checks whether a type is nullable.</summary>
-        /// <param name="type">The type.</param>
-        /// <param name="parentAttributes">The parent attributes (e.g. property or parameter attributes).</param>
-        /// <param name="settings">The settings</param>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
         /// <returns>true if the type can be null.</returns>
-        bool IsNullable(Type type, IEnumerable<Attribute> parentAttributes, JsonSchemaGeneratorSettings settings);
+        bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling);
+
+        /// <summary>Checks whether the give type is a string enum.</summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="serializerSettings">The serializer settings.</param>
+        /// <returns>The result.</returns>
+        bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings);
     }
 }

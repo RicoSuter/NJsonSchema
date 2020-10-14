@@ -1,0 +1,10 @@
+---
+type: object
+properties:
+  bar:
+    "$ref": "./collection.json#/myBool"
+  foo:
+    "$ref": "#/definitions/collection/myInt"
+definitions:
+  collection:
+    "$ref": "./collection.json"

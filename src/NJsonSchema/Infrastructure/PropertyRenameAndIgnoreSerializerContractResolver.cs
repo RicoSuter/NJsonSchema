@@ -33,10 +33,14 @@ namespace NJsonSchema.Infrastructure
         public void IgnoreProperty(Type type, params string[] jsonPropertyNames)
         {
             if (!_ignores.ContainsKey(type.FullName))
+            {
                 _ignores[type.FullName] = new HashSet<string>();
+            }
 
             foreach (var prop in jsonPropertyNames)
+            {
                 _ignores[type.FullName].Add(prop);
+            }
         }
 
         /// <summary>Rename a property of the given type.</summary>
@@ -46,16 +50,18 @@ namespace NJsonSchema.Infrastructure
         public void RenameProperty(Type type, string propertyName, string newJsonPropertyName)
         {
             if (!_renames.ContainsKey(type.FullName))
+            {
                 _renames[type.FullName] = new Dictionary<string, string>();
+            }
 
             _renames[type.FullName][propertyName] = newJsonPropertyName;
         }
 
-        /// <summary>Creates a Newtonsoft.Json.Serialization.JsonProperty for the given System.Reflection.MemberInfo.</summary>
+        /// <summary>Creates a JsonProperty for the given System.Reflection.MemberInfo.</summary>
         /// <param name="member">The member's parent Newtonsoft.Json.MemberSerialization.</param>
-        /// <param name="memberSerialization">The member to create a Newtonsoft.Json.Serialization.JsonProperty for.</param>
-        /// <returns>A created Newtonsoft.Json.Serialization.JsonProperty for the given System.Reflection.MemberInfo.</returns>
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        /// <param name="memberSerialization">The member to create a JsonProperty for.</param>
+        /// <returns>A created JsonProperty for the given System.Reflection.MemberInfo.</returns>
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
 
@@ -78,7 +84,9 @@ namespace NJsonSchema.Infrastructure
         private bool IsIgnored(Type type, string jsonPropertyName)
         {
             if (!_ignores.ContainsKey(type.FullName))
+            {
                 return false;
+            }
 
             return _ignores[type.FullName].Contains(jsonPropertyName);
         }

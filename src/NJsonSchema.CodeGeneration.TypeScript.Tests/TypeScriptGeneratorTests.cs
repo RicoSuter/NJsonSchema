@@ -33,8 +33,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 1.8m
+            });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             //// Assert
@@ -71,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("Foo");
 
@@ -90,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains(@"lastName: string;", output);
-            Assert.Contains(@"Dictionary: { [key: string] : number; };", output);
+            Assert.Contains(@"Dictionary: { [key: string]: number; };", output);
         }
 
         [Fact]
@@ -123,7 +127,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = JsonSchema.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -138,7 +142,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = JsonSchema.FromType<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -153,8 +157,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
-            schema.Properties["Class"].Description = "PropertyDesc.";
+            var schema = JsonSchema.FromType<Teacher>();
+            schema.ActualProperties["Class"].Description = "PropertyDesc.";
+            var json = schema.ToJson();
+
             var generator = new TypeScriptGenerator(schema);
 
             //// Act
@@ -168,10 +174,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = JsonSchema.FromType<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface, 
+                TypeStyle = TypeScriptTypeStyle.Interface,
                 TypeScriptVersion = 2.0m
             });
 
@@ -186,8 +192,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["foo-bar"] = new JsonProperty
+            var schema = new JsonSchema();
+            schema.Properties["foo-bar"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };
@@ -205,7 +211,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_type_name_is_missing_then_anonymous_name_is_generated()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
 
             var generator = new TypeScriptGenerator(schema);
 
@@ -218,9 +224,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Teacher>();
+            var schema = JsonSchema.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                TypeScriptVersion = 1.8m
+            });
             return generator;
         }
 
@@ -229,6 +239,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             //// Arrange
             var schemaJson = @"{
+                ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
                         ""type"": ""object"", 
@@ -242,15 +253,105 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             }";
 
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("dict: { [key: string] : string; };", code); // property not nullable
+            Assert.Contains("dict: { [key: string]: string; };", code); // property not nullable
             Assert.Contains("this.dict = {};", code); // must be initialized with {}
+        }
+
+        [Fact]
+        public async Task When_default_is_generated_then_no_liquid_error_is_in_output()
+        {
+            var json = @"{
+""type"": ""object"",
+""properties"": {
+  ""foo"": {
+    ""$ref"": ""#/definitions/Person""
+  }
+},
+""definitions"": {
+    ""Person"": {
+      ""type"": ""object"",
+      ""discriminator"": ""discriminator"",
+      ""additionalProperties"": false,
+      ""required"": [
+        ""Id"",
+        ""FirstName"",
+        ""LastName"",
+        ""Gender"",
+        ""DateOfBirth"",
+        ""Weight"",
+        ""Height"",
+        ""Age"",
+        ""AverageSleepTime"",
+        ""Address"",
+        ""Children"",
+        ""discriminator""
+      ],
+      ""properties"": {
+        ""Id"": {
+          ""type"": ""string"",
+          ""format"": ""guid""
+        },
+        ""FirstName"": {
+          ""type"": ""string"",
+          ""description"": ""Gets or sets the first name."",
+          ""minLength"": 2
+        },
+        ""LastName"": {
+          ""type"": ""string"",
+          ""description"": ""Gets or sets the last name."",
+          ""minLength"": 1
+        },
+        ""DateOfBirth"": {
+          ""type"": ""string"",
+          ""format"": ""date-time""
+        },
+        ""Weight"": {
+          ""type"": ""number"",
+          ""format"": ""decimal""
+        },
+        ""Height"": {
+          ""type"": ""number"",
+          ""format"": ""double""
+        },
+        ""Age"": {
+          ""type"": ""integer"",
+          ""format"": ""int32"",
+          ""maximum"": 99.0,
+          ""minimum"": 5.0
+        },
+        ""AverageSleepTime"": {
+          ""type"": ""string"",
+          ""format"": ""time-span""
+        },
+        ""Children"": {
+          ""type"": ""array"",
+          ""items"": {
+            ""$ref"": ""#/definitions/Person""
+          }
+        },
+        ""discriminator"": {
+          ""type"": ""string""
+        }
+      }
+    }
+  }
+}";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain("Liquid error: ", code);
         }
     }
 }
