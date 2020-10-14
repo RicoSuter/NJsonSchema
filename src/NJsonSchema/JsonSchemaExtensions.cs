@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NJsonSchema.Visitors;
 
 namespace NJsonSchema
@@ -21,17 +20,17 @@ namespace NJsonSchema
         /// <param name="parentSchema">The possible parent schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns>true or false.</returns>
-        public static bool InheritsSchema(this JsonSchema4 schema, JsonSchema4 parentSchema, object rootObject)
+        public static bool InheritsSchema(this JsonSchema schema, JsonSchema parentSchema, object rootObject)
         {
             return parentSchema != null && schema.ActualSchema
                 .GetAllInheritedSchemas(rootObject)
-                .Concat(new List<JsonSchema4> { schema })
+                .Concat(new List<JsonSchema> { schema })
                 .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
         }
 
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
-        public static JsonSchema4 GetInheritedSchema(this JsonSchema4 schema, object rootObject)
+        public static JsonSchema GetInheritedSchema(this JsonSchema schema, object rootObject)
         {
             if (schema.HasReference)
                 return null;
@@ -55,14 +54,14 @@ namespace NJsonSchema
         /// <summary>Gets the list of all inherited/parent schemas.</summary>
         /// <remarks>Used for code generation.</remarks>
 #if !LEGACY
-        public static IReadOnlyCollection<JsonSchema4> GetAllInheritedSchemas(this JsonSchema4 schema, object rootObject)
+        public static IReadOnlyCollection<JsonSchema> GetAllInheritedSchemas(this JsonSchema schema, object rootObject)
 #else
-        public static ICollection<JsonSchema4> GetAllInheritedSchemas(this JsonSchema4 schema, object rootObject)
+        public static ICollection<JsonSchema> GetAllInheritedSchemas(this JsonSchema schema, object rootObject)
 #endif
         {
             var inheritedSchema = schema.GetInheritedSchema(rootObject) != null ?
-                new List<JsonSchema4> { schema.GetInheritedSchema(rootObject) } :
-                new List<JsonSchema4>();
+                new List<JsonSchema> { schema.GetInheritedSchema(rootObject) } :
+                new List<JsonSchema>();
 
             return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.GetAllInheritedSchemas(rootObject))).ToList();
         }
@@ -72,7 +71,7 @@ namespace NJsonSchema
         /// <param name="inheritedSchema">The possible subtype schema.</param>
         /// <param name="rootObject">The root object needed to scan oneOf properties.</param>
         /// <returns>true or false</returns>
-        public static bool Inherits(this JsonSchema4 schema, JsonSchema4 inheritedSchema, object rootObject)
+        public static bool Inherits(this JsonSchema schema, JsonSchema inheritedSchema, object rootObject)
         {
             inheritedSchema = inheritedSchema.ActualSchema;
             return schema.GetInheritedSchema(rootObject)?.ActualSchema == inheritedSchema || 
@@ -80,7 +79,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the discriminator or discriminator of an inherited schema (or null).</summary>
-        public static OpenApiDiscriminator GetBaseDiscriminator(this JsonSchema4 schema, object rootObject)
+        public static OpenApiDiscriminator GetBaseDiscriminator(this JsonSchema schema, object rootObject)
         {
             return schema.DiscriminatorObject ?? schema.GetInheritedSchema(rootObject)?.ActualSchema.GetBaseDiscriminator(rootObject);
         }
@@ -89,29 +88,27 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns></returns>
-        public static IDictionary<JsonSchema4, string> GetDerivedSchemas(this JsonSchema4 schema, object rootObject)
+        public static IDictionary<JsonSchema, string> GetDerivedSchemas(this JsonSchema schema, object rootObject)
         {
             var visitor = new DerivedSchemaVisitor(schema, rootObject);
-            visitor.VisitAsync(rootObject).GetAwaiter().GetResult();
+            visitor.Visit(rootObject);
             return visitor.DerivedSchemas;
         }
 
         private class DerivedSchemaVisitor : JsonSchemaVisitorBase
         {
-            private readonly JsonSchema4 _baseSchema;
+            private readonly JsonSchema _baseSchema;
             private readonly object _rootObject;
 
-            public Dictionary<JsonSchema4, string> DerivedSchemas { get; } = new Dictionary<JsonSchema4, string>();
+            public Dictionary<JsonSchema, string> DerivedSchemas { get; } = new Dictionary<JsonSchema, string>();
 
-            public DerivedSchemaVisitor(JsonSchema4 baseSchema, object rootObject)
+            public DerivedSchemaVisitor(JsonSchema baseSchema, object rootObject)
             {
                 _baseSchema = baseSchema;
                 _rootObject = rootObject;
             }
 
-#pragma warning disable 1998
-            protected override async Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint)
-#pragma warning restore 1998
+            protected override JsonSchema VisitSchema(JsonSchema schema, string path, string typeNameHint)
             {
                 if (schema.Inherits(_baseSchema, _rootObject) && _baseSchema != schema)
                     DerivedSchemas.Add(schema, typeNameHint);
@@ -125,7 +122,7 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns></returns>
-        public static JsonSchema4 GetOneOfInheritedSchema(this JsonSchema4 schema, object rootObject)
+        public static JsonSchema GetOneOfInheritedSchema(this JsonSchema schema, object rootObject)
         {
             return schema.GetOneOfInheritedSchemas(rootObject)?.FirstOrDefault().Key;
         }
@@ -134,27 +131,25 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns></returns>
-        public static IDictionary<JsonSchema4, string> GetOneOfInheritedSchemas(this JsonSchema4 schema, object rootObject)
+        public static IDictionary<JsonSchema, string> GetOneOfInheritedSchemas(this JsonSchema schema, object rootObject)
         {
             var visitor = new InheritedSchemaVisitor(schema);
-            visitor.VisitAsync(rootObject).GetAwaiter().GetResult();
+            visitor.Visit(rootObject);
             return visitor.InheritedSchemas;
         }
 
         private class InheritedSchemaVisitor : JsonSchemaVisitorBase
         {
-            private readonly JsonSchema4 _schema;
+            private readonly JsonSchema _schema;
 
-            public Dictionary<JsonSchema4, string> InheritedSchemas { get; } = new Dictionary<JsonSchema4, string>();
+            public Dictionary<JsonSchema, string> InheritedSchemas { get; } = new Dictionary<JsonSchema, string>();
 
-            public InheritedSchemaVisitor(JsonSchema4 schema)
+            public InheritedSchemaVisitor(JsonSchema schema)
             {
                 _schema = schema;
             }
 
-#pragma warning disable 1998
-            protected override async Task<JsonSchema4> VisitSchemaAsync(JsonSchema4 schema, string path, string typeNameHint)
-#pragma warning restore 1998
+            protected override JsonSchema VisitSchema(JsonSchema schema, string path, string typeNameHint)
             {
                 if (schema.OneOf.Any(s => s.ActualSchema == _schema.ActualSchema))
                     InheritedSchemas.Add(schema, typeNameHint);

@@ -41,9 +41,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             Properties = _schema.ActualProperties.Values
-                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface || 
+                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface ||
                             v.IsInheritanceDiscriminator == false)
-                .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
+                .Select(property => new PropertyModel(this, property, _rootObject, ClassName, _resolver, _settings))
                 .ToList();
         }
 
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the name for the discriminator check.</summary>
         public string DiscriminatorName => HasBaseDiscriminator ?
-            (_schema.ResponsibleDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
+            (_schema.ActualDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
             _discriminatorName;
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
@@ -99,9 +99,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the base class name.</summary>
         public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
 
-        /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
-        public bool HasIndexerProperty => _schema.InheritedSchema?.IsDictionary == true;
-
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
 
@@ -140,9 +137,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasProperties => Properties.Any();
 
         /// <summary>Gets the property models.</summary>
-        public List<PropertyModel> Properties => _schema.ActualProperties.Values
-            .Where(v => v.IsInheritanceDiscriminator == false)
-            .Select(property => new PropertyModel(this, property, _rootObject, ClassName, _resolver, _settings)).ToList();
+        public List<PropertyModel> Properties { get; }
 
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
         public bool HasDefaultValues => Properties.Any(p => p.HasDefaultValue);
@@ -154,6 +149,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool ExportTypes => _settings.ExportTypes;
 
         /// <summary>Gets the inherited schema.</summary>
-        private JsonSchema4 InheritedSchema => _schema.GetInheritedSchema(_rootObject)?.ActualSchema;
+        private JsonSchema InheritedSchema => _schema.GetInheritedSchema(_rootObject)?.ActualSchema;
     }
 }

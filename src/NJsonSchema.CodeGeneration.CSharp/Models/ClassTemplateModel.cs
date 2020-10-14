@@ -41,9 +41,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToArray();
 
-            if (schema.InheritedSchema != null)
+            var inheritedSchema = schema.GetInheritedSchema(rootObject);
+            if (inheritedSchema != null)
             {
-                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
+                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, inheritedSchema, rootObject);
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
             }
             else

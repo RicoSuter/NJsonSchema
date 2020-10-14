@@ -367,7 +367,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(2, bar.AllOf.Count);
 
             Assert.Equal(bar.AllOf.Last(), bar.ActualTypeSchema);
-            Assert.Equal(bar.AllOf.First(), bar.InheritedSchema);
+            Assert.Equal(bar.AllOf.First(), bar.GetInheritedSchema(schema));
 
             Assert.True(bar.AllOf.First().IsDictionary); // base class (dictionary)
             Assert.True(bar.AllOf.Last().ActualProperties.Any()); // actual class

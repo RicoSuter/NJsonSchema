@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly object _rootObject;
         private readonly TypeScriptTypeResolver _resolver;
 

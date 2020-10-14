@@ -60,7 +60,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         /// <returns>The result.</returns>
-        public bool SupportsConstructorConversion(JsonSchema4 schema, object rootObject)
+        public bool SupportsConstructorConversion(JsonSchema schema, object rootObject)
         {
             return schema?.ActualSchema.GetBaseDiscriminator(rootObject) == null;
         }
@@ -90,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             // Primitive schemas (no new type)
 
             if (schema.ActualTypeSchema.IsAnyType &&
-                schema.InheritedSchema == null && // not in inheritance hierarchy
+                schema.GetInheritedSchema(_rootObject) == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
                 !Types.Keys.Contains(schema) &&
                 !schema.HasReference)
