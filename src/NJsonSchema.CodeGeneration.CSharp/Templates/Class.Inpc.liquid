@@ -1,7 +1,7 @@
 ﻿{% if HasInheritance == false -%}
-public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+public event System.ComponentModel.PropertyChangedEventHandler{% if GenerateNullableReferenceTypes %}?{% endif %} PropertyChanged;
 
-protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string{% if GenerateNullableReferenceTypes %}?{% endif %} propertyName = null)
 {
     var handler = PropertyChanged;
     if (handler != null) 
