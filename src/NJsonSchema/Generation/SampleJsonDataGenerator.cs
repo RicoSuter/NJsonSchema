@@ -80,6 +80,10 @@ namespace NJsonSchema.Generation
                 }
                 else if (schema.Type.HasFlag(JsonObjectType.Integer) || schema.Type.HasFlag(JsonObjectType.Number))
                 {
+                    if (schema.Minimum.HasValue || schema.Maximum.HasValue)
+                    {
+                        return JToken.FromObject(schema.Minimum.HasValue ? Convert.ToInt32(schema.Minimum) : Convert.ToInt32(schema.Maximum));
+                    }
                     return JToken.FromObject(0);
                 }
                 else if (schema.Type.HasFlag(JsonObjectType.String))
