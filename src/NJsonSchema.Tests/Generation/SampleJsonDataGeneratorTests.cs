@@ -191,5 +191,55 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(1.0, testJson.SelectToken("body.numberContent.value").Value<float>());
         }
 
+        [Fact]
+        public async Task PropertyWithDefaultDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""default"": 42,
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(42, testJson.SelectToken("body.numberContent.value").Value<int>());
+        }
+
     }
 }
