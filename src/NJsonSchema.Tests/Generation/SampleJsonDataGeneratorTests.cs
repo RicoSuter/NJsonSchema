@@ -241,5 +241,58 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(42, testJson.SelectToken("body.numberContent.value").Value<int>());
         }
 
+        //exclusiveMaximum
+
+        [Fact]
+        public async Task PropertyExclusiveMinimumDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""maximum"": 5.0,
+                        ""minimum"": 1.0,
+                        ""exclusiveMinimum"" : true
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(1.1, testJson.SelectToken("body.numberContent.value").Value<double>());
+        }
     }
 }
