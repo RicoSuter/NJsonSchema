@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -87,5 +88,211 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(new JArray(new int[] { 1, 2, 3 }), obj.GetValue(nameof(Measurements.Weights)));
         }
 
+        [Fact]
+        public async Task PropertyWithIntegerMinimumDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""integer"",
+                        ""maximum"": 5,
+                        ""minimum"": 1
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(1, testJson.SelectToken("body.numberContent.value").Value<int>());
+        }
+
+
+        [Fact]
+        public async Task PropertyWithFloatMinimumDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""maximum"": 5.0,
+                        ""minimum"": 1.0
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(1.0, testJson.SelectToken("body.numberContent.value").Value<float>());
+        }
+
+        [Fact]
+        public async Task PropertyWithDefaultDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""default"": 42,
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(42, testJson.SelectToken("body.numberContent.value").Value<int>());
+        }
+
+        //exclusiveMaximum
+
+        [Fact]
+        public async Task PropertyExclusiveMinimumDefiniton()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""maximum"": 5.0,
+                        ""minimum"": 1.0,
+                        ""exclusiveMinimum"" : true
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(1.1, testJson.SelectToken("body.numberContent.value").Value<double>());
+        }
     }
 }
