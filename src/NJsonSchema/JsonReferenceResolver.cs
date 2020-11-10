@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -57,12 +58,14 @@ namespace NJsonSchema
         /// <param name="jsonPath">The JSON path.</param>
         /// <param name="targetType">The target type to resolve.</param>
         /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
+        public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, 
+                IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, true).ConfigureAwait(false);
+            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, true, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -70,12 +73,14 @@ namespace NJsonSchema
         /// <param name="jsonPath">The JSON path.</param>
         /// <param name="targetType">The target type to resolve.</param>
         /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
+        public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath, Type targetType, 
+                IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false).ConfigureAwait(false);
+            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Resolves a document reference.</summary>
@@ -99,22 +104,24 @@ namespace NJsonSchema
 
         /// <summary>Resolves a file reference.</summary>
         /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public virtual async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
+        public virtual async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
         {
-            return await JsonSchema.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
+            return await JsonSchema.FromFileAsync(filePath, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public virtual async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
+        public virtual async Task<IJsonReference> ResolveUrlReferenceAsync(string url, CancellationToken cancellationToken = default)
         {
-            return await JsonSchema.FromUrlAsync(url, schema => this).ConfigureAwait(false);
+            return await JsonSchema.FromUrlAsync(url, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver, bool append)
+        private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver, bool append, CancellationToken cancellationToken = default)
         {
             if (jsonPath == "#")
             {
@@ -131,7 +138,7 @@ namespace NJsonSchema
             }
             else if (jsonPath.StartsWith("http://") || jsonPath.StartsWith("https://"))
             {
-                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, targetType, contractResolver, append).ConfigureAwait(false);
+                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, targetType, contractResolver, append, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -143,7 +150,7 @@ namespace NJsonSchema
                     if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
                     {
                         var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, contractResolver, append).ConfigureAwait(false);
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, contractResolver, append, cancellationToken ).ConfigureAwait(false);
                     }
                     else
                     {
@@ -153,7 +160,7 @@ namespace NJsonSchema
 
                         var arr = Regex.Split(jsonPath, @"(?=#)");
                         var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), arr[0]);
-                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, targetType, contractResolver, jsonPath, append).ConfigureAwait(false);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, targetType, contractResolver, jsonPath, append, cancellationToken).ConfigureAwait(false);
                     }
                 }
                 else
@@ -163,7 +170,7 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, IContractResolver contractResolver, string jsonPath, bool append)
+        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, IContractResolver contractResolver, string jsonPath, bool append, CancellationToken cancellationToken)
         {
             try
             {
@@ -194,14 +201,14 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, Type targetType, IContractResolver contractResolver, bool append)
+        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, Type targetType, IContractResolver contractResolver, bool append, CancellationToken cancellationToken)
         {
             try
             {
                 var arr = fullJsonPath.Split('#');
                 if (!_resolvedObjects.ContainsKey(arr[0]))
                 {
-                    var schema = await ResolveUrlReferenceAsync(arr[0]).ConfigureAwait(false);
+                    var schema = await ResolveUrlReferenceAsync(arr[0], cancellationToken).ConfigureAwait(false);
                     schema.DocumentPath = arr[0];
                     if (schema is JsonSchema && append)
                     {
@@ -212,7 +219,7 @@ namespace NJsonSchema
                 }
 
                 var result = _resolvedObjects[arr[0]];
-                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1], targetType, contractResolver).ConfigureAwait(false);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1], targetType, contractResolver, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {

@@ -9,6 +9,7 @@
 using System;
 using System.Dynamic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -44,7 +45,7 @@ namespace NJsonSchema.Yaml
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromYamlAsync(string data, string documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromYamlAsync(string data, string documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var deserializer = new DeserializerBuilder().Build();
             var yamlObject = deserializer.Deserialize(new StringReader(data));
@@ -53,7 +54,7 @@ namespace NJsonSchema.Yaml
                 .Build();
 
             var json = serializer.Serialize(yamlObject);
-            return await JsonSchema.FromJsonAsync(json, documentPath, referenceResolverFactory).ConfigureAwait(false);
+            return await JsonSchema.FromJsonAsync(json, documentPath, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Converts the JSON Schema to YAML.</summary>
@@ -81,7 +82,7 @@ namespace NJsonSchema.Yaml
         /// <param name="filePath">The file path.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var data = DynamicApis.FileReadAllText(filePath);
             return await FromYamlAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
@@ -91,10 +92,10 @@ namespace NJsonSchema.Yaml
         /// <param name="url">The URL.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The <see cref="JsonSchema"/>.</returns>
-        public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
-            return await FromYamlAsync(data, url, referenceResolverFactory).ConfigureAwait(false);
+            return await FromYamlAsync(data, url, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
         private static string ConvertYamlToJson(string data)
