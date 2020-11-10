@@ -269,8 +269,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-100000000m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(100000000m, schema.Properties["value"].ActualSchema.Maximum);
-            Assert.Equal(true, schema.Properties["value"].ActualSchema.IsExclusiveMaximum);
-            Assert.Equal(true, schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
+            Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMaximum);
+            Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
 
             // expect the integer to be converted to an int64
             Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-99999999, 99999999)]\n" +
@@ -314,8 +314,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-100000000.5m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(100000000.5m, schema.Properties["value"].ActualSchema.Maximum);
-            Assert.Equal(true, schema.Properties["value"].ActualSchema.IsExclusiveMaximum);
-            Assert.Equal(true, schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
+            Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMaximum);
+            Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
 
             // expect the integer to be converted to an int64
             Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-100000000.4999D, 100000000.4999D)]\n" +

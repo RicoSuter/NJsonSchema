@@ -67,7 +67,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.Equal(5.5m, property.Minimum);
-            Assert.Equal(null, property.Maximum);
+            Assert.Null(property.Maximum);
         }
 
         [Fact]
