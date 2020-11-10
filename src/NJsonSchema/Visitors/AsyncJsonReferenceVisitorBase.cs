@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -41,17 +42,28 @@ namespace NJsonSchema.Visitors
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
         /// <returns>The task.</returns>
+        [Obsolete("VisitAsync is deprecated, please use VisitAsync with cancellation token insteaed.")]
         public virtual async Task VisitAsync(object obj)
         {
-            await VisitAsync(obj, "#", null, new HashSet<object>(), o => throw new NotSupportedException("Cannot replace the root.")).ConfigureAwait(false);
+            await VisitAsync(obj, "#", null, new HashSet<object>(), o => throw new NotSupportedException("Cannot replace the root."), CancellationToken.None).ConfigureAwait(false);
+        }
+
+        /// <summary>Processes an object.</summary>
+        /// <param name="obj">The object to process.</param>
+        /// <param name="cancellationToken">Cancellation token instance</param>
+        /// <returns>The task.</returns>
+        public virtual async Task VisitAsync(object obj, CancellationToken cancellationToken)
+        {
+            await VisitAsync(obj, "#", null, new HashSet<object>(), o => throw new NotSupportedException("Cannot replace the root."), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
         /// <param name="reference">The visited schema.</param>
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The task.</returns>
-        protected abstract Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint);
+        protected abstract Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint, CancellationToken cancellationToken);
 
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
@@ -59,9 +71,11 @@ namespace NJsonSchema.Visitors
         /// <param name="typeNameHint">The type name hint.</param>
         /// <param name="checkedObjects">The checked objects.</param>
         /// <param name="replacer">The replacer.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The task.</returns>
-        protected virtual async Task VisitAsync(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
+        protected virtual async Task VisitAsync(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (obj == null || checkedObjects.Contains(obj))
             {
                 return;
@@ -71,7 +85,7 @@ namespace NJsonSchema.Visitors
 
             if (obj is IJsonReference reference)
             {
-                var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint).ConfigureAwait(false);
+                var newReference = await VisitJsonReferenceAsync(reference, path, typeNameHint, cancellationToken).ConfigureAwait(false);
                 if (newReference != reference)
                 {
                     replacer(newReference);
@@ -91,66 +105,66 @@ namespace NJsonSchema.Visitors
 
                 if (schema.AdditionalItemsSchema != null)
                 {
-                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o).ConfigureAwait(false);
+                    await VisitAsync(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.AdditionalPropertiesSchema != null)
                 {
-                    await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o).ConfigureAwait(false);
+                    await VisitAsync(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.Item != null)
                 {
-                    await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o).ConfigureAwait(false);
+                    await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.Items.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.AllOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.AnyOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema.OneOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o)).ConfigureAwait(false);
+                    await VisitAsync(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.Not != null)
                 {
-                    await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o).ConfigureAwait(false);
+                    await VisitAsync(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.DictionaryKey != null)
                 {
-                    await VisitAsync(schema.DictionaryKey, path + "/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o).ConfigureAwait(false);
+                    await VisitAsync(schema.DictionaryKey, path + "/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.DiscriminatorRaw != null)
                 {
-                    await VisitAsync(schema.DiscriminatorRaw, path + "/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o).ConfigureAwait(false);
+                    await VisitAsync(schema.DiscriminatorRaw, path + "/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o, cancellationToken).ConfigureAwait(false);
                 }
 
                 foreach (var p in schema.Properties.ToArray())
                 {
-                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 foreach (var p in schema.PatternProperties.ToArray())
                 {
-                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o).ConfigureAwait(false);
+                    await VisitAsync(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o, cancellationToken).ConfigureAwait(false);
                 }
 
                 foreach (var p in schema.Definitions.ToArray())
@@ -165,7 +179,7 @@ namespace NJsonSchema.Visitors
                         {
                             schema.Definitions.Remove(p.Key);
                         }
-                    }).ConfigureAwait(false);
+                    }, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -183,7 +197,7 @@ namespace NJsonSchema.Visitors
                         var value = property.ValueProvider.GetValue(obj);
                         if (value != null)
                         {
-                            await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o)).ConfigureAwait(false);
+                            await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
                         }
                     }
                 }
@@ -201,7 +215,7 @@ namespace NJsonSchema.Visitors
                             {
                                 dictionary.Remove(key);
                             }
-                        }).ConfigureAwait(false);
+                        }, cancellationToken).ConfigureAwait(false);
                     }
 
                     // Custom dictionary type with additional properties (OpenApiPathItem)
@@ -215,7 +229,7 @@ namespace NJsonSchema.Visitors
                             var value = property.GetValue(obj);
                             if (value != null)
                             {
-                                await VisitAsync(value, path + "/" + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o)).ConfigureAwait(false);
+                                await VisitAsync(value, path + "/" + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
                             }
                         }
                     }
@@ -226,7 +240,7 @@ namespace NJsonSchema.Visitors
                     for (var i = 0; i < items.Length; i++)
                     {
                         var index = i;
-                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(list, index, o)).ConfigureAwait(false);
+                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(list, index, o), cancellationToken).ConfigureAwait(false);
                     }
                 }
                 else if (obj is IEnumerable enumerable)
@@ -234,7 +248,7 @@ namespace NJsonSchema.Visitors
                     var items = enumerable.OfType<object>().ToArray();
                     for (var i = 0; i < items.Length; i++)
                     {
-                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item.")).ConfigureAwait(false);
+                        await VisitAsync(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."), cancellationToken).ConfigureAwait(false);
                     }
                 }
             }

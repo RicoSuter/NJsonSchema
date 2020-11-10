@@ -8,6 +8,7 @@
 
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -81,10 +82,12 @@ namespace NJsonSchema.Infrastructure
         /// <param name="documentPath">The document path.</param>
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
         /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The deserialized schema.</returns>
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
-            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
+            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             CurrentSchemaType = schemaType;
 
             var schema = FromJson<T>(json, contractResolver);
