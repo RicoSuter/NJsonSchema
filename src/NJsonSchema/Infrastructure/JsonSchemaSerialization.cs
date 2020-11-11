@@ -83,7 +83,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
-        [Obsolete("Use FromJsonAsync with cancellation token instead")]
+        [Obsolete("Use FromJsonAsync with cancellation token instead.")]
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
         {
