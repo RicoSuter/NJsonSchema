@@ -85,7 +85,7 @@ namespace NJsonSchema.Yaml
         public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var data = DynamicApis.FileReadAllText(filePath);
-            return await FromYamlAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
+            return await FromYamlAsync(data, filePath, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Creates a JSON Schema from an URL.</summary>
@@ -94,7 +94,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema"/>.</returns>
         public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
+            var data = await DynamicApis.HttpGetAsync(url, cancellationToken).ConfigureAwait(false);
             return await FromYamlAsync(data, url, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 

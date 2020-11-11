@@ -40,7 +40,7 @@ namespace NJsonSchema.Yaml
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
+            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
