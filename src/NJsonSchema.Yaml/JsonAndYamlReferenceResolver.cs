@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using NJsonSchema.Generation;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Yaml
@@ -38,17 +38,17 @@ namespace NJsonSchema.Yaml
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
+        public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
+            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
+        public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaYaml.FromUrlAsync(url, schema => this).ConfigureAwait(false);
+            return await JsonSchemaYaml.FromUrlAsync(url, schema => this, cancellationToken).ConfigureAwait(false);
         }
     }
 }

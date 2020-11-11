@@ -78,28 +78,17 @@ namespace NJsonSchema.Generation
                 {
                     return JToken.FromObject(schema.Enumeration.First());
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.Integer) || schema.Type.HasFlag(JsonObjectType.Number))
+                else if (schema.Type.HasFlag(JsonObjectType.Integer))
                 {
-                    return JToken.FromObject(0);
+                    return HandleIntegerType(schema);
+                }
+                else if (schema.Type.HasFlag(JsonObjectType.Number))
+                {
+                    return HandleNumberType(schema);
                 }
                 else if (schema.Type.HasFlag(JsonObjectType.String))
                 {
-                    if (schema.Format == JsonFormatStrings.Date)
-                    {
-                        return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"));
-                    }
-                    else if (schema.Format == JsonFormatStrings.DateTime)
-                    {
-                        return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
-                    }
-                    else if (property != null)
-                    {
-                        return JToken.FromObject(property.Name);
-                    }
-                    else
-                    {
-                        return JToken.FromObject("");
-                    }
+                    return HandleStringType(schema, property);
                 }
                 else if (schema.Type.HasFlag(JsonObjectType.Boolean))
                 {
@@ -108,6 +97,59 @@ namespace NJsonSchema.Generation
             }
 
             return null;
+        }
+        private static JToken HandleNumberType(JsonSchema schema)
+        {
+            if (schema.ExclusiveMinimumRaw != null)
+            {
+                return JToken.FromObject(float.Parse(schema.Minimum.ToString()) + 0.1);
+            }
+            else if (schema.ExclusiveMinimum != null)
+            {
+                return JToken.FromObject(float.Parse(schema.ExclusiveMinimum.ToString()));
+            }
+            else if (schema.Minimum.HasValue)
+            {
+                return float.Parse(schema.Minimum.ToString());
+            }
+            return JToken.FromObject(0.0);
+        }
+
+        private static JToken HandleIntegerType(JsonSchema schema)
+        {
+            if (schema.ExclusiveMinimumRaw != null)
+            {
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw));
+            }
+            else if (schema.ExclusiveMinimum != null)
+            {
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum));
+            }
+            else if (schema.Minimum.HasValue)
+            {
+                return Convert.ToInt32(schema.Minimum);
+            }
+            return JToken.FromObject(0);
+        }
+
+        private JToken HandleStringType(JsonSchema schema, JsonSchemaProperty property)
+        {
+            if (schema.Format == JsonFormatStrings.Date)
+            {
+                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"));
+            }
+            else if (schema.Format == JsonFormatStrings.DateTime)
+            {
+                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
+            }
+            else if (property != null)
+            {
+                return JToken.FromObject(property.Name);
+            }
+            else
+            {
+                return JToken.FromObject("");
+            }
         }
     }
 }

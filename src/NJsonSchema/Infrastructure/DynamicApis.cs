@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -62,9 +63,10 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Request the given URL via HTTP.</summary>
         /// <param name="url">The URL.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The content.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<string> HttpGetAsync(string url)
+        public static async Task<string> HttpGetAsync(string url, CancellationToken cancellationToken)
         {
             if (!SupportsHttpClientApis)
             {
@@ -74,8 +76,7 @@ namespace NJsonSchema.Infrastructure
             using (dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType))
             using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType, new[] { handler }))
             {
-                handler.UseDefaultCredentials = true;
-                var response = await client.GetAsync(url).ConfigureAwait(false);
+                var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }

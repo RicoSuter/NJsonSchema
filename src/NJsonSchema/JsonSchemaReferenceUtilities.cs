@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
@@ -31,10 +32,12 @@ namespace NJsonSchema
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
         /// <param name="contractResolver">The contract resolver.</param>
-        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
+        /// <param name="cancellationToken">The cancellation token</param>
+        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, 
+                IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
             var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
-            await updater.VisitAsync(rootObject).ConfigureAwait(false);
+            await updater.VisitAsync(rootObject, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
@@ -81,16 +84,17 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-            public override async Task VisitAsync(object obj)
+            public override async Task VisitAsync(object obj, CancellationToken cancellationToken = default)
             {
                 _replaceRefsRound = true;
-                await base.VisitAsync(obj).ConfigureAwait(false);
+                await base.VisitAsync(obj, cancellationToken).ConfigureAwait(false);
                 _replaceRefsRound = false;
-                await base.VisitAsync(obj).ConfigureAwait(false);
+                await base.VisitAsync(obj, cancellationToken).ConfigureAwait(false);
             }
 
-            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint)
+            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint, CancellationToken cancellationToken)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if (reference.ReferencePath != null && reference.Reference == null)
                 {
                     if (_replaceRefsRound)

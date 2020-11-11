@@ -8,6 +8,7 @@
 
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -82,9 +83,25 @@ namespace NJsonSchema.Infrastructure
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
+        [Obsolete("Use FromJsonAsync with cancellation token instead.")]
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
         {
+            return await FromJsonAsync(json, schemaType, documentPath, referenceResolverFactory, contractResolver, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
+        /// <param name="json">The JSON data.</param>
+        /// <param name="schemaType">The schema type.</param>
+        /// <param name="documentPath">The document path.</param>
+        /// <param name="referenceResolverFactory">The reference resolver factory.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The deserialized schema.</returns>
+        public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
+        Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             CurrentSchemaType = schemaType;
 
             var schema = FromJson<T>(json, contractResolver);
