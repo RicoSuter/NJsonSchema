@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -134,71 +135,79 @@ namespace NJsonSchema
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">Cancellation token instance</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromFileAsync(string filePath)
+        public static async Task<JsonSchema> FromFileAsync(string filePath, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromFileAsync(filePath, factory).ConfigureAwait(false);
+            return await FromFileAsync(filePath, factory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var data = DynamicApis.FileReadAllText(filePath);
-            return await FromJsonAsync(data, filePath, referenceResolverFactory).ConfigureAwait(false);
+            return await FromJsonAsync(data, filePath, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
         /// <param name="url">The URL to the document.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<JsonSchema> FromUrlAsync(string url)
+        public static async Task<JsonSchema> FromUrlAsync(string url, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromUrlAsync(url, factory).ConfigureAwait(false);
+            return await FromUrlAsync(url, factory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
         /// <param name="url">The URL to the document.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false);
-            return await FromJsonAsync(data, url, referenceResolverFactory).ConfigureAwait(false);
+            var data = await DynamicApis.HttpGetAsync(url).ConfigureAwait(false); 
+            return await FromJsonAsync(data, url, referenceResolverFactory,cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/>. </summary>
         /// <param name="data">The JSON string. </param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data)
+        public static async Task<JsonSchema> FromJsonAsync(string data, CancellationToken cancellationToken = default)
         {
-            return await FromJsonAsync(data, null).ConfigureAwait(false);
+            return await FromJsonAsync(data, null, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/>. </summary>
         /// <param name="data">The JSON string. </param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath)
+        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromJsonAsync(data, documentPath, factory).ConfigureAwait(false);
+            return await FromJsonAsync(data, documentPath, factory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema" />.</summary>
         /// <param name="data">The JSON string.</param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory)
+        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema, 
+            JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value).ConfigureAwait(false);
+            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken).ConfigureAwait(false);
         }
 
         internal static JsonSchema FromJsonWithCurrentSettings(object obj)
