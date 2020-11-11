@@ -76,6 +76,8 @@ namespace NJsonSchema.Infrastructure
             using (dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType))
             using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType, new[] { handler }))
             {
+                handler.UseDefaultCredentials = true;
+
                 var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
