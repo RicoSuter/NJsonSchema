@@ -1,0 +1,46 @@
+﻿[Newtonsoft.Json.JsonConverter(typeof(OneOfConverter))]
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{% assign skipComma = true -%}
+{{ TypeAccessModifier }} abstract class OneOfBase<{% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}T{{ n }}{% endfor -%}>
+{
+    private readonly byte _index;
+{% for n in CaseNumbers -%}
+    private readonly T{{ n }} _case{{ n }};
+{% endfor -%}
+
+{% for n in CaseNumbers -%}
+    private protected OneOfBase(T{{ n }} case{{ n }}) => (_index, _case{{ n }}) = ({{ n }}, case{{ n }});
+{% endfor -%}
+
+    /// <summary>Apply a function to the OneOf value, depending on which case it is</summary>
+    /// <typeparam name="T">The type of the result</typeparam>
+{% for n in CaseNumbers -%}
+    /// <param name="case{{ n }}">The function to apply to the value if it's of case {{ n }}</param>
+{% endfor -%}
+    /// <returns>The result of the function which is applied</returns>
+{% assign skipComma = true -%}
+    public T Match<T>({% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}System.Func<T{{ n }}, T> case{{ n }}{% endfor -%}) =>
+        _index switch { {% for n in CaseNumbers -%}{{ n }} => case{{ n }}(_case{{ n }}), {% endfor -%}_ => default };
+
+    /// <summary>Apply an action on the OneOf value, depending on which case it is</summary>
+{% for n in CaseNumbers -%}
+    /// <param name="case{{ n }}">The action to apply on the value if it's of case {{ n }}</param>
+{% endfor -%}
+{% assign skipComma = true -%}
+    public void Match({% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}System.Action<T{{ n }}> case{{ n }}{% endfor -%}) =>
+{% assign skipComma = true -%}
+        Match({% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}ToFunc(case{{ n }}){% endfor -%});
+
+{% for n in CaseNumbers -%}
+    /// <summary>Attempt to access the inner OneOf value if it is of case {{ n }}. This throws an exception if the OneOf value is of another case.</summary>
+    public T{{ n }} AsCase{{ n }} => _index == {{ n }} || CanCoerceNullTo<T{{ n }}>() ? _case{{ n }} : throw new System.InvalidOperationException($"Cannot coerce to case {{ n }} - index is {_index}");
+{% endfor -%}
+
+    private static System.Func<T, object> ToFunc<T>(System.Action<T> action) => x => { action(x); return null; };
+
+{% assign skipComma = true -%}
+    private object AsObject => Match<object>({% for n in CaseNumbers -%}{% if skipComma -%}{% assign skipComma = false %}{% else %}, {% endif -%}x => x{% endfor -%});
+    private bool CanCoerceNullTo<T>() => AsObject == null && (!typeof(T).IsValueType || typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(System.Nullable<>));
+    
+    public override string ToString() => $"Case {_index}: {AsObject}";
+}

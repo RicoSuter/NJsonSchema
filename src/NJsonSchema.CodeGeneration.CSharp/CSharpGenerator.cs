@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.CSharp.Models;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -53,6 +54,34 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var baseArtifacts = base.GenerateTypes();
             var artifacts = new List<CodeArtifact>();
 
+            foreach (var r in baseArtifacts)
+            {
+                if (Regex.Match(r.Code, "OneOf<.+?>") is var m && m.Success)
+                {
+                    var arity = m.Value.Count(c => c == ',') + 1;
+                    var name = $"OneOf`{arity}";
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "OneOfAnonymous", new OneOfTemplateModel(arity, null, Settings));
+                    if (!artifacts.Any(a => a.TypeName == name))
+                    {
+                        artifacts.Add(new CodeArtifact(name, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template));
+                    }
+                }
+            }
+
+            foreach (var r in baseArtifacts)
+            {
+                if (Regex.Match(r.Code, "OneOf(Base)?<.+?>") is var m && m.Success)
+                {
+                    var arity = m.Value.Count(c => c == ',') + 1;
+                    var name = $"OneOfBase`{arity}";
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "OneOfBase", new OneOfTemplateModel(arity, null, Settings));
+                    if (!artifacts.Any(a => a.TypeName == name))
+                    {
+                        artifacts.Add(new CodeArtifact(name, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template));
+                    }
+                }
+            }
+
             if (baseArtifacts.Any(r => r.Code.Contains("JsonInheritanceConverter")))
             {
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
@@ -74,6 +103,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 {
                     var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", new TemplateModelBase());
                     artifacts.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
+                }
+            }
+
+            if (artifacts.Any(r => r.Code.Contains("OneOfConverter")))
+            {
+                if (Settings.ExcludedTypeNames?.Contains("OneOfConverter") != true)
+                {
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "OneOfConverter", new TemplateModelBase());
+                    artifacts.Add(new CodeArtifact("OneOfConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }
 
@@ -105,6 +143,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (schema.IsEnumeration)
             {
                 return GenerateEnum(schema, typeName);
+            }
+            else if (schema.IsUnionType && typeName != null)
+            {
+                return GenerateNamedOneOf(schema, typeName);
             }
             else
             {
@@ -142,6 +184,22 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var model = new EnumTemplateModel(typeName, schema, Settings);
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Enum", model);
             return new CodeArtifact(typeName, CodeArtifactType.Enum, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
+        }
+
+        private CodeArtifact GenerateNamedOneOf(JsonSchema schema, string typeName)
+        {
+            var namedDetails =
+                new NamedOneOfDetails(
+                    typeName,
+                    !(schema is JsonSchemaProperty) && !string.IsNullOrEmpty(schema.Description),
+                    schema.Description,
+                    schema.OneOf.Select((t,i) => _resolver.Resolve(t, t.IsNullable(Settings.SchemaType), t.HasTypeNameTitle ? t.Title : $"{typeName}Case{i+1}")).ToList()
+                );
+
+            var model = new OneOfTemplateModel(schema.OneOf.Count, namedDetails, Settings);
+
+            var template = Settings.TemplateFactory.CreateTemplate("CSharp", "OneOfNamed", model);
+            return new CodeArtifact(typeName, null, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
     }
 }

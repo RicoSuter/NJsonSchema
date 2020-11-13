@@ -1,0 +1,40 @@
+﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+internal sealed class OneOfConverter : Newtonsoft.Json.JsonConverter
+{
+    public override bool CanConvert(System.Type objectType) => objectType.BaseType.Name == "OneOfBase";
+
+    public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+    {
+        var jTkn = serializer.Deserialize<Newtonsoft.Json.Linq.JToken>(reader);
+
+        System.Collections.Generic.IEnumerable<(System.Type, object)> Deserialise()
+        {
+            foreach (var t in objectType.BaseType.GenericTypeArguments)
+            {
+                (System.Type, object)? value = null;
+                try  { value = (t, jTkn.ToObject(t)); } catch { }
+                if (jTkn.Type == Newtonsoft.Json.Linq.JTokenType.Boolean && t == typeof(string)) continue;
+                if (value.HasValue) yield return value.Value;
+            }
+        }
+        
+        var successfulDeserialisations = new System.Collections.Generic.List<(System.Type, object)>(Deserialise());
+        if (successfulDeserialisations.Count < 1 && jTkn.Type == Newtonsoft.Json.Linq.JTokenType.Null)
+            return null;
+        if (successfulDeserialisations.Count < 1 && jTkn.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+            throw new System.InvalidOperationException("Payload didn't match schema of any one-of case");
+        if (successfulDeserialisations.Count > 1 && jTkn.Type != Newtonsoft.Json.Linq.JTokenType.Null)
+            throw new System.InvalidOperationException($"Payload must match precisely one one-of case, but matched inner types {string.Join(", ", System.Linq.Enumerable.Select(successfulDeserialisations, t => $"'{t.Item1}'"))}");
+
+        var (t, obj) = successfulDeserialisations[0];
+        return objectType.GetConstructor(new[] { t }).Invoke(new[] { obj });
+    }
+
+    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+    {
+        var t = value.GetType();
+        var index = t.GetField("_index", System.Reflection.BindingFlags.NonPublic).GetValue(value);
+        var underlying = t.GetField($"_item{index}", System.Reflection.BindingFlags.NonPublic).GetValue(value);
+        serializer.Serialize(writer, underlying);
+    }
+}
