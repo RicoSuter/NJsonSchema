@@ -2,7 +2,7 @@
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly TypeScriptTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <param name="settings">The settings.</param>
         public PropertyModel(
             ClassTemplateModel classTemplateModel,
-            JsonProperty property, string parentTypeName,
+            JsonSchemaProperty property, string parentTypeName,
             TypeScriptTypeResolver typeResolver,
             TypeScriptGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)
@@ -64,7 +64,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (Type == ConstructorInterfaceType)
+                {
                     return false;
+                }
 
                 if (IsArray)
                 {
@@ -101,9 +103,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             get
             {
                 if (IsNullable && _settings.SupportsStrictNullChecks)
+                {
                     return " | " + _settings.NullValue.ToString().ToLowerInvariant();
+                }
                 else
+                {
                     return string.Empty;
+                }
             }
         }
 
@@ -128,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         Variable = typeStyle == TypeScriptTypeStyle.Class ?
                             (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
-                        Value = "data[\"" + _property.Name + "\"]",
+                        Value = "_data[\"" + _property.Name + "\"]",
                         Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
                         TypeNameHint = PropertyName,

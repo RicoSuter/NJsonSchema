@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Conversion
             dict.Add("bar", new List<string> { "a", "b" });
             var json = JsonConvert.SerializeObject(dict);
 
-            var schema = await JsonSchema4.FromTypeAsync<DictionarySubType>();
+            var schema = JsonSchema.FromType<DictionarySubType>();
             var data = schema.ToJson();
 
             //// Assert
@@ -90,7 +90,7 @@ namespace NJsonSchema.Tests.Conversion
         private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyType>();
+            var schema = JsonSchema.FromType<MyType>();
             var schemaData = schema.ToJson();
 
             //// Assert

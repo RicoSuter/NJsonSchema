@@ -8,6 +8,7 @@
 
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -52,17 +53,6 @@ namespace NJsonSchema.Infrastructure
         /// <param name="obj">The object to serialize.</param>
         /// <param name="schemaType">The schema type.</param>
         /// <param name="contractResolver">The contract resolver.</param>
-        /// <returns></returns>
-        [Obsolete("This overload will be removed soon.")]
-        public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver)
-        {
-            return ToJson(obj, schemaType, contractResolver, Formatting.Indented);
-        }
-
-        /// <summary>Serializes an object to a JSON string with reference handling.</summary>
-        /// <param name="obj">The object to serialize.</param>
-        /// <param name="schemaType">The schema type.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="formatting">The formatting.</param>
         /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver, Formatting formatting)
@@ -71,17 +61,7 @@ namespace NJsonSchema.Infrastructure
             CurrentSchemaType = schemaType;
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false, contractResolver);
-            var json = FromJson(obj, contractResolver, formatting);
-            return JsonSchemaReferenceUtilities.ConvertPropertyReferences(json);
-        }
 
-        /// <summary>Serializes an object to a JSON string.</summary>
-        /// <param name="obj">The object to serialize.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        /// <param name="formatting">The formatting.</param>
-        /// <returns>The JSON.</returns>
-        public static string FromJson(object obj, IContractResolver contractResolver, Formatting formatting)
-        {
             IsWriting = false;
             CurrentSerializerSettings = new JsonSerializerSettings
             {
@@ -89,7 +69,9 @@ namespace NJsonSchema.Infrastructure
             };
 
             var json = JsonConvert.SerializeObject(obj, formatting, CurrentSerializerSettings);
+
             CurrentSerializerSettings = null;
+            CurrentSchemaType = SchemaType.JsonSchema;
 
             return json;
         }
@@ -101,23 +83,45 @@ namespace NJsonSchema.Infrastructure
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
+        [Obsolete("Use FromJsonAsync with cancellation token instead.")]
         public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
         {
+            return await FromJsonAsync(json, schemaType, documentPath, referenceResolverFactory, contractResolver, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
+        /// <param name="json">The JSON data.</param>
+        /// <param name="schemaType">The schema type.</param>
+        /// <param name="documentPath">The document path.</param>
+        /// <param name="referenceResolverFactory">The reference resolver factory.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The deserialized schema.</returns>
+        public static async Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
+        Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             CurrentSchemaType = schemaType;
 
             var schema = FromJson<T>(json, contractResolver);
             if (schema is IDocumentPathProvider documentPathProvider)
+            {
                 documentPathProvider.DocumentPath = documentPath;
+            }
 
             var referenceResolver = referenceResolverFactory.Invoke(schema);
             if (schema is IJsonReference referenceSchema)
             {
                 if (!string.IsNullOrEmpty(documentPath))
+                {
                     referenceResolver.AddDocumentReference(documentPath, referenceSchema);
+                }
             }
 
             await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver).ConfigureAwait(false);
+            CurrentSchemaType = SchemaType.JsonSchema;
+
             return schema;
         }
 
@@ -136,8 +140,6 @@ namespace NJsonSchema.Infrastructure
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 PreserveReferencesHandling = PreserveReferencesHandling.None
             };
-
-            json = JsonSchemaReferenceUtilities.ConvertJsonReferences(json);
 
             var obj = JsonConvert.DeserializeObject<T>(json, CurrentSerializerSettings);
             CurrentSerializerSettings = null;

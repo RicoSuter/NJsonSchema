@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
         public async Task When_class_is_abstract_then_is_abstract_CSharp_keyword_is_generated()
         {
             /// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<AbstractClass>();
+            var schema = JsonSchema.FromType<AbstractClass>();
 
             /// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());

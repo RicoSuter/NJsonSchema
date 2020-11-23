@@ -2,7 +2,7 @@
 // <copyright file="TypeScriptPropertyNameGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
-    /// <summary>Generates the property name for a given TypeScript <see cref="JsonProperty"/>.</summary>
+    /// <summary>Generates the property name for a given TypeScript <see cref="JsonSchemaProperty"/>.</summary>
     public class TypeScriptPropertyNameGenerator : IPropertyNameGenerator
     {
         /// <summary>Gets or sets the reserved names.</summary>
@@ -20,11 +20,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
-        public virtual string Generate(JsonProperty property)
+        public virtual string Generate(JsonSchemaProperty property)
         {
             var name = ConversionUtilities.ConvertToLowerCamelCase(property.Name
                     .Replace("\"", string.Empty)
                     .Replace("@", string.Empty)
+                    .Replace("?", string.Empty)
                     .Replace(".", "-")
                     .Replace("=", "-")
                     .Replace("+", "plus"), true)

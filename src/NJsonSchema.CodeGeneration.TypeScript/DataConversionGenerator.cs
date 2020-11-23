@@ -2,9 +2,11 @@
 // <copyright file="DataConversionGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
+
+using System;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -49,13 +51,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 Variable = parameters.Variable,
                 Value = parameters.Value,
 
-                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema, 
+                HasDefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver) != null,
                 DefaultValue = valueGenerator.GetDefaultValue(parameters.Schema,
                     parameters.IsPropertyNullable, type, parameters.TypeNameHint, parameters.Settings.GenerateDefaultValues, parameters.Resolver),
 
                 Type = type,
 
+                CheckNewableObject = parameters.CheckNewableObject,
                 IsNewableObject = IsNewableObject(parameters.Schema, parameters),
                 IsDate = IsDate(typeSchema.Format, parameters.Settings.DateTimeType),
                 IsDateTime = IsDateTime(typeSchema.Format, parameters.Settings.DateTimeType),
@@ -83,19 +86,85 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
-                StringToDateCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date ? "new Date" :
-                        (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
-                        typeSchema.Format == JsonFormatStrings.TimeSpan ? "moment.duration" :
-                    parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "moment.parseZone" : "moment",
-                DateTimeToStringCode =
-                        (parameters.Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                        parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS) &&
-                        typeSchema.Format == JsonFormatStrings.TimeSpan ? "format('d.hh:mm:ss.SS', { trim: false })" :
-                    parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS ? "toISOString(true)" : "toISOString()",
+                StringToDateCode = GetStringToDateTime(parameters, typeSchema),
+                DateTimeToStringCode = GetDateTimeToString(parameters, typeSchema),
 
                 HandleReferences = parameters.Settings.HandleReferences
             };
+        }
+
+        private static string GetStringToDateTime(DataConversionParameters parameters, JsonSchema typeSchema)
+        {
+            switch (parameters.Settings.DateTimeType)
+            {
+                case TypeScriptDateTimeType.Date:
+                    return "new Date";
+
+                case TypeScriptDateTimeType.MomentJS:
+                case TypeScriptDateTimeType.OffsetMomentJS:
+                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    {
+                        return "moment.duration";
+                    }
+
+                    if (parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
+                    {
+                        return "moment.parseZone";
+                    }
+
+                    return "moment";
+                    
+                case TypeScriptDateTimeType.String:
+                    return "";
+
+                case TypeScriptDateTimeType.Luxon:
+                    return "DateTime.fromISO";
+
+                case TypeScriptDateTimeType.DayJS:
+                    return "dayjs";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static string GetDateTimeToString(DataConversionParameters parameters, JsonSchema typeSchema)
+        {
+            switch (parameters.Settings.DateTimeType)
+            {
+                case TypeScriptDateTimeType.Date:
+                    return "toISOString()";
+
+                case TypeScriptDateTimeType.MomentJS:
+                case TypeScriptDateTimeType.OffsetMomentJS:
+                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    {
+                        return "format('d.hh:mm:ss.SS', { trim: false })";
+                    }
+
+                    if (parameters.Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
+                    {
+                        return "toISOString(true)";
+                    }
+                    return "toISOString()";
+
+                case TypeScriptDateTimeType.String:
+                    return "";
+
+                case TypeScriptDateTimeType.Luxon:
+                    return "toString()";
+
+                case TypeScriptDateTimeType.DayJS:
+                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    {
+                        return "format('d.hh:mm:ss.SSS')";
+                    }
+
+                    return "toISOString()";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private static bool IsDateTime(string format, TypeScriptDateTimeType type)
@@ -104,25 +173,55 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type == TypeScriptDateTimeType.Date)
             {
                 if (format == JsonFormatStrings.DateTime)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.Time)
+                {
                     return false;
+                }
 
                 if (format == JsonFormatStrings.TimeSpan)
+                {
                     return false;
+                }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.DateTime)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.Time)
+                {
                     return true;
+                }
 
                 if (format == JsonFormatStrings.TimeSpan)
+                {
                     return true;
+                }
+            }
+            else if (type == TypeScriptDateTimeType.Luxon)
+            {
+                if (format == JsonFormatStrings.DateTime)
+                {
+                    return true;
+                }
+
+                if (format == JsonFormatStrings.Time)
+                {
+                    return true;
+                }
+
+                if (format == JsonFormatStrings.TimeSpan)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -134,21 +233,35 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (type == TypeScriptDateTimeType.Date)
             {
                 if (format == JsonFormatStrings.Date)
+                {
                     return true;
+                }
             }
-            else if (type == TypeScriptDateTimeType.MomentJS ||
+            else if (type == TypeScriptDateTimeType.DayJS || 
+                     type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (format == JsonFormatStrings.Date)
+                {
                     return true;
+                }
+            }
+            else if (type == TypeScriptDateTimeType.Luxon)
+            {
+                if (format == JsonFormatStrings.Date)
+                {
+                    return true;
+                }
             }
             return false;
         }
 
-        private static bool IsNewableObject(JsonSchema4 schema, DataConversionParameters parameters)
+        private static bool IsNewableObject(JsonSchema schema, DataConversionParameters parameters)
         {
             if (schema.ActualTypeSchema.IsEnumeration)
+            {
                 return false;
+            }
 
             return parameters.Resolver.GeneratesType(schema);
         }

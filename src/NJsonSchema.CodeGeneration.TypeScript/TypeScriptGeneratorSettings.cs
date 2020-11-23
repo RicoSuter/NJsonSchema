@@ -2,7 +2,7 @@
 // <copyright file="CSharpGeneratorSettings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -23,8 +23,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             NullValue = TypeScriptNullValue.Undefined;
             TypeStyle = TypeScriptTypeStyle.Class;
             DateTimeType = TypeScriptDateTimeType.Date;
+            EnumStyle = TypeScriptEnumStyle.Enum;
+            UseLeafType = false;
             ExtensionCode = string.Empty;
-            TypeScriptVersion = 1.8m;
+            TypeScriptVersion = 2.7m;
             GenerateConstructorInterface = true;
             ConvertConstructorInterfaceData = false;
             ExportTypes = true;
@@ -56,6 +58,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
         public TypeScriptDateTimeType DateTimeType { get; set; }
+        
+        /// <summary>Gets or sets the enum style (default: Enum).</summary>
+        public TypeScriptEnumStyle EnumStyle { get; set; }
+
+        /// <summary>Generate leaf types for an object with discriminator (default: false).</summary>
+        public bool UseLeafType { get; set; }
 
         /// <summary>Gets or sets the TypeScript module name (default: '', no module).</summary>
         public string ModuleName { get; set; }
@@ -96,7 +104,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         internal ITemplate CreateTemplate(string typeName, object model)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
+            {
                 return TemplateFactory.CreateTemplate("TypeScript", "Class", model);
+            }
 
             return TemplateFactory.CreateTemplate("TypeScript", TypeStyle.ToString(), model);
         }
@@ -107,7 +117,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public TypeScriptTypeStyle GetTypeStyle(string typeName)
         {
             if (ClassTypes != null && ClassTypes.Contains(typeName))
+            {
                 return TypeScriptTypeStyle.Class;
+            }
 
             return TypeStyle;
         }

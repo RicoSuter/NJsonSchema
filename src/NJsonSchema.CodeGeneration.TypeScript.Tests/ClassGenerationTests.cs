@@ -53,13 +53,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
 
             //// Assert
-            Assert.Contains("init(data?: any) {", code);
+            Assert.Contains("init(_data?: any) {", code);
         }
 
         [Fact]
         public async Task When_default_value_is_available_then_variable_is_initialized()
         {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 1.8m
+            });
 
             //// Assert
             Assert.Contains("name: string;", code);
@@ -77,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
-            var schema = await JsonSchema4.FromTypeAsync<MyClassTest>();
+            var schema = JsonSchema.FromType<MyClassTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -90,24 +94,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
-                            Item = new JsonSchema4
+                            Item = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Array,
-                            Item = new JsonSchema4
+                            Item = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
@@ -121,7 +125,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -135,24 +140,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
-                            AdditionalPropertiesSchema = new JsonSchema4
+                            AdditionalPropertiesSchema = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
-                            AdditionalPropertiesSchema = new JsonSchema4
+                            AdditionalPropertiesSchema = new JsonSchema
                             {
                                 Type = JsonObjectType.String
                             },
@@ -166,30 +171,31 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("a: { [key: string] : string; };", code);
+            Assert.Contains("a: { [key: string]: string; };", code);
             Assert.Contains("this.a = {};", code);
-            Assert.Contains("b: { [key: string] : string; };", code);
+            Assert.Contains("b: { [key: string]: string; };", code);
         }
 
         [Fact]
         public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             //// Arrange
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    { "A", new JsonProperty
+                    { "A", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -198,12 +204,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                             IsRequired = true
                         }
                     },
-                    { "B", new JsonProperty
+                    { "B", new JsonSchemaProperty
                         {
                             Type = JsonObjectType.Object,
                             Properties =
                             {
-                                {"A", new JsonProperty
+                                {"A", new JsonSchemaProperty
                                     {
                                         Type = JsonObjectType.String
                                     }
@@ -219,17 +225,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                TypeScriptVersion = 1.8m
             });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
             Assert.Contains("a: A;", code);
             Assert.Contains("this.a = new A();", code);
-            Assert.Contains("this.a = data[\"A\"] ? A.fromJS(data[\"A\"]) : new A();", code);
+            Assert.Contains("this.a = _data[\"A\"] ? A.fromJS(_data[\"A\"]) : new A();", code);
 
             Assert.Contains("b: B;", code);
-            Assert.Contains("this.b = data[\"B\"] ? B.fromJS(data[\"B\"]) : <any>undefined;", code);
+            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : <any>undefined;", code);
         }
 
         [Fact]
@@ -315,12 +322,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
         {
             // Assert
-            var schema = JsonSchema4.FromTypeAsync(
+            var schema = JsonSchema.FromType(
                 typeof(MyDerivedClass),
                 new JsonSchemaGeneratorSettings
                 {
                     GenerateAbstractProperties = true
-                }).Result;
+                });
 
             var generator = new TypeScriptGenerator(schema);
             generator.Settings.GenerateConstructorInterface = false;

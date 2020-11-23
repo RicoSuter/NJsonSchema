@@ -39,7 +39,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Bytes"].Type);
@@ -53,7 +53,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["Byte"].Type);
@@ -67,7 +67,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["TimeSpan"].Type);
@@ -81,7 +81,7 @@ namespace NJsonSchema.Tests.Generation
             var data = JsonConvert.SerializeObject(new Foo { Type = typeof(Foo) }); // Type property is serialized as string
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var json = schema.ToJson();
 
             //// Assert
@@ -95,7 +95,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Date"].Type);
@@ -109,7 +109,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["ZonedDateTime"].Type);
@@ -123,7 +123,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["OffsetDateTime"].Type);
@@ -137,7 +137,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Instant"].Type);
@@ -151,7 +151,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Duration"].Type);

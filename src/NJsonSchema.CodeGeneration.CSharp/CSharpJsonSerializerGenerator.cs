@@ -2,7 +2,7 @@
 // <copyright file="CSharpJsonSerializerGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -41,18 +41,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
             else
             {
                 if (hasJsonConverters)
+                {
                     return ", " + GenerateConverters(jsonConverters);
+                }
                 else
+                {
                     return string.Empty;
+                }
             }
         }
 
         private static string GenerateConverters(List<string> jsonConverters)
         {
             if (jsonConverters.Any())
+            {
                 return "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
+            }
             else
+            {
                 return string.Empty;
+            }
         }
     }
 }

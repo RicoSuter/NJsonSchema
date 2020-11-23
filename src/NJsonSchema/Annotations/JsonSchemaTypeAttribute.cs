@@ -31,6 +31,7 @@ namespace NJsonSchema.Annotations
             set => IsNullableRaw = value;
         }
 
-        internal bool? IsNullableRaw { get; set; } // required because attribute properties cannot be bool?
+        /// <summary>Gets the raw nullable information.</summary>
+        public bool? IsNullableRaw { get; internal set; } // required because attribute properties cannot be bool?
     }
 }

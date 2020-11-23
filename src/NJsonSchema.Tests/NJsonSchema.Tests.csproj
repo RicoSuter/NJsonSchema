@@ -1,18 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net46;net45</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net46;net452</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>
     <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Tests.xml</DocumentationFile>
+    <NoWarn>1998,1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="References\LocalReferencesTests\animal.json" />
     <None Remove="References\LocalReferencesTests\collection.json" />
+    <None Remove="References\LocalReferencesTests\dir_with_#\first.json" />
+    <None Remove="References\LocalReferencesTests\dir_with_#\second.json" />
     <None Remove="References\LocalReferencesTests\schema_with_collection_reference.json" />
     <None Remove="References\LocalReferencesTests\schema_with_indirect_reference.json" />
     <None Remove="References\LocalReferencesTests\schema_with_reference.json" />
@@ -23,6 +26,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\LocalReferencesTests\collection.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\LocalReferencesTests\dir_with_#\first.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\LocalReferencesTests\dir_with_#\second.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\LocalReferencesTests\schema_with_collection_reference.json">
@@ -40,11 +49,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.Text.Json" Version="4.6.0" />
 
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
 
     <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net45'" Include="System.ComponentModel.DataAnnotations"></Reference>
+    <Reference Condition="'$(TargetFramework)' == 'net452'" Include="System.ComponentModel.DataAnnotations"></Reference>
     <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations"></Reference>
 
     <PackageReference Include="NodaTime" Version="2.2.0" />

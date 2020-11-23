@@ -2,7 +2,7 @@
 // <copyright file="DefaultTemplateFactory.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The toolchain version.</returns>
         protected virtual string GetToolchainVersion()
         {
-            return JsonSchema4.ToolchainVersion;
+            return JsonSchema.ToolchainVersion;
         }
 
         /// <summary>Gets a Liquid template by name.</summary>
@@ -60,7 +60,9 @@ namespace NJsonSchema.CodeGeneration
         {
             var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
             if (assembly != null)
+            {
                 return assembly;
+            }
 
             throw new InvalidOperationException("The assembly '" + name + "' containting liquid templates could not be found.");
         }
@@ -72,6 +74,7 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
         protected virtual string GetEmbeddedLiquidTemplate(string language, string template)
         {
+            template = template.TrimEnd('!');
             var assembly = GetLiquidAssembly("NJsonSchema.CodeGeneration." + language);
             var resourceName = "NJsonSchema.CodeGeneration." + language + ".Templates." + template + ".liquid";
 
@@ -79,7 +82,9 @@ namespace NJsonSchema.CodeGeneration
             if (resource != null)
             {
                 using (var reader = new StreamReader(resource))
+                {
                     return reader.ReadToEnd();
+                }
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
@@ -92,7 +97,9 @@ namespace NJsonSchema.CodeGeneration
             {
                 var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
+                {
                     return File.ReadAllText(templateFilePath);
+                }
             }
 
             return GetEmbeddedLiquidTemplate(language, template);
@@ -168,7 +175,7 @@ namespace NJsonSchema.CodeGeneration
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}.", exception);
+                    throw new InvalidOperationException($"Error while rendering Liquid template {_language}/{_template}: \n" + exception, exception);
                 }
             }
         }
@@ -193,6 +200,11 @@ namespace NJsonSchema.CodeGeneration
             public static string Uppercamelcase(Context context, string input, bool firstCharacterMustBeAlpha = true)
             {
                 return ConversionUtilities.ConvertToUpperCamelCase(input, firstCharacterMustBeAlpha);
+            }
+
+            public static string Literal(string input)
+            {
+                return "\"" + ConversionUtilities.ConvertToStringLiteral(input) + "\"";
             }
 
             public static IEnumerable<object> Concat(Context context, IEnumerable<object> input, IEnumerable<object> concat)
@@ -238,14 +250,18 @@ namespace NJsonSchema.CodeGeneration
                     var output = template.Render().Trim();
 
                     if (string.IsNullOrEmpty(output))
+                    {
                         result.Write("");
+                    }
                     else if (_tabCount >= 0)
                     {
                         result.Write(string.Join("", Enumerable.Repeat("    ", _tabCount)) +
                             ConversionUtilities.Tab(output, _tabCount) + "\r\n");
                     }
                     else
+                    {
                         result.Write(output);
+                    }
                 }
                 catch (InvalidOperationException)
                 {
@@ -257,9 +273,15 @@ namespace NJsonSchema.CodeGeneration
                 var model = new LiquidProxyHash(((LiquidProxyHash)context.Environments[0]).Object);
                 model.Merge(context.Registers);
                 foreach (var scope in Enumerable.Reverse(context.Scopes))
+                {
                     model.Merge(scope);
+                }
+
                 foreach (var environment in Enumerable.Reverse(context.Environments))
+                {
                     model.Merge(environment);
+                }
+
                 return model;
             }
         }

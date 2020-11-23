@@ -2,7 +2,7 @@
 // <copyright file="ClassTemplateModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     public class ClassTemplateModel : ClassTemplateModelBase
     {
         private readonly CSharpTypeResolver _resolver;
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
         private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel"/> class.</summary>
@@ -26,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
         public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings,
-            CSharpTypeResolver resolver, JsonSchema4 schema, object rootObject)
+            CSharpTypeResolver resolver, JsonSchema schema, object rootObject)
             : base(resolver, schema, rootObject)
         {
             _resolver = resolver;
@@ -45,7 +45,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
             }
             else
+            {
                 AllProperties = Properties;
+            }
         }
 
         /// <summary>Gets or sets the class name.</summary>
@@ -54,13 +56,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the namespace.</summary>
         public string Namespace => _settings.Namespace;
 
+        /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
+        public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
+
         /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
         public bool HasAdditionalPropertiesType =>
             !_schema.IsDictionary &&
             !_schema.ActualTypeSchema.IsDictionary &&
             !_schema.IsArray &&
             !_schema.ActualTypeSchema.IsArray &&
-            (_schema.AdditionalPropertiesSchema != null ||
+            (_schema.ActualTypeSchema.AllowAdditionalProperties ||
              _schema.ActualTypeSchema.AdditionalPropertiesSchema != null);
 
         /// <summary>Gets the type of the additional properties.</summary>
@@ -77,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonProperty) &&
+        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
@@ -137,5 +142,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
+
+        /// <summary>Gets a value indicating whether the class is deprecated.</summary>
+        public bool IsDeprecated => _schema.IsDeprecated;
+
+        /// <summary>Gets a value indicating whether the class has a deprecated message.</summary>
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_schema.DeprecatedMessage);
+
+        /// <summary>Gets the deprecated message.</summary>
+        public string DeprecatedMessage => _schema.DeprecatedMessage;
     }
 }

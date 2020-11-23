@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer,
                 GenerateEnumMappingDescription = true
@@ -60,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -81,7 +82,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.String,
                 GenerateEnumMappingDescription = true
@@ -105,7 +106,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -130,7 +131,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<EnumProperty>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<EnumProperty>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2,
                 DefaultEnumHandling = EnumHandling.Integer
@@ -160,7 +161,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_string_enum_property_has_default_then_default_is_converted_to_string()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<EnumPropertyWithDefaultClass>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchema.FromType<EnumPropertyWithDefaultClass>(new JsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -183,7 +184,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_enum_property_has_should_serialize_then_no_npe()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<Party>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchema.FromType<Party>(new JsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -191,6 +192,34 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(schema.Properties.ContainsKey("EnumValue"));
             Assert.NotNull(json);
+        }
+
+        public class RequiredEnumProperty
+        {
+            [Required]
+            public Bar Bar { get; set; }
+
+            public Bar Bar2 { get; set; }
+        }
+
+        [Fact]
+        public async Task When_enum_property_is_required_then_MinLength_is_not_set()
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = JsonSchema.FromType<RequiredEnumProperty>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3,
+                DefaultEnumHandling = EnumHandling.String
+            });
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.RequiredProperties.Contains("Bar"));
+            Assert.True(schema.Properties["Bar"].OneOf.Count == 0);
+            Assert.True(schema.Properties["Bar"].Reference != null);
         }
     }
 }

@@ -9,12 +9,12 @@ namespace NJsonSchema.Tests.Validation
         public void When_property_can_be_null_then_null_is_allowed()
         {
             //// Arrange
-            var schema = new JsonSchema4();
-            schema.Properties["test"] = new JsonProperty
+            var schema = new JsonSchema();
+            schema.Properties["test"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.Null | JsonObjectType.Object
             };
-            schema.Properties["test"].Properties["foo"] = new JsonProperty
+            schema.Properties["test"].Properties["foo"] = new JsonSchemaProperty
             {
                 Type = JsonObjectType.String
             };
@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_property_can_be_null_then_null_is_allowed2()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<NullablePropertyClass>();
+            var schema = JsonSchema.FromType<NullablePropertyClass>();
             var schemaData = schema.ToJson();
 
             //// Act

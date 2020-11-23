@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schema = JsonSchema.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m });
@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task Demo2()
         {
-            var schema = await JsonSchema4.FromTypeAsync<Person>();
+            var schema = JsonSchema.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });
@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
                     }
                 }
             }";
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
             var dataJson = @"{
                 ""SimpleDate"":""2012-05-18T00:00:00Z"",
@@ -121,7 +121,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
                     }
                 }
             }";
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
             var data = JObject.Parse(@"{
                 ""SimpleDate"":""2012-05-18T00:00:00Z"",

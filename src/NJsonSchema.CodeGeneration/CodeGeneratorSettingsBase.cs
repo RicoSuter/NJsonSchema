@@ -2,7 +2,7 @@
 // <copyright file="CodeGeneratorSettingsBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -51,5 +51,8 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets or sets the output language specific value generator.</summary>
         [JsonIgnore]
         public ValueGeneratorBase ValueGenerator { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether named/referenced any schemas should be inlined or generated as class.</summary>
+        public bool InlineNamedAny { get; set; }
     }
 }

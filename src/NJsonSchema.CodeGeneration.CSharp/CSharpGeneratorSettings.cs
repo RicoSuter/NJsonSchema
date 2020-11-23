@@ -2,7 +2,7 @@
 // <copyright file="CSharpGeneratorSettings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -16,25 +16,29 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Initializes a new instance of the <see cref="CSharpGeneratorSettings"/> class.</summary>
         public CSharpGeneratorSettings()
         {
+            AnyType = "object";
             Namespace = "MyNamespace";
 
-            DateType = "System.DateTime";
-            DateTimeType = "System.DateTime";
+            DateType = "System.DateTimeOffset";
+            DateTimeType = "System.DateTimeOffset";
             TimeType = "System.TimeSpan";
             TimeSpanType = "System.TimeSpan";
 
-            ArrayType = "System.Collections.ObjectModel.ObservableCollection";
-            DictionaryType = "System.Collections.Generic.Dictionary";
+            ArrayType = "System.Collections.Generic.ICollection";
+            ArrayInstanceType = "System.Collections.ObjectModel.Collection";
+            ArrayBaseType = "System.Collections.ObjectModel.Collection";
 
-            ArrayBaseType = "System.Collections.ObjectModel.ObservableCollection";
+            DictionaryType = "System.Collections.Generic.IDictionary";
+            DictionaryInstanceType = "System.Collections.Generic.Dictionary";
             DictionaryBaseType = "System.Collections.Generic.Dictionary";
+
+            ClassStyle = CSharpClassStyle.Poco;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
-            ClassStyle = CSharpClassStyle.Inpc;
             TypeAccessModifier = "public";
             PropertySetterAccessModifier = string.Empty;
-            GenerateJsonMethods = true;
+            GenerateJsonMethods = false;
             EnforceFlagEnums = false;
 
             ValueGenerator = new CSharpValueGenerator(this);
@@ -59,10 +63,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether to generated data annotation attributes (default: true).</summary>
         public bool GenerateDataAnnotations { get; set; }
 
-        /// <summary>Gets or sets the date .NET type (default: 'DateTime').</summary>
+        /// <summary>Gets or sets the any type (default: "object").</summary>
+        public string AnyType { get; set; }
+
+        /// <summary>Gets or sets the date .NET type (default: 'DateTimeOffset').</summary>
         public string DateType { get; set; }
 
-        /// <summary>Gets or sets the date time .NET type (default: 'DateTime').</summary>
+        /// <summary>Gets or sets the date time .NET type (default: 'DateTimeOffset').</summary>
         public string DateTimeType { get; set; }
 
         /// <summary>Gets or sets the time .NET type (default: 'TimeSpan').</summary>
@@ -71,19 +78,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
         public string TimeSpanType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type (default: 'ObservableCollection').</summary>
+        /// <summary>Gets or sets the generic array .NET type (default: 'ICollection').</summary>
         public string ArrayType { get; set; }
 
-        /// <summary>Gets or sets the generic dictionary .NET type (default: 'Dictionary').</summary>
+        /// <summary>Gets or sets the generic dictionary .NET type (default: 'IDictionary').</summary>
         public string DictionaryType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type which is used for ArrayType instances (default: empty = use ArrayType).</summary>
+        /// <summary>Gets or sets the generic array .NET type which is used for ArrayType instances (default: 'Collection').</summary>
         public string ArrayInstanceType { get; set; }
 
-        /// <summary>Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: empty = use DictionaryType).</summary>
+        /// <summary>Gets or sets the generic dictionary .NET type which is used for DictionaryType instances (default: 'Dictionary').</summary>
         public string DictionaryInstanceType { get; set; }
 
-        /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'ObservableCollection').</summary>
+        /// <summary>Gets or sets the generic array .NET type which is used as base class (default: 'Collection').</summary>
         public string ArrayBaseType { get; set; }
 
         /// <summary>Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').</summary>
@@ -127,5 +134,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether named/referenced arrays should be inlined or generated as class with array inheritance.</summary>
         public bool InlineNamedArrays { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether optional schema properties (not required) are generated as nullable properties (default: false).</summary>
+        public bool GenerateOptionalPropertiesAsNullable { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).</summary>
+        public bool GenerateNullableReferenceTypes { get; set; }
     }
 }

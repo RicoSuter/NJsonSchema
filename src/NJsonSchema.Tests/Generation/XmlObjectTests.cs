@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             
             //// Assert
             AssertTypeWithoutXmlAttributes(schema);
@@ -155,7 +155,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_without_xml_attributes_defined()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
             var schemaObject = JObject.Parse(schemaData);
 
@@ -171,7 +171,7 @@ namespace NJsonSchema.Tests.Generation
             AssertTypeWithoutXmlAttributes(definitionSchema);
         }
 
-        private void AssertTypeWithoutXmlAttributes(JsonSchema4 schema)
+        private void AssertTypeWithoutXmlAttributes(JsonSchema schema)
         {
             Assert.Null(schema.Xml);
             var fooProperty = schema.Properties[Foo];
@@ -209,7 +209,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes_and_serialized()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = JsonSchema.FromType<WithoutXmlAttributesDefined>(new JsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
 
             var schemaObject = JObject.Parse(schemaData);
@@ -326,7 +326,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -389,7 +389,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_xml_attributes_defined()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined[]>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -410,7 +410,7 @@ namespace NJsonSchema.Tests.Generation
             AssertTypeWithXmlAttributes(schema, definitionSchema);
         }
 
-        private void AssertTypeWithXmlAttributes(JsonSchema4 schema, JsonSchema4 rootDefinitionSchema)
+        private void AssertTypeWithXmlAttributes(JsonSchema schema, JsonSchema rootDefinitionSchema)
         {
             Assert.Equal("NotTheSameName", rootDefinitionSchema.Xml.Name);
             Assert.Equal("http://test.shema.org/type", rootDefinitionSchema.Xml.Namespace);
@@ -452,7 +452,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_and_serialized()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -486,7 +486,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_that_are_incorrect()
         {
-            var schema = await JsonSchema4.FromTypeAsync<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<WithXmlIncorrectAttributesDefined>(new JsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });

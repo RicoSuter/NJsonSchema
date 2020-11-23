@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
+            var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.DoesNotContain("extends { [key: string]: any; }", code);
             Assert.Contains("[key: string]: any; ", code);
         }
 
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(AnyDictionary));
+            var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -53,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : any; }", code);
+            Assert.DoesNotContain("extends { [key: string]: any; }", code);
             Assert.DoesNotContain("super()", code);
             Assert.Contains("[key: string]: any; ", code);
         }
@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
+            var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.DoesNotContain("extends { [key: string]: string; }", code);
             Assert.Contains("[key: string]: string | any; ", code);
         }
 
@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 SchemaType = SchemaType.Swagger2
             });
-            var schema = await schemaGenerator.GenerateAsync(typeof(StringDictionary));
+            var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
             //// Act
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             //// Assert
-            Assert.DoesNotContain("extends { [key: string] : string; }", code);
+            Assert.DoesNotContain("extends { [key: string]: string; }", code);
             Assert.DoesNotContain("super()", code);
             Assert.Contains("[key: string]: string | any; ", code);
         }
@@ -122,18 +122,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Null
+                NullValue = TypeScriptNullValue.Null,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = data[\"resource\"][key] ? MyItem.fromJS(data[\"resource\"][key]) : new MyItem();", code);
+            Assert.Contains("this.resource[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
         }
 
         [Fact]
@@ -147,7 +148,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -159,7 +160,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("resource: any;", code);
-            Assert.DoesNotContain("this.resource[key] = data[\"resource\"][key];", code);
+            Assert.DoesNotContain("this.resource[key] = _data[\"resource\"][key];", code);
             Assert.DoesNotContain(" : new any();", code);
         }
 
@@ -182,18 +183,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
     }
 }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Undefined
+                NullValue = TypeScriptNullValue.Undefined,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = data[\"resource\"][key];", code);
+            Assert.Contains("this.resource[key] = _data[\"resource\"][key];", code);
         }
 
         public class DictionaryContainer
@@ -213,7 +215,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DictionaryContainer>();
+            var schema = JsonSchema.FromType<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act
@@ -222,14 +224,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullValue = TypeScriptNullValue.Undefined,
                 ConvertConstructorInterfaceData = convertConstructorInterfaceData,
-                InlineNamedDictionaries = inlineNamedDictionaries
+                InlineNamedDictionaries = inlineNamedDictionaries,
+                TypeScriptVersion = 1.8m
             });
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
             if (inlineNamedDictionaries)
             {
-                Assert.Contains("foo: { [key: string] : string; };", code);
+                Assert.Contains("foo: { [key: string]: string; };", code);
                 Assert.Contains(@"data[""Foo""] = {};", code);
                 Assert.Contains(@"this.foo = {} as any;", code);
 
@@ -241,7 +244,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 Assert.DoesNotContain("this.foo = {};", code);
                 Assert.DoesNotContain("data[\"Foo\"] = {};", code);
 
-                Assert.Contains(@"this.foo = data[""Foo""] ? DisplayValueDictionary.fromJS(data[""Foo""]) : <any>undefined;", code);
+                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : <any>undefined;", code);
                 Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : <any>undefined;", code);
 
                 Assert.Contains("foo: DisplayValueDictionary", code);
@@ -255,6 +258,51 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                     Assert.DoesNotContain("new DisplayValueDictionary(data.foo)", code);
                 }
             }
+        }
+
+        [Fact]
+        public async Task When_dictionary_has_arbitrary_nonenum_key_then_generated_typescript_uses_plain_string_key()
+        {
+            //// Arrange
+            var json = @"{
+    ""properties"": {
+        ""myDict"": {
+            ""type"": ""object"",
+            ""additionalProperties"": {
+                ""$ref"": ""#/definitions/myItem""
+            }
+        }
+    },
+    ""definitions"": {
+        ""myItem"": {
+            ""type"": ""object"",
+            ""additionalProperties"": false,
+            ""properties"": {
+                ""name"": {
+                    ""type"": ""string""
+                },
+                ""age"": {
+                    ""type"": ""integer""
+                }
+            }
+        }
+    }
+}";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                ConvertConstructorInterfaceData = true,
+                TypeStyle = TypeScriptTypeStyle.Class,
+                TypeScriptVersion = 2.7m
+            });
+
+            var code = codeGenerator.GenerateFile("Test");
+
+            //// Assert
+            Assert.DoesNotContain("[key in keyof typeof Istring]", code);
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema", "NJsonSchema\NJsonSchema.csproj", "{7B7A2E32-E808-4A19-98B1-37E766580F8C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Tests", "NJsonSchema.Tests\NJsonSchema.Tests.csproj", "{4F0A74F2-54BE-4747-8EDB-562ABB6E0B64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NJsonSchema.Demo", "NJsonSchema.Demo\NJsonSchema.Demo.csproj", "{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Demo", "NJsonSchema.Demo\NJsonSchema.Demo.csproj", "{3B2362AC-B75C-4EE5-9AB8-EDC3F5419970}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.CodeGeneration", "NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj", "{8A463FA0-DAAF-483C-813E-AE9C6153CBF7}"
 EndProject
@@ -30,6 +30,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Benchmark", "NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj", "{E59CE32B-181F-4AAE-BF62-772AEEFC3177}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Yaml.Tests", "NJsonSchema.Yaml.Tests\NJsonSchema.Yaml.Tests.csproj", "{990EF464-C967-4E08-8C3D-0568A47B6D2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{863B2D88-A0BD-4466-8583-AAD0B8D3F182}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

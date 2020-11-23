@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
+using NJsonSchema.Tests.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -14,7 +17,7 @@ namespace NJsonSchema.Tests.Serialization
             var json = @"{ ""definitions"": { ""abc"": null } }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
             //// Assert
@@ -26,7 +29,7 @@ namespace NJsonSchema.Tests.Serialization
         public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.ExtensionData = new Dictionary<string, object>
             {
                 { "Test", 123 }
@@ -53,7 +56,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.Equal((long)123, schema.ExtensionData["Test"]);
@@ -69,7 +72,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Assert
             Assert.Null(schema.ExtensionData);
@@ -90,7 +93,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
+            var schema = JsonSchema.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -103,11 +106,46 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<MyTest>();
+            var schema = JsonSchema.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
             Assert.Equal(3, schema.Properties["Property"].ExtensionData["Bar"]);
+        }
+
+        public class MyCustomExtensionAttribute : ValidationAttribute, IJsonSchemaExtensionDataAttribute
+        {
+            public MyCustomExtensionAttribute()
+            {
+                this.Key = "My custom key";
+                this.Value = "My custom logic";
+            }
+
+            public string Key { get; }
+            public object Value { get; }
+
+            public override bool IsValid(object value)
+            {
+                return false;
+            }
+        }
+
+        [MyCustomExtension()]
+        public class MyCustomAttributeTest
+        {
+            [MyCustomExtension]
+            public string Property { get; set; }
+        }
+
+        [Fact]
+        public async Task When_extension_data_interface_is_used_on_property_then_extension_data_property_is_set()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<MyCustomAttributeTest>();
+
+            //// Assert
+            Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
+            Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
         }
 
         [Fact]
@@ -165,7 +203,7 @@ namespace NJsonSchema.Tests.Serialization
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
             //// Assert

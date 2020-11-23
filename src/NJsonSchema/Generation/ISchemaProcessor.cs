@@ -2,11 +2,9 @@
 // <copyright file="ISchemaProcessor.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation
 {
@@ -15,6 +13,6 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Processes the specified JSON Schema.</summary>
         /// <param name="context">The schema context.</param>
-        Task ProcessAsync(SchemaProcessorContext context);
+        void Process(SchemaProcessorContext context);
     }
 }

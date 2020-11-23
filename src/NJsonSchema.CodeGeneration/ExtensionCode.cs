@@ -2,7 +2,7 @@
 // <copyright file="ExtensionCode.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -34,7 +34,9 @@ namespace NJsonSchema.CodeGeneration
 		public string GetExtensionClassBody(string className)
         {
 			if (!ExtensionClasses.ContainsKey(className))
-				throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
+            {
+                throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
+            }
 
             var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
             return match.Groups[3].Value;

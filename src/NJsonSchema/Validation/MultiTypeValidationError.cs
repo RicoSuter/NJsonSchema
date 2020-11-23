@@ -2,7 +2,7 @@
 // <copyright file="MultiTypeValidationError.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -22,9 +22,9 @@ namespace NJsonSchema.Validation
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
 #if !LEGACY
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
+        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
 #else
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema4 schema)
+        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
 #endif
             : base(kind, property, path, token, schema)
         {

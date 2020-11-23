@@ -38,7 +38,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
 
             //// Assert
             Assert.Equal(1, schema.Properties.Count);

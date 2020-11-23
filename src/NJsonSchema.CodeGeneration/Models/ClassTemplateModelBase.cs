@@ -2,7 +2,7 @@
 // <copyright file="ClassTemplateModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.Models
     /// <summary>The class template base class.</summary>
     public abstract class ClassTemplateModelBase : TemplateModelBase
     {
-        private readonly JsonSchema4 _schema;
+        private readonly JsonSchema _schema;
         private readonly object _rootObject;
         private readonly TypeResolverBase _resolver;
 
@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        protected ClassTemplateModelBase(TypeResolverBase resolver, JsonSchema4 schema, object rootObject)
+        protected ClassTemplateModelBase(TypeResolverBase resolver, JsonSchema schema, object rootObject)
         {
             _schema = schema;
             _rootObject = rootObject;
@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>The model of a derived class.</summary>
         public class DerivedClassModel
         {
-            internal DerivedClassModel(string typeName, JsonSchema4 schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
+            internal DerivedClassModel(string typeName, JsonSchema schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
             {
                 var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualTypeSchema == schema.ActualTypeSchema);
 

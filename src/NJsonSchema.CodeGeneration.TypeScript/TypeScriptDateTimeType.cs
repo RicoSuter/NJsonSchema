@@ -2,7 +2,7 @@
 // <copyright file="TypeScriptDateTimeType.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -22,5 +22,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Uses the Moment.js for date time with offset handling.</summary>
         OffsetMomentJS,
+
+        /// <summary>Uses Luxon for date time handling.</summary>
+        Luxon,
+
+        /// <summary>Uses the DayJS.js for date time handling.</summary>
+        DayJS,
     }
 }

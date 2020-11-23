@@ -16,10 +16,9 @@ namespace NJsonSchema.Tests.Generation
                 _example = example;
             }
 
-            public Task ProcessAsync(SchemaProcessorContext context)
+            public void Process(SchemaProcessorContext context)
             {
                 context.Schema.Example = _example;
-                return Task.FromResult<object>(null);
             }
         }
 
@@ -30,10 +29,10 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
-        public async Task When_class_has_schema_processor_attribute_then_it_is_processed()
+        public void When_class_has_schema_processor_attribute_then_it_is_processed()
         {
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithSchemaProcessor>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<ClassWithSchemaProcessor>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });

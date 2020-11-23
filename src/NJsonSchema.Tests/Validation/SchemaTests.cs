@@ -316,7 +316,7 @@ namespace NJsonSchema.Tests.Validation
 }
 
 ";
-            var schema = await JsonSchema4.FromJsonAsync(schemaData);
+            var schema = await JsonSchema.FromJsonAsync(schemaData);
 
             //// Act
             var errors = schema.Validate(@"{""Key"": ""Value""}");
@@ -372,7 +372,7 @@ namespace NJsonSchema.Tests.Validation
 }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
             var errors = schema.Validate(json);
 
             //// Assert
@@ -405,11 +405,56 @@ namespace NJsonSchema.Tests.Validation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(schemaJson);
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
             var errors = schema.Validate(json);
 
             //// Assert
             Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public async Task When_property_name_is_ref_then_validation_works()
+        {
+            //// Arrange
+            var jsonSchema = @"{
+    ""$schema"": ""http://json-schema.org/draft-07/schema"",  
+    ""$ref"": ""#/definitions/reference_to_other_object"",
+    ""definitions"": {
+        ""reference_to_other_object"": {
+            ""type"": ""object"",
+            ""required"": [
+                ""$ref""
+            ],
+            ""additionalProperties"": false,
+            ""properties"": {
+                ""$ref"": {
+                    ""type"": ""string"",
+                    ""allOf"": [
+                        {
+                            ""format"": ""uri-reference""
+                        },
+                        {
+                            ""pattern"": ""^.*#/datatypes/.*$""
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}";
+
+            //// Act
+            var jsonContent = @"{
+  ""$ref"": ""#/datatypes/MyCustomDataType""
+}";
+
+            //// Arrange
+            var validator = new JsonSchemaValidator();
+            var schema = await JsonSchema.FromJsonAsync(jsonSchema);
+            var result = validator.Validate(jsonContent, schema);
+
+            //// Assert
+            Assert.Empty(result);
         }
     }
 }

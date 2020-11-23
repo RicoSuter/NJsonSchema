@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = JsonSchema.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["NewName"];
@@ -20,10 +20,48 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name_even_with_contactresolver_that_has_nameing_strategy()
+        {
+            var settings = new NJsonSchema.Generation.JsonSchemaGeneratorSettings();
+            settings.SerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver
+                {
+                    NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy()
+                }
+            };
+
+            //// Arrange
+            var schema = JsonSchema.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>(settings);
+
+            //// Act
+            var property = schema.Properties["NewName"];
+
+            //// Assert
+            Assert.Equal("NewName", property.Name);
+        }
+
+        [Fact]
+        public async Task Use_JsonSchemaGeneratorSettings_ContractResolver_For_JsonPropertyName()
+        {
+            var settings = new NJsonSchema.Generation.JsonSchemaGeneratorSettings();
+            settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+
+            //// Arrange
+            var schema = JsonSchema.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>(settings);
+
+            //// Act
+            var property = schema.Properties["newName"];
+
+            //// Assert
+            Assert.Equal("newName", property.Name);
+        }
+
+        [Fact]
         public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
             //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
+            var schema = JsonSchema.FromType<JsonPropertyAttributeTests.MyJsonPropertyTestClass>();
 
             //// Act
             var property = schema.Properties["Required"];

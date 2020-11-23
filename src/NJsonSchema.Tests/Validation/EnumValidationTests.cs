@@ -16,7 +16,7 @@ namespace NJsonSchema.Tests.Validation
                     ""residential""
                 ]
             }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"""commercial""");
@@ -36,7 +36,7 @@ namespace NJsonSchema.Tests.Validation
                     ""residential""
                 ]
             }";
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"""wrong""");
@@ -69,7 +69,7 @@ namespace NJsonSchema.Tests.Validation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"{ ""SalutationType"": ""Prof"" }");
@@ -102,7 +102,7 @@ namespace NJsonSchema.Tests.Validation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"{ ""SalutationType"": null }");
@@ -134,7 +134,7 @@ namespace NJsonSchema.Tests.Validation
             }";
 
             //// Act
-            var schema = await JsonSchema4.FromJsonAsync(json);
+            var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
             var errors = schema.Validate(@"{ ""SalutationType"": null }");

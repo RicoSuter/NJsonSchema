@@ -12,16 +12,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Arrange
             var classes = new List<CodeArtifact>
             {
-                new CodeArtifact("Car", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Apple", "List<Fruit>", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Professor", "Teacher", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Teacher", "Person[]", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp),
-                new CodeArtifact("Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp)
+                new CodeArtifact("Car", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
+                new CodeArtifact("Apple", "List<Fruit>", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
+                new CodeArtifact("Professor", "Teacher", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
+                new CodeArtifact("Teacher", "Person[]", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
+                new CodeArtifact("Fruit", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
+                new CodeArtifact("Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, "")
             };
 
             //// Act
-            classes = CodeArtifactCollection.OrderByBaseDependency(classes).ToList();
+            classes = classes.OrderByBaseDependency().ToList();
             var order = string.Join(", ", classes.Select(c => c.TypeName));
 
             //// Assert

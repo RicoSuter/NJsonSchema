@@ -81,20 +81,28 @@ namespace NJsonSchema.Collections
         public void AddRange(IDictionary<TKey, TValue> items)
         {
             if (items == null)
+            {
                 throw new ArgumentNullException("items");
+            }
 
             if (items.Count > 0)
             {
                 if (Dictionary.Count > 0)
                 {
                     if (items.Keys.Any(k => Dictionary.ContainsKey(k)))
+                    {
                         throw new ArgumentException("An item with the same key has already been added.");
+                    }
 
                     foreach (var item in items)
+                    {
                         Dictionary.Add(item);
+                    }
                 }
                 else
+                {
                     _dictionary = new Dictionary<TKey, TValue>(items);
+                }
 
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());
             }
@@ -110,10 +118,14 @@ namespace NJsonSchema.Collections
             if (Dictionary.TryGetValue(key, out item))
             {
                 if (add)
+                {
                     throw new ArgumentException("An item with the same key has already been added.");
+                }
 
                 if (Equals(item, value))
+                {
                     return;
+                }
 
                 Dictionary[key] = value;
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
@@ -129,7 +141,9 @@ namespace NJsonSchema.Collections
         {
             var copy = PropertyChanged;
             if (copy != null)
+            {
                 copy(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
         protected void OnCollectionChanged()
@@ -137,7 +151,9 @@ namespace NJsonSchema.Collections
             OnPropertyChanged();
             var copy = CollectionChanged;
             if (copy != null)
+            {
                 copy(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
         }
 
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
@@ -145,7 +161,9 @@ namespace NJsonSchema.Collections
             OnPropertyChanged();
             var copy = CollectionChanged;
             if (copy != null)
+            {
                 copy(this, new NotifyCollectionChangedEventArgs(action, changedItem, 0));
+            }
         }
 
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
@@ -153,7 +171,9 @@ namespace NJsonSchema.Collections
             OnPropertyChanged();
             var copy = CollectionChanged;
             if (copy != null)
+            {
                 copy(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem, 0));
+            }
         }
 
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
@@ -161,7 +181,9 @@ namespace NJsonSchema.Collections
             OnPropertyChanged();
             var copy = CollectionChanged;
             if (copy != null)
+            {
                 copy(this, new NotifyCollectionChangedEventArgs(action, newItems, 0));
+            }
         }
 
         private void OnPropertyChanged()
@@ -205,14 +227,18 @@ namespace NJsonSchema.Collections
         public virtual bool Remove(TKey key)
         {
             if (key == null)
+            {
                 throw new ArgumentNullException("key");
+            }
 
             TValue value;
             Dictionary.TryGetValue(key, out value);
 
             var removed = Dictionary.Remove(key);
             if (removed)
+            {
                 OnCollectionChanged();
+            }
             //OnCollectionChanged(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value));
             return removed;
         }
@@ -269,10 +295,14 @@ namespace NJsonSchema.Collections
         {
             var pairs = keyValuePairs.ToList();
             foreach (var pair in pairs)
+            {
                 Dictionary[pair.Key] = pair.Value;
+            }
 
             foreach (var key in Dictionary.Keys.Where(k => !pairs.Any(p => Equals(p.Key, k))).ToArray())
+            {
                 Dictionary.Remove(key);
+            }
 
             OnCollectionChanged();
         }

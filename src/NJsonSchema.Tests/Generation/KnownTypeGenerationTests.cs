@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -75,7 +75,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Container>();
+            var schema = JsonSchema.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert

@@ -1,18 +1,20 @@
 NJsonSchema for .NET
 ====================
 
-[![NuGet Version](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
-[![Build status](https://img.shields.io/appveyor/ci/rsuter/njsonschema.svg?label=build)](https://ci.appveyor.com/project/rsuter/njsonschema)
-[![Build status](https://img.shields.io/appveyor/ci/rsuter/njsonschema-jlw0p.svg?label=CI+build)](https://ci.appveyor.com/project/rsuter/njsonschema-jlw0p)
+[![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/NJsonSchema/17/master.svg)](https://rsuter.visualstudio.com/NJsonSchema/_build?definitionId=17)
+[![Nuget](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
+[![MyGet](https://img.shields.io/myget/njsonschema/v/NJsonSchema.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/njsonschema)
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/NJsonSchema/NJsonSchema)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
-[![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/rsuter/njsonschema/wiki)
+[![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
+[![Apimundo](https://img.shields.io/badge/NJsonSchema%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
+[![Apimundo](https://img.shields.io/badge/Architecture-Apimundo-728199.svg)](https://apimundo.com/organizations/github/projects/ricosuter?tab=repositories)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
 
 NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v4+ schemas. The library can read a schema from a file or string and validate JSON data against it. A schema can also be generated from an existing .NET class. With the code generation APIs you can generate C# and TypeScript classes or interfaces from a schema. 
 
-The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data. 
+The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data and [Namotion.Reflection](https://github.com/RicoSuter/Namotion.Reflection) for additional .NET reflection APIs.
 
 **NuGet packages:** 
 - [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0 & 2.0/.NET 4.5/.NET 4.0): JSON Schema parsing, validation and generation classes
@@ -23,13 +25,13 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
 
-CI NuGet Feed: https://www.myget.org/gallery/njsonschema-ci
+Preview NuGet Feed: https://www.myget.org/gallery/njsonschema
 
 **Features:**
 
-- [Read existing JSON Schemas](https://github.com/RSuter/NJsonSchema/wiki/JsonSchema4) and [validate JSON data](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema4.FromJsonAsync()`)
-- [Generate JSON Schema from .NET type via reflection](https://github.com/RSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema4.FromTypeAsync<MyType>()`)
-- [Generate JSON Schema from sample JSON data](https://github.com/RSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema4.FromSampleJson()`)
+- [Read existing JSON Schemas](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchema) and [validate JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema.FromJsonAsync()`)
+- [Generate JSON Schema from .NET type via reflection](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromTypeAsync<MyType>()`)
+- [Generate JSON Schema from sample JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
 - Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
@@ -39,19 +41,21 @@ NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchai
 
 The project is developed and maintained by [Rico Suter](http://rsuter.com) and other contributors. 
 
+**Some code generators can directly be used via the [Apimundo service](https://apimundo.com/tools).**
+
 ## NJsonSchema usage
 
-The [JsonSchema4](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema4) class can be used as follows: 
+The [JsonSchema](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema) class can be used as follows: 
 
 ```csharp
-var schema = await JsonSchema4.FromTypeAsync<Person>();
+var schema = await JsonSchema.FromTypeAsync<Person>();
 var schemaData = schema.ToJson();
 var errors = schema.Validate("{...}");
 
 foreach (var error in errors)
     Console.WriteLine(error.Path + ": " + error.Kind);
 
-schema = await JsonSchema4.FromJsonAsync(schemaData);
+schema = await JsonSchema.FromJsonAsync(schemaData);
 ```
 
 The `Person` class: 
@@ -425,4 +429,4 @@ Applications which use the library:
 
 - [VisualJsonEditor](http://visualjsoneditor.org), a JSON schema based file editor for Windows. 
 - [NSwag](http://nswag.org): The Swagger API toolchain for .NET
-- [SigSpec for SignalR Core](https://github.com/RSuter/SigSpec): Specification and code generator for SignalR Core. 
+- [SigSpec for SignalR Core](https://github.com/RicoSuter/SigSpec): Specification and code generator for SignalR Core. 

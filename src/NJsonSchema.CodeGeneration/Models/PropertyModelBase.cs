@@ -2,7 +2,7 @@
 // <copyright file="PropertyModelBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Models
     public abstract class PropertyModelBase
     {
         private readonly ClassTemplateModelBase _classTemplateModel;
-        private readonly JsonProperty _property;
+        private readonly JsonSchemaProperty _property;
         private readonly TypeResolverBase _typeResolver;
         private readonly CodeGeneratorSettingsBase _settings;
 
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="settings">The settings.</param>
         protected PropertyModelBase(
-            JsonProperty property,
+            JsonSchemaProperty property,
             ClassTemplateModelBase classTemplateModel,
             TypeResolverBase typeResolver,
             CodeGeneratorSettingsBase settings)
@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Models
         public string PropertyName { get; set; }
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
-        public bool IsNullable => _property.IsNullable(_settings.SchemaType);
+        public virtual bool IsNullable => _property.IsNullable(_settings.SchemaType);
 
         /// <summary>Gets a value indicating whether the property is required.</summary>
         public bool IsRequired => _property.IsRequired;
@@ -75,14 +75,20 @@ namespace NJsonSchema.CodeGeneration.Models
         {
             var propertyName = PropertyName;
             if (_property.IsEnumeration == false)
+            {
                 return propertyName;
+            }
 
             var className = _classTemplateModel.ClassName;
             if (className.Contains("Anonymous"))
+            {
                 return propertyName;
+            }
 
             if (propertyName.StartsWith(className, StringComparison.OrdinalIgnoreCase))
+            {
                 return propertyName;
+            }
 
             return className + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
         }

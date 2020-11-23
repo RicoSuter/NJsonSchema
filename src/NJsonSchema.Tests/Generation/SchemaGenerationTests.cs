@@ -28,11 +28,11 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.Equal(false, schema.Properties["Bar"].ActualTypeSchema.AllowAdditionalProperties);
+            Assert.False(schema.Properties["Bar"].ActualTypeSchema.AllowAdditionalProperties);
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -55,11 +55,11 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
             
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
-            Assert.Equal(true, schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
+            Assert.True(schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
             Assert.Equal(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.ActualSchema.Type);
             // "#/definitions/ref_7de8187d_d860_41fa_a17b_3f395c053cae"
         }
@@ -70,7 +70,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = await JsonSchema4.FromTypeAsync<Foo>();
+            var schema = JsonSchema.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -86,13 +86,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_default_value_is_set_on_property_then_default_is_set_in_schema()
         {
-            //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DefaultTests>();
+            // Arrange
+            var schema = JsonSchema.FromType<DefaultTests>();
 
-            //// Act
+            // Act
             var property = schema.Properties["Number"];
 
-            //// Assert
+            // Assert
             Assert.Equal(10, property.Default);
         }
 
@@ -104,8 +104,8 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_dictionary_value_is_null_then_string_values_are_allowed()
         {
-            //// Arrange
-            var schema = await JsonSchema4.FromTypeAsync<DictTest>();
+            // Arrange
+            var schema = JsonSchema.FromType<DictTest>();
             var schemaData = schema.ToJson();
 
             var data = @"{
@@ -114,21 +114,21 @@ namespace NJsonSchema.Tests.Generation
                 }
             }";
 
-            //// Act
+            // Act
             var errors = schema.Validate(data);
 
-            //// Assert
+            // Assert
             Assert.Equal(0, errors.Count);
         }
 
         [Fact]
         public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
-            //// Generate JSON
-            var schema = await JsonSchema4.FromTypeAsync<IEnumerable<Tuple<string, string>>>();
+            // Generate JSON
+            var schema = JsonSchema.FromType<IEnumerable<Tuple<string, string>>>();
             var json = schema.ToJson();
 
-            //// Should be reached and not StackOverflowed
+            // Should be reached and not StackOverflowed
             Assert.True(!string.IsNullOrEmpty(json));
         }
 
@@ -142,11 +142,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_property_is_object_then_it_should_not_be_a_dictonary_but_any()
         {
-            /// Act
-            var schema = await JsonSchema4.FromTypeAsync<FilterDto>();
+            // Act
+            var schema = JsonSchema.FromType<FilterDto>();
             var json = schema.ToJson();
 
-            /// Assert
+            // Assert
             var property = schema.Properties["Value"].ActualTypeSchema;
             Assert.True(property.IsAnyType);
             Assert.False(property.IsDictionary);
@@ -162,11 +162,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_property_is_static_then_it_is_ignored()
         {
-            /// Act
-            var schema = await JsonSchema4.FromTypeAsync<ClassWithStaticProperty>();
+            // Act
+            var schema = JsonSchema.FromType<ClassWithStaticProperty>();
             var json = schema.ToJson();
 
-            /// Assert
+            // Assert
             Assert.Equal(1, schema.ActualProperties.Count);
             Assert.True(schema.ActualProperties.ContainsKey("Bar"));
         }

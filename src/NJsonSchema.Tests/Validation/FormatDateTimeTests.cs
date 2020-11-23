@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_incorrect_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_correct_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_with_non_iso8601_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
@@ -62,7 +62,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_with_iso8601_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
@@ -79,7 +79,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_with_iso8601_with_timezone_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
@@ -96,7 +96,7 @@ namespace NJsonSchema.Tests.Validation
         public void When_format_date_time_with_iso8601_and_fractional_seconds_then_validation_succeeds()
         {
             //// Arrange
-            var schema = new JsonSchema4();
+            var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 

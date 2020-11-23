@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using NJsonSchema.Generation;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Yaml
@@ -17,19 +17,19 @@ namespace NJsonSchema.Yaml
     public class JsonAndYamlReferenceResolver : JsonReferenceResolver
     {
         /// <summary>Initializes a new instance of the <see cref="JsonAndYamlReferenceResolver"/> class.</summary>
-        /// <param name="schemaResolver">The schema resolver.</param>
-        public JsonAndYamlReferenceResolver(JsonSchemaResolver schemaResolver)
-            : base(schemaResolver)
+        /// <param name="schemaAppender">The schema appender.</param>
+        public JsonAndYamlReferenceResolver(JsonSchemaAppender schemaAppender)
+            : base(schemaAppender)
         {
         }
 
         /// <summary>Creates the factory to be used in the FromJsonAsync method.</summary>
-        /// <param name="settings">The generator settings.</param>
+        /// <param name="typeNameGenerator">The type name generator.</param>
         /// <returns>The factory.</returns>
-        public static Func<JsonSchema4, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(JsonSchemaGeneratorSettings settings)
+        public static Func<JsonSchema, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema4 schema) =>
-                new JsonAndYamlReferenceResolver(new JsonSchemaResolver(schema, settings));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
+                new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
 
             return ReferenceResolverFactory;
         }
@@ -38,17 +38,17 @@ namespace NJsonSchema.Yaml
         /// <param name="filePath">The file path.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath)
+        public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this).ConfigureAwait(false);
+            return await JsonSchemaYaml.FromFileAsync(filePath, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url)
+        public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaYaml.FromUrlAsync(url, schema => this).ConfigureAwait(false);
+            return await JsonSchemaYaml.FromUrlAsync(url, schema => this, cancellationToken).ConfigureAwait(false);
         }
     }
 }

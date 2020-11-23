@@ -2,12 +2,11 @@
 // <copyright file="ITypeMapper.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/rsuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using System;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
 {
@@ -23,6 +22,6 @@ namespace NJsonSchema.Generation.TypeMappers
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="context">The context.</param>
-        Task GenerateSchemaAsync(JsonSchema4 schema, TypeMapperContext context);
+        void GenerateSchema(JsonSchema schema, TypeMapperContext context);
     }
 }
