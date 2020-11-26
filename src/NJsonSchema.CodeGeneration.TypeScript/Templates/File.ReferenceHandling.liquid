@@ -41,7 +41,7 @@
     return json;
 }
 
-function createInstance<T>(data: any, mappings: any, type: any): T {
+function createInstance<T>(data: any, mappings: any, type: any): T | null {
   if (!mappings)
     mappings = [];
   if (!data)
