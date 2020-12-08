@@ -859,6 +859,12 @@ namespace NJsonSchema.Generation
                                 (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false))
                 )
                 .ToList();
+            var allMembers = 
+                type.GetTypeInfo().DeclaredFields.OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo().DeclaredProperties
+                )
+                .ToList();
 #else
             var members = type.GetTypeInfo()
                 .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
@@ -871,9 +877,19 @@ namespace NJsonSchema.Generation
                                 (p.GetSetMethod()?.IsPrivate != true && p.GetSetMethod()?.IsStatic == false))
                 )
                 .ToList();
+            var allMembers = 
+                type.GetTypeInfo()
+                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .OfType<MemberInfo>()
+                .Concat(
+                    type.GetTypeInfo()
+                    .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                )
+                .ToList();
 #endif
 
-            var contextualMembers = members.Select(m => m.ToContextualMember());
+            var publicContextualMembers = members.Select(m => m.ToContextualMember());
+            var allContextualMembers = allMembers.Select(m => m.ToContextualMember());
             var contract = Settings.ResolveContract(type);
 
             var allowedProperties = GetTypeProperties(type);
@@ -894,7 +910,7 @@ namespace NJsonSchema.Generation
 
                     if (shouldSerialize)
                     {
-                        var memberInfo = contextualMembers.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
+                        var memberInfo = allContextualMembers.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
                         if (memberInfo != null && (Settings.GenerateAbstractProperties || !IsAbstractProperty(memberInfo)))
                         {
                             LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
@@ -905,7 +921,7 @@ namespace NJsonSchema.Generation
             else
             {
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-                foreach (var memberInfo in contextualMembers.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
+                foreach (var memberInfo in publicContextualMembers.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
                     var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
