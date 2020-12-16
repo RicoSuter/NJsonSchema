@@ -17,8 +17,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     {
         private readonly TypeScriptGeneratorSettings _settings;
         private readonly JsonSchema _schema;
+        private readonly object _rootObject;
         private readonly TypeScriptTypeResolver _resolver;
-        private readonly string _discriminatorName;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel" /> class.</summary>
         /// <param name="typeName">The type name.</param>
@@ -30,37 +30,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public ClassTemplateModel(string typeName, string discriminatorName,
             TypeScriptGeneratorSettings settings, TypeScriptTypeResolver resolver,
             JsonSchema schema, object rootObject)
-            : base(resolver, schema, rootObject)
+            : base(resolver, schema, rootObject, discriminatorName)
         {
             _settings = settings;
             _schema = schema;
+            _rootObject = rootObject;
             _resolver = resolver;
-            _discriminatorName = discriminatorName;
 
             ClassName = typeName;
             Properties = _schema.ActualProperties.Values
-                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface || 
+                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface ||
                             v.IsInheritanceDiscriminator == false)
-                .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
+                .Select(property => new PropertyModel(this, property, _rootObject, ClassName, _resolver, _settings))
                 .ToList();
         }
 
         /// <summary>Gets the class name.</summary>
         public override string ClassName { get; }
-
-        /// <summary>Gets the name for the discriminator check.</summary>
-        public string DiscriminatorName => HasBaseDiscriminator ?
-            (_schema.ResponsibleDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
-            _discriminatorName;
-
-        /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
-
-        /// <summary>Gets a value indicating whether the class or an inherited class has a discriminator property.</summary>
-        public bool HasBaseDiscriminator => _schema.ResponsibleDiscriminatorObject != null;
-
-        /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
-        public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonSchemaProperty) &&
@@ -71,9 +57,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Description => ConversionUtilities.RemoveLineBreaks(
             !string.IsNullOrEmpty(_schema.Description) ?
                 _schema.Description : _schema.ActualTypeSchema.Description);
-
-        /// <summary>Gets a value indicating whether this class has a parent class.</summary>
-        public bool HasInheritance => InheritedSchema != null && !InheritedSchema.IsDictionary;
 
         /// <summary>Gets the inheritance code.</summary>
         public string Inheritance
@@ -111,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
         public bool HasIndexerProperty => _schema.IsDictionary ||
-                                          _schema.InheritedSchema?.IsDictionary == true;
+                                          _schema.GetInheritedSchema(_rootObject)?.IsDictionary == true;
 
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
@@ -145,8 +128,5 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;
-
-        /// <summary>Gets the inherited schema.</summary>
-        private JsonSchema InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
 }

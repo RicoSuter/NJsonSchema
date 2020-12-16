@@ -17,20 +17,23 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     {
         private readonly CSharpTypeResolver _resolver;
         private readonly JsonSchema _schema;
+        private readonly object _rootObject;
         private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel"/> class.</summary>
         /// <param name="typeName">Name of the type.</param>
+        /// <param name="discriminatorName">The name to compare the discriminator against.</param>
         /// <param name="settings">The settings.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="schema">The schema.</param>
         /// <param name="rootObject">The root object.</param>
-        public ClassTemplateModel(string typeName, CSharpGeneratorSettings settings,
+        public ClassTemplateModel(string typeName, string discriminatorName, CSharpGeneratorSettings settings,
             CSharpTypeResolver resolver, JsonSchema schema, object rootObject)
-            : base(resolver, schema, rootObject)
+            : base(resolver, schema, rootObject, discriminatorName)
         {
             _resolver = resolver;
             _schema = schema;
+            _rootObject = rootObject;
             _settings = settings;
 
             ClassName = typeName;
@@ -39,9 +42,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
                 .ToArray();
 
-            if (schema.InheritedSchema != null)
+            var inheritedSchema = schema.GetInheritedSchema(rootObject);
+            if (inheritedSchema != null)
             {
-                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
+                BaseClass = new ClassTemplateModel(BaseClassName, discriminatorName, settings, resolver, inheritedSchema, rootObject);
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
             }
             else
@@ -102,12 +106,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether to render ToJson() and FromJson() methods.</summary>
         public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
 
-        /// <summary>Gets a value indicating whether the class has discriminator property.</summary>
-        public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
-
-        /// <summary>Gets the discriminator property name.</summary>
-        public string Discriminator => _schema.ActualDiscriminator;
-
         /// <summary>Gets a value indicating whether this class represents a tuple.</summary>
         public bool IsTuple => _schema.ActualTypeSchema.IsTuple;
 
@@ -116,11 +114,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             .Select(i => _resolver.Resolve(i, i.IsNullable(_settings.SchemaType), string.Empty, false))
             .ToArray();
 
-        /// <summary>Gets a value indicating whether the class has a parent class.</summary>
-        public bool HasInheritance => _schema.InheritedTypeSchema != null;
-
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema, false, string.Empty, false)
+        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.GetInheritedSchema(_rootObject), false, string.Empty, false)
                 .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
                 .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
@@ -129,7 +124,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class inherits from exception.</summary>
         public bool InheritsExceptionSchema => _resolver.ExceptionSchema != null &&
-                                               _schema?.InheritsSchema(_resolver.ExceptionSchema) == true;
+                                               _schema?.InheritsSchema(_resolver.ExceptionSchema, _rootObject) == true;
 
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
         public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");

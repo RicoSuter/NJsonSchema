@@ -11,7 +11,6 @@ using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Converters;
 using Xunit;
-
 using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
