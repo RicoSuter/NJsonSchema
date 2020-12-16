@@ -75,13 +75,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 isNullable = true;
             }
 
+            var markAsNullableType = Settings.GenerateNullableReferenceTypes && isNullable;
+
             if (schema.ActualTypeSchema.IsAnyType &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
                 !Types.Keys.Contains(schema) &&
                 !schema.HasReference)
             {
-                return Settings.AnyType;
+                return markAsNullableType ? Settings.AnyType + "?" : Settings.AnyType;
             }
 
             var type = schema.ActualTypeSchema.Type;
@@ -107,7 +109,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return ResolveBoolean(isNullable);
             }
 
-            var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
+
+            var nullableReferenceType = markAsNullableType ? "?" : string.Empty;
 
             if (schema.IsBinary)
             {
