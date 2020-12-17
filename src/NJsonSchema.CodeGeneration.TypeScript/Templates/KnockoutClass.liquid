@@ -37,7 +37,7 @@
         }
     }
 
-    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
+    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
 {% if HandleReferences -%}
 {%   if HasBaseDiscriminator -%}
 {%     for derivedClass in DerivedClasses -%}
