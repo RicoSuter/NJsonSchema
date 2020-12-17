@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -23,6 +24,7 @@ namespace NJsonSchema.Infrastructure
         private static readonly Type FileType;
         private static readonly Type DirectoryType;
         private static readonly Type PathType;
+        private static readonly Type HttpClientHandlerType;
         private static readonly Type HttpClientType;
 
         static DynamicApis()
@@ -30,6 +32,10 @@ namespace NJsonSchema.Infrastructure
             XPathExtensionsType = TryLoadType(
                 "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument",
                 "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+
+            HttpClientHandlerType = TryLoadType(
+                "System.Net.Http.HttpClientHandler, System.Net.Http",
+                "System.Net.Http.HttpClientHandler, System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
 
             HttpClientType = TryLoadType(
                 "System.Net.Http.HttpClient, System.Net.Http",
@@ -57,18 +63,22 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Request the given URL via HTTP.</summary>
         /// <param name="url">The URL.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The content.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<string> HttpGetAsync(string url)
+        public static async Task<string> HttpGetAsync(string url, CancellationToken cancellationToken)
         {
             if (!SupportsHttpClientApis)
             {
                 throw new NotSupportedException("The System.Net.Http.HttpClient API is not available on this platform.");
             }
 
-            using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType))
+            using (dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType))
+            using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType, new[] { handler }))
             {
-                var response = await client.GetAsync(url).ConfigureAwait(false);
+                handler.UseDefaultCredentials = true;
+
+                var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
