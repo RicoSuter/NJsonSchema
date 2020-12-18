@@ -102,15 +102,15 @@ namespace NJsonSchema.Generation
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(float.Parse(schema.Minimum.ToString()) + 0.1);
+                return JToken.FromObject((decimal)(float.Parse(schema.Minimum.ToString()) + 0.1));
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(float.Parse(schema.ExclusiveMinimum.ToString()));
+                return JToken.FromObject(decimal.Parse(schema.ExclusiveMinimum.ToString()));
             }
             else if (schema.Minimum.HasValue)
             {
-                return float.Parse(schema.Minimum.ToString());
+                return decimal.Parse(schema.Minimum.ToString());
             }
             return JToken.FromObject(0.0);
         }
