@@ -28,6 +28,26 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(JsonObjectType.Array, arrayProperty.Type);
             Assert.True(arrayProperty.Item.ActualTypeSchema.IsAnyType);
         }
+#nullable enable
+        public class ClassWithArrayOfNullable
+        {
+            public string?[] Array { get; set; } = new string?[0];
+        }
+#nullable restore
+
+        [Fact]
+        public async Task When_property_is_Array_of_nullable_then_schema_with_array_of_nullable_is_generated()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<ClassWithArrayOfNullable>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(1, schema.ActualProperties.Count);
+            var arrayProperty = schema.ActualProperties["Array"].ActualTypeSchema;
+            Assert.Equal(JsonObjectType.Array, arrayProperty.Type);
+            Assert.True(arrayProperty.Item.IsNullableRaw);
+        }
 
         public class ListContainer
         {
