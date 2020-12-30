@@ -174,8 +174,8 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = await DynamicApis.HttpGetAsync(url, cancellationToken).ConfigureAwait(false); 
-            return await FromJsonAsync(data, url, referenceResolverFactory,cancellationToken).ConfigureAwait(false);
+            var data = await DynamicApis.HttpGetAsync(url, cancellationToken).ConfigureAwait(false);
+            return await FromJsonAsync(data, url, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/>. </summary>
@@ -204,7 +204,7 @@ namespace NJsonSchema
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema, 
+        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema,
             JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken).ConfigureAwait(false);
@@ -241,20 +241,20 @@ namespace NJsonSchema
 
                 if (AllOf.Count == 1)
                 {
-                    return AllOf.First().ActualSchema;
+                    return AllOf.First();
                 }
 
                 if (AllOf.Any(s => s.HasReference))
                 {
-                    return AllOf.First(s => s.HasReference).ActualSchema;
+                    return AllOf.First(s => s.HasReference);
                 }
 
                 if (AllOf.Any(s => s.Type.HasFlag(JsonObjectType.Object)))
                 {
-                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object)).ActualSchema;
+                    return AllOf.First(s => s.Type.HasFlag(JsonObjectType.Object));
                 }
 
-                return AllOf.FirstOrDefault()?.ActualSchema;
+                return AllOf.FirstOrDefault();
             }
         }
 
@@ -286,8 +286,8 @@ namespace NJsonSchema
         {
             get
             {
-                var inheritedSchema = this.InheritedSchema != null ?
-                    new List<JsonSchema> { this.InheritedSchema } :
+                var inheritedSchema = InheritedSchema != null ?
+                    new List<JsonSchema> { InheritedSchema } :
                     new List<JsonSchema>();
 
                 return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
