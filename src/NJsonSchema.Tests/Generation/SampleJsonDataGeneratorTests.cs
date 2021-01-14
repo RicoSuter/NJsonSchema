@@ -141,7 +141,7 @@ namespace NJsonSchema.Tests.Generation
 
 
         [Fact]
-        public async Task PropertyWithFloatMinimumDefiniton()
+        public async Task PropertyWithFloatMinimumDefinition()
         {
             //// Arrange
             var data = @"{
@@ -172,8 +172,8 @@ namespace NJsonSchema.Tests.Generation
                     ""properties"": {
                       ""value"": {
                         ""type"": ""number"",
-                        ""maximum"": 5.0,
-                        ""minimum"": 1.0
+                        ""maximum"": 5.00001,
+                        ""minimum"": 1.000012
                       }
                     }
                   }
@@ -188,7 +188,7 @@ namespace NJsonSchema.Tests.Generation
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
             Assert.Equal(0, validationResult.Count);
-            Assert.Equal(1.0, testJson.SelectToken("body.numberContent.value").Value<float>());
+            Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
         }
 
         [Fact]
