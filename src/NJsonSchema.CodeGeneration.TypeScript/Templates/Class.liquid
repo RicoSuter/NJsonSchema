@@ -93,7 +93,7 @@
 {% endif -%}
     }
 
-    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
+    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
         data = typeof data === 'object' ? data : {};
 {% if HandleReferences -%}
 {%   if HasBaseDiscriminator -%}
