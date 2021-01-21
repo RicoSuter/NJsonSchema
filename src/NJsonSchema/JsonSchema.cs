@@ -489,7 +489,7 @@ namespace NJsonSchema
 
         #region Child JSON schemas
 
-        /// <summary>Gets or sets the dictionary key schema (x-key, only enum schemas are allowed).</summary>
+        /// <summary>Gets or sets the dictionary key schema (x-dictionaryKey, only enum schemas are allowed).</summary>
         [JsonProperty("x-dictionaryKey", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema DictionaryKey
         {
