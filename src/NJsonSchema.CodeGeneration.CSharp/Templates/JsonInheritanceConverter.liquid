@@ -1,5 +1,16 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {% if UseSystemTextJson -%}
+internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
+{
+    public string DiscriminatorName { get; }
+
+    public JsonInheritanceConverterAttribute(System.Type baseType, string discriminatorName = "discriminator")
+        : base(typeof(JsonInheritanceConverter<>).MakeGenericType(baseType))
+    {
+        DiscriminatorName = discriminatorName;
+    }
+}
+
 // TODO(system.text.json): Add inheritance converter here (provide the discriminator name from outside?)
 {% else -%}
 internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter

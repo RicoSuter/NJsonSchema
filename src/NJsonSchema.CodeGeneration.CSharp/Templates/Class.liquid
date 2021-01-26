@@ -3,7 +3,7 @@
 {% endif -%}
 {% if HasDiscriminator -%}
 {% if UseSystemTextJson -%}
-[System.Text.Json.Serialization.JsonConverter(typeof(JsonInheritanceConverter<{{ClassName}}>))]
+[JsonInheritanceConverter(typeof({{ ClassName }}), "{{ Discriminator }}")]
 {% else -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {% endif -%}
@@ -28,7 +28,7 @@
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial class {{ClassName}} {% template Class.Inheritance %}
 {
 {% if IsTuple -%}
-    public {{ClassName}}({% for tupleType in TupleTypes -%}{{ tupleType }} item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%}) : base({% for tupleType in TupleTypes -%}item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%})
+    public {{ ClassName }}({% for tupleType in TupleTypes -%}{{ tupleType }} item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%}) : base({% for tupleType in TupleTypes -%}item{{ forloop.index }}{% if forloop.last == false %}, {% endif %}{% endfor -%})
     {
     }
 
