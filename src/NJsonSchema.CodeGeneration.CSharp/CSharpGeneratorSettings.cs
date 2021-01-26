@@ -33,6 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             DictionaryBaseType = "System.Collections.Generic.Dictionary";
 
             ClassStyle = CSharpClassStyle.Poco;
+            JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
@@ -98,6 +99,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
+
+        /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
+        public CSharpJsonLibrary JsonLibrary { get; set; }
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }

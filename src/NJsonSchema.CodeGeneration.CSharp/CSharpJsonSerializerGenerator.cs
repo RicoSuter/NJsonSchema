@@ -24,8 +24,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var hasJsonConverters = jsonConverters.Any();
 
             var useSettingsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsTransformationMethod);
+            return settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson ?
+                string.Empty : // TODO(system.text.json): What to do here?
+                GenerateForNewtonsoftJson(settings, jsonConverters, hasJsonConverters, useSettingsTransformationMethod);
+        }
+
+        private static string GenerateForNewtonsoftJson(CSharpGeneratorSettings settings, List<string> jsonConverters, bool hasJsonConverters, bool useSettingsTransformationMethod)
+        {
             if (settings.HandleReferences || useSettingsTransformationMethod)
             {
+                // TODO(system.text.json): Also support System.Text.Json
                 return ", " +
                        (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                        "new Newtonsoft.Json.JsonSerializerSettings { " +
