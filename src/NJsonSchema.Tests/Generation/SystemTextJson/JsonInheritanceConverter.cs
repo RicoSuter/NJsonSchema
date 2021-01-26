@@ -49,6 +49,14 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             }
 
             return (TBase)JsonSerializer.Deserialize(bufferWriter.ToArray(), subtype, options);
+
+            //var bufferWriter = new ArrayBufferWriter<byte>();
+            //using (var writer = new Utf8JsonWriter(bufferWriter))
+            //{
+            //    document.RootElement.WriteTo(writer);
+            //}
+
+            //return (TBase)JsonSerializer.Deserialize(bufferWriter.WrittenSpan, subtype, options);
         }
 
         /// <inheritdoc />
@@ -78,10 +86,10 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                 return knownType.Key;
             }
 
-            var jsonInheritanceAttribute = GetSubtypeDiscriminator(type);
-            if (jsonInheritanceAttribute != null)
+            var jsonInheritanceAttributeDiscriminator = GetSubtypeDiscriminator(type);
+            if (jsonInheritanceAttributeDiscriminator != null)
             {
-                return jsonInheritanceAttribute.Key;
+                return jsonInheritanceAttributeDiscriminator;
             }
 
             return type.Name;
@@ -99,10 +107,10 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                 return AdditionalKnownTypes[discriminatorValue];
             }
 
-            var jsonInheritanceAttribute = GetObjectSubtype(objectType, discriminatorValue);
-            if (jsonInheritanceAttribute != null)
+            var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
+            if (jsonInheritanceAttributeSubtype != null)
             {
-                return jsonInheritanceAttribute.Type;
+                return jsonInheritanceAttributeSubtype;
             }
 
             if (objectType.Name == discriminatorValue)
@@ -166,24 +174,24 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             return null;
         }
 
-        private static JsonInheritanceAttribute GetObjectSubtype(Type baseType, string discriminatorName)
+        private static Type GetObjectSubtype(Type baseType, string discriminatorName)
         {
             var jsonInheritanceAttributes = baseType
                 .GetTypeInfo()
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName);
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
         }
 
-        private static JsonInheritanceAttribute GetSubtypeDiscriminator(Type objectType)
+        private static string GetSubtypeDiscriminator(Type objectType)
         {
             var jsonInheritanceAttributes = objectType
                 .GetTypeInfo()
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Type == objectType);
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Type == objectType)?.Key;
         }
     }
 }
