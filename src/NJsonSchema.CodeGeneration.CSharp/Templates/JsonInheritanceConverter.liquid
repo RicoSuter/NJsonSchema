@@ -1,6 +1,6 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {% if UseSystemTextJson -%}
-// TODO(system.text.json): Add inheritance converter here
+// TODO(system.text.json): Add inheritance converter here (provide the discriminator name from outside?)
 {% else -%}
 internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
