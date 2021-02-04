@@ -577,19 +577,18 @@ namespace NJsonSchema.Generation
             typeDescription.ApplyType(schema);
 
             var jsonSchemaAttribute = contextualType.GetTypeAttribute<JsonSchemaAttribute>();
-            var itemType = jsonSchemaAttribute?.ArrayItem ?? contextualType.OriginalType.GetEnumerableItemType();
+            var itemType = jsonSchemaAttribute?.ArrayItem.ToContextualType() ?? contextualType.EnumerableItemType;
             if (itemType != null)
             {
-                var contextualItemType = contextualType.ElementType ?? itemType.ToContextualType();
                 var itemIsNullable = contextualType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
-                                     contextualItemType.Nullability == Nullability.Nullable;
+                                     itemType.Nullability == Nullability.Nullable;
 
                 schema.Item = GenerateWithReferenceAndNullability<JsonSchema>(
-                    contextualItemType, itemIsNullable, schemaResolver, (itemSchema, typeSchema) =>
+                    itemType, itemIsNullable, schemaResolver, (itemSchema, typeSchema) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
-                            itemSchema.GenerateXmlObjectForItemType(contextualItemType);
+                            itemSchema.GenerateXmlObjectForItemType(itemType);
                         }
                     });
 

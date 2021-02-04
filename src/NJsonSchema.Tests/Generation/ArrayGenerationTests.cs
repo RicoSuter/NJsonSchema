@@ -28,6 +28,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(JsonObjectType.Array, arrayProperty.Type);
             Assert.True(arrayProperty.Item.ActualTypeSchema.IsAnyType);
         }
+
 #nullable enable
         public class ClassWithArrayOfNullable
         {
