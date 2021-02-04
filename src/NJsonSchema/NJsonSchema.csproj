@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard2.0;net40;net45</TargetFrameworks>
     <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.3.3</Version>
+    <Version>10.3.4</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2020</Copyright>
     <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
@@ -45,6 +45,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="NuGetIcon.png" Pack="true" PackagePath="\"/>
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
