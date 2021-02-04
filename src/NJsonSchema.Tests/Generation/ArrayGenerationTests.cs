@@ -33,6 +33,8 @@ namespace NJsonSchema.Tests.Generation
         public class ClassWithArrayOfNullable
         {
             public string?[] Array { get; set; } = new string?[0];
+
+            public List<string?> List { get; set; } = new List<string?>();
         }
 #nullable restore
 
@@ -44,10 +46,15 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             //// Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Equal(2, schema.ActualProperties.Count);
+
             var arrayProperty = schema.ActualProperties["Array"].ActualTypeSchema;
             Assert.Equal(JsonObjectType.Array, arrayProperty.Type);
             Assert.True(arrayProperty.Item.IsNullableRaw);
+
+            var listProperty = schema.ActualProperties["List"].ActualTypeSchema;
+            Assert.Equal(JsonObjectType.Array, listProperty.Type);
+            Assert.True(listProperty.Item.IsNullableRaw);
         }
 
         public class ListContainer
