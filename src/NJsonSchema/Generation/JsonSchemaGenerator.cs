@@ -903,7 +903,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
+                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x]) 
                 foreach (var memberInfo in contextualMembers.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
