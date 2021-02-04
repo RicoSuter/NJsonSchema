@@ -577,19 +577,18 @@ namespace NJsonSchema.Generation
             typeDescription.ApplyType(schema);
 
             var jsonSchemaAttribute = contextualType.GetTypeAttribute<JsonSchemaAttribute>();
-            var itemType = jsonSchemaAttribute?.ArrayItem ?? contextualType.OriginalType.GetEnumerableItemType();
+            var itemType = jsonSchemaAttribute?.ArrayItem.ToContextualType() ?? contextualType.EnumerableItemType;
             if (itemType != null)
             {
-                var contextualItemType = itemType.ToContextualType();
                 var itemIsNullable = contextualType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
-                                     contextualItemType.Nullability == Nullability.Nullable;
+                                     itemType.Nullability == Nullability.Nullable;
 
                 schema.Item = GenerateWithReferenceAndNullability<JsonSchema>(
-                    contextualItemType, itemIsNullable, schemaResolver, (itemSchema, typeSchema) =>
+                    itemType, itemIsNullable, schemaResolver, (itemSchema, typeSchema) =>
                     {
                         if (Settings.GenerateXmlObjects)
                         {
-                            itemSchema.GenerateXmlObjectForItemType(contextualItemType);
+                            itemSchema.GenerateXmlObjectForItemType(itemType);
                         }
                     });
 
@@ -904,7 +903,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
+                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x]) 
                 foreach (var memberInfo in contextualMembers.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
                     var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
