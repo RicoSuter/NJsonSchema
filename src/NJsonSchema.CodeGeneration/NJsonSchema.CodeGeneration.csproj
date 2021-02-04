@@ -9,7 +9,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
     <Authors>Rico Suter</Authors>
-    <PackageIconUrl>https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/NuGetIcon.png</PackageIconUrl>
+    <PackageIcon>NuGetIcon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -32,5 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>

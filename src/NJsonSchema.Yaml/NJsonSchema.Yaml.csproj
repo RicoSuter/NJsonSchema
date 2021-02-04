@@ -9,7 +9,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
     <Authors>Rico Suter</Authors>
-    <PackageIconUrl>https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/NuGetIcon.png</PackageIconUrl>
+    <PackageIcon>NuGetIcon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -20,5 +20,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
