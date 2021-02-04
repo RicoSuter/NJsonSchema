@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+        <TargetFrameworks>netcoreapp5.0;net452</TargetFrameworks>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
         <IsPackable>false</IsPackable>
