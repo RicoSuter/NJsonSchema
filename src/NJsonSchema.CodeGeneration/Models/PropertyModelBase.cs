@@ -70,6 +70,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets the property extension data.</summary>
         public IDictionary<string, object> ExtensionData => _property.ExtensionData;
 
+        /// <summary>Gets the JSON Schema format property.</summary>
+        public string Format => _property.ActualSchema.Format;
+
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()
         {
