@@ -11,7 +11,6 @@ using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Converters;
 using Xunit;
-
 using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
@@ -310,10 +309,9 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         private Assembly Compile(string code)
         {
-
             CSharpCompilation compilation = CSharpCompilation.Create("assemblyName")
-             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-             .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
 
 #if NET452
             compilation = compilation.AddReferences(
@@ -321,9 +319,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(System.Linq.Expressions.Expression).Assembly.Location));
-#endif
-
-#if NETCOREAPP2_0            
+#else
             var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);            
             compilation = compilation.AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
