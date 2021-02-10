@@ -21,7 +21,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public void SystemTextJson_When_class_has_property_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = JsonSchema.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3,
+                SerializerOptions = new System.Text.Json.JsonSerializerOptions()
+            });
 
             //// Assert
             Assert.Equal(1, schema.ActualProperties.Count);
