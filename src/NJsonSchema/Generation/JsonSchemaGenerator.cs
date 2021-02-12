@@ -351,10 +351,29 @@ namespace NJsonSchema.Generation
             var contextualType = typeDescription.ContextualType;
 
             dynamic displayAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+#if NETSTANDARD10
             if (displayAttribute != null && displayAttribute.Name != null)
             {
                 schema.Title = displayAttribute.Name;
             }
+#else
+            if (displayAttribute != null && displayAttribute.Name != null && displayAttribute.ResourceType == null)
+            {
+                schema.Title = displayAttribute.Name;
+            }
+
+            else if (displayAttribute != null && displayAttribute.Name != null && displayAttribute.ResourceType != null)
+            {
+                schema.Title = displayAttribute.ResourceType
+                    .GetProperty(displayAttribute.Name,
+                    BindingFlags.NonPublic |
+                    BindingFlags.Instance |
+                    BindingFlags.Static |
+                    BindingFlags.Public
+                    ).GetValue(null);
+
+            }
+#endif
 
             dynamic defaultValueAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
