@@ -351,10 +351,14 @@ namespace NJsonSchema.Generation
             var contextualType = typeDescription.ContextualType;
 
             dynamic displayAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
-            if (displayAttribute != null && displayAttribute.Name != null)
+            if (displayAttribute != null)
             {
                 // GetName returns null if the Name property on the attribute is not specified.
-                schema.Title = displayAttribute.GetName();
+                var name = displayAttribute.GetName();
+                if (name != null) 
+                {
+                    schema.Title = name;
+                }
             }
 
             dynamic defaultValueAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
