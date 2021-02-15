@@ -100,6 +100,21 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task When_display_attribute_with_resource_type_is_available_then_name_and_description_are_read() 
+        {
+            //// Arrange
+
+
+            //// Act
+            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var property = schema.Properties["DisplayWithResource"];
+
+            //// Assert
+            Assert.Equal(AttributeGenerationTestsResources.AttributeGenerationsTests_Name, property.Title);
+            Assert.Equal(AttributeGenerationTestsResources.AttributeGenerationsTests_Description, property.Description);
+        }
+
+        [Fact]
         public async Task When_description_attribute_is_available_then_description_are_read()
         {
             //// Arrange
@@ -190,6 +205,13 @@ namespace NJsonSchema.Tests.Generation
 
             [ReadOnly(true)]
             public bool ReadOnly { get; set; }
+
+            [Display(
+                ResourceType = typeof(AttributeGenerationTestsResources), 
+                Name = nameof(AttributeGenerationTestsResources.AttributeGenerationsTests_Name), 
+                Description = nameof(AttributeGenerationTestsResources.AttributeGenerationsTests_Description)
+            )]
+            public string DisplayWithResource { get; set; }
         }
 
         public class ClassWithTypedRange

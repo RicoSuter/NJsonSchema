@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net46;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp5.0;net46;net452</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
+      <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -62,6 +63,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Generation\AttributeGenerationTestsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AttributeGenerationTestsResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Generation\AttributeGenerationTestsResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>AttributeGenerationTestsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -73,9 +73,14 @@ namespace NJsonSchema.Infrastructure
             else
             {
                 dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
-                if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
+                if (displayAttribute != null)
                 {
-                    return displayAttribute.Description;
+                    // GetDescription returns null if the Description property on the attribute is not specified.
+                    var description = displayAttribute.GetDescription();
+                    if (description != null) 
+                    {
+                        return description;
+                    }
                 }
 
                 if (type is ContextualMemberInfo contextualMember)
