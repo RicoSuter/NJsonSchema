@@ -351,9 +351,14 @@ namespace NJsonSchema.Generation
             var contextualType = typeDescription.ContextualType;
 
             dynamic displayAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
-            if (displayAttribute != null && displayAttribute.Name != null)
+            if (displayAttribute != null)
             {
-                schema.Title = displayAttribute.Name;
+                // GetName returns null if the Name property on the attribute is not specified.
+                var name = displayAttribute.GetName();
+                if (name != null) 
+                {
+                    schema.Title = name;
+                }
             }
 
             dynamic defaultValueAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
@@ -751,7 +756,7 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema, new()
         {
             var extensionDataProperty = type.GetContextualProperties()
-                .FirstOrDefault(p => p.ContextAttributes.Any(a => 
+                .FirstOrDefault(p => p.ContextAttributes.Any(a =>
                     Namotion.Reflection.TypeExtensions.IsAssignableToTypeName(a.GetType(), "JsonExtensionDataAttribute", TypeNameStyle.Name)));
 
             if (extensionDataProperty != null)
@@ -1155,9 +1160,12 @@ namespace NJsonSchema.Generation
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name))
+                if (converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Newtonsoft's converter
+                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter) + "`1", TypeNameStyle.Name)) // System.Text.Json's converter
                 {
-                    return jsonConverterAttribute.ConverterParameters != null && jsonConverterAttribute.ConverterParameters.Length > 0 ?
+                    return ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterParameters") && 
+                           jsonConverterAttribute.ConverterParameters != null && 
+                           jsonConverterAttribute.ConverterParameters.Length > 0 ?
                         Activator.CreateInstance(jsonConverterAttribute.ConverterType, jsonConverterAttribute.ConverterParameters) :
                         Activator.CreateInstance(jsonConverterAttribute.ConverterType);
                 }

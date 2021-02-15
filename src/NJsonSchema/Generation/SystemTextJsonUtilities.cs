@@ -56,8 +56,9 @@ namespace NJsonSchema.Generation
                 var attributes = member.GetCustomAttributes(true);
 
                 var property = base.CreateProperty(member, memberSerialization);
-                property.Ignored = attributes
-                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName) != null;
+                property.Ignored = 
+                    attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName) != null ||
+                    attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
 
                 if (_serializerOptions.PropertyNamingPolicy != null)
                 {
