@@ -1,4 +1,18 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+{% if UseSystemTextJson -%}
+internal class DateFormatConverter : JsonConverter<DateTime>
+{
+    public override System.DateTime Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+    {
+        return DateTime.Parse(reader.GetString());
+    }
+
+    public override void Write(System.Text.Json.Utf8JsonReader writer, System.DateTime value, System.Text.Json.JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString("yyyy-MM-dd"));
+    }
+}
+{% else -%}
 internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConverter
 {
     public DateFormatConverter()
@@ -6,3 +20,4 @@ internal class DateFormatConverter : Newtonsoft.Json.Converters.IsoDateTimeConve
         DateTimeFormat = "yyyy-MM-dd";
     }
 }
+{% endif -%}

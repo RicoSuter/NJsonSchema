@@ -83,8 +83,6 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_generating_type_with_inheritance_then_allOf_has_one_item()
         {
-            //// Arrange
-
             //// Act
             var schema = JsonSchema.FromType<Teacher>();
 
@@ -409,6 +407,37 @@ namespace NJsonSchema.Tests.Generation
             Assert.Null(exceptionBase.DiscriminatorObject);
             Assert.NotNull(exceptionBase.ActualTypeSchema.DiscriminatorObject);
             Assert.True(exceptionBase.ActualTypeSchema.DiscriminatorObject.Mapping.ContainsKey("MyException"));
+        }
+
+        public class Apple : Fruit
+        {
+            public string Foo { get; set; }
+        }
+
+        public class Orange : Fruit
+        {
+            public string Bar { get; set; }
+        }
+
+        [JsonInheritance("a", typeof(Apple))]
+        [JsonInheritance("o", typeof(Orange))]
+        [JsonConverter(typeof(JsonInheritanceConverter), "k")]
+        public class Fruit
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_using_JsonInheritanceAttribute_then_schema_is_correct()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<Fruit>();
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.NotNull(data);
+            Assert.Contains(@"""a"": """, data);
+            Assert.Contains(@"""o"": """, data);
         }
     }
 }

@@ -49,7 +49,8 @@ namespace NJsonSchema.Converters
 
         /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
         /// <param name="discriminator">The discriminator.</param>
-        /// <param name="readTypeProperty">Read the $type property to determine the type (fallback).</param>
+        /// <param name="readTypeProperty">Read the $type property to determine the type 
+        /// (fallback, should not be used as it might lead to security problems).</param>
         public JsonInheritanceConverter(string discriminator, bool readTypeProperty)
         {
             _discriminator = discriminator;
@@ -188,6 +189,12 @@ namespace NJsonSchema.Converters
         /// <returns>The discriminator value.</returns>
         public virtual string GetDiscriminatorValue(Type type)
         {
+            var jsonInheritanceAttributeDiscriminator = GetSubtypeDiscriminator(type);
+            if (jsonInheritanceAttributeDiscriminator != null)
+            {
+                return jsonInheritanceAttributeDiscriminator;
+            }
+
             return type.Name;
         }
 
@@ -198,6 +205,12 @@ namespace NJsonSchema.Converters
         /// <returns></returns>
         protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
         {
+            var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
+            if (jsonInheritanceAttributeSubtype != null)
+            {
+                return jsonInheritanceAttributeSubtype;
+            }
+
             if (objectType.Name == discriminatorValue)
             {
                 return objectType;
@@ -262,6 +275,26 @@ namespace NJsonSchema.Converters
             } while (type != null);
 
             return null;
+        }
+
+        private static Type GetObjectSubtype(Type baseType, string discriminatorName)
+        {
+            var jsonInheritanceAttributes = baseType
+                .GetTypeInfo()
+                .GetCustomAttributes(true)
+                .OfType<JsonInheritanceAttribute>();
+
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
+        }
+
+        private static string GetSubtypeDiscriminator(Type objectType)
+        {
+            var jsonInheritanceAttributes = objectType
+                .GetTypeInfo()
+                .GetCustomAttributes(true)
+                .OfType<JsonInheritanceAttribute>();
+
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Type == objectType)?.Key;
         }
     }
 }
