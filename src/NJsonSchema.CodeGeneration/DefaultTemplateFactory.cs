@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration
         internal class LiquidTemplate : ITemplate
         {
             private const string TemplateTagName = "__njs_template";
-            private static readonly ConcurrentDictionary<string, Template> Templates = new ConcurrentDictionary<string, Template>();
+            private static readonly ConcurrentDictionary<string, string> Templates = new ConcurrentDictionary<string, string>();
 
             static LiquidTemplate()
             {
@@ -162,10 +162,10 @@ namespace NJsonSchema.CodeGeneration
                             m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
                             RegexOptions.Singleline);
 
-                        Templates[_data] = Template.Parse(data);
+                        Templates[_data] = data; // TODO: How to cache thread-safe parsed template?
                     }
 
-                    var template = Templates[_data];
+                    var template = Template.Parse(Templates[_data]);
                     return template.Render(new RenderParameters(CultureInfo.InvariantCulture)
                     {
                         LocalVariables = hash,
