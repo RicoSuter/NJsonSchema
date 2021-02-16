@@ -163,6 +163,7 @@ namespace NJsonSchema.CodeGeneration
                             RegexOptions.Singleline);
 
                         Templates[_data] = Template.Parse(data);
+                        Templates[_data].MakeThreadSafe();
                     }
 
                     var template = Templates[_data];
