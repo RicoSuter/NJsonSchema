@@ -118,6 +118,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "";
 
                 case TypeScriptDateTimeType.Luxon:
+                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    {
+                        return "Duration.fromISO";
+                    }
                     return "DateTime.fromISO";
 
                 case TypeScriptDateTimeType.DayJS:
