@@ -19,6 +19,7 @@
     <None Remove="References\LocalReferencesTests\dir_with_#\second.json" />
     <None Remove="References\LocalReferencesTests\schema_with_collection_reference.json" />
     <None Remove="References\LocalReferencesTests\schema_with_indirect_reference.json" />
+    <None Remove="References\LocalReferencesTests\schema_with_indirect_subreference.json" />
     <None Remove="References\LocalReferencesTests\schema_with_reference.json" />
   </ItemGroup>
 
@@ -36,6 +37,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\LocalReferencesTests\schema_with_collection_reference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\LocalReferencesTests\schema_with_indirect_subreference.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\LocalReferencesTests\schema_with_indirect_reference.json">
