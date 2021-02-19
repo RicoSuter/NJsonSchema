@@ -546,7 +546,7 @@ namespace NJsonSchema.Generation
                 schema.IsAbstract = type.GetTypeInfo().IsAbstract;
             }
 
-            GenerateInheritanceDiscriminator(type, rootSchema, schema);
+            GenerateInheritanceDiscriminator(type, rootSchema, schema, schemaResolver);
             GenerateKnownTypes(type, schemaResolver);
 
             if (Settings.GenerateXmlObjects)
@@ -1033,7 +1033,7 @@ namespace NJsonSchema.Generation
                             GenerateProperties(baseType, schema, schemaResolver);
                             var actualSchema = GenerateInheritance(baseType, schema, schemaResolver);
 
-                            GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema);
+                            GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema, schemaResolver);
                         }
                     }
                     else
@@ -1098,7 +1098,7 @@ namespace NJsonSchema.Generation
                         GenerateProperties(i, schema, schemaResolver);
                         var actualSchema = GenerateInheritance(i.ToContextualType(), schema, schemaResolver);
 
-                        GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
+                        GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema, schemaResolver);
                     }
                 }
             }
@@ -1106,7 +1106,7 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private void GenerateInheritanceDiscriminator(Type type, JsonSchema schema, JsonSchema typeSchema)
+        private void GenerateInheritanceDiscriminator(Type type, JsonSchema schema, JsonSchema typeSchema, JsonSchemaResolver schemaResolver)
         {
             if (!Settings.GetActualFlattenInheritanceHierarchy(type))
             {
@@ -1146,7 +1146,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    var baseDiscriminator = schema.ResponsibleDiscriminatorObject ?? schema.ActualTypeSchema.ResponsibleDiscriminatorObject;
+                    var baseDiscriminator = schema.GetBaseDiscriminator(schemaResolver.RootObject);
                     baseDiscriminator?.AddMapping(type, schema);
                 }
             }
