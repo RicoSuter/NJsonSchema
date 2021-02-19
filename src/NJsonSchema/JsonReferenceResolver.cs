@@ -189,7 +189,7 @@ namespace NJsonSchema
                 if (resolvedSchema is JsonSchema && append &&
                     (_schemaAppender.RootObject as JsonSchema)?.Definitions.Values.Contains(referencedFile) != true)
                 {
-                    var key = arr[0].Split('/', '\\').Last().Split('.').First();
+                    var key = jsonPath.Split('/', '\\').Last().Split('.').First();
                     _schemaAppender.AppendSchema((JsonSchema)resolvedSchema, key);
                 }
 
