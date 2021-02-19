@@ -20,6 +20,8 @@ namespace NJsonSchema.Tests.Generation
             public IDictionary<PropertyName, string> Mapping2 { get; set; }
 
             public IDictionary<PropertyName, int?> Mapping3 { get; set; }
+
+            public IDictionary<PropertyName, double?> Mapping4 { get; set; }
         }
 
         [Fact]
@@ -50,6 +52,9 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
+
+            Assert.True(schema.Properties["Mapping3"].IsDictionary);
+            Assert.True(schema.Properties["Mapping4"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
         }
 
         [Fact]
@@ -66,6 +71,28 @@ namespace NJsonSchema.Tests.Generation
             //// Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.Swagger2));
+
+            Assert.True(schema.Properties["Mapping4"].IsDictionary);
+            Assert.True(schema.Properties["Mapping4"].AdditionalPropertiesSchema.IsNullable(SchemaType.Swagger2));
+        }
+
+        [Fact]
+        public async Task When_value_type_is_nullable_then_json_schema_is_nullable_OpenApi3()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = SchemaType.OpenApi3,
+                GenerateCustomNullableProperties = true
+            });
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.True(schema.Properties["Mapping3"].IsDictionary);
+            Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.OpenApi3));
+
+            Assert.True(schema.Properties["Mapping4"].IsDictionary);
+            Assert.True(schema.Properties["Mapping4"].AdditionalPropertiesSchema.IsNullable(SchemaType.OpenApi3));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
@@ -81,6 +82,22 @@ namespace NJsonSchema.Tests.References
 
             //// Assert
             Assert.Equal(1, schema.Definitions.Count);
+            Assert.Equal("FooAnimal", schema.Definitions.Single().Key);
+        }
+
+        [Fact]
+        public async Task When_document_has_indirect_external_ref_to_a_definition_than_it_is_loaded()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_subreference.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(1, schema.Definitions.Count);
+            Assert.Equal("SubAnimal", schema.Definitions.Single().Key);
         }
 
         [Fact]

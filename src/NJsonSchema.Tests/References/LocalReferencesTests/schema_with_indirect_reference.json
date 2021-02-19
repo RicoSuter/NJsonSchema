@@ -1,13 +1,13 @@
 {
-	"type": "object",
-  "properties": {
-    "foo": {
-      "$ref": "#/definitions/Animal"
+    "type": "object",
+    "properties": {
+        "foo": {
+            "$ref": "#/definitions/FooAnimal"
+        }
+    },
+    "definitions": {
+        "FooAnimal": {
+            "$ref": "./animal.json"
+        }
     }
-  },
-  "definitions": {
-    "Animal": {
-      "$ref": "./animal.json"
-    }
-  }
 }
