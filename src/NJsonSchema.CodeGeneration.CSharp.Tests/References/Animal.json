@@ -1,0 +1,25 @@
+{
+    "title": "Animal",
+    "type": "object",
+    "x-abstract": true,
+    "discriminator": "discriminator",
+
+    "definitions": {
+        "Cat": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "Animal.json"
+                }
+            ]
+        },
+        "PersianCat": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Cat"
+                }
+            ]
+        }
+    }
+}
