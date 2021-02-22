@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>
         /// Gets the original title of the class (schema title).
         /// </summary>
-        public virtual string SchemaTitle { get; }
+        public string SchemaTitle { get; }
 
         /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
         public bool IsObject => _schema.ActualTypeSchema.IsObject;
