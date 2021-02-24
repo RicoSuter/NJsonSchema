@@ -141,6 +141,9 @@ namespace NJsonSchema.Validation
         Base64Expected,
 
         /// <summary>No type of the types does validate (check error details in <see cref="MultiTypeValidationError"/>). </summary>
-        NoTypeValidates
+        NoTypeValidates,
+
+        /// <summary>A valid UUID is expected. </summary>
+        UuidExpected,
     }
 }

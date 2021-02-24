@@ -33,7 +33,8 @@ namespace NJsonSchema.Validation
             new TimeSpanFormatValidator(),
             new UriFormatValidator(),
             new ByteFormatValidator(),
-            new Base64FormatValidator()
+            new Base64FormatValidator(),
+            new UuidFormatValidator()
         };
 
         private readonly IDictionary<string, IFormatValidator[]> _formatValidatorsMap;
