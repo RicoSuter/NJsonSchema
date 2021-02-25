@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="References\A.json" />
+    <None Remove="References\Animal.json" />
     <None Remove="References\B.json" />
     <None Remove="References\C.json" />
     <None Remove="References\D.json" />
@@ -14,6 +15,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="References\A.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="References\Animal.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\B.json">

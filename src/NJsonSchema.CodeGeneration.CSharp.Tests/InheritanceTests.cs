@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -131,6 +132,34 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.Contains("public Dog Dog { get; set; }", code);
+        }
+
+        [Fact]
+        public async Task When_definitions_inherit_from_root_schema()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/Animal.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Record });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("public abstract partial class Animal", code);
+            Assert.Contains("public partial class Cat : Animal", code);
+            Assert.Contains("public partial class PersianCat : Cat", code);
+            Assert.Contains("[JsonInheritanceAttribute(\"Cat\", typeof(Cat))]", code);
+            Assert.Contains("[JsonInheritanceAttribute(\"PersianCat\", typeof(PersianCat))]", code);
+        }
+
+        private string GetTestDirectory()
+        {
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new UriBuilder(codeBase);
+            return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }
     }
 }
