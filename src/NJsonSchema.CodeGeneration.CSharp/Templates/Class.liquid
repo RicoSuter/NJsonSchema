@@ -49,7 +49,7 @@
     /// <summary>{{ property.Description | csharpdocs }}</summary>
 {%   endif -%}
 {% if UseSystemTextJson -%}
-    [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}"]
+    [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
 {%   if property.IsStringEnumArray -%}
     // TODO(system.text.json): Add string enum item converter
 {%   endif -%}
@@ -76,7 +76,7 @@
 {%   endif -%}
 {%   if property.IsStringEnum -%}
 {%     if UseSystemTextJson -%}
-    [System.Text.Json.Serialization.JsonConverter(System.Text.Json.Serialization.JsonStringEnumConverter)]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
 {%     else -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%     endif -%}
@@ -98,11 +98,11 @@
         get { return {{ property.FieldName }}; }
 {%     if property.HasSetter -%}
 {%         if RenderInpc -%}
-        {{PropertySetterAccessModifier}}set 
+        {{PropertySetterAccessModifier}}set
         {
             if ({{ property.FieldName }} != value)
             {
-                {{ property.FieldName }} = value; 
+                {{ property.FieldName }} = value;
                 RaisePropertyChanged();
             }
         }
