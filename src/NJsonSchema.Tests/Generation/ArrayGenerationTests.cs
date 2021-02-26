@@ -80,5 +80,38 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(JsonObjectType.Array, schema.Definitions["SomeModelCollectionResponse"].Type);
             Assert.NotNull(schema.Definitions["SomeModelCollectionResponse"].Item);
         }
+
+#if NET5_0
+
+        public class ClassWithAsyncEnumerable
+        {
+            public IAsyncEnumerable<Apple> AsyncApples { get; set; }
+
+            public List<Apple> AppleList { get; set; }
+        }
+
+        public class Apple
+        {
+            public string Name { get; set; }
+        }
+
+        [Fact]
+        public async Task When_property_is_async_numerable_then_item_type_is_correct()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<ClassWithAsyncEnumerable>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var json = schema.ToJson();
+
+            //// Assert
+            var asyncProperty = schema.ActualProperties["AsyncApples"].ActualTypeSchema;
+            Assert.Equal(JsonObjectType.Array, asyncProperty.Type);
+            Assert.True(asyncProperty.Item.HasReference);
+
+            var listProperty = schema.ActualProperties["AppleList"].ActualTypeSchema;
+            Assert.Equal(JsonObjectType.Array, listProperty.Type);
+            Assert.True(listProperty.Item.HasReference);
+        }
+
+#endif
     }
 }

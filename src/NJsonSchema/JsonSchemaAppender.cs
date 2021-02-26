@@ -44,7 +44,7 @@ namespace NJsonSchema
 
             if (schema == RootObject)
             {
-                throw new ArgumentException("The root schema cannot be appended.");
+                return;
             }
 
             if (!RootSchema.Definitions.Values.Contains(schema))
