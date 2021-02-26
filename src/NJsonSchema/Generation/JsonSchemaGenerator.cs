@@ -582,7 +582,10 @@ namespace NJsonSchema.Generation
             typeDescription.ApplyType(schema);
 
             var jsonSchemaAttribute = contextualType.GetTypeAttribute<JsonSchemaAttribute>();
-            var itemType = jsonSchemaAttribute?.ArrayItem.ToContextualType() ?? contextualType.EnumerableItemType;
+            var itemType = jsonSchemaAttribute?.ArrayItem.ToContextualType() ?? 
+                           contextualType.EnumerableItemType ??
+                           contextualType.GenericArguments.FirstOrDefault();
+
             if (itemType != null)
             {
                 var itemIsNullable = contextualType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
