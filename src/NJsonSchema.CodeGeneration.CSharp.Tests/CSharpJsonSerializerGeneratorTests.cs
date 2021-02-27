@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", System.Text.Json.JsonSerializerOptions {  }; var converters = new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
+            Assert.Equal(", System.Text.Json.JsonSerializerOptions(); var converters = new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", TestJsonSerializerSettingsOrOptionsTransformationMethod(System.Text.Json.JsonSerializerOptions {  })", output);
+            Assert.Equal(", TestJsonSerializerSettingsOrOptionsTransformationMethod(System.Text.Json.JsonSerializerOptions())", output);
         }
 
         [Fact]
