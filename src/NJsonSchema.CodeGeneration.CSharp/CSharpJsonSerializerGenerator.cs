@@ -61,6 +61,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                             return string.Empty;
                         }
                     }
+
                 case CSharpJsonLibrary.SystemTextJson:
                     var useOptionsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerOptionsTransformationMethod);
                     // TODO: add more conditions?
@@ -89,6 +90,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     {
                         return string.Empty;
                     }
+
                 default: // TODO: possibly add more json converters
                     return string.Empty;
             }
@@ -102,8 +104,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 {
                     case CSharpJsonLibrary.NewtonsoftJson:
                         return "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
+
                     case CSharpJsonLibrary.SystemTextJson:
                         return "new System.Text.Json.Serialization.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
+
                     default: // TODO: possibly add more json converters
                         return string.Empty;
                 }
