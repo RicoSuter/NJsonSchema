@@ -28,14 +28,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private static string GenerateForJsonLibrary(CSharpGeneratorSettings settings, List<string> jsonConverters, bool hasJsonConverters)
         {
+            var useSettingsOrOptionsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsOrOptionsTransformationMethod);
             switch (settings.JsonLibrary)
             {
                 case CSharpJsonLibrary.NewtonsoftJson:
-                    var useSettingsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsTransformationMethod);
-                    if (settings.HandleReferences || useSettingsTransformationMethod)
+                    if (settings.HandleReferences || useSettingsOrOptionsTransformationMethod)
                     {
                         return ", " +
-                            (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
+                            (useSettingsOrOptionsTransformationMethod ? settings.JsonSerializerSettingsOrOptionsTransformationMethod + "(" : string.Empty) +
                             "new Newtonsoft.Json.JsonSerializerSettings { " +
                             (settings.HandleReferences
                                 ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All"
@@ -43,12 +43,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                             (hasJsonConverters
                                 ? (settings.HandleReferences ? ", " : string.Empty) + "Converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
                                 : string.Empty) +
-
-                            // TODO(newtonsoft.json): Add supporting more options for Newtonsoft.Json (hided for System.Text.Json)
-                            // or it can be handled in JsonSerializerSettingsTransformationMethod?
-
                             " }" +
-                            (useSettingsTransformationMethod ? ")" : string.Empty);
+                            (useSettingsOrOptionsTransformationMethod ? ")" : string.Empty);
                     }
                     else
                     {
@@ -63,25 +59,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     }
 
                 case CSharpJsonLibrary.SystemTextJson:
-                    var useOptionsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerOptionsTransformationMethod);
                     // TODO: add more conditions?
-                    if (useOptionsTransformationMethod || hasJsonConverters)
+                    if (useSettingsOrOptionsTransformationMethod || hasJsonConverters)
                     {
                         return ", " +
-                            (useOptionsTransformationMethod ? settings.JsonSerializerOptionsTransformationMethod + "(" : string.Empty) +
-                            "System.Text.Json.JsonSerializerOptions { " +
-
-                            // TODO(system.text.json): Add supporting more options for System.Text.Json (hided for Newtonsoft.Json)
-                            // or it can be handled in JsonSerializerOptionsTransformationMethod?
-                            //
-                            // "AllowTrailingCommas" (bool), "DefaultBufferSize" (int), "IgnoreNullValues" (bool),
-                            // "IgnoreReadOnlyProperties" (bool), "MaxDepth" (int), "PropertyNameCaseInsensitive" (bool)
-                            // "WriteIndented" (bool), "ReadCommentHandling" (enum - System.Text.Json.JsonCommentHandling),
-                            // "PropertyNamingPolicy" (abstract class - System.Text.Json.JsonNamingPolicy), "Encoder" (abstract class - System.Text.Encodings.Web.JavaScriptEncoder),
-                            // "DictionaryKeyPolicy" (abstract class - System.Text.Json.JsonNamingPolicy)
-
-                            " }" +
-                            (useOptionsTransformationMethod ? ")" : string.Empty) +
+                            (useSettingsOrOptionsTransformationMethod ? settings.JsonSerializerSettingsOrOptionsTransformationMethod + "(" : string.Empty) +
+                            "System.Text.Json.JsonSerializerOptions()" +
+                            (useSettingsOrOptionsTransformationMethod ? ")" : string.Empty) +
                             (hasJsonConverters
                                 ? "; var converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
                                 : string.Empty);
