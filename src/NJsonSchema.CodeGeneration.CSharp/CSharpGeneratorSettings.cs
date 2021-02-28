@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool HandleReferences { get; set; }
 
         /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).</summary>
-        public string JsonSerializerSettingsOrOptionsTransformationMethod { get; set; }
+        public string JsonSerializerSettingsTransformationMethod { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: true).</summary>
         public bool GenerateJsonMethods { get; set; }

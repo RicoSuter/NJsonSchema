@@ -28,14 +28,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private static string GenerateForJsonLibrary(CSharpGeneratorSettings settings, List<string> jsonConverters, bool hasJsonConverters)
         {
-            var useSettingsOrOptionsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsOrOptionsTransformationMethod);
+            var useSettingsTransformationMethod = !string.IsNullOrEmpty(settings.JsonSerializerSettingsTransformationMethod);
             switch (settings.JsonLibrary)
             {
                 case CSharpJsonLibrary.NewtonsoftJson:
-                    if (settings.HandleReferences || useSettingsOrOptionsTransformationMethod)
+                    if (settings.HandleReferences || useSettingsTransformationMethod)
                     {
                         return ", " +
-                            (useSettingsOrOptionsTransformationMethod ? settings.JsonSerializerSettingsOrOptionsTransformationMethod + "(" : string.Empty) +
+                            (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                             "new Newtonsoft.Json.JsonSerializerSettings { " +
                             (settings.HandleReferences
                                 ? "PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All"
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                                 ? (settings.HandleReferences ? ", " : string.Empty) + "Converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
                                 : string.Empty) +
                             " }" +
-                            (useSettingsOrOptionsTransformationMethod ? ")" : string.Empty);
+                            (useSettingsTransformationMethod ? ")" : string.Empty);
                     }
                     else
                     {
@@ -60,12 +60,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
                 case CSharpJsonLibrary.SystemTextJson:
                     // TODO: add more conditions?
-                    if (useSettingsOrOptionsTransformationMethod || hasJsonConverters)
+                    if (useSettingsTransformationMethod || hasJsonConverters)
                     {
                         return ", " +
-                            (useSettingsOrOptionsTransformationMethod ? settings.JsonSerializerSettingsOrOptionsTransformationMethod + "(" : string.Empty) +
+                            (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                             "System.Text.Json.JsonSerializerOptions()" +
-                            (useSettingsOrOptionsTransformationMethod ? ")" : string.Empty) +
+                            (useSettingsTransformationMethod ? ")" : string.Empty) +
                             (hasJsonConverters
                                 ? "; var converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
                                 : string.Empty);
