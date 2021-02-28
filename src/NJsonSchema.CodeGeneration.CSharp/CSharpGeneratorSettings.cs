@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
         public string Namespace { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
+        /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
@@ -121,7 +121,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).</summary>
         public bool HandleReferences { get; set; }
 
-        /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings used in the generated ToJson()/FromJson() methods (default: null).</summary>
+        /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).</summary>
         public string JsonSerializerSettingsTransformationMethod { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: true).</summary>
