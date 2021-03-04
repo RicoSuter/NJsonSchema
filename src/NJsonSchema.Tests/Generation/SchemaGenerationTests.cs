@@ -173,8 +173,6 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.ActualProperties.ContainsKey("Bar"));
         }
         
-        
-
         [DataContract]
         class ClassWithPrivateDataMember1
         {
