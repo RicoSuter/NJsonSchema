@@ -5,6 +5,7 @@ using System.Reflection;
 using NSwag;
 using System.Threading.Tasks;
 using Xunit;
+using Newtonsoft.Json;
 
 namespace NJsonSchema.Yaml.Tests.References
 {
@@ -60,6 +61,21 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.True(Unauthorized.Content.ContainsKey(problemType));
             Assert.NotNull(Unauthorized.Content[problemType]);
             Assert.NotNull(Unauthorized.Schema);
+        }
+
+        [Fact]
+        public async Task When_document_has_indirect_external_ref_to_a_schema_named_title_then_it_is_loaded()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/YamlReferencesTest/schema_with_indirect_subreference_to_title.yaml";
+
+            //// Act
+            var schema = await JsonSchemaYaml.FromFileAsync(path);
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Equal(1, schema.Definitions.Count);
+            Assert.True(schema.Definitions.ContainsKey("Title"));
         }
 
         private string GetTestDirectory()
