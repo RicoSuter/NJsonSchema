@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation
 {
@@ -858,12 +859,13 @@ namespace NJsonSchema.Generation
 #if !LEGACY
             var members = type.GetTypeInfo()
                 .DeclaredFields
-                .Where(f => !f.IsPrivate && !f.IsStatic)
+                .Where(f => !f.IsPrivate && !f.IsStatic || f.IsDefined(typeof(DataMemberAttribute)))
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
                     .Where(p => (p.GetMethod?.IsPrivate != true && p.GetMethod?.IsStatic == false) ||
-                                (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false))
+                                (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false) ||
+                                p.IsDefined(typeof(DataMemberAttribute)))
                 )
                 .ToList();
 #else
