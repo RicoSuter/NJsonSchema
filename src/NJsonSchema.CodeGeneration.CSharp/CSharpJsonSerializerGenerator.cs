@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     {
                         return ", " +
                             (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
-                            "System.Text.Json.JsonSerializerOptions()" +
+                            "new System.Text.Json.JsonSerializerOptions()" +
                             (useSettingsTransformationMethod ? ")" : string.Empty) +
                             (hasJsonConverters
                                 ? "; var converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
