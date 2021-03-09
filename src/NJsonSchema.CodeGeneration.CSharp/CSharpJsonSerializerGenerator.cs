@@ -20,10 +20,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The code.</returns>
         public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
         {
-            var jsonConverters = (settings.JsonConverters ?? new string[0]).Concat(additionalJsonConverters ?? new string[0]).ToList();
+            var jsonConverters = GetJsonConverters(settings, additionalJsonConverters);
             var hasJsonConverters = jsonConverters.Any();
 
             return GenerateForJsonLibrary(settings, jsonConverters, hasJsonConverters);
+        }
+
+        /// <summary>Generates the JSON converters array code.</summary>
+        /// <param name="settings">The settings.</param>
+        /// <param name="additionalJsonConverters">The additional JSON converters.</param>
+        /// <returns>The code.</returns>
+        public static string GenerateJsonConvertersArrayCode(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
+        {
+            var jsonConverters = GetJsonConverters(settings, additionalJsonConverters);
+
+            return GenerateConverters(jsonConverters, settings.JsonLibrary);
+        }
+
+        private static List<string> GetJsonConverters(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
+        {
+            return (settings.JsonConverters ?? new string[0]).Concat(additionalJsonConverters ?? new string[0]).ToList();
         }
 
         private static string GenerateForJsonLibrary(CSharpGeneratorSettings settings, List<string> jsonConverters, bool hasJsonConverters)
@@ -34,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 case CSharpJsonLibrary.NewtonsoftJson:
                     if (settings.HandleReferences || useSettingsTransformationMethod)
                     {
-                        return ", " +
+                        return
                             (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                             "new Newtonsoft.Json.JsonSerializerSettings { " +
                             (settings.HandleReferences
@@ -50,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     {
                         if (hasJsonConverters)
                         {
-                            return ", " + GenerateConverters(jsonConverters, settings.JsonLibrary);
+                            return GenerateConverters(jsonConverters, settings.JsonLibrary);
                         }
                         else
                         {
@@ -62,13 +78,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     // TODO: add more conditions?
                     if (useSettingsTransformationMethod || hasJsonConverters)
                     {
-                        return ", " +
+                        return
                             (useSettingsTransformationMethod ? settings.JsonSerializerSettingsTransformationMethod + "(" : string.Empty) +
                             "new System.Text.Json.JsonSerializerOptions()" +
-                            (useSettingsTransformationMethod ? ")" : string.Empty) +
-                            (hasJsonConverters
-                                ? "; var converters = " + GenerateConverters(jsonConverters, settings.JsonLibrary)
-                                : string.Empty);
+                            (useSettingsTransformationMethod ? ")" : string.Empty);
                     }
                     else
                     {

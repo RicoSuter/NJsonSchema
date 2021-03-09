@@ -1,8 +1,8 @@
 ﻿public static {{ ClassName }} FromJson(string data)
 {
 {% if UseSystemTextJson -%}
-    return System.Text.Json.JsonSerializer.Deserialize<{{ ClassName }}>(data{{ JsonSerializerParameterCode }});
+    return System.Text.Json.JsonSerializer.Deserialize<{{ ClassName }}>(data, {{ JsonSerializerParameterCode }});
 {% else -%}
-    return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ ClassName }}>(data{{ JsonSerializerParameterCode }});
+    return Newtonsoft.Json.JsonConvert.DeserializeObject<{{ ClassName }}>(data, {{ JsonSerializerParameterCode }});
 {% endif -%}
 }

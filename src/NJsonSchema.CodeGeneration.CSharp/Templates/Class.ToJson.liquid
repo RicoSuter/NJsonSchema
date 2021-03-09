@@ -1,8 +1,8 @@
-﻿public string ToJson() 
+﻿public string ToJson()
 {
 {% if UseSystemTextJson -%}
-    return System.Text.Json.JsonSerializer.Serialize(this{{ JsonSerializerParameterCode }});
+    return System.Text.Json.JsonSerializer.Serialize(this, {{ JsonSerializerParameterCode }});
 {% else -%}
-    return Newtonsoft.Json.JsonConvert.SerializeObject(this{{ JsonSerializerParameterCode }});
+    return Newtonsoft.Json.JsonConvert.SerializeObject(this, {{ JsonSerializerParameterCode }});
 {% endif -%}
 }
