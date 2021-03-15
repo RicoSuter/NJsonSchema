@@ -70,12 +70,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         }
                         else
                         {
-                            return string.Empty;
+                            return "new Newtonsoft.Json.JsonSerializerSettings()";
                         }
                     }
 
                 case CSharpJsonLibrary.SystemTextJson:
-                    // TODO: add more conditions?
                     if (useSettingsTransformationMethod || hasJsonConverters)
                     {
                         return
@@ -85,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     }
                     else
                     {
-                        return string.Empty;
+                        return "new System.Text.Json.JsonSerializerOptions()";
                     }
 
                 default: // TODO: possibly add more json converters

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -385,9 +386,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 Type = JsonObjectType.String
             };
-            
+
             var generator = new CSharpGenerator(schema);
-            
+
             // Act
             var output = generator.GenerateFile("MyClass");
 
@@ -594,7 +595,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 ""required"": [ ""dict"" ],
                 ""properties"": {
                     ""dict"": {
-                        ""type"": ""object"", 
+                        ""type"": ""object"",
                         ""additionalProperties"": false,
                         ""patternProperties"": {
                             ""^[a-zA-Z_$][a-zA-Z_$0-9]*$"": {
@@ -686,15 +687,19 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
     }
   }".Replace("\r", string.Empty), schemaJson.Replace("\r", string.Empty));
 
-            Assert.Contains(@"        [Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
+            var expected = @"[Newtonsoft.Json.JsonProperty(""FirstName"", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
-    
+
         [Newtonsoft.Json.JsonProperty(""MiddleName"", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string MiddleName { get; set; }
-    
+
         [Newtonsoft.Json.JsonProperty(""Age"", Required = Newtonsoft.Json.Required.AllowNull)]
-        public int? Age { get; set; }".Replace("\r", string.Empty), code.Replace("\r", string.Empty));
+        public int? Age { get; set; }";
+            var normalizedExpected = Regex.Replace(expected, @"\s+", string.Empty);
+            var normalizedCode = Regex.Replace(code, @"\s+", string.Empty);
+
+            Assert.Contains(normalizedExpected, normalizedCode);
 
             AssertCompile(code);
         }
@@ -851,16 +856,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 			""$ref"": ""#/definitions/Object""
 		}
-	}, 
+	},
 	""definitions"": {
-		""Object"": { 
-			""type"": ""object"", 
-			""properties"": {} 
+		""Object"": {
+			""type"": ""object"",
+			""properties"": {}
 		}
 	}
 }";
@@ -973,7 +978,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""integer"",
@@ -1003,7 +1008,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""integer"",
@@ -1033,7 +1038,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""integer"",
@@ -1064,7 +1069,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
@@ -1094,7 +1099,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
@@ -1124,7 +1129,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
@@ -1154,7 +1159,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
@@ -1185,7 +1190,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""number"",
@@ -1216,7 +1221,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
                 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""array"",
@@ -1248,7 +1253,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""string"",
@@ -1278,7 +1283,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""foo"": {
 		  ""type"": ""number"",
@@ -1308,7 +1313,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
                 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""a"": {
 		  ""type"": ""integer"",
@@ -1395,7 +1400,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""a"": {
     		""type"": ""string"",
@@ -1539,7 +1544,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""a"": {
     		""type"": ""string"",
@@ -1571,7 +1576,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var json =
                 @"{
-	""type"": ""object"", 
+	""type"": ""object"",
 	""properties"": {
 		""a"": {
     		""type"": ""string"",
@@ -1762,6 +1767,170 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }
 
             Assert.Empty(sb.ToString());
+        }
+
+        [Fact]
+        public async Task When_using_SytemTextJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        {
+            //// Arrange
+            var expectedToJsonMethod =
+@"
+public string ToJson()
+{
+	var options = new System.Text.Json.JsonSerializerOptions();
+	return System.Text.Json.JsonSerializer.Serialize(this, options);
+}
+";
+
+            var expectedFromJsonMethod =
+@"
+public static Person FromJson(string data)
+{
+	var options = new System.Text.Json.JsonSerializerOptions();
+	return System.Text.Json.JsonSerializer.Deserialize<Person>(data, options);
+}
+";
+
+            var generator = await CreateGeneratorAsync();
+            generator.Settings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
+            generator.Settings.GenerateJsonMethods = true;
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+            //Remove the spaces from the string to avoid indentation change errors
+            var normalizedOutput = Regex.Replace(output, @"\s+", string.Empty);
+            var normalizedExpectedToJsonMethod = Regex.Replace(expectedToJsonMethod, @"\s+", string.Empty);
+            var normalizedExpectedFromJsonMethodMethod = Regex.Replace(expectedFromJsonMethod, @"\s+", string.Empty);
+
+            //// Assert
+            Assert.Contains(normalizedExpectedToJsonMethod, normalizedOutput);
+            Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_using_SytemTextJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        {
+            //// Arrange
+            var expectedToJsonMethod =
+@"
+public string ToJson()
+{
+	var options = new System.Text.Json.JsonSerializerOptions();
+	var converters = new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2() };
+	foreach(var converter in converters)
+		options.Converters.Add(converter);
+	return System.Text.Json.JsonSerializer.Serialize(this, options);
+}
+";
+
+            var expectedFromJsonMethod =
+@"
+public static Person FromJson(string data)
+{
+	var options = new System.Text.Json.JsonSerializerOptions();
+	var converters = new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2() };
+	foreach(var converter in converters)
+		options.Converters.Add(converter);
+	return System.Text.Json.JsonSerializer.Deserialize<Person>(data, options);
+}
+";
+
+            var generator = await CreateGeneratorAsync();
+            generator.Settings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
+            generator.Settings.GenerateJsonMethods = true;
+            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+            //Remove the spaces from the string to avoid indentation change errors
+            var normalizedOutput = Regex.Replace(output, @"\s+", string.Empty);
+            var normalizedExpectedToJsonMethod = Regex.Replace(expectedToJsonMethod, @"\s+", string.Empty);
+            var normalizedExpectedFromJsonMethodMethod = Regex.Replace(expectedFromJsonMethod, @"\s+", string.Empty);
+
+            //// Assert
+            Assert.Contains(normalizedExpectedToJsonMethod, normalizedOutput);
+            Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_using_NewtonsoftJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        {
+            //// Arrange
+            var expectedToJsonMethod =
+@"
+public string ToJson()
+{
+	return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
+}
+";
+
+            var expectedFromJsonMethod =
+@"
+public static Person FromJson(string data)
+{
+	return Newtonsoft.Json.JsonConvert.DeserializeObject<Person>(data, new Newtonsoft.Json.JsonSerializerSettings());
+}
+";
+
+            var generator = await CreateGeneratorAsync();
+            generator.Settings.JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
+            generator.Settings.GenerateJsonMethods = true;
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+            //Remove the spaces from the string to avoid indentation change errors
+            var normalizedOutput = Regex.Replace(output, @"\s+", string.Empty);
+            var normalizedExpectedToJsonMethod = Regex.Replace(expectedToJsonMethod, @"\s+", string.Empty);
+            var normalizedExpectedFromJsonMethodMethod = Regex.Replace(expectedFromJsonMethod, @"\s+", string.Empty);
+
+            //// Assert
+            Assert.Contains(normalizedExpectedToJsonMethod, normalizedOutput);
+            Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_using_NewtonsoftJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        {
+            //// Arrange
+            var expectedToJsonMethod =
+@"
+public string ToJson()
+{
+	return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2() });
+}
+";
+
+            var expectedFromJsonMethod =
+@"
+public static Person FromJson(string data)
+{
+	return Newtonsoft.Json.JsonConvert.DeserializeObject<Person>(data, new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2() });
+}
+";
+
+            var generator = await CreateGeneratorAsync();
+            generator.Settings.JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
+            generator.Settings.GenerateJsonMethods = true;
+            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+
+            //// Act
+            var output = generator.GenerateFile("MyClass");
+            //Remove the spaces from the string to avoid indentation change errors
+            var normalizedOutput = Regex.Replace(output, @"\s+", string.Empty);
+            var normalizedExpectedToJsonMethod = Regex.Replace(expectedToJsonMethod, @"\s+", string.Empty);
+            var normalizedExpectedFromJsonMethodMethod = Regex.Replace(expectedFromJsonMethod, @"\s+", string.Empty);
+
+            //// Assert
+            Assert.Contains(normalizedExpectedToJsonMethod, normalizedOutput);
+            Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
+
+            AssertCompile(output);
         }
     }
 }
