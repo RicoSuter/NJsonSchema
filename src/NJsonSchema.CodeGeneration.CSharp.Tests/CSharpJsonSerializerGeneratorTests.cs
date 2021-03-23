@@ -6,14 +6,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
     public class CSharpJsonSerializerGeneratorTests
     {
         [Fact]
-        public void When_using_SytemTextJson_with_JsonConverters_GenerateJsonSerializerParameterCode_generates_correctly()
+        public void When_using_SytemTextJson_GenerateJsonSerializerParameterCode_generates_correctly()
         {
             //// Arrange
             var additionalJsonConverters = new string[] { "AdditionalConverter1", "AdditionalConverter2" };
             var settings = new CSharpGeneratorSettings
             {
-                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson
             };
 
             //// Act
@@ -21,7 +20,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", new System.Text.Json.JsonSerializerOptions(); var converters = new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
+            Assert.Equal("new System.Text.Json.JsonSerializerOptions()", output);
         }
 
         [Fact]
@@ -40,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
+            Assert.Equal("new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
         }
 
         [Fact]
@@ -58,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", TestJsonSerializerSettingsTransformationMethod(new System.Text.Json.JsonSerializerOptions())", output);
+            Assert.Equal("TestJsonSerializerSettingsTransformationMethod(new System.Text.Json.JsonSerializerOptions())", output);
         }
 
         [Fact]
@@ -79,7 +78,45 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Console.WriteLine(output);
 
             //// Assert
-            Assert.Equal(", TestJsonSerializerSettingsTransformationMethod(new Newtonsoft.Json.JsonSerializerSettings { PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, Converters = new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() } })", output);
+            Assert.Equal("TestJsonSerializerSettingsTransformationMethod(new Newtonsoft.Json.JsonSerializerSettings { PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, Converters = new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() } })", output);
+        }
+
+        [Fact]
+        public void When_using_SytemTextJson_with_JsonConverters_GenerateJsonConvertersArrayCode_generates_correctly()
+        {
+            //// Arrange
+            var additionalJsonConverters = new string[] { "AdditionalConverter1", "AdditionalConverter2" };
+            var settings = new CSharpGeneratorSettings
+            {
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+            };
+
+            //// Act
+            var output = CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(settings, additionalJsonConverters);
+            Console.WriteLine(output);
+
+            //// Assert
+            Assert.Equal("new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
+        }
+
+        [Fact]
+        public void When_using_NewtonsoftJson_with_JsonConverters_GenerateJsonConvertersArrayCode_generates_correctly()
+        {
+            //// Arrange
+            var additionalJsonConverters = new string[] { "AdditionalConverter1", "AdditionalConverter2" };
+            var settings = new CSharpGeneratorSettings
+            {
+                JsonLibrary = CSharpJsonLibrary.NewtonsoftJson,
+                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+            };
+
+            //// Act
+            var output = CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(settings, additionalJsonConverters);
+            Console.WriteLine(output);
+
+            //// Assert
+            Assert.Equal("new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
         }
     }
 }

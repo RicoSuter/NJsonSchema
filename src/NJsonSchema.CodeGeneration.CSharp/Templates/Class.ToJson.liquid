@@ -1,8 +1,14 @@
-﻿public string ToJson() 
+﻿public string ToJson()
 {
 {% if UseSystemTextJson -%}
-    return System.Text.Json.JsonSerializer.Serialize(this{{ JsonSerializerParameterCode }});
+    var options = {{ JsonSerializerParameterCode }};
+{% if JsonConvertersArrayCode contains "System.Text.Json.Serialization.JsonConverter[]" -%}
+    var converters = {{ JsonConvertersArrayCode }};
+    foreach(var converter in converters)
+        options.Converters.Add(converter);
+{% endif -%}
+    return System.Text.Json.JsonSerializer.Serialize(this, options);
 {% else -%}
-    return Newtonsoft.Json.JsonConvert.SerializeObject(this{{ JsonSerializerParameterCode }});
+    return Newtonsoft.Json.JsonConvert.SerializeObject(this, {{ JsonSerializerParameterCode }});
 {% endif -%}
 }

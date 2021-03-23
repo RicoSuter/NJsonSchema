@@ -146,6 +146,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
 
+        /// <summary>Gets the JSON converters array code.</summary>
+        public string JsonConvertersArrayCode => CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(_settings, null);
+
         /// <summary>Gets a value indicating whether the class is deprecated.</summary>
         public bool IsDeprecated => _schema.IsDeprecated;
 
