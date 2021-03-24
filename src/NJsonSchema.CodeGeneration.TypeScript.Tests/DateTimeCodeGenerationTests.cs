@@ -48,8 +48,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDateTime: moment.Moment", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment(_data[\"MyDateTime\"].toString()) : _data[\"MyDateTime\"];", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : this.myDateTime;", code);
         }
 
         [Fact]
@@ -68,8 +68,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDateTime: moment.Moment", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment.parseZone(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString(true) : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment.parseZone(_data[\"MyDateTime\"].toString()) : _data[\"MyDateTime\"];", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString(true) : this.myDateTime;", code);
         }
 
         [Fact]
@@ -108,8 +108,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("myDateTime: Date", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? new Date(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? new Date(_data[\"MyDateTime\"].toString()) : _data[\"MyDateTime\"];", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : this.myDateTime;", code);
         }
 
         [Fact]
