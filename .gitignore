@@ -9,6 +9,7 @@ src/packages/Newtonsoft.Json**
 **.sln.ide/**
 **.vs/**
 .vscode/
+.idea/
 
 /src/NJsonSchema.sln.GhostDoc.xml
 
@@ -20,3 +21,4 @@ src/packages/Newtonsoft.Json**
 *.vspx
 /src/TestResults
 /src/.cr/*
+/src/NJsonSchema.Benchmark/BenchmarkDotNet.Artifacts*
