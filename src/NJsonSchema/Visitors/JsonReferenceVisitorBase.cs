@@ -61,12 +61,10 @@ namespace NJsonSchema.Visitors
         /// <returns>The task.</returns>
         protected virtual void Visit(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
         {
-            if (obj == null || checkedObjects.Contains(obj))
+            if (obj == null || !checkedObjects.Add(obj))
             {
                 return;
             }
-
-            checkedObjects.Add(obj);
 
             if (obj is IJsonReference reference)
             {

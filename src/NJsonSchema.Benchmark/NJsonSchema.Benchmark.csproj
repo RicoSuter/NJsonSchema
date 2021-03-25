@@ -2,21 +2,21 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <NoWarn>$(NoWarn),xUnit1013</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="*.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="NBench" Version="2.0.1" />
     <PackageReference Include="Pro.NBench.xUnit" Version="2.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+      <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
