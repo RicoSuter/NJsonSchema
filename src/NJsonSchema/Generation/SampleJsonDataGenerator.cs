@@ -52,8 +52,7 @@ namespace NJsonSchema.Generation
                 return null;
             }
 
-            if (schema.Type.HasFlag(JsonObjectType.Object) ||
-                GetPropertiesToGenerate(schema.AllOf).Any())
+            if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
             {
                 usedSchemas.Add(schema);
 
@@ -70,7 +69,7 @@ namespace NJsonSchema.Generation
             {
                 return JToken.FromObject(schema.Default);
             }
-            else if (schema.Type.HasFlag(JsonObjectType.Array))
+            else if (schema.Type.IsArray())
             {
                 if (schema.Item != null)
                 {
@@ -98,19 +97,19 @@ namespace NJsonSchema.Generation
                 {
                     return JToken.FromObject(schema.Enumeration.First());
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.Integer))
+                else if (schema.Type.IsInteger())
                 {
                     return HandleIntegerType(schema);
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.Number))
+                else if (schema.Type.IsNumber())
                 {
                     return HandleNumberType(schema);
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.String))
+                else if (schema.Type.IsString())
                 {
                     return HandleStringType(schema, property);
                 }
-                else if (schema.Type.HasFlag(JsonObjectType.Boolean))
+                else if (schema.Type.IsBoolean())
                 {
                     return JToken.FromObject(false);
                 }

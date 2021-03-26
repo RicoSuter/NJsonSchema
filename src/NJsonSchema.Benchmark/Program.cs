@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 
 namespace NJsonSchema.Benchmark
@@ -7,7 +6,7 @@ namespace NJsonSchema.Benchmark
     {
         public static void Main(string[] args)
         {
-            //RunCsharpBenchmark();
+            // RunCsharpBenchmark();
             BenchmarkDotNet.Running.BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).RunAllJoined();
         }
 
@@ -16,15 +15,15 @@ namespace NJsonSchema.Benchmark
             var benchmark = new CsharpGeneratorBenchmark();
             benchmark.Setup().GetAwaiter().GetResult();
             benchmark.GenerateFile();
-            ExecuteBenchmarkMultiple(benchmark.GenerateFile);
+            RunCode(benchmark);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void ExecuteBenchmarkMultiple(Action a)
+        private static void RunCode(CsharpGeneratorBenchmark benchmark)
         {
             for (int i = 0; i < 100; ++i)
             {
-                a();
+                benchmark.GenerateFile();
             }
         }
     }
