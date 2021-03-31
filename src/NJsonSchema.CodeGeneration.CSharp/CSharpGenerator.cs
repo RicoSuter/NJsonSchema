@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 if (Settings.ExcludedTypeNames?.Contains("DateFormatConverter") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", new TemplateModelBase());
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "DateFormatConverter", new DateFormatConverterTemplateModel(Settings));
                     artifacts.Add(new CodeArtifact("DateFormatConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }
