@@ -68,7 +68,13 @@ namespace NJsonSchema.Generation
         /// <summary>Gets all the schemas.</summary>
         public IEnumerable<JsonSchema> Schemas => _mappings.Values;
 
-        private string GetKey(Type type, bool isIntegerEnum)
+        /// <summary>
+        /// Gets the mapping key for the given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="isIntegerEnum">Specifies whether the type is an integer enum.</param>
+        /// <returns>The mapping key.</returns>
+        protected virtual string GetKey(Type type, bool isIntegerEnum)
         {
             return type.FullName + (isIntegerEnum ? ":Integer" : string.Empty);
         }
