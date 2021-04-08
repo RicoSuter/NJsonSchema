@@ -7,7 +7,7 @@ if (Array.isArray({{ Value }})) {
 {%     if IsArrayItemNewableObject -%}
         {{ Variable }}.push(item.toJSON());
 {%     elseif IsArrayItemDate -%}
-        {{ Variable }}.push({% if UseJsDate %}formatDate(item){% else %}item.format('YYYY-MM-DD'){% endif %});
+        {{ Variable }}.push({% if UseJsDate %}formatDate(item){% else %}item.{{ DateToStringCode }}{% endif %});
 {%     elseif IsArrayItemDateTime -%}
         {{ Variable }}.push(item.{{ DateTimeToStringCode }});
 {%     else -%}
@@ -22,7 +22,7 @@ if ({{ Value }}) {
 {%     if IsDictionaryValueNewableObject -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].toJSON() : <any>{{ NullValue }};
 {%     elseif IsDictionaryValueDate -%}
-            {{ Variable }}[key] = {{ Value }}[key] ? {% if UseJsDate %}formatDate({{ Value }}[key]){% else %}{{ Value }}[key].format('YYYY-MM-DD'){% endif %} : <any>{{ NullValue }};
+            {{ Variable }}[key] = {{ Value }}[key] ? {% if UseJsDate %}formatDate({{ Value }}[key]){% else %}{{ Value }}[key].{{ DateToStringCode }}{% endif %} : <any>{{ NullValue }};
 {%     elseif IsDictionaryValueDateTime -%}
             {{ Variable }}[key] = {{ Value }}[key] ? {{ Value }}[key].{{ DateTimeToStringCode }} : <any>{{ NullValue }};
 {%     else -%}
@@ -35,7 +35,7 @@ if ({{ Value }}) {
     }
 }
 {% elseif IsDate -%}
-{{ Variable }} = {{ Value }} ? {% if UseJsDate %}formatDate({{ Value }}){% else %}{{ Value }}.format('YYYY-MM-DD'){% endif %} : {% if HasDefaultValue -%}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {% if UseJsDate %}formatDate({{ Value }}){% else %}{{ Value }}.{{ DateToStringCode }}{% endif %} : {% if HasDefaultValue -%}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {% elseif IsDateTime -%}
 {{ Variable }} = {{ Value }} ? {{ Value }}.{{ DateTimeToStringCode }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {% elseif NullValue != "undefined" -%}

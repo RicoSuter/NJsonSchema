@@ -77,6 +77,46 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_date_handling_is_luxon_then_datetime_property_is_generated_in_class()
+        {
+            //// Arrange
+            var schema = await JsonSchema.FromJsonAsync(Json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                DateTimeType = TypeScriptDateTimeType.Luxon
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("myDate: DateTime", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? DateTime.fromISO(_data[\"myDate\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.toFormat('yyyy-MM-dd') : <any>undefined;", code);
+        }
+
+        [Fact]
+        public async Task When_date_handling_is_luxon_then_duration_property_is_generated_in_class()
+        {
+            //// Arrange
+            var schema = await JsonSchema.FromJsonAsync(Json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                DateTimeType = TypeScriptDateTimeType.Luxon
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("myTimeSpan: Duration", code);
+            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? Duration.fromISO(_data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
+            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.toString() : <any>undefined;", code);
+        }
+
+        [Fact]
         public async Task When_date_handling_is_dayjs_then_dayjs_property_is_generated_in_class()
         {
             //// Arrange
@@ -147,7 +187,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
-                //DateTimeType = TypeScriptDateTimeType.Date 
+                //DateTimeType = TypeScriptDateTimeType.Date
             });
             var code = generator.GenerateFile("MyClass");
 
