@@ -87,6 +87,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = GetStringToDateTime(parameters, typeSchema),
+                DateToStringCode = GetDateToString(parameters, typeSchema),
                 DateTimeToStringCode = GetDateTimeToString(parameters, typeSchema),
 
                 HandleReferences = parameters.Settings.HandleReferences
@@ -113,7 +114,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     }
 
                     return "moment";
-                    
+
                 case TypeScriptDateTimeType.String:
                     return "";
 
@@ -126,6 +127,27 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 case TypeScriptDateTimeType.DayJS:
                     return "dayjs";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static string GetDateToString(DataConversionParameters parameters, JsonSchema typeSchema)
+        {
+            switch (parameters.Settings.DateTimeType)
+            {
+                case TypeScriptDateTimeType.Date:
+                case TypeScriptDateTimeType.String:
+                    return "";
+
+                case TypeScriptDateTimeType.MomentJS:
+                case TypeScriptDateTimeType.OffsetMomentJS:
+                case TypeScriptDateTimeType.DayJS:
+                    return "format('YYYY-MM-DD')";
+
+                case TypeScriptDateTimeType.Luxon:
+                    return "toFormat('yyyy-MM-dd')";
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -191,7 +213,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return false;
                 }
             }
-            else if (type == TypeScriptDateTimeType.DayJS || 
+            else if (type == TypeScriptDateTimeType.DayJS ||
                      type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {
@@ -241,7 +263,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
                 }
             }
-            else if (type == TypeScriptDateTimeType.DayJS || 
+            else if (type == TypeScriptDateTimeType.DayJS ||
                      type == TypeScriptDateTimeType.MomentJS ||
                      type == TypeScriptDateTimeType.OffsetMomentJS)
             {

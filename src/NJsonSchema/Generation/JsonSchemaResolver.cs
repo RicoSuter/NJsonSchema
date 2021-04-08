@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using NJsonSchema.Generation;
 
 namespace NJsonSchema.Generation
 {
@@ -33,7 +32,7 @@ namespace NJsonSchema.Generation
         /// <returns><c>true</c> when the mapping exists.</returns>
         public bool HasSchema(Type type, bool isIntegerEnumeration)
         {
-            return _mappings.ContainsKey(GetKey(type, isIntegerEnumeration));
+            return _mappings.ContainsKey(GetTypeKey(type, isIntegerEnumeration));
         }
 
         /// <summary>Gets the schema for a given type.</summary>
@@ -42,7 +41,7 @@ namespace NJsonSchema.Generation
         /// <returns>The schema.</returns>
         public JsonSchema GetSchema(Type type, bool isIntegerEnumeration)
         {
-            return _mappings[GetKey(type, isIntegerEnumeration)];
+            return _mappings[GetTypeKey(type, isIntegerEnumeration)];
         }
 
         /// <summary>Adds a schema to type mapping.</summary>
@@ -62,13 +61,19 @@ namespace NJsonSchema.Generation
                 AppendSchema(schema, _settings.SchemaNameGenerator.Generate(type));
             }
 
-            _mappings.Add(GetKey(type, isIntegerEnumeration), schema);
+            _mappings.Add(GetTypeKey(type, isIntegerEnumeration), schema);
         }
 
         /// <summary>Gets all the schemas.</summary>
         public IEnumerable<JsonSchema> Schemas => _mappings.Values;
 
-        private string GetKey(Type type, bool isIntegerEnum)
+        /// <summary>
+        /// Gets the mapping key for the given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="isIntegerEnum">Specifies whether the type is an integer enum.</param>
+        /// <returns>The mapping key.</returns>
+        protected virtual string GetTypeKey(Type type, bool isIntegerEnum)
         {
             return type.FullName + (isIntegerEnum ? ":Integer" : string.Empty);
         }
