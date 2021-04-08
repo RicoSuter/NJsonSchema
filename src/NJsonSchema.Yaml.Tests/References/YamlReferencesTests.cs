@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using NSwag;
 using System.Threading.Tasks;
@@ -37,8 +38,7 @@ namespace NJsonSchema.Yaml.Tests.References
             var path = GetTestDirectory() + relativePath;
 
             //// Act
-            Task<OpenApiDocument> docTask = OpenApiYamlDocument.FromFileAsync(path);
-            OpenApiDocument doc = docTask.Result;
+            OpenApiDocument doc = await OpenApiYamlDocument.FromFileAsync(path);
             IDictionary<string, OpenApiPathItem> docPaths = doc.Paths;
             OpenApiPathItem pathItem = docPaths[docPath];
             OpenApiOperation operation = pathItem["get"];
@@ -62,6 +62,39 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.NotNull(Unauthorized.Schema);
         }
 
+        [Theory]
+        [InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
+        public async Task When_yaml_OpenAPI_spec_has__relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
+        {
+            var path = GetTestDirectory() + relativePath;
+
+            OpenApiDocument doc = await OpenApiYamlDocument.FromFileAsync(path);
+            IDictionary<string, OpenApiPathItem> docPaths = doc.Paths;
+
+            OpenApiPathItem pathItem = docPaths["/life-cycles"];
+            OpenApiOperation operation = pathItem["get"];
+            IDictionary<string, OpenApiResponse> responses = operation.Responses;
+            OpenApiResponse OK = responses["200"].ActualResponse;
+            var schema = OK.Content["application/json"];
+            JsonSchemaProperty items = schema.Schema.ActualSchema.ActualProperties["items"];
+            var innerProperties = items.Item.ActualSchema.ActualProperties;
+            string[] expectedProperties = new string[] { "id", "systemName", "name", "smallImageID", "helpText" };
+
+            foreach (string property in expectedProperties)
+            {
+                Assert.True(innerProperties.ContainsKey(property));
+            }
+
+            pathItem = docPaths["/ad-hoc-tasks/{adhocTaskId}/execute"];
+            operation = pathItem["post"];
+            responses = operation.Responses;
+            OK = responses["200"].ActualResponse;
+            schema = OK.Content["application/json"];
+
+            Assert.Equal("status", schema.Schema.ActualDiscriminator);
+            Assert.Equal("Completed", schema.Schema.ActualDiscriminatorObject.Mapping.Keys.First());
+            Assert.Equal(2, schema.Schema.ActualSchema.ActualProperties["status"].ActualSchema.Enumeration.Count);
+        }
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;

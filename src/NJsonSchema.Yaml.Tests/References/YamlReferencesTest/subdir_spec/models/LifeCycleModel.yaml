@@ -1,0 +1,32 @@
+LifeCycleModel:
+  description: |-
+    Gets the life cycle with the associated id.
+  properties:
+    id:
+      description: |-
+        The unique identifier of the life cycle.
+      type: string
+      example: 101
+    systemName:
+      description: |-
+        The untranslated system name of the life cycle.  Localization is controlled by the Accept-Language header and the 
+        language of the response is represented by the Content-Language header.
+      type: string
+      example: AR - Outstanding Invoices
+    name:
+      description: |-
+        The localized name of the life cycle.
+      type: string
+      example: AR - Outstanding Invoices      
+    smallImageID:
+      description: |-
+        The document ID in SYS System Icons or SYS System Bitmaps which is the image for the item.
+      type: string
+      example: 201
+    helpText:
+      description: |-
+        The life cycle help text.
+      type: string
+      example: |-
+        AR Invoices are automatically entered into the workflow process when they are generated. Invoices remain in this workflow until 
+        a corresponding payment is made to the invoice.

@@ -1,0 +1,11 @@
+ExecuteTaskResultModel:
+  description: |-
+    Contains the status of an ad hoc or system task executon.
+  type: object
+  properties:
+    status:
+      $ref: '../enums/TaskExecutionStatusEnum.yaml#/TaskExecutionStatusEnum'
+  discriminator:
+    propertyName: status
+    mapping:
+      Completed: '../yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml#/components/schemas/ExecuteTaskCompletedModel'
