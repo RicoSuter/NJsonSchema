@@ -134,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
+            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = _data[\"resource\"][key];", code);
+            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key];", code);
         }
 
         public class DictionaryContainer
