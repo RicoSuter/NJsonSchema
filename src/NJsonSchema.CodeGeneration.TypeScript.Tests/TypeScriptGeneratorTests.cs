@@ -1,5 +1,7 @@
-﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
+﻿using System.Collections.Generic;
+using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -352,6 +354,80 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.DoesNotContain("Liquid error: ", code);
+        }
+        
+        [Fact]
+        public async Task When_a_nullable_array_property_exists_and_typestyle_is_null_then_init_should_assign_null()
+        {
+            //// Arrange
+            var schema = new JsonSchema
+            {
+                Properties =
+                {
+                    { "Prop", new JsonSchemaProperty
+                        {
+                            Type = JsonObjectType.Array,
+                            Item = new JsonSchema
+                            {
+                                Type = JsonObjectType.String
+                            },
+                            IsRequired = true,
+                            IsNullableRaw = true
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                NullValue = TypeScriptNullValue.Null,
+                TypeScriptVersion = 4,
+                MarkOptionalProperties = false,
+            });
+            var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
+
+            //// Assert
+            Assert.Matches(new Regex(
+                @"init\(.*\)\s{.*}\selse\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
+                code);
+        }
+        
+        [Fact]
+        public async Task When_a_nullable_dict_property_exists_and_typestyle_is_null_then_init_should_assign_null()
+        {
+            //// Arrange
+            var schema = new JsonSchema
+            {
+                Properties =
+                {
+                    { "Prop", new JsonSchemaProperty
+                        {
+                            Type = JsonObjectType.Object,
+                            AdditionalPropertiesSchema = new JsonSchema
+                            {
+                                Properties = { }
+                            },
+                            IsRequired = true,
+                            IsNullableRaw = true
+                        }
+                    },
+                }
+            };
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                NullValue = TypeScriptNullValue.Null,
+                TypeScriptVersion = 4,
+                MarkOptionalProperties = false,
+            });
+            var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
+
+            //// Assert
+            Assert.Matches(new Regex(
+                    @"init\(.*\)\s{.*}\selse\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
+                code);
         }
     }
 }
