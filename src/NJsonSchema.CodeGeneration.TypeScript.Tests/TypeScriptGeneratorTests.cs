@@ -389,7 +389,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Matches(new Regex(
-                @"init\(.*\)\s{.*}\selse\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
+                @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
                 code);
         }
         
@@ -426,7 +426,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Matches(new Regex(
-                    @"init\(.*\)\s{.*}\selse\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
+                    @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
                 code);
         }
     }

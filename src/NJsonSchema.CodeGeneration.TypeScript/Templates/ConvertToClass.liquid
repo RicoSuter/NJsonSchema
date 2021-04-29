@@ -17,9 +17,11 @@ if (Array.isArray({{ Value }})) {
         {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push(item);
 {%     endif -%}
 {%   endif -%}
-} else {
+}
+{% if NullValue != "undefined" %}else {
     {{ Variable }} = <any>{{ NullValue }};
 }
+{% endif %}
 {% elseif IsDictionary -%}
 if ({{ Value }}) {
     {{ Variable }} = {} as any;
@@ -39,9 +41,11 @@ if ({{ Value }}) {
 {%         endif -%}
 {%     endif -%}
     }
-} else {
+}
+{% if NullValue != "undefined" %}else {
     {{ Variable }} = <any>{{ NullValue }};
 }
+{% endif %}
 {% else -%}
     {% if IsDate or IsDateTime -%}
 {{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
