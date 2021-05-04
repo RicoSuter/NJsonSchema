@@ -1,0 +1,4 @@
+type: object
+properties:
+  titleProperty:
+    $ref: 'schema_named_title.yaml#/Title'

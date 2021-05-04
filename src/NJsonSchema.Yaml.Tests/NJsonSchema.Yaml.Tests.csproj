@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
       <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Yaml.Tests.xml</DocumentationFile>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NSwag.Core.Yaml" Version="13.10.2" />
@@ -35,6 +35,9 @@
     </Content>  
     <Content Include="References\YamlReferencesTest\json_schema_with_json_reference.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+    <Content Include="References\YamlReferencesTest\schema_with_indirect_subreference_to_title.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="References\YamlReferencesTest\yaml_schema_with_json_reference.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -54,6 +57,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="References\YamlReferencesTest\common-items\schemas.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\YamlReferencesTest\schema_named_title.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="References\YamlReferencesTest\yaml_spec_with_yaml_schema_refs.yaml">
