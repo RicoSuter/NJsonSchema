@@ -21,7 +21,7 @@ if (Array.isArray({{ Value }})) {
 {% if NullValue != "undefined" %}else {
     {{ Variable }} = <any>{{ NullValue }};
 }
-{% endif %}
+{% endif -%}
 {% elseif IsDictionary -%}
 if ({{ Value }}) {
     {{ Variable }} = {} as any;
@@ -45,7 +45,7 @@ if ({{ Value }}) {
 {% if NullValue != "undefined" %}else {
     {{ Variable }} = <any>{{ NullValue }};
 }
-{% endif %}
+{% endif -%}
 {% else -%}
     {% if IsDate or IsDateTime -%}
 {{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
