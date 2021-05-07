@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration
         {
             if (typeName == baseTypeName)
             {
-                throw new ArgumentException("The baseTypeName cannot equal typeName.", nameof(typeName));
+                throw new ArgumentException($"The baseTypeName '{baseTypeName}' cannot equal typeName.", nameof(typeName));
             }
 
             TypeName = typeName;

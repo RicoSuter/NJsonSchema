@@ -1,0 +1,162 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Person",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "FirstName",
+        "LastName"
+    ],
+    "properties": {
+        "FirstName": {
+            "type": "string"
+        },
+        "MiddleName": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName1": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName2": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName3": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName4": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName5": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName6": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName7": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName8": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "MiddleName9": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "LastName": {
+            "type": "string"
+        },
+        "Gender": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Gender"
+                }
+            ]
+        },
+        "NumberWithRange": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 5.0,
+            "minimum": 2.0
+        },
+        "Birthday": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "Company": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Company"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "Cars": {
+            "type": [
+                "array",
+                "null"
+            ],
+            "items": {
+                "$ref": "#/definitions/Car"
+            }
+        }
+    },
+    "definitions": {
+        "Gender": {
+            "type": "integer",
+            "description": "",
+            "x-enumNames": [
+                "Male",
+                "Female"
+            ],
+            "enum": [
+                0,
+                1
+            ]
+        },
+        "Company": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Name": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                }
+            }
+        },
+        "Car": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Name": {
+                    "type": [
+                        "null",
+                        "string"
+                    ]
+                },
+                "Manufacturer": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Company"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

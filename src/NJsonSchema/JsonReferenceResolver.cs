@@ -157,9 +157,7 @@ namespace NJsonSchema
                         // Split the file path and fragment before concatenating with
                         // document path. If document path have '#' in it, doing this
                         // later would not work.
-
-                        var arr = Regex.Split(jsonPath, @"(?=#)");
-                        var filePath = DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), arr[0]);
+                        var filePath = ResolveFilePath(documentPath, jsonPath);
                         return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, targetType, contractResolver, jsonPath, append, cancellationToken).ConfigureAwait(false);
                     }
                 }
@@ -170,12 +168,23 @@ namespace NJsonSchema
             }
         }
 
+        /// <summary>Resolves file path.</summary>
+        /// <param name="documentPath">The document path.</param>
+        /// <param name="jsonPath">The JSON path</param>
+        public virtual string ResolveFilePath(string documentPath, string jsonPath)
+        {
+            var arr = Regex.Split(jsonPath, @"(?=#)");
+            return DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), arr[0]);
+        }
+
         private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, IContractResolver contractResolver, string jsonPath, bool append, CancellationToken cancellationToken)
         {
             try
             {
                 var fullPath = DynamicApis.GetFullPath(filePath);
                 var arr = Regex.Split(jsonPath, @"(?=#)");
+
+                fullPath = DynamicApis.HandleSubdirectoryRelativeReferences(fullPath, jsonPath);
 
                 if (!_resolvedObjects.ContainsKey(fullPath))
                 {

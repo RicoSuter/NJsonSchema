@@ -56,8 +56,26 @@
     <None Update="References\YamlReferencesTest\common-items\schemas.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="References\YamlReferencesTest\subdir_spec\enums\TaskExecutionStatusEnum.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\YamlReferencesTest\subdir_spec\models\ExecuteTaskResultModel.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleCollectionModel.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleModel.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="References\YamlReferencesTest\subdir_spec\yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="References\YamlReferencesTest\yaml_spec_with_yaml_schema_refs.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="References\YamlReferencesTest\models\" />
   </ItemGroup>
 </Project>

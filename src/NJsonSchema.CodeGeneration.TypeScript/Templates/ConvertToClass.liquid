@@ -18,26 +18,34 @@ if (Array.isArray({{ Value }})) {
 {%     endif -%}
 {%   endif -%}
 }
+{% if NullValue != "undefined" %}else {
+    {{ Variable }} = <any>{{ NullValue }};
+}
+{% endif -%}
 {% elseif IsDictionary -%}
 if ({{ Value }}) {
     {{ Variable }} = {} as any;
     for (let key in {{ Value }}) {
         if ({{ Value }}.hasOwnProperty(key))
 {%     if IsDictionaryValueNewableObject -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            (<any>{{ Variable }}){% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ DictionaryValueType }}.fromJS({{ Value }}[key]{% if HandleReferences %}, _mappings{% endif %}) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%     elseif IsDictionaryValueNewableArray -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            (<any>{{ Variable }}){% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ Value }}[key].map((i: any) => {{ DictionaryValueArrayItemType }}.fromJS(i{% if HandleReferences %}, _mappings{% endif %})) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%     elseif IsDictionaryValueDate or IsDictionaryValueDateTime -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            (<any>{{ Variable }}){% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] ? {{ StringToDateCode }}({{ Value }}[key].toString()) : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%     else -%}
 {%         if(HasDictionaryValueDefaultValue || NullValue != "undefined"){ -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+            (<any>{{ Variable }}){% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : {% if HasDictionaryValueDefaultValue %}{{ DictionaryValueDefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
 {%         else -%}
-            {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key];
+            (<any>{{ Variable }}){% if RequiresStrictPropertyInitialization %}!{% endif %}[key] = {{ Value }}[key];
 {%         endif -%}
 {%     endif -%}
     }
 }
+{% if NullValue != "undefined" %}else {
+    {{ Variable }} = <any>{{ NullValue }};
+}
+{% endif -%}
 {% else -%}
     {% if IsDate or IsDateTime -%}
 {{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};

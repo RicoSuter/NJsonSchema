@@ -1,0 +1,9 @@
+LifeCycleCollectionModel:
+  description: |-
+    A list of life cycles.
+  properties:
+    items:
+      description: List of life cycles.
+      type: array
+      items:
+        $ref: 'LifeCycleModel.yaml#/LifeCycleModel'
