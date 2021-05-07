@@ -1,0 +1,121 @@
+openapi: '3.0.1'
+info:
+  version: 1.0.0-draft-draft12
+  title: Generic REST API
+servers:
+  - url: '{protocol}://{server}/{product}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      server:
+        default: api.generic.com/apiserver
+        description: |-
+          This is the server being used to host the API in the current environment.
+      product:
+        default: generic/core
+        description: |-
+          This is the portion of the url to add to each base-url before each path defined below.
+security:
+  - Bearer: []
+paths:
+  /life-cycles:
+    get:
+      summary: |-
+        Gets a list of life cycles.
+      description: |-
+        Gets a list of life cycles the user has rights to access in a client.
+      operationId: GetLifeCycles
+      tags:
+        - Life Cycles
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: array
+            items:
+              type: string
+          description: |-
+            The unique indentifiers of life cycles.  This parameter cannot be used in conjuntion
+            with the systemName parameter.  Multiple values are supported and in a URL should be
+            joined using the "&" character. Ex: ?id=101&id=102
+        - in: query
+          name: systemName
+          schema:
+            type: array
+            items:
+              type: string
+          description: |-
+            The name of life cycles.  This parameter cannot be used in conjunction
+            with the id parameter.  Multiple values are supported and in a URL should be
+            joined using the "&" character. Ex: ?name=lifecycle_1&name=lifecycle_2
+        - $ref: '../common-items/parameters.yaml#/components/parameters/Accept-Language'
+      responses:
+        200:
+          description: OK
+          headers:
+            Content-Language:
+              $ref: '../common-items/headers.yaml#/components/headers/Content-Language'
+          content:
+            application/json:
+              schema:
+                $ref: 'models/LifeCycleCollectionModel.yaml#/LifeCycleCollectionModel'
+  /ad-hoc-tasks/{adhocTaskId}/execute:
+    post:
+      summary: |-
+        Executes an ad hoc task
+      description: |-
+        Executes an ad hoc task.
+      operationId: ExecuteAdHocTask
+      tags:
+       - Ad Hoc Tasks
+      parameters:
+       - $ref: '../common-items/parameters.yaml#/components/parameters/Accept-Language'
+      responses:
+        200:
+          description: |-
+            Task execution is complete
+          headers:
+            Content-Language:
+              $ref: '../common-items/headers.yaml#/components/headers/Content-Language'
+          content:
+            application/json:
+              schema:
+                $ref: 'models/ExecuteTaskResultModel.yaml#/ExecuteTaskResultModel'
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+  schemas:
+    ExecuteTaskCompletedModel:
+      description: |-
+        Information that is returned when a task has completed executing.
+      allOf:
+        - $ref: 'models/ExecuteTaskResultModel.yaml#/ExecuteTaskResultModel'
+        - type: object
+          properties:
+            items:
+              description: |-
+                List of work items that were not executed on due to them being locked by another user, not in the queue etc...
+              type: array
+              items:
+                properties:
+                  reason:
+                    type: string
+                    enum:
+                      - Locked
+                      - NotInQueue
+                      - NotOwnedByUser
+                      - Other
+                    description: |-
+                      The reason why the task was not executed on the work item.
+                      - Locked: The work item was locked by another user.
+                      - NotInQueue: The work item was no longer in the queue.
+                      - NotOwnedByUser: The work item was not owned by the user and the task was configured to take ownership.
+                      - Other: The work item was not execute on due to other reasons.
+                    example: Locked
+                required:
+                  - reason

@@ -1,0 +1,8 @@
+TaskExecutionStatusEnum:
+  description: |-
+    Status of a task execution
+  type: string
+  enum: 
+    - Completed
+    - Failed
+  example: Completed

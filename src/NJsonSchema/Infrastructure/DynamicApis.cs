@@ -8,6 +8,7 @@
 
 using Namotion.Reflection;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -97,6 +98,19 @@ namespace NJsonSchema.Infrastructure
             return (string)DirectoryType.GetRuntimeMethod("GetCurrentDirectory", new Type[] { }).Invoke(null, new object[] { });
         }
 
+        /// <summary>Gets the current working directory.</summary>
+        /// <returns>The directory path.</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
+        public static string[] DirectoryGetDirectories(string directory)
+        {
+            if (!SupportsDirectoryApis)
+            {
+                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
+
+            return (string[])DirectoryType.GetRuntimeMethod("GetDirectories", new[] { typeof(string) }).Invoke(null, new object[] { directory });
+        }
+
         /// <summary>Gets the files of the given directory.</summary>
         /// <param name="directory">The directory.</param>
         /// <param name="filter">The filter.</param>
@@ -111,6 +125,19 @@ namespace NJsonSchema.Infrastructure
 
             return (string[])DirectoryType.GetRuntimeMethod("GetFiles",
                 new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { directory, filter });
+        }
+
+        /// <summary>Retrieves the parent directory of the specified path, including both absolute and relative paths..</summary>
+        /// <returns>The directory path.</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Directory API is not available on this platform.</exception>
+        public static string DirectoryGetParent(string path)
+        {
+            if (!SupportsDirectoryApis)
+            {
+                throw new NotSupportedException("The System.IO.Directory API is not available on this platform.");
+            }
+
+            return DirectoryType.GetRuntimeMethod("GetParent", new[] { typeof(string) }).Invoke(null, new object[] { path }).TryGetPropertyValue<string>("FullName");
         }
 
         /// <summary>Creates a directory.</summary>
@@ -214,6 +241,20 @@ namespace NJsonSchema.Infrastructure
             return (string)PathType.GetRuntimeMethod("Combine", new[] { typeof(string), typeof(string) }).Invoke(null, new object[] { path1, path2 });
         }
 
+        /// <summary>Gets the file name from a given path.</summary>
+        /// <param name="filePath">The file path.</param>
+        /// <returns>The directory name.</returns>
+        /// <exception cref="NotSupportedException">The System.IO.Path API is not available on this platform.</exception>
+        public static string PathGetFileName(string filePath)
+        {
+            if (!SupportsPathApis)
+            {
+                throw new NotSupportedException("The System.IO.Path API is not available on this platform.");
+            }
+
+            return (string)PathType.GetRuntimeMethod("GetFileName", new[] { typeof(string) }).Invoke(null, new object[] { filePath });
+        }
+
         /// <summary>Gets the full path from a given path</summary>
         /// <param name="path">The path</param>
         /// <returns>The full path</returns>
@@ -255,6 +296,64 @@ namespace NJsonSchema.Infrastructure
             }
 
             return XPathExtensionsType.GetRuntimeMethod("XPathEvaluate", new[] { typeof(XDocument), typeof(string) }).Invoke(null, new object[] { document, path });
+        }
+
+        /// <summary>
+        /// Handle cases of specs in subdirectories having external references to specs also in subdirectories
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <param name="jsonPath"></param>
+        /// <returns></returns>
+        public static string HandleSubdirectoryRelativeReferences(string fullPath, string jsonPath)
+        {
+            try
+            {
+                if (!DynamicApis.DirectoryExists(DynamicApis.PathGetDirectoryName(fullPath)))
+                {
+                    string fileName = DynamicApis.PathGetFileName(fullPath);
+                    string directoryName = DynamicApis.PathGetDirectoryName(fullPath);
+                    string folderName = directoryName.Replace("\\", "/").Split('/').Last();
+                    if (!string.IsNullOrWhiteSpace(DynamicApis.DirectoryGetParent(directoryName)))
+                    {
+                        foreach (string subDir in DynamicApis.DirectoryGetDirectories(DynamicApis.DirectoryGetParent(directoryName)))
+                        {
+                            string expectedDir = DynamicApis.PathCombine(subDir, folderName);
+                            string expectedFile = DynamicApis.PathCombine(expectedDir, fileName);
+                            if (DynamicApis.DirectoryExists(expectedDir))
+                            {
+                                fullPath = DynamicApis.PathCombine(expectedDir, fileName);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!DynamicApis.FileExists(fullPath))
+                {
+                    string fileDir = DynamicApis.PathGetDirectoryName(fullPath);
+                    if (DynamicApis.DirectoryExists(fileDir))
+                    {
+                        string fileName = DynamicApis.PathGetFileName(fullPath);
+                        string[] pathPieces = fullPath.Replace("\\", "/").Split('/');
+                        string subDirPiece = pathPieces[pathPieces.Length - 2];
+                        foreach (string subDir in DynamicApis.DirectoryGetDirectories(fileDir))
+                        {
+                            string expectedFile = DynamicApis.PathCombine(subDir, fileName);
+                            if (DynamicApis.FileExists(expectedFile) && DynamicApis.FileReadAllText(expectedFile).Contains(jsonPath.Split('/').Last()))
+                            {
+                                fullPath = DynamicApis.PathCombine(subDir, fileName);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return fullPath;
+            }
+            catch
+            {
+                return fullPath;
+            }
         }
 
 #if LEGACY

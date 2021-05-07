@@ -184,6 +184,8 @@ namespace NJsonSchema
                 var fullPath = DynamicApis.GetFullPath(filePath);
                 var arr = Regex.Split(jsonPath, @"(?=#)");
 
+                fullPath = DynamicApis.HandleSubdirectoryRelativeReferences(fullPath, jsonPath);
+
                 if (!_resolvedObjects.ContainsKey(fullPath))
                 {
                     var loadedFile = await ResolveFileReferenceAsync(fullPath).ConfigureAwait(false);
