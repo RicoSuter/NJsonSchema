@@ -767,6 +767,8 @@ namespace NJsonSchema.Generation
             {
                 var genericTypeArguments = extensionDataProperty.GenericArguments;
                 var extensionDataPropertyType = genericTypeArguments.Length == 2 ? genericTypeArguments[1] : typeof(object).ToContextualType();
+                if (extensionDataPropertyType.TypeInfo.FullName.Equals("System.Text.Json.JsonElement"))
+                    extensionDataPropertyType = typeof(object).ToContextualType();
 
                 schema.AdditionalPropertiesSchema = GenerateWithReferenceAndNullability<JsonSchema>(
                     extensionDataPropertyType, schemaResolver);
