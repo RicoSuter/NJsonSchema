@@ -176,6 +176,7 @@ namespace NJsonSchema.Generation
 
             if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
                 type.FullName == "System.Dynamic.ExpandoObject" ||
+                type.FullName == "System.Text.Json.JsonElement" ||
                 type == typeof(object))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.None, isNullable, null);
