@@ -8,6 +8,7 @@
 
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace NJsonSchema
@@ -173,7 +174,8 @@ namespace NJsonSchema
                 .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
                 ?? string.Empty;
 
-            return new XText(input).ToString();
+            var xml = new XText(input).ToString();
+            return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
         }
 
         private static string ConvertDashesToCamelCase(string input)
