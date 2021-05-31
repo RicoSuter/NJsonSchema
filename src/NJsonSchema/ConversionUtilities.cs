@@ -174,6 +174,7 @@ namespace NJsonSchema
                 .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
                 ?? string.Empty;
 
+            // TODO: Support more markdown features here
             var xml = new XText(input).ToString();
             return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
         }
