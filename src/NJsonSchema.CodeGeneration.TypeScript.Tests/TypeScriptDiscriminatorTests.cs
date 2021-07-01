@@ -110,7 +110,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export interface OneChild extends Base", code);
             Assert.Contains("export interface SecondChild extends Base", code);
             Assert.Contains("Child: OneChild | SecondChild;", code);
-            Assert.Contains("Children: OneChild[] | SecondChild[];", code);
+            Assert.Contains("Children: (OneChild | SecondChild)[];", code);
         }
         
         [Fact]
@@ -133,7 +133,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export class OneChild extends Base", code);
             Assert.Contains("export class SecondChild extends Base", code);
             Assert.Contains("child: OneChild | SecondChild;", code);
-            Assert.Contains("children: OneChild[] | SecondChild[];", code);
+            Assert.Contains("children: (OneChild | SecondChild)[];", code);
         }
     }
 }
