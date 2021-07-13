@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             InlineNamedDictionaries = false;
         }
 
-        /// <summary>Gets or sets the target TypeScript version (default: 1.8).</summary>
+        /// <summary>Gets or sets the target TypeScript version (default: 2.7).</summary>
         public decimal TypeScriptVersion { get; set; }
 
         /// <summary>Gets a value indicating whether the target TypeScript version supports strict null checks.</summary>
