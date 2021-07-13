@@ -30,7 +30,7 @@ Preview NuGet Feed: https://www.myget.org/gallery/njsonschema
 **Features:**
 
 - [Read existing JSON Schemas](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchema) and [validate JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaValidator) (`JsonSchema.FromJsonAsync()`)
-- [Generate JSON Schema from .NET type via reflection](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromTypeAsync<MyType>()`)
+- [Generate JSON Schema from .NET type via reflection](https://github.com/RicoSuter/NJsonSchema/wiki/JsonSchemaGenerator) (with support for many attributes/annotations) (`JsonSchema.FromType<MyType>()`)
 - [Generate JSON Schema from sample JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
@@ -48,7 +48,7 @@ The project is developed and maintained by [Rico Suter](http://rsuter.com) and o
 The [JsonSchema](https://github.com/NJsonSchema/NJsonSchema/wiki/JsonSchema) class can be used as follows: 
 
 ```csharp
-var schema = await JsonSchema.FromTypeAsync<Person>();
+var schema = JsonSchema.FromType<Person>();
 var schemaData = schema.ToJson();
 var errors = schema.Validate("{...}");
 

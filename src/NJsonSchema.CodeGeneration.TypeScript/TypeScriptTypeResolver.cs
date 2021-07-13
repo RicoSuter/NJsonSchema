@@ -304,10 +304,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 if (Settings.UseLeafType)
                 {
-                    return string.Join(UnionPipe,
-                        Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                            .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
-                            .Select(x => string.Format("{0}[]", GetNullableItemType(schema, prefix + x))));
+                    var itemTypes = Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
+                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => GetNullableItemType(schema, prefix + x))
+                        .ToList();
+
+                    var itemType = string.Join(UnionPipe, itemTypes);
+
+                    // is TypeUnion
+                    if (itemTypes.Count > 1)
+                    {
+                        itemType = string.Format("({0})", itemType);
+                    }
+
+                    return string.Format("{0}[]", itemType);
                 }
                 else
                 {
