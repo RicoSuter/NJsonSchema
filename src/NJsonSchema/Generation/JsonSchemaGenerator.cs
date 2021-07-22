@@ -1165,8 +1165,10 @@ namespace NJsonSchema.Generation
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
-                if (converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Newtonsoft's converter
-                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter) + "`1", TypeNameStyle.Name)) // System.Text.Json's converter
+                if (converterType != null && (
+                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Newtonsoft's converter
+                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter) + "`1", TypeNameStyle.Name) // System.Text.Json's converter
+                    ))
                 {
                     return ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterParameters") && 
                            jsonConverterAttribute.ConverterParameters != null && 
