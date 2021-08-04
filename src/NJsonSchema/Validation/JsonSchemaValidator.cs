@@ -53,7 +53,7 @@ namespace NJsonSchema.Validation
         /// <param name="schemaType">The type of the schema.</param>
         /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The list of validation errors.</returns>
-        public ICollection<ValidationError> Validate(string jsonData, JsonSchema schema, SchemaType schemaType = SchemaType.OpenApi3)
+        public ICollection<ValidationError> Validate(string jsonData, JsonSchema schema, SchemaType schemaType = SchemaType.JsonSchema)
         {
             using (var reader = new StringReader(jsonData))
             using (var jsonReader = new JsonTextReader(reader)
@@ -71,7 +71,7 @@ namespace NJsonSchema.Validation
         /// <param name="schema">The schema.</param>
         /// <param name="schemaType">The type of the schema.</param>
         /// <returns>The list of validation errors.</returns>
-        public ICollection<ValidationError> Validate(JToken token, JsonSchema schema, SchemaType schemaType = SchemaType.OpenApi3)
+        public ICollection<ValidationError> Validate(JToken token, JsonSchema schema, SchemaType schemaType = SchemaType.JsonSchema)
         {
             return Validate(token, schema.ActualSchema, schemaType, null, token.Path);
         }
