@@ -8,6 +8,7 @@
 
 using Namotion.Reflection;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -20,51 +21,106 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        internal static string GetName(this ContextualMemberInfo member)
+        internal static string GetName(this ContextualAccessorInfo accessorInfo)
         {
-            if (!_names.ContainsKey(member))
+            if (!_names.ContainsKey(accessorInfo))
             {
                 lock (_names)
                 {
-                    if (!_names.ContainsKey(member))
+                    if (!_names.ContainsKey(accessorInfo))
                     {
-                        _names[member] = GetNameWithoutCache(member);
+                        _names[accessorInfo] = GetNameWithoutCache(accessorInfo);
                     }
                 }
             }
-            return _names[member];
+            return _names[accessorInfo];
         }
 
-        private static string GetNameWithoutCache(ContextualMemberInfo member)
+        private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)
         {
-            var jsonPropertyAttribute = member.GetContextAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = accessorInfo.AccessorType.GetContextAttribute<JsonPropertyAttribute>();
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
             {
                 return jsonPropertyAttribute.PropertyName;
             }
 
-            var dataMemberAttribute = member.GetContextAttribute<DataMemberAttribute>();
+            var dataMemberAttribute = accessorInfo.AccessorType.GetContextAttribute<DataMemberAttribute>();
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
-                var dataContractAttribute = member.MemberInfo.DeclaringType.ToCachedType().GetTypeAttribute<DataContractAttribute>();
+                var dataContractAttribute = accessorInfo.MemberInfo.DeclaringType.ToCachedType().GetInheritedAttribute<DataContractAttribute>();
                 if (dataContractAttribute != null)
                 {
                     return dataMemberAttribute.Name;
                 }
             }
 
-            return member.Name;
+            return accessorInfo.Name;
         }
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="type">The member info</param>
-        /// <param name="attributeType">The attribute type to check.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this CachedType type, DescriptionAttributeType attributeType = DescriptionAttributeType.Context)
+        public static string GetDescription(this CachedType type)
         {
-            var attributes = type is ContextualType contextualType && attributeType == DescriptionAttributeType.Context ?
-                contextualType.ContextAttributes : type.TypeAttributes;
+            var attributes = type is ContextualType contextualType ? contextualType.ContextAttributes : type.InheritedAttributes;
 
+            var description = GetDescription(attributes);
+            if (description != null)
+            {
+                return description;
+            }
+
+            var summary = type.GetXmlDocsSummary();
+            if (summary != string.Empty)
+            {
+                return summary;
+            }
+
+            return null;
+        }
+
+        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
+        /// <param name="accessorInfo">The accessor info.</param>
+        /// <returns>The description or null if no description is available.</returns>
+        public static string GetDescription(this ContextualAccessorInfo accessorInfo)
+        {
+            var description = GetDescription(accessorInfo.AccessorType.Attributes);
+            if (description != null)
+            {
+                return description;
+            }
+
+            var summary = accessorInfo.MemberInfo.GetXmlDocsSummary();
+            if (summary != string.Empty)
+            {
+                return summary;
+            }
+
+            return null;
+        }
+
+        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The description or null if no description is available.</returns>
+        public static string GetDescription(this ContextualParameterInfo parameter)
+        {
+            var description = GetDescription(parameter.ContextAttributes);
+            if (description != null)
+            {
+                return description;
+            }
+
+            var summary = parameter.GetXmlDocs();
+            if (summary != string.Empty)
+            {
+                return summary;
+            }
+
+            return null;
+        }
+
+        private static string GetDescription(IEnumerable<Attribute> attributes)
+        {
             dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
             if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
             {
@@ -77,57 +133,9 @@ namespace NJsonSchema.Infrastructure
                 {
                     // GetDescription returns null if the Description property on the attribute is not specified.
                     var description = displayAttribute.GetDescription();
-                    if (description != null) 
+                    if (description != null)
                     {
                         return description;
-                    }
-                }
-
-                if (type is ContextualMemberInfo contextualMember)
-                {
-                    var summary = contextualMember.GetXmlDocsSummary();
-                    if (summary != string.Empty)
-                    {
-                        return summary;
-                    }
-                }
-                else if (type != null)
-                {
-                    var summary = type.GetXmlDocsSummary();
-                    if (summary != string.Empty)
-                    {
-                        return summary;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
-        /// <param name="parameter">The parameter.</param>
-        /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualParameterInfo parameter)
-        {
-            dynamic descriptionAttribute = parameter.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
-            {
-                return descriptionAttribute.Description;
-            }
-            else
-            {
-                dynamic displayAttribute = parameter.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
-                if (displayAttribute != null && !string.IsNullOrEmpty(displayAttribute.Description))
-                {
-                    return displayAttribute.Description;
-                }
-
-                if (parameter != null)
-                {
-                    var summary = parameter.GetXmlDocs();
-                    if (summary != string.Empty)
-                    {
-                        return summary;
                     }
                 }
             }
