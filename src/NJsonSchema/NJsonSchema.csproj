@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard2.0;net40;net45</TargetFrameworks>
     <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.4.6</Version>
+    <Version>10.5.0</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2020</Copyright>
     <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
@@ -28,7 +28,7 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Namotion.Reflection" Version="1.0.23" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">

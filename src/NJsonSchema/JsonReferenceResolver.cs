@@ -62,7 +62,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, 
+        public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType,
                 IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
             return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, true, cancellationToken).ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace NJsonSchema
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
-        public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath, Type targetType, 
+        public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath, Type targetType,
                 IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
             return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false, cancellationToken).ConfigureAwait(false);
@@ -150,7 +150,7 @@ namespace NJsonSchema
                     if (documentPath.StartsWith("http://") || documentPath.StartsWith("https://"))
                     {
                         var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, contractResolver, append, cancellationToken ).ConfigureAwait(false);
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, contractResolver, append, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -305,8 +305,10 @@ namespace NJsonSchema
                     return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
 
-                foreach (var member in obj.GetType().GetContextualPropertiesAndFields()
-                    .Where(p => p.GetTypeAttribute<JsonIgnoreAttribute>() == null))
+                foreach (var member in obj
+                    .GetType()
+                    .GetContextualAccessors()
+                    .Where(p => p.AccessorType.GetInheritedAttribute<JsonIgnoreAttribute>() == null))
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)
