@@ -142,12 +142,14 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
             }
 
-            if (type.FullName == "NodaTime.LocalDate")
+            if (type.FullName == "NodaTime.LocalDate" ||
+                type.FullName == "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (type.FullName == "NodaTime.LocalTime")
+            if (type.FullName == "NodaTime.LocalTime" ||
+                type.FullName == "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
