@@ -87,8 +87,7 @@ namespace NJsonSchema.Tests.Validation
                 ""properties"": {
                     ""SalutationType"": {
                         ""type"": [
-                            ""string"",
-                            ""null""
+                            ""string""
                         ],
                         ""enum"": [
                             ""Mr"",
@@ -120,8 +119,7 @@ namespace NJsonSchema.Tests.Validation
                 ""properties"": {
                     ""SalutationType"": {
                         ""type"": [
-                            ""string"",
-                            ""null""
+                            ""string""
                         ],
                         ""enum"": [
                             ""Mr"",
@@ -140,7 +138,7 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(@"{ ""SalutationType"": null }");
 
             //// Assert
-            Assert.Equal(1, errors.Count);
+            Assert.Equal(2, errors.Count);
         }
     }
 }

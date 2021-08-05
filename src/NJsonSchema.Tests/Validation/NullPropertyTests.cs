@@ -1,3 +1,5 @@
+using NJsonSchema.Generation;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -27,9 +29,9 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal(0, errors.Count);
         }
 
-        public class NullablePropertyClass
+        public class NullablePropertyClass<T>
         {
-            public QueryRule ReportRules { get; set; }
+            public T Value { get; set; }
         }
 
         public class QueryRule
@@ -37,16 +39,121 @@ namespace NJsonSchema.Tests.Validation
             public string Name { get; set; }
         }
 
-        [Fact]
-        public async Task When_property_can_be_null_then_null_is_allowed2()
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_object_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass>();
-            var schemaData = schema.ToJson();
+            var schema = JsonSchema.FromType<NullablePropertyClass<QueryRule>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
 
             //// Act
-            var data = "{ 'ReportRules': null }";
-            var errors = schema.Validate(data);
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_number_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<NullablePropertyClass<int?>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
+
+            //// Act
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_string_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<NullablePropertyClass<string>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
+
+            //// Act
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_boolean_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<NullablePropertyClass<bool?>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
+
+            //// Act
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_array_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<NullablePropertyClass<int[]>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
+
+            //// Act
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
+
+            //// Assert
+            Assert.Equal(0, errors.Count);
+        }
+
+        [Theory]
+        [InlineData(SchemaType.JsonSchema)]
+        [InlineData(SchemaType.OpenApi3)]
+        [InlineData(SchemaType.Swagger2)]
+        public async Task When_enum_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<NullablePropertyClass<AttributeTargets?>>(new JsonSchemaGeneratorSettings
+            {
+                SchemaType = schemaType
+            });
+
+            //// Act
+            var data = "{ 'Value': null }";
+            var errors = schema.Validate(data, schemaType);
 
             //// Assert
             Assert.Equal(0, errors.Count);
