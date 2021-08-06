@@ -24,8 +24,9 @@ namespace NJsonSchema
         /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
-        public static Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver) =>
-            UpdateSchemaReferencesAsync(rootObject, referenceResolver, new DefaultContractResolver());
+        /// <param name="cancellationToken">The cancellation token</param>
+        public static Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, CancellationToken cancellationToken = default) =>
+            UpdateSchemaReferencesAsync(rootObject, referenceResolver, new DefaultContractResolver(), cancellationToken);
 
         /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
         /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
