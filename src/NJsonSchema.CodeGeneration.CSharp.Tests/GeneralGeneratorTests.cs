@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
@@ -1694,6 +1695,49 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             await VerifyHelper.Verify(output);
             CodeCompiler.AssertCompile(output);
         }
+
+#if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
+        [Fact]
+        public async Task When_csharp_record_no_setter_in_record_and_constructor_provided()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.CSharpRecord,
+                SortConstructorParameters = false
+            });
+
+            // Act
+            var output = generator.GenerateFile("Address");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output, new CSharpParseOptions(LanguageVersion.CSharp9));
+        }
+
+        [Fact]
+        public async Task When_csharp_record_init_in_record_and_constructor_provided()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.CSharpRecord,
+                SortConstructorParameters = false,
+                GenerateInitProperties = true,
+            });
+
+            // Act
+            var output = generator.GenerateFile("Address");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output, new CSharpParseOptions(LanguageVersion.CSharp9));
+        }
+#endif
 
         public abstract class AbstractAddress
         {

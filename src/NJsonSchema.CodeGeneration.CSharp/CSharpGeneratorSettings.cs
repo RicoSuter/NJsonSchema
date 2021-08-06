@@ -56,6 +56,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
             InlineNamedTuples = true;
+            SortConstructorParameters = true;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
@@ -175,5 +176,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// </summary>
         public string FieldNamePrefix { get; set; } = "_";
         
+        /// <summary>Gets a value indicating whether the constructor parameters should be sorted alphabetically (default: true).</summary>
+        public bool SortConstructorParameters { get; set; }
     }
 }
