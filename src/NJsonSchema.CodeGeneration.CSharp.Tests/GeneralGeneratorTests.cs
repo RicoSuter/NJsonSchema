@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
@@ -1714,7 +1713,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output, new CSharpParseOptions(LanguageVersion.CSharp9));
+            CodeCompiler.AssertCompile(output, new Microsoft.CodeAnalysis.CSharp.CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp9));
         }
 
         [Fact]
@@ -1727,7 +1726,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.CSharpRecord,
                 SortConstructorParameters = false,
-                GenerateInitProperties = true,
+                GenerateNativeRecords = true,
             });
 
             // Act
@@ -1735,7 +1734,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output, new CSharpParseOptions(LanguageVersion.CSharp9));
+            CodeCompiler.AssertCompile(output, new Microsoft.CodeAnalysis.CSharp.CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp9));
         }
 #endif
 

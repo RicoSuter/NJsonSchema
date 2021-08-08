@@ -50,8 +50,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 BaseClass = new ClassTemplateModel(BaseClassName!, settings, resolver, schema.InheritedSchema, rootObject);
                 _allProperties = new List<PropertyModel>(_properties.Count + BaseClass._allProperties.Count);
-                _allProperties.AddRange(_properties);
                 _allProperties.AddRange(BaseClass._allProperties);
+                _allProperties.AddRange(_properties);
             }
             else
             {
@@ -151,10 +151,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the constructor parameters should be sorted.</summary>
         public bool SortConstructorParameters => _settings.SortConstructorParameters;
-
-        /// <summary>Gets a value indicating whether the properties should have an 'init' part. (default: false).</summary>
-        public bool GenerateInitProperties => _settings.ClassStyle == CSharpClassStyle.CSharpRecord &&
-                                              _settings.GenerateInitProperties;
 
         /// <summary>Gets the base class name.</summary>
         public string? BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema!, false, string.Empty, false)
