@@ -8,7 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using NJsonSchema.References;
 
@@ -31,12 +30,12 @@ namespace NJsonSchema
             get
             {
                 var schema = Reference != null ? Reference : this;
-                if (schema.AllOf.Count > 1 && schema.AllOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
+                if (schema._allOf.Count > 1 && schema._allOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
                 {
-                    return schema.AllOf.First(s => !s.HasReference && !s.IsDictionary).ActualSchema;
+                    return schema._allOf.First(s => !s.HasReference && !s.IsDictionary).ActualSchema;
                 }
 
-                return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+                return schema._oneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
             }
         }
 
@@ -46,39 +45,39 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasAllOfSchemaReference => AllOf.Count == 1 &&
-                                               AllOf.Any(s => s.HasReference) &&
+        public bool HasAllOfSchemaReference => _allOf.Count == 1 &&
+                                               _allOf.Any(s => s.HasReference) &&
                                                Type == JsonObjectType.None &&
-                                               AnyOf.Count == 0 &&
-                                               OneOf.Count == 0 &&
-                                               Properties.Count == 0 &&
-                                               PatternProperties.Count == 0 &&
+                                               _anyOf.Count == 0 &&
+                                               _oneOf.Count == 0 &&
+                                               _properties.Count == 0 &&
+                                               _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
 
         /// <summary>Gets a value indicating whether this is an oneOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasOneOfSchemaReference => OneOf.Count == 1 &&
-                                               OneOf.Any(s => s.HasReference) &&
+        public bool HasOneOfSchemaReference => _oneOf.Count == 1 &&
+                                               _oneOf.Any(s => s.HasReference) &&
                                                Type == JsonObjectType.None &&
-                                               AnyOf.Count == 0 &&
-                                               AllOf.Count == 0 &&
-                                               Properties.Count == 0 &&
-                                               PatternProperties.Count == 0 &&
+                                               _anyOf.Count == 0 &&
+                                               _allOf.Count == 0 &&
+                                               _properties.Count == 0 &&
+                                               _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
 
         /// <summary>Gets a value indicating whether this is an anyOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasAnyOfSchemaReference => AnyOf.Count == 1 &&
-                                               AnyOf.Any(s => s.HasReference) &&
+        public bool HasAnyOfSchemaReference => _anyOf.Count == 1 &&
+                                               _anyOf.Any(s => s.HasReference) &&
                                                Type == JsonObjectType.None &&
-                                               AllOf.Count == 0 &&
-                                               OneOf.Count == 0 &&
-                                               Properties.Count == 0 &&
-                                               PatternProperties.Count == 0 &&
+                                               _allOf.Count == 0 &&
+                                               _oneOf.Count == 0 &&
+                                               _properties.Count == 0 &&
+                                               _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
                                                IsEnumeration == false;
@@ -103,17 +102,17 @@ namespace NJsonSchema
 
                 if (HasAllOfSchemaReference)
                 {
-                    return AllOf.First().GetActualSchema(checkedSchemas);
+                    return _allOf.First().GetActualSchema(checkedSchemas);
                 }
 
                 if (HasOneOfSchemaReference)
                 {
-                    return OneOf.First().GetActualSchema(checkedSchemas);
+                    return _oneOf.First().GetActualSchema(checkedSchemas);
                 }
 
                 if (HasAnyOfSchemaReference)
                 {
-                    return AnyOf.First().GetActualSchema(checkedSchemas);
+                    return _anyOf.First().GetActualSchema(checkedSchemas);
                 }
 
                 return Reference.GetActualSchema(checkedSchemas);
@@ -143,7 +142,7 @@ namespace NJsonSchema
                 if (value != null)
                 {
                     // only $ref property is allowed when schema is a reference
-                    // TODO: Fix all SchemaReference assignments so that this code is not needed 
+                    // TODO: Fix all SchemaReference assignments so that this code is not needed
                     Type = JsonObjectType.None;
                 }
             }

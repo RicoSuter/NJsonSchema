@@ -142,7 +142,7 @@ namespace NJsonSchema.Generation
                 schema.Title = Settings.SchemaNameGenerator.Generate(typeDescription.ContextualType.OriginalType);
             }
 
-            if (typeDescription.Type.HasFlag(JsonObjectType.Object))
+            if (typeDescription.Type.IsObject())
             {
                 if (typeDescription.IsDictionary)
                 {
@@ -168,7 +168,7 @@ namespace NJsonSchema.Generation
             {
                 GenerateEnum(schema, typeDescription, schemaResolver);
             }
-            else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
+            else if (typeDescription.Type.IsArray()) // TODO: Add support for tuples?
             {
                 GenerateArray(schema, typeDescription, schemaResolver);
             }
@@ -304,7 +304,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                referencingSchema.AllOf.Add(new JsonSchema
+                referencingSchema._allOf.Add(new JsonSchema
                 {
                     Reference = referencedSchema.ActualSchema
                 });
@@ -363,7 +363,7 @@ namespace NJsonSchema.Generation
             if (defaultValueAttribute != null)
             {
                 if (typeDescription.IsEnum &&
-                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                    typeDescription.Type.IsString())
                 {
                     schema.Default = defaultValueAttribute.Value?.ToString();
                 }
@@ -546,7 +546,7 @@ namespace NJsonSchema.Generation
                 ApplyAdditionalProperties(schema, type, schemaResolver);
             }
 
-            if (!schema.Type.HasFlag(JsonObjectType.Array))
+            if (!schema.Type.IsArray())
             {
                 typeDescription.ApplyType(schema);
             }
@@ -1085,18 +1085,18 @@ namespace NJsonSchema.Generation
                                     schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
                                 }
 
-                                schema.AllOf.Add(new JsonSchema
+                                schema._allOf.Add(new JsonSchema
                                 {
                                     Reference = baseSchema.ActualSchema
                                 });
                             }
                             else
                             {
-                                schema.AllOf.Add(baseSchema);
+                                schema._allOf.Add(baseSchema);
                             }
 
                             // First schema is the (referenced) base schema, second is the type schema itself
-                            schema.AllOf.Add(actualSchema);
+                            schema._allOf.Add(actualSchema);
                             return actualSchema;
                         }
                         else
@@ -1144,8 +1144,8 @@ namespace NJsonSchema.Generation
                     // Existing property can be discriminator only if it has String type
                     if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) &&
-                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
+                        if (!existingProperty.ActualTypeSchema.Type.IsInteger() &&
+                            !existingProperty.ActualTypeSchema.Type.IsString())
                         {
                             throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
                         }

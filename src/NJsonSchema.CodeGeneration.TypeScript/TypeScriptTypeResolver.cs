@@ -87,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.ActualTypeSchema.IsAnyType &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
-                !Types.Keys.Contains(schema) &&
+                !Types.ContainsKey(schema) &&
                 !schema.HasReference)
             {
                 return "any";
@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         {
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
-                        
+
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
                     }
 

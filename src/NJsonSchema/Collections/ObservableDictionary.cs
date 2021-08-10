@@ -25,7 +25,7 @@ namespace NJsonSchema.Collections
         , IReadOnlyDictionary<TKey, TValue>
 #endif
     {
-        private IDictionary<TKey, TValue> _dictionary;
+        private Dictionary<TKey, TValue> _dictionary;
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         public ObservableDictionary()
@@ -354,10 +354,9 @@ namespace NJsonSchema.Collections
 
         #region IEnumerable<KeyValuePair<TKey,TValue>> interface
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return Dictionary.GetEnumerator();
-        }
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() => GetEnumerator();
+
+        public Dictionary<TKey, TValue>.Enumerator GetEnumerator() => _dictionary.GetEnumerator();
 
         #endregion
 

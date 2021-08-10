@@ -31,6 +31,7 @@ namespace NJsonSchema
         internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
+
         private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
             () => CreateJsonSerializerContractResolver(SerializationSchemaType));
 
@@ -38,8 +39,8 @@ namespace NJsonSchema
         private ObservableDictionary<string, JsonSchemaProperty> _patternProperties;
         private ObservableDictionary<string, JsonSchema> _definitions;
 
-        private ObservableCollection<JsonSchema> _allOf;
-        private ObservableCollection<JsonSchema> _anyOf;
+        internal ObservableCollection<JsonSchema> _allOf;
+        internal ObservableCollection<JsonSchema> _anyOf;
         internal ObservableCollection<JsonSchema> _oneOf;
         private JsonSchema _not;
         private JsonSchema _dictionaryKey;
@@ -236,27 +237,29 @@ namespace NJsonSchema
         {
             get
             {
-                if (AllOf == null || AllOf.Count == 0 || HasReference)
+                if (_allOf == null || _allOf.Count == 0 || HasReference)
                 {
                     return null;
                 }
 
-                if (AllOf.Count == 1)
+                if (_allOf.Count == 1)
                 {
-                    return AllOf.First().ActualSchema;
+                    return _allOf[0].ActualSchema;
                 }
 
-                if (AllOf.Any(s => s.HasReference))
+                var hasReference = _allOf.FirstOrDefault(s => s.HasReference);
+                if (hasReference != null)
                 {
-                    return AllOf.First(s => s.HasReference).ActualSchema;
+                    return hasReference.ActualSchema;
                 }
 
-                if (AllOf.Any(s => s.Type.IsObject()))
+                var objectTyped = _allOf.First(s => s.Type.IsObject());
+                if (objectTyped != null)
                 {
-                    return AllOf.First(s => s.Type.IsObject()).ActualSchema;
+                    return objectTyped.ActualSchema;
                 }
 
-                return AllOf.FirstOrDefault()?.ActualSchema;
+                return _allOf.FirstOrDefault()?.ActualSchema;
             }
         }
 
@@ -310,6 +313,33 @@ namespace NJsonSchema
         public OpenApiDiscriminator ResponsibleDiscriminatorObject =>
             ActualDiscriminatorObject ?? InheritedSchema?.ActualSchema.ResponsibleDiscriminatorObject;
 
+        /// <summary>
+        /// Calculates whether <see cref="ActualProperties"/> has elements without incurring collection building
+        /// performance cost.
+        /// </summary>
+        [JsonIgnore]
+        public bool HasActualProperties
+        {
+            get
+            {
+                if (_properties.Count > 0)
+                {
+                    return true;
+                }
+
+                for (var i = 0; i < _allOf.Count; i++)
+                {
+                    var s = _allOf[i];
+                    if (s.ActualSchema != InheritedSchema && s.ActualSchema.HasActualProperties)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         /// <summary>Gets all properties of this schema (i.e. all direct properties and properties from the schemas in allOf which do not have a type).</summary>
         /// <remarks>Used for code generation.</remarks>
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
@@ -322,26 +352,31 @@ namespace NJsonSchema
         {
             get
             {
-                var properties = Properties
-                    .Union(AllOf.Where(s => s.ActualSchema != InheritedSchema)
-                    .SelectMany(s => s.ActualSchema.ActualProperties))
-                    .ToList();
-
-                var duplicatedProperties = properties
-                    .GroupBy(p => p.Key)
-                    .Where(g => g.Count() > 1)
-                    .ToList();
-
-                if (duplicatedProperties.Any())
+                // check fast case
+                if (_allOf.Count == 0)
                 {
-                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
+                    return new Dictionary<string, JsonSchemaProperty>(_properties);
                 }
 
-#if !LEGACY
-                return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#else
-                return new Dictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#endif
+                var properties = _properties
+                    .Union(
+                        _allOf
+                            .Where(s => s.ActualSchema != InheritedSchema)
+                            .SelectMany(s => s.ActualSchema.ActualProperties)
+                    );
+
+                try
+                {
+                    return properties.ToDictionary(p => p.Key, p => p.Value);
+                }
+                catch (ArgumentException)
+                {
+                    var duplicatedProperties = properties
+                        .GroupBy(p => p.Key)
+                        .Where(g => g.Count() > 1);
+
+                    throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
+                }
             }
         }
 
@@ -511,12 +546,13 @@ namespace NJsonSchema
         public IDictionary<string, JsonSchemaProperty> Properties
         {
             get { return _properties; }
-            private set
+            internal set
             {
                 if (_properties != value)
                 {
-                    RegisterProperties(_properties, value);
-                    _properties = value as ObservableDictionary<string, JsonSchemaProperty> ?? new ObservableDictionary<string, JsonSchemaProperty>(value);
+                    var newCollection = ToObservableDictionary(value);
+                    RegisterProperties(_properties, newCollection);
+                    _properties = newCollection;
                 }
             }
         }
@@ -545,12 +581,13 @@ namespace NJsonSchema
         public IDictionary<string, JsonSchemaProperty> PatternProperties
         {
             get { return _patternProperties; }
-            private set
+            internal set
             {
                 if (_patternProperties != value)
                 {
-                    RegisterSchemaDictionary(_patternProperties, value);
-                    _patternProperties = value as ObservableDictionary<string, JsonSchemaProperty> ?? new ObservableDictionary<string, JsonSchemaProperty>(value);
+                    var newCollection = ToObservableDictionary(value);
+                    RegisterSchemaDictionary(_patternProperties, newCollection);
+                    _patternProperties = newCollection;
                 }
             }
         }
@@ -579,12 +616,13 @@ namespace NJsonSchema
         public ICollection<JsonSchema> Items
         {
             get { return _items; }
-            private set
+            internal set
             {
                 if (_items != value)
                 {
-                    RegisterSchemaCollection(_items, value);
-                    _items = value as ObservableCollection<JsonSchema> ?? new ObservableCollection<JsonSchema>(value);
+                    var newCollection = ToObservableCollection(value);
+                    RegisterSchemaCollection(_items, newCollection);
+                    _items = newCollection;
 
                     if (_items != null)
                     {
@@ -614,12 +652,13 @@ namespace NJsonSchema
         public IDictionary<string, JsonSchema> Definitions
         {
             get { return _definitions; }
-            private set
+            internal set
             {
                 if (_definitions != value)
                 {
-                    RegisterSchemaDictionary(_definitions, value);
-                    _definitions = value as ObservableDictionary<string, JsonSchema> ?? new ObservableDictionary<string, JsonSchema>(value);
+                    var newCollection = ToObservableDictionary(value);
+                    RegisterSchemaDictionary(_definitions, newCollection);
+                    _definitions = newCollection;
                 }
             }
         }
@@ -629,12 +668,13 @@ namespace NJsonSchema
         public ICollection<JsonSchema> AllOf
         {
             get { return _allOf; }
-            private set
+            internal set
             {
                 if (_allOf != value)
                 {
-                    RegisterSchemaCollection(_allOf, value);
-                    _allOf = value as ObservableCollection<JsonSchema> ?? new ObservableCollection<JsonSchema>(value);
+                    var newCollection = ToObservableCollection(value);
+                    RegisterSchemaCollection(_allOf, newCollection);
+                    _allOf = newCollection;
                 }
             }
         }
@@ -644,12 +684,13 @@ namespace NJsonSchema
         public ICollection<JsonSchema> AnyOf
         {
             get { return _anyOf; }
-            private set
+            internal set
             {
                 if (_anyOf != value)
                 {
-                    RegisterSchemaCollection(_anyOf, value);
-                    _anyOf = value as ObservableCollection<JsonSchema> ?? new ObservableCollection<JsonSchema>(value);
+                    var newCollection = ToObservableCollection(value);
+                    RegisterSchemaCollection(_anyOf, newCollection);
+                    _anyOf = newCollection;
                 }
             }
         }
@@ -658,17 +699,18 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> OneOf
         {
-            get => _oneOf;
-            private set
+            get { return _oneOf; }
+            internal set
             {
                 if (_oneOf != value)
                 {
-                    RegisterSchemaCollection(_oneOf, value);
-                    _oneOf = value as ObservableCollection<JsonSchema> ?? new ObservableCollection<JsonSchema>(value); 
+                    var newCollection = ToObservableCollection(value);
+                    RegisterSchemaCollection(_oneOf, newCollection);
+                    _oneOf = newCollection;
                 }
             }
-        }        
-        
+        }
+
         /// <summary>Gets or sets a value indicating whether additional items are allowed (default: true). </summary>
         /// <remarks>If this property is set to <c>false</c>, then <see cref="AdditionalItemsSchema"/> is set to <c>null</c>. </remarks>
         [JsonIgnore]
@@ -760,18 +802,18 @@ namespace NJsonSchema
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties or PatternProperties contain a schema).</summary>
         [JsonIgnore]
         public bool IsDictionary => Type.IsObject() &&
-                                    ActualProperties.Count == 0 &&
+                                    !HasActualProperties &&
                                     (AdditionalPropertiesSchema != null || PatternProperties.Any());
 
         /// <summary>Gets a value indicating whether this is any type (e.g. any in TypeScript or object in CSharp).</summary>
         [JsonIgnore]
         public bool IsAnyType => (Type.IsObject() || Type == JsonObjectType.None) &&
                                  Reference == null &&
-                                 AllOf.Count == 0 &&
-                                 AnyOf.Count == 0 &&
-                                 OneOf.Count == 0 &&
-                                 ActualProperties.Count == 0 &&
-                                 PatternProperties.Count == 0 &&
+                                 _allOf.Count == 0 &&
+                                 _anyOf.Count == 0 &&
+                                 _oneOf.Count == 0 &&
+                                 !HasActualProperties &&
+                                 _patternProperties.Count == 0 &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
                                  IsEnumeration == false;
@@ -798,17 +840,19 @@ namespace NJsonSchema
                 return true;
             }
 
-            if ((Type.IsNone() || Type.IsNull()) && OneOf.Any(o => o.IsNullable(schemaType)))
+            if ((Type == JsonObjectType.None || Type.IsNull()) && _oneOf.Any(o => o.IsNullable(schemaType)))
             {
                 return true;
             }
 
-            if (ActualSchema != this && ActualSchema.IsNullable(schemaType))
+            var actualSchema = ActualSchema;
+            if (actualSchema != this && actualSchema.IsNullable(schemaType))
             {
                 return true;
             }
 
-            if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
+            var actualTypeSchema = ActualTypeSchema;
+            if (actualTypeSchema != this && actualTypeSchema.IsNullable(schemaType))
             {
                 return true;
             }
@@ -993,6 +1037,24 @@ namespace NJsonSchema
             {
                 EnumerationNames = new Collection<string>();
             }
+        }
+
+        private static ObservableCollection<T> ToObservableCollection<T>(ICollection<T> value)
+        {
+            if (value is null)
+            {
+                return null;
+            }
+            return value as ObservableCollection<T> ?? new ObservableCollection<T>(value);
+        }
+
+        private static ObservableDictionary<string, T> ToObservableDictionary<T>(IDictionary<string, T> value)
+        {
+            if (value is null)
+            {
+                return null;
+            }
+            return value as ObservableDictionary<string, T> ?? new ObservableDictionary<string, T>(value);
         }
     }
 }

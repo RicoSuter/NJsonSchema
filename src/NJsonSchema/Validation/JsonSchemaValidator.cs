@@ -151,9 +151,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateAnyOf(JToken token, JsonSchema schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.AnyOf.Count > 0)
+            if (schema._anyOf.Count > 0)
             {
-                var propertyErrors = schema.AnyOf.ToDictionary(s => s, s => Validate(token, s));
+                var propertyErrors = schema._anyOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.All(s => s.Value.Count != 0))
                 {
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath, propertyErrors, token, schema));
@@ -163,9 +163,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateAllOf(JToken token, JsonSchema schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.AllOf.Count > 0)
+            if (schema._allOf.Count > 0)
             {
-                var propertyErrors = schema.AllOf.ToDictionary(s => s, s => Validate(token, s));
+                var propertyErrors = schema._allOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.Any(s => s.Value.Count != 0))
                 {
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath, propertyErrors, token, schema));

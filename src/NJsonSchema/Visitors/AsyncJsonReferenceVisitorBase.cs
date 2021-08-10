@@ -124,22 +124,22 @@ namespace NJsonSchema.Visitors
                     await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.AllOf.Count; i++)
+                for (var i = 0; i < schema._allOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(schema._allOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.AnyOf.Count; i++)
+                for (var i = 0; i < schema._anyOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(schema._anyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 for (var i = 0; i < schema._oneOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema._oneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema._oneOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(schema._oneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.Not != null)

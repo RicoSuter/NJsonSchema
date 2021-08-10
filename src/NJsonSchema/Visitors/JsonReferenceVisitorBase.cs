@@ -104,22 +104,22 @@ namespace NJsonSchema.Visitors
                     Visit(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o));
                 }
 
-                for (var i = 0; i < schema.AllOf.Count; i++)
+                for (var i = 0; i < schema._allOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o));
+                    Visit(schema._allOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o));
                 }
 
-                for (var i = 0; i < schema.AnyOf.Count; i++)
+                for (var i = 0; i < schema._anyOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o));
+                    Visit(schema._anyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o));
                 }
 
                 for (var i = 0; i < schema._oneOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema._oneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema._oneOf, index, (JsonSchema)o));
+                    Visit(schema._oneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o));
                 }
 
                 if (schema.Not != null)
@@ -234,7 +234,7 @@ namespace NJsonSchema.Visitors
             }
         }
 
-        private void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
+        private static void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
         {
             ((Collection<T>)collection).RemoveAt(index);
             if (obj != null)
@@ -243,7 +243,7 @@ namespace NJsonSchema.Visitors
             }
         }
 
-        private void ReplaceOrDelete(IList collection, int index, object obj)
+        private static void ReplaceOrDelete(IList collection, int index, object obj)
         {
             collection.RemoveAt(index);
             if (obj != null)

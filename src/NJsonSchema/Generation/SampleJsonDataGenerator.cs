@@ -58,6 +58,7 @@ namespace NJsonSchema.Generation
 
                 var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
                 var properties = GetPropertiesToGenerate(schemas);
+
                 var obj = new JObject();
                 foreach (var p in properties)
                 {

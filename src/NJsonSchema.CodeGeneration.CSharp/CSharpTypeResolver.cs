@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 schema.ActualDiscriminator == null &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
-                !Types.Keys.Contains(schema) &&
+                !Types.ContainsKey(schema) &&
                 !schema.HasReference)
             {
                 return markAsNullableType ? Settings.AnyType + "?" : Settings.AnyType;
