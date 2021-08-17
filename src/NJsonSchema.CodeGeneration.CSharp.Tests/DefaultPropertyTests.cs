@@ -21,7 +21,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "ns",
-                GenerateDefaultValues = true
+                GenerateDefaultValues = true,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             };
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
@@ -44,7 +45,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "ns",
-                GenerateDefaultValues = true
+                GenerateDefaultValues = true,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             };
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
@@ -67,7 +69,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 Namespace = "ns",
-                GenerateDefaultValues = false
+                GenerateDefaultValues = false,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             };
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
@@ -93,6 +96,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Act
             var settings = new CSharpGeneratorSettings();
             settings.GenerateDefaultValues = true;
+            settings.PropertyNamingStyle = CSharpNamingStyle.PascalCase;
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();
@@ -119,6 +123,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Act
             var settings = new CSharpGeneratorSettings();
             settings.GenerateDefaultValues = true;
+            settings.PropertyNamingStyle = CSharpNamingStyle.PascalCase;
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();

@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var data = schema.ToJson();
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { PropertyNamingStyle = CSharpNamingStyle.PascalCase });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
@@ -49,7 +49,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 DictionaryType = "Foo",
-                DictionaryInstanceType = "Bar"
+                DictionaryInstanceType = "Bar",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 

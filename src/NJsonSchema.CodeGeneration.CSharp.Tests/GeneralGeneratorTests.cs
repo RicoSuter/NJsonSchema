@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var schema = await JsonSchema.FromJsonAsync(json);
 
             //// Act
-            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", PropertyNamingStyle = CSharpNamingStyle.PascalCase };
             var generator = new CSharpGenerator(schema, settings);
             var output = generator.GenerateFile("MyClass");
 
@@ -232,7 +232,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var schema = JsonSchema.FromType<Person>();
             var data = schema.ToJson();
-            var generator = new CSharpGenerator(schema);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
 
             //// Act
             var output = generator.GenerateFile("MyClass");
@@ -357,7 +360,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 Type = JsonObjectType.String
             };
 
-            var generator = new CSharpGenerator(schema);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
 
             // Act
             var output = generator.GenerateFile("MyClass");
@@ -370,14 +376,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Theory]
-        [InlineData("foo@bar", "Foobar")]
-        [InlineData("foo$bar", "Foobar")]
+        [InlineData("foo@bar", "FooBar")]
+        [InlineData("foo$bar", "FooBar")]
         [InlineData("foobars[]", "Foobars")]
         [InlineData("foo.bar", "FooBar")]
         [InlineData("foo=bar", "FooBar")]
-        [InlineData("foo+bar", "Fooplusbar")]
-        [InlineData("foo*bar", "FooStarbar")]
-        [InlineData("foo:bar", "Foo_bar")]
+        [InlineData("foo+bar", "FooplusBar")]
+        [InlineData("foo*bar", "FoostarBar")]
+        [InlineData("foo:bar", "Foo_Bar")]
         public void When_name_contains_unallowed_characters_then_they_are_converted_to_valid_csharp(string jsonPropertyName, string expectedCSharpName)
         {
             // Arrange
@@ -387,7 +393,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 Type = JsonObjectType.String
             };
 
-            var generator = new CSharpGenerator(schema);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
 
             // Act
             var output = generator.GenerateFile("MyClass");
@@ -421,6 +430,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
             settings.Namespace = "MyNamespace";
+            settings.PropertyNamingStyle = CSharpNamingStyle.PascalCase;
             var generator = new CSharpGenerator(schema, settings);
             return generator;
         }
@@ -489,7 +499,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "Foo"
+                Namespace = "Foo",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -510,7 +521,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "Foo"
+                Namespace = "Foo",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -552,7 +564,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                Namespace = "Foo"
+                Namespace = "Foo",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -662,7 +675,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var schemaJson = schema.ToJson();
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings {
+                ClassStyle = CSharpClassStyle.Poco,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
@@ -961,6 +977,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
             var settings = new CSharpGeneratorSettings();
+            settings.PropertyNamingStyle = CSharpNamingStyle.PascalCase;
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
@@ -1654,7 +1671,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Record
+                ClassStyle = CSharpClassStyle.Record,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
 
             //// Act
@@ -1681,7 +1699,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.Record
+                ClassStyle = CSharpClassStyle.Record,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
 
             //// Act

@@ -32,7 +32,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema.FromType<MyContainer>();
             var data = schema.ToJson();
 
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
 
             //// Act
             var code = generator.GenerateFile();

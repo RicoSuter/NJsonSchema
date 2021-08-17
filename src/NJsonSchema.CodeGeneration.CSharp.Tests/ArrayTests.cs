@@ -26,7 +26,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 ArrayType = "Foo",
-                ArrayInstanceType = "Bar"
+                ArrayInstanceType = "Bar",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 

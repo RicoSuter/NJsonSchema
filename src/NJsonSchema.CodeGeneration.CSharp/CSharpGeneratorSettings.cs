@@ -42,6 +42,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             GenerateJsonMethods = false;
             EnforceFlagEnums = false;
 
+            PropertyNamingStyle = CSharpNamingStyle.PascalSnakeCase;
+
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator(this);
             TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
@@ -52,8 +54,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
             InlineNamedTuples = true;
-
-            PropertyNamingStyle = CSharpNamingStyle.PascalSnakeCase;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>

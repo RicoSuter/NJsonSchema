@@ -151,7 +151,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
-            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns" };
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", PropertyNamingStyle = CSharpNamingStyle.PascalCase };
             var generator = new CSharpGenerator(schema, settings);
             var output = generator.GenerateFile("Foo");
 

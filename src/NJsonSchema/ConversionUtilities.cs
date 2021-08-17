@@ -184,7 +184,8 @@ namespace NJsonSchema
         private static Dictionary<char, string> _wordReplacements = new Dictionary<char, string>
         {
             { '+', "plus" },
-            { '*', "star" }
+            { '*', "star" },
+            { ':', "_" }
         };
 
         private static HashSet<string> _reservedKeywords = new HashSet<string>

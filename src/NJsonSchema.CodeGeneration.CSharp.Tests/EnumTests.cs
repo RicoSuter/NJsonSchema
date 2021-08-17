@@ -219,6 +219,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
+            settings.PropertyNamingStyle = CSharpNamingStyle.PascalCase;
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");
@@ -485,7 +486,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true, PropertyNamingStyle = CSharpNamingStyle.PascalCase };
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");
@@ -523,7 +524,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true, PropertyNamingStyle = CSharpNamingStyle.PascalCase };
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");

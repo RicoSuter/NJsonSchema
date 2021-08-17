@@ -13,13 +13,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
     public class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
-        private readonly Func<string, string> _propertyNameGenerator;
+        private readonly CSharpGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="CSharpPropertyNameGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>
         public CSharpPropertyNameGenerator(CSharpGeneratorSettings settings)
         {
-            _propertyNameGenerator = GetPropertyNameGenerator(settings);
+            _settings = settings;
         }
 
         private static Func<string, string> GetPropertyNameGenerator(CSharpGeneratorSettings settings)
@@ -53,6 +53,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonSchemaProperty property)
-            => _propertyNameGenerator(property.Name);
+            => GetPropertyNameGenerator(_settings)(property.Name);
     }
 }
