@@ -6,32 +6,53 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
     public class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
+        private readonly Func<string, string> _propertyNameGenerator;
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpPropertyNameGenerator" /> class.</summary>
+        /// <param name="settings">The settings.</param>
+        public CSharpPropertyNameGenerator(CSharpGeneratorSettings settings)
+        {
+            _propertyNameGenerator = GetPropertyNameGenerator(settings);
+        }
+
+        private static Func<string, string> GetPropertyNameGenerator(CSharpGeneratorSettings settings)
+        {
+            switch (settings.PropertyNamingStyle)
+            {
+                case CSharpNamingStyle.FlatCase:
+                    return ConversionUtilities.ConvertNameToFlatCase;
+
+                case CSharpNamingStyle.UpperFlatCase:
+                    return ConversionUtilities.ConvertNameToUpperFlatCase;
+
+                case CSharpNamingStyle.CamelCase:
+                    return ConversionUtilities.ConvertNameToCamelCase;
+
+                case CSharpNamingStyle.PascalCase:
+                    return ConversionUtilities.ConvertNameToPascalCase;
+
+                case CSharpNamingStyle.SnakeCase:
+                    return ConversionUtilities.ConvertNameToSnakeCase;
+
+                case CSharpNamingStyle.PascalSnakeCase:
+                    return ConversionUtilities.ConvertNameToPascalSnakeCase;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonSchemaProperty property)
-        {
-            return ConversionUtilities.ConvertToUpperCamelCase(property.Name
-                    .Replace("\"", string.Empty)
-                    .Replace("@", string.Empty)
-                    .Replace("?", string.Empty)
-                    .Replace("$", string.Empty)
-                    .Replace("[", string.Empty)
-                    .Replace("]", string.Empty)
-                    .Replace("(", "_")
-                    .Replace(")", string.Empty)
-                    .Replace(".", "-")
-                    .Replace("=", "-")
-                    .Replace("+", "plus"), true)
-                .Replace("*", "Star")
-                .Replace(":", "_")
-                .Replace("-", "_")
-                .Replace("#", "_");
-        }
+            => _propertyNameGenerator(property.Name);
     }
 }
