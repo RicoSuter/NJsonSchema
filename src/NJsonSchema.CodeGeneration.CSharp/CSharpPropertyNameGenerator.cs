@@ -22,37 +22,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             _settings = settings;
         }
 
-        private static Func<string, string> GetPropertyNameGenerator(CSharpGeneratorSettings settings)
-        {
-            switch (settings.PropertyNamingStyle)
-            {
-                case CSharpNamingStyle.FlatCase:
-                    return ConversionUtilities.ConvertNameToFlatCase;
-
-                case CSharpNamingStyle.UpperFlatCase:
-                    return ConversionUtilities.ConvertNameToUpperFlatCase;
-
-                case CSharpNamingStyle.CamelCase:
-                    return ConversionUtilities.ConvertNameToCamelCase;
-
-                case CSharpNamingStyle.PascalCase:
-                    return ConversionUtilities.ConvertNameToPascalCase;
-
-                case CSharpNamingStyle.SnakeCase:
-                    return ConversionUtilities.ConvertNameToSnakeCase;
-
-                case CSharpNamingStyle.PascalSnakeCase:
-                    return ConversionUtilities.ConvertNameToPascalSnakeCase;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonSchemaProperty property)
-            => GetPropertyNameGenerator(_settings)(property.Name);
+            => _settings.PropertyNamingStyle.RunConversion(property.Name);
     }
 }

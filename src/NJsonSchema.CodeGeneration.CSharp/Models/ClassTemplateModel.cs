@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _schema = schema;
             _settings = settings;
 
-            ClassName = typeName;
+            ClassName = settings.ClassNamingStyle.RunConversion(typeName);
             Properties = _schema.ActualProperties.Values
                 .Where(p => !p.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, _resolver, _settings))
