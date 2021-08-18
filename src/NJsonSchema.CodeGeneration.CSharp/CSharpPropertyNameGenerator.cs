@@ -6,32 +6,26 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
     public class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
+        private readonly CSharpGeneratorSettings _settings;
+
+        /// <summary>Initializes a new instance of the <see cref="CSharpPropertyNameGenerator" /> class.</summary>
+        /// <param name="settings">The settings.</param>
+        public CSharpPropertyNameGenerator(CSharpGeneratorSettings settings)
+        {
+            _settings = settings;
+        }
+
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
         public virtual string Generate(JsonSchemaProperty property)
-        {
-            return ConversionUtilities.ConvertToUpperCamelCase(property.Name
-                    .Replace("\"", string.Empty)
-                    .Replace("@", string.Empty)
-                    .Replace("?", string.Empty)
-                    .Replace("$", string.Empty)
-                    .Replace("[", string.Empty)
-                    .Replace("]", string.Empty)
-                    .Replace("(", "_")
-                    .Replace(")", string.Empty)
-                    .Replace(".", "-")
-                    .Replace("=", "-")
-                    .Replace("+", "plus"), true)
-                .Replace("*", "Star")
-                .Replace(":", "_")
-                .Replace("-", "_")
-                .Replace("#", "_");
-        }
+            => _settings.PropertyNamingStyle.RunConversion(property.Name);
     }
 }

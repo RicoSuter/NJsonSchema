@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -178,6 +180,133 @@ namespace NJsonSchema
             var xml = new XText(input).ToString();
             return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
         }
+
+        private static Dictionary<char, string> _wordReplacements = new Dictionary<char, string>
+        {
+            { '+', "plus" },
+            { '*', "star" },
+            { ':', "_" }
+        };
+
+        private static HashSet<string> _reservedKeywords = new HashSet<string>
+        {
+            "abstract", "as", "base", "bool", "break",
+            "byte", "case", "catch", "char", "checked",
+            "class", "const", "continue", "decimal", "default",
+            "delegate", "do", "double", "else", "enum",
+            "event", "explicit", "extern", "false", "finally",
+            "fixed", "float", "for", "foreach","goto",
+            "if", "implicit", "in", "int", "interface",
+            "internal", "is", "lock", "long", "namespace",
+            "new", "null", "object", "operator", "out",
+            "override", "params", "private", "protected", "public",
+            "readonly", "ref", "return", "sbyte",
+            "sealed", "short", "sizeof", "stackalloc", "static", "string",
+            "struct", "switch", "this", "throw", "true",
+            "try", "typeof", "uint", "ulong", "unchecked",
+            "unsafe", "ushort", "using", "virtual", "void",
+            "volatile", "while"
+        };
+
+        private static IEnumerable<string> SplitWords(string input)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var c in input)
+            {
+                var isLetterOrDigit = char.IsLetterOrDigit(c);
+                var isUpper = char.IsUpper(c);
+                var isReplaceable = _wordReplacements.ContainsKey(c);
+
+                if (!isLetterOrDigit || isUpper || isReplaceable)
+                {
+                    if (isReplaceable)
+                        sb.Append(_wordReplacements[c]);
+
+                    if (sb.Length > 0)
+                    {
+                        yield return sb.ToString();
+                        sb.Clear();
+                    }
+
+                    if (!isUpper)
+                        continue;
+                }
+
+                sb.Append(c);
+            }
+
+            if (sb.Length > 0)
+                yield return sb.ToString();
+        }
+
+        private static string JoinWords(IEnumerable<string> inputs, string join, bool pascal)
+        {
+            var adjustedInputs = inputs.Select(x => x.ToLower())
+                                       .Select((x, i) => pascal || i > 0 ? char.ToUpper(x[0]) + x.Substring(1) : x);
+
+            // Join our Inputs by the join identifier
+            var output = string.Join(join, adjustedInputs);
+
+            // If our first character is a number, then we need to prepend it with an underscore
+            if (char.IsNumber(output[0]))
+                output = $"_{output}";
+
+            return output;
+        }
+
+        private static string SplitAndJoin(string input, string join, bool pascal, Func<string, string> postprocess = null)
+        {
+            var split = SplitWords(input);
+
+            var joined = JoinWords(split, join, pascal);
+
+            var output = postprocess != null
+                ? postprocess(joined)
+                : joined;
+
+            // If we got a C# reserved keyword, then we need to prepend it with an amperstand
+            if (_reservedKeywords.Contains(output))
+                output = $"@{output}";
+
+            return output;
+        }
+
+        /// <summary>Converts the given input to flat case (twowords).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToFlatCase(string input)
+            => SplitAndJoin(input, string.Empty, false, postprocess: (x) => x.ToLower());
+
+        /// <summary>Converts the given input to upper flat case (TWOWORDS).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToUpperFlatCase(string input)
+            => SplitAndJoin(input, string.Empty, false, postprocess: (x) => x.ToUpper());
+
+        /// <summary>Converts the given input to camel case (twoWords).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToCamelCase(string input)
+            => SplitAndJoin(input, string.Empty, false);
+
+        /// <summary>Converts the given input to pascal case (TwoWords).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToPascalCase(string input)
+            => SplitAndJoin(input, string.Empty, true);
+
+        /// <summary>Converts the given input to snake case (two_words).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToSnakeCase(string input)
+            => SplitAndJoin(input, "_", false, postprocess: (x) => x.ToLower());
+
+        /// <summary>Converts the given input to pascal snake case (Two_Words).</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The output.</returns>
+        public static string ConvertNameToPascalSnakeCase(string input)
+            => SplitAndJoin(input, "_", true);
 
         private static string ConvertDashesToCamelCase(string input)
         {

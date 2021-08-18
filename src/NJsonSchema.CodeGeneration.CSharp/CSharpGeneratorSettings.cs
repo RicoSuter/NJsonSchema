@@ -42,8 +42,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
             GenerateJsonMethods = false;
             EnforceFlagEnums = false;
 
+            PropertyNamingStyle = CSharpNamingStyle.PascalSnakeCase;
+            ClassNamingStyle = CSharpNamingStyle.PascalCase;
+
             ValueGenerator = new CSharpValueGenerator(this);
-            PropertyNameGenerator = new CSharpPropertyNameGenerator();
+            PropertyNameGenerator = new CSharpPropertyNameGenerator(this);
             TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
             {
                 typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
@@ -144,5 +147,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).</summary>
         public bool GenerateNullableReferenceTypes { get; set; }
+
+        /// <summary>Gets or sets a value indicating what type of naming style to use for properties (default: PascalSnakeCase).</summary>
+        public CSharpNamingStyle PropertyNamingStyle { get; set; }
+
+        /// <summary>Gets or sets a value indicating what type of naming style to use for classes (default: PascalCase).</summary>
+        public CSharpNamingStyle ClassNamingStyle { get; set; }
     }
 }

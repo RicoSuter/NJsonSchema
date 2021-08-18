@@ -57,7 +57,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
-                SchemaType = SchemaType.Swagger2
+                SchemaType = SchemaType.Swagger2,
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -86,7 +87,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             {
                 ClassStyle = CSharpClassStyle.Poco,
                 SchemaType = SchemaType.Swagger2,
-                DateTimeType = "System.DateTime"
+                DateTimeType = "System.DateTime",
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
             });
             var code = generator.GenerateFile("MyClass");
 

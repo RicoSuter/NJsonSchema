@@ -18,7 +18,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var schema = JsonSchema.FromType<ClassWithUri>();
             var json = schema.ToJson();
-            var generator = new CSharpGenerator(schema);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                PropertyNamingStyle = CSharpNamingStyle.PascalCase
+            });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
