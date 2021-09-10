@@ -77,6 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("dateOfBirth = ko.observable<Date>();", code);
+            Assert.Contains("init(_data?: any) {", code);
         }
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)

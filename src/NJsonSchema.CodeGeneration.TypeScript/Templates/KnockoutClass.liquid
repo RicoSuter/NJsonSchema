@@ -23,11 +23,11 @@
     }
 {% endif -%}
 
-    init(data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+    init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
 {% if HasInheritance -%}
-        super.init(data);
+        super.init(_data);
 {% endif -%}
-        if (data !== undefined) {
+        if (_data !== undefined) {
 {% for property in Properties -%}
             var {{ property.PropertyName }}_: any; 
             {{ property.ConvertToClassCode | tab }}
