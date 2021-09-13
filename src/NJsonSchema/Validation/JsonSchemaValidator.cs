@@ -404,9 +404,9 @@ namespace NJsonSchema.Validation
                     continue;
                 }
 
-                var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
-                if (obj?.Property(requiredProperty) == null)
+                if (obj?.TryGetValue(requiredProperty, stringComparison, out _) != true)
                 {
+                    var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, requiredProperty, newPropertyPath, token, schema));
                 }
             }
