@@ -1625,6 +1625,31 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
+        [Fact]
+        public async Task When_native_record_no_setter_in_class_and_constructor_provided()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                GenerateNativeRecords = true
+            });
+
+            //// Act
+            var output = generator.GenerateFile("Address");
+
+            //// Assert
+            Assert.Contains(@"record Address", output);
+            Assert.Contains(@"public string Street { get; init; }", output);
+            Assert.DoesNotContain(@"public string Street { get; set; }", output);
+
+            Assert.Contains("public Address(string @city, string @street)", output);
+
+            AssertCompile(output);
+        }
+
         public abstract class AbstractAddress
         {
             [JsonProperty("city")]

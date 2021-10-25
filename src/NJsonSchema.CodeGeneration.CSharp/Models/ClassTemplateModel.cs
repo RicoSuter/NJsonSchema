@@ -102,6 +102,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the class style is Record.</summary>
         public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
 
+        /// <summary>Gets a value indicating whether to generate records as C# 9.0 records.</summary>
+        public bool GenerateNativeRecords => _settings.GenerateNativeRecords;
+
         /// <summary>Gets a value indicating whether to render ToJson() and FromJson() methods.</summary>
         public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
 
