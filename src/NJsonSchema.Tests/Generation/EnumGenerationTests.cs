@@ -36,9 +36,8 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.Integer,
                 GenerateEnumMappingDescription = true
             });
             var data = schema.ToJson();
@@ -61,10 +60,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Assert
@@ -82,9 +78,12 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String,
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                },
                 GenerateEnumMappingDescription = true
             });
             var data = schema.ToJson();
@@ -106,10 +105,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Assert
             Assert.Equal(3, schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.Count);
@@ -131,10 +127,9 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumProperty>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                SchemaType = SchemaType.Swagger2,
-                DefaultEnumHandling = EnumHandling.Integer
+                SchemaType = SchemaType.Swagger2
             });
             var json = schema.ToJson();
 
@@ -161,7 +156,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_string_enum_property_has_default_then_default_is_converted_to_string()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<EnumPropertyWithDefaultClass>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchemaGenerator.FromType<EnumPropertyWithDefaultClass>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -184,7 +179,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_enum_property_has_should_serialize_then_no_npe()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Party>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchemaGenerator.FromType<Party>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -209,10 +204,13 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<RequiredEnumProperty>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<RequiredEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
-                DefaultEnumHandling = EnumHandling.String
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
             });
             var json = schema.ToJson();
 

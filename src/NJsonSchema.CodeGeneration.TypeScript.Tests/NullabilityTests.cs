@@ -13,7 +13,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task Strict_nullability_in_TypeScript2()
         {
             var schema = JsonSchemaGenerator.FromType<Person>(
-                new JsonSchemaGeneratorSettings
+                new NewtonsoftJsonSchemaGeneratorSettings
                 {
                     DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull
                 });

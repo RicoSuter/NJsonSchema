@@ -21,7 +21,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_AllowAdditionalProperties_is_true()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<Employee>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Employee>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
@@ -35,12 +35,12 @@ namespace NJsonSchema.Tests.Generation
         public void When_AlwaysAllowAdditionalObjectProperties_is_used_then_AdditionalPropertiesSchema_is_ok()
         {
             // Act
-            var schemaTrue = JsonSchemaGenerator.FromType<Dictionary<string, string>>(new JsonSchemaGeneratorSettings
+            var schemaTrue = JsonSchemaGenerator.FromType<Dictionary<string, string>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
 
-            var schemaFalse = JsonSchemaGenerator.FromType<Dictionary<string, string>>(new JsonSchemaGeneratorSettings
+            var schemaFalse = JsonSchemaGenerator.FromType<Dictionary<string, string>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = false
             });

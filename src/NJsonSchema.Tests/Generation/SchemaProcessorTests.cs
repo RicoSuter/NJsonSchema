@@ -32,10 +32,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_class_has_schema_processor_attribute_then_it_is_processed()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithSchemaProcessor>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<ClassWithSchemaProcessor>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Assert

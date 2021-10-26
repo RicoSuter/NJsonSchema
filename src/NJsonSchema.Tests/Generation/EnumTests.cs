@@ -42,10 +42,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyController>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<MyController>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             // Assert
@@ -64,10 +61,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ContainerWithEnumDictionary>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<ContainerWithEnumDictionary>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             // Assert
@@ -84,7 +78,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_SerializerSettings_has_CamelCase_StringEnumConverter_then_enum_values_are_correct()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings = new JsonSerializerSettings
                 {
@@ -121,9 +115,12 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumWithFlags>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumWithFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
             });
             var json = schema.ToJson();
 
@@ -145,9 +142,12 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumWithoutFlags>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumWithoutFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
             });
             var json = schema.ToJson();
 

@@ -324,7 +324,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             var schema = JsonSchemaGenerator.FromType(
                 typeof(MyDerivedClass),
-                new JsonSchemaGeneratorSettings
+                new NewtonsoftJsonSchemaGeneratorSettings
                 {
                     GenerateAbstractProperties = true
                 });

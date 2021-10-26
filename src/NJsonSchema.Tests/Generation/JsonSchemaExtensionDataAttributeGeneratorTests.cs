@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_property_with_JsonSchemaExtensionDataAttribute_on_property_then_extensiondata_schema_is_set_on_property_level()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<RootType>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = JsonSchemaGenerator.FromType<RootType>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             var expectedJSON = @"{
@@ -129,7 +129,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_property_with_JsonSchemaExtensionDataAttribute_on_property_then_extensiondata_is_set_to_property()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithExtensionData>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
@@ -171,7 +171,7 @@ namespace NJsonSchema.Tests.Generation
             }";
 
             //// Assert generated JSON matches schema, ignores whitespace and spaces
-            var result = String.Compare(json, expectedJSON, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols);
+            var result = string.Compare(json, expectedJSON, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols);
 
             Assert.Equal(0, result);
         }

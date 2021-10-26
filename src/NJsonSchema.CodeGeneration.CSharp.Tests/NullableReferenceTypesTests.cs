@@ -21,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_optional_and_GenerateNullableReferenceTypes_is_not_set_then_CSharp_property_is_not_nullable()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
@@ -45,7 +45,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });

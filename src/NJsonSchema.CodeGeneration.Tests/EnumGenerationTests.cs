@@ -36,10 +36,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_string_and_integer_enum_used_then_two_enums_are_generated_in_typescript()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Act
@@ -54,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_export_types_is_true_add_export_before_enum_in_typescript()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
@@ -74,7 +71,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_add_export_keyword_is_false_dont_add_export_before_enum_in_typescript()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
@@ -94,10 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_string_and_integer_enum_used_then_one_enum_is_generated_in_CSharp()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Act
@@ -118,10 +112,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_byte_enum_is_generated_then_no_exception_occurs()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<DifferentEnumTypeTestClass>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<DifferentEnumTypeTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Act

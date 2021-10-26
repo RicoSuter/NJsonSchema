@@ -175,7 +175,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<SomeClass>(new JsonSchemaGeneratorSettings());
+            var schema = JsonSchemaGenerator.FromType<SomeClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             //// Act

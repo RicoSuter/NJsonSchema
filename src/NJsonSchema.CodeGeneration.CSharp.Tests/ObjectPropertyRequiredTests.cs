@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithoutRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithoutRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });

@@ -503,7 +503,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_property_has_default_and_string_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
+            var schema = JsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
+            });
+
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -1735,7 +1742,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = JsonSchemaGenerator.FromType<ClassWithExtensionData>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

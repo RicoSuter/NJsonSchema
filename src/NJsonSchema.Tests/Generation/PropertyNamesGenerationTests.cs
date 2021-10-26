@@ -1,6 +1,7 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using Xunit;
 
@@ -24,9 +25,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.Default
+                SerializerSettings =
+                {
+                    ContractResolver = new DefaultContractResolver()
+                }
             });
 
             var data = schema.ToJson();
@@ -44,9 +48,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
+                SerializerSettings =
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                }
             });
 
             var data = schema.ToJson();
@@ -64,9 +71,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
+                SerializerSettings =
+                {
+                    ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy()}
+                }
             });
 
             var data = schema.ToJson();

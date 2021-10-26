@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable_Swagger2()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2,
                 GenerateCustomNullableProperties = true
@@ -80,7 +80,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable_OpenApi3()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
                 GenerateCustomNullableProperties = true

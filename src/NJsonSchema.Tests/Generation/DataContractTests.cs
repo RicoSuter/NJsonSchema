@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_DataContractRequired_is_set_property_is_nullable_in_OpenApi3()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Person>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = JsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             //// Assert
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_DataContractRequired_is_set_property_is_not_nullable_in_Swagger2()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Person>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.Swagger2 });
+            var schema = JsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.Swagger2 });
             var json = schema.ToJson();
 
             //// Assert

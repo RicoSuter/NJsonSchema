@@ -110,7 +110,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<CC>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<CC>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             });
@@ -191,7 +191,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_discriminator_is_externally_defined_then_it_is_generated()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
                 {
@@ -223,7 +223,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_discriminator_is_externally_defined_then_it_is_generated_without_exception()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
                 {
@@ -350,7 +350,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_dictionary_then_allOf_contains_base_dictionary_schema_and_actual_schema()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };
@@ -392,7 +392,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_with_discriminator_has_base_class_then_mapping_is_placed_in_type_schema_and_not_root()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };

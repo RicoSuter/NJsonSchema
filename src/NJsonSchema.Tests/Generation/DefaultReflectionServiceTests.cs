@@ -36,7 +36,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var svc = new DefaultReflectionService();
+            var svc = new NewtonsoftJsonReflectionService();
 
             //// Assert
             foreach (var check in checks)
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var svc = new DefaultReflectionService();
+            var svc = new NewtonsoftJsonReflectionService();
 
             //// Assert
             foreach (var check in checks)

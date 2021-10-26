@@ -114,9 +114,9 @@ namespace NJsonSchema.Tests.References
                 }
             }");
 
-            Func<JsonSchema, JsonReferenceResolver> factory = schema4 =>
+            Func<JsonSchema, JsonReferenceResolver> factory = schema =>
             {
-                var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
+                var schemaResolver = new JsonSchemaResolver(schema, new NewtonsoftJsonSchemaGeneratorSettings());
                 var resolver = new JsonReferenceResolver(schemaResolver);
                 resolver.AddDocumentReference("../dir/external.json", externalSchema);
                 return resolver;

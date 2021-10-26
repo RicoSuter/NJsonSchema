@@ -159,10 +159,7 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_enum_then_enum_array_must_be_set()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyType>(new JsonSchemaGeneratorSettings
-            {
-                DefaultEnumHandling = EnumHandling.Integer
-            });
+            var schema = JsonSchemaGenerator.FromType<MyType>(new NewtonsoftJsonSchemaGeneratorSettings());
             var property = schema.Properties["Color"];
 
             //// Assert

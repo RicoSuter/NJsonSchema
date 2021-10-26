@@ -12,9 +12,9 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
+using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
-using NJsonSchema.NewtonsoftJson.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ using System.Runtime.Serialization;
 namespace NJsonSchema.Generation
 {
     /// <summary>Generates a <see cref="JsonSchema"/> object for a given type. </summary>
-    public class JsonSchemaGenerator
+    public abstract class JsonSchemaGenerator
     {
         private static readonly Dictionary<string, string> DataTypeFormats = new Dictionary<string, string>
         {
@@ -39,45 +39,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
-        public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
+        protected JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
         {
             Settings = settings;
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>()
-        {
-            return FromType<TType>(new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type)
-        {
-            return FromType(type, new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType));
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type);
         }
 
         /// <summary>Gets the settings.</summary>
@@ -353,29 +317,7 @@ namespace NJsonSchema.Generation
         /// <param name="jsonProperty">The property.</param>
         /// <param name="accessorInfo">The accessor info.</param>
         /// <returns>The property name.</returns>
-        public virtual string GetPropertyName(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo)
-        {
-            if (jsonProperty?.PropertyName != null)
-            {
-                return jsonProperty.PropertyName;
-            }
-
-            try
-            {
-                var propertyName = accessorInfo.GetName();
-
-                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
-                return contractResolver != null
-                    ? contractResolver.GetResolvedPropertyName(propertyName)
-                    : propertyName;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("Could not get JSON property name of property '" +
-                    (accessorInfo != null ? accessorInfo.Name : "n/a") + "' and type '" +
-                    (accessorInfo?.MemberInfo?.DeclaringType != null ? accessorInfo.MemberInfo.DeclaringType.FullName : "n/a") + "'.", e);
-            }
-        }
+        public abstract string GetPropertyName(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo);
 
         /// <summary>Applies the property annotations to the JSON property.</summary>
         /// <param name="schema">The schema.</param>
@@ -489,7 +431,7 @@ namespace NJsonSchema.Generation
         {
             if (defaultValue != null && defaultValue.GetType().GetTypeInfo().IsEnum)
             {
-                var hasStringEnumConverter = Settings.ReflectionService.IsStringEnum(type, Settings.ActualSerializerSettings);
+                var hasStringEnumConverter = Settings.ReflectionService.IsStringEnum(type, Settings);
                 if (hasStringEnumConverter)
                 {
                     return defaultValue.ToString();
@@ -744,13 +686,6 @@ namespace NJsonSchema.Generation
             schema.IsFlagEnumerable = contextualType.GetInheritedAttribute<FlagsAttribute>() != null;
 
             var underlyingType = Enum.GetUnderlyingType(contextualType.Type);
-
-            var converters = Settings.ActualSerializerSettings.Converters.ToList();
-            if (!converters.OfType<StringEnumConverter>().Any())
-            {
-                converters.Add(new StringEnumConverter());
-            }
-
             foreach (var enumName in Enum.GetNames(contextualType.Type))
             {
                 if (typeDescription.Type == JsonObjectType.Integer)
@@ -770,7 +705,7 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var value = Enum.Parse(contextualType.Type, enumName);
-                        var json = JsonConvert.SerializeObject(value, Formatting.None, converters.ToArray());
+                        var json = JsonConvert.SerializeObject(value, Formatting.None, new[] { new StringEnumConverter() });
                         schema.Enumeration.Add(JsonConvert.DeserializeObject<string>(json));
                     }
                 }
@@ -801,9 +736,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var valueTypeInfo = Settings.ReflectionService.GetDescription(
-                    valueType, Settings.DefaultDictionaryValueReferenceTypeNullHandling, Settings);
-
+                var valueTypeInfo = Settings.ReflectionService.GetDescription(valueType, Settings);
                 var valueTypeIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
                                           valueTypeInfo.IsNullable;
 
@@ -909,87 +842,20 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void GenerateProperties(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
-        {
-            // TODO(reflection): Here we should use ContextualAccessorInfo to avoid losing information
+        /// <summary>
+        /// Generates the properties for the given type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="schema"></param>
+        /// <param name="schemaResolver"></param>
+        protected abstract void GenerateProperties(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver);
 
-            var members = type.GetTypeInfo()
-                .DeclaredFields
-                .Where(f => !f.IsPrivate && !f.IsStatic || f.IsDefined(typeof(DataMemberAttribute)))
-                .OfType<MemberInfo>()
-                .Concat(
-                    type.GetTypeInfo().DeclaredProperties
-                    .Where(p => (p.GetMethod?.IsPrivate != true && p.GetMethod?.IsStatic == false) ||
-                                (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false) ||
-                                p.IsDefined(typeof(DataMemberAttribute)))
-                )
-                .ToList();
-
-            var contextualAccessors = members.Select(m => m.ToContextualAccessor()); // TODO(reflection): Do not use this method
-            var contract = Settings.ResolveContract(type);
-
-            var allowedProperties = GetTypeProperties(type);
-            var objectContract = contract as JsonObjectContract;
-            if (objectContract != null && allowedProperties == null)
-            {
-                foreach (var jsonProperty in objectContract.Properties.Where(p => p.DeclaringType == type))
-                {
-                    bool shouldSerialize;
-                    try
-                    {
-                        shouldSerialize = jsonProperty.ShouldSerialize?.Invoke(null) != false;
-                    }
-                    catch
-                    {
-                        shouldSerialize = true;
-                    }
-
-                    if (shouldSerialize)
-                    {
-                        var memberInfo = contextualAccessors.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
-                        if (memberInfo != null && (Settings.GenerateAbstractProperties || !IsAbstractProperty(memberInfo)))
-                        {
-                            LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-                foreach (var memberInfo in contextualAccessors.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
-                {
-                    var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
-                    var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
-                                     (memberInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
-
-                    var jsonProperty = new JsonProperty
-                    {
-                        AttributeProvider = new ReflectionAttributeProvider(memberInfo),
-                        PropertyType = memberType,
-                        Ignored = IsPropertyIgnored(memberInfo, type)
-                    };
-
-                    if (attribute != null)
-                    {
-                        jsonProperty.PropertyName = attribute.PropertyName ?? memberInfo.Name;
-                        jsonProperty.Required = attribute.Required;
-                        jsonProperty.DefaultValueHandling = attribute.DefaultValueHandling;
-                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
-                        jsonProperty.NullValueHandling = attribute.NullValueHandling;
-                        jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
-                    }
-                    else
-                    {
-                        jsonProperty.PropertyName = memberInfo.Name;
-                    }
-
-                    LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
-                }
-            }
-        }
-
-        private bool IsAbstractProperty(ContextualMemberInfo memberInfo)
+        /// <summary>
+        /// Chesk whether a member info is abstract.
+        /// </summary>
+        /// <param name="memberInfo"></param>
+        /// <returns></returns>
+        protected bool IsAbstractProperty(ContextualMemberInfo memberInfo)
         {
             return memberInfo is ContextualPropertyInfo propertyInfo &&
                    !propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface &&
@@ -1201,8 +1067,8 @@ namespace NJsonSchema.Generation
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
                 if (converterType != null && (
-                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Newtonsoft's converter
-                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter) + "`1", TypeNameStyle.Name) // System.Text.Json's converter
+                    converterType.IsAssignableToTypeName("JsonInheritanceConverter", TypeNameStyle.Name) || // Newtonsoft's converter
+                    converterType.IsAssignableToTypeName("JsonInheritanceConverter`1", TypeNameStyle.Name) // System.Text.Json's converter
                     ))
                 {
                     return ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterParameters") &&
@@ -1218,15 +1084,24 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
         {
-            if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
+            if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverterAttribute.DiscriminatorName)))
             {
                 return jsonInheritanceConverter.DiscriminatorName;
             }
 
-            return JsonInheritanceConverter.DefaultDiscriminatorName;
+            return JsonInheritanceConverterAttribute.DefaultDiscriminatorName;
         }
 
-        private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jsonProperty"></param>
+        /// <param name="accessorInfo"></param>
+        /// <param name="parentType"></param>
+        /// <param name="parentSchema"></param>
+        /// <param name="schemaResolver"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        protected void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = Settings.ReflectionService.GetDescription(accessorInfo.AccessorType, Settings);
             if (jsonProperty.Ignored == false && IsPropertyIgnoredBySettings(accessorInfo) == false)

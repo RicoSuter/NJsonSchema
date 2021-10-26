@@ -16,9 +16,12 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task Properties_should_match_custom_resolver()
         {
-            var schema = JsonSchemaGenerator.FromType<Person>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                ContractResolver = new CustomContractResolver()
+                SerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CustomContractResolver()
+                }
             });
 
             var data = schema.ToJson();

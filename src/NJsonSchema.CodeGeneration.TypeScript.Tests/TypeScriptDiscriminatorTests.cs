@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Nested>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
@@ -71,7 +71,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Nested>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });

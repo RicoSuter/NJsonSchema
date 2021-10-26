@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenLowerCamelCasePropertiesAreUsed_ThenCamelCasePropertyNamesContractResolverIsUsed()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenNamingPolicyIsNull_ThenDefaultContractResolverIsUsed()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {
@@ -107,7 +107,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenGeneratingWithCustomPropertyNames_ThenAttributesArePickedUp()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {
