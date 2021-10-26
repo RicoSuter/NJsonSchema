@@ -11,25 +11,6 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
 {
     public class SystemTextJsonOptionsConverterTests
     {
-        [Fact]
-        public async Task SystemTextJson_WhenEnumsAreSerializedAsStrings_ThenGlobalConverterExists()
-        {
-            // Arrange
-            var options = new JsonSerializerOptions
-            {
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                }
-            };
-
-            // Act
-            var settings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(options);
-
-            // Assert
-            Assert.Contains(settings.Converters, c => c is StringEnumConverter);
-        }
-
         public class Person
         {
             public string FirstName { get; set; }
@@ -99,7 +80,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
 
         public enum MyEnum
         {
-            Foo, 
+            Foo,
             Bar
         }
 
