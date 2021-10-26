@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
+    <ProjectReference Include="..\NJsonSchema.Newtonsoft.Json\NJsonSchema.Newtonsoft.Json.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
 

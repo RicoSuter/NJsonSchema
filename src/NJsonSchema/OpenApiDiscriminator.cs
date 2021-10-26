@@ -40,7 +40,7 @@ namespace NJsonSchema
             dynamic converter = JsonInheritanceConverter;
 
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
-                .GetRuntimeMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
+                .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
 
             if (getDiscriminatorValueMethod != null)
             {

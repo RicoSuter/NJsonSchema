@@ -42,9 +42,9 @@
         <Reference Include="System.Xml.Linq" />
     </ItemGroup>
     <ItemGroup>
-        <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+        <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>

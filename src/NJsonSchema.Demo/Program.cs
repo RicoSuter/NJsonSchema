@@ -3,9 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Benchmark;
 
 namespace NJsonSchema.Demo
 {
