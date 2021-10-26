@@ -11,12 +11,24 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace NJsonSchema.Converters2
+namespace NJsonSchema.Converters
 {
-    internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
+    /// <summary>
+    /// The JSON inheritance converter attribute.
+    /// </summary>
+    public class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
+        /// <summary>Gets the default discriminiator name.</summary>
+        public static string DefaultDiscriminatorName { get; } = "discriminator";
+
+        /// <summary>
+        /// Gets the discriminator name.
+        /// </summary>
         public string DiscriminatorName { get; }
 
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverterAttribute"/> class.</summary>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="discriminatorName">The discriminator name.</param>
         public JsonInheritanceConverterAttribute(Type baseType, string discriminatorName = "discriminator")
             : base(typeof(JsonInheritanceConverter<>).MakeGenericType(baseType))
         {

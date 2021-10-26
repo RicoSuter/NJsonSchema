@@ -11,7 +11,6 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Namotion.Reflection;
 using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.NewtonsoftJson.Converters

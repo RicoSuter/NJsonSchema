@@ -7,9 +7,8 @@
 //-----------------------------------------------------------------------
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
-using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.Converters;
 using System;
 
 namespace NJsonSchema.Generation.SchemaProcessors
@@ -17,7 +16,7 @@ namespace NJsonSchema.Generation.SchemaProcessors
     public class DiscriminatorSchemaProcessor : ISchemaProcessor
     {
         public DiscriminatorSchemaProcessor(Type baseType)
-            : this(baseType, JsonInheritanceConverter.DefaultDiscriminatorName)
+            : this(baseType, JsonInheritanceConverterAttribute.DefaultDiscriminatorName)
         {
         }
 
