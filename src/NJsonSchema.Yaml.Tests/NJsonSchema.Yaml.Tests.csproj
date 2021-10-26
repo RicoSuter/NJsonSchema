@@ -5,15 +5,13 @@
   </PropertyGroup>
   <PropertyGroup>
       <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Yaml.Tests.xml</DocumentationFile>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="NSwag.Core.Yaml" Version="13.13.1" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations" />
     <PackageReference Include="NodaTime" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
@@ -21,58 +19,7 @@
     <ProjectReference Include="..\NJsonSchema.Yaml\NJsonSchema.Yaml.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="References\YamlReferencesTest\collection.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\collection.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\json_schema_with_yaml_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
-    <Content Include="References\YamlReferencesTest\json_schema_with_json_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\yaml_schema_with_json_reference.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\yaml_schema_with_yaml_reference.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="References\YamlReferencesTest\common-items\headers.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\parameters.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\responses.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\schemas.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\enums\TaskExecutionStatusEnum.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\ExecuteTaskResultModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleCollectionModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\yaml_spec_with_yaml_schema_refs.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="References\YamlReferencesTest\models\" />
+    <Content Include="References\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="References\**\*.yaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

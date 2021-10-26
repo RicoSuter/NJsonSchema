@@ -141,7 +141,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         Resolver = _resolver,
                         NullValue = _settings.NullValue,
                         Settings = _settings
-                    });
+                    }).TrimEnd();
                 }
 
                 return string.Empty;

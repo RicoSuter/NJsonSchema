@@ -1,56 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>netcoreapp5.0</TargetFrameworks>
-        <IsPackable>false</IsPackable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>1998,1591</NoWarn>
-    </PropertyGroup>
-    <ItemGroup>
-        <None Remove="References\A.json" />
-        <None Remove="References\Animal.json" />
-        <None Remove="References\B.json" />
-        <None Remove="References\C.json" />
-        <None Remove="References\D.json" />
-        <None Remove="References\E.json" />
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="References\A.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="References\Animal.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="References\B.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="References\C.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="References\D.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="References\E.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-        
-        <PackageReference Include="xunit" Version="2.3.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" Condition="'$(TargetFramework)' == 'netcoreapp5.0'" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.3.2" Condition="'$(TargetFramework)' == 'net452'" />
-
-        <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp5.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-        <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations">
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
-        <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
-        <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
-        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="References\*.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" Condition="'$(TargetFramework)' == 'net5.0'" />
+    <PackageReference Condition="'$(TargetFramework)' == 'net5.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
+    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
 </Project>

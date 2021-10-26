@@ -1,71 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp5.0;net461</TargetFrameworks>
-
+    <TargetFrameworks>net5.0;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
-      <LangVersion>8</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Tests.xml</DocumentationFile>
-    <NoWarn>1998,1591</NoWarn>
+    <NoWarn>$(NoWarn),618,1587,1998,1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="References\LocalReferencesTests\animal.json" />
-    <None Remove="References\LocalReferencesTests\collection.json" />
-    <None Remove="References\LocalReferencesTests\dir_with_#\first.json" />
-    <None Remove="References\LocalReferencesTests\dir_with_#\second.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_collection_reference.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_indirect_reference.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_indirect_subreference.json" />
-    <None Remove="References\LocalReferencesTests\schema_with_reference.json" />
+    <Content Include="References\**\*.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="References\LocalReferencesTests\animal.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\collection.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\dir_with_#\first.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\dir_with_#\second.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_collection_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_indirect_subreference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_indirect_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\LocalReferencesTests\schema_with_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
-
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations"></Reference>
-
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
     <PackageReference Include="NodaTime" Version="2.2.0" />
+    <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations"></Reference>
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
 

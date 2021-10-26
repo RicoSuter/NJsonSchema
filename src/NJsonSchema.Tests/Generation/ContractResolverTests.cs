@@ -13,12 +13,10 @@ namespace NJsonSchema.Tests.Generation
 {
     public class ContractResolverTests
     {
-#if !NET461
         [Fact]
-#endif
         public async Task Properties_should_match_custom_resolver()
         {
-            var schema = JsonSchemaGenerator.FromType<Person>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings
             {
                 ContractResolver = new CustomContractResolver()
             });

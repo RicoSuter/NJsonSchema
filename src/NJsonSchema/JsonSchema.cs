@@ -84,7 +84,9 @@ namespace NJsonSchema
         public static string ToolchainVersion => typeof(JsonSchema).Assembly.GetName().Version +
                                                  " NET40 (Newtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
 #else
-        public static string ToolchainVersion => typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
+        public static string ToolchainVersion => version;
+
+        private static readonly string version = typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
                                                  " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 #endif
 
@@ -129,7 +131,7 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = await DynamicApis.HttpGetAsync(url, cancellationToken).ConfigureAwait(false); 
+            var data = await DynamicApis.HttpGetAsync(url, cancellationToken).ConfigureAwait(false);
             return await FromJsonAsync(data, url, referenceResolverFactory,cancellationToken).ConfigureAwait(false);
         }
 
@@ -159,7 +161,7 @@ namespace NJsonSchema
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema, 
+        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema,
             JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken).ConfigureAwait(false);
@@ -213,7 +215,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets the inherited/parent schema which may also be inlined 
+        /// <summary>Gets the inherited/parent schema which may also be inlined
         /// (the schema itself if it is a dictionary or array, otherwise <see cref="InheritedSchema"/>).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
