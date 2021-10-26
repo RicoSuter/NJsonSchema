@@ -21,12 +21,13 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(ContextualType contextualType, T settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, T settings)
         {
             var type = contextualType.OriginalType;
-            var isNullable = IsNullable(contextualType, settings.DefaultReferenceTypeNullHandling);
+            var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
 
             var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
             if (jsonSchemaTypeAttribute != null)
@@ -48,7 +49,7 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
             }
 
-            return GetDescription(contextualType, settings, type, isNullable);
+            return GetDescription(contextualType, settings, type, isNullable, defaultReferenceTypeNullHandling);
         }
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
@@ -56,8 +57,9 @@ namespace NJsonSchema.Generation
         /// <param name="settings">The settings.</param>
         /// <param name="originalType">The original type.</param>
         /// <param name="isNullable">Specifies whether the type is nullable.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, T settings, Type originalType, bool isNullable)
+        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, T settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             if (originalType.GetTypeInfo().IsEnum)
             {
@@ -196,7 +198,7 @@ namespace NJsonSchema.Generation
 
             if (contextualType.IsNullableType)
             {
-                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], settings);
+                var typeDescription = GetDescription(contextualType.OriginalGenericArguments[0], defaultReferenceTypeNullHandling, settings);
                 typeDescription.IsNullable = true;
                 return typeDescription;
             }
@@ -338,9 +340,14 @@ namespace NJsonSchema.Generation
             return false;
         }
 
+        JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        {
+            return GetDescription(contextualType, defaultReferenceTypeNullHandling, (T)settings);
+        }
+
         JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
         {
-            return GetDescription(contextualType, (T)settings);
+            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, (T)settings);
         }
 
         bool IReflectionService.IsStringEnum(ContextualType contextualType, JsonSchemaGeneratorSettings settings)

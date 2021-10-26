@@ -16,6 +16,13 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings);
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="contextualType">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         JsonTypeDescription GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings);

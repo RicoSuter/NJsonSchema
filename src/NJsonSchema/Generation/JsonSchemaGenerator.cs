@@ -736,7 +736,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                var valueTypeInfo = Settings.ReflectionService.GetDescription(valueType, Settings);
+                var valueTypeInfo = Settings.ReflectionService.GetDescription(valueType, Settings.DefaultDictionaryValueReferenceTypeNullHandling, Settings);
                 var valueTypeIsNullable = valueType.GetContextAttribute<ItemsCanBeNullAttribute>() != null ||
                                           valueTypeInfo.IsNullable;
 

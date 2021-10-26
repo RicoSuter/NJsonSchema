@@ -40,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Properties["Mapping2"].DictionaryKey.ActualSchema.IsEnumeration);
 
             Assert.False(schema.Properties["Mapping2"].DictionaryKey.IsNullable(SchemaType.JsonSchema));
-            Assert.True(schema.Properties["Mapping2"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
+            Assert.False(schema.Properties["Mapping2"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
         }
 
         [Fact]
