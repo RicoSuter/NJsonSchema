@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_offset_moment_then_moment_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_dayjs_then_dayjs_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_class()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -117,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_date_then_date_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -135,7 +135,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_moment_then_moment_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -154,7 +154,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_date_handling_is_string_then_string_property_are_generated_in_interface()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDateTimeProperty>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

@@ -1,4 +1,4 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,7 +31,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
             
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -90,7 +90,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_default_value_is_set_on_property_then_default_is_set_in_schema()
         {
             // Arrange
-            var schema = JsonSchemaGenerator.FromType<DefaultTests>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DefaultTests>();
 
             // Act
             var property = schema.Properties["Number"];
@@ -108,7 +108,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_dictionary_value_is_null_then_string_values_are_allowed()
         {
             // Arrange
-            var schema = JsonSchemaGenerator.FromType<DictTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DictTest>();
             var schemaData = schema.ToJson();
 
             var data = @"{
@@ -128,7 +128,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_type_is_enumerable_it_should_not_stackoverflow_on_JSON_generation()
         {
             // Generate JSON
-            var schema = JsonSchemaGenerator.FromType<IEnumerable<Tuple<string, string>>>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<IEnumerable<Tuple<string, string>>>();
             var json = schema.ToJson();
 
             // Should be reached and not StackOverflowed
@@ -146,7 +146,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_object_then_it_should_not_be_a_dictonary_but_any()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<FilterDto>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<FilterDto>();
             var json = schema.ToJson();
 
             // Assert
@@ -166,7 +166,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_static_then_it_is_ignored()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithStaticProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithStaticProperty>();
             var json = schema.ToJson();
 
             // Assert
@@ -197,7 +197,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_private_field_is_dataMember_then_it_is_not_ignored1()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithPrivateDataMember1>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithPrivateDataMember1>();
             var json = schema.ToJson();
 
             // Assert
@@ -220,7 +220,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_private_field_is_dataMember_then_it_is_not_ignored2()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithPrivateDataMember2>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithPrivateDataMember2>();
             var json = schema.ToJson();
 
             // Assert
@@ -240,7 +240,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_private_property_is_dataMember_then_it_is_not_ignored()
         {
             // Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithPrivateDataMember3>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithPrivateDataMember3>();
             var json = schema.ToJson();
 
             // Assert

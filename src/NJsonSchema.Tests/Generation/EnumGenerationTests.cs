@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -36,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateEnumMappingDescription = true
             });
@@ -60,7 +61,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Assert
@@ -78,7 +79,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
                 {
@@ -105,7 +106,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Assert
             Assert.Equal(3, schema.Properties["Bar"].ActualTypeSchema.EnumerationNames.Count);
@@ -127,7 +128,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<EnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -156,7 +157,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_string_enum_property_has_default_then_default_is_converted_to_string()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<EnumPropertyWithDefaultClass>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumPropertyWithDefaultClass>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -179,7 +180,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_enum_property_has_should_serialize_then_no_npe()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Party>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Party>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var json = schema.ToJson();
@@ -204,7 +205,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<RequiredEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<RequiredEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
                 SerializerSettings =

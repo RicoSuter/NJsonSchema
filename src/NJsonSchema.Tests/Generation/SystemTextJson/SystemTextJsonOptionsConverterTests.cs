@@ -51,7 +51,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
             };
-            var generator = new JsonSchemaGenerator(settings);
+            var generator = new SystemTextJsonSchemaGenerator(settings);
 
             // Act
             var schema = generator.Generate(typeof(Person));
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                     PropertyNamingPolicy = null
                 }
             };
-            var generator = new JsonSchemaGenerator(settings);
+            var generator = new SystemTextJsonSchemaGenerator(settings);
 
             // Act
             var schema = generator.Generate(typeof(Person));
@@ -114,7 +114,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
             };
-            var generator = new JsonSchemaGenerator(settings);
+            var generator = new SystemTextJsonSchemaGenerator(settings);
 
             // Act
             var schema = generator.Generate(typeof(AnnotatedPerson));

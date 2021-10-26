@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -41,7 +42,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType(typeof(Teacher), settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -84,7 +85,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<IFoo>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<IFoo>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -114,7 +115,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Test>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -130,7 +131,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Test>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -159,7 +160,7 @@ namespace NJsonSchema.Tests.Generation
             var settings = new NewtonsoftJsonSchemaGeneratorSettings();
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<A>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<A>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -181,10 +182,10 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act 
-            var TeacherSchema = JsonSchemaGenerator.FromType(typeof(Teacher), settings);
+            var TeacherSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var TacherData = TeacherSchema.ToJson();
 
-            var PersonSchema = JsonSchemaGenerator.FromType(typeof(Person), settings);
+            var PersonSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Person), settings);
             var PersonData = PersonSchema.ToJson();
 
             //// Assert

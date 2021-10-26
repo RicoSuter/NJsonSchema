@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -137,7 +138,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<MyStringEnumListTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -152,7 +153,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<MyStringEnumListTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -175,7 +176,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<SomeClass>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<SomeClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             //// Act

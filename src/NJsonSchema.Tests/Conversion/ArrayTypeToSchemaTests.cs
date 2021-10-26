@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Conversion
@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Conversion
             dict.Add("bar", new List<string> { "a", "b" });
             var json = JsonConvert.SerializeObject(dict);
 
-            var schema = JsonSchemaGenerator.FromType<DictionarySubType>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionarySubType>();
             var data = schema.ToJson();
 
             //// Assert
@@ -91,7 +91,7 @@ namespace NJsonSchema.Tests.Conversion
         private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyType>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
             var schemaData = schema.ToJson();
 
             //// Assert

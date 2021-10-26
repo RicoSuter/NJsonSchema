@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -32,7 +33,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_class_has_schema_processor_attribute_then_it_is_processed()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithSchemaProcessor>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithSchemaProcessor>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
             //// Assert

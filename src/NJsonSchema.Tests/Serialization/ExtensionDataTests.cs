@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
-using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using NJsonSchema.Tests.Generation;
 using Xunit;
 
@@ -94,7 +94,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -107,7 +107,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
@@ -142,7 +142,7 @@ namespace NJsonSchema.Tests.Serialization
         public async Task When_extension_data_interface_is_used_on_property_then_extension_data_property_is_set()
         {
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyCustomAttributeTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyCustomAttributeTest>();
 
             //// Assert
             Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);

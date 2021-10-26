@@ -23,7 +23,7 @@ namespace NJsonSchema.Generation
         /// <param name="contextualType">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(ContextualType contextualType, T settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, T settings)
         {
             var type = contextualType.OriginalType;
             var isNullable = IsNullable(contextualType, settings.DefaultReferenceTypeNullHandling);
@@ -48,7 +48,18 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
             }
 
-            if (type.GetTypeInfo().IsEnum)
+            return GetDescription(contextualType, settings, type, isNullable);
+        }
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="settings">The settings.</param>
+        /// <param name="originalType">The original type.</param>
+        /// <param name="isNullable">Specifies whether the type is nullable.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, T settings, Type originalType, bool isNullable)
+        {
+            if (originalType.GetTypeInfo().IsEnum)
             {
                 var isStringEnum = IsStringEnum(contextualType, settings);
                 return JsonTypeDescription.CreateForEnumeration(contextualType,
@@ -57,115 +68,116 @@ namespace NJsonSchema.Generation
 
             // Primitive types
 
-            if (type == typeof(short) ||
-                type == typeof(uint) ||
-                type == typeof(ushort))
+            if (originalType == typeof(short) ||
+                originalType == typeof(uint) ||
+                originalType == typeof(ushort))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, null);
             }
 
-            if (type == typeof(int))
+            if (originalType == typeof(int))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
             }
 
-            if (type == typeof(long) ||
-                type == typeof(ulong))
+            if (originalType == typeof(long) ||
+                originalType == typeof(ulong))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
 
-            if (type == typeof(double))
+            if (originalType == typeof(double))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
             }
 
-            if (type == typeof(float))
+            if (originalType == typeof(float))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Float);
             }
 
-            if (type == typeof(decimal))
+            if (originalType == typeof(decimal))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
             }
 
-            if (type == typeof(bool))
+            if (originalType == typeof(bool))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Boolean, false, null);
             }
 
-            if (type == typeof(string) || type == typeof(Type))
+            if (originalType == typeof(string) || originalType == typeof(Type))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
             }
 
-            if (type == typeof(char))
+            if (originalType == typeof(char))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, null);
             }
 
-            if (type == typeof(Guid))
+            if (originalType == typeof(Guid))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Guid);
             }
 
             // Date & time types
 
-            if (type == typeof(DateTime) ||
-                type == typeof(DateTimeOffset) ||
-                type.FullName == "NodaTime.OffsetDateTime" ||
-                type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime" ||
-                type.FullName == "NodaTime.Instant")
+            if (originalType == typeof(DateTime) ||
+                originalType == typeof(DateTimeOffset) ||
+                originalType.FullName == "NodaTime.OffsetDateTime" ||
+                originalType.FullName == "NodaTime.LocalDateTime" ||
+                originalType.FullName == "NodaTime.ZonedDateTime" ||
+                originalType.FullName == "NodaTime.Instant")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.DateTime);
             }
 
-            if (type == typeof(TimeSpan) ||
-                type.FullName == "NodaTime.Duration")
+            if (originalType == typeof(TimeSpan) ||
+                originalType.FullName == "NodaTime.Duration")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
             }
 
-            if (type.FullName == "NodaTime.LocalDate" ||
-                type.FullName == "System.DateOnly")
+            if (originalType.FullName == "NodaTime.LocalDate" ||
+                originalType.FullName == "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (type.FullName == "NodaTime.LocalTime" ||
-                type.FullName == "System.TimeOnly")
+            if (originalType.FullName == "NodaTime.LocalTime" ||
+                originalType.FullName == "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
 
             // Special types
 
-            if (type == typeof(Uri))
+            if (originalType == typeof(Uri))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
             }
 
-            if (type == typeof(byte))
+            if (originalType == typeof(byte))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
             }
 
-            if (type == typeof(byte[]))
+            if (originalType == typeof(byte[]))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
             }
 
-            if (type.FullName == "Newtonsoft.Json.Linq.JArray")
+            if (originalType.FullName == "Newtonsoft.Json.Linq.JArray")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
-            if (type.FullName == "Newtonsoft.Json.Linq.JToken" ||
-                type.FullName == "System.Dynamic.ExpandoObject" ||
-                type.FullName == "System.Text.Json.JsonElement" ||
-                type == typeof(object))
+            if (originalType.FullName == "Newtonsoft.Json.Linq.JToken" ||
+                originalType.FullName == "Newtonsoft.Json.Linq.JObject" ||
+                originalType.FullName == "System.Dynamic.ExpandoObject" ||
+                originalType.FullName == "System.Text.Json.JsonElement" ||
+                originalType == typeof(object))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.None, isNullable, null);
             }

@@ -10,11 +10,24 @@ using System.Linq;
 using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
 using Newtonsoft.Json;
+using System;
+using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.Generation
 {
     public class NewtonsoftJsonReflectionService : ReflectionServiceBase<NewtonsoftJsonSchemaGeneratorSettings>
     {
+        protected override JsonTypeDescription GetDescription(ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings, Type originalType, bool isNullable)
+        {
+            var contract = settings.ResolveContract(originalType);
+            if (contract is JsonStringContract)
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
+            }
+
+            return base.GetDescription(contextualType, settings, originalType, isNullable);
+        }
+
         public override bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();

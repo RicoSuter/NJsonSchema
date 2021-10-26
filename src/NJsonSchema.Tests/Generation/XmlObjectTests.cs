@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,7 +94,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes()
         {
-            var schema = JsonSchemaGenerator.FromType<WithoutXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithoutXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             
             //// Assert
             AssertTypeWithoutXmlAttributes(schema);
@@ -155,7 +156,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_without_xml_attributes_defined()
         {
-            var schema = JsonSchemaGenerator.FromType<WithoutXmlAttributesDefined[]>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithoutXmlAttributesDefined[]>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
             var schemaObject = JObject.Parse(schemaData);
 
@@ -209,7 +210,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_without_xml_attributes_and_serialized()
         {
-            var schema = JsonSchemaGenerator.FromType<WithoutXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithoutXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             var schemaData = schema.ToJson();
 
             var schemaObject = JObject.Parse(schemaData);
@@ -326,7 +327,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes()
         {
-            var schema = JsonSchemaGenerator.FromType<WithXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -389,7 +390,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_arraytype_as_parent_with_xml_attributes_defined()
         {
-            var schema = JsonSchemaGenerator.FromType<WithXmlAttributesDefined[]>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithXmlAttributesDefined[]>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -452,7 +453,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_and_serialized()
         {
-            var schema = JsonSchemaGenerator.FromType<WithXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });
@@ -486,7 +487,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_xmlobject_generation_is_active_with_a_type_with_xml_attributes_that_are_incorrect()
         {
-            var schema = JsonSchemaGenerator.FromType<WithXmlIncorrectAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<WithXmlIncorrectAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateXmlObjects = true
             });

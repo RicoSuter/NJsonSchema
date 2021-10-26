@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using NJsonSchema.Annotations;
-using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -25,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassPrimitiveJsonSchemaTypeAttributes>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassPrimitiveJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassArrayJsonSchemaTypeAttributes>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassArrayJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -94,7 +94,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassComplexJsonSchemaTypeAttributes>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassComplexJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
             //// Assert
@@ -129,7 +129,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<ClassWithReference>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithReference>();
             var json = schema.ToJson();
 
             //// Assert

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -23,7 +23,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Mno>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Mno>();
 
             //// Act
             var json = schema.ToJson();
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_field_has_no_DataMemberAttribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Xyz>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Xyz>();
 
             //// Act
             var json = schema.ToJson();
@@ -77,7 +77,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_indexer_property_has_ignore_attribute_then_it_is_ignored()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
 
             //// Act
             var json = schema.ToJson();

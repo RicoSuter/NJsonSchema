@@ -1,4 +1,4 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -18,7 +18,7 @@ namespace NJsonSchema.Tests.Generation
             
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<MyTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
             var json = schema.ToJson();
 
             //// Assert

@@ -1,4 +1,4 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -62,7 +62,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert
@@ -76,7 +76,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var schemaData = schema.ToJson();
 
             //// Assert

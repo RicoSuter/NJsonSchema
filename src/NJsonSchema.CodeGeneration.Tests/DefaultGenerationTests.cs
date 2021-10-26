@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
@@ -20,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             //// Arrange
             
             //// Act
-            var schema = JsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Assert
             Assert.Equal("foo", schema.Properties["Test"].Default); 
@@ -30,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_INPC_CSharp_code()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema);
@@ -45,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_property_has_default_attribute_then_default_value_is_set_in_generated_Poco_CSharp_code()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DefaultPropertyGenerationClass>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema);

@@ -1,5 +1,6 @@
 ﻿using Namotion.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
@@ -10,12 +11,15 @@ using System.Runtime.Serialization;
 
 namespace NJsonSchema.NewtonsoftJson.Generation
 {
-    public  class NewtonsoftJsonSchemaGenerator : JsonSchemaGenerator
+    public class NewtonsoftJsonSchemaGenerator : JsonSchemaGenerator
     {
-        public NewtonsoftJsonSchemaGenerator(NewtonsoftJsonSchemaGeneratorSettings settings) 
+        public NewtonsoftJsonSchemaGenerator(NewtonsoftJsonSchemaGeneratorSettings settings)
             : base(settings)
         {
         }
+
+        /// <summary>Gets the settings.</summary>
+        public new NewtonsoftJsonSchemaGeneratorSettings Settings => (NewtonsoftJsonSchemaGeneratorSettings)base.Settings;
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
@@ -53,34 +57,6 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             return generator.Generate(type);
         }
 
-        /// <summary>Gets the converted property name.</summary>
-        /// <param name="jsonProperty">The property.</param>
-        /// <param name="accessorInfo">The accessor info.</param>
-        /// <returns>The property name.</returns>
-        public override string GetPropertyName(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo)
-        {
-            if (jsonProperty?.PropertyName != null)
-            {
-                return jsonProperty.PropertyName;
-            }
-
-            try
-            {
-                var propertyName = accessorInfo.GetName();
-
-                var contractResolver = ((NewtonsoftJsonSchemaGeneratorSettings)Settings).ActualContractResolver as DefaultContractResolver;
-                return contractResolver != null
-                    ? contractResolver.GetResolvedPropertyName(propertyName)
-                    : propertyName;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("Could not get JSON property name of property '" +
-                    (accessorInfo != null ? accessorInfo.Name : "n/a") + "' and type '" +
-                    (accessorInfo?.MemberInfo?.DeclaringType != null ? accessorInfo.MemberInfo.DeclaringType.FullName : "n/a") + "'.", e);
-            }
-        }
-
         protected override void GenerateProperties(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
             // TODO(reflection): Here we should use ContextualAccessorInfo to avoid losing information
@@ -91,14 +67,14 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 .OfType<MemberInfo>()
                 .Concat(
                     type.GetTypeInfo().DeclaredProperties
-                    .Where(p => (p.GetMethod?.IsPrivate != true && p.GetMethod?.IsStatic == false) ||
-                                (p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false) ||
+                    .Where(p => p.GetMethod?.IsPrivate != true && p.GetMethod?.IsStatic == false ||
+                                p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false ||
                                 p.IsDefined(typeof(DataMemberAttribute)))
                 )
                 .ToList();
 
             var contextualAccessors = members.Select(m => m.ToContextualAccessor()); // TODO(reflection): Do not use this method
-            var contract = ((NewtonsoftJsonSchemaGeneratorSettings)Settings).ResolveContract(type);
+            var contract = Settings.ResolveContract(type);
 
             var allowedProperties = GetTypeProperties(type);
             var objectContract = contract as JsonObjectContract;
@@ -158,6 +134,84 @@ namespace NJsonSchema.NewtonsoftJson.Generation
 
                     LoadPropertyOrField(jsonProperty, memberInfo, type, schema, schemaResolver);
                 }
+            }
+        }
+
+        private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)
+        {
+            var propertyTypeDescription = Settings.ReflectionService.GetDescription(accessorInfo.AccessorType, Settings);
+            if (jsonProperty.Ignored == false && IsPropertyIgnoredBySettings(accessorInfo) == false)
+            {
+                var propertyName = GetPropertyName(jsonProperty, accessorInfo);
+                var propertyAlreadyExists = parentSchema.Properties.ContainsKey(propertyName);
+
+                if (propertyAlreadyExists)
+                {
+                    if (Settings.GetActualFlattenInheritanceHierarchy(parentType))
+                    {
+                        parentSchema.Properties.Remove(propertyName);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+                    }
+                }
+
+                var requiredAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+
+                var hasJsonNetAttributeRequired = jsonProperty.Required == Required.Always || jsonProperty.Required == Required.AllowNull;
+                var isDataContractMemberRequired = GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
+
+                var hasRequiredAttribute = requiredAttribute != null;
+                if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
+                {
+                    parentSchema.RequiredProperties.Add(propertyName);
+                }
+
+                var isNullable = propertyTypeDescription.IsNullable &&
+                    hasRequiredAttribute == false &&
+                    (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
+
+                var defaultValue = jsonProperty.DefaultValue;
+
+                AddProperty(accessorInfo, parentSchema, schemaResolver, propertyTypeDescription, propertyName, requiredAttribute, hasRequiredAttribute, isNullable, defaultValue);
+            }
+        }
+
+        protected override string ConvertEnumValue(object value)
+        {
+            var converters = Settings.SerializerSettings.Converters.ToList();
+            if (!converters.OfType<StringEnumConverter>().Any())
+            {
+                converters.Add(new StringEnumConverter());
+            }
+
+            var json = JsonConvert.SerializeObject(value, Formatting.None, converters.ToArray());
+            var enumString = JsonConvert.DeserializeObject<string>(json);
+            return enumString;
+        }
+
+        private string GetPropertyName(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo)
+        {
+            if (jsonProperty?.PropertyName != null)
+            {
+                return jsonProperty.PropertyName;
+            }
+
+            try
+            {
+                var propertyName = accessorInfo.GetName();
+
+                var contractResolver = Settings.ActualContractResolver as DefaultContractResolver;
+                return contractResolver != null
+                    ? contractResolver.GetResolvedPropertyName(propertyName)
+                    : propertyName;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Could not get JSON property name of property '" +
+                    (accessorInfo != null ? accessorInfo.Name : "n/a") + "' and type '" +
+                    (accessorInfo?.MemberInfo?.DeclaringType != null ? accessorInfo.MemberInfo.DeclaringType.FullName : "n/a") + "'.", e);
             }
         }
     }

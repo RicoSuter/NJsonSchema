@@ -1,4 +1,4 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace NJsonSchema.Tests.Conversion
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Person>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var json = schema.ToJson();
 
             //// Assert
@@ -25,7 +25,7 @@ namespace NJsonSchema.Tests.Conversion
             //// Arrange
 
             //// Act
-            var schema = JsonSchemaGenerator.FromType<Car>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Car>();
 
             //// Assert
             Assert.Equal(schema, schema.Properties["Person"].ActualTypeSchema.Properties["Car"].ActualTypeSchema);
@@ -35,7 +35,7 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_a_referencing_type_then_path_is_in_json()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<Person>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
 
             //// Act
             var json = schema.ToJson();
@@ -48,7 +48,7 @@ namespace NJsonSchema.Tests.Conversion
         public async Task When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
             //// Arrange
-            var schema = JsonSchemaGenerator.FromType<House>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<House>();
 
             //// Act
             var json = schema.ToJson();
