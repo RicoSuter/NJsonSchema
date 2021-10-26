@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NJsonSchema.Generation;
+using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace NJsonSchema.Demo.Performance
             stopwatch.Start();
             for (int i = 0; i < 500; i++)
             {
-                var schema = JsonSchema.FromType<Container>();
+                var schema = JsonSchemaGenerator.FromType<Container>();
                 var json = schema.ToJson();
             }
             stopwatch.Stop();

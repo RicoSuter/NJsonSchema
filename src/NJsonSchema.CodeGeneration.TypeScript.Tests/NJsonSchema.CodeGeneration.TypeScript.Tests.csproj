@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp5.0;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp5.0;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1998,1591</NoWarn>
@@ -11,12 +11,13 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net452'" Include="System.ComponentModel.DataAnnotations">
+    <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations">
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
-    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+      <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
+      <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
 </Project>

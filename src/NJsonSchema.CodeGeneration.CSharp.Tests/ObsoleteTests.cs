@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -35,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_obsolete_then_obsolete_attribute_is_rendered()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObsoletePropertyTestClass>();
+            var schema = JsonSchemaGenerator.FromType<ObsoletePropertyTestClass>();
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -50,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_obsolete_with_a_message_then_obsolete_attribute_with_a_message_is_rendered()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObsoletePropertyWithMessageTestClass>();
+            var schema = JsonSchemaGenerator.FromType<ObsoletePropertyWithMessageTestClass>();
             var generator = new CSharpGenerator(schema);
 
             //// Act
@@ -66,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
 #pragma warning disable 612
-            var schema = JsonSchema.FromType<ObsoleteTestClass>();
+            var schema = JsonSchemaGenerator.FromType<ObsoleteTestClass>();
 #pragma warning restore 612
             var generator = new CSharpGenerator(schema);
 
@@ -83,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
 #pragma warning disable 618
-            var schema = JsonSchema.FromType<ObsoleteWithMessageTestClass>();
+            var schema = JsonSchemaGenerator.FromType<ObsoleteWithMessageTestClass>();
 #pragma warning restore 618
             var generator = new CSharpGenerator(schema);
 

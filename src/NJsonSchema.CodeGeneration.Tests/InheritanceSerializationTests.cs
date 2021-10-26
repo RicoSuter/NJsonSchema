@@ -14,6 +14,7 @@ using Xunit;
 using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
@@ -99,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
-            var schema = JsonSchema.FromType<Container>();
+            var schema = JsonSchemaGenerator.FromType<Container>();
             var schemaJson = schema.ToJson();
             var errors = schema.Validate(json);
 
@@ -205,7 +206,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = JsonSchemaGenerator.FromType<Container>();
 
             //// Act
             var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
@@ -224,7 +225,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_mappings_are_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = JsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
@@ -241,7 +242,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = JsonSchemaGenerator.FromType<Container>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
@@ -257,7 +258,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = JsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
@@ -313,7 +314,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
 
-#if NET452
+#if NET461
             compilation = compilation.AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),

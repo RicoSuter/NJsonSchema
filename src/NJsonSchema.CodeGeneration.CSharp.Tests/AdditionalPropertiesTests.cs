@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_dictionary_and_no_object_are_not_same()
         {
             // Arrange
-            var schema = JsonSchema.FromType<Book>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Book>(new JsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
@@ -84,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_any_page_has_additional_properties()
         {
             // Arrange
-            var schema = JsonSchema.FromType<Book>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Book>(new JsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp5.0;net46;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp5.0;net461</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
       <LangVersion>8</LangVersion>
@@ -54,18 +54,18 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.Text.Json" Version="4.6.0" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0" />
 
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
 
     <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net452'" Include="System.ComponentModel.DataAnnotations"></Reference>
-    <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations"></Reference>
+    <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations"></Reference>
 
     <PackageReference Include="NodaTime" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
 

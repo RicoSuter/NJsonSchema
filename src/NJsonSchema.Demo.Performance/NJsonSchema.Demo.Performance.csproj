@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp5.0</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
-  </ItemGroup>
-
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp5.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
+        <ProjectReference Include="..\NJsonSchema.Generation\NJsonSchema.Generation.csproj" />
+        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    </ItemGroup>
 </Project>

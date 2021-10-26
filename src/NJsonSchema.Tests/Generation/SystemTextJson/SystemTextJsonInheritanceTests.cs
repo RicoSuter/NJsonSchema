@@ -1,5 +1,6 @@
-﻿#if !NET46 && !NET452
+﻿#if !NET461
 
+using NJsonSchema.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,7 +30,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task When_using_JsonInheritanceAttribute_and_SystemTextJson_then_schema_is_correct()
         {
             //// Act
-            var schema = JsonSchema.FromType<Fruit>();
+            var schema = JsonSchemaGenerator.FromType<Fruit>();
             var data = schema.ToJson();
 
             //// Assert

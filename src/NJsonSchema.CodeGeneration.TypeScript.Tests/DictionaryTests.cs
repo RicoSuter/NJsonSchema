@@ -215,7 +215,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<DictionaryContainer>();
+            var schema = JsonSchemaGenerator.FromType<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act

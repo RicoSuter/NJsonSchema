@@ -46,7 +46,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_object_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<QueryRule>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<QueryRule>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_number_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<int?>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<int?>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
@@ -86,7 +86,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_string_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<string>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<string>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_boolean_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<bool?>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<bool?>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
@@ -126,7 +126,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_array_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<int[]>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<int[]>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
@@ -146,7 +146,7 @@ namespace NJsonSchema.Tests.Validation
         public async Task When_enum_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NullablePropertyClass<AttributeTargets?>>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<NullablePropertyClass<AttributeTargets?>>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });

@@ -42,7 +42,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<MyController>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<MyController>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -64,7 +64,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<ContainerWithEnumDictionary>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ContainerWithEnumDictionary>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.Integer
             });
@@ -96,7 +96,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             // Act
-            var schema = JsonSchema.FromType<MyEnum>(settings);
+            var schema = JsonSchemaGenerator.FromType<MyEnum>(settings);
             var json = schema.ToJson();
 
             // Assert
@@ -121,7 +121,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<EnumWithFlags>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumWithFlags>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.String
             });
@@ -145,7 +145,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<EnumWithoutFlags>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<EnumWithoutFlags>(new JsonSchemaGeneratorSettings
             {
                 DefaultEnumHandling = EnumHandling.String
             });

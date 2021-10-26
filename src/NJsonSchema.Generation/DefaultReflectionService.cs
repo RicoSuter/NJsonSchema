@@ -342,7 +342,7 @@ namespace NJsonSchema.Generation
 #else
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
         protected virtual bool IsArrayType(ContextualType contextualType)
         {

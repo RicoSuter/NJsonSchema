@@ -44,6 +44,42 @@ namespace NJsonSchema.Generation
             Settings = settings;
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>()
+        {
+            return FromType<TType>(new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type)
+        {
+            return FromType(type, new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(typeof(TType));
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(type);
+        }
+
         /// <summary>Gets the settings.</summary>
         public JsonSchemaGeneratorSettings Settings { get; }
 
@@ -1409,7 +1445,7 @@ namespace NJsonSchema.Generation
         {
             Attribute[] extensionAttributes;
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_0 || NETSTANDARD1_3
             extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes().Where(attribute =>
                 attribute.GetType().GetTypeInfo().ImplementedInterfaces.Contains(typeof(IJsonSchemaExtensionDataAttribute))).ToArray();
 #else

@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
             }";
 
             //// Act
-            var schema = JsonSchema.FromSampleJson(data);
+            var schema = SampleJsonSchemaGenerator.FromSampleJson(data);
             var json = schema.ToJson();
             var property = schema.Properties["persons"].ActualTypeSchema;
 
@@ -94,7 +94,7 @@ namespace NJsonSchema.Tests.Generation
 }";
 
             //// Act
-            var schema = JsonSchema.FromSampleJson(data);
+            var schema = SampleJsonSchemaGenerator.FromSampleJson(data);
             var json = schema.ToJson();
 
             //// Assert

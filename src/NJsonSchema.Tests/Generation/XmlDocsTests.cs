@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NJsonSchema.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,7 +26,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_example_xml_docs_is_defined_then_examples_can_be_defined()
         {
             /// Act
-            var schema = JsonSchema.FromType<AbstractClass>();
+            var schema = JsonSchemaGenerator.FromType<AbstractClass>();
             var json = schema.ToJson(Formatting.None);
 
             /// Assert

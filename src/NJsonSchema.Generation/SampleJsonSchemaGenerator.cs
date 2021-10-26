@@ -33,6 +33,14 @@ namespace NJsonSchema.Generation
             return schema;
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromSampleJson(string data)
+        {
+            var generator = new SampleJsonSchemaGenerator();
+            return generator.Generate(data);
+        }
+
         private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)

@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Nested>(new JsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
@@ -71,7 +71,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<Nested>(new JsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_parameter_is_abstract_then_generate_union_interface()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>();
+            var schema = JsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
             //// Act
@@ -117,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_parameter_is_abstract_then_generate_union_class()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Nested>();
+            var schema = JsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
             //// Act

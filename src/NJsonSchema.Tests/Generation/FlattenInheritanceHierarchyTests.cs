@@ -37,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType(typeof(Teacher), settings);
+            var schema = JsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -77,7 +77,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType<IFoo>(settings);
+            var schema = JsonSchemaGenerator.FromType<IFoo>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -107,7 +107,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType<Test>(settings);
+            var schema = JsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -123,7 +123,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType<Test>(settings);
+            var schema = JsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -152,7 +152,7 @@ namespace NJsonSchema.Tests.Generation
             var settings = new JsonSchemaGeneratorSettings();
 
             //// Act
-            var schema = JsonSchema.FromType<A>(settings);
+            var schema = JsonSchemaGenerator.FromType<A>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -174,10 +174,10 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act 
-            var TeacherSchema = JsonSchema.FromType(typeof(Teacher), settings);
+            var TeacherSchema = JsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var TacherData = TeacherSchema.ToJson();
 
-            var PersonSchema = JsonSchema.FromType(typeof(Person), settings);
+            var PersonSchema = JsonSchemaGenerator.FromType(typeof(Person), settings);
             var PersonData = PersonSchema.ToJson();
 
             //// Assert

@@ -40,7 +40,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_sample_data_is_generated_from_schema_then_properties_are_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>();
+            var schema = JsonSchemaGenerator.FromType<Person>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act
@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_sample_data_is_generated_from_schema_with_base_then_properties_are_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Student>();
+            var schema = JsonSchemaGenerator.FromType<Student>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act
@@ -77,7 +77,7 @@ namespace NJsonSchema.Tests.Generation
         public void Default_values_are_set_for_arrays()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Measurements>();
+            var schema = JsonSchemaGenerator.FromType<Measurements>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act

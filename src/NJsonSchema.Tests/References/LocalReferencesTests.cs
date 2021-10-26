@@ -4,10 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
+using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.References
 {
-    using NJsonSchema.Generation;
 
     public class LocalReferencesTests
     {

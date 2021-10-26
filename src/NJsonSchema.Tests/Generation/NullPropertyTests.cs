@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -19,7 +20,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_nullable_then_property_schema_type_is_also_null()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassRoom>();
+            var schema = JsonSchemaGenerator.FromType<ClassRoom>();
             
             //// Act
             var json = schema.ToJson();
@@ -46,7 +47,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_NotNullAttribute_is_available_then_property_is_not_nullable()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<NotNullAttributeClass>();
+            var schema = JsonSchemaGenerator.FromType<NotNullAttributeClass>();
 
             //// Act
             var json = schema.ToJson();

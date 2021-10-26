@@ -21,7 +21,7 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        internal static string GetName(this ContextualAccessorInfo accessorInfo)
+        public static string GetName(this ContextualAccessorInfo accessorInfo)
         {
             if (!_names.ContainsKey(accessorInfo))
             {

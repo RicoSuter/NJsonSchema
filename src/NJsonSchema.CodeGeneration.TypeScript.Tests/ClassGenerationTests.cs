@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
-            var schema = JsonSchema.FromType<MyClassTest>();
+            var schema = JsonSchemaGenerator.FromType<MyClassTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -322,7 +322,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
         {
             // Assert
-            var schema = JsonSchema.FromType(
+            var schema = JsonSchemaGenerator.FromType(
                 typeof(MyDerivedClass),
                 new JsonSchemaGeneratorSettings
                 {

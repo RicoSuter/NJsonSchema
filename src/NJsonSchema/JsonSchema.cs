@@ -18,7 +18,6 @@ using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Collections;
-using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
 using NJsonSchema.Validation.FormatValidators;
@@ -88,50 +87,6 @@ namespace NJsonSchema
         public static string ToolchainVersion => typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
                                                  " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 #endif
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>()
-        {
-            return FromType<TType>(new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type)
-        {
-            return FromType(type, new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType));
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type);
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
-        /// <returns>The JSON Schema.</returns>
-        public static JsonSchema FromSampleJson(string data)
-        {
-            var generator = new SampleJsonSchemaGenerator();
-            return generator.Generate(data);
-        }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>

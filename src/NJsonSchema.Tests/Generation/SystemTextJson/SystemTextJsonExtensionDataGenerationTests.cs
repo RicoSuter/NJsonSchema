@@ -1,4 +1,4 @@
-﻿#if !NET46 && !NET452
+﻿#if !NET461
 
 using System.Collections.Generic;
 using System.Text.Json;
@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public void SystemTextJson_When_class_has_object_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithObjectExtensionData>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithObjectExtensionData>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
                 SerializerOptions = new JsonSerializerOptions()
@@ -46,7 +46,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public void SystemTextJson_When_class_has_JsonElement_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithJsonElementExtensionData>(new JsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithJsonElementExtensionData>(new JsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
                 SerializerOptions = new JsonSerializerOptions()

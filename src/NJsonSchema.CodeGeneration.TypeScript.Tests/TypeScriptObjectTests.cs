@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.TypeScript;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -16,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObjectTest>();
+            var schema = JsonSchemaGenerator.FromType<ObjectTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -40,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<DictionaryObjectTest>();
+            var schema = JsonSchemaGenerator.FromType<DictionaryObjectTest>();
             var data = schema.ToJson();
 
             //// Act

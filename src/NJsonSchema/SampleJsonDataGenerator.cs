@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NJsonSchema.Generation
+namespace NJsonSchema
 {
     /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
     public class SampleJsonDataGenerator

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -18,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_schema_contains_range_then_code_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<RangeClass>();
+            var schema = JsonSchemaGenerator.FromType<RangeClass>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -25,7 +26,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_key_is_enum_then_typescript_has_string_key()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<EnumKeyDictionaryTest>();
+            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -45,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_key_is_enum_then_typescript_has_enum_key_ts_2_1()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<EnumKeyDictionaryTest>();
+            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -62,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_key_is_string_literal_then_typescript_has_string_literal_key_ts_2_1()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<EnumKeyDictionaryTest>();
+            var schema = JsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -99,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_dictionary_value_is_enum_then_typescript_has_enum_value()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<EnumValueDictionaryTest>();
+            var schema = JsonSchemaGenerator.FromType<EnumValueDictionaryTest>();
             var data = schema.ToJson();
 
             //// Act
