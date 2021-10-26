@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.SchemaProcessors;
+using NJsonSchema.NewtonsoftJson.Converters;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation

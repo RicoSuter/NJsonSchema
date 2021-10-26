@@ -9,12 +9,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Converters;
 using Xunit;
 using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {

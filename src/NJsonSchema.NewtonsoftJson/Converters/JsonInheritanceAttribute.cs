@@ -8,7 +8,7 @@
 
 using System;
 
-namespace NJsonSchema.Converters
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     /// <summary>Defines a child class in the inheritance chain.</summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]

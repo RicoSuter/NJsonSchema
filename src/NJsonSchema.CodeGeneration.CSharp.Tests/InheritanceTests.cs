@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp

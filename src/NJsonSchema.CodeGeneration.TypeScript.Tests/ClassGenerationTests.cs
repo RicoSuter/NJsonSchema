@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

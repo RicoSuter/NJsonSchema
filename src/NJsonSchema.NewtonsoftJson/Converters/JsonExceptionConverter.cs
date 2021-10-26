@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
-namespace NJsonSchema.Converters
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     // IMPORTANT: Always sync with JsonExceptionConverterTemplate.tt in NSwag, IMPORTANT: Copy from CanWrite property
 

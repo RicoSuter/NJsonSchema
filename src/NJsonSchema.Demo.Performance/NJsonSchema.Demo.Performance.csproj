@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.Newtonsoft.Json\NJsonSchema.Newtonsoft.Json.csproj" />
+    <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
 

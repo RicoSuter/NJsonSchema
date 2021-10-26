@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 using Namotion.Reflection;
 using Newtonsoft.Json.Serialization;
 
-namespace NJsonSchema.Converters
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     // TODO: Add caching
 

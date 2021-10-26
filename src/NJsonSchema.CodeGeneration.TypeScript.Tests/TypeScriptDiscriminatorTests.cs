@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Xunit;
+using NJsonSchema.NewtonsoftJson.Converters;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {

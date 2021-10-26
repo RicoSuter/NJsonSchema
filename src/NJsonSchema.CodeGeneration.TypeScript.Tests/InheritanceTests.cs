@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
+using NJsonSchema.NewtonsoftJson.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;

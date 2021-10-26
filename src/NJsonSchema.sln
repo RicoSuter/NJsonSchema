@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Newtonsoft.Json", "NJsonSchema.Newtonsoft.Json\NJsonSchema.Newtonsoft.Json.csproj", "{A9C2A9CD-44F6-4A21-9D72-00CF5BE0A36F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.NewtonsoftJson", "NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj", "{A9C2A9CD-44F6-4A21-9D72-00CF5BE0A36F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
