@@ -141,7 +141,7 @@ namespace NJsonSchema.Tests.References
         }
 
         [Theory]
-        [InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
+        //[InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
         [InlineData("b#r")] // Non-escaped ill-formed JSON Pointer
         public async Task When_definitions_have_sharp_in_type_name(string referenceTypeName)
         {
