@@ -25,6 +25,7 @@
     <ItemGroup>
         <PackageReference Include="Namotion.Reflection" Version="2.0.3" />
         <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+        <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
         <PackageReference Include="Microsoft.Bcl.Async">
