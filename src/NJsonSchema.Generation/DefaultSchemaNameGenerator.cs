@@ -31,11 +31,7 @@ namespace NJsonSchema.Generation
 
             var nType = type.ToCachedType();
 
-#if !LEGACY
             if (nType.Type.IsConstructedGenericType)
-#else
-            if (nType.Type.IsGenericType)
-#endif
             {
                 return GetName(nType).Split('`').First() + "Of" +
                        string.Join("And", nType.GenericArguments

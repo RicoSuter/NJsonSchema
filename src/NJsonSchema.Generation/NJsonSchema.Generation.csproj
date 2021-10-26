@@ -17,9 +17,6 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DefineConstants>TRACE;DEBUG</DefineConstants>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
-        <DefineConstants>LEGACY</DefineConstants>
-    </PropertyGroup>
     <PropertyGroup>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     </PropertyGroup>

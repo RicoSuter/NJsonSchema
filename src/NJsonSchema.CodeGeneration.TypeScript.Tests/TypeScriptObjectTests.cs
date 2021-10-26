@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.Generation;
 using Xunit;
 

@@ -44,6 +44,42 @@ namespace NJsonSchema.Generation
             Settings = settings;
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>()
+        {
+            return FromType<TType>(new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type)
+        {
+            return FromType(type, new JsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(typeof(TType));
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(type);
+        }
+
         /// <summary>Gets the settings.</summary>
         public JsonSchemaGeneratorSettings Settings { get; }
 
@@ -877,7 +913,6 @@ namespace NJsonSchema.Generation
         {
             // TODO(reflection): Here we should use ContextualAccessorInfo to avoid losing information
 
-#if !LEGACY
             var members = type.GetTypeInfo()
                 .DeclaredFields
                 .Where(f => !f.IsPrivate && !f.IsStatic || f.IsDefined(typeof(DataMemberAttribute)))
@@ -889,19 +924,6 @@ namespace NJsonSchema.Generation
                                 p.IsDefined(typeof(DataMemberAttribute)))
                 )
                 .ToList();
-#else
-            var members = type.GetTypeInfo()
-                .GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-                .Where(f => !f.IsPrivate && !f.IsStatic)
-                .OfType<MemberInfo>()
-                .Concat(
-                    type.GetTypeInfo()
-                    .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => (p.GetGetMethod()?.IsPrivate != true && p.GetGetMethod()?.IsStatic == false) ||
-                                (p.GetSetMethod()?.IsPrivate != true && p.GetSetMethod()?.IsStatic == false))
-                )
-                .ToList();
-#endif
 
             var contextualAccessors = members.Select(m => m.ToContextualAccessor()); // TODO(reflection): Do not use this method
             var contract = Settings.ResolveContract(type);
@@ -971,11 +993,7 @@ namespace NJsonSchema.Generation
         {
             return memberInfo is ContextualPropertyInfo propertyInfo &&
                    !propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface &&
-#if !LEGACY
                    (propertyInfo.PropertyInfo.GetMethod?.IsAbstract == true || propertyInfo.PropertyInfo.SetMethod?.IsAbstract == true);
-#else
-                   (propertyInfo.PropertyInfo.GetGetMethod()?.IsAbstract == true || propertyInfo.PropertyInfo.GetSetMethod()?.IsAbstract == true);
-#endif
         }
 
         private void GenerateKnownTypes(Type type, JsonSchemaResolver schemaResolver)
@@ -1111,11 +1129,7 @@ namespace NJsonSchema.Generation
 
             if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
-#if !LEGACY
                 foreach (var i in type.Type.GetTypeInfo().ImplementedInterfaces)
-#else
-                foreach (var i in type.Type.GetTypeInfo().GetInterfaces())
-#endif
                 {
                     var typeDescription = Settings.ReflectionService.GetDescription(i.ToContextualType(), Settings);
                     if (!typeDescription.IsDictionary && !type.Type.IsArray &&

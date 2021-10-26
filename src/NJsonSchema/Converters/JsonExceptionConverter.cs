@@ -18,8 +18,6 @@ namespace NJsonSchema.Converters
 {
     // IMPORTANT: Always sync with JsonExceptionConverterTemplate.tt in NSwag, IMPORTANT: Copy from CanWrite property
 
-#if !LEGACY
-
     /// <summary>A converter to correctly serialize exception objects.</summary>
     public class JsonExceptionConverter : JsonConverter
     {
@@ -221,6 +219,4 @@ namespace NJsonSchema.Converters
             }
         }
     }
-
-#endif
 }

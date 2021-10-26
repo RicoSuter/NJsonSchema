@@ -50,13 +50,8 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-#if !LEGACY
         public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject,
             IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#else
-        public static IDictionary<object, string> GetJsonPaths(object rootObject,
-            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#endif
         {
             if (rootObject == null)
             {

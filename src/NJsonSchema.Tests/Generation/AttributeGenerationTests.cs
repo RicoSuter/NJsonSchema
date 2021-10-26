@@ -11,8 +11,6 @@ namespace NJsonSchema.Tests.Generation
 {
     public class AttributeGenerationTests
     {
-#if !LEGACY
-
         [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
@@ -40,8 +38,6 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(3, property.MinLength);
             Assert.Equal(5, property.MaxLength);
         }
-
-#endif
 
         [Fact]
         public async Task When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
@@ -174,16 +170,12 @@ namespace NJsonSchema.Tests.Generation
 
         public class AttributeTestClass
         {
-#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
-#endif
             public string[] Items { get; set; }
 
-#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
-#endif
             public string String { get; set; }
 
             [Range(5.5, 10.5)]

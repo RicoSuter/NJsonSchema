@@ -80,15 +80,10 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-#if LEGACY
-        public static string ToolchainVersion => typeof(JsonSchema).Assembly.GetName().Version +
-                                                 " NET40 (Newtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
-#else
         public static string ToolchainVersion => version;
 
         private static readonly string version = typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
-                                                 " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
-#endif
+            " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
@@ -235,11 +230,7 @@ namespace NJsonSchema
         /// <summary>Gets the list of all inherited/parent schemas.</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
-#if !LEGACY
         public IReadOnlyCollection<JsonSchema> AllInheritedSchemas
-#else
-        public ICollection<JsonSchema> AllInheritedSchemas
-#endif
         {
             get
             {
@@ -269,11 +260,7 @@ namespace NJsonSchema
         /// <remarks>Used for code generation.</remarks>
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
         [JsonIgnore]
-#if !LEGACY
         public IReadOnlyDictionary<string, JsonSchemaProperty> ActualProperties
-#else
-        public IDictionary<string, JsonSchemaProperty> ActualProperties
-#endif
         {
             get
             {
@@ -292,11 +279,7 @@ namespace NJsonSchema
                     throw new InvalidOperationException("The properties " + string.Join(", ", duplicatedProperties.Select(g => "'" + g.Key + "'")) + " are defined multiple times.");
                 }
 
-#if !LEGACY
                 return new ReadOnlyDictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#else
-                return new Dictionary<string, JsonSchemaProperty>(properties.ToDictionary(p => p.Key, p => p.Value));
-#endif
             }
         }
 

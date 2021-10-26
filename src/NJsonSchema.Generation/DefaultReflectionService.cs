@@ -283,11 +283,7 @@ namespace NJsonSchema.Generation
             return parameterTypeName == "IFormFile" ||
                    contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
                    contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
-#if !LEGACY
                    contextualType.TypeInfo.ImplementedInterfaces.Any(i => i.Name == "IFormFile");
-#else
-                   contextualType.TypeInfo.GetInterfaces().Any(i => i.Name == "IFormFile");
-#endif
         }
 
         /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
@@ -300,8 +296,6 @@ namespace NJsonSchema.Generation
         {
             return contextualType.TypeName == "IAsyncEnumerable`1";
         }
-
-#if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
         /// <param name="contextualType">The type.</param>
@@ -338,48 +332,6 @@ namespace NJsonSchema.Generation
                 (contextualType.TypeInfo.BaseType == null ||
                     !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
-
-#else
-
-        /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="contextualType">The type.</param>
-        /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(ContextualType contextualType)
-        {
-            if (IsDictionaryType(contextualType))
-            {
-                return false;
-            }
-
-            // TODO: Improve these checks
-            if (contextualType.TypeName == "ObservableCollection`1")
-            {
-                return true;
-            }
-
-            return contextualType.Type.IsArray || 
-                (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
-                (contextualType.TypeInfo.BaseType == null ||
-                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
-        }
-
-        /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="contextualType">The type.</param>
-        /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(ContextualType contextualType)
-        {
-            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
-            {
-                return true;
-            }
-
-            return contextualType.Type.GetInterfaces().Contains(typeof(IDictionary)) &&
-                (contextualType.TypeInfo.BaseType == null ||
-                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
-        }
-
-#endif
-
         private bool HasStringEnumConverter(ContextualType contextualType)
         {
             dynamic jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");

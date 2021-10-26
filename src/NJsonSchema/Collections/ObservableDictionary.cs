@@ -20,10 +20,8 @@ namespace NJsonSchema.Collections
     /// <typeparam name="TValue">The type of the value. </typeparam>
     internal class ObservableDictionary<TKey, TValue> :
         IDictionary<TKey, TValue>, INotifyCollectionChanged,
-        INotifyPropertyChanged, IDictionary
-#if !LEGACY
-        , IReadOnlyDictionary<TKey, TValue>
-#endif
+        INotifyPropertyChanged, IDictionary, 
+        IReadOnlyDictionary<TKey, TValue>
     {
         private IDictionary<TKey, TValue> _dictionary;
 
@@ -211,11 +209,7 @@ namespace NJsonSchema.Collections
 
         ICollection IDictionary.Keys => ((IDictionary) Dictionary).Keys;
 
-#if !LEGACY
-
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
-
-#endif
 
         public virtual bool Remove(TKey key)
         {
@@ -242,11 +236,7 @@ namespace NJsonSchema.Collections
             return Dictionary.TryGetValue(key, out value);
         }
 
-#if !LEGACY
-
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
-
-#endif
 
         public ICollection<TValue> Values => Dictionary.Values;
 

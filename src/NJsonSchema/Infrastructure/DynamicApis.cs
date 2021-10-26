@@ -356,18 +356,11 @@ namespace NJsonSchema.Infrastructure
             }
         }
 
-#if LEGACY
-        internal static async Task<T> FromResult<T>(T result)
-        {
-            return result;
-        }
-#else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Task<T> FromResult<T>(T result)
         {
             return Task.FromResult(result);
         }
-#endif
 
         private static Type TryLoadType(params string[] typeNames)
         {
