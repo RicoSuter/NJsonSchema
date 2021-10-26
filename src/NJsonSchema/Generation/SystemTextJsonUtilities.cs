@@ -42,7 +42,7 @@ namespace NJsonSchema.Generation
             return settings;
         }
 
-        internal class SystemTextJsonContractResolver : DefaultContractResolver
+        private sealed class SystemTextJsonContractResolver : DefaultContractResolver
         {
             private readonly dynamic _serializerOptions;
 
@@ -56,9 +56,19 @@ namespace NJsonSchema.Generation
                 var attributes = member.GetCustomAttributes(true);
 
                 var property = base.CreateProperty(member, memberSerialization);
-                property.Ignored = 
-                    attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName) != null ||
-                    attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
+
+                var propertyIgnored = false;
+                var jsonIgnoreAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
+                if (jsonIgnoreAttribute != null)
+                {
+                    var condition = jsonIgnoreAttribute.TryGetPropertyValue<object>("Condition");
+                    if (condition is null || condition.ToString() == "Always")
+                    {
+                        propertyIgnored = true;
+                    }
+                }
+
+                property.Ignored = propertyIgnored || attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
 
                 if (_serializerOptions.PropertyNamingPolicy != null)
                 {
@@ -67,7 +77,7 @@ namespace NJsonSchema.Generation
 
                 dynamic jsonPropertyNameAttribute = attributes
                     .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
-                
+
                 if (jsonPropertyNameAttribute != null && !string.IsNullOrEmpty(jsonPropertyNameAttribute.Name))
                 {
                     property.PropertyName = jsonPropertyNameAttribute.Name;

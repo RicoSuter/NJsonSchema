@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,7 +29,8 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToLowerInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
+            input = ConvertDashesToCamelCase(
+                (input[0].ToString().ToLowerInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
@@ -55,7 +58,8 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase((input[0].ToString().ToUpperInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
+            input = ConvertDashesToCamelCase(
+                (input[0].ToString().ToUpperInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
@@ -77,17 +81,39 @@ namespace NJsonSchema
             {
                 switch (c)
                 {
-                    case '\'': literal.Append(@"\'"); break;
-                    case '\"': literal.Append("\\\""); break;
-                    case '\\': literal.Append(@"\\"); break;
-                    case '\0': literal.Append(@"\0"); break;
-                    case '\a': literal.Append(@"\a"); break;
-                    case '\b': literal.Append(@"\b"); break;
-                    case '\f': literal.Append(@"\f"); break;
-                    case '\n': literal.Append(@"\n"); break;
-                    case '\r': literal.Append(@"\r"); break;
-                    case '\t': literal.Append(@"\t"); break;
-                    case '\v': literal.Append(@"\v"); break;
+                    case '\'':
+                        literal.Append(@"\'");
+                        break;
+                    case '\"':
+                        literal.Append("\\\"");
+                        break;
+                    case '\\':
+                        literal.Append(@"\\");
+                        break;
+                    case '\0':
+                        literal.Append(@"\0");
+                        break;
+                    case '\a':
+                        literal.Append(@"\a");
+                        break;
+                    case '\b':
+                        literal.Append(@"\b");
+                        break;
+                    case '\f':
+                        literal.Append(@"\f");
+                        break;
+                    case '\n':
+                        literal.Append(@"\n");
+                        break;
+                    case '\r':
+                        literal.Append(@"\r");
+                        break;
+                    case '\t':
+                        literal.Append(@"\t");
+                        break;
+                    case '\v':
+                        literal.Append(@"\v");
+                        break;
                     default:
                         // ASCII printable character
                         if (c >= 0x20 && c <= 0x7e)
@@ -98,11 +124,13 @@ namespace NJsonSchema
                         else
                         {
                             literal.Append(@"\u");
-                            literal.Append(((int)c).ToString("x4"));
+                            literal.Append(((int) c).ToString("x4"));
                         }
+
                         break;
                 }
             }
+
             return literal.ToString();
         }
 
@@ -160,7 +188,62 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string Tab(string input, int tabCount)
         {
-            return input?.Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount))) ?? string.Empty;
+            if (input is null)
+            {
+                return "";
+            }
+            var stringWriter = new StringWriter(new StringBuilder(input.Length), CultureInfo.CurrentCulture);
+            Tab(input, tabCount, stringWriter);
+            return stringWriter.ToString();
+        }
+
+        /// <summary>Add tabs to the given string.</summary>
+        /// <param name="input">The input.</param>
+        /// <param name="tabCount">The tab count.</param>
+        /// <param name="writer">Stream to write transformed content into.</param>
+        /// <returns>The output.</returns>
+        public static void Tab(string input, int tabCount, TextWriter writer)
+        {
+            var tabString = CreateTabString(tabCount);
+            AddPrefixToBeginningOfNonEmptyLines(input, tabString, writer);
+        }
+
+        private static void AddPrefixToBeginningOfNonEmptyLines(string input, string tabString, TextWriter writer)
+        {
+            if (tabString.Length == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < input.Length; i++)
+            {
+                var c = input[i];
+                writer.Write(c);
+                if (c == '\n')
+                {
+                    // only write if not entirely empty line
+                    var foundNonEmptyBeforeNewLine = false;
+                    for (var j = i + 1; j < input.Length; ++j)
+                    {
+                        var c2 = input[j];
+                        if (c2 == '\n')
+                        {
+                            break;
+                        }
+
+                        if (!char.IsWhiteSpace(c2))
+                        {
+                            foundNonEmptyBeforeNewLine = true;
+                            break;
+                        }
+                    }
+
+                    if (foundNonEmptyBeforeNewLine)
+                    {
+                        writer.Write(tabString);
+                    }
+                }
+            }
         }
 
         /// <summary>Converts all line breaks in a string into '\n' and removes white spaces.</summary>
@@ -169,21 +252,48 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            input = input?
-                .Replace("\r", string.Empty)
-                .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
-                ?? string.Empty;
+            if (input is null)
+            {
+                return "";
+            }
+            var tabString = CreateTabString(tabCount);
+            input = input
+                .Replace("\r", string.Empty);
+
+            var stringWriter = new StringWriter(new StringBuilder(input.Length), CultureInfo.CurrentCulture);
+            AddPrefixToBeginningOfNonEmptyLines(input, tabString + "/// ", stringWriter);
 
             // TODO: Support more markdown features here
-            var xml = new XText(input).ToString();
+            var xml = new XText(stringWriter.ToString()).ToString();
             return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
+        }
+
+        private static string CreateTabString(int tabCount)
+        {
+            if (tabCount == 0)
+            {
+                return "";
+            }
+
+            if (tabCount == 1)
+            {
+                return "    ";
+            }
+
+            if (tabCount == 2)
+            {
+                return "        ";
+            }
+
+            var tabString = new string(' ', 4 * tabCount);
+            return tabString;
         }
 
         private static string ConvertDashesToCamelCase(string input)
         {
             var sb = new StringBuilder();
             var caseFlag = false;
-            foreach (char c in input)
+            foreach (var c in input)
             {
                 if (c == '-')
                 {
@@ -199,6 +309,7 @@ namespace NJsonSchema
                     sb.Append(c);
                 }
             }
+
             return sb.ToString();
         }
     }
