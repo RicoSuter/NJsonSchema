@@ -16,15 +16,33 @@ using Namotion.Reflection;
 namespace NJsonSchema.Generation
 {
     /// <summary>The default reflection service implementation.</summary>
-    public abstract class ReflectionServiceBase<T> : IReflectionService
-        where T : JsonSchemaGeneratorSettings
+    public abstract class ReflectionServiceBase<TSettings> : IReflectionService
+        where TSettings : JsonSchemaGeneratorSettings
     {
+        /// <summary>
+        /// Converts an enum value to a JSON string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public abstract string ConvertEnumValue(object value, TSettings settings);
+
+        /// <summary>
+        /// Generates the properties for the given type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="schema"></param>
+        /// <param name="settings"></param>
+        /// <param name="schemaGenerator"></param>
+        /// <param name="schemaResolver"></param>
+        public abstract void GenerateProperties(Type type, JsonSchema schema, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, T settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, TSettings settings)
         {
             var type = contextualType.OriginalType;
             var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
@@ -59,7 +77,7 @@ namespace NJsonSchema.Generation
         /// <param name="isNullable">Specifies whether the type is nullable.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, T settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
+        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, TSettings settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             if (originalType.GetTypeInfo().IsEnum)
             {
@@ -248,7 +266,7 @@ namespace NJsonSchema.Generation
         /// <param name="contextualType">The type.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The result.</returns>
-        public virtual bool IsStringEnum(ContextualType contextualType, T settings)
+        public virtual bool IsStringEnum(ContextualType contextualType, TSettings settings)
         {
             if (!contextualType.TypeInfo.IsEnum)
             {
@@ -342,17 +360,27 @@ namespace NJsonSchema.Generation
 
         JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
         {
-            return GetDescription(contextualType, defaultReferenceTypeNullHandling, (T)settings);
+            return GetDescription(contextualType, defaultReferenceTypeNullHandling, (TSettings)settings);
         }
 
         JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
         {
-            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, (T)settings);
+            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, (TSettings)settings);
         }
 
         bool IReflectionService.IsStringEnum(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
         {
-            return IsStringEnum(contextualType, (T)settings);
+            return IsStringEnum(contextualType, (TSettings)settings);
+        }
+
+        string IReflectionService.ConvertEnumValue(object value, JsonSchemaGeneratorSettings settings)
+        {
+            return ConvertEnumValue(value, (TSettings)settings);
+        }
+
+        void IReflectionService.GenerateProperties(JsonSchema schema, Type type, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        {
+            GenerateProperties(type, schema, (TSettings)settings, schemaGenerator, schemaResolver);
         }
     }
 }

@@ -14,6 +14,24 @@ namespace NJsonSchema.Generation
     /// <summary>Provides methods to reflect on types.</summary>
     public interface IReflectionService
     {
+        /// <summary>
+        /// Converts an enum value to a JSON string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        string ConvertEnumValue(object value, JsonSchemaGeneratorSettings settings);
+
+        /// <summary>
+        /// Generates the properties for the given type.
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="type"></param>
+        /// <param name="settings"></param>
+        /// <param name="schemaGenerator"></param>
+        /// <param name="schemaResolver"></param>
+        void GenerateProperties(JsonSchema schema, Type type, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
         /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>

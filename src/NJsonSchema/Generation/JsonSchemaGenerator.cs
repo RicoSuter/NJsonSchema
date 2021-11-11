@@ -8,9 +8,7 @@
 
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
@@ -20,12 +18,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation
 {
     /// <summary>Generates a <see cref="JsonSchema"/> object for a given type. </summary>
-    public abstract class JsonSchemaGenerator
+    public class JsonSchemaGenerator
     {
         private static readonly Dictionary<string, string> DataTypeFormats = new Dictionary<string, string>
         {
@@ -39,9 +36,29 @@ namespace NJsonSchema.Generation
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
-        protected JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
+        public JsonSchemaGenerator(JsonSchemaGeneratorSettings settings)
         {
             Settings = settings;
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>(SystemTextJsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(typeof(TType));
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type, SystemTextJsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(type);
         }
 
         /// <summary>Gets the settings.</summary>
@@ -514,7 +531,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                GenerateProperties(type, schema, schemaResolver);
+                Settings.ReflectionService.GenerateProperties(schema, type, Settings, this, schemaResolver);
                 ApplyAdditionalProperties(schema, type, schemaResolver);
             }
 
@@ -550,7 +567,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the properties of the given type or null to take all properties.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The property names or null for all.</returns>
-        protected virtual string[] GetTypeProperties(Type type)
+        public virtual string[] GetTypeProperties(Type type)
         {
             if (type == typeof(Exception))
             {
@@ -699,7 +716,7 @@ namespace NJsonSchema.Generation
                     else
                     {
                         var value = Enum.Parse(contextualType.Type, enumName);
-                        schema.Enumeration.Add(ConvertEnumValue(value));
+                        schema.Enumeration.Add(Settings.ReflectionService.ConvertEnumValue(value, Settings));
                     }
                 }
 
@@ -712,13 +729,6 @@ namespace NJsonSchema.Generation
                     string.Join("\n", schema.Enumeration.Select((e, i) => e + " = " + schema.EnumerationNames[i]))).Trim();
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        protected abstract string ConvertEnumValue(object value);
 
         private TSchema GenerateDictionaryValueSchema<TSchema>(JsonSchemaResolver schemaResolver, ContextualType valueType)
             where TSchema : JsonSchema, new()
@@ -843,19 +853,11 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>
-        /// Generates the properties for the given type.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="schema"></param>
-        /// <param name="schemaResolver"></param>
-        protected abstract void GenerateProperties(Type type, JsonSchema schema, JsonSchemaResolver schemaResolver);
-
-        /// <summary>
         /// Chesk whether a member info is abstract.
         /// </summary>
         /// <param name="memberInfo"></param>
         /// <returns></returns>
-        protected bool IsAbstractProperty(ContextualMemberInfo memberInfo)
+        public bool IsAbstractProperty(ContextualMemberInfo memberInfo)
         {
             return memberInfo is ContextualPropertyInfo propertyInfo &&
                    !propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface &&
@@ -940,7 +942,7 @@ namespace NJsonSchema.Generation
                         var typeDescription = Settings.ReflectionService.GetDescription(baseType, Settings);
                         if (!typeDescription.IsDictionary && !type.Type.IsArray)
                         {
-                            GenerateProperties(baseType, schema, schemaResolver);
+                            Settings.ReflectionService.GenerateProperties(schema, baseType, Settings, this, schemaResolver);
                             var actualSchema = GenerateInheritance(baseType, schema, schemaResolver);
 
                             GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema);
@@ -950,7 +952,7 @@ namespace NJsonSchema.Generation
                     {
                         var actualSchema = new JsonSchema();
 
-                        GenerateProperties(type, actualSchema, schemaResolver);
+                        Settings.ReflectionService.GenerateProperties(actualSchema, type, Settings, this, schemaResolver);
                         ApplyAdditionalProperties(actualSchema, type, schemaResolver);
 
                         var baseTypeInfo = Settings.ReflectionService.GetDescription(baseType, Settings);
@@ -1001,7 +1003,7 @@ namespace NJsonSchema.Generation
                     if (!typeDescription.IsDictionary && !type.Type.IsArray &&
                         !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
                     {
-                        GenerateProperties(i, schema, schemaResolver);
+                        Settings.ReflectionService.GenerateProperties(schema, i, Settings, this, schemaResolver);
                         var actualSchema = GenerateInheritance(i.ToContextualType(), schema, schemaResolver);
 
                         GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
@@ -1095,22 +1097,28 @@ namespace NJsonSchema.Generation
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="accessorInfo"></param>
         /// <param name="parentSchema"></param>
-        /// <param name="schemaResolver"></param>
+        /// <param name="property"></param>
         /// <param name="propertyTypeDescription"></param>
         /// <param name="propertyName"></param>
         /// <param name="requiredAttribute"></param>
         /// <param name="hasRequiredAttribute"></param>
         /// <param name="isNullable"></param>
         /// <param name="defaultValue"></param>
-        protected void AddProperty(ContextualAccessorInfo accessorInfo, JsonSchema parentSchema, JsonSchemaResolver schemaResolver, JsonTypeDescription propertyTypeDescription, string propertyName, Attribute requiredAttribute, bool hasRequiredAttribute, bool isNullable, object defaultValue)
+        /// <param name="schemaResolver"></param>
+        public void AddProperty(
+            JsonSchema parentSchema,
+            ContextualAccessorInfo property,
+            JsonTypeDescription propertyTypeDescription, string propertyName,
+            Attribute requiredAttribute, bool hasRequiredAttribute, bool isNullable, object defaultValue, JsonSchemaResolver schemaResolver)
         {
+            // TODO: Extension method on JsonSchema class?
+
             Action<JsonSchemaProperty, JsonSchema> TransformSchema = (propertySchema, typeSchema) =>
             {
                 if (Settings.GenerateXmlObjects)
                 {
-                    propertySchema.GenerateXmlObjectForProperty(accessorInfo.AccessorType, propertyName);
+                    propertySchema.GenerateXmlObjectForProperty(property.AccessorType, propertyName);
                 }
 
                 if (hasRequiredAttribute &&
@@ -1129,7 +1137,7 @@ namespace NJsonSchema.Generation
                     }
                 }
 
-                dynamic readOnlyAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
+                dynamic readOnlyAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
                 if (readOnlyAttribute != null)
                 {
                     propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
@@ -1137,29 +1145,29 @@ namespace NJsonSchema.Generation
 
                 if (propertySchema.Description == null)
                 {
-                    propertySchema.Description = accessorInfo.GetDescription();
+                    propertySchema.Description = property.GetDescription();
                 }
 
                 if (propertySchema.Example == null)
                 {
-                    propertySchema.Example = GenerateExample(accessorInfo);
+                    propertySchema.Example = GenerateExample(property);
                 }
 
-                dynamic obsoleteAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+                dynamic obsoleteAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
                 if (obsoleteAttribute != null)
                 {
                     propertySchema.IsDeprecated = true;
                     propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
                 }
 
-                propertySchema.Default = ConvertDefaultValue(accessorInfo.AccessorType, defaultValue);
+                propertySchema.Default = ConvertDefaultValue(property.AccessorType, defaultValue);
 
                 ApplyDataAnnotations(propertySchema, propertyTypeDescription);
-                ApplyPropertyExtensionDataAttributes(accessorInfo, propertySchema);
+                ApplyPropertyExtensionDataAttributes(property, propertySchema);
             };
 
             var referencingProperty = GenerateWithReferenceAndNullability(
-                accessorInfo.AccessorType, isNullable, schemaResolver, TransformSchema);
+                property.AccessorType, isNullable, schemaResolver, TransformSchema);
 
             parentSchema.Properties.Add(propertyName, referencingProperty);
         }
@@ -1168,7 +1176,7 @@ namespace NJsonSchema.Generation
         /// <param name="accessorInfo">The accessor info.</param>
         /// <param name="parentType">The properties parent type.</param>
         /// <returns>The result.</returns>
-        protected virtual bool IsPropertyIgnored(ContextualAccessorInfo accessorInfo, Type parentType)
+        public virtual bool IsPropertyIgnored(ContextualAccessorInfo accessorInfo, Type parentType)
         {
             if (accessorInfo.GetContextAttribute<JsonIgnoreAttribute>() != null)
             {
@@ -1190,9 +1198,10 @@ namespace NJsonSchema.Generation
         /// </summary>
         /// <param name="accessorInfo"></param>
         /// <returns></returns>
-        protected bool IsPropertyIgnoredBySettings(ContextualAccessorInfo accessorInfo)
+        public bool IsPropertyIgnoredBySettings(ContextualAccessorInfo accessorInfo)
         {
-            if (Settings.IgnoreObsoleteProperties && accessorInfo.GetContextAttribute<ObsoleteAttribute>() != null)
+            if (Settings.IgnoreObsoleteProperties && 
+                accessorInfo.GetContextAttribute<ObsoleteAttribute>() != null)
             {
                 return true;
             }
@@ -1211,7 +1220,7 @@ namespace NJsonSchema.Generation
         /// <param name="accessorInfo"></param>
         /// <param name="parentType"></param>
         /// <returns></returns>
-        protected dynamic GetDataMemberAttribute(ContextualAccessorInfo accessorInfo, Type parentType)
+        public dynamic GetDataMemberAttribute(ContextualAccessorInfo accessorInfo, Type parentType)
         {
             if (!HasDataContractAttribute(parentType))
             {

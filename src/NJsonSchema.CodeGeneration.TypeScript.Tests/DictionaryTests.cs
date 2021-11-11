@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_any_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new NewtonsoftJsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -43,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_any_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new NewtonsoftJsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_string_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new NewtonsoftJsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_string_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new NewtonsoftJsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });

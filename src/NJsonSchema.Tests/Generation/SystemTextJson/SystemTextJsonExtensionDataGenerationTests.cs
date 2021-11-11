@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public void SystemTextJson_When_class_has_object_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
             //// Act
-            var schema = SystemTextJsonSchemaGenerator.FromType<ClassWithObjectExtensionData>(new SystemTextJsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithObjectExtensionData>(new SystemTextJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
@@ -44,7 +44,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public void SystemTextJson_When_class_has_JsonElement_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
             //// Act
-            var schema = SystemTextJsonSchemaGenerator.FromType<ClassWithJsonElementExtensionData>(new SystemTextJsonSchemaGeneratorSettings
+            var schema = JsonSchemaGenerator.FromType<ClassWithJsonElementExtensionData>(new SystemTextJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
