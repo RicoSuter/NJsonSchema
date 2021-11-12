@@ -192,10 +192,10 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
 
-            if (obj is IDictionary)
+            if (obj is IDictionary dict)
             {
-                if (((IDictionary)obj).Contains(firstSegment))
-                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), checkedObjects);
+                if (dict.Contains(firstSegment))
+                    return ResolveDocumentReference(dict[firstSegment], segments.Skip(1).ToList(), checkedObjects);
             }
             else if (obj is IEnumerable)
             {

@@ -72,11 +72,11 @@ namespace NJsonSchema
 
             checkedObjects.Add(obj);
 
-            if (obj is IDictionary)
+            if (obj is IDictionary dict)
             {
-                foreach (var key in ((IDictionary)obj).Keys)
+                foreach (var key in dict.Keys)
                 {
-                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects))
+                    if (FindJsonPaths(dict[key], searchedObjects, basePath + "/" + key, checkedObjects))
                         return true;
                 }
             }
