@@ -278,11 +278,11 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
 
-            if (obj is IDictionary)
+            if (obj is IDictionary dictionary)
             {
-                if (((IDictionary)obj).Contains(firstSegment))
+                if (dictionary.Contains(firstSegment))
                 {
-                    return ResolveDocumentReference(((IDictionary)obj)[firstSegment], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                    return ResolveDocumentReference(dictionary[firstSegment], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
             }
             else if (obj is IEnumerable)
