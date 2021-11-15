@@ -152,10 +152,10 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                     }
                     else if (attribute.MethodName != null)
                     {
-                        var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = (IEnumerable<Type>)method.Invoke(null, new object[0]);
+                            var types = (IEnumerable<Type>)method.Invoke(null, Array.Empty<object>());
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminatorValue)
