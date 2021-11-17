@@ -22,54 +22,7 @@
     <None Remove="Templates\Class.Constructor.Record.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\Class.Annotations.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Class.Body.liquid" />
-    <EmbeddedResource Include="Templates\Class.Constructor.liquid" />
-    <EmbeddedResource Include="Templates\Class.Constructor.Record.liquid" />
-    <EmbeddedResource Include="Templates\Class.FromJson.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Class.Inheritance.liquid" />
-    <EmbeddedResource Include="Templates\Class.Inpc.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Class.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Class.Property.Annotations.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Class.ToJson.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\DateFormatConverter.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\Enum.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\File.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\JsonInheritanceAttribute.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Templates\JsonInheritanceConverter.liquid">
-      <CustomToolNamespace>
-      </CustomToolNamespace>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Templates\*.liquid" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
@@ -80,12 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="NJsonSchema.CodeGeneration.CSharp.nuspec">
-      <Generator>
-      </Generator>
     </None>
     <None Update="NJsonSchema.snk">
-      <Generator>
-      </Generator>
     </None>
   </ItemGroup>
   <ItemGroup>
