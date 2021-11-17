@@ -72,8 +72,9 @@ namespace NJsonSchema.Generation
             // Primitive types
 
             if (type == typeof(short) ||
+                type == typeof(ushort) ||
                 type == typeof(uint) ||
-                type == typeof(ushort))
+                type == typeof(ulong))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, null);
             }
@@ -83,8 +84,7 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
             }
 
-            if (type == typeof(long) ||
-                type == typeof(ulong))
+            if (type == typeof(long))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
