@@ -14,7 +14,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema.Infrastructure
 {
-    internal class IgnoreEmptyCollectionsContractResolver : PropertyRenameAndIgnoreSerializerContractResolver
+    internal sealed class IgnoreEmptyCollectionsContractResolver : PropertyRenameAndIgnoreSerializerContractResolver
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
