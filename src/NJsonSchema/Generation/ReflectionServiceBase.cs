@@ -30,12 +30,12 @@ namespace NJsonSchema.Generation
         /// <summary>
         /// Generates the properties for the given type.
         /// </summary>
-        /// <param name="type"></param>
         /// <param name="schema"></param>
+        /// <param name="type"></param>
         /// <param name="settings"></param>
         /// <param name="schemaGenerator"></param>
         /// <param name="schemaResolver"></param>
-        public abstract void GenerateProperties(Type type, JsonSchema schema, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+        public abstract void GenerateProperties(JsonSchema schema, Type type, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
@@ -380,7 +380,7 @@ namespace NJsonSchema.Generation
 
         void IReflectionService.GenerateProperties(JsonSchema schema, Type type, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            GenerateProperties(type, schema, (TSettings)settings, schemaGenerator, schemaResolver);
+            GenerateProperties(schema, type, (TSettings)settings, schemaGenerator, schemaResolver);
         }
     }
 }

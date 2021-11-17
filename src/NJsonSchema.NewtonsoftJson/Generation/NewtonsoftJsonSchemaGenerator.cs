@@ -3,6 +3,9 @@ using System;
 
 namespace NJsonSchema.NewtonsoftJson.Generation
 {
+    /// <summary>
+    /// Provides method to generate JSON Schemas with the Newtonsoft.Json schema generator.
+    /// </summary>
     public static class NewtonsoftJsonSchemaGenerator
     {
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>

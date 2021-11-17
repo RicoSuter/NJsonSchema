@@ -14,11 +14,13 @@ using Newtonsoft.Json;
 
 namespace NJsonSchema.Generation
 {
+    /// <inheritdocs />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
         private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
         private JsonSerializerSettings _serializerSettings;
 
+        /// <inheritdocs />
         public NewtonsoftJsonSchemaGeneratorSettings()
         {
             ReflectionService = new NewtonsoftJsonReflectionService();

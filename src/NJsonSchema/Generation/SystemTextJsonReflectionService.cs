@@ -20,7 +20,7 @@ namespace NJsonSchema.Generation
     public class SystemTextJsonReflectionService : ReflectionServiceBase<SystemTextJsonSchemaGeneratorSettings>
     {
         /// <inheritdocs />
-        public override void GenerateProperties(Type type, JsonSchema schema, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        public override void GenerateProperties(JsonSchema schema, Type type, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             foreach (var accessorInfo in type.GetContextualAccessors())
             {
