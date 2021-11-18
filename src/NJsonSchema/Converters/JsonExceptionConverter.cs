@@ -184,10 +184,13 @@ namespace NJsonSchema.Converters
 
         private FieldInfo GetField(Type type, string fieldName)
         {
-            var field = type.GetTypeInfo().GetDeclaredField(fieldName);
-            if (field == null && type.GetTypeInfo().BaseType != null)
+            var typeInfo = type.GetTypeInfo();
+
+            var field = typeInfo.GetDeclaredField(fieldName);
+
+            if (field == null && typeInfo.BaseType != null)
             {
-                return GetField(type.GetTypeInfo().BaseType, fieldName);
+                return GetField(typeInfo.BaseType, fieldName);
             }
 
             return field;
