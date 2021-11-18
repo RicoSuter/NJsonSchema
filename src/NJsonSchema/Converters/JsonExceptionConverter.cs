@@ -158,14 +158,16 @@ namespace NJsonSchema.Converters
                 }
                 else
                 {
-                    field = GetField(objectType, "m_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1));
+                    var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
+
+                    field = GetField(objectType, "m_" + fieldNameSuffix);
                     if (field != null)
                     {
                         field.SetValue(value, propertyValue);
                     }
                     else
                     {
-                        field = GetField(objectType, "_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1));
+                        field = GetField(objectType, "_" + fieldNameSuffix);
                         if (field != null)
                         {
                             field.SetValue(value, propertyValue);
