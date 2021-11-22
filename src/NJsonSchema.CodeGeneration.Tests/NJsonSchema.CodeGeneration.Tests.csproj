@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net6.0;net461</TargetFrameworks>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn),1998,1591,618</NoWarn>
     </PropertyGroup>

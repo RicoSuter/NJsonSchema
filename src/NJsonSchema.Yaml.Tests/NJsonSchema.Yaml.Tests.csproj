@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
       <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Yaml.Tests.xml</DocumentationFile>

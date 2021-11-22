@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
 
@@ -32,6 +34,13 @@ partial class Build : NukeBuild
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
     static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    string TagVersion => GitRepository.Tags.SingleOrDefault(x => x.StartsWith("v"))?[1..];
+
+    string VersionSuffix =>
+        string.IsNullOrWhiteSpace(TagVersion)
+            ? "preview-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmm")
+            : "";
 
     Target Clean => _ => _
         .Before(Restore)
@@ -88,18 +97,14 @@ partial class Build : NukeBuild
 
             EnsureCleanDirectory(ArtifactsDirectory);
 
-            foreach (var project in Solution.GetProjects("*"))
-            {
-                if (project.GetProperty("IsPackable") == "false")
-                {
-                    continue;
-                }
-
-                DotNetPack(x => x
-                    .SetConfiguration(Configuration)
-                    .SetOutputDirectory(ArtifactsDirectory)
-                    .SetProject(project)
-                );
-            }
+            DotNetPack(s => s
+                .SetProcessWorkingDirectory(SourceDirectory)
+                .SetAssemblyVersion(TagVersion)
+                .SetFileVersion(TagVersion)
+                .SetInformationalVersion(TagVersion)
+                .SetVersionSuffix(VersionSuffix)
+                .SetConfiguration(Configuration)
+                .SetOutputDirectory(ArtifactsDirectory)
+            );
         });
 }

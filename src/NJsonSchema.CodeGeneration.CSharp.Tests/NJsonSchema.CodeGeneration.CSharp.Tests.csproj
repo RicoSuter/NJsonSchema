@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
+    <NoWarn>$(NoWarn),1587,1998,1591,618,SYSLIB0012</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="References\*.json" CopyToOutputDirectory="Always" />

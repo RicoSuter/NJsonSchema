@@ -342,7 +342,7 @@ namespace NJsonSchema.Generation
 #else
 
         /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
+        /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
         protected virtual bool IsArrayType(ContextualType contextualType)
         {
@@ -357,7 +357,7 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            return contextualType.Type.IsArray || 
+            return contextualType.Type.IsArray ||
                 (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
                 (contextualType.TypeInfo.BaseType == null ||
                     !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
