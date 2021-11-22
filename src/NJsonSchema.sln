@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Benchmark", "NJ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NJsonSchema.Yaml.Tests", "NJsonSchema.Yaml.Tests\NJsonSchema.Yaml.Tests.csproj", "{990EF464-C967-4E08-8C3D-0568A47B6D2A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{863B2D88-A0BD-4466-8583-AAD0B8D3F182}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{863B2D88-A0BD-4466-8583-AAD0B8D3F182}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		..\README.md = ..\README.md
