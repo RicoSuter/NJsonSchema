@@ -15,8 +15,7 @@ using Nuke.Common.CI.GitHubActions;
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.UbuntuLatest,
     GitHubActionsImage.MacOsLatest,
-    // TODO remove "nuke-build" when verified working
-    OnPushBranches = new [] { "master", "main", "nuke" },
+    OnPushBranches = new [] { "master", "main" },
     PublishArtifacts = true,
     InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack), nameof(Publish) },
     ImportSecrets = new [] { "NUGET_API_KEY", "MYGET_API_KEY" },
