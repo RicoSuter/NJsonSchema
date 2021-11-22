@@ -19,23 +19,14 @@ namespace NJsonSchema.Generation
     public abstract class ReflectionServiceBase<TSettings> : IReflectionService
         where TSettings : JsonSchemaGeneratorSettings
     {
-        /// <summary>
-        /// Converts an enum value to a JSON string.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <inheritdocs />
         public abstract string ConvertEnumValue(object value, TSettings settings);
 
-        /// <summary>
-        /// Generates the properties for the given type.
-        /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="type"></param>
-        /// <param name="settings"></param>
-        /// <param name="schemaGenerator"></param>
-        /// <param name="schemaResolver"></param>
+        /// <inheritdocs />
         public abstract void GenerateProperties(JsonSchema schema, Type type, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+
+        /// <inheritdocs />
+        public abstract string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>

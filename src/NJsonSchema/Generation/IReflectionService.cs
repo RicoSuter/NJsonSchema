@@ -23,6 +23,14 @@ namespace NJsonSchema.Generation
         string ConvertEnumValue(object value, JsonSchemaGeneratorSettings settings);
 
         /// <summary>
+        /// Gets the property name for the given accessor info.
+        /// </summary>
+        /// <param name="accessorInfo">The accessor info.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The property name.</returns>
+        string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings);
+
+        /// <summary>
         /// Generates the properties for the given type.
         /// </summary>
         /// <param name="schema"></param>

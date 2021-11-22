@@ -152,6 +152,12 @@ namespace NJsonSchema.Generation
             }
         }
 
+        /// <inheritdocs />
+        public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
+        {
+            return GetPropertyName(null, accessorInfo, (NewtonsoftJsonSchemaGeneratorSettings)settings);
+        }
+
         private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
