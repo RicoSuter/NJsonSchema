@@ -1,7 +1,7 @@
 using System;
+using System.Runtime.InteropServices;
 using Nuke.Common;
 using Nuke.Common.CI;
-using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
@@ -11,7 +11,6 @@ using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-[CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
 partial class Build : NukeBuild
 {
@@ -31,6 +30,8 @@ partial class Build : NukeBuild
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+
+    static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     Target Clean => _ => _
         .Before(Restore)
@@ -61,10 +62,18 @@ partial class Build : NukeBuild
         .After(Compile)
         .Executes(() =>
         {
+            var framework = "";
+            if (!IsRunningOnWindows)
+            {
+                framework = "net6.0";
+            }
+
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .EnableNoRestore());
+                .EnableNoRestore()
+                .SetFramework(framework)
+            );
         });
 
     Target Pack => _ => _
