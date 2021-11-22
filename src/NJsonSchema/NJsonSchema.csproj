@@ -1,21 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard2.0;net40;net45</TargetFrameworks>
-    <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.5.2</Version>
-    <PackageTags>json schema validation generator .net</PackageTags>
-    <Copyright>Copyright © Rico Suter, 2020</Copyright>
-    <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
-    <Authors>Rico Suter</Authors>
-    <PackageIcon>NuGetIcon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Company />
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
     <DefineConstants>LEGACY</DefineConstants>
@@ -32,9 +17,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="Microsoft.Bcl.Async">
-      <Version>1.0.168</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net40' Or '$(TargetFramework)' == 'net45'">
     <Reference Include="Microsoft.CSharp" />

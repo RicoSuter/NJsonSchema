@@ -357,10 +357,12 @@ namespace NJsonSchema.Infrastructure
         }
 
 #if LEGACY
+#pragma warning disable CS1998
         internal static async Task<T> FromResult<T>(T result)
         {
             return result;
         }
+#pragma warning restore CS1998
 #else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Task<T> FromResult<T>(T result)
