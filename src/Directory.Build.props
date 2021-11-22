@@ -1,21 +1,19 @@
 <Project>
   <PropertyGroup>
-
       <VersionPrefix>11.0.0</VersionPrefix>
-
+      
       <Authors>Rico Suter</Authors>
       <Copyright>Copyright © Rico Suter, 2020</Copyright>
+
+      <SignAssembly>True</SignAssembly>
+      <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
 
       <PackageTags>json schema validation generator .net</PackageTags>
       <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
       <Description>JSON Schema reader, generator and validator for .NET</Description>
-
-      <SignAssembly>True</SignAssembly>
-      <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
       <PackageIcon>NuGetIcon.png</PackageIcon>
       <PackageLicenseExpression>MIT</PackageLicenseExpression>
       <Company />
-
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
       <EmbedUntrackedSources>true</EmbedUntrackedSources>
       <IncludeSymbols>true</IncludeSymbols>
@@ -23,6 +21,5 @@
 
       <LangVersion>latest</LangVersion>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
   </PropertyGroup>
 </Project>
