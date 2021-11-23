@@ -1,5 +1,6 @@
-NJsonSchema for .NET
-====================
+# NJsonSchema for .NET
+
+[NSwag](http://nswag.org) | NJsonSchema | [Apimundo](https://apimundo.com) | [Namotion.Reflection](https://github.com/RicoSuter/Namotion.Reflection)
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/NJsonSchema/17/master.svg)](https://rsuter.visualstudio.com/NJsonSchema/_build?definitionId=17)
 [![Nuget](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
