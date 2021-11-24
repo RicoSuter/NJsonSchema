@@ -9,7 +9,6 @@
 [![Discord](https://img.shields.io/badge/Discord-join%20chat-1dce73.svg)](https://discord.gg/4x48JjUT)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
-[![Apimundo](https://img.shields.io/badge/NJsonSchema%20API-Apimundo-728199.svg)](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest?tab=types&type=NJsonSchema.JsonSchema)
 [![Apimundo](https://img.shields.io/badge/Architecture-Apimundo-728199.svg)](https://apimundo.com/organizations/github/projects/ricosuter?tab=repositories)
 
 <img align="left" src="https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/GitHubIcon.png">
@@ -19,15 +18,15 @@ NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data and [Namotion.Reflection](https://github.com/RicoSuter/Namotion.Reflection) for additional .NET reflection APIs.
 
 **NuGet packages:** 
-- [NJsonSchema](https://www.nuget.org/packages/NJsonSchema) (.NET Standard 1.0 & 2.0/.NET 4.5/.NET 4.0): JSON Schema parsing, validation and generation classes
-- [NJsonSchema.Yaml](https://www.nuget.org/packages/NJsonSchema.Yaml) (.NET Standard 1.3 & 2.0/.NET 4.5): Read and write JSON Schemas from YAML
-- [NJsonSchema.CodeGeneration](https://www.nuget.org/packages/NJsonSchema.CodeGeneration) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Base classes to generate code from a JSON Schema
-- [NJsonSchema.CodeGeneration.CSharp](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.CSharp) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates CSharp classes
-- [NJsonSchema.CodeGeneration.TypeScript](https://www.nuget.org/packages/NJsonSchema.CodeGeneration.TypeScript) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates TypeScript interfaces or classes
+- [NJsonSchema](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest) (.NET Standard 1.0 & 2.0/.NET 4.5/.NET 4.0): JSON Schema parsing, validation and generation classes
+- [NJsonSchema.Yaml](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.Yaml/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5): Read and write JSON Schemas from YAML
+- [NJsonSchema.CodeGeneration](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Base classes to generate code from a JSON Schema
+- [NJsonSchema.CodeGeneration.CSharp](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.CSharp/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates CSharp classes
+- [NJsonSchema.CodeGeneration.TypeScript](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.TypeScript/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates TypeScript interfaces or classes
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
 
-Preview NuGet Feed: https://www.myget.org/gallery/njsonschema
+Preview NuGet Feed: https://www.myget.org/feed/Packages/njsonschema
 
 **Features:**
 
