@@ -16,6 +16,25 @@ namespace NJsonSchema.Generation
     /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
     public class SampleJsonDataGenerator
     {
+        private readonly SampleJsonDataGeneratorSettings _settings;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SampleJsonDataGenerator"/> class with default settings..
+        /// </summary>
+        public SampleJsonDataGenerator()
+        {
+            _settings = new SampleJsonDataGeneratorSettings();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SampleJsonDataGenerator"/> class.
+        /// </summary>
+        /// <param name="settings">The settings to use.</param>
+        public SampleJsonDataGenerator(SampleJsonDataGeneratorSettings settings)
+        {
+            _settings = settings;
+        }
+
         /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
         /// <param name="schema">The JSON Schema.</param>
         /// <returns>The JSON token.</returns>
@@ -34,11 +53,12 @@ namespace NJsonSchema.Generation
             }
 
             if (schema.Type.HasFlag(JsonObjectType.Object) ||
-                schema.AllOf.Any(s => s.ActualProperties.Any()))
+                GetPropertiesToGenerate(schema.AllOf).Any())
             {
                 usedSchemas.Add(schema);
 
-                var properties = schema.ActualProperties.Concat(schema.AllOf.SelectMany(s => s.ActualSchema.ActualProperties));
+                var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
+                var properties = GetPropertiesToGenerate(schemas);
                 var obj = new JObject();
                 foreach (var p in properties)
                 {
@@ -98,7 +118,7 @@ namespace NJsonSchema.Generation
 
             return null;
         }
-        private static JToken HandleNumberType(JsonSchema schema)
+        private JToken HandleNumberType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
@@ -115,7 +135,7 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0.0);
         }
 
-        private static JToken HandleIntegerType(JsonSchema schema)
+        private JToken HandleIntegerType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
@@ -150,6 +170,22 @@ namespace NJsonSchema.Generation
             {
                 return JToken.FromObject("");
             }
+        }
+
+        private IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetPropertiesToGenerate(IEnumerable<JsonSchema> schemas)
+        {
+            return schemas.SelectMany(GetPropertiesToGenerate);
+        }
+
+        private IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetPropertiesToGenerate(JsonSchema schema)
+        {
+            if (_settings.GenerateOptionalProperties)
+            {
+                return schema.ActualProperties;
+            }
+
+            var required = schema.RequiredProperties;
+            return schema.ActualProperties.Where(x => required.Contains(x.Key));
         }
     }
 }
