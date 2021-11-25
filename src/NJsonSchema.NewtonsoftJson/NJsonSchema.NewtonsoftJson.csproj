@@ -14,15 +14,8 @@
         <Company />
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DefineConstants>TRACE;DEBUG</DefineConstants>
-    </PropertyGroup>
     <PropertyGroup>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsAsErrors />
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
@@ -33,7 +26,7 @@
             <Version>1.0.168</Version>
         </PackageReference>
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net461'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
         <Reference Include="Microsoft.CSharp" />
         <Reference Include="System" />
         <Reference Include="System.Net" />
