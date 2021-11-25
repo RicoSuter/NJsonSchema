@@ -104,6 +104,7 @@ partial class Build : NukeBuild
                 .SetInformationalVersion(TagVersion)
                 .SetVersionSuffix(VersionSuffix)
                 .SetConfiguration(Configuration)
+                .EnableNoBuild()
                 .SetOutputDirectory(ArtifactsDirectory)
             );
         });
