@@ -13,7 +13,7 @@ namespace NJsonSchema.Demo.Performance
             Run().GetAwaiter().GetResult();
         }
 
-        private static async Task Run()
+        private static Task Run()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -26,6 +26,7 @@ namespace NJsonSchema.Demo.Performance
             
             Console.WriteLine("Time: " + stopwatch.ElapsedMilliseconds);
             Console.ReadKey();
+            return Task.CompletedTask;
         }
     }
 

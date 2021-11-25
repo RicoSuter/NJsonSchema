@@ -13,18 +13,21 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
+
             public List<string> Schedule { get; set; }
         }
 
         public class Teacher : Person
         {
             public string Class { get; set; }
-            public List<Schedule> Schedule { get; set; }
+
+            public new List<Schedule> Schedule { get; set; }
         }
 
         public class Schedule
         {
             int a { get; set; }
+
             int b { get; set; }
         }
 

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.Generation
 {
@@ -18,13 +19,21 @@ namespace NJsonSchema.Generation
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
         private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
+
+        private EnumHandling _defaultEnumHandling;
+        private PropertyNameHandling _defaultPropertyNameHandling;
         private JsonSerializerSettings _serializerSettings;
 
-        /// <inheritdocs />
+        /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public NewtonsoftJsonSchemaGeneratorSettings()
         {
             ReflectionService = new NewtonsoftJsonReflectionService();
             SerializerSettings = new JsonSerializerSettings();
+
+#pragma warning disable CS0618
+            DefaultEnumHandling = EnumHandling.Integer;
+            DefaultPropertyNameHandling = PropertyNameHandling.Default;
+#pragma warning restore CS0618
         }
 
         /// <summary>Gets or sets the Newtonsoft JSON serializer settings.</summary>
@@ -35,6 +44,28 @@ namespace NJsonSchema.Generation
             {
                 _serializerSettings = value;
                 _cachedContracts.Clear();
+            }
+        }
+
+        /// <summary>Gets or sets the default property name handling (default: Default).</summary>
+        [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
+        public PropertyNameHandling DefaultPropertyNameHandling
+        {
+            get => _defaultPropertyNameHandling; set
+            {
+                _defaultPropertyNameHandling = value;
+                UpdateActualContractResolverAndSerializerSettings();
+            }
+        }
+
+        /// <summary>Gets or sets the default enum handling (default: Integer).</summary>
+        [Obsolete("Use SerializerSettings directly instead. In NSwag.AspNetCore the property is set automatically.")]
+        public EnumHandling DefaultEnumHandling
+        {
+            get => _defaultEnumHandling; set
+            {
+                _defaultEnumHandling = value;
+                UpdateActualSerializerSettings();
             }
         }
 
@@ -70,5 +101,37 @@ namespace NJsonSchema.Generation
 
             return _cachedContracts[key];
         }
+
+#pragma warning disable CS0618
+        private void UpdateActualContractResolverAndSerializerSettings()
+        {
+            _cachedContracts = new Dictionary<string, JsonContract>();
+
+            if (DefaultPropertyNameHandling == PropertyNameHandling.CamelCase)
+            {
+                SerializerSettings.ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
+            }
+            else if (DefaultPropertyNameHandling == PropertyNameHandling.SnakeCase)
+            {
+                SerializerSettings.ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy(false, true) };
+            }
+
+            UpdateActualSerializerSettings();
+        }
+
+        private void UpdateActualSerializerSettings()
+        {
+            if (DefaultEnumHandling == EnumHandling.String)
+            {
+                SerializerSettings.Converters.Add(new StringEnumConverter());
+            }
+            else if (DefaultEnumHandling == EnumHandling.CamelCaseString)
+            {
+                SerializerSettings.Converters.Add(new StringEnumConverter(true));
+            }
+
+            _cachedContracts.Clear();
+        }
+#pragma warning restore CS0618
     }
 }

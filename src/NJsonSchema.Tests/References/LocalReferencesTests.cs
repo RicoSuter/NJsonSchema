@@ -184,9 +184,11 @@ namespace NJsonSchema.Tests.References
 
         private string GetTestDirectory()
         {
+#pragma warning disable SYSLIB0012
             var codeBase = Assembly.GetExecutingAssembly().CodeBase.Replace("#", "%23");
             var uri = new UriBuilder(codeBase);
             return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
+#pragma warning restore SYSLIB0012
         }
     }
 }

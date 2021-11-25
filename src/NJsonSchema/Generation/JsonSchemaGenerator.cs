@@ -273,7 +273,7 @@ namespace NJsonSchema.Generation
                         }
                         else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                         {
-                            schema.IsNullableRaw = isNullable;
+                            schema.IsNullableRaw = true;
                         }
                     }
 

@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Validation
 
         private string Json { get; set; }
 
-        public async Task InitAsync()
+        private async Task InitAsync()
         {
             Schema = await JsonSchema.FromJsonAsync(@"{
                 ""type"": ""object"",

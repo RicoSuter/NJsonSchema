@@ -208,10 +208,12 @@ namespace NJsonSchema.Tests.Generation
         [DataContract]
         class ClassWithPrivateDataMember2
         {
+#pragma warning disable CS0169
             [DataMember(Name = nameof(MyField))] 
             [Display(Name = "My Field", Description = "......")]
             private int _myField;
-            
+#pragma warning restore CS0169
+
             [IgnoreDataMember]
             public string MyField { get; set; }
         }
