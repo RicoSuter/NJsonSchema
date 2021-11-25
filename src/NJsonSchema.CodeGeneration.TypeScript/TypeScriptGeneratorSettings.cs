@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -38,8 +39,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly
             });
 
-            ClassTypes = new string[0];
-            ExtendedClasses = new string[0];
+            ClassTypes = Array.Empty<string>();
+            ExtendedClasses = Array.Empty<string>();
 
             InlineNamedDictionaries = false;
         }

@@ -23,3 +23,5 @@ src/packages/Newtonsoft.Json**
 /src/.cr/*
 /src/NJsonSchema.Benchmark/BenchmarkDotNet.Artifacts*
 _ReSharper.Caches
+/.nuke/temp
+/artifacts

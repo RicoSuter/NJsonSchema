@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Demo
@@ -11,7 +12,10 @@ namespace NJsonSchema.Demo
     {
         static void Main(string[] args)
         {
-            Console.BufferHeight = 2000;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Console.BufferHeight = 2000;
+            }
 
             var passes = 0;
             var fails = 0;

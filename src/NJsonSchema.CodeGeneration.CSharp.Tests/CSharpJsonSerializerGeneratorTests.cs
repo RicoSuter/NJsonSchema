@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(settings, additionalJsonConverters);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("new System.Text.Json.JsonSerializerOptions()", output);
@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(settings, additionalJsonConverters);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(settings, null);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("TestJsonSerializerSettingsTransformationMethod(new System.Text.Json.JsonSerializerOptions())", output);
@@ -75,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(settings, additionalJsonConverters);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("TestJsonSerializerSettingsTransformationMethod(new Newtonsoft.Json.JsonSerializerSettings { PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All, Converters = new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() } })", output);
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(settings, additionalJsonConverters);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("new System.Text.Json.Serialization.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);
@@ -113,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(settings, additionalJsonConverters);
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Equal("new Newtonsoft.Json.JsonConverter[] { new CustomConverter1(), new CustomConverter2(), new AdditionalConverter1(), new AdditionalConverter2() }", output);

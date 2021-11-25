@@ -120,7 +120,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = generator.GenerateFile("Teacher");
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName""", output);
@@ -909,7 +909,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = generator.GenerateFile("MyClass");
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Contains("ObservableCollection<string>", output);

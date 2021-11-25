@@ -43,7 +43,7 @@ namespace NJsonSchema.Tests.Serialization
             Assert.Contains(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""Test"": 123
-}", json);
+}".Replace("\r\n", Environment.NewLine), json);
         }
 
         [Fact]

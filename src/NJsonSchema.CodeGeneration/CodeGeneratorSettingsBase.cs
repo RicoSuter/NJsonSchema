@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.CodeGeneration
@@ -17,7 +18,7 @@ namespace NJsonSchema.CodeGeneration
         public CodeGeneratorSettingsBase()
         {
             GenerateDefaultValues = true;
-            ExcludedTypeNames = new string[0];
+            ExcludedTypeNames = Array.Empty<string>();
         }
 
         /// <summary>Gets or sets the schema type (default: JsonSchema).</summary>

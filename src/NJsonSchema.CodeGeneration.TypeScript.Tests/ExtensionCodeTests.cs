@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -130,7 +131,7 @@ export class UseHttpCookiesForApi {
 }";
 
             //// Act
-            var extensionCode = new TypeScriptExtensionCode(code, new string[0], new[] { "UseHttpCookiesForApi" });
+            var extensionCode = new TypeScriptExtensionCode(code, Array.Empty<string>(), new[] { "UseHttpCookiesForApi" });
 
             //// Assert
             Assert.Empty(extensionCode.ExtensionClasses);
