@@ -3,8 +3,8 @@ using Nuke.Common.CI.GitHubActions;
 [GitHubActionsAttribute(
     "pr",
     GitHubActionsImage.WindowsLatest,
-    GitHubActionsImage.UbuntuLatest,
-    GitHubActionsImage.MacOsLatest,
+    //GitHubActionsImage.UbuntuLatest,
+    //GitHubActionsImage.MacOsLatest,
     OnPullRequestBranches = new [] { "master", "main" },
     PublishArtifacts = false,
     InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack) },
@@ -13,8 +13,8 @@ using Nuke.Common.CI.GitHubActions;
 [GitHubActionsAttribute(
     "build",
     GitHubActionsImage.WindowsLatest,
-    GitHubActionsImage.UbuntuLatest,
-    GitHubActionsImage.MacOsLatest,
+    //GitHubActionsImage.UbuntuLatest,
+    //GitHubActionsImage.MacOsLatest,
     OnPushBranches = new [] { "master", "main" },
     PublishArtifacts = true,
     InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack), nameof(Publish) },
