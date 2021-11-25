@@ -24,6 +24,8 @@ partial class Build : NukeBuild
 
     public static int Main() => Execute<Build>(x => x.Compile);
 
+    private static string DateTimeSuffix = DateTime.UtcNow.ToString("yyyyMMdd-HHmm");
+
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
@@ -31,6 +33,7 @@ partial class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
+
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
     static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -39,7 +42,7 @@ partial class Build : NukeBuild
 
     string VersionSuffix =>
         string.IsNullOrWhiteSpace(TagVersion)
-            ? "preview-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmm")
+            ? "preview-" + DateTimeSuffix
             : "";
 
     Target Clean => _ => _
@@ -104,7 +107,6 @@ partial class Build : NukeBuild
                 .SetInformationalVersion(TagVersion)
                 .SetVersionSuffix(VersionSuffix)
                 .SetConfiguration(Configuration)
-                .EnableNoBuild()
                 .SetOutputDirectory(ArtifactsDirectory)
             );
         });
