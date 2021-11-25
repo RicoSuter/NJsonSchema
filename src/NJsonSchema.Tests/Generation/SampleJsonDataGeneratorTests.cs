@@ -134,7 +134,6 @@ namespace NJsonSchema.Tests.Generation
             Assert.Null(obj.Property("isoptional"));
         }
 
-
         [Fact]
         public async Task PropertyWithIntegerMinimumDefiniton()
         {
