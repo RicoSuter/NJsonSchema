@@ -1,43 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-        <Description>JSON Schema reader, generator and validator for .NET</Description>
-        <Version>10.5.2</Version>
-        <PackageTags>json schema validation generator .net</PackageTags>
-        <Copyright>Copyright © Rico Suter, 2020</Copyright>
-        <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
-        <Authors>Rico Suter</Authors>
-        <PackageIcon>NuGetIcon.png</PackageIcon>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Company />
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    </PropertyGroup>
-    <PropertyGroup>
-        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
-        <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-        <PackageReference Include="Microsoft.Bcl.Async">
-            <Version>1.0.168</Version>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-        <Reference Include="Microsoft.CSharp" />
-        <Reference Include="System" />
-        <Reference Include="System.Net" />
-        <Reference Include="System.Runtime.Serialization" />
-        <Reference Include="System.Xml" />
-        <Reference Include="System.Xml.Linq" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <PackageReference Include="Microsoft.Bcl.Async">
+      <Version>1.0.168</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
