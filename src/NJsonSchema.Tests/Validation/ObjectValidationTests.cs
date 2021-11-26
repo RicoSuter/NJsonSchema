@@ -135,7 +135,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal("Foo", errors.First().Property);
             Assert.Equal("#/Foo", errors.First().Path);
         }
-        
+
         [Fact]
         public async Task When_type_property_has_integer_type_then_it_is_validated_correctly()
         {
@@ -197,7 +197,7 @@ namespace NJsonSchema.Tests.Validation
             var token = new JObject();
             token["foo"] = new JValue(5);
 
-            var validator = new JsonSchemaValidator(new JsonSchemaValidatorOptions()
+            var validator = new JsonSchemaValidator(new JsonSchemaValidatorSettings()
             {
                 IgnorePropertyNameCase = true,
             });

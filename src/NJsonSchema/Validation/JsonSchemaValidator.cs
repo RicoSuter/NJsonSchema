@@ -38,7 +38,7 @@ namespace NJsonSchema.Validation
         };
 
         private readonly IDictionary<string, IFormatValidator[]> _formatValidatorsMap;
-        private readonly JsonSchemaValidatorOptions _options;
+        private readonly JsonSchemaValidatorSettings _options;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
@@ -46,13 +46,13 @@ namespace NJsonSchema.Validation
         public JsonSchemaValidator(params IFormatValidator[] customValidators)
         {
             _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
-            _options = new JsonSchemaValidatorOptions();
+            _options = new JsonSchemaValidatorSettings();
         }
 
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
-        public JsonSchemaValidator(JsonSchemaValidatorOptions options, params IFormatValidator[] customValidators)
+        public JsonSchemaValidator(JsonSchemaValidatorSettings options, params IFormatValidator[] customValidators)
         {
             _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
             _options = options;
