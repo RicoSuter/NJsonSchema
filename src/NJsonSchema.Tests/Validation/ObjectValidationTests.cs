@@ -199,7 +199,7 @@ namespace NJsonSchema.Tests.Validation
 
             var validator = new JsonSchemaValidator(new JsonSchemaValidatorSettings()
             {
-                IgnorePropertyNameCase = true,
+                PropertyStringComparer = StringComparer.OrdinalIgnoreCase,
             });
 
             //// Act

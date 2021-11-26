@@ -370,8 +370,7 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            var stringComparer = _options.IgnorePropertyNameCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-            var stringComparison = _options.IgnorePropertyNameCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            var stringComparer = _options.PropertyStringComparer;
 
             var schemaPropertyKeys = new HashSet<string>(schema.Properties.Keys, stringComparer);
 
@@ -379,7 +378,7 @@ namespace NJsonSchema.Validation
             {
                 var newPropertyPath = GetPropertyPath(propertyPath, propertyInfo.Key);
 
-                if (obj != null && obj.TryGetValue(propertyInfo.Key, stringComparison, out var value))
+                if (obj != null && TryGetPropertyWithStringComparer(obj, propertyInfo.Key, stringComparer, out var value))
                 {
                     if (value.Type == JTokenType.Null && propertyInfo.Value.IsNullable(schemaType))
                     {
@@ -404,7 +403,7 @@ namespace NJsonSchema.Validation
                     continue;
                 }
 
-                if (obj?.TryGetValue(requiredProperty, stringComparison, out _) != true)
+                if (obj == null || !TryGetPropertyWithStringComparer(obj, requiredProperty, stringComparer, out _))
                 {
                     var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, requiredProperty, newPropertyPath, token, schema));
@@ -586,6 +585,28 @@ namespace NJsonSchema.Validation
             errorDictionary.Add(schema, errors);
 
             return new ChildSchemaValidationError(errorKind, property, path, errorDictionary, token, schema);
+        }
+
+        private bool TryGetPropertyWithStringComparer(JObject obj, string propertyName, StringComparer comparer, out JToken value)
+        {
+            // This method mimics the behavior of the JObject.TryGetValue(string property, StringComparison comparison, out JToken)
+            // extension method using a StringComparer class instead of StringComparison enum value.
+
+            if (obj.TryGetValue(propertyName, out value))
+            {
+                return true;
+            }
+
+            foreach (var property in obj.Properties())
+            {
+                if (comparer.Equals(propertyName, property.Name))
+                {
+                    value = property.Value;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
