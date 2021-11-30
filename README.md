@@ -26,7 +26,7 @@ The library uses [Json.NET](http://james.newtonking.com/json) to read and write 
 
 The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
 
-Preview NuGet Feed: https://www.myget.org/feed/Packages/njsonschema
+Preview NuGet Feed: https://www.myget.org/F/njsonschema/api/v3/index.json
 
 **Features:**
 
