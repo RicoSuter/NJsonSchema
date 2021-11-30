@@ -1795,7 +1795,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_using_SytemTextJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        public async Task When_using_SystemTextJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
         {
             //// Arrange
             var expectedToJsonMethod =
@@ -1835,7 +1835,7 @@ public static Person FromJson(string data)
         }
 
         [Fact]
-        public async Task When_using_SytemTextJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        public async Task When_using_SystemTextJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
         {
             //// Arrange
             var expectedToJsonMethod =

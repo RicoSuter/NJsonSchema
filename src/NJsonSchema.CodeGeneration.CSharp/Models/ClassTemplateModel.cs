@@ -69,7 +69,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             !_schema.IsArray &&
             !_schema.ActualTypeSchema.IsArray &&
             (_schema.ActualTypeSchema.AllowAdditionalProperties ||
-             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null);
+             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null)
+            && _schema.InheritedTypeSchema == null;
 
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries

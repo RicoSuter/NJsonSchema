@@ -6,7 +6,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
     public class CSharpJsonSerializerGeneratorTests
     {
         [Fact]
-        public void When_using_SytemTextJson_GenerateJsonSerializerParameterCode_generates_correctly()
+        public void When_using_SystemTextJson_GenerateJsonSerializerParameterCode_generates_correctly()
         {
             //// Arrange
             var additionalJsonConverters = new string[] { "AdditionalConverter1", "AdditionalConverter2" };
@@ -43,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public void When_using_SytemTextJson_with_JsonSerializerSettingsOrOptionsTransformationMethod_GenerateJsonSerializerParameterCode_generates_correctly()
+        public void When_using_SystemTextJson_with_JsonSerializerSettingsOrOptionsTransformationMethod_GenerateJsonSerializerParameterCode_generates_correctly()
         {
             //// Arrange
             var settings = new CSharpGeneratorSettings
@@ -82,7 +82,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public void When_using_SytemTextJson_with_JsonConverters_GenerateJsonConvertersArrayCode_generates_correctly()
+        public void When_using_SystemTextJson_with_JsonConverters_GenerateJsonConvertersArrayCode_generates_correctly()
         {
             //// Arrange
             var additionalJsonConverters = new string[] { "AdditionalConverter1", "AdditionalConverter2" };
