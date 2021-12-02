@@ -135,6 +135,12 @@ partial class Build : NukeBuild
                 throw new InvalidOperationException("Cannot pack if compilation hasn't been done in Release mode, use --configuration Release");
             }
 
+            var nugetVersion = VersionPrefix;
+            if (!string.IsNullOrWhiteSpace(VersionSuffix))
+            {
+                nugetVersion += "-" + VersionSuffix;
+            }
+
             EnsureCleanDirectory(ArtifactsDirectory);
 
             DotNetPack(s => s
@@ -142,8 +148,7 @@ partial class Build : NukeBuild
                 .SetAssemblyVersion(VersionPrefix)
                 .SetFileVersion(VersionPrefix)
                 .SetInformationalVersion(VersionPrefix)
-                .SetVersion(VersionPrefix)
-                .SetVersionSuffix(VersionSuffix)
+                .SetVersion(nugetVersion)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
             );
