@@ -21,6 +21,15 @@ on:
     branches:
       - master
       - main
+    tags:
+      - 'v*.*.*'
+    paths:
+      - '**/*.*'
+      - '!**/*.md'
+  pull_request:
+    paths:
+      - '**/*.*'
+      - '!**/*.md'
 
 jobs:
   windows-latest:
