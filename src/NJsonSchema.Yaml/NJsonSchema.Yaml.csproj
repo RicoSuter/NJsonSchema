@@ -7,7 +7,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-    <PackageReference Include="YamlDotNet" Version="9.1.4" />
+    <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />

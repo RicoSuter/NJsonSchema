@@ -89,6 +89,52 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task When_generateOptionalProperties_is_false_then_optional_properties_are_not_set()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""isrequired""
+                ],
+                ""properties"": {
+                  ""isrequired"": {
+                    ""type"": ""object"",
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""integer""
+                      }
+                    }
+                  },
+                  ""isoptional"": {
+                    ""type"": ""object"",
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""integer""
+                      }
+                    }
+                  }
+                }
+              }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var generator = new SampleJsonDataGenerator(new SampleJsonDataGeneratorSettings
+            {
+                GenerateOptionalProperties = false
+            });
+
+            //// Act
+            var token = generator.Generate(schema);
+            var obj = token as JObject;
+
+            //// Assert
+            Assert.NotNull(obj.Property("isrequired"));
+            Assert.Null(obj.Property("isoptional"));
+        }
+
+        [Fact]
         public async Task PropertyWithIntegerMinimumDefiniton()
         {
             //// Arrange
