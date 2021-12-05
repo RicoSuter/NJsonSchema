@@ -7,6 +7,8 @@ using NSwag;
 using System.Threading.Tasks;
 using Xunit;
 
+#pragma warning disable SYSLIB0012
+
 namespace NJsonSchema.Yaml.Tests.References
 {
     public class LocalReferencesTests
@@ -31,8 +33,8 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
         }
 
-        //[Theory]
-        //[InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
+        [Theory(Skip = "Ignored for now.")]
+        [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
         public async Task When_yaml_OpenAPI_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
         {
             var path = GetTestDirectory() + relativePath;
@@ -62,8 +64,8 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.NotNull(Unauthorized.Schema);
         }
 
-        //[Theory]
-        //[InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
+        [Theory(Skip = "Ignored for now.")]
+        [InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
         public async Task When_yaml_OpenAPI_spec_has__relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
         {
             var path = GetTestDirectory() + relativePath;
@@ -95,6 +97,7 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal("Completed", schema.Schema.ActualDiscriminatorObject.Mapping.Keys.First());
             Assert.Equal(2, schema.Schema.ActualSchema.ActualProperties["status"].ActualSchema.Enumeration.Count);
         }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
