@@ -20,9 +20,13 @@ namespace NJsonSchema.Generation
     public class SystemTextJsonReflectionService : ReflectionServiceBase<SystemTextJsonSchemaGeneratorSettings>
     {
         /// <inheritdocs />
-        public override void GenerateProperties(JsonSchema schema, Type type, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            foreach (var accessorInfo in type.GetContextualAccessors())
+            foreach (var accessorInfo in contextualType
+                .Properties
+                .OfType<ContextualAccessorInfo>()
+                .Concat(contextualType.Fields)
+                .Where(p => p.MemberInfo.DeclaringType == contextualType.Type))
             {
                 if (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute))))
                 {
@@ -60,23 +64,23 @@ namespace NJsonSchema.Generation
                 {
                     var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
                     var propertyName = GetPropertyName(accessorInfo, settings);
-                    var propertyAlreadyExists = schema.Properties.ContainsKey(propertyName);
 
+                    var propertyAlreadyExists = schema.Properties.ContainsKey(propertyName);
                     if (propertyAlreadyExists)
                     {
-                        if (settings.GetActualFlattenInheritanceHierarchy(type))
+                        if (settings.GetActualFlattenInheritanceHierarchy(contextualType.Type))
                         {
                             schema.Properties.Remove(propertyName);
                         }
                         else
                         {
-                            throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + type.FullName + "'.");
+                            throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + contextualType.Type.FullName + "'.");
                         }
                     }
 
                     var requiredAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
-                    var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, type)?.IsRequired == true;
+                    var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
                     var hasRequiredAttribute = requiredAttribute != null;
                     if (hasRequiredAttribute || isDataContractMemberRequired)

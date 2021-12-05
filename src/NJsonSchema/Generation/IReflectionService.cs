@@ -33,12 +33,12 @@ namespace NJsonSchema.Generation
         /// <summary>
         /// Generates the properties for the given type.
         /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="type"></param>
-        /// <param name="settings"></param>
-        /// <param name="schemaGenerator"></param>
-        /// <param name="schemaResolver"></param>
-        void GenerateProperties(JsonSchema schema, Type type, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+        /// <param name="schema">The schema.</param>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="settings">The settings.</param>
+        /// <param name="schemaGenerator">The schema generator.</param>
+        /// <param name="schemaResolver">The schema resolver.</param>
+        void GenerateProperties(JsonSchema schema, ContextualType contextualType, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>

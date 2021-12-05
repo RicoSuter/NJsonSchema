@@ -39,10 +39,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             //// Assert
-            var dschema = schema.Definitions["EmptyClassInheritingDictionary"];
+            var dictionarySchema = schema.Definitions["EmptyClassInheritingDictionary"];
 
-            Assert.Equal(0, dschema.AllOf.Count);
-            Assert.True(dschema.IsDictionary);
+            Assert.Equal(0, dictionarySchema.AllOf.Count);
+            Assert.True(dictionarySchema.IsDictionary);
             Assert.Contains("Foobar.", data);
             Assert.Contains("Foobar.", code);
 

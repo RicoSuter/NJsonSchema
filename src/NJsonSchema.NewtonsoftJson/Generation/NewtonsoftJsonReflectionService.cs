@@ -72,30 +72,28 @@ namespace NJsonSchema.Generation
         }
 
         /// <inheritdocs />
-        public override void GenerateProperties(JsonSchema schema, Type type, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            // TODO(reflection): Here we should use ContextualAccessorInfo to avoid losing information
+            var contextualAccessors = contextualType
+                .Properties
+                .Where(p => p.PropertyInfo.DeclaringType == contextualType.Type &&
+                            (p.PropertyInfo.GetMethod?.IsPrivate != true && p.PropertyInfo.GetMethod?.IsStatic == false ||
+                             p.PropertyInfo.SetMethod?.IsPrivate != true && p.PropertyInfo.SetMethod?.IsStatic == false ||
+                             p.PropertyInfo.IsDefined(typeof(DataMemberAttribute))))
+                .OfType<ContextualAccessorInfo>()
+                .Concat(contextualType
+                    .Fields
+                    .Where(f => f.FieldInfo.DeclaringType == contextualType.Type &&
+                                (!f.FieldInfo.IsPrivate && 
+                                 !f.FieldInfo.IsStatic || f.FieldInfo.IsDefined(typeof(DataMemberAttribute)))));
 
-            var members = type.GetTypeInfo()
-                .DeclaredFields
-                .Where(f => !f.IsPrivate && !f.IsStatic || f.IsDefined(typeof(DataMemberAttribute)))
-                .OfType<MemberInfo>()
-                .Concat(
-                    type.GetTypeInfo().DeclaredProperties
-                    .Where(p => p.GetMethod?.IsPrivate != true && p.GetMethod?.IsStatic == false ||
-                                p.SetMethod?.IsPrivate != true && p.SetMethod?.IsStatic == false ||
-                                p.IsDefined(typeof(DataMemberAttribute)))
-                )
-                .ToList();
+            var contract = settings.ResolveContract(contextualType.Type);
 
-            var contextualAccessors = members.Select(m => m.ToContextualAccessor()); // TODO(reflection): Do not use this method
-            var contract = settings.ResolveContract(type);
-
-            var allowedProperties = schemaGenerator.GetTypeProperties(type);
+            var allowedProperties = schemaGenerator.GetTypeProperties(contextualType.Type);
             var objectContract = contract as JsonObjectContract;
             if (objectContract != null && allowedProperties == null)
             {
-                foreach (var jsonProperty in objectContract.Properties.Where(p => p.DeclaringType == type))
+                foreach (var jsonProperty in objectContract.Properties.Where(p => p.DeclaringType == contextualType.Type))
                 {
                     bool shouldSerialize;
                     try
@@ -112,7 +110,7 @@ namespace NJsonSchema.Generation
                         var memberInfo = contextualAccessors.FirstOrDefault(p => p.Name == jsonProperty.UnderlyingName);
                         if (memberInfo != null && (settings.GenerateAbstractProperties || !schemaGenerator.IsAbstractProperty(memberInfo)))
                         {
-                            LoadPropertyOrField(jsonProperty, memberInfo, type, schema, settings, schemaGenerator, schemaResolver);
+                            LoadPropertyOrField(jsonProperty, memberInfo, contextualType.Type, schema, settings, schemaGenerator, schemaResolver);
                         }
                     }
                 }
@@ -120,22 +118,22 @@ namespace NJsonSchema.Generation
             else
             {
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
-                foreach (var memberInfo in contextualAccessors.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
+                foreach (var accessorInfo in contextualAccessors.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
-                    var attribute = memberInfo.GetContextAttribute<JsonPropertyAttribute>();
-                    var memberType = (memberInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
-                                     (memberInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
+                    var attribute = accessorInfo.GetContextAttribute<JsonPropertyAttribute>();
+                    var memberType = (accessorInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
+                                     (accessorInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
 
                     var jsonProperty = new JsonProperty
                     {
-                        AttributeProvider = new ReflectionAttributeProvider(memberInfo),
+                        AttributeProvider = new ReflectionAttributeProvider(accessorInfo),
                         PropertyType = memberType,
-                        Ignored = schemaGenerator.IsPropertyIgnored(memberInfo, type)
+                        Ignored = schemaGenerator.IsPropertyIgnored(accessorInfo, contextualType.Type)
                     };
 
                     if (attribute != null)
                     {
-                        jsonProperty.PropertyName = attribute.PropertyName ?? memberInfo.Name;
+                        jsonProperty.PropertyName = attribute.PropertyName ?? accessorInfo.Name;
                         jsonProperty.Required = attribute.Required;
                         jsonProperty.DefaultValueHandling = attribute.DefaultValueHandling;
                         jsonProperty.TypeNameHandling = attribute.TypeNameHandling;
@@ -144,10 +142,10 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
-                        jsonProperty.PropertyName = memberInfo.Name;
+                        jsonProperty.PropertyName = accessorInfo.Name;
                     }
 
-                    LoadPropertyOrField(jsonProperty, memberInfo, type, schema, settings, schemaGenerator, schemaResolver);
+                    LoadPropertyOrField(jsonProperty, accessorInfo, contextualType.Type, schema, settings, schemaGenerator, schemaResolver);
                 }
             }
         }

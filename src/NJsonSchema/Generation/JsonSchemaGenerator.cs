@@ -520,7 +520,6 @@ namespace NJsonSchema.Generation
         protected virtual void GenerateObject(JsonSchema schema, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
         {
             var type = typeDescription.ContextualType.Type;
-
             schemaResolver.AddSchema(type, false, schema);
 
             var rootSchema = schema;
@@ -531,7 +530,7 @@ namespace NJsonSchema.Generation
             }
             else
             {
-                Settings.ReflectionService.GenerateProperties(schema, type, Settings, this, schemaResolver);
+                Settings.ReflectionService.GenerateProperties(schema, typeDescription.ContextualType, Settings, this, schemaResolver);
                 ApplyAdditionalProperties(schema, type, schemaResolver);
             }
 
@@ -997,16 +996,17 @@ namespace NJsonSchema.Generation
 
             if (Settings.GetActualFlattenInheritanceHierarchy(type) && Settings.GenerateAbstractProperties)
             {
-                foreach (var i in type.Type.GetTypeInfo().ImplementedInterfaces)
+                foreach (var implementedInterface in type.Type.GetTypeInfo().ImplementedInterfaces)
                 {
-                    var typeDescription = Settings.ReflectionService.GetDescription(i.ToContextualType(), Settings);
+                    var contextualType = implementedInterface.ToContextualType();
+                    var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
                     if (!typeDescription.IsDictionary && !type.Type.IsArray &&
-                        !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(i.GetTypeInfo()))
+                        !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(implementedInterface.GetTypeInfo()))
                     {
-                        Settings.ReflectionService.GenerateProperties(schema, i, Settings, this, schemaResolver);
-                        var actualSchema = GenerateInheritance(i.ToContextualType(), schema, schemaResolver);
+                        Settings.ReflectionService.GenerateProperties(schema, contextualType, Settings, this, schemaResolver);
+                        var actualSchema = GenerateInheritance(contextualType, schema, schemaResolver);
 
-                        GenerateInheritanceDiscriminator(i, schema, actualSchema ?? schema);
+                        GenerateInheritanceDiscriminator(implementedInterface, schema, actualSchema ?? schema);
                     }
                 }
             }

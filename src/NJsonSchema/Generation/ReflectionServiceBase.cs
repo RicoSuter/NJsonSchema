@@ -23,7 +23,7 @@ namespace NJsonSchema.Generation
         public abstract string ConvertEnumValue(object value, TSettings settings);
 
         /// <inheritdocs />
-        public abstract void GenerateProperties(JsonSchema schema, Type type, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+        public abstract void GenerateProperties(JsonSchema schema, ContextualType contextualType, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
 
         /// <inheritdocs />
         public abstract string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings);
@@ -369,9 +369,9 @@ namespace NJsonSchema.Generation
             return ConvertEnumValue(value, (TSettings)settings);
         }
 
-        void IReflectionService.GenerateProperties(JsonSchema schema, Type type, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        void IReflectionService.GenerateProperties(JsonSchema schema, ContextualType contextualType, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            GenerateProperties(schema, type, (TSettings)settings, schemaGenerator, schemaResolver);
+            GenerateProperties(schema, contextualType, (TSettings)settings, schemaGenerator, schemaResolver);
         }
     }
 }
