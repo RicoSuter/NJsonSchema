@@ -19,7 +19,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>());
+        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>()); // we use list here there are usually very when items
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
@@ -84,14 +84,14 @@ namespace NJsonSchema
 
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        private JsonSchema GetActualSchema(IList<JsonSchema> checkedSchemas)
+        private JsonSchema GetActualSchema(List<JsonSchema> checkedSchemas)
         {
             if (checkedSchemas.Contains(this))
             {
                 throw new InvalidOperationException("Cyclic references detected.");
             }
 
-            if (((IJsonReferenceBase)this).ReferencePath != null && Reference == null)
+            if (Reference == null && ((IJsonReferenceBase)this).ReferencePath != null)
             {
                 throw new InvalidOperationException("The schema reference path '" + ((IJsonReferenceBase)this).ReferencePath + "' has not been resolved.");
             }
@@ -102,17 +102,17 @@ namespace NJsonSchema
 
                 if (HasAllOfSchemaReference)
                 {
-                    return _allOf.First().GetActualSchema(checkedSchemas);
+                    return _allOf[0].GetActualSchema(checkedSchemas);
                 }
 
                 if (HasOneOfSchemaReference)
                 {
-                    return _oneOf.First().GetActualSchema(checkedSchemas);
+                    return _oneOf[0].GetActualSchema(checkedSchemas);
                 }
 
                 if (HasAnyOfSchemaReference)
                 {
-                    return _anyOf.First().GetActualSchema(checkedSchemas);
+                    return _anyOf[0].GetActualSchema(checkedSchemas);
                 }
 
                 return Reference.GetActualSchema(checkedSchemas);
