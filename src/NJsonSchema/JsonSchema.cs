@@ -32,8 +32,7 @@ namespace NJsonSchema
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
 
-        private static Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new Lazy<PropertyRenameAndIgnoreSerializerContractResolver>(
-            () => CreateJsonSerializerContractResolver(SerializationSchemaType));
+        private static readonly Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new(() => CreateJsonSerializerContractResolver(SerializationSchemaType));
 
         private ObservableDictionary<string, JsonSchemaProperty> _properties;
         private ObservableDictionary<string, JsonSchemaProperty> _patternProperties;
@@ -47,7 +46,7 @@ namespace NJsonSchema
 
         private JsonObjectType _type;
         private JsonSchema _item;
-        private ObservableCollection<JsonSchema> _items;
+        internal ObservableCollection<JsonSchema> _items;
 
         private bool _allowAdditionalItems = true;
         private JsonSchema _additionalItemsSchema = null;
