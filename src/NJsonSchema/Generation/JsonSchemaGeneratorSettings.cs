@@ -80,7 +80,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are 
+        /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are
         /// defined on the object (otherwise allOf/oneOf with $ref is used, default: false).</summary>
         public bool AllowReferencesWithProperties { get; set; }
 
@@ -203,20 +203,22 @@ namespace NJsonSchema.Generation
                 return null;
             }
 
-            if (!_cachedContracts.ContainsKey(key))
+            if (!_cachedContracts.TryGetValue(key, out var contract))
             {
                 lock (_cachedContracts)
                 {
-                    if (!_cachedContracts.ContainsKey(key))
+                    if (!_cachedContracts.TryGetValue(key, out contract))
                     {
-                        _cachedContracts[key] = !type.GetTypeInfo().IsGenericTypeDefinition ?
-                            ActualContractResolver.ResolveContract(type) :
-                            null;
+                        contract = !type.GetTypeInfo().IsGenericTypeDefinition
+                            ? ActualContractResolver.ResolveContract(type)
+                            : null;
+
+                        _cachedContracts[key] = contract;
                     }
                 }
             }
 
-            return _cachedContracts[key];
+            return contract;
         }
 
         /// <summary>Gets the actual computed <see cref="GenerateAbstractSchemas"/> setting based on the global setting and the JsonSchemaAbstractAttribute attribute.</summary>
