@@ -23,10 +23,14 @@ namespace NJsonSchema
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema : IJsonExtensionObject
     {
-        private static JsonObjectType[] _jsonObjectTypeValues = Enum.GetValues(typeof(JsonObjectType))
+        private static readonly JsonObjectType[] _jsonObjectTypeValues = Enum.GetValues(typeof(JsonObjectType))
             .OfType<JsonObjectType>()
             .Where(v => v != JsonObjectType.None)
             .ToArray();
+
+
+        // keep a reference so we don't need to create a delegate each time
+        private readonly NotifyCollectionChangedEventHandler _initializeSchemaCollectionEventHandler;
 
         /// <summary>Creates the serializer contract resolver based on the <see cref="SchemaType"/>.</summary>
         /// <param name="schemaType">The schema type.</param>
@@ -427,12 +431,12 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
             {
-                oldCollection.CollectionChanged -= InitializeSchemaCollection;
+                oldCollection.CollectionChanged -= _initializeSchemaCollectionEventHandler;
             }
 
             if (newCollection != null)
             {
-                newCollection.CollectionChanged += InitializeSchemaCollection;
+                newCollection.CollectionChanged += _initializeSchemaCollectionEventHandler;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
@@ -442,12 +446,12 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
             {
-                oldCollection.CollectionChanged -= InitializeSchemaCollection;
+                oldCollection.CollectionChanged -= _initializeSchemaCollectionEventHandler;
             }
 
             if (newCollection != null)
             {
-                newCollection.CollectionChanged += InitializeSchemaCollection;
+                newCollection.CollectionChanged += _initializeSchemaCollectionEventHandler;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
@@ -456,39 +460,35 @@ namespace NJsonSchema
         {
             if (oldCollection != null)
             {
-                oldCollection.CollectionChanged -= InitializeSchemaCollection;
+                oldCollection.CollectionChanged -= _initializeSchemaCollectionEventHandler;
             }
 
             if (newCollection != null)
             {
-                newCollection.CollectionChanged += InitializeSchemaCollection;
+                newCollection.CollectionChanged += _initializeSchemaCollectionEventHandler;
                 InitializeSchemaCollection(newCollection, null);
             }
         }
 
         private void InitializeSchemaCollection(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (sender is ObservableDictionary<string, JsonSchemaProperty>)
+            if (sender is ObservableDictionary<string, JsonSchemaProperty> properties)
             {
-                var properties = (ObservableDictionary<string, JsonSchemaProperty>)sender;
                 foreach (var property in properties)
                 {
                     property.Value.Name = property.Key;
                     property.Value.Parent = this;
                 }
             }
-            else if (sender is ObservableCollection<JsonSchema>)
+            else if (sender is ObservableCollection<JsonSchema> items)
             {
-                var collection = (ObservableCollection<JsonSchema>)sender;
-                foreach (var item in collection)
+                foreach (var item in items)
                 {
                     item.Parent = this;
                 }
             }
-            else if (sender is ObservableDictionary<string, JsonSchema>)
+            else if (sender is ObservableDictionary<string, JsonSchema> collection)
             {
-                var collection = (ObservableDictionary<string, JsonSchema>)sender;
-
                 foreach (var pair in collection.ToArray())
                 {
                     if (pair.Value == null)

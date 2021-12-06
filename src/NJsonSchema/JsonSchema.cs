@@ -57,6 +57,8 @@ namespace NJsonSchema
         /// <summary>Initializes a new instance of the <see cref="JsonSchema"/> class. </summary>
         public JsonSchema()
         {
+            _initializeSchemaCollectionEventHandler = InitializeSchemaCollection;
+
             Initialize();
 
             if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2)
