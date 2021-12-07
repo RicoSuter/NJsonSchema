@@ -107,7 +107,10 @@ partial class Build : NukeBuild
                 .SetFileVersion(VersionPrefix)
                 .SetInformationalVersion(VersionPrefix)
                 .SetConfiguration(Configuration)
-                .EnableNoRestore());
+                .EnableNoRestore()
+                .SetDeterministic(IsServerBuild)
+                .SetContinuousIntegrationBuild(IsServerBuild)
+            );
         });
 
     Target Test => _ => _
@@ -154,6 +157,8 @@ partial class Build : NukeBuild
                 .SetVersion(nugetVersion)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
+                .SetDeterministic(IsServerBuild)
+                .SetContinuousIntegrationBuild(IsServerBuild)
             );
         });
 }
