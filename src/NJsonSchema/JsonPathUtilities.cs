@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema
@@ -79,8 +80,22 @@ namespace NJsonSchema
         private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects,
             string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
-            if (obj == null || obj is string || checkedObjects.Contains(obj))
+            if (obj == null)
             {
+                return false;
+            }
+
+            var type = obj.GetType();
+            if (type == typeof(string)
+#if !NETSTANDARD1_0
+                || type.IsPrimitive
+                || type.IsEnum
+#endif
+                || type == typeof(JValue)
+                || checkedObjects.Contains(obj)
+            )
+            {
+                // no need to inspect
                 return false;
             }
 
@@ -98,9 +113,20 @@ namespace NJsonSchema
             var pathAndSeparator = basePath + "/";
             if (obj is IDictionary dictionary)
             {
-                foreach (var key in dictionary.Keys)
+                foreach (DictionaryEntry pair in dictionary)
                 {
-                    if (FindJsonPaths(dictionary[key], searchedObjects, pathAndSeparator + key, checkedObjects, contractResolver))
+                    if (FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects, contractResolver))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else if (obj is IList list)
+            {
+                for (var i = 0; i < list.Count; ++i)
+                {
+                    var item = list[i];
+                    if (FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
                     {
                         return true;
                     }
@@ -115,17 +141,20 @@ namespace NJsonSchema
                     {
                         return true;
                     }
-
                     i++;
                 }
             }
             else
             {
-                var type = obj.GetType();
                 if (contractResolver.ResolveContract(type) is JsonObjectContract contract)
                 {
-                    foreach (var jsonProperty in contract.Properties.Where(p => !p.Ignored))
+                    foreach (var jsonProperty in contract.Properties)
                     {
+                        if (jsonProperty.Ignored)
+                        {
+                            continue;
+                        }
+
                         var value = jsonProperty.ValueProvider.GetValue(obj);
                         if (value != null)
                         {

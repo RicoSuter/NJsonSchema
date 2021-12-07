@@ -151,9 +151,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateAnyOf(JToken token, JsonSchema schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.AnyOf.Count > 0)
+            if (schema._anyOf.Count > 0)
             {
-                var propertyErrors = schema.AnyOf.ToDictionary(s => s, s => Validate(token, s));
+                var propertyErrors = schema._anyOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.All(s => s.Value.Count != 0))
                 {
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAnyOf, propertyName, propertyPath, propertyErrors, token, schema));
@@ -163,9 +163,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateAllOf(JToken token, JsonSchema schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.AllOf.Count > 0)
+            if (schema._allOf.Count > 0)
             {
-                var propertyErrors = schema.AllOf.ToDictionary(s => s, s => Validate(token, s));
+                var propertyErrors = schema._allOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.Any(s => s.Value.Count != 0))
                 {
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotAllOf, propertyName, propertyPath, propertyErrors, token, schema));
@@ -175,9 +175,9 @@ namespace NJsonSchema.Validation
 
         private void ValidateOneOf(JToken token, JsonSchema schema, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (schema.OneOf.Count > 0)
+            if (schema._oneOf.Count > 0)
             {
-                var propertyErrors = schema.OneOf.ToDictionary(s => s, s => Validate(token, s));
+                var propertyErrors = schema._oneOf.ToDictionary(s => s, s => Validate(token, s));
                 if (propertyErrors.Count(s => s.Value.Count == 0) != 1)
                 {
                     errors.Add(new ChildSchemaValidationError(ValidationErrorKind.NotOneOf, propertyName, propertyPath, propertyErrors, token, schema));
@@ -195,7 +195,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateNull(JToken token, JsonSchema schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Null) && token != null && token.Type != JTokenType.Null)
+            if (type.IsNull() && token != null && token.Type != JTokenType.Null)
             {
                 errors.Add(new ValidationError(ValidationErrorKind.NullExpected, propertyName, propertyPath, token, schema));
             }
@@ -251,7 +251,7 @@ namespace NJsonSchema.Validation
                     }
                 }
             }
-            else if (type.HasFlag(JsonObjectType.String))
+            else if (type.IsString())
             {
                 errors.Add(new ValidationError(ValidationErrorKind.StringExpected, propertyName, propertyPath, token, schema));
             }
@@ -259,7 +259,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateNumber(JToken token, JsonSchema schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Number) && token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
+            if (type.IsNumber() && token.Type != JTokenType.Float && token.Type != JTokenType.Integer)
             {
                 errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath, token, schema));
             }
@@ -329,7 +329,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateInteger(JToken token, JsonSchema schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Integer) && token.Type != JTokenType.Integer)
+            if (type.IsInteger() && token.Type != JTokenType.Integer)
             {
                 errors.Add(new ValidationError(ValidationErrorKind.IntegerExpected, propertyName, propertyPath, token, schema));
             }
@@ -337,7 +337,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateBoolean(JToken token, JsonSchema schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Boolean) && token.Type != JTokenType.Boolean)
+            if (type.IsBoolean() && token.Type != JTokenType.Boolean)
             {
                 errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath, token, schema));
             }
@@ -345,7 +345,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateObject(JToken token, JsonSchema schema, JsonObjectType type, string propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.HasFlag(JsonObjectType.Object) && !(token is JObject))
+            if (type.IsObject() && !(token is JObject))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath, token, schema));
             }
@@ -354,7 +354,7 @@ namespace NJsonSchema.Validation
         private void ValidateProperties(JToken token, JsonSchema schema, SchemaType schemaType, string propertyName, string propertyPath, List<ValidationError> errors)
         {
             var obj = token as JObject;
-            if (obj == null && schema.Type.HasFlag(JsonObjectType.Null))
+            if (obj == null && schema.Type.IsNull())
             {
                 return;
             }
@@ -517,7 +517,7 @@ namespace NJsonSchema.Validation
                     ValidateAdditionalItems(item, schema, schemaType, index, propertyPath, errors);
                 }
             }
-            else if (type.HasFlag(JsonObjectType.Array))
+            else if (type.IsArray())
             {
                 errors.Add(new ValidationError(ValidationErrorKind.ArrayExpected, propertyName, propertyPath, token, schema));
             }

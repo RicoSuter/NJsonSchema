@@ -98,28 +98,32 @@ namespace NJsonSchema.Visitors
                     Visit(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o);
                 }
 
-                for (var i = 0; i < schema.Items.Count; i++)
+                var items = schema._items;
+                for (var i = 0; i < items.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o));
+                    Visit(items[i], path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o));
                 }
 
-                for (var i = 0; i < schema.AllOf.Count; i++)
+                var allOf = schema._allOf;
+                for (var i = 0; i < allOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o));
+                    Visit(allOf[i], path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o));
                 }
 
-                for (var i = 0; i < schema.AnyOf.Count; i++)
+                var anyOf = schema._anyOf;
+                for (var i = 0; i < anyOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o));
+                    Visit(anyOf[i], path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o));
                 }
 
-                for (var i = 0; i < schema.OneOf.Count; i++)
+                var oneOf = schema._oneOf;
+                for (var i = 0; i < oneOf.Count; i++)
                 {
                     var index = i;
-                    Visit(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o));
+                    Visit(oneOf[i], path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o));
                 }
 
                 if (schema.Not != null)
@@ -234,16 +238,16 @@ namespace NJsonSchema.Visitors
             }
         }
 
-        private void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
+        private static void ReplaceOrDelete<T>(ObservableCollection<T> collection, int index, T obj)
         {
-            ((Collection<T>)collection).RemoveAt(index);
+            collection.RemoveAt(index);
             if (obj != null)
             {
-                ((Collection<T>)collection).Insert(index, obj);
+                collection.Insert(index, obj);
             }
         }
 
-        private void ReplaceOrDelete(IList collection, int index, object obj)
+        private static void ReplaceOrDelete(IList collection, int index, object obj)
         {
             collection.RemoveAt(index);
             if (obj != null)
