@@ -309,7 +309,14 @@ namespace NJsonSchema
 
         private static string ConvertDashesToCamelCase(string input)
         {
-            var sb = new StringBuilder();
+            if (input.IndexOf('-') == -1)
+            {
+                // no conversion necessary
+                return input;
+            }
+
+            // we are removing at least one character
+            var sb = new StringBuilder(input.Length - 1);
             var caseFlag = false;
             foreach (var c in input)
             {
