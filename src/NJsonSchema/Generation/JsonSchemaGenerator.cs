@@ -474,11 +474,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualType type)
         {
-            if (Settings.GenerateExamples)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = type.GetXmlDocsTag("example");
+                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -494,11 +494,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualAccessorInfo accessorInfo)
         {
-            if (Settings.GenerateExamples)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = accessorInfo.GetXmlDocsTag("example");
+                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -551,7 +551,7 @@ namespace NJsonSchema.Generation
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = type.ToCachedType().GetDescription();
+            schema.Description = type.ToCachedType().GetDescription(Settings);
             schema.Example = GenerateExample(type.ToContextualType());
 
             dynamic obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
@@ -861,10 +861,13 @@ namespace NJsonSchema.Generation
             else if (schema.GetType() == typeof(JsonSchema))
             {
                 typeDescription.ApplyType(schema);
-                schema.Description = type.GetXmlDocsSummary();
+
+                if (Settings.UseXmlDocumentation)
+                {
+                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocumentation);
+                }
 
                 GenerateEnum(schema, typeDescription);
-
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
             else
@@ -1278,7 +1281,7 @@ namespace NJsonSchema.Generation
 
                     if (propertySchema.Description == null)
                     {
-                        propertySchema.Description = accessorInfo.GetDescription();
+                        propertySchema.Description = accessorInfo.GetDescription(Settings);
                     }
 
                     if (propertySchema.Example == null)
