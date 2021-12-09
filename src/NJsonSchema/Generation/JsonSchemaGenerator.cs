@@ -474,11 +474,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualType type)
         {
-            if (Settings.GenerateExamples && Settings.UseXmlDocs)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocs);
+                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -494,11 +494,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualAccessorInfo accessorInfo)
         {
-            if (Settings.GenerateExamples && Settings.UseXmlDocs)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocs);
+                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -862,9 +862,9 @@ namespace NJsonSchema.Generation
             {
                 typeDescription.ApplyType(schema);
 
-                if (Settings.UseXmlDocs)
+                if (Settings.UseXmlDocumentation)
                 {
-                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocs);
+                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocumentation);
                 }
 
                 GenerateEnum(schema, typeDescription);

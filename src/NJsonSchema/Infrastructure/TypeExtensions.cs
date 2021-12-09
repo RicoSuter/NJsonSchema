@@ -72,9 +72,9 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            if (xmlDocsSettings.UseXmlDocs)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = type.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocs);
+                var summary = type.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -96,9 +96,9 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            if (xmlDocsSettings.UseXmlDocs)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocs);
+                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -120,9 +120,9 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            if (xmlDocsSettings.UseXmlDocs)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = parameter.GetXmlDocs(xmlDocsSettings.ResolveExternalXmlDocs);
+                var summary = parameter.GetXmlDocs(xmlDocsSettings.ResolveExternalXmlDocumentation);
                 if (summary != string.Empty)
                 {
                     return summary;
