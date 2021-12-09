@@ -22,7 +22,7 @@ using Namotion.Reflection;
 namespace NJsonSchema.Generation
 {
     /// <summary>The JSON Schema generator settings.</summary>
-    public class JsonSchemaGeneratorSettings
+    public class JsonSchemaGeneratorSettings : IXmlDocsSettings
     {
         private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
 
@@ -54,6 +54,7 @@ namespace NJsonSchema.Generation
             ReflectionService = new DefaultReflectionService();
 
             ExcludedTypeNames = new string[0];
+            UseXmlDocs = true;
         }
 
         /// <summary>Gets or sets the default reference type null handling when no nullability information is available (default: Null).</summary>
@@ -122,6 +123,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
         public string[] ExcludedTypeNames { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to read XML Docs (default: true).</summary>
+        public bool UseXmlDocs { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]
