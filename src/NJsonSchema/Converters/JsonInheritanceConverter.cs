@@ -9,6 +9,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
