@@ -91,7 +91,7 @@ namespace NJsonSchema.Generation
         /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
         public bool AlwaysAllowAdditionalObjectProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to generate the example property of the schemas based on the &lt;example&gt; xml docs entry as JSON.</summary>
+        /// <summary>Gets or sets a value indicating whether to generate the example property of the schemas based on the &lt;example&gt; xml docs entry as JSON (requires <see cref="UseXmlDocs"/> to be true, default: true).</summary>
         public bool GenerateExamples { get; set; }
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
