@@ -54,7 +54,9 @@ namespace NJsonSchema.Generation
             ReflectionService = new DefaultReflectionService();
 
             ExcludedTypeNames = new string[0];
+
             UseXmlDocs = true;
+            ResolveExternalXmlDocs = true;
         }
 
         /// <summary>Gets or sets the default reference type null handling when no nullability information is available (default: Null).</summary>
@@ -126,6 +128,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether to read XML Docs (default: true).</summary>
         public bool UseXmlDocs { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory (default: true).</summary>
+        public bool ResolveExternalXmlDocs { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]

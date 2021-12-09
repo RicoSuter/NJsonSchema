@@ -13,5 +13,8 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Gets or sets a value indicating whether to read XML Docs (default: true).</summary>
         bool UseXmlDocs { get; }
+
+        /// <summary>Gets or sets a value indicating whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory (default: true).</summary>
+        bool ResolveExternalXmlDocs { get; }
     }
 }

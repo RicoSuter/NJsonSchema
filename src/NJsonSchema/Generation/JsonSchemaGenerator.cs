@@ -478,7 +478,7 @@ namespace NJsonSchema.Generation
             {
                 try
                 {
-                    var docs = type.GetXmlDocsTag("example");
+                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocs);
                     return GenerateExample(docs);
                 }
                 catch
@@ -498,7 +498,7 @@ namespace NJsonSchema.Generation
             {
                 try
                 {
-                    var docs = accessorInfo.GetXmlDocsTag("example");
+                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocs);
                     return GenerateExample(docs);
                 }
                 catch
@@ -864,7 +864,7 @@ namespace NJsonSchema.Generation
 
                 if (Settings.UseXmlDocs)
                 {
-                    schema.Description = type.GetXmlDocsSummary();
+                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocs);
                 }
 
                 GenerateEnum(schema, typeDescription);
