@@ -24,7 +24,7 @@
 {%- if IsDeprecated -%}
 [System.Obsolete{% if HasDeprecatedMessage %}({{ DeprecatedMessage | literal }}){% endif %}]
 {% endif -%}
-{%- template Class.Annotations %}
+{%- template Class.Annotations -%}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {% if GenerateNativeRecords %}record{% else %}class{% endif %} {{ClassName}} {%- template Class.Inheritance %}
 {
 {%- if IsTuple -%}

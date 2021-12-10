@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     // TODO: Add base class for CSharp.EnumTemplateModel and TypeScript.EnumTemplateModel
 
     /// <summary>The CSharp enum template model.</summary>
-    public class EnumTemplateModel : TemplateModelBase
+    public class EnumTemplateModel
     {
         private readonly JsonSchema _schema;
         private readonly CSharpGeneratorSettings _settings;

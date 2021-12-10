@@ -222,7 +222,7 @@ namespace NJsonSchema.CodeGeneration
                     {
                         templateContext = new TemplateContext(_model, _templateOptions);
                         templateContext.AmbientValues.Add(LiquidParser.SettingsKey, _settings);
-                        templateContext.AmbientValues.Add("ToolchainVersion", _toolchainVersion);
+                        templateContext.SetValue("ToolchainVersion", _toolchainVersion);
                     }
 
                     templateContext.AmbientValues[LiquidParser.LanguageKey] = _language;
