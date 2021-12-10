@@ -43,6 +43,29 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
+        [Fact]
+        public async Task When_code_is_generated_then_toolchain_version_is_printed()
+        {
+            //// Arrange
+            var json = @"{
+                'required': [ 'emptySchema' ],
+                'properties': {
+                    'emptySchema': { 'type': 'array' }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var generator = new CSharpGenerator(schema, settings);
+            var output = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains(" (Newtonsoft.Json ", output);
+
+            AssertCompile(output);
+        }
+
         class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
             public string Generate(JsonSchemaProperty property)
