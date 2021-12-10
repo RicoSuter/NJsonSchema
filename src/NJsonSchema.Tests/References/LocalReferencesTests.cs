@@ -3,12 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using NJsonSchema.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.References
 {
-    using NJsonSchema.Generation;
-
     public class LocalReferencesTests
     {
         [Fact]

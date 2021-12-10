@@ -245,7 +245,7 @@ namespace NJsonSchema
 
             if (obj is IJsonReference reference && reference.Reference != null)
             {
-                var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, targetType, contractResolver, checkedObjects);
+                var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, targetType, contractResolver, new HashSet<object>(checkedObjects));
                 if (result == null)
                 {
                     return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
@@ -255,8 +255,10 @@ namespace NJsonSchema
                     return result;
                 }
             }
-
-            return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
+            else
+            {
+                return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
+            }
         }
 
         private IJsonReference ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
