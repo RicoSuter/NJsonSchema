@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
         public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
 
-        /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
+        /// <summary>Gets a value indicating whether an additional properties type is available and needed.</summary>
         public bool HasAdditionalPropertiesType =>
             !_schema.IsDictionary &&
             !_schema.ActualTypeSchema.IsDictionary &&
@@ -70,7 +70,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             !_schema.ActualTypeSchema.IsArray &&
             (_schema.ActualTypeSchema.AllowAdditionalProperties ||
              _schema.ActualTypeSchema.AdditionalPropertiesSchema != null)
-            && _schema.InheritedTypeSchema == null;
+            && BaseClass?.HasAdditionalPropertiesType != true;
 
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
