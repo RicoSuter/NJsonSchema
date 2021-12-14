@@ -270,19 +270,13 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            if (input is null)
-            {
-                return "";
-            }
-            var tabString = CreateTabString(tabCount);
-            input = input
-                .Replace("\r", string.Empty);
-
-            var stringWriter = new StringWriter(new StringBuilder(input.Length), CultureInfo.CurrentCulture);
-            AddPrefixToBeginningOfNonEmptyLines(input, tabString + "/// ", stringWriter);
+            input = input?
+                        .Replace("\r", string.Empty)
+                        .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
+                    ?? string.Empty;
 
             // TODO: Support more markdown features here
-            var xml = new XText(stringWriter.ToString()).ToString();
+            var xml = new XText(input).ToString();
             return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
         }
 

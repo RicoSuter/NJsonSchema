@@ -293,7 +293,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>EnumDesc.</summary>", output);
+            var summary = @"
+        /// <summary>
+        /// EnumDesc.
+        /// </summary>".Replace("\r", "").Trim();
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -310,7 +314,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>ClassDesc.</summary>", output);
+            var summary = @"
+    /// <summary>
+    /// ClassDesc.
+    /// </summary>".Replace("\r", "");
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -327,7 +335,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>PropertyDesc.</summary>", output);
+            var summary = @"
+        /// <summary>
+        /// PropertyDesc.
+        /// </summary>".Replace("\r", "").Trim();
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -1979,6 +1991,49 @@ public static Person FromJson(string data)
             Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
 
             AssertCompile(output);
+        }
+
+        public class DocumentationTest
+        {
+            /// <summary>
+            /// Summary is here
+            ///
+            /// spanning multiple lines
+            ///
+            /// like this.
+            ///
+            /// </summary>
+            public string HelloMessage { get; set; }
+        }
+
+        [Fact]
+        public async Task When_documentation_present_produces_valid_xml_documentation_syntax()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<DocumentationTest>();
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            var expected = @"
+        /// <summary>
+        /// Summary is here
+        /// <br/>            
+        /// <br/>spanning multiple lines
+        /// <br/>            
+        /// <br/>like this.
+        /// <br/>            
+        /// </summary>".Replace("\r","");
+
+            Assert.Contains(expected, code);
+
+            AssertCompile(code);
         }
     }
 }
