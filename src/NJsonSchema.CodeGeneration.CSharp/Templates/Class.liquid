@@ -1,5 +1,7 @@
 ﻿{%- if HasDescription -%}
-/// <summary>{{ Description | csharpdocs }}</summary>
+/// <summary>
+/// {{ Description | csharpdocs }}
+/// </summary>
 {%- endif -%}
 {%- if HasDiscriminator -%}
 {%- if UseSystemTextJson -%}
@@ -45,7 +47,9 @@
 {%- endif -%}
 {%- for property in Properties -%}
 {%-   if property.HasDescription -%}
-    /// <summary>{{ property.Description | csharpdocs }}</summary>
+    /// <summary>
+    /// {{ property.Description | csharpdocs }}
+    /// </summary>
 {%-   endif -%}
 {%- if UseSystemTextJson %}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
