@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="13.14.8" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="13.15.4" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
