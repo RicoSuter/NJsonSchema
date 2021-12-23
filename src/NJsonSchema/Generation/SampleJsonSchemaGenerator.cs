@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -33,6 +34,26 @@ namespace NJsonSchema.Generation
             return schema;
         }
 
+        /// <summary>Generates the JSON Schema for the given JSON data.</summary>
+        /// <param name="stream">The JSON data stream.</param>
+        /// <returns>The JSON Schema.</returns>
+        public JsonSchema Generate(Stream stream)
+        {
+            using var reader = new StreamReader(stream);
+            using var jsonReader = new JsonTextReader(reader);
+
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat
+            });
+
+            var token = serializer.Deserialize<JToken>(jsonReader);
+
+            var schema = new JsonSchema();
+            Generate(token, schema, schema, "Anonymous");
+            return schema;
+        }
+
         private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)
@@ -48,7 +69,7 @@ namespace NJsonSchema.Generation
                             s.Type == JsonObjectType.Object &&
                             properties.All(p => s.Properties.ContainsKey(p.Name)));
                 }
-                
+
                 if (referencedSchema == null)
                 {
                     referencedSchema = new JsonSchema();

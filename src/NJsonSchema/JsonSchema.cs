@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -137,14 +138,22 @@ namespace NJsonSchema
             return generator.Generate(data);
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromSampleJson(Stream stream)
+        {
+            var generator = new SampleJsonSchemaGenerator();
+            return generator.Generate(stream);
+        }
+
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="cancellationToken">Cancellation token instance</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromFileAsync(string filePath, CancellationToken cancellationToken = default)
+        public static Task<JsonSchema> FromFileAsync(string filePath, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromFileAsync(filePath, factory, cancellationToken).ConfigureAwait(false);
+            return FromFileAsync(filePath, factory, cancellationToken);
         }
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
@@ -153,10 +162,15 @@ namespace NJsonSchema
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
-        public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
+        public static Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = DynamicApis.FileReadAllText(filePath);
-            return await FromJsonAsync(data, filePath, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
+#if !NETSTANDARD1_0
+            using var stream = File.OpenRead(filePath);
+            return FromJsonAsync(stream, filePath, referenceResolverFactory, cancellationToken);
+#else
+            var json = DynamicApis.FileReadAllText(filePath);
+            return FromJsonAsync(json, filePath, referenceResolverFactory, cancellationToken);
+#endif
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -164,10 +178,10 @@ namespace NJsonSchema
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
-        public static async Task<JsonSchema> FromUrlAsync(string url, CancellationToken cancellationToken = default)
+        public static Task<JsonSchema> FromUrlAsync(string url, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromUrlAsync(url, factory, cancellationToken).ConfigureAwait(false);
+            return FromUrlAsync(url, factory, cancellationToken);
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
@@ -186,9 +200,19 @@ namespace NJsonSchema
         /// <param name="data">The JSON string. </param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, CancellationToken cancellationToken = default)
+        public static Task<JsonSchema> FromJsonAsync(string data, CancellationToken cancellationToken = default)
         {
-            return await FromJsonAsync(data, null, cancellationToken).ConfigureAwait(false);
+            return FromJsonAsync(data, null, cancellationToken);
+        }
+
+        /// <summary>Deserializes a JSON stream to a <see cref="JsonSchema"/>. </summary>
+        /// <param name="stream">The JSON data stream.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The JSON Schema.</returns>
+        public static Task<JsonSchema> FromJsonAsync(Stream stream, CancellationToken cancellationToken = default)
+        {
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
+            return FromJsonAsync(stream, null, factory, cancellationToken);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/>. </summary>
@@ -196,10 +220,10 @@ namespace NJsonSchema
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, CancellationToken cancellationToken = default)
+        public static Task<JsonSchema> FromJsonAsync(string data, string documentPath, CancellationToken cancellationToken = default)
         {
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            return await FromJsonAsync(data, documentPath, factory, cancellationToken).ConfigureAwait(false);
+            return FromJsonAsync(data, documentPath, factory, cancellationToken);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema" />.</summary>
@@ -208,10 +232,22 @@ namespace NJsonSchema
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema,
+        public static Task<JsonSchema> FromJsonAsync(string data, string documentPath, Func<JsonSchema,
             JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            return await JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken).ConfigureAwait(false);
+            return JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema" />.</summary>
+        /// <param name="stream">The JSON data stream.</param>
+        /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
+        /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The JSON Schema.</returns>
+        public static Task<JsonSchema> FromJsonAsync(Stream stream, string documentPath, Func<JsonSchema,
+            JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
+        {
+            return JsonSchemaSerialization.FromJsonAsync(stream, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
         }
 
         internal static JsonSchema FromJsonWithCurrentSettings(object obj)
