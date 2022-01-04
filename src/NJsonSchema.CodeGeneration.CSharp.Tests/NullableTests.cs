@@ -36,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public int Property { get; set; }", code);
+            Assert.Contains("public int? Property { get; set; }", code);
             Assert.Contains("public int Property2 { get; set; }", code);
         }
 
