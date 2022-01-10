@@ -290,7 +290,7 @@ namespace NJsonSchema
                     return hasReference.ActualSchema;
                 }
 
-                var objectTyped = _allOf.First(s => s.Type.IsObject());
+                var objectTyped = _allOf.FirstOrDefault(s => s.Type.IsObject());
                 if (objectTyped != null)
                 {
                     return objectTyped.ActualSchema;
