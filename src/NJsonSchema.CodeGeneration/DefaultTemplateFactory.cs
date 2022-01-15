@@ -147,6 +147,10 @@ namespace NJsonSchema.CodeGeneration
             private static readonly LiquidParser _parser;
             private static readonly TemplateOptions _templateOptions;
 
+            private static readonly Regex _tabCountRegex = new("(\\s*)?\\{%(-)?\\s+template\\s+([a-zA-Z0-9_.]+)(\\s*?.*?)\\s(-)?%}", RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _csharpDocsRegex = new("(\n( )*)([^\n]*?) \\| csharpdocs }}", RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _tabRegex = new("(\n( )*)([^\n]*?) \\| tab }}", RegexOptions.Singleline | RegexOptions.Compiled);
+
             public LiquidTemplate(
                 string language,
                 string template,
@@ -167,6 +171,8 @@ namespace NJsonSchema.CodeGeneration
             {
                 var childScope = false;
                 TemplateContext templateContext = null;
+                var templateContent = _templateContentLoader(_language, _template);
+
                 try
                 {
                     // use language and template name as key for faster lookup than using the content
@@ -174,11 +180,11 @@ namespace NJsonSchema.CodeGeneration
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
-                        var data = _templateContentLoader(_language, _template).Replace("\r", "");
+                        var data = templateContent.Replace("\r", "");
                         data = "\n" + data;
 
                         // tab count parameters to template based on surrounding code, how many spaces before the template tag
-                        data = Regex.Replace(data, "(\\s*)?\\{%(-)?\\s+template\\s+([a-zA-Z0-9_.]+)(\\s*?.*?)\\s(-)?%}",
+                        data = _tabCountRegex.Replace(data,
                             m =>
                             {
                                 var whitespace = m.Groups[1].Value;
@@ -197,16 +203,13 @@ namespace NJsonSchema.CodeGeneration
                                 rewritten += m.Groups[5].Value + "%}";
 
                                 return rewritten;
-                            },
-                            RegexOptions.Singleline);
+                            });
 
-                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| csharpdocs }}", m =>
-                            m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}",
-                            RegexOptions.Singleline);
+                        data = _csharpDocsRegex.Replace(data,  m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}");
 
-                        data = Regex.Replace(data, "(\n( )*)([^\n]*?) \\| tab }}", m =>
-                            m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}",
-                            RegexOptions.Singleline);
+                        data = _tabRegex.Replace(data, m =>
+                            m.Groups[1].Value + m.Groups[3].Value + " | tab: " + m.Groups[1].Value.Length / 4 + " }}");
 
                         return _parser.Parse(data);
                     });
@@ -239,8 +242,13 @@ namespace NJsonSchema.CodeGeneration
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidOperationException(
-                        $"Error while rendering Liquid template {_language}/{_template}: \n" + exception, exception);
+                    var message = $"Error while rendering Liquid template {_language}/{_template}: \n{exception.Message}";
+                    if (exception.Message.Contains("'{% endif %}' was expected ")
+                        && templateContent.IndexOf("elseif", StringComparison.Ordinal) != -1)
+                    {
+                        message += ", did you use 'elseif' instead of correct 'elsif'?";
+                    }
+                    throw new InvalidOperationException(message, exception);
                 }
                 finally
                 {
