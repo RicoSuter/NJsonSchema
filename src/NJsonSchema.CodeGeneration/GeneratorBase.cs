@@ -72,9 +72,12 @@ namespace NJsonSchema.CodeGeneration
         {
             var processedTypes = new List<string>();
             var types = new Dictionary<string, CodeArtifact>();
+
             while (_resolver.Types.Any(t => !processedTypes.Contains(t.Value)))
             {
-                foreach (var pair in _resolver.Types)
+                // we need to keep clone to allow updates
+                var resolverTypes = new Dictionary<JsonSchema, string>(_resolver._generatedTypeNames);
+                foreach (var pair in resolverTypes)
                 {
                     processedTypes.Add(pair.Value);
                     var result = GenerateType(pair.Key, pair.Value);
