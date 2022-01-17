@@ -23,14 +23,12 @@
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
 {%     endif -%}
-{%     if GenerateConstructorInterface and condition_temp -%}
         if (data) {
-{%         if HasInheritance == false -%}
             for (var property in data) {
-                if (data.hasOwnProperty(property))
+                if (data.hasOwnProperty(property) && this.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
-{%         endif -%}
+{%     if GenerateConstructorInterface and condition_temp -%}
 {%         if ConvertConstructorInterfaceData -%}
 {%             for property in Properties -%}
 {%                 if property.SupportsConstructorConversion -%}
@@ -58,8 +56,9 @@
 {%                 endif -%}
 {%             endfor -%}
 {%         endif -%}
-        }
 {%     endif -%}
+        }
+
 {%     if HasDefaultValues -%}
         {% if GenerateConstructorInterface %}if (!data) {% endif %}{
 {%         for property in Properties -%}
