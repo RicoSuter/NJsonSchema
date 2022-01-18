@@ -70,25 +70,45 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code.</returns>
         public virtual IEnumerable<CodeArtifact> GenerateTypes()
         {
-            var processedTypes = new List<string>();
-            var types = new Dictionary<string, CodeArtifact>();
-
-            while (_resolver.Types.Any(t => !processedTypes.Contains(t.Value)))
+            // gathers all items that have not yet been processed
+            static List<KeyValuePair<JsonSchema, string>> GetItemsRequiringGeneration(
+                Dictionary<JsonSchema, string> types,
+                HashSet<string> processedTypes)
             {
-                // we need to keep clone to allow updates
-                var resolverTypes = new Dictionary<JsonSchema, string>(_resolver._generatedTypeNames);
-                foreach (var pair in resolverTypes)
+                var items = new List<KeyValuePair<JsonSchema, string>>();
+                foreach (var pair in types)
+                {
+                    if (!processedTypes.Contains(pair.Value))
+                    {
+                        items.Add(pair);
+                    }
+                }
+
+                return items;
+            }
+
+            var processedTypes = new HashSet<string>();
+            var missing = GetItemsRequiringGeneration(_resolver._generatedTypeNames, processedTypes);
+
+            var types = new Dictionary<string, CodeArtifact>(missing.Count);
+            while (missing.Count > 0)
+            {
+                // generate all, but only include non-ignored in final result
+                foreach (var pair in missing)
                 {
                     processedTypes.Add(pair.Value);
                     var result = GenerateType(pair.Key, pair.Value);
-                    types[result.TypeName] = result;
+                    if (!_settings.ExcludedTypeNames.Contains(result.TypeName))
+                    {
+                        types[result.TypeName] = result;
+                    }
                 }
+
+                // another pass if needed
+                missing = GetItemsRequiringGeneration(_resolver._generatedTypeNames, processedTypes);
             }
 
-            var artifacts = types.Values
-                .Where(p => !_settings.ExcludedTypeNames.Contains(p.TypeName));
-
-            return artifacts;
+            return types.Values;
         }
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
