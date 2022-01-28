@@ -12,9 +12,9 @@ if (Array.isArray({{ Value }})) {
         {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push({{ ArrayItemType }}.fromJS(item{% if HandleReferences %}, _mappings{% endif %}));
 {%   else -%}
 {%     if IsArrayItemDate -%}
-        {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push({{ StringToDateCode }}(item));
-{%     elsif IsArrayItemDateTime -%}
         {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push({{ StringToDateOnlyCode }}(item));
+{%     elsif IsArrayItemDateTime -%}
+        {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push({{ StringToDateCode }}(item));
 {%     else -%}
         {{ Variable }}{% if RequiresStrictPropertyInitialization %}!{% endif %}.push(item);
 {%     endif -%}
