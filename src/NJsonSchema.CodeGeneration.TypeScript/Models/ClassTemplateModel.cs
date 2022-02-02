@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             Properties = _schema.ActualProperties.Values
-                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface || 
+                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface ||
                             v.IsInheritanceDiscriminator == false)
                 .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
                 .ToList();
@@ -141,7 +141,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDefaultValues => Properties.Any(p => p.HasDefaultValue);
 
         /// <summary>Gets a value indicating whether </summary>
-        public bool RequiresStrictPropertyInitialization => _settings.TypeScriptVersion >= 2.7m;
+        public bool RequiresStrictPropertyInitialization => _settings.RequiresStrictPropertyInitialization;
+
+        /// <summary>Gets a value indicating whether </summary>
+        public bool SupportsOverrideKeyword => _settings.SupportsOverrideKeyword;
 
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;

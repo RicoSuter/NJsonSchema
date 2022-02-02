@@ -57,6 +57,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_generating_TypeScript_derived_classes_with_override_supporting_version_then_output_is_correct()
+        {
+            var code = await PrepareAsync<Student>(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 4.3m });
+
+            // Assert
+            Assert.Contains("override init(_data?: any) {", code);
+        }
+
+        [Fact]
+        public async Task When_generating_TypeScript_non_derived_classes_with_override_supporting_version_then_output_is_correct()
+        {
+            var code = await PrepareAsync<Person>(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 4.3m });
+
+            // Assert
+            Assert.DoesNotContain("override init(_data?: any) {", code);
+        }
+
+        [Fact]
         public async Task When_default_value_is_available_then_variable_is_initialized()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings
@@ -79,9 +97,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("dateOfBirth = ko.observable<Date>();", code);
         }
 
-        private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
+        private static Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
-            var schema = JsonSchema.FromType<MyClassTest>();
+            return PrepareAsync<MyClassTest>(settings);
+        }
+
+        private static async Task<string> PrepareAsync<T>(TypeScriptGeneratorSettings settings)
+        {
+            var schema = JsonSchema.FromType<T>();
             var data = schema.ToJson();
 
             //// Act
