@@ -1,13 +1,19 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {%- if UseSystemTextJson -%}
-internal class DateFormatConverter : JsonConverter<DateTime>
+internal class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTime>
 {
     public override System.DateTime Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
     {
-        return DateTime.Parse(reader.GetString());
+        var dateTime = reader.GetString();
+        if (dateTime == null)
+        {
+            throw new JsonException("Unexpected JsonTokenType.Null");
+        }
+
+        return System.DateTime.Parse(dateTime);
     }
 
-    public override void Write(System.Text.Json.Utf8JsonReader writer, System.DateTime value, System.Text.Json.JsonSerializerOptions options)
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, System.DateTime value, System.Text.Json.JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString("yyyy-MM-dd"));
     }
