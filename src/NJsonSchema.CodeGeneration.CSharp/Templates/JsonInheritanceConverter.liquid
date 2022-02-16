@@ -1,6 +1,6 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {%- if UseSystemTextJson -%}
-internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
+internal class JsonInheritanceConverterAttribute : System.Text.Json.Serialization.JsonConverterAttribute
 {
     public string DiscriminatorName { get; }
 
