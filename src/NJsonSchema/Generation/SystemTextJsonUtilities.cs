@@ -34,12 +34,14 @@ namespace NJsonSchema.Generation
             };
 
             var jsonStringEnumConverter = ((IEnumerable) serializerOptions.Converters).OfType<object>()
-                .FirstOrDefault(c => c.GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter",
-                    TypeNameStyle.FullName));
+                .FirstOrDefault(c => c
+                    .GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName));
 
-            if (jsonStringEnumConverter == null) 
+            if (jsonStringEnumConverter == null)
+            {
                 return settings;
-            
+            }
+
             var camelCasePolicy = IsCamelCaseEnumNamingPolicy(jsonStringEnumConverter);
             settings.Converters.Add(new StringEnumConverter(camelCasePolicy));
 
@@ -55,8 +57,8 @@ namespace NJsonSchema.Generation
                     .FirstOrDefault(x => x.FieldType.FullName == "System.Text.Json.JsonNamingPolicy")
                     ?.GetValue(jsonStringEnumConverter);
 
-                return enumNamingPolicy != null 
-                       && enumNamingPolicy.GetType().FullName == "System.Text.Json.JsonCamelCaseNamingPolicy";
+                return enumNamingPolicy != null && 
+                    enumNamingPolicy.GetType().FullName == "System.Text.Json.JsonCamelCaseNamingPolicy";
             }
             catch
             {
