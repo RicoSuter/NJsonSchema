@@ -33,13 +33,37 @@ namespace NJsonSchema.Generation
                 ContractResolver = new SystemTextJsonContractResolver(serializerOptions)
             };
 
-            if (((IEnumerable)serializerOptions.Converters).OfType<object>().Any(c =>
-                c.GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName)))
+            var jsonStringEnumConverter = ((IEnumerable) serializerOptions.Converters).OfType<object>()
+                .FirstOrDefault(c => c
+                    .GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName));
+
+            if (jsonStringEnumConverter == null)
             {
-                settings.Converters.Add(new StringEnumConverter());
+                return settings;
             }
 
+            var camelCasePolicy = IsCamelCaseEnumNamingPolicy(jsonStringEnumConverter);
+            settings.Converters.Add(new StringEnumConverter(camelCasePolicy));
+
             return settings;
+        }
+
+        private static bool IsCamelCaseEnumNamingPolicy(object jsonStringEnumConverter)
+        {
+            try
+            {
+                var enumNamingPolicy = jsonStringEnumConverter
+                    .GetType().GetRuntimeFields()
+                    .FirstOrDefault(x => x.FieldType.FullName == "System.Text.Json.JsonNamingPolicy")
+                    ?.GetValue(jsonStringEnumConverter);
+
+                return enumNamingPolicy != null && 
+                    enumNamingPolicy.GetType().FullName == "System.Text.Json.JsonCamelCaseNamingPolicy";
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private sealed class SystemTextJsonContractResolver : DefaultContractResolver

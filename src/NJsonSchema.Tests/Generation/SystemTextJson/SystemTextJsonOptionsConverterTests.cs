@@ -1,5 +1,6 @@
 ﻿#if !NET461
 
+using System.Linq;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
 using System.Text.Json;
@@ -27,7 +28,30 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var settings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(options);
 
             // Assert
-            Assert.Contains(settings.Converters, c => c is StringEnumConverter);
+            var enumConverter = settings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
+            Assert.NotNull(enumConverter);
+            Assert.False(enumConverter.CamelCaseText);
+        }
+        
+        [Fact]
+        public async Task SystemTextJson_WhenEnumsAreSerializedAsCamelCaseStrings_ThenGlobalConverterExists()
+        {
+            // Arrange
+            var options = new JsonSerializerOptions
+            {
+                Converters =
+                {
+                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+                }
+            };
+
+            // Act
+            var settings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(options);
+
+            // Assert
+            var enumConverter = settings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
+            Assert.NotNull(enumConverter);
+            Assert.True(enumConverter.CamelCaseText);
         }
 
         public class Person
