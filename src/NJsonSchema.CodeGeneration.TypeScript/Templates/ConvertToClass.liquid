@@ -52,7 +52,7 @@ if ({{ Value }}) {
 {% endif -%}
 {% else -%}
     {% if IsDate -%}
-{{ Variable }} = {{ Value }} ? {{ StringToDateOnlyCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {{ StringToDateOnlyCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateOnlyCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
     {% elsif IsDateTime -%}
 {{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
     {% else -%}
