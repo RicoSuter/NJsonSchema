@@ -11,7 +11,7 @@ internal class JsonInheritanceConverterAttribute : System.Text.Json.Serializatio
     }
 }
 
-internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>
+public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>
 {
     private readonly string _discriminatorName;
 
@@ -115,7 +115,7 @@ internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.
     }
 }
 {%- else -%}
-internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
+public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
