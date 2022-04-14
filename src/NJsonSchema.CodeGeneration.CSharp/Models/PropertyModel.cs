@@ -64,7 +64,18 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
+            
+        /// <summary>Indicates whether or not this property has a <see cref="JsonIgnoreCondition"/>.</summary>
+        public bool HasJsonIgnoreCondition =>
+            JsonIgnoreCondition != null;
 
+        /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
+        public string JsonIgnoreCondition => _property switch {
+            { IsRequired: false } => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
+            { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
+            _ => null
+        };
+            
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequiredCode
         {
