@@ -28,10 +28,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace(".", "-")
                     .Replace("=", "-")
                     .Replace("+", "plus"), true)
-                .Replace("*", "Star")
-                .Replace(":", "_")
-                .Replace("-", "_")
-                .Replace("#", "_");
+                    .Replace("*", "Star")
+                    .Replace(":", "_")
+                    .Replace("-", "_")
+                    .Replace("#", "_")
+                    .Replace("&", "And");
         }
     }
 }
