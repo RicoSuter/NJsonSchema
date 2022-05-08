@@ -66,8 +66,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             )) == false;
             
         /// <summary>Indicates whether or not this property has a <see cref="JsonIgnoreCondition"/>.</summary>
-        public bool HasJsonIgnoreCondition =>
-            JsonIgnoreCondition != null;
+        public bool HasJsonIgnoreCondition => JsonIgnoreCondition != null;
 
         /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
         public string JsonIgnoreCondition => _property switch {
