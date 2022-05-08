@@ -121,7 +121,7 @@
 {%-   endif %}
 {%- endfor -%}
 
-{%- if HasAdditionalPropertiesType -%}
+{%- if GenerateAdditionalPropertiesProperty -%}
 
     private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
 
