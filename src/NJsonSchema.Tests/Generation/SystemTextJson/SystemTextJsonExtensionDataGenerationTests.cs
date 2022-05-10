@@ -1,4 +1,4 @@
-﻿#if !NET461
+﻿#if !NET462
 
 using System.Collections.Generic;
 using System.Text.Json;
