@@ -798,7 +798,7 @@ namespace NJsonSchema.Generation
 
         private void ApplySchemaProcessors(JsonSchema schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
+            var context = new SchemaProcessorContext(contextualType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
             {
                 processor.Process(context);
