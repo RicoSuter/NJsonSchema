@@ -131,7 +131,7 @@ namespace NJsonSchema.Generation
 
                 case JTokenType.TimeSpan:
                     schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.TimeSpan;
+                    schema.Format = JsonFormatStrings.Duration;
                     break;
 
                 case JTokenType.Guid:
@@ -157,7 +157,7 @@ namespace NJsonSchema.Generation
 
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
             {
-                schema.Format = JsonFormatStrings.TimeSpan;
+                schema.Format = JsonFormatStrings.Duration;
             }
         }
 

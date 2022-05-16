@@ -175,7 +175,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType;
             }
 
-            if (schema.Format == JsonFormatStrings.TimeSpan)
+            if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
             {
                 return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
             }

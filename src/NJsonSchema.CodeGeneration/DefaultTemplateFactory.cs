@@ -171,7 +171,6 @@ namespace NJsonSchema.CodeGeneration
             {
                 var childScope = false;
                 TemplateContext templateContext = null;
-                var templateContent = _templateContentLoader(_language, _template);
 
                 try
                 {
@@ -180,6 +179,7 @@ namespace NJsonSchema.CodeGeneration
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
+                        var templateContent = _templateContentLoader(_language, _template);
                         var data = templateContent.Replace("\r", "");
                         data = "\n" + data;
 
@@ -243,8 +243,7 @@ namespace NJsonSchema.CodeGeneration
                 catch (Exception exception)
                 {
                     var message = $"Error while rendering Liquid template {_language}/{_template}: \n{exception.Message}";
-                    if (exception.Message.Contains("'{% endif %}' was expected ")
-                        && templateContent.IndexOf("elseif", StringComparison.Ordinal) != -1)
+                    if (exception.Message.Contains("'{% endif %}' was expected ") && exception.Message.Contains("elseif"))
                     {
                         message += ", did you use 'elseif' instead of correct 'elsif'?";
                     }

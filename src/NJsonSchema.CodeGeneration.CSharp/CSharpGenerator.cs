@@ -57,13 +57,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new object());
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new JsonInheritanceConverterTemplateModel(Settings));
                     artifacts.Add(new CodeArtifact("JsonInheritanceAttribute", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
 
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", new object());
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings));
                     artifacts.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }

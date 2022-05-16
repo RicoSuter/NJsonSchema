@@ -42,13 +42,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_schema_has_base_schema_then_it_is_referenced()
+        public async Task When_schema_has_base_schema_then_it_is_referenced_with_Newtonsoft()
         {
             //// Arrange
             var json = JsonSchema.FromType<MyContainer>();
             var data = json.ToJson();
 
-            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings());
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings { JsonLibrary = CSharpJsonLibrary.NewtonsoftJson });
 
             //// Act
             var code = generator.GenerateFile();
@@ -57,6 +57,26 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code);
             Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
+            Assert.Contains("public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter", code);
+        }
+
+        [Fact]
+        public async Task When_schema_has_base_schema_then_it_is_referenced_with_STJ()
+        {
+            //// Arrange
+            var json = JsonSchema.FromType<MyContainer>();
+            var data = json.ToJson();
+
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings { JsonLibrary = CSharpJsonLibrary.SystemTextJson });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
+            Assert.Contains("[JsonInheritanceConverter(typeof(Fruit), \"discriminator\")]", code);
+            Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
+            Assert.Contains("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
         }
     }
 }

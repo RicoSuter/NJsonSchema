@@ -35,7 +35,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["datetime"].Format);
 
             Assert.Equal(JsonObjectType.String, schema.Properties["timespan"].Type);
-            Assert.Equal(JsonFormatStrings.TimeSpan, schema.Properties["timespan"].Format);
+            Assert.Equal(JsonFormatStrings.Duration, schema.Properties["timespan"].Format);
         }
 
         [Fact]
