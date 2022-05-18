@@ -20,42 +20,16 @@ namespace NJsonSchema.Validation
     /// <summary>Class to validate a JSON schema against a given <see cref="JToken"/>. </summary>
     public class JsonSchemaValidator
     {
-        private readonly IEnumerable<IFormatValidator> _formatValidators = new IFormatValidator[]
-        {
-            new DateTimeFormatValidator(),
-            new DateFormatValidator(),
-            new EmailFormatValidator(),
-            new GuidFormatValidator(),
-            new HostnameFormatValidator(),
-            new IpV4FormatValidator(),
-            new IpV6FormatValidator(),
-            new TimeFormatValidator(),
-            new TimeSpanFormatValidator(),
-            new UriFormatValidator(),
-            new ByteFormatValidator(),
-            new Base64FormatValidator(),
-            new UuidFormatValidator()
-        };
-
         private readonly IDictionary<string, IFormatValidator[]> _formatValidatorsMap;
-        private readonly JsonSchemaValidatorSettings _options;
+        private readonly JsonSchemaValidatorSettings _settings;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
-        public JsonSchemaValidator(params IFormatValidator[] customValidators)
+        public JsonSchemaValidator(JsonSchemaValidatorSettings settings)
         {
-            _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
-            _options = new JsonSchemaValidatorSettings();
-        }
-
-        /// <summary>
-        /// Initializes JsonSchemaValidator
-        /// </summary>
-        public JsonSchemaValidator(JsonSchemaValidatorSettings options, params IFormatValidator[] customValidators)
-        {
-            _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
-            _options = options;
+            _settings = settings ?? new JsonSchemaValidatorSettings();
+            _formatValidatorsMap = _settings.FormatValidators.GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
         }
 
         /// <summary>Validates the given JSON data.</summary>
@@ -370,7 +344,7 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            var stringComparer = _options.PropertyStringComparer;
+            var stringComparer = _settings.PropertyStringComparer;
 
             var schemaPropertyKeys = new HashSet<string>(schema.Properties.Keys, stringComparer);
 
