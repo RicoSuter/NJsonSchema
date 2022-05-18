@@ -955,7 +955,7 @@ namespace NJsonSchema
         /// <param name="settings">The validator settings.</param>
         /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(string jsonData, JsonSchemaValidatorSettings settings)
+        public ICollection<ValidationError> Validate(string jsonData, JsonSchemaValidatorSettings settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
             return validator.Validate(jsonData, ActualSchema);
