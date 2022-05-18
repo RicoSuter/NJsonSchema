@@ -38,6 +38,7 @@ namespace NJsonSchema.Validation
         };
 
         private readonly IDictionary<string, IFormatValidator[]> _formatValidatorsMap;
+        private readonly JsonSchemaValidatorSettings _options;
 
         /// <summary>
         /// Initializes JsonSchemaValidator
@@ -45,6 +46,16 @@ namespace NJsonSchema.Validation
         public JsonSchemaValidator(params IFormatValidator[] customValidators)
         {
             _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
+            _options = new JsonSchemaValidatorSettings();
+        }
+
+        /// <summary>
+        /// Initializes JsonSchemaValidator
+        /// </summary>
+        public JsonSchemaValidator(JsonSchemaValidatorSettings options, params IFormatValidator[] customValidators)
+        {
+            _formatValidatorsMap = _formatValidators.Union(customValidators).GroupBy(x => x.Format).ToDictionary(v => v.Key, v => v.ToArray());
+            _options = options;
         }
 
         /// <summary>Validates the given JSON data.</summary>
@@ -359,11 +370,15 @@ namespace NJsonSchema.Validation
                 return;
             }
 
+            var stringComparer = _options.PropertyStringComparer;
+
+            var schemaPropertyKeys = new HashSet<string>(schema.Properties.Keys, stringComparer);
+
             foreach (var propertyInfo in schema.Properties)
             {
                 var newPropertyPath = GetPropertyPath(propertyPath, propertyInfo.Key);
 
-                if (obj != null && obj.TryGetValue(propertyInfo.Key, out var value))
+                if (obj != null && TryGetPropertyWithStringComparer(obj, propertyInfo.Key, stringComparer, out var value))
                 {
                     if (value.Type == JTokenType.Null && propertyInfo.Value.IsNullable(schemaType))
                     {
@@ -382,15 +397,15 @@ namespace NJsonSchema.Validation
             // Properties may be required in a schema without being specified as a property.
             foreach (var requiredProperty in schema.RequiredProperties)
             {
-                if (schema.Properties.ContainsKey(requiredProperty))
+                if (schemaPropertyKeys.Contains(requiredProperty))
                 {
                     // The property has already been checked.
                     continue;
                 }
 
-                var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
-                if (obj?.Property(requiredProperty) == null)
+                if (obj == null || !TryGetPropertyWithStringComparer(obj, requiredProperty, stringComparer, out _))
                 {
+                    var newPropertyPath = GetPropertyPath(propertyPath, requiredProperty);
                     errors.Add(new ValidationError(ValidationErrorKind.PropertyRequired, requiredProperty, newPropertyPath, token, schema));
                 }
             }
@@ -402,7 +417,7 @@ namespace NJsonSchema.Validation
                 ValidateMaxProperties(token, properties, schema, propertyName, propertyPath, errors);
                 ValidateMinProperties(token, properties, schema, propertyName, propertyPath, errors);
 
-                var additionalProperties = properties.Where(p => !schema.Properties.ContainsKey(p.Name)).ToList();
+                var additionalProperties = properties.Where(p => !schemaPropertyKeys.Contains(p.Name)).ToList();
 
                 ValidatePatternProperties(additionalProperties, schema, schemaType, errors);
                 ValidateAdditionalProperties(token, additionalProperties, schema, schemaType, propertyName, propertyPath, errors);
@@ -542,7 +557,7 @@ namespace NJsonSchema.Validation
                 else if (schema.AdditionalItemsSchema != null)
                 {
                     var error = TryCreateChildSchemaError(item,
-                        schema.AdditionalItemsSchema, 
+                        schema.AdditionalItemsSchema,
                         schemaType,
                         ValidationErrorKind.AdditionalItemNotValid, propertyIndex, propertyPath + propertyIndex);
                     if (error != null)
@@ -570,6 +585,28 @@ namespace NJsonSchema.Validation
             errorDictionary.Add(schema, errors);
 
             return new ChildSchemaValidationError(errorKind, property, path, errorDictionary, token, schema);
+        }
+
+        private bool TryGetPropertyWithStringComparer(JObject obj, string propertyName, StringComparer comparer, out JToken value)
+        {
+            // This method mimics the behavior of the JObject.TryGetValue(string property, StringComparison comparison, out JToken)
+            // extension method using a StringComparer class instead of StringComparison enum value.
+
+            if (obj.TryGetValue(propertyName, out value))
+            {
+                return true;
+            }
+
+            foreach (var property in obj.Properties())
+            {
+                if (comparer.Equals(propertyName, property.Name))
+                {
+                    value = property.Value;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
