@@ -26,6 +26,14 @@ namespace NJsonSchema.Validation
         /// <summary>
         /// Initializes JsonSchemaValidator
         /// </summary>
+        public JsonSchemaValidator(params IFormatValidator[] customValidators)
+            : this(new JsonSchemaValidatorSettings() { FormatValidators = customValidators})
+        {
+        }
+
+        /// <summary>
+        /// Initializes JsonSchemaValidator
+        /// </summary>
         public JsonSchemaValidator(JsonSchemaValidatorSettings settings)
         {
             _settings = settings ?? new JsonSchemaValidatorSettings();
