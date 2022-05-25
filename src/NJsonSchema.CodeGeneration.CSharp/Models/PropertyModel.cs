@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
+using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -64,17 +65,40 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
-            
+
         /// <summary>Indicates whether or not this property has a <see cref="JsonIgnoreCondition"/>.</summary>
         public bool HasJsonIgnoreCondition => JsonIgnoreCondition != null;
 
         /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
-        public string JsonIgnoreCondition => _property switch {
-            { IsRequired: false } => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
-            { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
-            _ => null
-        };
-            
+        public string JsonIgnoreCondition
+        {
+            get
+            {
+                var isValueType = IsValueType();
+                return _property switch
+                {
+                    { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
+                    { IsRequired: false } when isValueType && IsNullable => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
+                    { IsRequired: false } when isValueType && !IsNullable => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault",
+                    { IsRequired: false } when !isValueType => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
+                    _ => null
+                };
+
+                bool IsValueType()
+                {
+                    var dateFormats = new string[] { "date", "date-time" };
+                    return _property.ActualTypeSchema.Type switch
+                    {
+                        JsonObjectType.Boolean => true,
+                        JsonObjectType.Integer => true,
+                        JsonObjectType.Number => true,
+                        JsonObjectType.String => dateFormats.Contains(_property.Format),
+                        _ => false,
+                    };
+                }
+            }
+        }
+
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequiredCode
         {
