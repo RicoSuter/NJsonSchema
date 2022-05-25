@@ -86,13 +86,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
                 bool IsValueType()
                 {
-                    var dateFormats = new string[] { "date", "date-time" };
+                    var valueFormats = new string[] { "date", "date-time", "uuid" };
                     return _property.ActualTypeSchema.Type switch
                     {
                         JsonObjectType.Boolean => true,
                         JsonObjectType.Integer => true,
                         JsonObjectType.Number => true,
-                        JsonObjectType.String => dateFormats.Contains(_property.Format),
+                        JsonObjectType.String => valueFormats.Contains(_property.Format),
                         _ => false,
                     };
                 }
