@@ -15,6 +15,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
+        private readonly static string[] ValueTypeFormats = {
+            JsonFormatStrings.Date,
+            JsonFormatStrings.DateTime,
+            JsonFormatStrings.Time,
+            JsonFormatStrings.Duration,
+            JsonFormatStrings.Guid
+        };
         private readonly JsonSchemaProperty _property;
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
@@ -86,15 +93,18 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
                 bool IsValueType()
                 {
-                    var valueTypeFormats = new string[] { "date", "date-time", "uuid" };
-                    return _property.ActualTypeSchema.Type switch
+                    var type = _property.ActualTypeSchema.Type;
+                    if (type.IsBoolean() || type.IsInteger() || type.IsNumber())
                     {
-                        JsonObjectType.Boolean => true,
-                        JsonObjectType.Integer => true,
-                        JsonObjectType.Number => true,
-                        JsonObjectType.String => valueTypeFormats.Contains(_property.Format),
-                        _ => false,
+                        return true;
+                    }
+
+                    if (type.IsString())
+                    {
+                        return ValueTypeFormats.Contains(_property.Format);
                     };
+
+                    return false;
                 }
             }
         }
