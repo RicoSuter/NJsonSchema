@@ -29,7 +29,7 @@ if ({{ Value }}) {
 {%-         if NullValue != "undefined" -%}
             (<any>{{ Variable }})[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : <any>{{ NullValue }};
 {%-         else -%}
-            (<any>{{ Variable }})[key] = {{ Value }}[key];
+            (<any>{{ Variable }})[key] = (<any>{{ Value }})[key];
 {%-         endif -%}
 {%-     endif -%}
     }
