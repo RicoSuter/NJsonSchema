@@ -26,8 +26,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                //GenerateNullableReferenceTypes = true,
-                //GenerateOptionalPropertiesAsNullable = true,
             });
 
             static string Normalized(string str) =>
@@ -77,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains(
                 Normalized(@"
                     [System.Text.Json.Serialization.JsonPropertyName(""optionalNullableValue"")]
-                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
                 "),
                 Normalized(code)
             );
@@ -85,7 +83,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains(
                 Normalized(@"
                     [System.Text.Json.Serialization.JsonPropertyName(""optionalRef"")]
-                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
                 "),
                 Normalized(code)
             );
@@ -154,7 +152,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains(
                 Normalized(@"
                     [System.Text.Json.Serialization.JsonPropertyName(""optionalRef"")]
-                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
                 "),
                 Normalized(code)
             );
@@ -170,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains(
                 Normalized(@"
                     [System.Text.Json.Serialization.JsonPropertyName(""optionalNullableValue"")]
-                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
                 "),
                 Normalized(code)
             );

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -77,37 +76,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasJsonIgnoreCondition => JsonIgnoreCondition != null;
 
         /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
-        public string JsonIgnoreCondition
+        public string JsonIgnoreCondition => _property switch
         {
-            get
-            {
-                var isValueType = IsValueType();
-                return _property switch
-                {
-                    { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
-                    { IsRequired: false } when isValueType && IsNullable => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
-                    { IsRequired: false } when isValueType && !IsNullable => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault",
-                    { IsRequired: false } when !isValueType => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
-                    _ => null
-                };
-
-                bool IsValueType()
-                {
-                    var type = _property.ActualTypeSchema.Type;
-                    if (type.IsBoolean() || type.IsInteger() || type.IsNumber())
-                    {
-                        return true;
-                    }
-
-                    if (type.IsString())
-                    {
-                        return ValueTypeFormats.Contains(_property.Format);
-                    };
-
-                    return false;
-                }
-            }
-        }
+            { IsRequired: false } => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault",
+            { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
+            _ => null
+        };
 
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequiredCode
