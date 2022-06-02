@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code);
             Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
-            Assert.Contains("internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter", code);
+            Assert.Contains("public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter", code);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
             Assert.Contains("[JsonInheritanceConverter(typeof(Fruit), \"discriminator\")]", code);
             Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
-            Assert.Contains("internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
+            Assert.Contains("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
         }
     }
 }

@@ -952,45 +952,44 @@ namespace NJsonSchema
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
-        /// <param name="customValidators">Custom validators to validate the JSON.</param>
+        /// <param name="settings">The validator settings.</param>
         /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(string jsonData, params IFormatValidator[] customValidators)
+        public ICollection<ValidationError> Validate(string jsonData, JsonSchemaValidatorSettings settings = null)
         {
-            var validator = new JsonSchemaValidator(customValidators);
+            var validator = new JsonSchemaValidator(settings);
             return validator.Validate(jsonData, ActualSchema);
         }
-
         /// <summary>Validates the given JSON token against this schema.</summary>
         /// <param name="token">The token to validate. </param>
-        /// <param name="customValidators">Custom validators to validate the token.</param>
+        /// <param name="settings">The validator settings.</param>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(JToken token, params IFormatValidator[] customValidators)
+        public ICollection<ValidationError> Validate(JToken token, JsonSchemaValidatorSettings settings = null)
         {
-            var validator = new JsonSchemaValidator(customValidators);
+            var validator = new JsonSchemaValidator(settings);
             return validator.Validate(token, ActualSchema);
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <param name="schemaType">The type of the schema.</param>
-        /// <param name="customValidators">Custom validators to validate the JSON.</param>
+        /// <param name="settings">The validator settings.</param>
         /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(string jsonData, SchemaType schemaType, params IFormatValidator[] customValidators)
+        public ICollection<ValidationError> Validate(string jsonData, SchemaType schemaType, JsonSchemaValidatorSettings settings = null)
         {
-            var validator = new JsonSchemaValidator(customValidators);
+            var validator = new JsonSchemaValidator(settings);
             return validator.Validate(jsonData, ActualSchema, schemaType);
         }
 
         /// <summary>Validates the given JSON token against this schema.</summary>
         /// <param name="token">The token to validate. </param>
         /// <param name="schemaType">The type of the schema.</param>
-        /// <param name="customValidators">Custom validators to validate the token.</param>
+        /// <param name="settings">The validator settings.</param>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(JToken token, SchemaType schemaType, params IFormatValidator[] customValidators)
+        public ICollection<ValidationError> Validate(JToken token, SchemaType schemaType, JsonSchemaValidatorSettings settings = null)
         {
-            var validator = new JsonSchemaValidator(customValidators);
+            var validator = new JsonSchemaValidator(settings);
             return validator.Validate(token, ActualSchema, schemaType);
         }
 
