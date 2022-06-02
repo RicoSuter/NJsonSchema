@@ -120,6 +120,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_interfaces_are_generated_with_inheritance_then_type_check_methods_are_generated()
+        {
+            //// Arrange
+            var schema = JsonSchema.FromType<ExceptionContainer>();
+            var data = schema.ToJson();
+
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeScriptVersion = 2.0m,
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                GenerateTypeCheckFunctions = true
+            });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("export function isExceptionBase(object: any): object is ExceptionBase {", code);
+            Assert.Contains("function isMyException(object: any): object is MyException {", code);
+        }
+
+        [Fact]
         public async Task When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
         {
             //// Arrange
@@ -322,7 +344,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
 
         [Fact]
-        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved() {
+        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved()
+        {
             //// Arrange
             string extensionCode = @"
 import * as generated from ""./generated"";
@@ -333,7 +356,8 @@ export class ExceptionBase extends generated.ExceptionBase {
             ";
 
             var schema = JsonSchema.FromType<ExceptionContainer>();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings {
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
                 ExtensionCode = extensionCode,
                 ExtendedClasses = new[] { "ExceptionBase" },
             });

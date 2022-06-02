@@ -43,6 +43,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ExtendedClasses = Array.Empty<string>();
 
             InlineNamedDictionaries = false;
+            GenerateTypeCheckFunctions = false;
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 2.7).</summary>
@@ -107,6 +108,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with an indexer.</summary>
         public bool InlineNamedDictionaries { get; set; }
+
+        /// <summary>Gets a value indicating whether to generate type check functions (for type style interface only, default: false).</summary>
+        public bool GenerateTypeCheckFunctions { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

@@ -149,6 +149,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;
 
+        /// <summary>Gets a value indicating whether to generate type check functions.</summary>
+        public bool GenerateTypeCheckFunctions => _settings.GenerateTypeCheckFunctions;
+
         /// <summary>Gets the inherited schema.</summary>
         private JsonSchema InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
