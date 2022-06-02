@@ -169,7 +169,7 @@ export class MyClass implements IMyClass {
             data["PrimitiveDictionary"] = {};
             for (let key in this.primitiveDictionary) {
                 if (this.primitiveDictionary.hasOwnProperty(key))
-                    (<any>data["PrimitiveDictionary"])[key] = this.primitiveDictionary[key];
+                    (<any>data["PrimitiveDictionary"])[key] = (<any>this.primitiveDictionary)[key];
             }
         }
         if (Array.isArray(this.dateArray)) {

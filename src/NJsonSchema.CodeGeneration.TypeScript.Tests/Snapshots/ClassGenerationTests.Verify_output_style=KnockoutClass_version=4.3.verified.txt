@@ -187,7 +187,7 @@ export class MyClass {
             data["PrimitiveDictionary"] = {};
             for (let key in primitiveDictionary_) {
                 if (primitiveDictionary_.hasOwnProperty(key))
-                    (<any>data["PrimitiveDictionary"])[key] = primitiveDictionary_[key];
+                    (<any>data["PrimitiveDictionary"])[key] = (<any>primitiveDictionary_)[key];
             }
         }
 
