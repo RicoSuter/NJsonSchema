@@ -1614,7 +1614,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"class DateFormatConverter", code);
+            Assert.Contains(@"class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTime>", code);
             Assert.Contains(@"[System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]", code);
 
             AssertCompile(code);
@@ -1791,7 +1791,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"class DateFormatConverter", code);
+            Assert.Contains(@"class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTimeOffset>", code);
             Assert.Contains(@"[System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]", code);
 
             AssertCompile(code);
