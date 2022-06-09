@@ -26,5 +26,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether to use System.Text.Json</summary>
         public bool UseSystemTextJson => _settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
+
+        /// <summary>Gets the date .NET type.</summary>
+        public string DateType => _settings.DateType;
     }
 }
