@@ -106,7 +106,7 @@ namespace NSwag.Core.Tests.Converters
             var settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ContractResolver = new DefaultContractResolver(),
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Converters =
                 {

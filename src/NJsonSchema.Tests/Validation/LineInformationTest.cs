@@ -94,9 +94,9 @@ namespace NJsonSchema.Tests.Validation
             await InitAsync();
 
             //// Act
-            var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Ignore});
+            var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Load});
             var errorsWithInfo = Schema.Validate(tokenWithInfo);
-            var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Load});
+            var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Ignore});
             var errorsNoInfoParse = Schema.Validate(tokenNoInfoParse);
             var tokenNoInfoDeserialize = JsonConvert.DeserializeObject<JToken>(Json);
             var errorsNoInfoDeserialize = Schema.Validate(tokenNoInfoDeserialize);
