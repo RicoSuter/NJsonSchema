@@ -50,11 +50,11 @@ partial class Build : NukeBuild
         if (!string.IsNullOrWhiteSpace(versionPrefix))
         {
             IsTaggedBuild = true;
-            Serilog.Log.Information($"Tag version {VersionPrefix} from Git found, using it as version prefix", versionPrefix);
+            Serilog.Log.Information("Tag version {VersionPrefix} from Git found, using it as version prefix", versionPrefix);
         }
         else
         {
-            var propsDocument = XDocument.Parse(TextTasks.ReadAllText(SourceDirectory / "Directory.Build.props"));
+            var propsDocument = XDocument.Parse((SourceDirectory / "Directory.Build.props").ReadAllText());
             versionPrefix = propsDocument.Element("Project").Element("PropertyGroup").Element("VersionPrefix").Value;
             Serilog.Log.Information("Version prefix {VersionPrefix} read from Directory.Build.props", versionPrefix);
         }
@@ -75,7 +75,7 @@ partial class Build : NukeBuild
             VersionSuffix = $"dev-{DateTime.UtcNow:yyyyMMdd-HHmm}";
         }
 
-        using var _ = Block("BUILD SETUP");
+        Serilog.Log.Information("BUILD SETUP");
         Serilog.Log.Information("Configuration:\t{Configuration}", Configuration);
         Serilog.Log.Information("Version prefix:\t{VersionPrefix}", VersionPrefix);
         Serilog.Log.Information("Version suffix:\t{VersionSuffix}", VersionSuffix);
@@ -86,8 +86,8 @@ partial class Build : NukeBuild
         .Before(Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            EnsureCleanDirectory(ArtifactsDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(x => x.DeleteDirectory());
+            ArtifactsDirectory.CreateOrCleanDirectory();
         });
 
     Target Restore => _ => _
@@ -147,7 +147,7 @@ partial class Build : NukeBuild
                 nugetVersion += "-" + VersionSuffix;
             }
 
-            EnsureCleanDirectory(ArtifactsDirectory);
+            ArtifactsDirectory.CreateOrCleanDirectory();
 
             DotNetPack(s => s
                 .SetProcessWorkingDirectory(SourceDirectory)
