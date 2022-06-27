@@ -249,7 +249,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.DoesNotContain("public string Discriminator", code); // discriminator property is not generated
+            Assert.DoesNotContain("public string Discriminator {", code); // discriminator property is not generated
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code); // attribute is generated
             Assert.Contains("class JsonInheritanceConverter", code); // converter is generated
         }

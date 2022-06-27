@@ -57,13 +57,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceAttribute") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new TemplateModelBase());
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceAttribute", new JsonInheritanceConverterTemplateModel(Settings));
                     artifacts.Add(new CodeArtifact("JsonInheritanceAttribute", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
 
                 if (Settings.ExcludedTypeNames?.Contains("JsonInheritanceConverter") != true)
                 {
-                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", new TemplateModelBase());
+                    var template = Settings.TemplateFactory.CreateTemplate("CSharp", "JsonInheritanceConverter", new JsonInheritanceConverterTemplateModel(Settings));
                     artifacts.Add(new CodeArtifact("JsonInheritanceConverter", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template));
                 }
             }
@@ -122,13 +122,24 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
 
-        private void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
+        private static void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
         {
-            var propertyWithSameNameAsClass = properties.SingleOrDefault(p => p.PropertyName == typeName);
+            var propertyModels = properties as PropertyModel[] ?? properties.ToArray();
+            PropertyModel propertyWithSameNameAsClass = null;
+            foreach (var p in propertyModels)
+            {
+                if (p.PropertyName == typeName)
+                {
+                    propertyWithSameNameAsClass = p;
+                    break;
+                }
+            }
+
             if (propertyWithSameNameAsClass != null)
             {
                 var number = 1;
-                while (properties.Any(p => p.PropertyName == typeName + number))
+                var candidate = typeName + number;
+                while (propertyModels.Any(p => p.PropertyName == candidate))
                 {
                     number++;
                 }

@@ -1,5 +1,7 @@
 ﻿{%- if HasDescription -%}
-/// <summary>{{ Description | csharpdocs }}</summary>
+/// <summary>
+/// {{ Description | csharpdocs }}
+/// </summary>
 {%- endif -%}
 {%- if HasDiscriminator -%}
 {%- if UseSystemTextJson -%}
@@ -24,7 +26,7 @@
 {%- if IsDeprecated -%}
 [System.Obsolete{% if HasDeprecatedMessage %}({{ DeprecatedMessage | literal }}){% endif %}]
 {% endif -%}
-{%- template Class.Annotations %}
+{%- template Class.Annotations -%}
 {{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {% if GenerateNativeRecords %}record{% else %}class{% endif %} {{ClassName}} {%- template Class.Inheritance %}
 {
 {%- if IsTuple -%}
@@ -45,10 +47,15 @@
 {%- endif -%}
 {%- for property in Properties -%}
 {%-   if property.HasDescription -%}
-    /// <summary>{{ property.Description | csharpdocs }}</summary>
+    /// <summary>
+    /// {{ property.Description | csharpdocs }}
+    /// </summary>
 {%-   endif -%}
 {%- if UseSystemTextJson %}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
+{%-   if property.HasJsonIgnoreCondition %}
+    [System.Text.Json.Serialization.JsonIgnore(Condition = {{ property.JsonIgnoreCondition }})]   
+{%-   endif -%}
 {%-   if property.IsStringEnumArray %}
     // TODO(system.text.json): Add string enum item converter
 {%-   endif -%}
@@ -114,7 +121,7 @@
 {%-   endif %}
 {%- endfor -%}
 
-{%- if HasAdditionalPropertiesType -%}
+{%- if GenerateAdditionalPropertiesProperty -%}
 
     private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
 

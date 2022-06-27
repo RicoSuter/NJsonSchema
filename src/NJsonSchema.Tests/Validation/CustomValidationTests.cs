@@ -22,7 +22,10 @@ namespace NJsonSchema.Tests.Validation
             var token = new JValue("2014-12-01 11:00:01:55");
 
             //// Act
-            var errors = schema.Validate(token, new CustomDateTimeFormatValidator());
+            var settings = new JsonSchemaValidatorSettings();
+            settings.AddCustomFormatValidator(new CustomDateTimeFormatValidator());
+
+            var errors = schema.Validate(token, settings);
 
             //// Assert
             Assert.Empty(errors);

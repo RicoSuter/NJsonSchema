@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class TypeResolverBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly Dictionary<JsonSchema, string> _generatedTypeNames = new Dictionary<JsonSchema, string>();
+        internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = new();
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
         }
 
         /// <summary>Gets the registered schemas and with their type names.</summary>
-        public IDictionary<JsonSchema, string> Types => _generatedTypeNames.ToDictionary(p => p.Key, p => p.Value);
+        public IReadOnlyDictionary<JsonSchema, string> Types => _generatedTypeNames;
 
         /// <summary>Tries to resolve the schema and returns null if there was a problem.</summary>
         /// <param name="schema">The schema.</param>
@@ -125,7 +125,7 @@ namespace NJsonSchema.CodeGeneration
                    !schema.IsArray &&
                    (schema.IsEnumeration ||
                     schema.Type == JsonObjectType.None ||
-                    schema.Type.HasFlag(JsonObjectType.Object));
+                    schema.Type.IsObject());
         }
 
         /// <summary>Resolves the type of the dictionary value of the given schema (must be a dictionary schema).</summary>

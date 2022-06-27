@@ -9,6 +9,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -58,8 +59,7 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase(
-                (input[0].ToString().ToUpperInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
+            input = ConvertDashesToCamelCase(Capitalize(input)
                 .Replace(" ", "_")
                 .Replace("/", "_"));
 
@@ -69,6 +69,20 @@ namespace NJsonSchema
             }
 
             return input;
+        }
+
+        [MethodImpl((MethodImplOptions) 256)]
+        private static string Capitalize(string input)
+        {
+            if (char.IsUpper(input[0]))
+            {
+                return input;
+            }
+            if (input.Length == 1)
+            {
+                return char.ToUpperInvariant(input[0]).ToString();
+            }
+            return char.ToUpperInvariant(input[0]) + input.Substring(1);
         }
 
         /// <summary>Converts the string to a string literal which can be used in C# or TypeScript code.</summary>
@@ -148,13 +162,17 @@ namespace NJsonSchema
         }
 
 
+        private static readonly char[] _whiteSpaceChars = { '\n', '\r', '\t', ' ' };
+
         /// <summary>Trims white spaces from the text.</summary>
         /// <param name="text">The text.</param>
         /// <returns>The updated text.</returns>
         public static string TrimWhiteSpaces(string text)
         {
-            return text?.Trim('\n', '\r', '\t', ' ');
+            return text?.Trim(_whiteSpaceChars);
         }
+
+        private static readonly char[] _lineBreakTrimChars = { '\n', '\t', ' ' };
 
         /// <summary>Removes the line breaks from the text.</summary>
         /// <param name="text">The text.</param>
@@ -166,7 +184,7 @@ namespace NJsonSchema
                 .Replace("\n ", "\n")
                 .Replace("  \n", " \n")
                 .Replace("\n", "")
-                .Trim('\n', '\t', ' ');
+                .Trim(_lineBreakTrimChars);
         }
 
         /// <summary>Singularizes the given noun in plural.</summary>
@@ -252,19 +270,13 @@ namespace NJsonSchema
         /// <returns>The output.</returns>
         public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            if (input is null)
-            {
-                return "";
-            }
-            var tabString = CreateTabString(tabCount);
-            input = input
-                .Replace("\r", string.Empty);
-
-            var stringWriter = new StringWriter(new StringBuilder(input.Length), CultureInfo.CurrentCulture);
-            AddPrefixToBeginningOfNonEmptyLines(input, tabString + "/// ", stringWriter);
+            input = input?
+                        .Replace("\r", string.Empty)
+                        .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
+                    ?? string.Empty;
 
             // TODO: Support more markdown features here
-            var xml = new XText(stringWriter.ToString()).ToString();
+            var xml = new XText(input).ToString();
             return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
         }
 
@@ -291,7 +303,14 @@ namespace NJsonSchema
 
         private static string ConvertDashesToCamelCase(string input)
         {
-            var sb = new StringBuilder();
+            if (input.IndexOf('-') == -1)
+            {
+                // no conversion necessary
+                return input;
+            }
+
+            // we are removing at least one character
+            var sb = new StringBuilder(input.Length - 1);
             var caseFlag = false;
             foreach (var c in input)
             {

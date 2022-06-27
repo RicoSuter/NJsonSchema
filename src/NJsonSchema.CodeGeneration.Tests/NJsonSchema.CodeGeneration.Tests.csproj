@@ -24,4 +24,7 @@
         <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
         <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <None Update="Templates\*.liquid" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 
 using Namotion.Reflection;
 using Newtonsoft.Json;
+using NJsonSchema.Generation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -59,8 +60,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="type">The member info</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this CachedType type)
+        public static string GetDescription(this CachedType type, IXmlDocsSettings xmlDocsSettings)
         {
             var attributes = type is ContextualType contextualType ? contextualType.ContextAttributes : type.InheritedAttributes;
 
@@ -70,10 +72,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = type.GetXmlDocsSummary();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = type.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;
@@ -81,8 +86,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="accessorInfo">The accessor info.</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualAccessorInfo accessorInfo)
+        public static string GetDescription(this ContextualAccessorInfo accessorInfo, IXmlDocsSettings xmlDocsSettings)
         {
             var description = GetDescription(accessorInfo.AccessorType.Attributes);
             if (description != null)
@@ -90,10 +96,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = accessorInfo.MemberInfo.GetXmlDocsSummary();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;
@@ -101,8 +110,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="parameter">The parameter.</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualParameterInfo parameter)
+        public static string GetDescription(this ContextualParameterInfo parameter, IXmlDocsSettings xmlDocsSettings)
         {
             var description = GetDescription(parameter.ContextAttributes);
             if (description != null)
@@ -110,10 +120,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = parameter.GetXmlDocs();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = parameter.GetXmlDocs(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;

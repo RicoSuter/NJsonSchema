@@ -72,7 +72,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["TimeSpan"].Type);
-            Assert.Equal(JsonFormatStrings.TimeSpan, schema.Properties["TimeSpan"].Format);
+            Assert.Equal(JsonFormatStrings.Duration, schema.Properties["TimeSpan"].Format);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace NJsonSchema.Tests.Generation
 
             //// Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Duration"].Type);
-            Assert.Equal(JsonFormatStrings.TimeSpan, schema.Properties["Duration"].Format);
+            Assert.Equal(JsonFormatStrings.Duration, schema.Properties["Duration"].Format);
         }
     }
 }

@@ -87,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (schema.ActualTypeSchema.IsAnyType &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
-                !Types.Keys.Contains(schema) &&
+                !Types.ContainsKey(schema) &&
                 !schema.HasReference)
             {
                 return "any";
@@ -101,22 +101,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Number))
+            if (type.IsNumber())
             {
                 return "number";
             }
 
-            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+            if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
             {
                 return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
             }
 
-            if (type.HasFlag(JsonObjectType.Boolean))
+            if (type.IsBoolean())
             {
                 return "boolean";
             }
 
-            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+            if (type.IsString() && !schema.ActualTypeSchema.IsEnumeration)
             {
                 return ResolveString(schema.ActualTypeSchema, typeNameHint);
             }
@@ -133,7 +133,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 return GetOrGenerateTypeName(schema, typeNameHint);
             }
 
-            if (schema.Type.HasFlag(JsonObjectType.Array))
+            if (schema.Type.IsArray())
             {
                 return ResolveArrayOrTuple(schema, typeNameHint, addInterfacePrefix);
             }
@@ -142,7 +142,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             {
                 var prefix = addInterfacePrefix &&
                     SupportsConstructorConversion(schema.AdditionalPropertiesSchema) &&
-                    schema.AdditionalPropertiesSchema?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true ? "I" : "";
+                    schema.AdditionalPropertiesSchema?.ActualSchema.Type.IsObject() == true ? "I" : "";
 
                 var valueType = ResolveDictionaryValueType(schema, "any");
                 if (valueType != "any")
@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         {
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
-                        
+
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
                     }
 
@@ -213,7 +213,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "string";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "string";
                 }
@@ -236,7 +236,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Moment";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "moment.Duration";
                 }
@@ -258,7 +258,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "DateTime";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "Duration";
                 }
@@ -280,7 +280,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "dayjs.Dayjs";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "dayjs.Dayjs";
                 }
@@ -298,7 +298,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Item != null)
             {
-                var isObject = schema.Item?.ActualSchema.Type.HasFlag(JsonObjectType.Object) == true;
+                var isObject = schema.Item?.ActualSchema.Type.IsObject() == true;
                 var isDictionary = schema.Item?.ActualSchema.IsDictionary == true;
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
 

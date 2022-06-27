@@ -96,7 +96,7 @@ namespace NJsonSchema.Visitors
             if (obj is JsonSchema schema)
             {
                 // Do not follow as the root object might be different than _rootObject, fixes https://github.com/RicoSuter/NJsonSchema/issues/588
-                // i.e. we should only visit the objects which might be references but not resolve 
+                // i.e. we should only visit the objects which might be references but not resolve
                 // because usually the resolved object is touched in another path (not via reference)
                 //if (schema.Reference != null)
                 //{
@@ -118,28 +118,32 @@ namespace NJsonSchema.Visitors
                     await VisitAsync(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.Items.Count; i++)
+                var items = schema._items;
+                for (var i = 0; i < items.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.Items.ElementAt(i), path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.Items, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(items[i], path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.AllOf.Count; i++)
+                var allOf = schema._allOf;
+                for (var i = 0; i < allOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AllOf.ElementAt(i), path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AllOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(allOf[i], path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.AnyOf.Count; i++)
+                var anyOf = schema._anyOf;
+                for (var i = 0; i < anyOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.AnyOf.ElementAt(i), path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.AnyOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(anyOf[i], path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
-                for (var i = 0; i < schema.OneOf.Count; i++)
+                var oneOf = schema._oneOf;
+                for (var i = 0; i < oneOf.Count; i++)
                 {
                     var index = i;
-                    await VisitAsync(schema.OneOf.ElementAt(i), path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(schema.OneOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
+                    await VisitAsync(oneOf[i], path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o), cancellationToken).ConfigureAwait(false);
                 }
 
                 if (schema.Not != null)
@@ -254,16 +258,16 @@ namespace NJsonSchema.Visitors
             }
         }
 
-        private void ReplaceOrDelete<T>(ICollection<T> collection, int index, T obj)
+        private static void ReplaceOrDelete<T>(ObservableCollection<T> collection, int index, T obj)
         {
-            ((Collection<T>)collection).RemoveAt(index);
+            collection.RemoveAt(index);
             if (obj != null)
             {
-                ((Collection<T>)collection).Insert(index, obj);
+                collection.Insert(index, obj);
             }
         }
 
-        private void ReplaceOrDelete(IList collection, int index, object obj)
+        private static void ReplaceOrDelete(IList collection, int index, object obj)
         {
             collection.RemoveAt(index);
             if (obj != null)

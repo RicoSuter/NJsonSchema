@@ -8,10 +8,14 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using VerifyXunit;
 using Xunit;
+
+using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
+    [UsesVerify]
     public class ClassGenerationTests
     {
         public class MyClassTest
@@ -48,36 +52,29 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public string LastName { get; set; }
         }
 
-        [Fact]
-        public async Task When_generating_TypeScript_classes_then_output_is_correct()
+        [Theory]
+        [InlineData(TypeScriptTypeStyle.Class, 1.8)]
+        [InlineData(TypeScriptTypeStyle.Class, 2.1)]
+        [InlineData(TypeScriptTypeStyle.Class, 2.7)]
+        [InlineData(TypeScriptTypeStyle.Class, 4.3)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass, 1.8)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.1)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.7)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass, 4.3)]
+        [InlineData(TypeScriptTypeStyle.Interface, 1.8)]
+        [InlineData(TypeScriptTypeStyle.Interface, 2.1)]
+        [InlineData(TypeScriptTypeStyle.Interface, 2.7)]
+        [InlineData(TypeScriptTypeStyle.Interface, 4.3)]
+        public async Task Verify_output(TypeScriptTypeStyle style, decimal version)
         {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
-
-            //// Assert
-            Assert.Contains("init(_data?: any) {", code);
-        }
-
-        [Fact]
-        public async Task When_default_value_is_available_then_variable_is_initialized()
-        {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            var settings = new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 1.8m
-            });
+                TypeStyle = style,
+                TypeScriptVersion = version
+            };
+            var output = await PrepareAsync(settings);
 
-            //// Assert
-            Assert.Contains("name: string;", code);
-            Assert.Contains("this.name = \"foo\";", code);
-        }
-
-        [Fact]
-        public async Task When_generating_TypeScript_knockout_classes_then_output_is_correct()
-        {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass });
-
-            //// Assert
-            Assert.Contains("dateOfBirth = ko.observable<Date>();", code);
+            await Verify(output).UseParameters(style, version);
         }
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
@@ -241,17 +238,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_export_types_is_true_add_export_before_class_and_interface()
-        {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = true });
-
-            //// Assert
-            Assert.Contains("export class Student extends Person implements IStudent {", code);
-            Assert.Contains("export interface IStudent extends IPerson {", code);
-            Assert.Contains("export interface IPerson {", code);
-        }
-
-        [Fact]
         public async Task When_export_types_is_false_dont_add_export_before_class_and_interface()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = false });
@@ -263,32 +249,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_add_export_keyword_is_true_with_knockout_class_add_export_before_class()
-        {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = true });
-
-            //// Assert
-            Assert.Contains("export class Student extends Person {", code);
-        }
-
-        [Fact]
         public async Task When_add_export_keyword_is_false_with_knockout_class_dont_add_export_before_class()
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = false });
 
             //// Assert
             Assert.DoesNotContain("export class Student extends Person {", code);
-        }
-
-        [Fact]
-        public async Task When_class_is_generated_then_constructor_interfaces_are_correctly_generated()
-        {
-            var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
-
-            //// Assert
-            Assert.Contains("class Student extends Person implements IStudent {", code);
-            Assert.Contains("interface IStudent extends IPerson {", code);
-            Assert.Contains("interface IPerson {", code);
         }
 
         [Fact]

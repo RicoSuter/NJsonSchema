@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -18,6 +19,17 @@ namespace NJsonSchema.Generation
     /// <summary>Generates a JSON Schema from sample JSON data.</summary>
     public class SampleJsonSchemaGenerator
     {
+        /// <summary>
+        /// Generates a JSON Schema from sample JSON data.
+        /// </summary>
+        /// <param name="data">The sample JSON data.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromSampleJson(string data)
+        {
+            var generator = new SampleJsonSchemaGenerator();
+            return generator.Generate(data);
+        }
+
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
         /// <returns>The JSON Schema.</returns>
@@ -33,12 +45,24 @@ namespace NJsonSchema.Generation
             return schema;
         }
 
-        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
+        /// <summary>Generates the JSON Schema for the given JSON data.</summary>
+        /// <param name="stream">The JSON data stream.</param>
         /// <returns>The JSON Schema.</returns>
-        public static JsonSchema FromSampleJson(string data)
+        public JsonSchema Generate(Stream stream)
         {
-            var generator = new SampleJsonSchemaGenerator();
-            return generator.Generate(data);
+            using var reader = new StreamReader(stream);
+            using var jsonReader = new JsonTextReader(reader);
+
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat
+            });
+
+            var token = serializer.Deserialize<JToken>(jsonReader);
+
+            var schema = new JsonSchema();
+            Generate(token, schema, schema, "Anonymous");
+            return schema;
         }
 
         private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
@@ -56,7 +80,7 @@ namespace NJsonSchema.Generation
                             s.Type == JsonObjectType.Object &&
                             properties.All(p => s.Properties.ContainsKey(p.Name)));
                 }
-                
+
                 if (referencedSchema == null)
                 {
                     referencedSchema = new JsonSchema();
@@ -118,7 +142,7 @@ namespace NJsonSchema.Generation
 
                 case JTokenType.TimeSpan:
                     schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.TimeSpan;
+                    schema.Format = JsonFormatStrings.Duration;
                     break;
 
                 case JTokenType.Guid:
@@ -144,7 +168,7 @@ namespace NJsonSchema.Generation
 
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
             {
-                schema.Format = JsonFormatStrings.TimeSpan;
+                schema.Format = JsonFormatStrings.Duration;
             }
         }
 

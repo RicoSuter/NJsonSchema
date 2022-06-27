@@ -16,9 +16,12 @@ namespace NJsonSchema
         /// <summary>Format for a <see cref="System.DateTime"/>. </summary>
         public const string DateTime = "date-time";
 
-        /// <summary>Format for a <see cref="TimeSpan"/>. </summary>
+        /// <summary>Non-standard Format for a duration (time span)<see cref="TimeSpan"/>. </summary>
         public const string TimeSpan = "time-span";
 
+        /// <summary>Format for a duration (time span) as of 2019-09 <see cref="TimeSpan"/>. </summary>
+        public const string Duration = "duration";
+        
         /// <summary>Format for an email. </summary>
         public const string Email = "email";
 

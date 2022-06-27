@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NJsonSchema.Infrastructure
 {
-    internal class DictionaryProxy<TKey, TInterface, TImplementation> : IDictionary<TKey, TInterface>
+    internal sealed class DictionaryProxy<TKey, TInterface, TImplementation> : IDictionary<TKey, TInterface>
         where TImplementation : TInterface
     {
         private readonly IDictionary<TKey, TImplementation> _dictionary;

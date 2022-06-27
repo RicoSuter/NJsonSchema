@@ -9,17 +9,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
 using System.Reflection;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using Namotion.Reflection;
 using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation
 {
     /// <summary>The JSON Schema generator settings.</summary>
-    public abstract class JsonSchemaGeneratorSettings
+    public abstract class JsonSchemaGeneratorSettings : IXmlDocsSettings
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
         public JsonSchemaGeneratorSettings()
@@ -35,6 +35,9 @@ namespace NJsonSchema.Generation
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
 
             ExcludedTypeNames = new string[0];
+
+            UseXmlDocumentation = true;
+            ResolveExternalXmlDocumentation = true;
         }
 
         /// <summary>Gets or sets the default reference type null handling when no nullability information is available (default: Null).</summary>
@@ -61,7 +64,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are 
+        /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are
         /// defined on the object (otherwise allOf/oneOf with $ref is used, default: false).</summary>
         public bool AllowReferencesWithProperties { get; set; }
 
@@ -71,7 +74,7 @@ namespace NJsonSchema.Generation
         /// <summary>Will set `additionalProperties` on all added <see cref="JsonSchema">schema definitions and references</see>(default: false).</summary>
         public bool AlwaysAllowAdditionalObjectProperties { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to generate the example property of the schemas based on the &lt;example&gt; xml docs entry as JSON.</summary>
+        /// <summary>Gets or sets a value indicating whether to generate the example property of the schemas based on the &lt;example&gt; xml docs entry as JSON (requires <see cref="UseXmlDocumentation"/> to be true, default: true).</summary>
         public bool GenerateExamples { get; set; }
 
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
@@ -79,6 +82,12 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the excluded type names (same as <see cref="JsonSchemaIgnoreAttribute"/>).</summary>
         public string[] ExcludedTypeNames { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether to read XML Docs (default: true).</summary>
+        public bool UseXmlDocumentation { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory (default: true).</summary>
+        public bool ResolveExternalXmlDocumentation { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]

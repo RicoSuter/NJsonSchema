@@ -1,5 +1,6 @@
 ﻿#if !NET461
 
+using System.Linq;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
 using System.Text.Json;

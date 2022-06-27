@@ -159,7 +159,7 @@ namespace NJsonSchema.Generation
                 schema.Title = Settings.SchemaNameGenerator.Generate(typeDescription.ContextualType.OriginalType);
             }
 
-            if (typeDescription.Type.HasFlag(JsonObjectType.Object))
+            if (typeDescription.Type.IsObject())
             {
                 if (typeDescription.IsDictionary)
                 {
@@ -185,7 +185,7 @@ namespace NJsonSchema.Generation
             {
                 GenerateEnum(schema, typeDescription, schemaResolver);
             }
-            else if (typeDescription.Type.HasFlag(JsonObjectType.Array)) // TODO: Add support for tuples?
+            else if (typeDescription.Type.IsArray()) // TODO: Add support for tuples?
             {
                 GenerateArray(schema, typeDescription, schemaResolver);
             }
@@ -263,8 +263,8 @@ namespace NJsonSchema.Generation
                         {
                             if (schema.Type == JsonObjectType.None)
                             {
-                                schema.OneOf.Add(new JsonSchema { Type = JsonObjectType.None });
-                                schema.OneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
+                                schema._oneOf.Add(new JsonSchema { Type = JsonObjectType.None });
+                                schema._oneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
                             }
                             else
                             {
@@ -296,7 +296,7 @@ namespace NJsonSchema.Generation
             {
                 if (Settings.SchemaType == SchemaType.JsonSchema)
                 {
-                    referencingSchema.OneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
+                    referencingSchema._oneOf.Add(new JsonSchema { Type = JsonObjectType.Null });
                 }
                 else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
                 {
@@ -308,20 +308,20 @@ namespace NJsonSchema.Generation
             var useDirectReference = Settings.AllowReferencesWithProperties ||
                 !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema)).Properties().Any(); // TODO: Improve performance
 
-            if (useDirectReference && referencingSchema.OneOf.Count == 0)
+            if (useDirectReference && referencingSchema._oneOf.Count == 0)
             {
                 referencingSchema.Reference = referencedSchema.ActualSchema;
             }
             else if (Settings.SchemaType != SchemaType.Swagger2)
             {
-                referencingSchema.OneOf.Add(new JsonSchema
+                referencingSchema._oneOf.Add(new JsonSchema
                 {
                     Reference = referencedSchema.ActualSchema
                 });
             }
             else
             {
-                referencingSchema.AllOf.Add(new JsonSchema
+                referencingSchema._allOf.Add(new JsonSchema
                 {
                     Reference = referencedSchema.ActualSchema
                 });
@@ -352,7 +352,7 @@ namespace NJsonSchema.Generation
             if (defaultValueAttribute != null)
             {
                 if (typeDescription.IsEnum &&
-                    typeDescription.Type.HasFlag(JsonObjectType.String))
+                    typeDescription.Type.IsString())
                 {
                     schema.Default = defaultValueAttribute.Value?.ToString();
                 }
@@ -463,11 +463,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualType type)
         {
-            if (Settings.GenerateExamples)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = type.GetXmlDocsTag("example");
+                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -483,11 +483,11 @@ namespace NJsonSchema.Generation
         /// <returns>The JToken or null.</returns>
         public virtual object GenerateExample(ContextualAccessorInfo accessorInfo)
         {
-            if (Settings.GenerateExamples)
+            if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
                 try
                 {
-                    var docs = accessorInfo.GetXmlDocsTag("example");
+                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
                     return GenerateExample(docs);
                 }
                 catch
@@ -534,12 +534,12 @@ namespace NJsonSchema.Generation
                 ApplyAdditionalProperties(schema, type, schemaResolver);
             }
 
-            if (!schema.Type.HasFlag(JsonObjectType.Array))
+            if (!schema.Type.IsArray())
             {
                 typeDescription.ApplyType(schema);
             }
 
-            schema.Description = type.ToCachedType().GetDescription();
+            schema.Description = type.ToCachedType().GetDescription(Settings);
             schema.Example = GenerateExample(type.ToContextualType());
 
             dynamic obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
@@ -776,7 +776,7 @@ namespace NJsonSchema.Generation
 
         private void ApplySchemaProcessors(JsonSchema schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
+            var context = new SchemaProcessorContext(contextualType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
             {
                 processor.Process(context);
@@ -839,10 +839,13 @@ namespace NJsonSchema.Generation
             else if (schema.GetType() == typeof(JsonSchema))
             {
                 typeDescription.ApplyType(schema);
-                schema.Description = type.GetXmlDocsSummary();
+
+                if (Settings.UseXmlDocumentation)
+                {
+                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocumentation);
+                }
 
                 GenerateEnum(schema, typeDescription);
-
                 schemaResolver.AddSchema(type, isIntegerEnumeration, schema);
             }
             else
@@ -970,18 +973,18 @@ namespace NJsonSchema.Generation
                                     schemaResolver.AppendSchema(baseSchema.ActualSchema, Settings.SchemaNameGenerator.Generate(baseType));
                                 }
 
-                                schema.AllOf.Add(new JsonSchema
+                                schema._allOf.Add(new JsonSchema
                                 {
                                     Reference = baseSchema.ActualSchema
                                 });
                             }
                             else
                             {
-                                schema.AllOf.Add(baseSchema);
+                                schema._allOf.Add(baseSchema);
                             }
 
                             // First schema is the (referenced) base schema, second is the type schema itself
-                            schema.AllOf.Add(actualSchema);
+                            schema._allOf.Add(actualSchema);
                             return actualSchema;
                         }
                         else
@@ -1026,8 +1029,8 @@ namespace NJsonSchema.Generation
                     // Existing property can be discriminator only if it has String type
                     if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) &&
-                            !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
+                        if (!existingProperty.ActualTypeSchema.Type.IsInteger() &&
+                            !existingProperty.ActualTypeSchema.Type.IsString())
                         {
                             throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
                         }
@@ -1084,14 +1087,12 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
+        private string TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)
         {
-            if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverterAttribute.DiscriminatorName)))
-            {
-                return jsonInheritanceConverter.DiscriminatorName;
-            }
-
-            return JsonInheritanceConverterAttribute.DefaultDiscriminatorName;
+            return ObjectExtensions.TryGetPropertyValue(
+                jsonInheritanceConverter,
+                nameof(JsonInheritanceConverterAttribute.DiscriminatorName),
+                JsonInheritanceConverterAttribute.DefaultDiscriminatorName);
         }
 
         /// <summary>
@@ -1145,7 +1146,7 @@ namespace NJsonSchema.Generation
 
                 if (propertySchema.Description == null)
                 {
-                    propertySchema.Description = property.GetDescription();
+                    propertySchema.Description = property.GetDescription(Settings);
                 }
 
                 if (propertySchema.Example == null)

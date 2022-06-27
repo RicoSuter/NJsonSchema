@@ -34,7 +34,7 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, 
+        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver,
                 IContractResolver contractResolver, CancellationToken cancellationToken = default)
         {
             var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
@@ -70,7 +70,7 @@ namespace NJsonSchema
             }
         }
 
-        private class JsonReferenceUpdater : AsyncJsonReferenceVisitorBase
+        private sealed class JsonReferenceUpdater : AsyncJsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
@@ -121,7 +121,7 @@ namespace NJsonSchema
             }
         }
 
-        private class JsonReferencePathUpdater : JsonReferenceVisitorBase
+        private sealed class JsonReferencePathUpdater : JsonReferenceVisitorBase
         {
             private readonly object _rootObject;
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;

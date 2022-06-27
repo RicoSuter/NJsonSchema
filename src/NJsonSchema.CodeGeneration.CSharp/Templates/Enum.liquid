@@ -1,5 +1,7 @@
 ﻿{%- if HasDescription -%}
-/// <summary>{{ Description | csharpdocs }}</summary>
+/// <summary>
+/// {{ Description | csharpdocs }}
+/// </summary>
 {%- endif -%}
 [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {%- if IsEnumAsBitFlags -%}

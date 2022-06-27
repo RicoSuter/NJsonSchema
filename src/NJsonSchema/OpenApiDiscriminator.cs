@@ -58,7 +58,7 @@ namespace NJsonSchema
         /// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#discriminator-object and
         /// issue https://github.com/RicoSuter/NSwag/issues/1684
         /// </summary>
-        private class DiscriminatorMappingConverter : JsonConverter
+        private sealed class DiscriminatorMappingConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {

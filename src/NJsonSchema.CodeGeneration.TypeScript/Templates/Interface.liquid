@@ -13,3 +13,9 @@
     [key: string]: {{ IndexerPropertyValueType }};
 {%- endif -%}
 }
+{%- if GenerateTypeCheckFunctions and HasInheritance -%}
+
+{% if ExportTypes %}export {% endif %}function is{{ ClassName }}(object: any): object is {{ ClassName }} {
+    return object && object['{{ BaseDiscriminator }}'] === '{{ DiscriminatorName }}';
+}
+{%- endif -%}

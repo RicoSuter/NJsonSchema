@@ -32,7 +32,7 @@ namespace NJsonSchema.Generation.SchemaProcessors
 
         public void Process(SchemaProcessorContext context)
         {
-            if (context.Type == BaseType)
+            if (context.ContextualType.OriginalType == BaseType)
             {
                 var schema = context.Schema;
                 schema.Discriminator = Discriminator;
