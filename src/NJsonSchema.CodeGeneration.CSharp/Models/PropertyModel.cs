@@ -14,13 +14,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
-        private readonly static string[] ValueTypeFormats = {
-            JsonFormatStrings.Date,
-            JsonFormatStrings.DateTime,
-            JsonFormatStrings.Time,
-            JsonFormatStrings.Duration,
-            JsonFormatStrings.Guid
-        };
         private readonly JsonSchemaProperty _property;
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
