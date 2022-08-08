@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
@@ -134,7 +135,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal("Foo", errors.First().Property);
             Assert.Equal("#/Foo", errors.First().Path);
         }
-        
+
         [Fact]
         public async Task When_type_property_has_integer_type_then_it_is_validated_correctly()
         {
@@ -157,6 +158,55 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.Equal(0, errors.Count);
+        }
+
+        [Fact]
+        public void When_case_sensitive_and_property_has_different_casing_then_it_should_fail()
+        {
+            //// Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.Object;
+            schema.AllowAdditionalProperties = false;
+            schema.Properties["Foo"] = new JsonSchemaProperty
+            {
+                Type = JsonObjectType.Number | JsonObjectType.Null
+            };
+
+            var token = new JObject();
+            token["foo"] = new JValue(5);
+
+            //// Act
+            var errors = schema.Validate(token);
+
+            //// Assert
+            Assert.Equal(ValidationErrorKind.NoAdditionalPropertiesAllowed, errors.First().Kind);
+        }
+
+        [Fact]
+        public void When_case_insensitive_and_property_has_different_casing_then_it_should_succeed()
+        {
+            //// Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.Object;
+            schema.AllowAdditionalProperties = false;
+            schema.Properties["Foo"] = new JsonSchemaProperty
+            {
+                Type = JsonObjectType.Number | JsonObjectType.Null
+            };
+
+            var token = new JObject();
+            token["foo"] = new JValue(5);
+
+            var validator = new JsonSchemaValidator(new JsonSchemaValidatorSettings()
+            {
+                PropertyStringComparer = StringComparer.OrdinalIgnoreCase,
+            });
+
+            //// Act
+            var errors = validator.Validate(token, schema);
+
+            //// Assert
+            Assert.Empty(errors);
         }
     }
 }

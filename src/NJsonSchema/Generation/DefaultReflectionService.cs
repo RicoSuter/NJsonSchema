@@ -139,7 +139,7 @@ namespace NJsonSchema.Generation
             if (type == typeof(TimeSpan) ||
                 type.FullName == "NodaTime.Duration")
             {
-                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Duration);
             }
 
             if (type.FullName == "NodaTime.LocalDate" ||

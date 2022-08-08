@@ -449,7 +449,7 @@ namespace NJsonSchema.Tests.Validation
 }";
 
             //// Arrange
-            var validator = new JsonSchemaValidator();
+            var validator = new JsonSchemaValidator(new JsonSchemaValidatorSettings());
             var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var result = validator.Validate(jsonContent, schema);
 

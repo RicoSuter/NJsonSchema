@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="ClassTemplateModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -62,15 +62,21 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
         public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
 
-        /// <summary>Gets a value indicating whether an additional properties type is available and needed.</summary>
+        /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
         public bool HasAdditionalPropertiesType =>
+            HasAdditionalPropertiesTypeInBaseClass || // if the base class has them, inheritance dictates that this class will have them to
             !_schema.IsDictionary &&
             !_schema.ActualTypeSchema.IsDictionary &&
             !_schema.IsArray &&
             !_schema.ActualTypeSchema.IsArray &&
             (_schema.ActualTypeSchema.AllowAdditionalProperties ||
-             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null)
-            && BaseClass?.HasAdditionalPropertiesType != true; // if base class already has extension data array, we need to avoid it in the subclass
+             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null); 
+        
+        /// <summary>Gets a value indicating whether an additional properties type is available in the base class.</summary>
+        public bool HasAdditionalPropertiesTypeInBaseClass => BaseClass?.HasAdditionalPropertiesType ?? false;
+
+        /// <summary> Gets a value indicating if the "Additional properties" property should be generated. </summary>
+        public bool GenerateAdditionalPropertiesProperty => HasAdditionalPropertiesType && !HasAdditionalPropertiesTypeInBaseClass;
 
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries

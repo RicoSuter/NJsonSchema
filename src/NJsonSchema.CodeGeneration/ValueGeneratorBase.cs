@@ -22,6 +22,7 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
             JsonFormatStrings.Time,
+            JsonFormatStrings.Duration,
             JsonFormatStrings.TimeSpan,
             JsonFormatStrings.Uri,
             JsonFormatStrings.Guid,

@@ -66,12 +66,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())
                     {
-                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType)
-                            ? targetType.Replace(_settings.DictionaryType + "<", _settings.DictionaryInstanceType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<")
+                            ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
 
-                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType)
-                            ? targetType.Replace(_settings.ArrayType + "<", _settings.ArrayInstanceType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<")
+                            ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
                         return $"new {targetType}()";

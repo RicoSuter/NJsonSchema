@@ -240,5 +240,38 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("public string Prop1 { get; set; }", code);
             Assert.Contains("public string Prop2 { get; set; }", code);
         }
+
+        [Fact]
+        public async Task When_allOf_schema_contains_two_anonymous_nodes_without_type_specifier_an_anonymous_class_is_generated()
+        {
+            //// Arrange
+            // The issue here is that the 'type' specifier has been (legally) omitted.
+            var json = @"
+                {
+                '$schema': 'http://json-schema.org/draft-04/schema#',
+                'type': 'object',
+                'allOf': [
+                    {
+                        'properties': {
+                            'prop1' : { 'type' : 'string' }
+                        }
+                    },
+                    {
+                        'properties': {
+                            'prop2' : { 'type' : 'number' }
+                        }
+                    }                    
+                ]
+            }";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile("Foo");
+
+            //// Assert
+            Assert.Contains("class Foo", code);
+            Assert.Contains("class Anonymous", code);
+        }
     }
 }

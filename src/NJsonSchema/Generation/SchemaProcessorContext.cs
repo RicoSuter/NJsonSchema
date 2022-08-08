@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using Namotion.Reflection;
 using System;
 
 namespace NJsonSchema.Generation
@@ -14,14 +15,14 @@ namespace NJsonSchema.Generation
     public class SchemaProcessorContext
     {
         /// <summary>Initializes a new instance of the <see cref="SchemaProcessorContext" /> class.</summary>
-        /// <param name="type">The source type.</param>
+        /// <param name="contextualType">The source contextual type.</param>
         /// <param name="schema">The JSON Schema.</param>
         /// <param name="resolver">The resolver.</param>
         /// <param name="generator">The generator.</param>
         /// <param name="settings">The settings.</param>
-        public SchemaProcessorContext(Type type, JsonSchema schema, JsonSchemaResolver resolver, JsonSchemaGenerator generator, JsonSchemaGeneratorSettings settings)
+        public SchemaProcessorContext(ContextualType contextualType, JsonSchema schema, JsonSchemaResolver resolver, JsonSchemaGenerator generator, JsonSchemaGeneratorSettings settings)
         {
-            Type = type;
+            ContextualType = contextualType;
             Schema = schema;
             Resolver = resolver;
             Generator = generator;
@@ -29,7 +30,11 @@ namespace NJsonSchema.Generation
         }
 
         /// <summary>The source type.</summary>
-        public Type Type { get; }
+        [Obsolete("Use ContextualType to obtain this instead.")]
+        public Type Type { get => ContextualType.OriginalType; }
+
+        /// <summary>The source contextual type.</summary>
+        public ContextualType ContextualType { get; }
 
         /// <summary>The JSON Schema to process.</summary>
         public JsonSchema Schema { get; }

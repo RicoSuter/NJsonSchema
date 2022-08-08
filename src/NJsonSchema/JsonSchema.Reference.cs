@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using NJsonSchema.References;
 
@@ -19,7 +20,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>()); // we use list here there are usually very when items
+        public virtual JsonSchema ActualSchema => GetActualSchema(null);
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
@@ -45,80 +46,92 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether this is an allOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasAllOfSchemaReference => _allOf.Count == 1 &&
-                                               _allOf.Any(s => s.HasReference) &&
-                                               Type == JsonObjectType.None &&
+        public bool HasAllOfSchemaReference => Type == JsonObjectType.None &&
                                                _anyOf.Count == 0 &&
                                                _oneOf.Count == 0 &&
                                                _properties.Count == 0 &&
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false;
+                                               IsEnumeration == false &&
+                                               _allOf.Count == 1 &&
+                                               _allOf.Any(s => s.HasReference);
 
         /// <summary>Gets a value indicating whether this is an oneOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasOneOfSchemaReference => _oneOf.Count == 1 &&
-                                               _oneOf.Any(s => s.HasReference) &&
-                                               Type == JsonObjectType.None &&
+        public bool HasOneOfSchemaReference => Type == JsonObjectType.None &&
                                                _anyOf.Count == 0 &&
                                                _allOf.Count == 0 &&
                                                _properties.Count == 0 &&
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false;
+                                               IsEnumeration == false &&
+                                               _oneOf.Count == 1 &&
+                                               _oneOf.Any(s => s.HasReference);
 
         /// <summary>Gets a value indicating whether this is an anyOf schema reference.</summary>
         [JsonIgnore]
-        public bool HasAnyOfSchemaReference => _anyOf.Count == 1 &&
-                                               _anyOf.Any(s => s.HasReference) &&
-                                               Type == JsonObjectType.None &&
+        public bool HasAnyOfSchemaReference => Type == JsonObjectType.None &&
                                                _allOf.Count == 0 &&
                                                _oneOf.Count == 0 &&
                                                _properties.Count == 0 &&
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false;
+                                               IsEnumeration == false &&
+                                               _anyOf.Count == 1 &&
+                                               _anyOf.Any(s => s.HasReference);
 
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        private JsonSchema GetActualSchema(List<JsonSchema> checkedSchemas)
+        [MethodImpl((MethodImplOptions) 256)] // aggressive inlining
+        private JsonSchema GetActualSchema(List<JsonSchema> checkedSchemas) // we use list here, there are usually very few items, if any
         {
-            if (checkedSchemas.Contains(this))
+            static void ThrowInvalidOperationException(string message)
             {
-                throw new InvalidOperationException("Cyclic references detected.");
+                throw new InvalidOperationException(message);
+            }
+
+            if (checkedSchemas?.Contains(this) == true)
+            {
+                ThrowInvalidOperationException("Cyclic references detected.");
             }
 
             if (Reference == null && ((IJsonReferenceBase)this).ReferencePath != null)
             {
-                throw new InvalidOperationException("The schema reference path '" + ((IJsonReferenceBase)this).ReferencePath + "' has not been resolved.");
+                ThrowInvalidOperationException("The schema reference path '" + ((IJsonReferenceBase)this).ReferencePath + "' has not been resolved.");
             }
 
             if (HasReference)
             {
-                checkedSchemas.Add(this);
-
-                if (HasAllOfSchemaReference)
-                {
-                    return _allOf[0].GetActualSchema(checkedSchemas);
-                }
-
-                if (HasOneOfSchemaReference)
-                {
-                    return _oneOf[0].GetActualSchema(checkedSchemas);
-                }
-
-                if (HasAnyOfSchemaReference)
-                {
-                    return _anyOf[0].GetActualSchema(checkedSchemas);
-                }
-
-                return Reference.GetActualSchema(checkedSchemas);
+                return GetActualSchemaReferences(checkedSchemas);
             }
 
             return this;
+        }
+
+        private JsonSchema GetActualSchemaReferences(List<JsonSchema> checkedSchemas)
+        {
+            checkedSchemas ??= new List<JsonSchema>();
+            checkedSchemas.Add(this);
+
+            if (HasAllOfSchemaReference)
+            {
+                return _allOf[0].GetActualSchema(checkedSchemas);
+            }
+
+            if (HasOneOfSchemaReference)
+            {
+                return _oneOf[0].GetActualSchema(checkedSchemas);
+            }
+
+            if (HasAnyOfSchemaReference)
+            {
+                return _anyOf[0].GetActualSchema(checkedSchemas);
+            }
+
+            return Reference.GetActualSchema(checkedSchemas);
         }
 
         #region Implementation of IJsonReference

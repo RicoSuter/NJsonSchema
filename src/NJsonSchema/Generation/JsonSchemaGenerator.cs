@@ -798,7 +798,7 @@ namespace NJsonSchema.Generation
 
         private void ApplySchemaProcessors(JsonSchema schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
+            var context = new SchemaProcessorContext(contextualType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
             {
                 processor.Process(context);
@@ -1205,14 +1205,12 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private string TryGetInheritanceDiscriminatorName(dynamic jsonInheritanceConverter)
+        private string TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)
         {
-            if (ObjectExtensions.HasProperty(jsonInheritanceConverter, nameof(JsonInheritanceConverter.DiscriminatorName)))
-            {
-                return jsonInheritanceConverter.DiscriminatorName;
-            }
-
-            return JsonInheritanceConverter.DefaultDiscriminatorName;
+            return ObjectExtensions.TryGetPropertyValue(
+                jsonInheritanceConverter,
+                nameof(JsonInheritanceConverter.DiscriminatorName),
+                JsonInheritanceConverter.DefaultDiscriminatorName);
         }
 
         private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, JsonSchemaResolver schemaResolver)

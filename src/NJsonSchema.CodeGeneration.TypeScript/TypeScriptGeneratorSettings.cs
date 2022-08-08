@@ -43,6 +43,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ExtendedClasses = Array.Empty<string>();
 
             InlineNamedDictionaries = false;
+            GenerateTypeCheckFunctions = false;
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 2.7).</summary>
@@ -50,6 +51,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets a value indicating whether the target TypeScript version supports strict null checks.</summary>
         public bool SupportsStrictNullChecks => TypeScriptVersion >= 2.0m;
+
+        /// <summary>Gets a value indicating whether the target TypeScript version requires strict property initialization.</summary>
+        public bool RequiresStrictPropertyInitialization => TypeScriptVersion >= 2.7m;
+
+        /// <summary>Gets a value indicating whether the target TypeScript version supports override keyword.</summary>
+        public bool SupportsOverrideKeyword => TypeScriptVersion >= 4.3m;
 
         /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
         public bool MarkOptionalProperties { get; set; }
@@ -59,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
         public TypeScriptDateTimeType DateTimeType { get; set; }
-        
+
         /// <summary>Gets or sets the enum style (default: Enum).</summary>
         public TypeScriptEnumStyle EnumStyle { get; set; }
 
@@ -101,6 +108,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with an indexer.</summary>
         public bool InlineNamedDictionaries { get; set; }
+
+        /// <summary>Gets a value indicating whether to generate type check functions (for type style interface only, default: false).</summary>
+        public bool GenerateTypeCheckFunctions { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {

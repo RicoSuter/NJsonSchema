@@ -213,7 +213,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "string";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "string";
                 }
@@ -236,7 +236,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "moment.Moment";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "moment.Duration";
                 }
@@ -258,7 +258,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "DateTime";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "Duration";
                 }
@@ -280,7 +280,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "dayjs.Dayjs";
                 }
 
-                if (schema.Format == JsonFormatStrings.TimeSpan)
+                if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return "dayjs.Dayjs";
                 }

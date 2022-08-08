@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -24,8 +24,6 @@ namespace NJsonSchema.Generation
     /// <summary>The JSON Schema generator settings.</summary>
     public class JsonSchemaGeneratorSettings : IXmlDocsSettings
     {
-        private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
-
         private EnumHandling _defaultEnumHandling;
         private PropertyNameHandling _defaultPropertyNameHandling;
 
@@ -212,20 +210,9 @@ namespace NJsonSchema.Generation
                 return null;
             }
 
-            if (!_cachedContracts.TryGetValue(key, out var contract))
-            {
-                lock (_cachedContracts)
-                {
-                    if (!_cachedContracts.TryGetValue(key, out contract))
-                    {
-                        contract = !type.GetTypeInfo().IsGenericTypeDefinition
-                            ? ActualContractResolver.ResolveContract(type)
-                            : null;
-
-                        _cachedContracts[key] = contract;
-                    }
-                }
-            }
+            var contract = !type.GetTypeInfo().IsGenericTypeDefinition
+                ? ActualContractResolver.ResolveContract(type)
+                : null;
 
             return contract;
         }
@@ -254,8 +241,6 @@ namespace NJsonSchema.Generation
 
         private void UpdateActualContractResolverAndSerializerSettings()
         {
-            _cachedContracts = new Dictionary<string, JsonContract>();
-
             if (SerializerOptions != null)
             {
                 if (DefaultPropertyNameHandling != PropertyNameHandling.Default)
