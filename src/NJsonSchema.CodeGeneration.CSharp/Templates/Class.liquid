@@ -123,7 +123,7 @@
 
 {%- if GenerateAdditionalPropertiesProperty -%}
 
-    private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> _additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>();
+    private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}>{% if GenerateNullableReferenceTypes %}?{% endif %} _additionalProperties;
 
 {%-       if UseSystemTextJson -%}
     [System.Text.Json.Serialization.JsonExtensionData]
@@ -132,7 +132,7 @@
 {%-       endif -%}
     public System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}> AdditionalProperties
     {
-        get { return _additionalProperties; }
+        get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, {{ AdditionalPropertiesType }}>()); }
         {{PropertySetterAccessModifier}}set { _additionalProperties = value; }
     }
 
