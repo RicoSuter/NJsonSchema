@@ -84,7 +84,7 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Removes a nullable oneOf reference if available.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The actually resolvable schema</returns>
-        public JsonSchema RemoveNullability(JsonSchema schema)
+        public virtual JsonSchema RemoveNullability(JsonSchema schema)
         {
             // TODO: Method on JsonSchema4?
             return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
