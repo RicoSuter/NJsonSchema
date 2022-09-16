@@ -10,9 +10,17 @@ using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
 {
-    internal static class XmlDocsSettingsExtensions
+    /// <summary>
+    /// XML Documentation settings extensions.
+    /// </summary>
+    public static class XmlDocsSettingsExtensions
     {
-        internal static XmlDocsOptions GetXmlDocsOptions(this IXmlDocsSettings settings)
+        /// <summary>
+        /// Converts a settings to options.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The options.</returns>
+        public static XmlDocsOptions GetXmlDocsOptions(this IXmlDocsSettings settings)
         {
             return new XmlDocsOptions
             {
