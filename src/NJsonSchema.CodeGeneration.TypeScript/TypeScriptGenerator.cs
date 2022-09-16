@@ -96,7 +96,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", new object());
                 yield return new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
             }
-
+            if (artifacts.Any(r => r.Code.Contains("parseDateOnly(")))
+            {
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ParseDateOnly", new object());
+                yield return new CodeArtifact("parseDateOnly", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
+            }
+            
             if (Settings.HandleReferences)
             {
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", new object());

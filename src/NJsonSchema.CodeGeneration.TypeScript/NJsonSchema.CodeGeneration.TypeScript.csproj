@@ -16,6 +16,7 @@
     <EmbeddedResource Include="Templates\Interface.liquid" />
     <EmbeddedResource Include="Templates\KnockoutClass.liquid" />
     <EmbeddedResource Include="Templates\File.ReferenceHandling.liquid" />
+    <EmbeddedResource Include="Templates\File.ParseDateOnly.liquid" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
