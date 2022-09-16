@@ -57,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             }";
 
             var schema = await JsonSchema.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings {EnforceFlagEnums = true});
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlagEnums = true });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
@@ -140,7 +140,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator =
-                new CSharpGenerator(schema, new CSharpGeneratorSettings {ClassStyle = CSharpClassStyle.Poco});
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
             //// Act
             var code = generator.GenerateFile();
@@ -493,7 +493,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");
@@ -531,7 +531,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");
