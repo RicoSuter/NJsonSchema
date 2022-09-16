@@ -111,7 +111,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
         public bool HasIndexerProperty => _schema.IsDictionary ||
-                                          _schema.InheritedSchema?.IsDictionary == true;
+                                          _schema.InheritedSchema?.IsDictionary == true ||
+                                          _schema.ActualTypeSchema.AllowAdditionalProperties ||
+                                          _schema.ActualTypeSchema.AdditionalPropertiesSchema != null;
 
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
