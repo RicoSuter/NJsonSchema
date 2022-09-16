@@ -55,6 +55,7 @@ namespace NJsonSchema.Generation
 
             UseXmlDocumentation = true;
             ResolveExternalXmlDocumentation = true;
+            XmlDocumentationFormatting = XmlDocsFormattingMode.None;
         }
 
         /// <summary>Gets or sets the default reference type null handling when no nullability information is available (default: Null).</summary>
@@ -129,6 +130,9 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets a value indicating whether tho resolve the XML Docs from the NuGet cache or .NET SDK directory (default: true).</summary>
         public bool ResolveExternalXmlDocumentation { get; set; }
+
+        /// <summary>Gets or sets the XML Docs formatting (default: None).</summary>
+        public XmlDocsFormattingMode XmlDocumentationFormatting { get; set; }
 
         /// <summary>Gets or sets the type name generator.</summary>
         [JsonIgnore]

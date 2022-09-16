@@ -74,7 +74,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = type.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = type.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -98,7 +98,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -122,7 +122,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = parameter.GetXmlDocs(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = parameter.GetXmlDocs(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
