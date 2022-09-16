@@ -52,6 +52,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets or sets if we output as Bit Flags.</summary>
         public bool IsEnumAsBitFlags => _settings.EnforceFlagEnums || _schema.IsFlagEnumerable;
 
+        /// <summary>Gets a value indicating whether the enum needs an other base type to representing an extended value range.</summary>
+        public bool HasExtendedValueRange => _schema.Format == JsonFormatStrings.Long;
+
         /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationItemModel> Enums
         {
