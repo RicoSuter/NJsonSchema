@@ -43,6 +43,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
+            Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
         }
 
         [Fact]
@@ -81,6 +82,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             Assert.Contains("[System.Text.Json.Serialization.JsonExtensionData]", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
+            Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
         }
 
         [Fact]

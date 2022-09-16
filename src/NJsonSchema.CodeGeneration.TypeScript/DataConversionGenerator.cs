@@ -87,6 +87,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = GetStringToDateTime(parameters, typeSchema),
+                StringToDateOnlyCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date 
+                                       && parameters.Settings.ConvertDateToLocalTimezone 
+                    ? "parseDateOnly" 
+                    : GetStringToDateTime(parameters, typeSchema),
                 DateToStringCode = GetDateToString(parameters, typeSchema),
                 DateTimeToStringCode = GetDateTimeToString(parameters, typeSchema),
 
