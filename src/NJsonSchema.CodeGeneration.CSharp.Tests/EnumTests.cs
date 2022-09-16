@@ -156,7 +156,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = JsonSchema.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator =
-                new CSharpGenerator(schema, new CSharpGeneratorSettings {ClassStyle = CSharpClassStyle.Poco});
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
             //// Act
             var code = generator.GenerateFile();
@@ -187,7 +187,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Act
             var generator =
-                new CSharpGenerator(schema, new CSharpGeneratorSettings {ClassStyle = CSharpClassStyle.Poco});
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
 
             //// Assert
@@ -259,7 +259,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     }
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings {SchemaType = SchemaType.Swagger2});
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
 
             //// Act
             var code = generator.GenerateFile("MyClass");
