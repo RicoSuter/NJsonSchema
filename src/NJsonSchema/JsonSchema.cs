@@ -308,7 +308,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple)
+                if (InheritedSchema == null && (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple))
                 {
                     return ActualTypeSchema;
                 }
