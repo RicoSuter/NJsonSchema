@@ -246,6 +246,53 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task GeneratorAdheresToMaxRecursionLevel()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body"", ""footer""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""text"": { ""type"": ""string"", ""enum"": [""my_string""] },
+                      ""body"": {
+                        ""$ref"": ""#/definitions/body""
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator(new SampleJsonDataGeneratorSettings() { MaxRecursionLevel = 2 });
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var secondBodyToken = testJson.SelectToken("body.body");
+            Assert.NotNull(secondBodyToken);
+
+            var thirdBodyToken = testJson.SelectToken("body.body.body") as JValue;
+            Assert.NotNull(thirdBodyToken);
+            Assert.Equal(JTokenType.Null, thirdBodyToken.Type);
+
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
+        }
+
+        [Fact]
         public async Task SchemaWithDefinitionUseMultipleTimes()
         {
             //// Arrange
