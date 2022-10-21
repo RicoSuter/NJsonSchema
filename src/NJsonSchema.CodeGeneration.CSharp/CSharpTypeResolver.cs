@@ -182,7 +182,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
 
-            if (schema.Format == JsonFormatStrings.Uri)
+            if (schema.Format == JsonFormatStrings.Uri && Settings.UseUriTypeForUriFormattedStrings)
             {
                 return "System.Uri" + nullableReferenceType;
             }

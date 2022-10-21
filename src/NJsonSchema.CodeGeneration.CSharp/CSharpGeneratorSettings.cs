@@ -52,6 +52,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
             InlineNamedTuples = true;
+
+            UseUriTypeForUriFormattedStrings = true;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
@@ -147,5 +149,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Generate C# 9.0 record types instead of record-like classes.</summary>
         public bool GenerateNativeRecords { get; set; }
+
+        /// <summary>Indicate if System.Uri should be used for strings with format uri (default: true)</summary>
+        public bool UseUriTypeForUriFormattedStrings { get; set; }
     }
 }
