@@ -67,6 +67,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
         public TypeScriptDateTimeType DateTimeType { get; set; }
 
+        /// <summary>
+        /// Whether to use UTC (default) or local time zone when deserializing dates 'yyyy-MM-dd' (default: 'false').
+        /// Only applicable if <see cref="DateTimeType"/> is <see cref="TypeScriptDateTimeType.Date"/>.
+        /// Other DateTimeTypes use local timezone by default.
+        /// </summary>
+        public bool ConvertDateToLocalTimezone { get; set; }
+
         /// <summary>Gets or sets the enum style (default: Enum).</summary>
         public TypeScriptEnumStyle EnumStyle { get; set; }
 

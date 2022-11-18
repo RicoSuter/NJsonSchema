@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var json =
-            @"{
+                @"{
                 ""type"": ""object"", 
                 ""properties"": {
                     ""category"" : {
@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var json =
-            @"{
+                @"{
                 ""type"": ""object"", 
                 ""properties"": {
                     ""category"" : {
@@ -139,7 +139,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Arrange
             var schema = JsonSchema.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator =
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
             //// Act
             var code = generator.GenerateFile();
@@ -154,16 +155,22 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Arrange
             var schema = JsonSchema.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator =
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
             //// Act
             var code = generator.GenerateFile();
 
             //// Assert
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]", code);
+            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]",
+                code);
         }
 
-        public enum SomeEnum { Thing1, Thing2 }
+        public enum SomeEnum
+        {
+            Thing1,
+            Thing2
+        }
 
         public class SomeClass
         {
@@ -179,7 +186,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var json = schema.ToJson();
 
             //// Act
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator =
+                new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
 
             //// Assert
@@ -232,7 +240,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var json =
-            @"{
+                @"{
     ""type"": ""object"",
     ""required"": [
         ""name"",
@@ -485,7 +493,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            var settings = new CSharpGeneratorSettings {EnforceFlagEnums = true};
+            var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
             var generator = new CSharpGenerator(schema, settings);
 
             var code = generator.GenerateFile("Foo");
@@ -539,7 +547,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         {
             //// Arrange
             var json =
-            @"{
+                @"{
                 ""type"": ""object"", 
                 ""properties"": {
                     ""category"" : {
@@ -565,7 +573,44 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;", code);
+            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;",
+                code);
+        }
+
+        [Fact]
+        public async Task When_enum_has_a_format_then_enum_is_generated_with_correct_basetype()
+        {
+            // Arrange
+            var json = @"
+{
+    ""properties"": {
+        ""foo"": {
+            ""$ref"": ""#/definitions/ManyValuesTestEnum""
+        }
+    },
+    ""definitions"": {
+        ""ManyValuesTestEnum"": {
+            ""type"": ""integer"",
+            ""format"": ""int64"",
+            ""x-enumNames"": [
+                ""None"",
+                ""FirstBit""
+            ],
+            ""enum"": [
+                0,
+                1
+            ]
+        }
+    }
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema);
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("public enum ManyValuesTestEnum : long", code);
         }
     }
 }
