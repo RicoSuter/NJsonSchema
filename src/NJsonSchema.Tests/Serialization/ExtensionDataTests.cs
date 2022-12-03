@@ -100,6 +100,64 @@ namespace NJsonSchema.Tests.Serialization
         }
 
         [Fact]
+        public async Task When_multi_extension_data_attribute_is_used_on_class_then_extension_data_property_is_set()
+        {
+            //// Arrange
+
+            //// Act
+            var schema = JsonSchema.FromType<MyMultiTest>();
+
+            //// Assert
+            Assert.Equal("myname", schema.ExtensionData["x-name"]);
+            Assert.Equal("red", schema.ExtensionData["x-color"]);
+        }
+
+        /// <summary>
+        /// Adds multiple extension data properties to a class or property.</summary>
+        /// <seealso cref="System.Attribute" />
+        [AttributeUsage(
+            AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue,
+            AllowMultiple = true)]
+        public class MultiJsonSchemaExtensionDataAttribute : Attribute, IMultiJsonSchemaExtensionDataAttribute
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MultiJsonSchemaExtensionDataAttribute" /> class.</summary>
+            /// <param name="kvps">The key value pairs.</param>
+            public MultiJsonSchemaExtensionDataAttribute(string name, string color)
+            {
+                SchemaExtensionData = new Dictionary<string, object>
+                {
+                  {"x-name", name},
+                  {"x-color", color}
+                };
+            }
+
+            /// <summary>
+            /// Gets the extension data properties dictionary.
+            /// </summary>
+            public IDictionary<string, object> SchemaExtensionData { get; }
+        }
+        [MultiJsonSchemaExtensionData("myname", "red")]
+        public class MyMultiTest
+        {
+          [MultiJsonSchemaExtensionData("prop", "blue")]
+          public string Property { get; set; }
+        }
+
+        [Fact]
+        public async Task When_multi_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
+        {
+          //// Arrange
+          
+          //// Act
+          var schema = JsonSchema.FromType<MyMultiTest>();
+          
+          //// Assert
+          Assert.Equal("prop", schema.Properties["Property"].ExtensionData["x-name"]);
+          Assert.Equal("blue", schema.Properties["Property"].ExtensionData["x-color"]);
+        }
+
+        [Fact]
         public async Task When_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
         {
             //// Arrange

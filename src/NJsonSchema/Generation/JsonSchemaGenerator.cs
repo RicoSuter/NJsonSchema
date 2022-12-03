@@ -1409,7 +1409,8 @@ namespace NJsonSchema.Generation
         private void ApplyTypeExtensionDataAttributes<TSchemaType>(TSchemaType schema, ContextualType contextualType) where TSchemaType : JsonSchema, new()
         {
             var extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes()
-                .Where(attribute => attribute is IJsonSchemaExtensionDataAttribute).ToArray();
+                .Where(attribute => attribute is IJsonSchemaExtensionDataAttribute 
+                                 || attribute is IMultiJsonSchemaExtensionDataAttribute).ToArray();
 
             if (extensionAttributes.Any())
             {
@@ -1417,8 +1418,17 @@ namespace NJsonSchema.Generation
 
                 foreach (var attribute in extensionAttributes)
                 {
-                    var extensionAttribute = (IJsonSchemaExtensionDataAttribute)attribute;
-                    extensionData.Add(extensionAttribute.Key, extensionAttribute.Value);
+                    if (attribute is IJsonSchemaExtensionDataAttribute singleExt)
+                    {
+                        extensionData.Add(singleExt.Key, singleExt.Value);
+                    }
+                    else if (attribute is IMultiJsonSchemaExtensionDataAttribute multiExt)
+                    {
+                        foreach (var kvp in multiExt.SchemaExtensionData)
+                        {
+                            extensionData.Add(kvp.Key, kvp.Value);
+                        }
+                    }
                 }
 
                 schema.ExtensionData = extensionData;
@@ -1434,6 +1444,25 @@ namespace NJsonSchema.Generation
             if (extensionDataAttributes.Any())
             {
                 propertySchema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
+            }
+
+            var multiExtensionDataAttributes = accessorInfo
+                .GetContextAttributes<IMultiJsonSchemaExtensionDataAttribute>()
+                .ToArray();
+            
+            if (multiExtensionDataAttributes.Any())
+            {
+                if (propertySchema.ExtensionData == null)
+                {
+                    propertySchema.ExtensionData = new Dictionary<string, object>();
+                }
+                foreach (var multiExt in multiExtensionDataAttributes)
+                {
+                    foreach (var kvp in multiExt.SchemaExtensionData)
+                    {
+                        propertySchema.ExtensionData.Add(kvp.Key, kvp.Value);
+                    }
+                }
             }
         }
     }
