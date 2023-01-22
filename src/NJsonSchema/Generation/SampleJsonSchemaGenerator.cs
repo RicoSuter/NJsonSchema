@@ -21,7 +21,7 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
-        /// <param name="standalone">Create schema without references</param>
+        /// <param name="standalone">Create standalone schema without references</param>
         /// <returns>The JSON Schema.</returns>
         public JsonSchema Generate(string json, bool standalone = false)
         {
