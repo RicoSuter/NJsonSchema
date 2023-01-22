@@ -21,8 +21,9 @@ namespace NJsonSchema.Generation
     {
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
+        /// <param name="standalone">Create schema without references</param>
         /// <returns>The JSON Schema.</returns>
-        public JsonSchema Generate(string json)
+        public JsonSchema Generate(string json, bool standalone = false)
         {
             var token = JsonConvert.DeserializeObject<JToken>(json, new JsonSerializerSettings
             {
@@ -30,7 +31,7 @@ namespace NJsonSchema.Generation
             });
 
             var schema = new JsonSchema();
-            Generate(token, schema, schema, "Anonymous");
+            Generate(token, schema, schema, "Anonymous", standalone);
             return schema;
         }
 
@@ -50,11 +51,11 @@ namespace NJsonSchema.Generation
             var token = serializer.Deserialize<JToken>(jsonReader);
 
             var schema = new JsonSchema();
-            Generate(token, schema, schema, "Anonymous");
+            Generate(token, schema, schema, "Anonymous", false);
             return schema;
         }
 
-        private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint, bool standalone)
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)
             {
@@ -70,21 +71,21 @@ namespace NJsonSchema.Generation
                             properties.All(p => s.Properties.ContainsKey(p.Name)));
                 }
 
-                if (referencedSchema == null)
+                if (referencedSchema == null || standalone)
                 {
                     referencedSchema = new JsonSchema();
                     AddSchemaDefinition(rootSchema, referencedSchema, typeNameHint);
                 }
 
                 schema.Reference = referencedSchema;
-                GenerateWithoutReference(token, referencedSchema, rootSchema, typeNameHint);
+                GenerateWithoutReference(token, referencedSchema, rootSchema, typeNameHint, standalone);
                 return;
             }
 
             GenerateWithoutReference(token, schema, rootSchema, typeNameHint);
         }
 
-        private void GenerateWithoutReference(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void GenerateWithoutReference(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint, bool standalone)
         {
             if (token == null)
             {
@@ -94,11 +95,11 @@ namespace NJsonSchema.Generation
             switch (token.Type)
             {
                 case JTokenType.Object:
-                    GenerateObject(token, schema, rootSchema);
+                    GenerateObject(token, schema, rootSchema, standalone);
                     break;
 
                 case JTokenType.Array:
-                    GenerateArray(token, schema, rootSchema, typeNameHint);
+                    GenerateArray(token, schema, rootSchema, typeNameHint, standalone);
                     break;
 
                 case JTokenType.Date:
@@ -161,7 +162,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void GenerateObject(JToken token, JsonSchema schema, JsonSchema rootSchema)
+        private void GenerateObject(JToken token, JsonSchema schema, JsonSchema rootSchema, bool standalone)
         {
             schema.Type = JsonObjectType.Object;
             foreach (var property in ((JObject)token).Properties())
@@ -170,19 +171,19 @@ namespace NJsonSchema.Generation
                 var propertyName = property.Value.Type == JTokenType.Array ? ConversionUtilities.Singularize(property.Name) : property.Name;
                 var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(propertyName, true);
 
-                Generate(property.Value, propertySchema, rootSchema, typeNameHint);
+                Generate(property.Value, propertySchema, rootSchema, typeNameHint, standalone);
                 schema.Properties[property.Name] = propertySchema;
             }
         }
 
-        private void GenerateArray(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void GenerateArray(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint, bool standalone)
         {
             schema.Type = JsonObjectType.Array;
 
             var itemSchemas = ((JArray)token).Select(item =>
             {
                 var itemSchema = new JsonSchema();
-                GenerateWithoutReference(item, itemSchema, rootSchema, typeNameHint);
+                GenerateWithoutReference(item, itemSchema, rootSchema, typeNameHint, standalone);
                 return itemSchema;
             }).ToList();
 
