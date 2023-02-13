@@ -203,14 +203,14 @@ namespace NJsonSchema.Converters
             return null;
         }
 
-        private static Type GetObjectSubtype(Type baseType, string discriminatorName)
+        private static Type GetObjectSubtype(Type baseType, string discriminatorValue)
         {
             var jsonInheritanceAttributes = baseType
                 .GetTypeInfo()
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorValue)?.Type;
         }
 
         private static string GetSubtypeDiscriminator(Type objectType)
