@@ -145,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                                _schema?.InheritsSchema(_resolver.ExceptionSchema) == true;
 
         /// <summary>Gets a value indicating whether to use the DateFormatConverter.</summary>
-        public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.Date");
+        public bool UseDateFormatConverter => _settings.DateType.StartsWith("System.DateTime");
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
         public string TypeAccessModifier => _settings.TypeAccessModifier;
