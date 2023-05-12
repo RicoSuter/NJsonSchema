@@ -74,9 +74,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //// Assert
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
-            Assert.Contains("[JsonInheritanceConverter(typeof(Fruit), \"discriminator\")]", code);
-            Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
-            Assert.Contains("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"discriminator\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(Banana), typeDiscriminator: \"Banana\")]", code);
+            Assert.DoesNotContain("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
         }
     }
 }

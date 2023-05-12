@@ -135,14 +135,20 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_definitions_inherit_from_root_schema()
+        public async Task When_definitions_inherit_from_root_schema_Newtonsoft()
         {
             //// Arrange
             var path = GetTestDirectory() + "/References/Animal.json";
 
             //// Act
             var schema = await JsonSchema.FromFileAsync(path);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Record });
+            var generator = new CSharpGenerator(
+                schema,
+                new CSharpGeneratorSettings
+                {
+                    ClassStyle = CSharpClassStyle.Record,
+                    JsonLibrary = CSharpJsonLibrary.NewtonsoftJson
+                });
 
             //// Act
             var code = generator.GenerateFile();
@@ -155,6 +161,33 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("[JsonInheritanceAttribute(\"PersianCat\", typeof(PersianCat))]", code);
         }
 
+        [Fact]
+        public async Task When_definitions_inherit_from_root_schema_STJ()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/Animal.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generator = new CSharpGenerator(
+                schema,
+                new CSharpGeneratorSettings
+                {
+                    ClassStyle = CSharpClassStyle.Record,
+                    JsonLibrary = CSharpJsonLibrary.SystemTextJson
+                });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("public abstract partial class Animal", code);
+            Assert.Contains("public partial class Cat : Animal", code);
+            Assert.Contains("public partial class PersianCat : Cat", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(Cat), typeDiscriminator: \"Cat\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(PersianCat), typeDiscriminator: \"PersianCat\")]", code);
+        }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
@@ -163,3 +196,4 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }
+
