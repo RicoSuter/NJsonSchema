@@ -988,6 +988,26 @@ namespace NJsonSchema.Generation
 
             if (Settings.GenerateKnownTypes)
             {
+
+#if NET7_0_OR_GREATER
+                var jsonDerivedTypeAttributes = attributes
+                   // Known types of inherited classes will be generated later (in GenerateInheritance)
+                   .GetAssignableToTypeName(nameof(System.Text.Json.Serialization.JsonDerivedTypeAttribute), TypeNameStyle.Name)
+                   .OfType<Attribute>();
+
+                foreach (dynamic attribute in jsonDerivedTypeAttributes)
+                {
+                    if (attribute.DerivedType != null)
+                    {
+                        AddKnownType(attribute.DerivedType, schemaResolver);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"A KnownType attribute on {type.FullName} does not specify a type or a method name.", nameof(type));
+                    }
+                }
+#endif
+
                 var knownTypeAttributes = attributes
                    // Known types of inherited classes will be generated later (in GenerateInheritance)
                    .GetAssignableToTypeName("KnownTypeAttribute", TypeNameStyle.Name)
@@ -1184,7 +1204,13 @@ namespace NJsonSchema.Generation
         private object TryGetInheritanceDiscriminatorConverter(Type type)
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
-
+#if NET7_0_OR_GREATER
+            dynamic jsonPolymorphicAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(System.Text.Json.Serialization.JsonPolymorphicAttribute), TypeNameStyle.Name);
+            if (jsonPolymorphicAttribute != null)
+            {
+                return jsonPolymorphicAttribute;
+            }
+#endif
             dynamic jsonConverterAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(JsonConverterAttribute), TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {
@@ -1207,6 +1233,12 @@ namespace NJsonSchema.Generation
 
         private string TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)
         {
+#if NET7_0_OR_GREATER
+            if (jsonInheritanceConverter is System.Text.Json.Serialization.JsonPolymorphicAttribute jsonPolymorphicAttribute)
+                return !string.IsNullOrWhiteSpace(jsonPolymorphicAttribute.TypeDiscriminatorPropertyName) ?
+                    jsonPolymorphicAttribute.TypeDiscriminatorPropertyName :
+                    JsonInheritanceConverter.DefaultDiscriminatorName;
+#endif
             return ObjectExtensions.TryGetPropertyValue(
                 jsonInheritanceConverter,
                 nameof(JsonInheritanceConverter.DiscriminatorName),

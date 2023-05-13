@@ -439,5 +439,56 @@ namespace NJsonSchema.Tests.Generation
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);
         }
+
+#if NET7_0_OR_GREATER
+        public class AppleSTJ : FruitSTJ
+        {
+            public string Foo { get; set; }
+        }
+
+        public class OrangeSTJ : FruitSTJ
+        {
+            public string Bar { get; set; }
+        }
+
+        [System.Text.Json.Serialization.JsonDerivedType(typeof(AppleSTJ), typeDiscriminator: "a")]
+        [System.Text.Json.Serialization.JsonDerivedType(typeof(OrangeSTJ), typeDiscriminator: "o")]
+        [System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "k")]
+        public class FruitSTJ
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_using_JsonDerivedType_then_schema_is_correct()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<FruitSTJ>();
+            var data = schema.ToJson();
+
+            //// Assert
+            Assert.NotNull(data);
+            Assert.Contains(@"""a"": """, data);
+            Assert.Contains(@"""o"": """, data);
+        }
+
+        [Fact]
+        public async Task When_using_JsonDerivedType_then_schema_is_equivalent_to_schema_using_JsonDerivedType()
+        {
+            //// Arrange
+            var expectedJson = JsonSchema
+                .FromType<Fruit>()
+                .ToJson();
+
+            //// Act
+            var actualJson = JsonSchema
+                .FromType<FruitSTJ>()
+                .ToJson()
+                .Replace("STJ", string.Empty);
+
+            //// Assert
+            Assert.Equal(expectedJson, actualJson);
+        }
+#endif
     }
 }

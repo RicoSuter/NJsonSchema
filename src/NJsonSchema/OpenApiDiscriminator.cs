@@ -9,7 +9,9 @@
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Namotion.Reflection;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using Newtonsoft.Json.Linq;
@@ -28,7 +30,16 @@ namespace NJsonSchema
         [JsonConverter(typeof(DiscriminatorMappingConverter))]
         public IDictionary<string, JsonSchema> Mapping { get; } = new Dictionary<string, JsonSchema>();
 
-        /// <summary>The currently used <see cref="JsonInheritanceConverter"/>.</summary>
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// The currently used <see cref="JsonInheritanceConverter"/>, or
+        /// the currently used <see cref="System.Text.Json.Serialization.JsonPolymorphicAttribute" /> if using System.Text.Json polymorphic type hierarchy serialization features.
+        /// </summary>
+#else
+        /// <summary>
+        /// The currently used <see cref="JsonInheritanceConverter"/>
+        /// </summary>
+#endif
         [JsonIgnore]
         public object JsonInheritanceConverter { get; set; }
 
@@ -37,7 +48,31 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         public void AddMapping(Type type, JsonSchema schema)
         {
-            dynamic converter = JsonInheritanceConverter;
+            var discriminatorValue = GetDiscriminatorValue(type);
+            Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
+        }
+
+        private string GetDiscriminatorValue(Type derivedType)
+        {
+#if NET7_0_OR_GREATER
+            var type = derivedType;
+            do
+            {
+                var jsonDerivedTypeAttribute = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<System.Text.Json.Serialization.JsonDerivedTypeAttribute>()
+                    .SingleOrDefault(a => a.DerivedType == derivedType);
+
+                if (jsonDerivedTypeAttribute is not null)
+                {
+                    var typeDiscriminator = jsonDerivedTypeAttribute.TypeDiscriminator?.ToString();
+                    return typeDiscriminator ?? type.Name;
+                }
+
+                type = type.BaseType;
+            } while (type is not null);
+#endif
 
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
 #if LEGACY
@@ -46,15 +81,10 @@ namespace NJsonSchema
                 .GetRuntimeMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
 #endif
 
-            if (getDiscriminatorValueMethod != null)
-            {
-                var discriminatorValue = converter.GetDiscriminatorValue(type);
-                Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
-            }
-            else
-            {
-                Mapping[type.Name] = new JsonSchema { Reference = schema.ActualSchema };
-            }
+            dynamic converter = JsonInheritanceConverter;
+            return getDiscriminatorValueMethod != null ? 
+                (string)converter.GetDiscriminatorValue(derivedType) : 
+                derivedType.Name;
         }
 
         /// <summary>
