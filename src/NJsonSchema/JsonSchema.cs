@@ -918,8 +918,8 @@ namespace NJsonSchema
             return json;
         }
 
-        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
-        /// <returns>The JSON Schema.</returns>
+        /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
+        /// <returns>The JSON token.</returns>
         public JToken ToSampleJson()
         {
             var generator = new SampleJsonDataGenerator();
