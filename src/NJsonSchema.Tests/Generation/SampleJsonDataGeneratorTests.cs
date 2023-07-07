@@ -185,6 +185,170 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(1, testJson.SelectToken("body.numberContent.value").Value<int>());
         }
 
+        [Fact]
+        public async Task SchemaWithRecursiveDefinition()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body"", ""footer""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  },
+                ""footer"": {
+                    ""$ref"": ""#/definitions/numberContent""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""maximum"": 5.00001,
+                        ""minimum"": 1.000012
+                      },
+                      ""data"": {
+                        ""$ref"": ""#/definitions/body""
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var footerToken = testJson.SelectToken("body.numberContent.data.numberContent.value");
+            Assert.NotNull(footerToken);
+
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(1.000012, testJson.SelectToken("footer.value").Value<double>());
+            Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
+        }
+
+        [Fact]
+        public async Task GeneratorAdheresToMaxRecursionLevel()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body"", ""footer""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""text"": { ""type"": ""string"", ""enum"": [""my_string""] },
+                      ""body"": {
+                        ""$ref"": ""#/definitions/body""
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator(new SampleJsonDataGeneratorSettings() { MaxRecursionLevel = 2 });
+            var schema = await JsonSchema.FromJsonAsync(data);
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var secondBodyToken = testJson.SelectToken("body.body");
+            Assert.NotNull(secondBodyToken);
+
+            var thirdBodyToken = testJson.SelectToken("body.body.body") as JValue;
+            Assert.NotNull(thirdBodyToken);
+            Assert.Equal(JTokenType.Null, thirdBodyToken.Type);
+
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
+        }
+
+        [Fact]
+        public async Task SchemaWithDefinitionUseMultipleTimes()
+        {
+            //// Arrange
+            var data = @"{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""body"", ""footer""
+                ],
+                ""properties"": {
+                  ""body"": {
+                    ""$ref"": ""#/definitions/body""
+                  },
+                ""footer"": {
+                    ""$ref"": ""#/definitions/numberContent""
+                  }
+                },
+                ""definitions"": {
+                  ""body"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""numberContent"": {
+                        ""$ref"": ""#/definitions/numberContent""
+                      }
+                    }
+                  },
+                  ""numberContent"": {
+                    ""type"": ""object"",
+                    ""additionalProperties"": false,
+                    ""properties"": {
+                      ""value"": {
+                        ""type"": ""number"",
+                        ""maximum"": 5.00001,
+                        ""minimum"": 1.000012
+                      }
+                    }
+                  }
+                }
+              }";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+
+            //// Act
+            var testJson = generator.Generate(schema);
+
+            //// Assert
+            var footerToken = testJson.SelectToken("footer.value");
+            Assert.NotNull(footerToken);
+
+            var validationResult = schema.Validate(testJson);
+            Assert.NotNull(validationResult);
+            Assert.Equal(0, validationResult.Count);
+            Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
+        }
 
         [Fact]
         public async Task PropertyWithFloatMinimumDefinition()
