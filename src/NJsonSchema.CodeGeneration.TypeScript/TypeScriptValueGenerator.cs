@@ -29,6 +29,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
         }
 
+        /// <summary>Gets the enum default value.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="actualSchema">The actual schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="typeResolver">The type resolver.</param>
+        /// <returns>The enum default value.</returns>
+        protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
+        {
+            if (schema?.Default is not null &&
+                typeResolver is TypeScriptTypeResolver { Settings.EnumStyle: TypeScriptEnumStyle.StringLiteral })
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+
+            return base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+        }
+
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="allowsNull">Specifies whether the default value assignment also allows null.</param>

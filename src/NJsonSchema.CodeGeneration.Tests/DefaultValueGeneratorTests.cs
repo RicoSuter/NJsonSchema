@@ -218,7 +218,36 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Equal("Ns.MyEnum.bar", csharpValue);
             Assert.Equal("MyEnum.bar", typescriptValue);
         }
-        
+
+        /// <summary>
+        /// This test asserts the fix for issue #1618
+        /// </summary>
+        [Fact]
+        public void When_schema_has_a_default_value_for_an_enum_and_uses_enumstyle_stringliteral_it_defaults_to_the_stringliteral()
+        {
+            //// Arrange
+            var schema = new JsonSchema()
+            {
+                Type = JsonObjectType.String,
+                Enumeration =
+                {
+                    "Foo",
+                    "Bar"
+                },
+                Default = "Bar"
+            };
+
+            var typescriptSettings = new TypeScriptGeneratorSettings { EnumStyle = TypeScriptEnumStyle.StringLiteral };
+            var typescriptGenerator = new TypeScriptValueGenerator(typescriptSettings);
+            var typescriptTypeResolver = new TypeScriptTypeResolver(typescriptSettings);
+
+            //// Act
+            var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true, typescriptTypeResolver);
+
+            //// Assert
+            Assert.Equal("\"Bar\"", typescriptValue);
+        }
+
         [Fact]
         public void When_schema_has_required_abstract_class_it_generates_no_default_value_for_in_CSharp_and_TypeScript()
         {
