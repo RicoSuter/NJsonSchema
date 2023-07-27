@@ -147,21 +147,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_enum_has_default_and_using_enumstyle_stringliteral_it_defaults_to_stringliteral()
         {
             //// Arrange
-            var jsonSchema = """
+            var jsonSchema = @"
                 {
-                  "$schema": "http://json-schema.org/draft-04/schema#",
-                  "openapi": "3.1.0",
-                  "title": "TShirt",
-                  "type": "object",
-                  "properties": {
-                    "color": {
-                      "type": "string",
-                      "default": "green",
-                      "enum": ["red", "green", "blue", "black"]
+                    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                    ""openapi"": ""3.1.0"",
+                    ""title"": ""TShirt"",
+                    ""type"": ""object"",
+                    ""properties"": {
+                        ""color"": {
+                            ""type"": ""string"",
+                            ""default"": ""green"",
+                            ""enum"": [""red"", ""green"", ""blue"", ""black""]
+                        }
                     }
-                  }
-                }
-                """;
+                }";
 
             var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
