@@ -50,7 +50,7 @@ namespace NJsonSchema.Yaml.Tests.References
             OpenApiResponse Unauthorized = responses["401"].ActualResponse;
 
             ////Assert
-            
+
             // Header schema loaded correctly from headers.yaml
             Assert.True(OKheaders.ContainsKey(header));
             Assert.NotNull(OKheaders[header]);
@@ -60,6 +60,20 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.True(Unauthorized.Content.ContainsKey(problemType));
             Assert.NotNull(Unauthorized.Content[problemType]);
             Assert.NotNull(Unauthorized.Schema);
+        }
+
+        [Theory]
+        [InlineData("https://www.zuora.com/developer/yaml/swagger.yaml", "https://rest.zuora.com/")]
+        public async Task When_yaml_OpenAPI_spec_is__served_with_gzip_compression__it_works(string inputYamlUrl, string expectedBaseUrl)
+        {
+            //// Act
+            OpenApiDocument doc = await OpenApiYamlDocument.FromUrlAsync(inputYamlUrl);
+
+            ////Assert
+            Assert.NotNull(doc);
+            Assert.NotNull(doc.Paths);
+            Assert.NotEmpty(doc.Paths);
+            Assert.Equal(expectedBaseUrl, doc.BaseUrl);
         }
 
         [Theory]
