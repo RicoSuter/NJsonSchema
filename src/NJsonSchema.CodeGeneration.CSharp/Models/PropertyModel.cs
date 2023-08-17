@@ -83,7 +83,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
-                    if (!_property.IsNullable(_settings.SchemaType))
+                    if (!IsNullable)
                     {
                         return "Newtonsoft.Json.Required.Always";
                     }
@@ -94,7 +94,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
                 else
                 {
-                    if (!_property.IsNullable(_settings.SchemaType))
+                    if (!IsNullable)
                     {
                         return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
                     }
