@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
@@ -7,11 +8,14 @@
     <OutputType>Exe</OutputType>
     <StartupObject />
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <None Update="Tests\**\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
 </Project>

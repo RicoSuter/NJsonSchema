@@ -1,23 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
   </PropertyGroup>
+
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Fluid.Core" Version="2.2.15" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs">
       <Link>EnumExtensions.cs</Link>
     </Compile>
   </ItemGroup>
+
 </Project>

@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>net6.0;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
@@ -13,13 +15,16 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="all" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Condition="'$(TargetFramework)' == 'net461'" Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
     <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
+
 </Project>
