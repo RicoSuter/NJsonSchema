@@ -12,29 +12,49 @@ using NJsonSchema.Generation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
+        private static ReaderWriterLockSlim _namesLock = new ReaderWriterLockSlim();
         private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
         public static string GetName(this ContextualAccessorInfo accessorInfo)
         {
-            if (!_names.ContainsKey(accessorInfo))
+            _namesLock.EnterUpgradeableReadLock();
+            try
             {
-                lock (_names)
+                if (_names.TryGetValue(accessorInfo, out var name))
                 {
-                    if (!_names.ContainsKey(accessorInfo))
+                    return name;
+                }
+
+                _namesLock.EnterWriteLock();
+                try
+                {
+                    if (_names.TryGetValue(accessorInfo, out name))
                     {
-                        _names[accessorInfo] = GetNameWithoutCache(accessorInfo);
+                        return name;
                     }
+
+                    name = GetNameWithoutCache(accessorInfo);
+                    _names[accessorInfo] = name;
+                    return name;
+                }
+                finally
+                {
+                    _namesLock.ExitWriteLock();
                 }
             }
-            return _names[accessorInfo];
+            finally
+            {
+                _namesLock.ExitUpgradeableReadLock();
+            }
         }
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)

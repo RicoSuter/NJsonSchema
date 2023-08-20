@@ -218,5 +218,32 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Equal("Ns.MyEnum.bar", csharpValue);
             Assert.Equal("MyEnum.bar", typescriptValue);
         }
+        
+        [Fact]
+        public void When_schema_has_required_abstract_class_it_generates_no_default_value_for_in_CSharp_and_TypeScript()
+        {
+            //// Arrange
+            var csharpSettings = new CSharpGeneratorSettings();
+            var csharpGenerator = new CSharpValueGenerator(csharpSettings);
+            var csharpTypeResolver = new CSharpTypeResolver(csharpSettings);
+
+            //// Act
+            var schema = new JsonSchema()
+            {
+                Type = JsonObjectType.Object,
+                IsAbstract = true
+            };
+
+            var typescriptSettings = new TypeScriptGeneratorSettings();
+            var typescriptGenerator = new TypeScriptValueGenerator(typescriptSettings);
+            var typescriptTypeResolver = new TypeScriptTypeResolver(typescriptSettings);
+
+            var csharpValue = csharpGenerator.GetDefaultValue(schema, false, "BaseClass", "BaseClass", true, csharpTypeResolver);
+            var typescriptValue = typescriptGenerator.GetDefaultValue(schema, false, "BaseClass", "BaseClass", true, typescriptTypeResolver);
+
+            //// Assert
+            Assert.Null(csharpValue);
+            Assert.Null(typescriptValue);
+        }
     }
 }

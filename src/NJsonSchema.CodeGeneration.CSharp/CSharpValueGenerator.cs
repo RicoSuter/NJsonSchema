@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                             ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
-                        return $"new {targetType}()";
+                        return schema.IsAbstract ? null : $"new {targetType}()";
                     }
                 }
             }
