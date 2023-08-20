@@ -53,13 +53,17 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             {
                 var resolver = serializer.ContractResolver as DefaultContractResolver ?? _defaultContractResolver;
 
-                var jObject = new JObject();
-                jObject.Add(resolver.GetResolvedPropertyName("discriminator"), exception.GetType().Name);
-                jObject.Add(resolver.GetResolvedPropertyName("Message"), exception.Message);
-                jObject.Add(resolver.GetResolvedPropertyName("StackTrace"), _hideStackTrace ? "HIDDEN" : exception.StackTrace);
-                jObject.Add(resolver.GetResolvedPropertyName("Source"), exception.Source);
-                jObject.Add(resolver.GetResolvedPropertyName("InnerException"),
-                    exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null);
+                var jObject = new JObject
+                {
+                    { resolver.GetResolvedPropertyName("discriminator"), exception.GetType().Name },
+                    { resolver.GetResolvedPropertyName("Message"), exception.Message },
+                    { resolver.GetResolvedPropertyName("StackTrace"), _hideStackTrace ? "HIDDEN" : exception.StackTrace },
+                    { resolver.GetResolvedPropertyName("Source"), exception.Source },
+                    {
+                        resolver.GetResolvedPropertyName("InnerException"),
+                        exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null
+                    }
+                };
 
                 foreach (var property in GetExceptionProperties(value.GetType()))
                 {
