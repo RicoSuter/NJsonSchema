@@ -1,4 +1,4 @@
-﻿#if !NET461
+﻿#if !net462
 
 using System.Linq;
 using Newtonsoft.Json.Converters;
