@@ -45,7 +45,7 @@ namespace NJsonSchema.Generation
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>(SystemTextJsonSchemaGeneratorSettings settings)
+        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
             return generator.Generate(typeof(TType));
@@ -55,7 +55,7 @@ namespace NJsonSchema.Generation
         /// <param name="type">The type to create the schema for.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type, SystemTextJsonSchemaGeneratorSettings settings)
+        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
         {
             var generator = new JsonSchemaGenerator(settings);
             return generator.Generate(type);
