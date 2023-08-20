@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Namotion.Reflection" Version="2.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
