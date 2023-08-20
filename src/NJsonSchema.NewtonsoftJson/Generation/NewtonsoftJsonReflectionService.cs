@@ -28,7 +28,8 @@ namespace NJsonSchema.Generation
             var contract = settings.ResolveContract(originalType);
             if (contract is JsonStringContract)
             {
-                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
+                var description = base.GetDescription(contextualType, settings, originalType, isNullable, defaultReferenceTypeNullHandling);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, description.Format);
             }
 
             return base.GetDescription(contextualType, settings, originalType, isNullable, defaultReferenceTypeNullHandling);
