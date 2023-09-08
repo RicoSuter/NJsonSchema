@@ -532,7 +532,7 @@ namespace NJsonSchema.Generation
         {
             var type = typeDescription.ContextualType.Type;
 
-            schemaResolver.AddSchema(type, false, schema);
+            schemaResolver.AddSchema(typeDescription.ContextualType.OriginalType, false, schema);
 
             var rootSchema = schema;
             var actualSchema = GenerateInheritance(typeDescription.ContextualType, schema, schemaResolver);
