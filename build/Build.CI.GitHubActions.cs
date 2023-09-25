@@ -18,7 +18,7 @@ using Nuke.Common.CI.GitHubActions;
     //GitHubActionsImage.UbuntuLatest,
     //GitHubActionsImage.MacOsLatest,
     OnPushBranches = new[] { "master", "main" },
-    OnPushTags = new[] { "v*.*.*" },
+    OnPushTags = new[] { "v*.*.*", "v*.*.*-*" },
     OnPushIncludePaths = new[] { "**/*.*" },
     OnPushExcludePaths = new[] { "**/*.md" },
     PublishArtifacts = true,
