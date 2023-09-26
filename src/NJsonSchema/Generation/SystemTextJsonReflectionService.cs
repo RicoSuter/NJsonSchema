@@ -28,15 +28,16 @@ namespace NJsonSchema.Generation
                 .Concat(contextualType.Fields)
                 .Where(p => p.MemberInfo.DeclaringType == contextualType.Type))
             {
-                if (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute))))
+                if (accessorInfo.MemberInfo is FieldInfo fieldInfo && 
+                    (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute))))
                 {
                     continue;
                 }
 
-                if (accessorInfo.MemberInfo is PropertyInfo propertyInfo && (
-                    !(propertyInfo.GetMethod?.IsPrivate != true && propertyInfo.GetMethod?.IsStatic == false) ||
-                    !(propertyInfo.SetMethod?.IsPrivate != true && propertyInfo.SetMethod?.IsStatic == false) &&
-                    !propertyInfo.IsDefined(typeof(DataMemberAttribute))))
+                if (accessorInfo.MemberInfo is PropertyInfo propertyInfo &&
+                    (propertyInfo.GetMethod?.IsPrivate == false || propertyInfo.GetMethod?.IsStatic == true) &&
+                    (propertyInfo.SetMethod?.IsPrivate == false || propertyInfo.SetMethod?.IsStatic == true) &&
+                    !propertyInfo.IsDefined(typeof(DataMemberAttribute)))
                 {
                     continue;
                 }

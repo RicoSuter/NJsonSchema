@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.Converters;
-using NJsonSchema.NewtonsoftJson.Generation;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,7 +28,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task When_using_JsonInheritanceAttribute_and_SystemTextJson_then_schema_is_correct()
         {
             //// Act
-            var schema = NewtonsoftJsonSchemaGenerator.FromType<Fruit>();
+            var schema = JsonSchema.FromType<Fruit>();
             var data = schema.ToJson();
 
             //// Assert
