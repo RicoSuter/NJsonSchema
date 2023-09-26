@@ -917,6 +917,18 @@ namespace NJsonSchema.Generation
                     AddKnownType(knownType, schemaResolver);
                 }
             }
+
+            foreach (var jsonConverterAttribute in attributes
+                .GetAssignableToTypeName("System.Text.Json.Serialization.JsonDerivedTypeAttribute", TypeNameStyle.FullName))
+            {
+                var knownType = ObjectExtensions.TryGetPropertyValue<Type>(
+                    jsonConverterAttribute, "DerivedType", null);
+
+                if (knownType != null)
+                {
+                    AddKnownType(knownType, schemaResolver);
+                }
+            }
         }
 
         private void AddKnownType(Type type, JsonSchemaResolver schemaResolver)
@@ -1067,6 +1079,7 @@ namespace NJsonSchema.Generation
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
 
+            // support for NJsonSchema provided inheritance converters
             dynamic jsonConverterAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(JsonConverterAttribute), TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {
@@ -1084,7 +1097,38 @@ namespace NJsonSchema.Generation
                 }
             }
 
+            // support for native System.Text.Json inheritance
+            dynamic[] jsonDerivedTypeAttributes = typeAttributes
+                .Where(a => a.GetType().IsAssignableToTypeName("System.Text.Json.Serialization.JsonDerivedTypeAttribute", TypeNameStyle.FullName))
+                .ToArray();
+
+            if (jsonDerivedTypeAttributes.Any())
+            {
+                dynamic jsonPolymorphicAttribute = typeAttributes
+                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPolymorphicAttribute", TypeNameStyle.FullName);
+                return new SystemTextJsonInheritanceWrapper(jsonPolymorphicAttribute?.TypeDiscriminatorPropertyName ?? "$type", jsonDerivedTypeAttributes);
+            }
+
             return null;
+        }
+
+        private class SystemTextJsonInheritanceWrapper
+        {
+            private readonly dynamic[] _jsonDerivedTypeAttributes;
+
+            public SystemTextJsonInheritanceWrapper(string discriminatorName, dynamic[] jsonDerivedTypeAttributes)
+            {
+                DiscriminatorName = discriminatorName;
+                _jsonDerivedTypeAttributes = jsonDerivedTypeAttributes;
+            }
+
+            public string DiscriminatorName { get; }
+
+            public string GetDiscriminatorValue(Type type)
+            {
+                return _jsonDerivedTypeAttributes.FirstOrDefault(a => a.DerivedType == type)?.TypeDiscriminator
+                    ?? throw new InvalidOperationException($"Discriminator value for {type.FullName} not found.");
+            }
         }
 
         private string TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)

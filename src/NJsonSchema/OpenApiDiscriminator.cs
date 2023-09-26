@@ -10,7 +10,6 @@ using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Reflection;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using Newtonsoft.Json.Linq;
 
@@ -37,14 +36,12 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         public void AddMapping(Type type, JsonSchema schema)
         {
-            dynamic converter = JsonInheritanceConverter;
-
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
                 .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
 
             if (getDiscriminatorValueMethod != null)
             {
-                var discriminatorValue = converter.GetDiscriminatorValue(type);
+                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, new[] { type } );
                 Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else
