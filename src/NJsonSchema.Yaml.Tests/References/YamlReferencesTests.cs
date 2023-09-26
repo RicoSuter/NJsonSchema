@@ -29,11 +29,11 @@ namespace NJsonSchema.Yaml.Tests.References
 
             //// Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
-            Assert.Equal(1, schema.Definitions.Count);
+            Assert.Single(schema.Definitions);
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
         }
 
-        [Theory(Skip = "Ignored for now.")]
+        [Theory]
         [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
         public async Task When_yaml_OpenAPI_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
         {
@@ -64,9 +64,9 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.NotNull(Unauthorized.Schema);
         }
 
-        [Theory(Skip = "Ignored for now.")]
+        [Theory]
         [InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
-        public async Task When_yaml_OpenAPI_spec_has__relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
+        public async Task When_yaml_OpenAPI_spec_has_relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
         {
             var path = GetTestDirectory() + relativePath;
 
