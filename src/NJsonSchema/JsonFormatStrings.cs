@@ -41,6 +41,9 @@ namespace NJsonSchema
         /// <summary>Format for a long integer. </summary>
         public const string Long = "int64";
 
+        /// <summary>Format for a unsigned long integer. </summary>
+        public const string ULong = "uint64";
+
         /// <summary>Format for a double number. </summary>
         public const string Double = "double";
 

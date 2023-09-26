@@ -91,10 +91,14 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
             }
 
-            if (originalType == typeof(long) ||
-                originalType == typeof(ulong))
+            if (originalType == typeof(long))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
+            }
+
+            if (originalType == typeof(ulong))
+            {
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.ULong);
             }
 
             if (originalType == typeof(double))

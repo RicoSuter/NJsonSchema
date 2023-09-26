@@ -221,6 +221,16 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable ? "long?" : "long";
             }
 
+            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            {
+                return isNullable ? "long?" : "long";
+            }
+
+            if (schema.Format == JsonFormatStrings.ULong || schema.Format == "ulong")
+            {
+                return isNullable ? "ulong?" : "ulong";
+            }
+
             if (schema.Minimum.HasValue || schema.Maximum.HasValue)
             {
                 if (string.IsNullOrEmpty(schema.Format) && schema.Type == JsonObjectType.Integer)
