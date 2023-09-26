@@ -228,6 +228,17 @@ namespace NJsonSchema
             return generator.Generate(type);
         }
 
+        /// <summary>
+        /// Generates a JSON Schema from sample JSON data.
+        /// </summary>
+        /// <param name="data">The sample JSON data.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromSampleJson(string data)
+        {
+            var generator = new SampleJsonSchemaGenerator();
+            return generator.Generate(data);
+        }
+
         internal static JsonSchema FromJsonWithCurrentSettings(object obj)
         {
             var json = JsonConvert.SerializeObject(obj, JsonSchemaSerialization.CurrentSerializerSettings);

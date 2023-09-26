@@ -19,17 +19,6 @@ namespace NJsonSchema
     /// <summary>Generates a JSON Schema from sample JSON data.</summary>
     public class SampleJsonSchemaGenerator
     {
-        /// <summary>
-        /// Generates a JSON Schema from sample JSON data.
-        /// </summary>
-        /// <param name="data">The sample JSON data.</param>
-        /// <returns>The JSON Schema.</returns>
-        public static JsonSchema FromSampleJson(string data)
-        {
-            var generator = new SampleJsonSchemaGenerator();
-            return generator.Generate(data);
-        }
-
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
         /// <returns>The JSON Schema.</returns>
