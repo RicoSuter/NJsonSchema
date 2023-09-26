@@ -18,6 +18,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             return ConversionUtilities.ConvertToUpperCamelCase(property.Name
                 .Replace("\"", string.Empty)
+                .Replace("'", string.Empty)
                 .Replace("@", string.Empty)
                 .Replace("?", string.Empty)
                 .Replace("!", string.Empty)

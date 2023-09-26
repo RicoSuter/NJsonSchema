@@ -7,6 +7,8 @@ using NSwag;
 using System.Threading.Tasks;
 using Xunit;
 
+#pragma warning disable SYSLIB0012
+
 namespace NJsonSchema.Yaml.Tests.References
 {
     public class LocalReferencesTests
@@ -27,7 +29,7 @@ namespace NJsonSchema.Yaml.Tests.References
 
             //// Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
-            Assert.Equal(1, schema.Definitions.Count);
+            Assert.Single(schema.Definitions);
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
         }
 
@@ -50,7 +52,7 @@ namespace NJsonSchema.Yaml.Tests.References
             OpenApiResponse Unauthorized = responses["401"].ActualResponse;
 
             ////Assert
-            
+
             // Header schema loaded correctly from headers.yaml
             Assert.True(OKheaders.ContainsKey(header));
             Assert.NotNull(OKheaders[header]);
@@ -63,8 +65,22 @@ namespace NJsonSchema.Yaml.Tests.References
         }
 
         [Theory]
+        [InlineData("https://www.zuora.com/developer/yaml/swagger.yaml", "https://rest.zuora.com/")]
+        public async Task When_yaml_OpenAPI_spec_is__served_with_gzip_compression__it_works(string inputYamlUrl, string expectedBaseUrl)
+        {
+            //// Act
+            OpenApiDocument doc = await OpenApiYamlDocument.FromUrlAsync(inputYamlUrl);
+
+            ////Assert
+            Assert.NotNull(doc);
+            Assert.NotNull(doc.Paths);
+            Assert.NotEmpty(doc.Paths);
+            Assert.Equal(expectedBaseUrl, doc.BaseUrl);
+        }
+
+        [Theory]
         [InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
-        public async Task When_yaml_OpenAPI_spec_has__relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
+        public async Task When_yaml_OpenAPI_spec_has_relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
         {
             var path = GetTestDirectory() + relativePath;
 
@@ -95,6 +111,7 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal("Completed", schema.Schema.ActualDiscriminatorObject.Mapping.Keys.First());
             Assert.Equal(2, schema.Schema.ActualSchema.ActualProperties["status"].ActualSchema.Enumeration.Count);
         }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;

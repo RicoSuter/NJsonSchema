@@ -1,5 +1,4 @@
-﻿#if !NET461
-
+﻿using NJsonSchema.Converters;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -39,5 +38,3 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         }
     }
 }
-
-#endif

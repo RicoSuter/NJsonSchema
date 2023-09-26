@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -19,7 +20,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_JArray_then_schema_with_any_array_is_generated()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithJArray>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithJArray>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             //// Assert
@@ -42,7 +43,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_Array_of_nullable_then_schema_with_array_of_nullable_is_generated()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithArrayOfNullable>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithArrayOfNullable>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             //// Assert
@@ -73,7 +74,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_list_then_schema_is_inlined_and_type_is_array()
         {
             //// Act
-            var schema = JsonSchema.FromType<ListContainer>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ListContainer>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             //// Assert
@@ -99,7 +100,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_async_numerable_then_item_type_is_correct()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithAsyncEnumerable>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithAsyncEnumerable>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             //// Assert

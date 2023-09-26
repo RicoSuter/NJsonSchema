@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -78,7 +79,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
-            var schema = JsonSchema.FromType<MyClassTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyClassTest>();
             var data = schema.ToJson();
 
             //// Act
@@ -288,9 +289,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
         {
             // Assert
-            var schema = JsonSchema.FromType(
+            var schema = NewtonsoftJsonSchemaGenerator.FromType(
                 typeof(MyDerivedClass),
-                new JsonSchemaGeneratorSettings
+                new NewtonsoftJsonSchemaGeneratorSettings
                 {
                     GenerateAbstractProperties = true
                 });

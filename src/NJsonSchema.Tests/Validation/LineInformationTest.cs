@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Validation
 
         private string Json { get; set; }
 
-        public async Task InitAsync()
+        private async Task InitAsync()
         {
             Schema = await JsonSchema.FromJsonAsync(@"{
                 ""type"": ""object"",
@@ -94,9 +94,9 @@ namespace NJsonSchema.Tests.Validation
             await InitAsync();
 
             //// Act
-            var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Ignore});
+            var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Load });
             var errorsWithInfo = Schema.Validate(tokenWithInfo);
-            var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() {LineInfoHandling = LineInfoHandling.Load});
+            var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Ignore });
             var errorsNoInfoParse = Schema.Validate(tokenNoInfoParse);
             var tokenNoInfoDeserialize = JsonConvert.DeserializeObject<JToken>(Json);
             var errorsNoInfoDeserialize = Schema.Validate(tokenNoInfoDeserialize);
@@ -117,44 +117,44 @@ namespace NJsonSchema.Tests.Validation
                 {
                     switch (error.Kind)
                     {
-                    case ValidationErrorKind.StringExpected:
-                        AssertLineNumber(2, 27, error);
-                        break;
-                    case ValidationErrorKind.NumberExpected:
-                        AssertLineNumber(3, 36, error);
-                        break;
-                    case ValidationErrorKind.NotInEnumeration:
-                        AssertLineNumber(3, 36, error);
-                        break;
-                    case ValidationErrorKind.StringTooShort:
-                        AssertLineNumber(3, 36, error);
-                        break;
-                    case ValidationErrorKind.PatternMismatch:
-                        AssertLineNumber(3, 36, error);
-                        break;
-                    case ValidationErrorKind.PropertyRequired:
-                        AssertLineNumber(1, 1, error);
-                        break;
-                    case ValidationErrorKind.NumberTooBig:
-                        AssertLineNumber(2, 27, error);
-                        break;
-                    case ValidationErrorKind.NumberTooSmall:
-                        AssertLineNumber(2, 27, error);
-                        break;
-                    case ValidationErrorKind.ItemsNotUnique:
-                        AssertLineNumber(4, 26, error);
-                        break;
-                    case ValidationErrorKind.NoAdditionalPropertiesAllowed:
-                        AssertLineNumber(5, 24, error);
-                        break;
-                    case ValidationErrorKind.NotOneOf:
-                        AssertLineNumber(1, 1, error);
-                        break;
-                    case ValidationErrorKind.NotAllOf:
-                        AssertLineNumber(1, 1, error);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(error.Kind));
+                        case ValidationErrorKind.StringExpected:
+                            AssertLineNumber(2, 27, error);
+                            break;
+                        case ValidationErrorKind.NumberExpected:
+                            AssertLineNumber(3, 36, error);
+                            break;
+                        case ValidationErrorKind.NotInEnumeration:
+                            AssertLineNumber(3, 36, error);
+                            break;
+                        case ValidationErrorKind.StringTooShort:
+                            AssertLineNumber(3, 36, error);
+                            break;
+                        case ValidationErrorKind.PatternMismatch:
+                            AssertLineNumber(3, 36, error);
+                            break;
+                        case ValidationErrorKind.PropertyRequired:
+                            AssertLineNumber(1, 1, error);
+                            break;
+                        case ValidationErrorKind.NumberTooBig:
+                            AssertLineNumber(2, 27, error);
+                            break;
+                        case ValidationErrorKind.NumberTooSmall:
+                            AssertLineNumber(2, 27, error);
+                            break;
+                        case ValidationErrorKind.ItemsNotUnique:
+                            AssertLineNumber(4, 26, error);
+                            break;
+                        case ValidationErrorKind.NoAdditionalPropertiesAllowed:
+                            AssertLineNumber(5, 24, error);
+                            break;
+                        case ValidationErrorKind.NotOneOf:
+                            AssertLineNumber(1, 1, error);
+                            break;
+                        case ValidationErrorKind.NotAllOf:
+                            AssertLineNumber(1, 1, error);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(error.Kind));
                     }
                 }
                 else

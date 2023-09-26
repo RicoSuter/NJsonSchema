@@ -12,7 +12,7 @@ namespace NJsonSchema.Annotations
 {
     /// <summary>Specifies the type to use for JSON Schema generation.</summary>
     [AttributeUsage(
-        AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.Property | AttributeTargets.Class,
+        AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Struct,
         AllowMultiple = false)]
     public class JsonSchemaTypeAttribute : Attribute
     {
