@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
@@ -132,7 +133,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
 
@@ -253,7 +254,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_timespan_than_csharp_timespan_is_used()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 
@@ -285,7 +286,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new CSharpGenerator(schema);
 
@@ -306,7 +307,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualSchema.Description = "ClassDesc.";
             var generator = new CSharpGenerator(schema);
 
@@ -327,7 +328,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -353,7 +354,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task Can_generate_type_from_string_property_with_byte_format()
         {
             // Arrange
-            var schema = JsonSchema.FromType<File>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<File>();
             var generator = new CSharpGenerator(schema);
 
             // Act
@@ -369,7 +370,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task Can_generate_type_from_string_property_with_base64_format()
         {
             // Arrange
-            var schema = JsonSchema.FromType<File>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<File>();
             schema.Properties["Content"].Format = "base64";
             var generator = new CSharpGenerator(schema);
 
@@ -452,7 +453,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
         private static async Task<CSharpGenerator> CreateGeneratorAsync()
         {
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
             settings.Namespace = "MyNamespace";
@@ -472,7 +473,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<ObjectTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTestClass>();
 
             //// Assert
             Assert.Equal(
@@ -485,7 +486,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_object_then_object_property_is_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObjectTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTestClass>();
             var json = schema.ToJson();
 
             //// Act
@@ -517,7 +518,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_property_has_default_and_int_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithDefaultEnumProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>();
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -538,7 +539,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_property_has_default_and_string_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
+            });
+
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -693,7 +701,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_required_then_CSharp_code_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person2>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person2>();
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -930,7 +938,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_ObservableCollection_then_generated_code_uses_the_same_class()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObsClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObsClass>();
             var settings = new CSharpGeneratorSettings { ArrayType = "ObservableCollection" };
             var generator = new CSharpGenerator(schema, settings);
 
@@ -1393,7 +1401,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_byte_then_its_type_is_preserved()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyByteTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyByteTest>();
             var json = schema.ToJson();
 
             //// Act
@@ -1416,7 +1424,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_nullable_property_is_required_then_it_is_not_nullable_in_generated_csharp_code()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyRequiredNullableTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyRequiredNullableTest>();
             var json = schema.ToJson();
 
             //// Act
@@ -1740,7 +1748,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_record_no_setter_in_class_and_constructor_provided()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Address>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Address>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1763,7 +1771,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_native_record_no_setter_in_class_and_constructor_provided()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Address>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Address>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1809,7 +1817,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_is_abstract_constructor_is_protected_for_record()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<AbstractAddress>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractAddress>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1836,7 +1844,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_record_has_inheritance()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<PersonAddress>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<PersonAddress>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1869,7 +1877,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithExtensionData>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -129,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -144,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -159,7 +160,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var json = schema.ToJson();
 
@@ -176,7 +177,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -226,7 +227,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {

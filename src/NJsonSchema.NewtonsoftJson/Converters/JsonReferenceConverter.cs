@@ -9,7 +9,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace NJsonSchema.Converters
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     /// <summary>Regenerates reference paths and correctly generates $ref properties.</summary>
     public class JsonReferenceConverter : JsonConverter

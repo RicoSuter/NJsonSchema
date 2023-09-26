@@ -1,4 +1,4 @@
-﻿#if !NET461
+﻿#if !net462
 
 using System.Linq;
 using Newtonsoft.Json.Converters;
@@ -12,48 +12,6 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
 {
     public class SystemTextJsonOptionsConverterTests
     {
-        [Fact]
-        public async Task SystemTextJson_WhenEnumsAreSerializedAsStrings_ThenGlobalConverterExists()
-        {
-            // Arrange
-            var options = new JsonSerializerOptions
-            {
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                }
-            };
-
-            // Act
-            var settings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(options);
-
-            // Assert
-            var enumConverter = settings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
-            Assert.NotNull(enumConverter);
-            Assert.False(enumConverter.CamelCaseText);
-        }
-        
-        [Fact]
-        public async Task SystemTextJson_WhenEnumsAreSerializedAsCamelCaseStrings_ThenGlobalConverterExists()
-        {
-            // Arrange
-            var options = new JsonSerializerOptions
-            {
-                Converters =
-                {
-                    new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-                }
-            };
-
-            // Act
-            var settings = SystemTextJsonUtilities.ConvertJsonOptionsToNewtonsoftSettings(options);
-
-            // Assert
-            var enumConverter = settings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
-            Assert.NotNull(enumConverter);
-            Assert.True(enumConverter.CamelCaseText);
-        }
-
         public class Person
         {
             public string FirstName { get; set; }
@@ -68,7 +26,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenLowerCamelCasePropertiesAreUsed_ThenCamelCasePropertyNamesContractResolverIsUsed()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {
@@ -90,7 +48,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenNamingPolicyIsNull_ThenDefaultContractResolverIsUsed()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {
@@ -123,7 +81,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
 
         public enum MyEnum
         {
-            Foo, 
+            Foo,
             Bar
         }
 
@@ -131,7 +89,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public async Task SystemTextJson_WhenGeneratingWithCustomPropertyNames_ThenAttributesArePickedUp()
         {
             // Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new SystemTextJsonSchemaGeneratorSettings
             {
                 SerializerOptions = new JsonSerializerOptions
                 {

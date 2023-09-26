@@ -1,15 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+    <PackageReference Include="YamlDotNet" Version="13.2.0" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+
 </Project>

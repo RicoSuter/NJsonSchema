@@ -4,7 +4,9 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Converters;
+using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -45,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_schema_has_base_schema_then_it_is_referenced_with_Newtonsoft()
         {
             //// Arrange
-            var json = JsonSchema.FromType<MyContainer>();
+            var json = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
             var data = json.ToJson();
 
             var generator = new CSharpGenerator(json, new CSharpGeneratorSettings { JsonLibrary = CSharpJsonLibrary.NewtonsoftJson });

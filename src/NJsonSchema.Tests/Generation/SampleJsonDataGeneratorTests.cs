@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Xunit;
@@ -40,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_sample_data_is_generated_from_schema_then_properties_are_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act
@@ -58,7 +59,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_sample_data_is_generated_from_schema_with_base_then_properties_are_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Student>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Student>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act
@@ -77,7 +78,7 @@ namespace NJsonSchema.Tests.Generation
         public void Default_values_are_set_for_arrays()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Measurements>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Measurements>();
             var generator = new SampleJsonDataGenerator();
 
             //// Act

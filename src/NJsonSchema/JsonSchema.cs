@@ -22,7 +22,6 @@ using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
-using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema
 {
@@ -84,67 +83,10 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-#if LEGACY
-        public static string ToolchainVersion => typeof(JsonSchema).Assembly.GetName().Version +
-                                                 " NET40 (Newtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
-#else
         public static string ToolchainVersion => version;
 
         private static readonly string version = typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
-                                                 " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
-#endif
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>()
-        {
-            return FromType<TType>(new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type)
-        {
-            return FromType(type, new JsonSchemaGeneratorSettings());
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <typeparam name="TType">The type to create the schema for.</typeparam>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(typeof(TType));
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
-        /// <param name="type">The type to create the schema for.</param>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonSchema" />.</returns>
-        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
-        {
-            var generator = new JsonSchemaGenerator(settings);
-            return generator.Generate(type);
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
-        /// <returns>The JSON Schema.</returns>
-        public static JsonSchema FromSampleJson(string data)
-        {
-            var generator = new SampleJsonSchemaGenerator();
-            return generator.Generate(data);
-        }
-
-        /// <summary>Creates a <see cref="JsonSchema" /> from sample JSON data.</summary>
-        /// <returns>The JSON Schema.</returns>
-        public static JsonSchema FromSampleJson(Stream stream)
-        {
-            var generator = new SampleJsonSchemaGenerator();
-            return generator.Generate(stream);
-        }
+            " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
@@ -250,6 +192,53 @@ namespace NJsonSchema
             return JsonSchemaSerialization.FromJsonAsync(stream, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
         }
 
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type (using System.Text.Json rules).</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>()
+        {
+            return FromType<TType>(new SystemTextJsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type (using System.Text.Json rules).</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type)
+        {
+            return FromType(type, new SystemTextJsonSchemaGeneratorSettings());
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <typeparam name="TType">The type to create the schema for.</typeparam>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType<TType>(JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(typeof(TType));
+        }
+
+        /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>
+        /// <param name="type">The type to create the schema for.</param>
+        /// <param name="settings">The settings.</param>
+        /// <returns>The <see cref="JsonSchema" />.</returns>
+        public static JsonSchema FromType(Type type, JsonSchemaGeneratorSettings settings)
+        {
+            var generator = new JsonSchemaGenerator(settings);
+            return generator.Generate(type);
+        }
+
+        /// <summary>
+        /// Generates a JSON Schema from sample JSON data.
+        /// </summary>
+        /// <param name="data">The sample JSON data.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromSampleJson(string data)
+        {
+            var generator = new SampleJsonSchemaGenerator();
+            return generator.Generate(data);
+        }
+
         internal static JsonSchema FromJsonWithCurrentSettings(object obj)
         {
             var json = JsonConvert.SerializeObject(obj, JsonSchemaSerialization.CurrentSerializerSettings);
@@ -320,11 +309,7 @@ namespace NJsonSchema
         /// <summary>Gets the list of all inherited/parent schemas.</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
-#if !LEGACY
         public IReadOnlyCollection<JsonSchema> AllInheritedSchemas
-#else
-        public ICollection<JsonSchema> AllInheritedSchemas
-#endif
         {
             get
             {
@@ -381,11 +366,7 @@ namespace NJsonSchema
         /// <remarks>Used for code generation.</remarks>
         /// <exception cref="InvalidOperationException" accessor="get">Some properties are defined multiple times.</exception>
         [JsonIgnore]
-#if !LEGACY
         public IReadOnlyDictionary<string, JsonSchemaProperty> ActualProperties
-#else
-        public IDictionary<string, JsonSchemaProperty> ActualProperties
-#endif
         {
             get
             {

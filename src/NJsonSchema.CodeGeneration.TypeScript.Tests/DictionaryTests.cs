@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -21,10 +22,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_any_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
+
             var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
@@ -41,10 +43,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_any_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
+
             var schema = schemaGenerator.Generate(typeof(AnyDictionary));
             var json = schema.ToJson();
 
@@ -62,10 +65,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_string_dictionary_then_interface_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
+
             var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
@@ -82,10 +86,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_inherits_from_string_dictionary_then_class_has_indexer_property()
         {
             //// Arrange
-            var schemaGenerator = new JsonSchemaGenerator(new JsonSchemaGeneratorSettings
+            var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
+
             var schema = schemaGenerator.Generate(typeof(StringDictionary));
             var json = schema.ToJson();
 
@@ -215,7 +220,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<DictionaryContainer>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionaryContainer>();
             var json = schema.ToJson();
 
             //// Act

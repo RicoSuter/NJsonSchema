@@ -2,8 +2,9 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -54,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             //// Act

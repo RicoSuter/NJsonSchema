@@ -7,192 +7,101 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using Namotion.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace NJsonSchema.Converters
 {
-    // TODO: Add caching
-
-    /// <summary>Defines the class as inheritance base class and adds a discriminator property to the serialized object.</summary>
-    public class JsonInheritanceConverter : JsonConverter
+    /// <summary>
+    /// The JSON inheritance converter attribute.
+    /// </summary>
+    public class JsonInheritanceConverterAttribute : JsonConverterAttribute
     {
         /// <summary>Gets the default discriminiator name.</summary>
         public static string DefaultDiscriminatorName { get; } = "discriminator";
 
-        private readonly Type _baseType;
+        /// <summary>
+        /// Gets the discriminator name.
+        /// </summary>
+        public string DiscriminatorName { get; }
+
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverterAttribute"/> class.</summary>
+        /// <param name="baseType">The base type.</param>
+        /// <param name="discriminatorName">The discriminator name.</param>
+        public JsonInheritanceConverterAttribute(Type baseType, string discriminatorName = "discriminator")
+            : base(typeof(JsonInheritanceConverter<>).MakeGenericType(baseType))
+        {
+            DiscriminatorName = discriminatorName;
+        }
+    }
+
+    /// <summary>Defines the class as inheritance base class and adds a discriminator property to the serialized object.</summary>
+    public class JsonInheritanceConverter<TBase> : JsonConverter<TBase>
+    {
+        /// <summary>Gets the list of additional known types.</summary>
+        public static IDictionary<string, Type> AdditionalKnownTypes { get; } = new Dictionary<string, Type>();
+
         private readonly string _discriminatorName;
-        private readonly bool _readTypeProperty;
 
-        [ThreadStatic]
-        private static bool _isReading;
-
-        [ThreadStatic]
-        private static bool _isWriting;
-
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter{TBase}"/> class.</summary>
         public JsonInheritanceConverter()
-            : this(DefaultDiscriminatorName, false)
         {
+            var attribute = typeof(TBase).GetCustomAttribute<JsonInheritanceConverterAttribute>();
+            _discriminatorName = attribute?.DiscriminatorName ?? "discriminator";
         }
 
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
-        /// <param name="discriminatorName">The discriminator.</param>
+        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter{TBase}"/> class.</summary>
+        /// <param name="discriminatorName">The discriminator name.</param>
         public JsonInheritanceConverter(string discriminatorName)
-            : this(discriminatorName, false)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class.</summary>
-        /// <param name="discriminatorName">The discriminator property name.</param>
-        /// <param name="readTypeProperty">Read the $type property to determine the type 
-        /// (fallback, should not be used as it might lead to security problems).</param>
-        public JsonInheritanceConverter(string discriminatorName, bool readTypeProperty)
         {
             _discriminatorName = discriminatorName;
-            _readTypeProperty = readTypeProperty;
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class which only applies for the given base type.</summary>
-        /// <remarks>Use this constructor for global registered converters (not defined on class).</remarks>
-        /// <param name="baseType">The base type.</param>
-        public JsonInheritanceConverter(Type baseType)
-            : this(baseType, DefaultDiscriminatorName, false)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class which only applies for the given base type.</summary>
-        /// <remarks>Use this constructor for global registered converters (not defined on class).</remarks>
-        /// <param name="baseType">The base type.</param>
-        /// <param name="discriminatorName">The discriminator.</param>
-        public JsonInheritanceConverter(Type baseType, string discriminatorName)
-            : this(baseType, discriminatorName, false)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonInheritanceConverter"/> class which only applies for the given base type.</summary>
-        /// <remarks>Use this constructor for global registered converters (not defined on class).</remarks>
-        /// <param name="baseType">The base type.</param>
-        /// <param name="discriminatorName">The discriminator.</param>
-        /// <param name="readTypeProperty">Read the $type property to determine the type 
-        /// (fallback, should not be used as it might lead to security problems).</param>
-        public JsonInheritanceConverter(Type baseType, string discriminatorName, bool readTypeProperty)
-            : this(discriminatorName, readTypeProperty)
-        {
-            _baseType = baseType;
         }
 
         /// <summary>Gets the discriminator property name.</summary>
         public virtual string DiscriminatorName => _discriminatorName;
 
-        /// <summary>Writes the JSON representation of the object.</summary>
-        /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        /// <inheritdoc />
+        public override TBase Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            try
-            {
-                _isWriting = true;
+            var document = JsonDocument.ParseValue(ref reader);
+            var hasDiscriminator = document.RootElement.TryGetProperty(_discriminatorName, out var discriminator);
+            var subtype = GetDiscriminatorType(document.RootElement, typeToConvert, hasDiscriminator ? discriminator.GetString() : null);
 
-                var jObject = JObject.FromObject(value, serializer);
-                jObject[_discriminatorName] = JToken.FromObject(GetDiscriminatorValue(value.GetType()));
-                writer.WriteToken(jObject.CreateReader());
-            }
-            finally
+            var bufferWriter = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(bufferWriter))
             {
-                _isWriting = false;
+                document.RootElement.WriteTo(writer);
             }
+
+            return (TBase)JsonSerializer.Deserialize(bufferWriter.ToArray(), subtype, options);
+
+            //var bufferWriter = new ArrayBufferWriter<byte>();
+            //using (var writer = new Utf8JsonWriter(bufferWriter))
+            //{
+            //    document.RootElement.WriteTo(writer);
+            //}
+
+            //return (TBase)JsonSerializer.Deserialize(bufferWriter.WrittenSpan, subtype, options);
         }
 
-        /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
-        public override bool CanWrite
+        /// <inheritdoc />
+        public override void Write(Utf8JsonWriter writer, TBase value, JsonSerializerOptions options)
         {
-            get
+            writer.WriteStartObject();
+            writer.WriteString(_discriminatorName, GetDiscriminatorValue(value.GetType()));
+
+            var bytes = JsonSerializer.SerializeToUtf8Bytes((object)value, options);
+            var document = JsonDocument.Parse(bytes);
+            foreach (var property in document.RootElement.EnumerateObject())
             {
-                if (_isWriting)
-                {
-                    _isWriting = false;
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can read JSON.</summary>
-        public override bool CanRead
-        {
-            get
-            {
-                if (_isReading)
-                {
-                    _isReading = false;
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        /// <summary>Determines whether this instance can convert the specified object type.</summary>
-        /// <param name="objectType">Type of the object.</param>
-        /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
-        public override bool CanConvert(Type objectType)
-        {
-            if (_baseType != null)
-            {
-                var type = objectType;
-                while (type != null)
-                {
-                    if (type == _baseType)
-                    {
-                        return true;
-                    }
-
-                    type = type.GetTypeInfo().BaseType;
-                }
-
-                return false;
+                property.WriteTo(writer);
             }
 
-            return true;
-        }
-
-        /// <summary>Reads the JSON representation of the object.</summary>
-        /// <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader" /> to read from.</param>
-        /// <param name="objectType">Type of the object.</param>
-        /// <param name="existingValue">The existing value of object being read.</param>
-        /// <param name="serializer">The calling serializer.</param>
-        /// <returns>The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            var jObject = serializer.Deserialize<JObject>(reader);
-            if (jObject == null)
-            {
-                return null;
-            }
-
-            var discriminator = jObject.GetValue(_discriminatorName, StringComparison.OrdinalIgnoreCase)?.Value<string>();
-            var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
-
-            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
-            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminatorName))
-            {
-                jObject.Remove(_discriminatorName);
-            }
-
-            try
-            {
-                _isReading = true;
-                return serializer.Deserialize(jObject.CreateReader(), subtype);
-            }
-            finally
-            {
-                _isReading = false;
-            }
+            writer.WriteEndObject();
         }
 
         /// <summary>Gets the discriminator value for the given type.</summary>
@@ -200,6 +109,12 @@ namespace NJsonSchema.Converters
         /// <returns>The discriminator value.</returns>
         public virtual string GetDiscriminatorValue(Type type)
         {
+            var knownType = AdditionalKnownTypes.SingleOrDefault(p => p.Value == type);
+            if (knownType.Key != null)
+            {
+                return knownType.Key;
+            }
+
             var jsonInheritanceAttributeDiscriminator = GetSubtypeDiscriminator(type);
             if (jsonInheritanceAttributeDiscriminator != null)
             {
@@ -214,8 +129,13 @@ namespace NJsonSchema.Converters
         /// <param name="objectType">The object (base) type.</param>
         /// <param name="discriminatorValue">The discriminator value.</param>
         /// <returns></returns>
-        protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
+        protected virtual Type GetDiscriminatorType(JsonElement jObject, Type objectType, string discriminatorValue)
         {
+            if (AdditionalKnownTypes.ContainsKey(discriminatorValue))
+            {
+                return AdditionalKnownTypes[discriminatorValue];
+            }
+
             var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
             if (jsonInheritanceAttributeSubtype != null)
             {
@@ -240,28 +160,22 @@ namespace NJsonSchema.Converters
                 return subtype;
             }
 
-            if (_readTypeProperty)
-            {
-                var typeInfo = jObject.GetValue("$type");
-                if (typeInfo != null)
-                {
-                    return Type.GetType(typeInfo.Value<string>());
-                }
-            }
-
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
-        private Type GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
+        private static Type GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminatorValue)
         {
             var type = objectType;
             do
             {
-                var knownTypeAttributes = type.GetTypeInfo().GetCustomAttributes(false)
+                var knownTypeAttributes = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes(false)
                     .Where(a => a.GetType().Name == "KnownTypeAttribute");
+
                 foreach (dynamic attribute in knownTypeAttributes)
                 {
-                    if (attribute.Type != null && attribute.Type.Name == discriminator)
+                    if (attribute.Type != null && attribute.Type.Name == discriminatorValue)
                     {
                         return attribute.Type;
                     }
@@ -270,10 +184,10 @@ namespace NJsonSchema.Converters
                         var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
                         if (method != null)
                         {
-                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, new object[0]);
+                            var types = (IEnumerable<Type>)method.Invoke(null, new object[0]);
                             foreach (var knownType in types)
                             {
-                                if (knownType.Name == discriminator)
+                                if (knownType.Name == discriminatorValue)
                                 {
                                     return knownType;
                                 }
@@ -282,20 +196,21 @@ namespace NJsonSchema.Converters
                         }
                     }
                 }
+
                 type = type.GetTypeInfo().BaseType;
             } while (type != null);
 
             return null;
         }
 
-        private static Type GetObjectSubtype(Type baseType, string discriminatorName)
+        private static Type GetObjectSubtype(Type baseType, string discriminatorValue)
         {
             var jsonInheritanceAttributes = baseType
                 .GetTypeInfo()
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
+            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorValue)?.Type;
         }
 
         private static string GetSubtypeDiscriminator(Type objectType)

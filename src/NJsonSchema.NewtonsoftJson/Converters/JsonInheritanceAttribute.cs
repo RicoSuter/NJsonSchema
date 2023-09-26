@@ -1,8 +1,14 @@
-﻿#if !NET461
+﻿//-----------------------------------------------------------------------
+// <copyright file="JsonInheritanceAttribute.cs" company="NJsonSchema">
+//     Copyright (c) Rico Suter. All rights reserved.
+// </copyright>
+// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// <author>Rico Suter, mail@rsuter.com</author>
+//-----------------------------------------------------------------------
 
 using System;
 
-namespace NJsonSchema.Tests.Generation.SystemTextJson
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     /// <summary>Defines a child class in the inheritance chain.</summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
@@ -24,5 +30,3 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         public Type Type { get; }
     }
 }
-
-#endif
