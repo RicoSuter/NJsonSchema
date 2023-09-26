@@ -24,7 +24,7 @@ namespace NJsonSchema
     }
 
     /// <summary>Deserializes all JSON Schemas in the extension data property.</summary>
-    internal class ExtensionDataDeserializationConverter : JsonConverter
+    internal sealed class ExtensionDataDeserializationConverter : JsonConverter
     {
         public override bool CanRead => true;
 

@@ -1,6 +1,6 @@
 ﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
-{% if UseSystemTextJson -%}
-internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
+{%- if UseSystemTextJson -%}
+internal class JsonInheritanceConverterAttribute : System.Text.Json.Serialization.JsonConverterAttribute
 {
     public string DiscriminatorName { get; }
 
@@ -11,7 +11,7 @@ internal class JsonInheritanceConverterAttribute : JsonConverterAttribute
     }
 }
 
-internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>
+public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>
 {
     private readonly string _discriminatorName;
 
@@ -26,7 +26,7 @@ internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.
         _discriminatorName = discriminatorName;
     }
 
-    public virtual string DiscriminatorName => _discriminatorName;
+    public string DiscriminatorName { get { return _discriminatorName; } }
 
     public override TBase Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
     {
@@ -58,7 +58,7 @@ internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.
         writer.WriteEndObject();
     }
 
-    public virtual string GetDiscriminatorValue(System.Type type)
+    public string GetDiscriminatorValue(System.Type type)
     {
         var jsonInheritanceAttributeDiscriminator = GetSubtypeDiscriminator(type);
         if (jsonInheritanceAttributeDiscriminator != null)
@@ -69,7 +69,7 @@ internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.
         return type.Name;
     }
 
-    protected virtual System.Type GetDiscriminatorType(System.Text.Json.JsonElement jObject, System.Type objectType, string discriminatorValue)
+    protected System.Type GetDiscriminatorType(System.Text.Json.JsonElement jObject, System.Type objectType, string discriminatorValue)
     {
         var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
         if (jsonInheritanceAttributeSubtype != null)
@@ -114,12 +114,12 @@ internal class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.
         return objectType.Name;
     }
 }
-{% else -%}
-internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
+{%- else -%}
+public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 {
     internal static readonly string DefaultDiscriminatorName = "discriminator";
 
-    private readonly string _discriminator;
+    private readonly string _discriminatorName;
 
     [System.ThreadStatic]
     private static bool _isReading;
@@ -129,13 +129,15 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
 
     public JsonInheritanceConverter()
     {
-        _discriminator = DefaultDiscriminatorName;
+        _discriminatorName = DefaultDiscriminatorName;
     }
 
-    public JsonInheritanceConverter(string discriminator)
+    public JsonInheritanceConverter(string discriminatorName)
     {
-        _discriminator = discriminator;
+        _discriminatorName = discriminatorName;
     }
+
+    public string DiscriminatorName { get { return _discriminatorName; } }
 
     public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
     {
@@ -144,7 +146,7 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
             _isWriting = true;
 
             var jObject = Newtonsoft.Json.Linq.JObject.FromObject(value, serializer);
-            jObject.AddFirst(new Newtonsoft.Json.Linq.JProperty(_discriminator, GetSubtypeDiscriminator(value.GetType())));
+            jObject.AddFirst(new Newtonsoft.Json.Linq.JProperty(_discriminatorName, GetSubtypeDiscriminator(value.GetType())));
             writer.WriteToken(jObject.CreateReader());
         }
         finally
@@ -190,14 +192,14 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         if (jObject == null)
             return null;
 
-        var discriminatorValue = jObject.GetValue(_discriminator);
+        var discriminatorValue = jObject.GetValue(_discriminatorName);
         var discriminator = discriminatorValue != null ? Newtonsoft.Json.Linq.Extensions.Value<string>(discriminatorValue) : null;
         var subtype = GetObjectSubtype(objectType, discriminator);
-       
+
         var objectContract = serializer.ContractResolver.ResolveContract(subtype) as Newtonsoft.Json.Serialization.JsonObjectContract;
-        if (objectContract == null || System.Linq.Enumerable.All(objectContract.Properties, p => p.PropertyName != _discriminator))
+        if (objectContract == null || System.Linq.Enumerable.All(objectContract.Properties, p => p.PropertyName != _discriminatorName))
         {
-            jObject.Remove(_discriminator);
+            jObject.Remove(_discriminatorName);
         }
 
         try
@@ -233,4 +235,4 @@ internal class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         return objectType.Name;
     }
 }
-{% endif -%}
+{%- endif -%}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
-using NJsonSchema.Tests.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -42,7 +42,7 @@ namespace NJsonSchema.Tests.Serialization
             Assert.Contains(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""Test"": 123
-}", json);
+}".Replace("\r\n", Environment.NewLine), json);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = JsonSchema.FromType<MyTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Serialization
 
 
             //// Act
-            var schema = JsonSchema.FromType<MyTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
             //// Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
@@ -122,7 +122,13 @@ namespace NJsonSchema.Tests.Serialization
             }
 
             public string Key { get; }
+
             public object Value { get; }
+
+            public IReadOnlyDictionary<string, object> ExtensionData => new Dictionary<string, object>
+            {
+                { Key, Value }
+            };
 
             public override bool IsValid(object value)
             {
@@ -141,7 +147,7 @@ namespace NJsonSchema.Tests.Serialization
         public async Task When_extension_data_interface_is_used_on_property_then_extension_data_property_is_set()
         {
             //// Act
-            var schema = JsonSchema.FromType<MyCustomAttributeTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyCustomAttributeTest>();
 
             //// Assert
             Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);

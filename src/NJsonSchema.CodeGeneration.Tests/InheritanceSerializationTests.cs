@@ -9,11 +9,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Converters;
 using Xunit;
 using System.IO;
 using System.Reflection;
 using System.CodeDom.Compiler;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
@@ -99,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
-            var schema = JsonSchema.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var schemaJson = schema.ToJson();
             var errors = schema.Validate(json);
 
@@ -205,7 +206,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
 
             //// Act
             var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
@@ -224,7 +225,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_mappings_are_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
@@ -241,14 +242,14 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.DoesNotContain("public string Discriminator", code); // discriminator property is not generated
+            Assert.DoesNotContain("public string Discriminator {", code); // discriminator property is not generated
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code); // attribute is generated
             Assert.Contains("class JsonInheritanceConverter", code); // converter is generated
         }
@@ -257,7 +258,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Container>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
             //// Act
@@ -282,7 +283,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Contains("this._discriminator = \"Dog\"", code);
         }
 
+#if NETCORE
         [Fact]
+#else
+        [Fact(Skip = "Dynamic compilation doesn't work for NET 4.6.1")]
+#endif
         public async Task Subtypes_are_serialized_with_correct_discriminator()
         {
             //// Arrange
@@ -313,13 +318,6 @@ namespace NJsonSchema.CodeGeneration.Tests
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
 
-#if NET452
-            compilation = compilation.AddReferences(
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(System.Linq.Expressions.Expression).Assembly.Location));
-#else
             var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);            
             compilation = compilation.AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
@@ -332,7 +330,6 @@ namespace NJsonSchema.CodeGeneration.Tests
                 MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll"),
                 MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
                 MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"));
-#endif
 
             using (var stream = new MemoryStream())
             {

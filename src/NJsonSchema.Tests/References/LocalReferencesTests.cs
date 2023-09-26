@@ -4,10 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
+using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.References
 {
-    using NJsonSchema.Generation;
+#pragma warning disable SYSLIB0012
 
     public class LocalReferencesTests
     {
@@ -114,9 +116,9 @@ namespace NJsonSchema.Tests.References
                 }
             }");
 
-            Func<JsonSchema, JsonReferenceResolver> factory = schema4 =>
+            Func<JsonSchema, JsonReferenceResolver> factory = schema =>
             {
-                var schemaResolver = new JsonSchemaResolver(schema4, new JsonSchemaGeneratorSettings());
+                var schemaResolver = new JsonSchemaResolver(schema, new NewtonsoftJsonSchemaGeneratorSettings());
                 var resolver = new JsonReferenceResolver(schemaResolver);
                 resolver.AddDocumentReference("../dir/external.json", externalSchema);
                 return resolver;
@@ -141,7 +143,7 @@ namespace NJsonSchema.Tests.References
         }
 
         [Theory]
-        [InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
+        //[InlineData("b%23r", Skip = "Not working ATM")] // Escaped well-formed JSON Pointer
         [InlineData("b#r")] // Non-escaped ill-formed JSON Pointer
         public async Task When_definitions_have_sharp_in_type_name(string referenceTypeName)
         {

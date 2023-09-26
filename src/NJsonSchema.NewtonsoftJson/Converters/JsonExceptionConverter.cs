@@ -14,11 +14,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
-namespace NJsonSchema.Converters
+namespace NJsonSchema.NewtonsoftJson.Converters
 {
     // IMPORTANT: Always sync with JsonExceptionConverterTemplate.tt in NSwag, IMPORTANT: Copy from CanWrite property
-
-#if !LEGACY
 
     /// <summary>A converter to correctly serialize exception objects.</summary>
     public class JsonExceptionConverter : JsonConverter
@@ -55,13 +53,17 @@ namespace NJsonSchema.Converters
             {
                 var resolver = serializer.ContractResolver as DefaultContractResolver ?? _defaultContractResolver;
 
-                var jObject = new JObject();
-                jObject.Add(resolver.GetResolvedPropertyName("discriminator"), exception.GetType().Name);
-                jObject.Add(resolver.GetResolvedPropertyName("Message"), exception.Message);
-                jObject.Add(resolver.GetResolvedPropertyName("StackTrace"), _hideStackTrace ? "HIDDEN" : exception.StackTrace);
-                jObject.Add(resolver.GetResolvedPropertyName("Source"), exception.Source);
-                jObject.Add(resolver.GetResolvedPropertyName("InnerException"),
-                    exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null);
+                var jObject = new JObject
+                {
+                    { resolver.GetResolvedPropertyName("discriminator"), exception.GetType().Name },
+                    { resolver.GetResolvedPropertyName("Message"), exception.Message },
+                    { resolver.GetResolvedPropertyName("StackTrace"), _hideStackTrace ? "HIDDEN" : exception.StackTrace },
+                    { resolver.GetResolvedPropertyName("Source"), exception.Source },
+                    {
+                        resolver.GetResolvedPropertyName("InnerException"),
+                        exception.InnerException != null ? JToken.FromObject(exception.InnerException, serializer) : null
+                    }
+                };
 
                 foreach (var property in GetExceptionProperties(value.GetType()))
                 {
@@ -158,14 +160,16 @@ namespace NJsonSchema.Converters
                 }
                 else
                 {
-                    field = GetField(objectType, "m_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1));
+                    var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
+
+                    field = GetField(objectType, "m_" + fieldNameSuffix);
                     if (field != null)
                     {
                         field.SetValue(value, propertyValue);
                     }
                     else
                     {
-                        field = GetField(objectType, "_" + property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1));
+                        field = GetField(objectType, "_" + fieldNameSuffix);
                         if (field != null)
                         {
                             field.SetValue(value, propertyValue);
@@ -184,10 +188,11 @@ namespace NJsonSchema.Converters
 
         private FieldInfo GetField(Type type, string fieldName)
         {
-            var field = type.GetTypeInfo().GetDeclaredField(fieldName);
-            if (field == null && type.GetTypeInfo().BaseType != null)
+            var typeInfo = type.GetTypeInfo();
+            var field = typeInfo.GetDeclaredField(fieldName);
+            if (field == null && typeInfo.BaseType != null)
             {
-                return GetField(type.GetTypeInfo().BaseType, fieldName);
+                return GetField(typeInfo.BaseType, fieldName);
             }
 
             return field;
@@ -221,6 +226,4 @@ namespace NJsonSchema.Converters
             }
         }
     }
-
-#endif
 }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -21,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_optional_and_GenerateNullableReferenceTypes_is_not_set_then_CSharp_property_is_not_nullable()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
@@ -45,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithRequiredObject>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
@@ -61,8 +62,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public object? Property { get; set; }= default!;", code);
-            Assert.Contains("public object Property2 { get; set; }= default!;", code);
+            Assert.Contains("public object? Property { get; set; } = default!;", code);
+            Assert.Contains("public object Property2 { get; set; } = default!;", code);
         }
 
         [Fact]
@@ -145,7 +146,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public object? Property { get; set; }= default!;", code);
+            Assert.Contains("public object? Property { get; set; } = default!;", code);
             Assert.Contains("public object Property2 { get; set; } = new object();", code);
         }
     }

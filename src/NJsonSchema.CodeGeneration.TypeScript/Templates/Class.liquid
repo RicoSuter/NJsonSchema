@@ -6,23 +6,24 @@
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
 {%   endif -%}
-    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elseif RequiresStrictPropertyInitialization && !property.HasDefaultValue %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
+    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elsif RequiresStrictPropertyInitialization %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
 {% endfor -%}
 {% if HasIndexerProperty -%}
 
-    [key: string]: {{ IndexerPropertyValueType }}; 
+    [key: string]: {{ IndexerPropertyValueType }};
 {% endif -%}
 {% if HasDiscriminator -%}
 
     protected _discriminator: string;
 {% endif -%}
 
+{% assign condition_temp = HasInheritance == false or ConvertConstructorInterfaceData -%}
 {% if GenerateConstructorInterface or HasBaseDiscriminator -%}
     constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
 {%     if HasInheritance -%}
         super({% if GenerateConstructorInterface %}data{% endif %});
 {%     endif -%}
-{%     if GenerateConstructorInterface and (HasInheritance == false or ConvertConstructorInterfaceData) -%}
+{%     if GenerateConstructorInterface and condition_temp -%}
         if (data) {
 {%         if HasInheritance == false -%}
             for (var property in data) {
@@ -41,7 +42,7 @@
                     this.{{ property.PropertyName }}[i] = item && !(<any>item).toJSON ? new {{ property.ArrayItemType }}(item) : <{{ property.ArrayItemType }}>item;
                 }
             }
-{%                     elseif property.IsDictionary -%}
+{%                     elsif property.IsDictionary -%}
             if (data.{{ property.PropertyName }}) {
                 this.{{ property.PropertyName }} = {};
                 for (let key in data.{{ property.PropertyName }}) {
@@ -52,7 +53,7 @@
                 }
             }
 {%                     else -%}
-            this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(<any>data.{{ property.PropertyName }}).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : <{{ property.Type }}>this.{{ property.PropertyName }}; 
+            this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(<any>data.{{ property.PropertyName }}).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : <{{ property.Type }}>this.{{ property.PropertyName }};
 {%                     endif -%}
 {%                 endif -%}
 {%             endfor -%}
@@ -74,7 +75,7 @@
     }
 {% endif -%}
 
-    init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
 {% if HasInheritance -%}
         super.init(_data);
 {% endif -%}
@@ -87,13 +88,13 @@
             }
 {%     endif -%}
 {%     for property in Properties -%}
-            {{ property.ConvertToClassCode | tab }}
+            {{ property.ConvertToClassCode | strip | tab }}
 {%     endfor -%}
         }
 {% endif -%}
     }
 
-    static fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
+    static {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
         data = typeof data === 'object' ? data : {};
 {% if HandleReferences -%}
 {%   if HasBaseDiscriminator -%}
@@ -135,7 +136,7 @@
 {% endif -%}
     }
 
-    toJSON(data?: any) {
+    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
 {% if HasIndexerProperty -%}
         for (var property in this) {
@@ -144,7 +145,7 @@
         }
 {% endif -%}
 {% if HasDiscriminator -%}
-        data["{{ BaseDiscriminator }}"] = this._discriminator; 
+        data["{{ BaseDiscriminator }}"] = this._discriminator;
 {% endif -%}
 {% for property in Properties -%}
         {{ property.ConvertToJavaScriptCode | tab }}
@@ -152,7 +153,7 @@
 {% if HasInheritance -%}
         super.toJSON(data);
 {% endif -%}
-        return data; 
+        return data;
     }
 {% if GenerateCloneMethod -%}
 
@@ -182,7 +183,7 @@
 {%   endfor -%}
 {%   if HasIndexerProperty -%}
 
-    [key: string]: {{ IndexerPropertyValueType }}; 
+    [key: string]: {{ IndexerPropertyValueType }};
 {%   endif -%}
 }
 {% endif -%}

@@ -8,36 +8,32 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Annotations;
 using System.Reflection;
-using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
 {
     /// <summary>The default reflection service implementation.</summary>
-    public class DefaultReflectionService : IReflectionService
+    public abstract class ReflectionServiceBase<TSettings> : IReflectionService
+        where TSettings : JsonSchemaGeneratorSettings
     {
-        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
-        /// <param name="contextualType">The type.</param>
-        /// <param name="settings">The settings.</param>
-        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public JsonTypeDescription GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
-        {
-            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, settings);
-        }
+        /// <inheritdocs />
+        public abstract string ConvertEnumValue(object value, TSettings settings);
+
+        /// <inheritdocs />
+        public abstract void GenerateProperties(JsonSchema schema, ContextualType contextualType, TSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver);
+
+        /// <inheritdocs />
+        public abstract string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings);
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>
-        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling used when no nullability information is available.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
         /// <param name="settings">The settings.</param>
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
-        public virtual JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        public JsonTypeDescription GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, TSettings settings)
         {
             var type = contextualType.OriginalType;
             var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
@@ -62,124 +58,137 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
             }
 
-            if (type.GetTypeInfo().IsEnum)
+            return GetDescription(contextualType, settings, type, isNullable, defaultReferenceTypeNullHandling);
+        }
+
+        /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
+        /// <param name="contextualType">The type.</param>
+        /// <param name="settings">The settings.</param>
+        /// <param name="originalType">The original type.</param>
+        /// <param name="isNullable">Specifies whether the type is nullable.</param>
+        /// <param name="defaultReferenceTypeNullHandling">The default reference type null handling.</param>
+        /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
+        protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, TSettings settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
+        {
+            if (originalType.GetTypeInfo().IsEnum)
             {
-                var isStringEnum = IsStringEnum(contextualType, settings.ActualSerializerSettings);
+                var isStringEnum = IsStringEnum(contextualType, settings);
                 return JsonTypeDescription.CreateForEnumeration(contextualType,
                     isStringEnum ? JsonObjectType.String : JsonObjectType.Integer, false);
             }
 
             // Primitive types
 
-            if (type == typeof(short) ||
-                type == typeof(uint) ||
-                type == typeof(ushort))
+            if (originalType == typeof(short) ||
+                originalType == typeof(uint) ||
+                originalType == typeof(ushort))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, null);
             }
 
-            if (type == typeof(int))
+            if (originalType == typeof(int))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Integer);
             }
 
-            if (type == typeof(long) ||
-                type == typeof(ulong))
+            if (originalType == typeof(long) ||
+                originalType == typeof(ulong))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Long);
             }
 
-            if (type == typeof(double))
+            if (originalType == typeof(double))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Double);
             }
 
-            if (type == typeof(float))
+            if (originalType == typeof(float))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Float);
             }
 
-            if (type == typeof(decimal))
+            if (originalType == typeof(decimal))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Number, false, JsonFormatStrings.Decimal);
             }
 
-            if (type == typeof(bool))
+            if (originalType == typeof(bool))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Boolean, false, null);
             }
 
-            if (type == typeof(string) || type == typeof(Type))
+            if (originalType == typeof(string) || originalType == typeof(Type))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
             }
 
-            if (type == typeof(char))
+            if (originalType == typeof(char))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, null);
             }
 
-            if (type == typeof(Guid))
+            if (originalType == typeof(Guid))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Guid);
             }
 
             // Date & time types
 
-            if (type == typeof(DateTime) ||
-                type == typeof(DateTimeOffset) ||
-                type.FullName == "NodaTime.OffsetDateTime" ||
-                type.FullName == "NodaTime.LocalDateTime" ||
-                type.FullName == "NodaTime.ZonedDateTime" ||
-                type.FullName == "NodaTime.Instant")
+            if (originalType == typeof(DateTime) ||
+                originalType == typeof(DateTimeOffset) ||
+                originalType.FullName == "NodaTime.OffsetDateTime" ||
+                originalType.FullName == "NodaTime.LocalDateTime" ||
+                originalType.FullName == "NodaTime.ZonedDateTime" ||
+                originalType.FullName == "NodaTime.Instant")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.DateTime);
             }
 
-            if (type == typeof(TimeSpan) ||
-                type.FullName == "NodaTime.Duration")
+            if (originalType == typeof(TimeSpan) ||
+                originalType.FullName == "NodaTime.Duration")
             {
-                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.TimeSpan);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Duration);
             }
 
-            if (type.FullName == "NodaTime.LocalDate" ||
-                type.FullName == "System.DateOnly")
+            if (originalType.FullName == "NodaTime.LocalDate" ||
+                originalType.FullName == "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (type.FullName == "NodaTime.LocalTime" ||
-                type.FullName == "System.TimeOnly")
+            if (originalType.FullName == "NodaTime.LocalTime" ||
+                originalType.FullName == "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
 
             // Special types
 
-            if (type == typeof(Uri))
+            if (originalType == typeof(Uri))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Uri);
             }
 
-            if (type == typeof(byte))
+            if (originalType == typeof(byte))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Integer, false, JsonFormatStrings.Byte);
             }
 
-            if (type == typeof(byte[]))
+            if (originalType == typeof(byte[]))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
             }
 
-            if (type.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name))
+            if (originalType.FullName == "Newtonsoft.Json.Linq.JArray")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
-            if (type.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
-                type.FullName == "System.Dynamic.ExpandoObject" ||
-                type.FullName == "System.Text.Json.JsonElement" ||
-                type == typeof(object))
+            if (originalType.FullName == "Newtonsoft.Json.Linq.JToken" ||
+                originalType.FullName == "Newtonsoft.Json.Linq.JObject" ||
+                originalType.FullName == "System.Dynamic.ExpandoObject" ||
+                originalType.FullName == "System.Text.Json.JsonElement" ||
+                originalType == typeof(object))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.None, isNullable, null);
             }
@@ -203,21 +212,14 @@ namespace NJsonSchema.Generation
                 return typeDescription;
             }
 
-            var contract = settings.ResolveContract(type);
-            if (IsDictionaryType(contextualType) && contract is JsonDictionaryContract)
+            if (IsDictionaryType(contextualType))
             {
                 return JsonTypeDescription.CreateForDictionary(contextualType, JsonObjectType.Object, isNullable);
             }
 
-            // TODO: Don't trust JsonArrayContract when contextualType is IAsyncEnumerable<T> until it is fixed
-            if (IsIAsyncEnumerableType(contextualType) || (IsArrayType(contextualType) && contract is JsonArrayContract))
+            if (IsIAsyncEnumerableType(contextualType) || IsArrayType(contextualType))
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
-            }
-
-            if (contract is JsonStringContract)
-            {
-                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, null);
             }
 
             return JsonTypeDescription.Create(contextualType, JsonObjectType.Object, isNullable, null);
@@ -229,12 +231,6 @@ namespace NJsonSchema.Generation
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();
-            if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
-            {
-                return false;
-            }
-
             if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
             {
                 return false;
@@ -259,17 +255,21 @@ namespace NJsonSchema.Generation
 
         /// <summary>Checks whether the give type is a string enum.</summary>
         /// <param name="contextualType">The type.</param>
-        /// <param name="serializerSettings">The serializer settings.</param>
+        /// <param name="settings">The settings.</param>
         /// <returns>The result.</returns>
-        public virtual bool IsStringEnum(ContextualType contextualType, JsonSerializerSettings serializerSettings)
+        public virtual bool IsStringEnum(ContextualType contextualType, TSettings settings)
         {
             if (!contextualType.TypeInfo.IsEnum)
             {
                 return false;
             }
 
-            var hasGlobalStringEnumConverter = serializerSettings.Converters.OfType<StringEnumConverter>().Any();
-            return hasGlobalStringEnumConverter || HasStringEnumConverter(contextualType);
+            if (HasStringEnumConverter(contextualType))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>Checks whether the given type is a file/binary type.</summary>
@@ -283,11 +283,7 @@ namespace NJsonSchema.Generation
             return parameterTypeName == "IFormFile" ||
                    contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
                    contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
-#if !LEGACY
                    contextualType.TypeInfo.ImplementedInterfaces.Any(i => i.Name == "IFormFile");
-#else
-                   contextualType.TypeInfo.GetInterfaces().Any(i => i.Name == "IFormFile");
-#endif
         }
 
         /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
@@ -300,8 +296,6 @@ namespace NJsonSchema.Generation
         {
             return contextualType.TypeName == "IAsyncEnumerable`1";
         }
-
-#if !LEGACY
 
         /// <summary>Checks whether the given type is an array type.</summary>
         /// <param name="contextualType">The type.</param>
@@ -339,47 +333,6 @@ namespace NJsonSchema.Generation
                     !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
-#else
-
-        /// <summary>Checks whether the given type is an array type.</summary>
-        /// <param name="type">The type.</param>
-        /// <returns>true or false.</returns>
-        protected virtual bool IsArrayType(ContextualType contextualType)
-        {
-            if (IsDictionaryType(contextualType))
-            {
-                return false;
-            }
-
-            // TODO: Improve these checks
-            if (contextualType.TypeName == "ObservableCollection`1")
-            {
-                return true;
-            }
-
-            return contextualType.Type.IsArray || 
-                (contextualType.Type.GetInterfaces().Contains(typeof(IEnumerable)) &&
-                (contextualType.TypeInfo.BaseType == null ||
-                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IEnumerable))));
-        }
-
-        /// <summary>Checks whether the given type is a dictionary type.</summary>
-        /// <param name="contextualType">The type.</param>
-        /// <returns>true or false.</returns>
-        protected virtual bool IsDictionaryType(ContextualType contextualType)
-        {
-            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
-            {
-                return true;
-            }
-
-            return contextualType.Type.GetInterfaces().Contains(typeof(IDictionary)) &&
-                (contextualType.TypeInfo.BaseType == null ||
-                    !contextualType.TypeInfo.BaseType.GetTypeInfo().GetInterfaces().Contains(typeof(IDictionary)));
-        }
-
-#endif
-
         private bool HasStringEnumConverter(ContextualType contextualType)
         {
             dynamic jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
@@ -394,6 +347,31 @@ namespace NJsonSchema.Generation
             }
 
             return false;
+        }
+
+        JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling, JsonSchemaGeneratorSettings settings)
+        {
+            return GetDescription(contextualType, defaultReferenceTypeNullHandling, (TSettings)settings);
+        }
+
+        JsonTypeDescription IReflectionService.GetDescription(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
+        {
+            return GetDescription(contextualType, settings.DefaultReferenceTypeNullHandling, (TSettings)settings);
+        }
+
+        bool IReflectionService.IsStringEnum(ContextualType contextualType, JsonSchemaGeneratorSettings settings)
+        {
+            return IsStringEnum(contextualType, (TSettings)settings);
+        }
+
+        string IReflectionService.ConvertEnumValue(object value, JsonSchemaGeneratorSettings settings)
+        {
+            return ConvertEnumValue(value, (TSettings)settings);
+        }
+
+        void IReflectionService.GenerateProperties(JsonSchema schema, ContextualType contextualType, JsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        {
+            GenerateProperties(schema, contextualType, (TSettings)settings, schemaGenerator, schemaResolver);
         }
     }
 }

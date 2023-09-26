@@ -8,32 +8,53 @@
 
 using Namotion.Reflection;
 using Newtonsoft.Json;
+using NJsonSchema.Generation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
+        private static ReaderWriterLockSlim _namesLock = new ReaderWriterLockSlim();
         private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        internal static string GetName(this ContextualAccessorInfo accessorInfo)
+        public static string GetName(this ContextualAccessorInfo accessorInfo)
         {
-            if (!_names.ContainsKey(accessorInfo))
+            _namesLock.EnterUpgradeableReadLock();
+            try
             {
-                lock (_names)
+                if (_names.TryGetValue(accessorInfo, out var name))
                 {
-                    if (!_names.ContainsKey(accessorInfo))
+                    return name;
+                }
+
+                _namesLock.EnterWriteLock();
+                try
+                {
+                    if (_names.TryGetValue(accessorInfo, out name))
                     {
-                        _names[accessorInfo] = GetNameWithoutCache(accessorInfo);
+                        return name;
                     }
+
+                    name = GetNameWithoutCache(accessorInfo);
+                    _names[accessorInfo] = name;
+                    return name;
+                }
+                finally
+                {
+                    _namesLock.ExitWriteLock();
                 }
             }
-            return _names[accessorInfo];
+            finally
+            {
+                _namesLock.ExitUpgradeableReadLock();
+            }
         }
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)
@@ -59,8 +80,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="type">The member info</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this CachedType type)
+        public static string GetDescription(this CachedType type, IXmlDocsSettings xmlDocsSettings)
         {
             var attributes = type is ContextualType contextualType ? contextualType.ContextAttributes : type.InheritedAttributes;
 
@@ -70,10 +92,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = type.GetXmlDocsSummary();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = type.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;
@@ -81,8 +106,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="accessorInfo">The accessor info.</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualAccessorInfo accessorInfo)
+        public static string GetDescription(this ContextualAccessorInfo accessorInfo, IXmlDocsSettings xmlDocsSettings)
         {
             var description = GetDescription(accessorInfo.AccessorType.Attributes);
             if (description != null)
@@ -90,10 +116,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = accessorInfo.MemberInfo.GetXmlDocsSummary();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;
@@ -101,8 +130,9 @@ namespace NJsonSchema.Infrastructure
 
         /// <summary>Gets the description of the given member (based on the DescriptionAttribute, DisplayAttribute or XML Documentation).</summary>
         /// <param name="parameter">The parameter.</param>
+        /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualParameterInfo parameter)
+        public static string GetDescription(this ContextualParameterInfo parameter, IXmlDocsSettings xmlDocsSettings)
         {
             var description = GetDescription(parameter.ContextAttributes);
             if (description != null)
@@ -110,10 +140,13 @@ namespace NJsonSchema.Infrastructure
                 return description;
             }
 
-            var summary = parameter.GetXmlDocs();
-            if (summary != string.Empty)
+            if (xmlDocsSettings.UseXmlDocumentation)
             {
-                return summary;
+                var summary = parameter.GetXmlDocs(xmlDocsSettings.GetXmlDocsOptions());
+                if (summary != string.Empty)
+                {
+                    return summary;
+                }
             }
 
             return null;

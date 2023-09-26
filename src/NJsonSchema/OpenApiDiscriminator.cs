@@ -40,11 +40,7 @@ namespace NJsonSchema
             dynamic converter = JsonInheritanceConverter;
 
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
-#if LEGACY
-                .GetMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
-#else
-                .GetRuntimeMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
-#endif
+                .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
 
             if (getDiscriminatorValueMethod != null)
             {
@@ -62,7 +58,7 @@ namespace NJsonSchema
         /// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#discriminator-object and
         /// issue https://github.com/RicoSuter/NSwag/issues/1684
         /// </summary>
-        private class DiscriminatorMappingConverter : JsonConverter
+        private sealed class DiscriminatorMappingConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {

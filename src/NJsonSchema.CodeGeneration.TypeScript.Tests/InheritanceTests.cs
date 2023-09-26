@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Converters;
+using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyContainer>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -100,7 +102,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ExceptionContainer>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
@@ -120,10 +122,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_interfaces_are_generated_with_inheritance_then_type_check_methods_are_generated()
+        {
+            //// Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
+            var data = schema.ToJson();
+
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeScriptVersion = 2.0m,
+                TypeStyle = TypeScriptTypeStyle.Interface,
+                GenerateTypeCheckFunctions = true
+            });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("export function isExceptionBase(object: any): object is ExceptionBase {", code);
+            Assert.Contains("function isMyException(object: any): object is MyException {", code);
+        }
+
+        [Fact]
         public async Task When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ExceptionContainer>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
 
             schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping["FooBar"] =
                 schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping["MyException"];
@@ -322,7 +346,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
 
         [Fact]
-        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved() {
+        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved()
+        {
             //// Arrange
             string extensionCode = @"
 import * as generated from ""./generated"";
@@ -332,8 +357,9 @@ export class ExceptionBase extends generated.ExceptionBase {
 }
             ";
 
-            var schema = JsonSchema.FromType<ExceptionContainer>();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings {
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings 
+            {
                 ExtensionCode = extensionCode,
                 ExtendedClasses = new[] { "ExceptionBase" },
             });

@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
@@ -39,6 +40,29 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Assert
             Assert.Contains("public System.Collections.Generic.ICollection<object> EmptySchema { get; set; } = ", output);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_code_is_generated_then_toolchain_version_is_printed()
+        {
+            //// Arrange
+            var json = @"{
+                'required': [ 'emptySchema' ],
+                'properties': {
+                    'emptySchema': { 'type': 'array' }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var settings = new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco, Namespace = "ns", };
+            var generator = new CSharpGenerator(schema, settings);
+            var output = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains(" (Newtonsoft.Json ", output);
 
             AssertCompile(output);
         }
@@ -109,7 +133,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_name_is_created_by_custom_fun_then_attribute_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
 
@@ -119,7 +143,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Act
             var output = generator.GenerateFile("Teacher");
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Contains(@"[Newtonsoft.Json.JsonProperty(""lastName""", output);
@@ -230,7 +254,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_timespan_than_csharp_timespan_is_used()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema);
 
@@ -262,7 +286,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new CSharpGenerator(schema);
 
@@ -270,7 +294,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>EnumDesc.</summary>", output);
+            var summary = @"
+        /// <summary>
+        /// EnumDesc.
+        /// </summary>".Replace("\r", "").Trim();
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -279,7 +307,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualSchema.Description = "ClassDesc.";
             var generator = new CSharpGenerator(schema);
 
@@ -287,7 +315,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>ClassDesc.</summary>", output);
+            var summary = @"
+    /// <summary>
+    /// ClassDesc.
+    /// </summary>".Replace("\r", "");
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -296,7 +328,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
@@ -304,7 +336,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var output = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains(@"/// <summary>PropertyDesc.</summary>", output);
+            var summary = @"
+        /// <summary>
+        /// PropertyDesc.
+        /// </summary>".Replace("\r", "").Trim();
+            Assert.Contains(summary, output);
 
             AssertCompile(output);
         }
@@ -318,7 +354,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task Can_generate_type_from_string_property_with_byte_format()
         {
             // Arrange
-            var schema = JsonSchema.FromType<File>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<File>();
             var generator = new CSharpGenerator(schema);
 
             // Act
@@ -334,7 +370,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task Can_generate_type_from_string_property_with_base64_format()
         {
             // Arrange
-            var schema = JsonSchema.FromType<File>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<File>();
             schema.Properties["Content"].Format = "base64";
             var generator = new CSharpGenerator(schema);
 
@@ -417,7 +453,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
         private static async Task<CSharpGenerator> CreateGeneratorAsync()
         {
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var settings = new CSharpGeneratorSettings();
             settings.Namespace = "MyNamespace";
@@ -437,7 +473,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<ObjectTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTestClass>();
 
             //// Assert
             Assert.Equal(
@@ -450,7 +486,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_object_then_object_property_is_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObjectTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTestClass>();
             var json = schema.ToJson();
 
             //// Act
@@ -482,7 +518,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_property_has_default_and_int_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithDefaultEnumProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>();
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -503,7 +539,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_enum_property_has_default_and_string_serialization_then_correct_csharp_code_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithDefaultEnumProperty>(new JsonSchemaGeneratorSettings { DefaultEnumHandling = EnumHandling.String });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDefaultEnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
+            });
+
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -658,7 +701,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_required_then_CSharp_code_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person2>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person2>();
             var schemaJson = schema.ToJson();
 
             //// Act
@@ -703,7 +746,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             AssertCompile(code);
         }
-
+        
         [Fact]
         public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
@@ -895,13 +938,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_ObservableCollection_then_generated_code_uses_the_same_class()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ObsClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ObsClass>();
             var settings = new CSharpGeneratorSettings { ArrayType = "ObservableCollection" };
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
             var output = generator.GenerateFile("MyClass");
-            Console.WriteLine(output);
+            //Console.WriteLine(output);
 
             //// Assert
             Assert.Contains("ObservableCollection<string>", output);
@@ -1358,7 +1401,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_property_is_byte_then_its_type_is_preserved()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyByteTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyByteTest>();
             var json = schema.ToJson();
 
             //// Act
@@ -1381,7 +1424,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_nullable_property_is_required_then_it_is_not_nullable_in_generated_csharp_code()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyRequiredNullableTest>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyRequiredNullableTest>();
             var json = schema.ToJson();
 
             //// Act
@@ -1422,6 +1465,39 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Assert
             Assert.Contains(@"class DateFormatConverter", code);
             Assert.Contains(@"[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
+
+            AssertCompile(code);
+        }
+
+        [Fact]
+        public async Task When_definition_contains_date_and_use_system_text_json_then_converter_should_be_added_for_datetime()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"",
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date""
+        }
+	}
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime",
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains(@"class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTime>", code);
+            Assert.Contains(@"[System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]", code);
 
             AssertCompile(code);
         }
@@ -1571,6 +1647,39 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_definition_contains_date_and_use_system_text_json_then_converter_should_be_added_for_datetimeoffset()
+        {
+            //// Arrange
+            var json =
+@"{
+	""type"": ""object"",
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date""
+        }
+	}
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTimeOffset",
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains(@"class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTimeOffset>", code);
+            Assert.Contains(@"[System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]", code);
+
+            AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_definition_contains_datetime_converter_should_not_be_added()
         {
             //// Arrange
@@ -1603,10 +1712,43 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_definition_contains_datetime_and_use_system_text_json_then_converter_should_not_be_added()
+        {
+            //// Arrange
+            var json =
+                @"{
+	""type"": ""object"",
+	""properties"": {
+		""a"": {
+    		""type"": ""string"",
+            ""format"": ""date-time""
+        }
+	}
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2,
+                DateType = "System.DateTime",
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.DoesNotContain(@"class DateFormatConverter", code);
+            Assert.DoesNotContain(@"[System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]", code);
+
+            AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_record_no_setter_in_class_and_constructor_provided()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Address>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Address>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1618,6 +1760,31 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             //// Assert
             Assert.Contains(@"public string Street { get; }", output);
+            Assert.DoesNotContain(@"public string Street { get; set; }", output);
+
+            Assert.Contains("public Address(string @city, string @street)", output);
+
+            AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_native_record_no_setter_in_class_and_constructor_provided()
+        {
+            //// Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                GenerateNativeRecords = true
+            });
+
+            //// Act
+            var output = generator.GenerateFile("Address");
+
+            //// Assert
+            Assert.Contains(@"record Address", output);
+            Assert.Contains(@"public string Street { get; init; }", output);
             Assert.DoesNotContain(@"public string Street { get; set; }", output);
 
             Assert.Contains("public Address(string @city, string @street)", output);
@@ -1650,7 +1817,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_is_abstract_constructor_is_protected_for_record()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<AbstractAddress>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractAddress>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1677,7 +1844,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_record_has_inheritance()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<PersonAddress>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<PersonAddress>();
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -1710,7 +1877,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_schema_has_AdditionProperties_schema_then_JsonExtensionDataAttribute_is_generated()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ClassWithExtensionData>(new JsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithExtensionData>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -1770,7 +1937,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_using_SytemTextJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        public async Task When_using_SystemTextJson_without_JsonConverters_generates_FromJson_and_ToJson_correctly()
         {
             //// Arrange
             var expectedToJsonMethod =
@@ -1810,7 +1977,7 @@ public static Person FromJson(string data)
         }
 
         [Fact]
-        public async Task When_using_SytemTextJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
+        public async Task When_using_SystemTextJson_with_JsonConverters_generates_FromJson_and_ToJson_correctly()
         {
             //// Arrange
             var expectedToJsonMethod =
@@ -1931,6 +2098,49 @@ public static Person FromJson(string data)
             Assert.Contains(normalizedExpectedFromJsonMethodMethod, normalizedOutput);
 
             AssertCompile(output);
+        }
+
+        public class DocumentationTest
+        {
+            /// <summary>
+            /// Summary is here
+            ///
+            /// spanning multiple lines
+            ///
+            /// like this.
+            ///
+            /// </summary>
+            public string HelloMessage { get; set; }
+        }
+
+        [Fact]
+        public async Task When_documentation_present_produces_valid_xml_documentation_syntax()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<DocumentationTest>();
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            var expected = @"
+        /// <summary>
+        /// Summary is here
+        /// <br/>            
+        /// <br/>spanning multiple lines
+        /// <br/>            
+        /// <br/>like this.
+        /// <br/>            
+        /// </summary>".Replace("\r","");
+
+            Assert.Contains(expected, code);
+
+            AssertCompile(code);
         }
     }
 }

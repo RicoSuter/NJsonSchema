@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,89 +17,121 @@ namespace NJsonSchema.Generation
     /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
     public class SampleJsonDataGenerator
     {
+        private readonly SampleJsonDataGeneratorSettings _settings;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SampleJsonDataGenerator"/> class with default settings..
+        /// </summary>
+        public SampleJsonDataGenerator()
+        {
+            _settings = new SampleJsonDataGeneratorSettings();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="SampleJsonDataGenerator"/> class.
+        /// </summary>
+        /// <param name="settings">The settings to use.</param>
+        public SampleJsonDataGenerator(SampleJsonDataGeneratorSettings settings)
+        {
+            _settings = settings;
+        }
+
         /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
         /// <param name="schema">The JSON Schema.</param>
         /// <returns>The JSON token.</returns>
         public JToken Generate(JsonSchema schema)
         {
-            return Generate(schema, new HashSet<JsonSchema>());
+            var stack = new Stack<JsonSchema>();
+            stack.Push(schema);
+            return Generate(schema, stack);
         }
 
-        private JToken Generate(JsonSchema schema, HashSet<JsonSchema> usedSchemas)
+        private JToken Generate(JsonSchema schema, Stack<JsonSchema> schemaStack)
         {
             var property = schema as JsonSchemaProperty;
             schema = schema.ActualSchema;
-            if (usedSchemas.Contains(schema))
+            try
             {
+                schemaStack.Push(schema);
+                if (schemaStack.Count(s => s == schema) > _settings.MaxRecursionLevel)
+                {
+                    return null;
+                }
+
+                if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
+                {
+                    var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
+                    var properties = GetPropertiesToGenerate(schemas);
+
+                    var obj = new JObject();
+                    foreach (var p in properties)
+                    {
+                        obj[p.Key] = Generate(p.Value, schemaStack);
+                    }
+
+                    return obj;
+                }
+                else if (schema.Default != null)
+                {
+                    return JToken.FromObject(schema.Default);
+                }
+                else if (schema.Type.IsArray())
+                {
+                    if (schema.Item != null)
+                    {
+                        var array = new JArray();
+
+                        var item = Generate(schema.Item, schemaStack);
+                        if (item != null)
+                        {
+                            array.Add(item);
+                        }
+
+                        return array;
+                    }
+                    else if (schema.Items.Count > 0)
+                    {
+                        var array = new JArray();
+                        foreach (var item in schema.Items)
+                        {
+                            array.Add(Generate(item, schemaStack));
+                        }
+
+                        return array;
+                    }
+                }
+                else
+                {
+                    if (schema.IsEnumeration)
+                    {
+                        return JToken.FromObject(schema.Enumeration.First());
+                    }
+                    else if (schema.Type.IsInteger())
+                    {
+                        return HandleIntegerType(schema);
+                    }
+                    else if (schema.Type.IsNumber())
+                    {
+                        return HandleNumberType(schema);
+                    }
+                    else if (schema.Type.IsString())
+                    {
+                        return HandleStringType(schema, property);
+                    }
+                    else if (schema.Type.IsBoolean())
+                    {
+                        return JToken.FromObject(false);
+                    }
+                }
+
                 return null;
             }
-
-            if (schema.Type.HasFlag(JsonObjectType.Object) ||
-                schema.AllOf.Any(s => s.ActualProperties.Any()))
+            finally
             {
-                usedSchemas.Add(schema);
-
-                var properties = schema.ActualProperties.Concat(schema.AllOf.SelectMany(s => s.ActualSchema.ActualProperties));
-                var obj = new JObject();
-                foreach (var p in properties)
-                {
-                    obj[p.Key] = Generate(p.Value, usedSchemas);
-                }
-                return obj;
+                schemaStack.Pop();
             }
-            else if (schema.Default != null)
-            {
-                return JToken.FromObject(schema.Default);
-            }
-            else if (schema.Type.HasFlag(JsonObjectType.Array))
-            {
-                if (schema.Item != null)
-                {
-                    var array = new JArray();
-                    var item = Generate(schema.Item, usedSchemas);
-                    if (item != null)
-                    {
-                        array.Add(item);
-                    }
-                    return array;
-                }
-                else if (schema.Items.Count > 0)
-                {
-                    var array = new JArray();
-                    foreach (var item in schema.Items)
-                    {
-                        array.Add(Generate(item, usedSchemas));
-                    }
-                    return array;
-                }
-            }
-            else
-            {
-                if (schema.IsEnumeration)
-                {
-                    return JToken.FromObject(schema.Enumeration.First());
-                }
-                else if (schema.Type.HasFlag(JsonObjectType.Integer))
-                {
-                    return HandleIntegerType(schema);
-                }
-                else if (schema.Type.HasFlag(JsonObjectType.Number))
-                {
-                    return HandleNumberType(schema);
-                }
-                else if (schema.Type.HasFlag(JsonObjectType.String))
-                {
-                    return HandleStringType(schema, property);
-                }
-                else if (schema.Type.HasFlag(JsonObjectType.Boolean))
-                {
-                    return JToken.FromObject(false);
-                }
-            }
-
-            return null;
         }
-        private static JToken HandleNumberType(JsonSchema schema)
+        private JToken HandleNumberType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
@@ -115,7 +148,7 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0.0);
         }
 
-        private static JToken HandleIntegerType(JsonSchema schema)
+        private JToken HandleIntegerType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
@@ -150,6 +183,22 @@ namespace NJsonSchema.Generation
             {
                 return JToken.FromObject("");
             }
+        }
+
+        private IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetPropertiesToGenerate(IEnumerable<JsonSchema> schemas)
+        {
+            return schemas.SelectMany(GetPropertiesToGenerate);
+        }
+
+        private IEnumerable<KeyValuePair<string, JsonSchemaProperty>> GetPropertiesToGenerate(JsonSchema schema)
+        {
+            if (_settings.GenerateOptionalProperties)
+            {
+                return schema.ActualProperties;
+            }
+
+            var required = schema.RequiredProperties;
+            return schema.ActualProperties.Where(x => required.Contains(x.Key));
         }
     }
 }

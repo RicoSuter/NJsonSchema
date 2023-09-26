@@ -63,18 +63,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false && isOptional == false)
                 {
-                    if (schema.Type.HasFlag(JsonObjectType.Array) ||
-                        schema.Type.HasFlag(JsonObjectType.Object))
+                    if (schema.Type.IsArray() ||
+                        schema.Type.IsObject())
                     {
-                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType)
-                            ? targetType.Replace(_settings.DictionaryType + "<", _settings.DictionaryInstanceType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<")
+                            ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
 
-                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType)
-                            ? targetType.Replace(_settings.ArrayType + "<", _settings.ArrayInstanceType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<")
+                            ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
-                        return $"new {targetType}()";
+                        return schema.IsAbstract ? null : $"new {targetType}()";
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     case JsonFormatStrings.Decimal:
                         return ConvertNumberToString(value) + "M";
                     default:
-                        return type.HasFlag(JsonObjectType.Integer) ?
+                        return type.IsInteger() ?
                             ConvertNumberToString(value) :
                             ConvertNumberToString(value) + "D";
                 }

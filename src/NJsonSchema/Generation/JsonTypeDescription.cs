@@ -6,10 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Namotion.Reflection;
 using NJsonSchema.Generation.TypeMappers;
 
@@ -84,7 +82,7 @@ namespace NJsonSchema.Generation
         public bool IsNullable { get; set; }
 
         /// <summary>Gets a value indicating whether this is a complex type (i.e. object, dictionary or array).</summary>
-        public bool IsComplexType => IsDictionary || Type.HasFlag(JsonObjectType.Object) || Type.HasFlag(JsonObjectType.Array);
+        public bool IsComplexType => IsDictionary || Type.IsObject() || Type.IsArray();
 
         /// <summary>Gets a value indicating whether this is an any type (e.g. object).</summary>
         public bool IsAny => Type == JsonObjectType.None;
@@ -100,7 +98,7 @@ namespace NJsonSchema.Generation
                 return typeMapper.UseReference;
             }
 
-            return !IsDictionary && (Type.HasFlag(JsonObjectType.Object) || IsEnum);
+            return !IsDictionary && (Type.IsObject() || IsEnum);
         }
 
         /// <summary>Applies the type and format to the given schema.</summary>

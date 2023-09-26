@@ -21,22 +21,15 @@ namespace NJsonSchema.Validation
         /// <param name="errors">The error list. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-#if !LEGACY
         public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
-#else
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
-#endif
+
             : base(kind, property, path, token, schema)
         {
             Errors = errors;
         }
 
         /// <summary>Gets the errors for each validated type. </summary>
-#if !LEGACY
         public IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> Errors { get; private set; }
-#else
-        public IDictionary<JsonObjectType, ICollection<ValidationError>> Errors { get; private set; }
-#endif
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

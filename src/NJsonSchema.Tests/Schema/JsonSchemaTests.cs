@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Schema
     {
         [Fact]
         public async Task Ensure_NJS_does_not_run_in_legacy_mode()
-        { 
+        {
             Assert.DoesNotContain("NET40", JsonSchema.ToolchainVersion);
         }
 
@@ -27,7 +27,7 @@ namespace NJsonSchema.Tests.Schema
             Assert.Equal(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
-}", data);
+}".Replace("\r\n", Environment.NewLine), data);
             Assert.True(schema.IsAnyType);
         }
 
@@ -195,7 +195,7 @@ namespace NJsonSchema.Tests.Schema
             Assert.Contains(@"  ""type"": [
     ""integer"",
     ""object""
-  ]", data);
+  ]".Replace("\r\n", Environment.NewLine), data);
         }
 
         [Fact]

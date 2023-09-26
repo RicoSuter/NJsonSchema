@@ -87,6 +87,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
                 StringToDateCode = GetStringToDateTime(parameters, typeSchema),
+                StringToDateOnlyCode = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date 
+                                       && parameters.Settings.ConvertDateToLocalTimezone 
+                    ? "parseDateOnly" 
+                    : GetStringToDateTime(parameters, typeSchema),
                 DateToStringCode = GetDateToString(parameters, typeSchema),
                 DateTimeToStringCode = GetDateTimeToString(parameters, typeSchema),
 
@@ -103,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 case TypeScriptDateTimeType.MomentJS:
                 case TypeScriptDateTimeType.OffsetMomentJS:
-                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                     {
                         return "moment.duration";
                     }
@@ -119,7 +123,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "";
 
                 case TypeScriptDateTimeType.Luxon:
-                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                     {
                         return "Duration.fromISO";
                     }
@@ -163,7 +167,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 case TypeScriptDateTimeType.MomentJS:
                 case TypeScriptDateTimeType.OffsetMomentJS:
-                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                     {
                         return "format('d.hh:mm:ss.SS', { trim: false })";
                     }
@@ -181,7 +185,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "toString()";
 
                 case TypeScriptDateTimeType.DayJS:
-                    if (typeSchema.Format == JsonFormatStrings.TimeSpan)
+                    if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                     {
                         return "format('d.hh:mm:ss.SSS')";
                     }
@@ -208,7 +212,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return false;
                 }
 
-                if (format == JsonFormatStrings.TimeSpan)
+                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return false;
                 }
@@ -227,7 +231,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
                 }
 
-                if (format == JsonFormatStrings.TimeSpan)
+                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return true;
                 }
@@ -244,7 +248,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return true;
                 }
 
-                if (format == JsonFormatStrings.TimeSpan)
+                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
                     return true;
                 }

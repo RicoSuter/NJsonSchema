@@ -1,81 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp5.0;net46;net452</TargetFrameworks>
+    <TargetFrameworks>net6.0;net462</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-  <PropertyGroup>
-      <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Yaml.Tests.xml</DocumentationFile>
-  </PropertyGroup>  
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="13.13.1" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="14.0.0-preview003" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0" PrivateAssets="all" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp2.0'" Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <Reference Condition="'$(TargetFramework)' == 'net452'" Include="System.ComponentModel.DataAnnotations">
-    </Reference>
-    <Reference Condition="'$(TargetFramework)' == 'net46'" Include="System.ComponentModel.DataAnnotations">
-    </Reference>
-    <PackageReference Include="NodaTime" Version="2.2.0" />
+    <PackageReference Include="NodaTime" Version="3.1.9" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
     <ProjectReference Include="..\NJsonSchema.Yaml\NJsonSchema.Yaml.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Content Include="References\YamlReferencesTest\collection.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\collection.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\json_schema_with_yaml_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
-    <Content Include="References\YamlReferencesTest\json_schema_with_json_reference.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\yaml_schema_with_json_reference.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="References\YamlReferencesTest\yaml_schema_with_yaml_reference.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="References\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="References\**\*.yaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="References\YamlReferencesTest\common-items\headers.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\parameters.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\responses.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\common-items\schemas.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\enums\TaskExecutionStatusEnum.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\ExecuteTaskResultModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleCollectionModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\models\LifeCycleModel.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\subdir_spec\yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="References\YamlReferencesTest\yaml_spec_with_yaml_schema_refs.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="References\YamlReferencesTest\models\" />
-  </ItemGroup>
+
 </Project>

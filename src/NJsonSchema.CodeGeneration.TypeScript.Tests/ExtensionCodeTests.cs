@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -96,7 +98,7 @@ var x = 10;";
         public async Task When_classes_have_extension_code_then_class_body_is_copied()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
@@ -129,7 +131,7 @@ export class UseHttpCookiesForApi {
 }";
 
             //// Act
-            var extensionCode = new TypeScriptExtensionCode(code, new string[0], new[] { "UseHttpCookiesForApi" });
+            var extensionCode = new TypeScriptExtensionCode(code, Array.Empty<string>(), new[] { "UseHttpCookiesForApi" });
 
             //// Assert
             Assert.Empty(extensionCode.ExtensionClasses);

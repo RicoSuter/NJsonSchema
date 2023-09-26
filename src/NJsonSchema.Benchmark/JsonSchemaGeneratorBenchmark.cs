@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Benchmark
 {
@@ -8,7 +9,7 @@ namespace NJsonSchema.Benchmark
         [Benchmark]
         public void GenerateFile()
         {
-            JsonSchema.FromType<SchemaGenerationBenchmarks.Container>();
+            NewtonsoftJsonSchemaGenerator.FromType<SchemaGenerationBenchmarks.Container>();
         }
     }
 }

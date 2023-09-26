@@ -144,5 +144,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).</summary>
         public bool GenerateNullableReferenceTypes { get; set; }
+
+        /// <summary>Generate C# 9.0 record types instead of record-like classes.</summary>
+        public bool GenerateNativeRecords { get; set; }
     }
 }

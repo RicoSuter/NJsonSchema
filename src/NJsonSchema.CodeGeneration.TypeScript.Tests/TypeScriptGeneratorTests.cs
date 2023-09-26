@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -129,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -140,11 +141,52 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains(@"/** EnumDesc. *", output);
         }
 
+        /// <summary>
+        /// This test asserts the fix for issue #1618
+        /// </summary>
+        [Fact]
+        public async Task When_enum_has_default_and_using_enumstyle_stringliteral_it_defaults_to_stringliteral()
+        {
+            //// Arrange
+            var jsonSchema = @"
+                {
+                    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                    ""openapi"": ""3.1.0"",
+                    ""title"": ""TShirt"",
+                    ""type"": ""object"",
+                    ""properties"": {
+                        ""color"": {
+                            ""type"": ""string"",
+                            ""default"": ""green"",
+                            ""enum"": [""red"", ""green"", ""blue"", ""black""]
+                        }
+                    }
+                }";
+
+            var schema = await JsonSchema.FromJsonAsync(jsonSchema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                EnumStyle = TypeScriptEnumStyle.StringLiteral,
+                TypeScriptVersion = 5m,
+            });
+
+            //// Act
+            var code = generator.GenerateFile("MyFile");
+
+            //// Assert
+            Assert.Contains("export type MyFileColor = \"red\" | \"green\" | \"blue\" | \"black\";", code);
+            Assert.Contains("this.color = _data[\"color\"] !== undefined ? _data[\"color\"] : \"green\";", code);
+            Assert.Contains("this.color = \"green\";", code);
+
+            // This is the old code gen that used the enum prior to the fix for #1618
+            Assert.DoesNotContain("Color.Green", code);
+        }
+
         [Fact]
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
@@ -159,7 +201,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var json = schema.ToJson();
 
@@ -176,7 +218,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -226,7 +268,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
         private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {

@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
             return visitor.DerivedSchemas;
         }
 
-        private class DerivedSchemaVisitor : JsonSchemaVisitorBase
+        private sealed class DerivedSchemaVisitor : JsonSchemaVisitorBase
         {
             private readonly JsonSchema _baseSchema;
 

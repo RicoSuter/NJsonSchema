@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace NJsonSchema
@@ -50,13 +51,8 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-#if !LEGACY
         public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject,
             IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#else
-        public static IDictionary<object, string> GetJsonPaths(object rootObject, 
-            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#endif
         {
             if (rootObject == null)
             {
@@ -79,8 +75,22 @@ namespace NJsonSchema
         private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects,
             string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
-            if (obj == null || obj is string || checkedObjects.Contains(obj))
+            if (obj == null)
             {
+                return false;
+            }
+
+            var type = obj.GetType();
+            if (type == typeof(string)
+#if !NETSTANDARD1_0
+                || type.IsPrimitive
+                || type.IsEnum
+#endif
+                || type == typeof(JValue)
+                || checkedObjects.Contains(obj)
+            )
+            {
+                // no need to inspect
                 return false;
             }
 
@@ -95,41 +105,55 @@ namespace NJsonSchema
 
             checkedObjects.Add(obj);
 
-            if (obj is IDictionary)
+            var pathAndSeparator = basePath + "/";
+            if (obj is IDictionary dictionary)
             {
-                foreach (var key in ((IDictionary)obj).Keys)
+                foreach (DictionaryEntry pair in dictionary)
                 {
-                    if (FindJsonPaths(((IDictionary)obj)[key], searchedObjects, basePath + "/" + key, checkedObjects, contractResolver))
+                    if (FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects, contractResolver))
                     {
                         return true;
                     }
                 }
             }
-            else if (obj is IEnumerable)
+            else if (obj is IList list)
             {
-                var i = 0;
-                foreach (var item in (IEnumerable)obj)
+                for (var i = 0; i < list.Count; ++i)
                 {
-                    if (FindJsonPaths(item, searchedObjects, basePath + "/" + i, checkedObjects, contractResolver))
+                    var item = list[i];
+                    if (FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
                     {
                         return true;
                     }
-
+                }
+            }
+            else if (obj is IEnumerable enumerable)
+            {
+                var i = 0;
+                foreach (var item in enumerable)
+                {
+                    if (FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
+                    {
+                        return true;
+                    }
                     i++;
                 }
             }
             else
             {
-                var type = obj.GetType();
-                var contract = contractResolver.ResolveContract(type) as JsonObjectContract;
-                if (contract != null)
+                if (contractResolver.ResolveContract(type) is JsonObjectContract contract)
                 {
-                    foreach (var jsonProperty in contract.Properties.Where(p => !p.Ignored))
+                    foreach (var jsonProperty in contract.Properties)
                     {
+                        if (jsonProperty.Ignored)
+                        {
+                            continue;
+                        }
+
                         var value = jsonProperty.ValueProvider.GetValue(obj);
                         if (value != null)
                         {
-                            if (FindJsonPaths(value, searchedObjects, basePath + "/" + jsonProperty.PropertyName, checkedObjects, contractResolver))
+                            if (FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonProperty.PropertyName, checkedObjects, contractResolver))
                             {
                                 return true;
                             }
