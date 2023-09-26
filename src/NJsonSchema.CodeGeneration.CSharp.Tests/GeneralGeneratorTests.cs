@@ -2117,7 +2117,7 @@ public static Person FromJson(string data)
         public async Task When_documentation_present_produces_valid_xml_documentation_syntax()
         {
             // Arrange
-            var schema = SystemTextJsonSchemaGenerator.FromType<DocumentationTest>();
+            var schema = JsonSchema.FromType<DocumentationTest>();
 
             // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
