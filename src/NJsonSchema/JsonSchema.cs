@@ -297,7 +297,7 @@ namespace NJsonSchema
         {
             get
             {
-                if (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple)
+                if (InheritedSchema == null && (ActualTypeSchema.IsDictionary || ActualTypeSchema.IsArray || ActualTypeSchema.IsTuple))
                 {
                     return ActualTypeSchema;
                 }
@@ -873,6 +873,14 @@ namespace NJsonSchema
             if (actualTypeSchema != this && actualTypeSchema.IsNullable(schemaType))
             {
                 return true;
+            }
+
+            if (ExtensionData != null && ExtensionData.TryGetValue("nullable", out var value))
+            {
+                if (bool.TryParse(value.ToString(), out var boolValue))
+                {
+                    return boolValue;
+                }
             }
 
             return false;
