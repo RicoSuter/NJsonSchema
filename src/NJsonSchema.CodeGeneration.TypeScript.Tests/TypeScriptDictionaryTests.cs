@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("extensions: { [key: string]: any; };", code);
+            Assert.Contains("extensions: { [key: string]: any; } | undefined;", code);
             Assert.DoesNotContain("extensions?: { [key: string]: Iany; } | null;", code);
             Assert.DoesNotContain("this.extensions[key] = item && !(<any>item).toJSON ? new any(item) : <any>item;", code);
         }
