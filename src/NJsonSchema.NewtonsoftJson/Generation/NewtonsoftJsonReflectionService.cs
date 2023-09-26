@@ -50,12 +50,8 @@ namespace NJsonSchema.Generation
         /// <inheritdocs />
         public override bool IsStringEnum(ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings)
         {
-            if (settings.SerializerSettings.Converters.OfType<StringEnumConverter>().Any())
-            {
-                return true;
-            }
-
-            return base.IsStringEnum(contextualType, settings);
+            var hasGlobalStringEnumConverter = settings.SerializerSettings.Converters.OfType<StringEnumConverter>().Any();
+            return hasGlobalStringEnumConverter || base.IsStringEnum(contextualType, settings);
         }
 
         /// <inheritdocs />

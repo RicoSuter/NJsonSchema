@@ -97,6 +97,13 @@ namespace NJsonSchema.Generation
         }
 
         /// <inheritdocs />
+        public override bool IsStringEnum(ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings)
+        {
+            var hasGlobalStringEnumConverter = settings.SerializerOptions.Converters.OfType<JsonStringEnumConverter>().Any();
+            return hasGlobalStringEnumConverter || base.IsStringEnum(contextualType, settings);
+        }
+
+        /// <inheritdocs />
         public override string ConvertEnumValue(object value, SystemTextJsonSchemaGeneratorSettings settings)
         {
             // TODO(performance): How to improve this one here?
