@@ -141,6 +141,47 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains(@"/** EnumDesc. *", output);
         }
 
+        /// <summary>
+        /// This test asserts the fix for issue #1618
+        /// </summary>
+        [Fact]
+        public async Task When_enum_has_default_and_using_enumstyle_stringliteral_it_defaults_to_stringliteral()
+        {
+            //// Arrange
+            var jsonSchema = @"
+                {
+                    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                    ""openapi"": ""3.1.0"",
+                    ""title"": ""TShirt"",
+                    ""type"": ""object"",
+                    ""properties"": {
+                        ""color"": {
+                            ""type"": ""string"",
+                            ""default"": ""green"",
+                            ""enum"": [""red"", ""green"", ""blue"", ""black""]
+                        }
+                    }
+                }";
+
+            var schema = await JsonSchema.FromJsonAsync(jsonSchema);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                EnumStyle = TypeScriptEnumStyle.StringLiteral,
+                TypeScriptVersion = 5m,
+            });
+
+            //// Act
+            var code = generator.GenerateFile("MyFile");
+
+            //// Assert
+            Assert.Contains("export type MyFileColor = \"red\" | \"green\" | \"blue\" | \"black\";", code);
+            Assert.Contains("this.color = _data[\"color\"] !== undefined ? _data[\"color\"] : \"green\";", code);
+            Assert.Contains("this.color = \"green\";", code);
+
+            // This is the old code gen that used the enum prior to the fix for #1618
+            Assert.DoesNotContain("Color.Green", code);
+        }
+
         [Fact]
         public async Task When_class_has_description_then_typescript_has_comment()
         {
