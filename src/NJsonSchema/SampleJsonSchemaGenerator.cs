@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace NJsonSchema.Generation
+namespace NJsonSchema
 {
     /// <summary>Generates a JSON Schema from sample JSON data.</summary>
     public class SampleJsonSchemaGenerator

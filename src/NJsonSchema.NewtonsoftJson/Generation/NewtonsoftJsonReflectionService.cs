@@ -15,8 +15,10 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;
 using System.Reflection;
+using NJsonSchema;
+using NJsonSchema.Generation;
 
-namespace NJsonSchema.Generation
+namespace NJsonSchema.NewtonsoftJson.Generation
 {
     /// <inheritdocs />
     public class NewtonsoftJsonReflectionService : ReflectionServiceBase<NewtonsoftJsonSchemaGeneratorSettings>
@@ -81,7 +83,7 @@ namespace NJsonSchema.Generation
                 .Concat(contextualType
                     .Fields
                     .Where(f => f.FieldInfo.DeclaringType == contextualType.Type &&
-                                (!f.FieldInfo.IsPrivate && 
+                                (!f.FieldInfo.IsPrivate &&
                                  !f.FieldInfo.IsStatic || f.FieldInfo.IsDefined(typeof(DataMemberAttribute)))));
 
             var contract = settings.ResolveContract(contextualType.Type);

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.References
 {
