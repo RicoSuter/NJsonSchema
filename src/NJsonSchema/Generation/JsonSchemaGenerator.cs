@@ -1164,7 +1164,7 @@ namespace NJsonSchema.Generation
                 propertySchema.Default = ConvertDefaultValue(property.AccessorType, defaultValue);
 
                 ApplyDataAnnotations(propertySchema, propertyTypeDescription);
-                ApplyPropertyExtensionDataAttributes(property, propertySchema);
+                ApplyPropertyExtensionDataAttributes(propertySchema, property);
             };
 
             var referencingProperty = GenerateWithReferenceAndNullability(
@@ -1201,7 +1201,7 @@ namespace NJsonSchema.Generation
         /// <returns></returns>
         public bool IsPropertyIgnoredBySettings(ContextualAccessorInfo accessorInfo)
         {
-            if (Settings.IgnoreObsoleteProperties && 
+            if (Settings.IgnoreObsoleteProperties &&
                 accessorInfo.GetContextAttribute<ObsoleteAttribute>() != null)
             {
                 return true;
@@ -1284,34 +1284,38 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void ApplyTypeExtensionDataAttributes<TSchemaType>(TSchemaType schema, ContextualType contextualType) where TSchemaType : JsonSchema, new()
+        private void ApplyTypeExtensionDataAttributes(JsonSchema schema, ContextualType contextualType)
         {
-            var extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes()
-                .Where(attribute => attribute is IJsonSchemaExtensionDataAttribute).ToArray();
+            var extensionAttributes = contextualType.OriginalType
+                .GetTypeInfo()
+                .GetCustomAttributes()
+                .OfType<IJsonSchemaExtensionDataAttribute>()
+                .ToArray();
 
-            if (extensionAttributes.Any())
-            {
-                var extensionData = new Dictionary<string, object>();
-
-                foreach (var attribute in extensionAttributes)
-                {
-                    var extensionAttribute = (IJsonSchemaExtensionDataAttribute)attribute;
-                    extensionData.Add(extensionAttribute.Key, extensionAttribute.Value);
-                }
-
-                schema.ExtensionData = extensionData;
-            }
+            ApplyTypeExtensionDataAttributes(schema, extensionAttributes);
         }
 
-        private void ApplyPropertyExtensionDataAttributes(ContextualAccessorInfo accessorInfo, JsonSchemaProperty propertySchema)
+        private void ApplyPropertyExtensionDataAttributes(JsonSchemaProperty propertySchema, ContextualAccessorInfo accessorInfo)
         {
-            var extensionDataAttributes = accessorInfo
+            var extensionAttributes = accessorInfo
                 .GetContextAttributes<IJsonSchemaExtensionDataAttribute>()
                 .ToArray();
 
-            if (extensionDataAttributes.Any())
+            ApplyTypeExtensionDataAttributes(propertySchema, extensionAttributes);
+        }
+
+        private static void ApplyTypeExtensionDataAttributes(JsonSchema schema, IJsonSchemaExtensionDataAttribute[] extensionAttributes)
+        {
+            if (extensionAttributes.Any())
             {
-                propertySchema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
+                var extensionData = new Dictionary<string, object>();
+                foreach (var kvp in extensionAttributes
+                    .SelectMany(attribute => attribute.ExtensionData))
+                {
+                    extensionData[kvp.Key] = kvp.Value;
+                }
+
+                schema.ExtensionData = extensionData;
             }
         }
     }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using NJsonSchema.Tests.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -123,7 +122,13 @@ namespace NJsonSchema.Tests.Serialization
             }
 
             public string Key { get; }
+
             public object Value { get; }
+
+            public IReadOnlyDictionary<string, object> ExtensionData => new Dictionary<string, object>
+            {
+                { Key, Value }
+            };
 
             public override bool IsValid(object value)
             {

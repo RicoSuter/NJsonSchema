@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace NJsonSchema.Annotations
 {
@@ -31,5 +32,11 @@ namespace NJsonSchema.Annotations
 
         /// <summary>Gets the value.</summary>
         public object Value { get; }
+
+        /// <inheritdocs />
+        public IReadOnlyDictionary<string, object> ExtensionData => new Dictionary<string, object>
+        {
+            { Key, Value }
+        };
     }
 }
