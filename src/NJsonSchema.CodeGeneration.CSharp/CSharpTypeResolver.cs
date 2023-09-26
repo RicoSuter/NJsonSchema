@@ -160,27 +160,27 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private string ResolveString(JsonSchema schema, bool isNullable, string typeNameHint)
         {
+            var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
+
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return isNullable && Settings.DateType?.ToLowerInvariant() != "string" ? Settings.DateType + "?" : Settings.DateType;
+                return isNullable && Settings.DateType?.ToLowerInvariant() != "string" ? Settings.DateType + "?" : Settings.DateType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.DateTime)
             {
-                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string" ? Settings.DateTimeType + "?" : Settings.DateTimeType;
+                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string" ? Settings.DateTimeType + "?" : Settings.DateTimeType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.Time)
             {
-                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType;
+                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType + nullableReferenceType;
             }
 
             if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
             {
-                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
+                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType + nullableReferenceType;
             }
-
-            var nullableReferenceType = Settings.GenerateNullableReferenceTypes && isNullable ? "?" : string.Empty;
 
             if (schema.Format == JsonFormatStrings.Uri)
             {
