@@ -242,8 +242,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("public string Required { get; set; }= default!;", code);
-            Assert.Contains("public string? Optional { get; set; }= default!;", code);
+            Assert.Contains("public string Required { get; set; } = default!;", code);
+            Assert.Contains("public string? Optional { get; set; } = default!;", code);
         }
     }
 }
