@@ -25,6 +25,7 @@ namespace NJsonSchema.Infrastructure
         private static readonly Type FileType;
         private static readonly Type DirectoryType;
         private static readonly Type PathType;
+        private static readonly Type DecompressionMethodsType;
         private static readonly Type HttpClientHandlerType;
         private static readonly Type HttpClientType;
 
@@ -33,6 +34,10 @@ namespace NJsonSchema.Infrastructure
             XPathExtensionsType = TryLoadType(
                 "System.Xml.XPath.Extensions, System.Xml.XPath.XDocument",
                 "System.Xml.XPath.Extensions, System.Xml.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+
+            DecompressionMethodsType = TryLoadType(
+                "System.Net.DecompressionMethods, System.Net.Primitives",
+                "System.Net.DecompressionMethods, System.Net.Primitives, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
 
             HttpClientHandlerType = TryLoadType(
                 "System.Net.Http.HttpClientHandler, System.Net.Http",
@@ -79,10 +84,32 @@ namespace NJsonSchema.Infrastructure
             {
                 handler.UseDefaultCredentials = true;
 
+                // enable all decompression methods
+                var calculatedAllValue = GenerateAllDecompressionMethodsEnumValue();
+                var allDecompressionMethodsValue = Enum.ToObject(DecompressionMethodsType, calculatedAllValue);
+                handler.AutomaticDecompression = (dynamic)allDecompressionMethodsValue;
+
                 var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
+        }
+
+        // see https://learn.microsoft.com/en-us/dotnet/api/system.net.decompressionmethods?view=net-7.0
+        private static int GenerateAllDecompressionMethodsEnumValue()
+        {
+            // calculate the set of all possible values (the set will depend on which version of the enum was loaded)
+            // NOTE: we can't use All or -1 since those weren't in the 4.0 version of the enum, but we
+            // still want to enable additional decompression methods like Brotli (and potentially
+            // additional ones in the future) if the loaded httpclient supports it.
+            // while the existing values would allow doing a Sum, we still bitwise or to be defensive about
+            // potential additions in the future of values like "GZipOrDeflate"
+            var calculatedAllValue = Enum.GetValues(DecompressionMethodsType)
+                .Cast<int>()
+                .Where(val => val > 0) // filter to only positive so we're not including All or None
+                .Aggregate(0, (accumulated, newValue) => accumulated | newValue);
+
+            return calculatedAllValue;
         }
 
         /// <summary>Gets the current working directory.</summary>
