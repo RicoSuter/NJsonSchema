@@ -156,7 +156,7 @@ namespace NJsonSchema.Generation
 
             if (schemaResolver.RootObject == schema)
             {
-                schema.Title = Settings.SchemaNameGenerator.Generate(typeDescription.ContextualType.OriginalType);
+                schema.Title = Settings.SchemaNameGenerator.Generate(typeDescription.ContextualType.Type);
             }
 
             if (typeDescription.Type.IsObject())
@@ -167,9 +167,9 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    if (schemaResolver.HasSchema(typeDescription.ContextualType.OriginalType, false))
+                    if (schemaResolver.HasSchema(typeDescription.ContextualType.Type, false))
                     {
-                        schema.Reference = schemaResolver.GetSchema(typeDescription.ContextualType.OriginalType, false);
+                        schema.Reference = schemaResolver.GetSchema(typeDescription.ContextualType.Type, false);
                     }
                     else if (schema.GetType() == typeof(JsonSchema))
                     {
