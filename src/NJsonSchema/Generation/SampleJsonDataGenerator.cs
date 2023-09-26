@@ -7,11 +7,12 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
+using NJsonSchema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NJsonSchema
+namespace NJsonSchema.Generation
 {
     /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
     public class SampleJsonDataGenerator
