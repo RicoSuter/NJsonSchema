@@ -10,6 +10,7 @@ using Namotion.Reflection;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -28,7 +29,7 @@ namespace NJsonSchema.Generation
                 .Concat(contextualType.Fields)
                 .Where(p => p.MemberInfo.DeclaringType == contextualType.Type))
             {
-                if (accessorInfo.MemberInfo is FieldInfo fieldInfo && 
+                if (accessorInfo.MemberInfo is FieldInfo fieldInfo &&
                     (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute))))
                 {
                     continue;
@@ -38,6 +39,12 @@ namespace NJsonSchema.Generation
                     (propertyInfo.GetMethod?.IsPrivate == true || propertyInfo.GetMethod?.IsStatic == true) &&
                     (propertyInfo.SetMethod?.IsPrivate == true || propertyInfo.SetMethod?.IsStatic == true) &&
                     !propertyInfo.IsDefined(typeof(DataMemberAttribute)))
+                {
+                    continue;
+                }
+
+                if (accessorInfo.Name == "EqualityContract" &&
+                    accessorInfo.ContextAttributes.OfType<CompilerGeneratedAttribute>().Any())
                 {
                     continue;
                 }
