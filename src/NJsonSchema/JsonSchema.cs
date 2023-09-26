@@ -875,6 +875,14 @@ namespace NJsonSchema
                 return true;
             }
 
+            if (ExtensionData != null && ExtensionData.TryGetValue("nullable", out var value))
+            {
+                if (bool.TryParse(value.ToString(), out var boolValue))
+                {
+                    return boolValue;
+                }
+            }
+
             return false;
         }
 

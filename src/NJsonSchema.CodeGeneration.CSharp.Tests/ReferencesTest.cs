@@ -47,6 +47,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.DoesNotContain("public enum C2", code);
         }
 
+        [Fact]
+        public async Task When_ref_is_file_and_it_contains_nullable_property_then_generated_property_is_also_nullable()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/F.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generatorSettings = new CSharpGeneratorSettings
+            {
+                GenerateNullableReferenceTypes = true
+            };
+            var generator = new CSharpGenerator(schema, generatorSettings);
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("public string? Name", code);
+        }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
