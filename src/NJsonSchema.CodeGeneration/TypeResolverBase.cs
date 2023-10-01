@@ -16,6 +16,7 @@ namespace NJsonSchema.CodeGeneration
     {
         private readonly CodeGeneratorSettingsBase _settings;
         internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = new();
+        private readonly HashSet<string> _reservedTypeNames = new();
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -55,9 +56,9 @@ namespace NJsonSchema.CodeGeneration
 
             if (!_generatedTypeNames.TryGetValue(schema, out var typeNames))
             {
-                var reservedTypeNames = new HashSet<string>(_generatedTypeNames.Values);
-                typeNames = _settings.TypeNameGenerator.Generate(schema, typeNameHint, reservedTypeNames);
+                typeNames = _settings.TypeNameGenerator.Generate(schema, typeNameHint, _reservedTypeNames);
                 _generatedTypeNames[schema] = typeNames;
+                _reservedTypeNames.Add(typeNames);
             }
 
             return typeNames;
@@ -87,7 +88,7 @@ namespace NJsonSchema.CodeGeneration
         public virtual JsonSchema RemoveNullability(JsonSchema schema)
         {
             // TODO: Method on JsonSchema4?
-            return schema.OneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
+            return schema.OneOf.FirstOrDefault(static o => !o.IsNullable(SchemaType.JsonSchema)) ?? schema;
         }
 
         /// <summary>Gets the actual schema (i.e. when not referencing a type schema or it is inlined)
@@ -141,10 +142,9 @@ namespace NJsonSchema.CodeGeneration
 
             if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
             {
-                var valueTypes = schema.PatternProperties
+                var valueTypes = new HashSet<string>(schema.PatternProperties
                     .Select(p => Resolve(p.Value, p.Value.IsNullable(_settings.SchemaType), null))
-                    .Distinct()
-                    .ToList();
+                );
 
                 if (valueTypes.Count == 1)
                 {
