@@ -82,7 +82,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.NotNull(schema.Definitions["SomeModelCollectionResponse"].Item);
         }
 
-#if NET5_0
+#if !NETFRAMEWORK
 
         public class ClassWithAsyncEnumerable
         {

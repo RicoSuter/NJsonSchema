@@ -106,13 +106,8 @@ namespace NJsonSchema
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public static Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-#if !NETSTANDARD1_0
             using var stream = File.OpenRead(filePath);
             return FromJsonAsync(stream, filePath, referenceResolverFactory, cancellationToken);
-#else
-            var json = DynamicApis.FileReadAllText(filePath);
-            return FromJsonAsync(json, filePath, referenceResolverFactory, cancellationToken);
-#endif
         }
 
         /// <summary>Loads a JSON Schema from a given URL (only available in .NET 4.x).</summary>
