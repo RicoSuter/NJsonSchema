@@ -82,10 +82,8 @@ namespace NJsonSchema
 
             var type = obj.GetType();
             if (type == typeof(string)
-#if !NETSTANDARD1_0
                 || type.IsPrimitive
                 || type.IsEnum
-#endif
                 || type == typeof(JValue)
                 || checkedObjects.Contains(obj)
             )
