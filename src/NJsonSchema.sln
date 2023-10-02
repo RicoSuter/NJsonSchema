@@ -32,7 +32,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Build", "00 Build", "{863B2D88-A0BD-4466-8583-AAD0B8D3F182}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		..\global.json = ..\global.json
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -242,22 +241,6 @@ Global
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x64.Build.0 = Release|Any CPU
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x86.ActiveCfg = Release|Any CPU
 		{990EF464-C967-4E08-8C3D-0568A47B6D2A}.Release|x86.Build.0 = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|ARM.Build.0 = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|x64.Build.0 = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Debug|x86.Build.0 = Debug|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|ARM.ActiveCfg = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|ARM.Build.0 = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|x64.ActiveCfg = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|x64.Build.0 = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|x86.ActiveCfg = Release|Any CPU
-		{8E4E5A64-B5B7-4718-A92F-CB6B08512264}.Release|x86.Build.0 = Release|Any CPU
 		{A9C2A9CD-44F6-4A21-9D72-00CF5BE0A36F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9C2A9CD-44F6-4A21-9D72-00CF5BE0A36F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9C2A9CD-44F6-4A21-9D72-00CF5BE0A36F}.Debug|ARM.ActiveCfg = Debug|Any CPU
