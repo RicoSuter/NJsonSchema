@@ -196,7 +196,10 @@ namespace NJsonSchema
             }
             else
             {
-                schema.Item = itemSchemas.First();
+                schema.Item = new JsonSchema
+                {
+                    AnyOf = itemSchemas
+                };
             }
         }
 

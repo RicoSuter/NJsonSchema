@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using Xunit;
 
 namespace NJsonSchema.Tests.Schema
@@ -424,6 +425,21 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.NotNull(schema);
             Assert.Contains("The identity type.", json);
+        }
+
+        [Fact]
+        public void When_sample_json_has_mixed_type_array_anyOf_should_be_used_for_schema_items()
+        {
+            //https://github.com/RicoSuter/NJsonSchema/issues/1593
+
+            //// Arrange
+            var schema = JsonSchema.FromSampleJson("[1, { \"a\": \"b\"}, \"value\"]");
+
+            //// Act
+            var json = schema.ToJson();
+
+            //// Assert
+            Assert.Contains("anyOf", json);
         }
     }
 }
