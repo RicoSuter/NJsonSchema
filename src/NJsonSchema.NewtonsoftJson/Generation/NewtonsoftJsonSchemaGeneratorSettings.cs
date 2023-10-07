@@ -29,6 +29,9 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             SerializerSettings = new JsonSerializerSettings();
         }
 
+        /// <summary> Returns whether to ignore a <see cref="JsonProperty"/>. By default this is simply the "Ignored" property of JsonProperty</summary>
+        public Func<JsonProperty, bool> IgnoreProperty = prop => prop.Ignored;
+
         /// <summary>Gets or sets the Newtonsoft JSON serializer settings.</summary>
         [JsonIgnore]
         public JsonSerializerSettings SerializerSettings

@@ -158,7 +158,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
-            if (jsonProperty.Ignored == false && schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo) == false)
+            if (!settings.IgnoreProperty(jsonProperty) && !schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo))
             {
                 var propertyName = GetPropertyName(jsonProperty, accessorInfo, settings);
                 var propertyAlreadyExists = parentSchema.Properties.ContainsKey(propertyName);
