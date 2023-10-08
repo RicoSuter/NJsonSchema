@@ -15,16 +15,14 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;
 using System.Reflection;
-using NJsonSchema;
 using NJsonSchema.Generation;
-using System.Collections.Generic;
 
 namespace NJsonSchema.NewtonsoftJson.Generation
 {
-    /// <inheritdocs />
+    /// <inheritdoc />
     public class NewtonsoftJsonReflectionService : ReflectionServiceBase<NewtonsoftJsonSchemaGeneratorSettings>
     {
-        /// <inheritdocs />
+        /// <inheritdoc />
         protected override JsonTypeDescription GetDescription(ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings,
             Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
@@ -38,7 +36,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             return base.GetDescription(contextualType, settings, originalType, isNullable, defaultReferenceTypeNullHandling);
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
             var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();
@@ -50,28 +48,27 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             return base.IsNullable(contextualType, defaultReferenceTypeNullHandling);
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override bool IsStringEnum(ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.SerializerSettings?.Converters.OfType<StringEnumConverter>().Any() == true;
             return hasGlobalStringEnumConverter || base.IsStringEnum(contextualType, settings);
         }
 
-        /// <inheritdocs />
-        public override string ConvertEnumValue(object value, NewtonsoftJsonSchemaGeneratorSettings settings)
+
+        /// <inheritdoc />
+        public override Func<object, string?> GetEnumValueConverter(NewtonsoftJsonSchemaGeneratorSettings settings)
         {
-            var converters = settings.SerializerSettings?.Converters.ToList() ?? new List<JsonConverter>();
+            var converters = settings.SerializerSettings.Converters.ToList();
             if (!converters.OfType<StringEnumConverter>().Any())
             {
                 converters.Add(new StringEnumConverter());
             }
 
-            var json = JsonConvert.SerializeObject(value, Formatting.None, converters.ToArray());
-            var enumString = JsonConvert.DeserializeObject<string>(json)!;
-            return enumString;
+            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, converters.ToArray()));
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             var contextualAccessors = contextualType
@@ -150,7 +147,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             }
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
         {
             return GetPropertyName(null, accessorInfo, (NewtonsoftJsonSchemaGeneratorSettings)settings);
@@ -197,7 +194,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             }
         }
 
-        private string GetPropertyName(JsonProperty? jsonProperty, ContextualAccessorInfo accessorInfo, NewtonsoftJsonSchemaGeneratorSettings settings)
+        private static string GetPropertyName(JsonProperty? jsonProperty, ContextualAccessorInfo accessorInfo, NewtonsoftJsonSchemaGeneratorSettings settings)
         {
             if (jsonProperty?.PropertyName != null)
             {
@@ -208,8 +205,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             {
                 var propertyName = accessorInfo.GetName();
 
-                var contractResolver = settings.ActualContractResolver as DefaultContractResolver;
-                return contractResolver != null
+                return settings.ActualContractResolver is DefaultContractResolver contractResolver
                     ? contractResolver.GetResolvedPropertyName(propertyName)
                     : propertyName;
             }

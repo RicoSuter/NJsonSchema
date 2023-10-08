@@ -15,7 +15,7 @@ using NJsonSchema.Generation;
 
 namespace NJsonSchema.NewtonsoftJson.Generation
 {
-    /// <inheritdocs />
+    /// <inheritdoc />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
         private Dictionary<string, JsonContract?> _cachedContracts = new Dictionary<string, JsonContract?>();

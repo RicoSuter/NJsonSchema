@@ -15,12 +15,11 @@ namespace NJsonSchema.Generation
     public interface IReflectionService
     {
         /// <summary>
-        /// Converts an enum value to a JSON string.
+        /// Get converter that converts an enum value to a JSON string.
         /// </summary>
-        /// <param name="value"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        string ConvertEnumValue(object value, JsonSchemaGeneratorSettings settings);
+        Func<object, string?> GetEnumValueConverter(JsonSchemaGeneratorSettings settings);
 
         /// <summary>
         /// Gets the property name for the given accessor info.
