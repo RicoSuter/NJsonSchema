@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
   },", data);
         }
 
-#if !NET462
+#if !NETFRAMEWORK
 
         public class Apple2 : Fruit2
         {

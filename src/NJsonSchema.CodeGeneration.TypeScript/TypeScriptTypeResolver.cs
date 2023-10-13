@@ -314,15 +314,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     // is TypeUnion
                     if (itemTypes.Count > 1)
                     {
-                        itemType = string.Format("({0})", itemType);
+                        itemType = $"({itemType})";
                     }
 
-                    return string.Format("{0}[]", itemType);
+                    return $"{itemType}[]";
                 }
                 else
                 {
                     var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
-                    return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
+                    return $"{GetNullableItemType(schema, itemType)}[]"; // TODO: Make typeNameHint singular if possible
                 }
             }
 
@@ -332,7 +332,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     .Select(s => GetNullableItemType(s, Resolve(s, false, null)))
                     .ToArray();
 
-                return string.Format("[" + string.Join(", ", tupleTypes) + "]");
+                return $"[{string.Join(", ", tupleTypes)}]";
             }
 
             return "any[]";
@@ -342,7 +342,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (Settings.SupportsStrictNullChecks && schema.Item?.IsNullable(Settings.SchemaType) == true)
             {
-                return string.Format("({0} | {1})", itemType, Settings.NullValue.ToString().ToLowerInvariant());
+                return $"({itemType} | {Settings.NullValue.ToString().ToLowerInvariant()})";
             }
 
             return itemType;

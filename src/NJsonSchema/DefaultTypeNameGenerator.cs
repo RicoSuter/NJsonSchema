@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,19 +17,24 @@ namespace NJsonSchema
     /// <summary>Converts the last part of the full type name to upper case.</summary>
     public class DefaultTypeNameGenerator : ITypeNameGenerator
     {
+        private static readonly char[] TypeNameHintCleanupChars = { '[', ']', '<', '>', ',', ' ' };
+
+        private readonly Dictionary<string, string> _typeNameMappings = new();
+        private string[] _reservedTypeNames = { "object" };
+
         // TODO: Expose as options to UI and cmd line?
 
         /// <summary>Gets or sets the reserved names.</summary>
-        public IEnumerable<string> ReservedTypeNames { get; set; } = new List<string> { "object" };
+        public IEnumerable<string> ReservedTypeNames
+        {
+            get => _reservedTypeNames;
+            set => _reservedTypeNames = value.ToArray();
+        }
 
         /// <summary>Gets the name mappings.</summary>
-        public IDictionary<string, string> TypeNameMappings { get; } = new Dictionary<string, string>();
+        public IDictionary<string, string> TypeNameMappings => _typeNameMappings;
 
-        /// <summary>Generates the type name for the given schema respecting the reserved type names.</summary>
-        /// <param name="schema">The schema.</param>
-        /// <param name="typeNameHint">The type name hint.</param>
-        /// <param name="reservedTypeNames">The reserved type names.</param>
-        /// <returns>The type name.</returns>
+        /// <inheritdoc />
         public virtual string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
         {
             if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
@@ -36,16 +42,24 @@ namespace NJsonSchema
                 typeNameHint = schema.DocumentPath!.Replace("\\", "/").Split('/').Last();
             }
 
-            typeNameHint = (typeNameHint ?? "")
-                .Replace("[", " Of ")
-                .Replace("]", " ")
-                .Replace("<", " Of ")
-                .Replace(">", " ")
-                .Replace(",", " And ")
-                .Replace("  ", " ");
+            typeNameHint ??= "";
 
-            var parts = typeNameHint.Split(' ');
-            typeNameHint = string.Join(string.Empty, parts.Select(p => Generate(schema, p)));
+            // check with one pass before doing iterations
+            var requiresCleanup = !string.IsNullOrEmpty(typeNameHint) && typeNameHint.IndexOfAny(TypeNameHintCleanupChars) != -1;
+
+            if (requiresCleanup)
+            {
+                typeNameHint = typeNameHint
+                    .Replace("[", " Of ")
+                    .Replace("]", " ")
+                    .Replace("<", " Of ")
+                    .Replace(">", " ")
+                    .Replace(",", " And ")
+                    .Replace("  ", " ");
+
+                var parts = typeNameHint.Split(' ');
+                typeNameHint = string.Join(string.Empty, parts.Select(p => Generate(schema, p)));
+            }
 
             var typeName = Generate(schema, typeNameHint);
             if (string.IsNullOrEmpty(typeName) || reservedTypeNames.Contains(typeName))
@@ -67,12 +81,8 @@ namespace NJsonSchema
                 typeNameHint = schema.Title;
             }
 
-            var lastSegment = typeNameHint;
-            var lastDotIndex = typeNameHint?.LastIndexOf('.') ?? -1;
-            if (lastDotIndex > -1)
-            {
-                lastSegment = typeNameHint?.Substring(lastDotIndex + 1);
-            }
+            var lastSegment = GetLastSegment(typeNameHint);
+
             return ConversionUtilities.ConvertToUpperCamelCase(lastSegment ?? "Anonymous", true);
         }
 
@@ -80,14 +90,16 @@ namespace NJsonSchema
         {
             if (!string.IsNullOrEmpty(typeNameHint))
             {
-                if (TypeNameMappings.ContainsKey(typeNameHint))
+                if (_typeNameMappings.TryGetValue(typeNameHint, out var mapping))
                 {
-                    typeNameHint = TypeNameMappings[typeNameHint];
+                    typeNameHint = mapping;
                 }
 
-                typeNameHint = typeNameHint.Split('.').Last();
+                typeNameHint = GetLastSegment(typeNameHint)!;
 
-                if (!reservedTypeNames.Contains(typeNameHint) && !ReservedTypeNames.Contains(typeNameHint))
+                if (typeNameHint != null &&
+                    !reservedTypeNames.Contains(typeNameHint) && 
+                    Array.IndexOf(_reservedTypeNames, typeNameHint) == -1)
                 {
                     return typeNameHint;
                 }
@@ -104,6 +116,21 @@ namespace NJsonSchema
             return GenerateAnonymousTypeName("Anonymous", reservedTypeNames);
         }
 
+        private static string? GetLastSegment(string? input)
+        {
+            var lastSegment = input;
+            if (input != null)
+            {
+                var index = input.LastIndexOf('.');
+                if (index != -1)
+                {
+                    lastSegment = input.Substring(index + 1);
+                }
+            }
+
+            return lastSegment;
+        }
+
         /// <summary>
         /// Replaces all characters that are not normals letters, numbers or underscore, with an underscore.
         /// Will prepend an underscore if the first characters is a number.
@@ -113,7 +140,7 @@ namespace NJsonSchema
         private static string RemoveIllegalCharacters(string typeName)
         {
             // TODO: Find a way to support unicode characters up to 3.0
-           
+
             // first check if all are valid and we skip altogether
             var invalid = false;
             for (var i = 0; i < typeName.Length; i++)
@@ -136,7 +163,7 @@ namespace NJsonSchema
             {
                 return typeName;
             }
-            
+
             return DoRemoveIllegalCharacters(typeName);
         }
 
@@ -171,10 +198,10 @@ namespace NJsonSchema
             var legalTypeNameString = regexMoreThanOneUnderscore.Replace(legalTypeName.ToString(), "_");
             return legalTypeNameString.TrimEnd('_');
         }
-        
+
         private static bool IsEnglishLetterOrUnderScore(char c)
         {
-            return (c>='A' && c<='Z') || (c>='a' && c<='z') || c == '_';
+            return c is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or '_';
         }
     }
 }

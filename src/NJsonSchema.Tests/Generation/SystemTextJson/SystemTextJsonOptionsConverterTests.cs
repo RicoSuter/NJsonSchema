@@ -1,11 +1,11 @@
-﻿#if !net462
+﻿#if !NETFRAMEWORK
 
-using System.Linq;
-using Newtonsoft.Json.Converters;
-using NJsonSchema.Generation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
+using NJsonSchema.Generation;
+
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation.SystemTextJson

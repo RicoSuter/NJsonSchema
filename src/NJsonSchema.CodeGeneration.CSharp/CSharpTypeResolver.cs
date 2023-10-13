@@ -270,7 +270,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var itemTypeNameHint = (schema as JsonSchemaProperty)?.Name;
                 var itemType = Resolve(schema.Item, schema.Item.IsNullable(Settings.SchemaType), itemTypeNameHint);
-                return string.Format(Settings.ArrayType + "<{0}>", itemType);
+                return $"{Settings.ArrayType}<{itemType}>";
             }
 
             if (schema.Items != null && schema.Items.Count > 0)
@@ -279,7 +279,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Select(i => Resolve(i, i.IsNullable(Settings.SchemaType), null))
                     .ToArray();
 
-                return string.Format("System.Tuple<" + string.Join(", ", tupleTypes) + ">");
+                return $"System.Tuple<{string.Join(", ", tupleTypes)}>";
             }
 
             return Settings.ArrayType + "<object>";
@@ -289,7 +289,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var valueType = ResolveDictionaryValueType(schema, "object");
             var keyType = ResolveDictionaryKeyType(schema, "string");
-            return string.Format(Settings.DictionaryType + "<{0}, {1}>", keyType, valueType);
+            return $"{Settings.DictionaryType}<{keyType}, {valueType}>";
         }
     }
 }

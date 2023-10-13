@@ -283,7 +283,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Contains("this._discriminator = \"Dog\"", code);
         }
 
-#if NETCORE
+#if !NETFRAMEWORK
         [Fact]
 #else
         [Fact(Skip = "Dynamic compilation doesn't work for NET 4.6.1")]
