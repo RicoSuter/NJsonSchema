@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using Namotion.Reflection;
@@ -63,7 +64,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by JSON Schema).</summary>
         [JsonExtensionData]
-        public IDictionary<string, object> ExtensionData { get; set; }
+        public IDictionary<string, object?>? ExtensionData { get; set; }
 
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext ctx)
@@ -73,11 +74,11 @@ namespace NJsonSchema
 
         /// <summary>Gets the discriminator property (Swagger only).</summary>
         [JsonIgnore]
-        public string ActualDiscriminator => ActualTypeSchema.Discriminator;
+        public string? ActualDiscriminator => ActualTypeSchema.Discriminator;
 
         /// <summary>Gets or sets the discriminator property (Swagger only, should not be used in internal tooling).</summary>
         [JsonIgnore]
-        public string Discriminator
+        public string? Discriminator
         {
             get => DiscriminatorObject?.PropertyName;
             set
@@ -98,15 +99,15 @@ namespace NJsonSchema
 
         /// <summary>Gets the actual resolved discriminator of this schema (no inheritance, OpenApi only).</summary>
         [JsonIgnore]
-        public OpenApiDiscriminator ActualDiscriminatorObject => DiscriminatorObject ?? ActualTypeSchema.DiscriminatorObject;
+        public OpenApiDiscriminator? ActualDiscriminatorObject => DiscriminatorObject ?? ActualTypeSchema.DiscriminatorObject;
 
         /// <summary>Gets or sets the discriminator of this schema (OpenApi only).</summary>
         [JsonIgnore]
-        public OpenApiDiscriminator DiscriminatorObject { get; set; }
+        public OpenApiDiscriminator? DiscriminatorObject { get; set; }
 
         /// <summary>Gets or sets the discriminator.</summary>
         [JsonProperty("discriminator", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 5)]
-        internal object DiscriminatorRaw
+        internal object? DiscriminatorRaw
         {
             get
             {
@@ -138,7 +139,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object ExclusiveMaximumRaw
+        internal object? ExclusiveMaximumRaw
         {
             get { return ExclusiveMaximum ?? (IsExclusiveMaximum ? (object)true : null); }
             set
@@ -160,7 +161,7 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets a value indicating whether the minimum value is excluded. </summary>
         [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object ExclusiveMinimumRaw
+        internal object? ExclusiveMinimumRaw
         {
             get { return ExclusiveMinimum ?? (IsExclusiveMinimum ? (object)true : null); }
             set
@@ -181,7 +182,7 @@ namespace NJsonSchema
         }
 
         [JsonProperty("additionalItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object AdditionalItemsRaw
+        internal object? AdditionalItemsRaw
         {
             get
             {
@@ -215,7 +216,7 @@ namespace NJsonSchema
         }
 
         [JsonProperty("additionalProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object AdditionalPropertiesRaw
+        internal object? AdditionalPropertiesRaw
         {
             get
             {
@@ -269,7 +270,7 @@ namespace NJsonSchema
         }
 
         [JsonProperty("items", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal object ItemsRaw
+        internal object? ItemsRaw
         {
             get
             {
@@ -298,14 +299,14 @@ namespace NJsonSchema
             }
         }
 
-        private Lazy<object> _typeRaw;
+        private Lazy<object?>? _typeRaw;
 
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
-        internal object TypeRaw
+        internal object? TypeRaw
         {
             get
             {
-                if (_typeRaw == null)
+                if (_typeRaw is null)
                 {
                     ResetTypeRaw();
                 }
@@ -327,9 +328,10 @@ namespace NJsonSchema
             }
         }
 
+        [MemberNotNull(nameof(_typeRaw))]
         private void ResetTypeRaw()
         {
-            _typeRaw = new Lazy<object>(() =>
+            _typeRaw = new Lazy<object?>(() =>
             {
                 var flags = _jsonObjectTypeValues
                     .Where(v => Type.HasFlag(v))
@@ -350,26 +352,26 @@ namespace NJsonSchema
         }
 
         [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<string> RequiredPropertiesRaw
+        internal ICollection<string>? RequiredPropertiesRaw
         {
             get { return RequiredProperties != null && RequiredProperties.Count > 0 ? RequiredProperties : null; }
-            set { RequiredProperties = value; }
+            set { RequiredProperties = value ?? new List<string>(); }
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchemaProperty> PropertiesRaw
+        internal IDictionary<string, JsonSchemaProperty>? PropertiesRaw
         {
             get => _properties != null && _properties.Count > 0 ? Properties : null;
             set
             {
                 Properties = value != null ?
-                    new ObservableDictionary<string, JsonSchemaProperty>(value) :
+                    new ObservableDictionary<string, JsonSchemaProperty>(value!) :
                     new ObservableDictionary<string, JsonSchemaProperty>();
             }
         }
 
         [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchemaProperty> PatternPropertiesRaw
+        internal IDictionary<string, JsonSchemaProperty>? PatternPropertiesRaw
         {
             get
             {
@@ -379,55 +381,55 @@ namespace NJsonSchema
             set
             {
                 PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonSchemaProperty>(value) :
+                    new ObservableDictionary<string, JsonSchemaProperty>(value!) :
                     new ObservableDictionary<string, JsonSchemaProperty>();
             }
         }
 
         [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal IDictionary<string, JsonSchema> DefinitionsRaw
+        internal IDictionary<string, JsonSchema>? DefinitionsRaw
         {
             get { return Definitions != null && Definitions.Count > 0 ? Definitions : null; }
-            set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value) : new ObservableDictionary<string, JsonSchema>(); }
+            set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value!) : new ObservableDictionary<string, JsonSchema>(); }
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal Collection<string> EnumerationNamesRaw
+        internal Collection<string>? EnumerationNamesRaw
         {
             get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
             set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
         }
 
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<object> EnumerationRaw
+        internal ICollection<object?>? EnumerationRaw
         {
             get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value != null ? new ObservableCollection<object>(value) : new ObservableCollection<object>(); }
+            set { Enumeration = value != null ? new ObservableCollection<object?>(value) : new ObservableCollection<object?>(); }
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema> AllOfRaw
+        internal ICollection<JsonSchema>? AllOfRaw
         {
             get { return _allOf != null && _allOf.Count > 0 ? AllOf : null; }
             set { AllOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
         }
 
         [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema> AnyOfRaw
+        internal ICollection<JsonSchema>? AnyOfRaw
         {
             get { return _anyOf != null && _anyOf.Count > 0 ? AnyOf : null; }
             set { AnyOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
         }
 
         [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal ICollection<JsonSchema> OneOfRaw
+        internal ICollection<JsonSchema>? OneOfRaw
         {
             get { return _oneOf != null && _oneOf.Count > 0 ? OneOf : null; }
             set { OneOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
         }
 
-        private void RegisterProperties(ObservableDictionary<string, JsonSchemaProperty> oldCollection, ObservableDictionary<string, JsonSchemaProperty> newCollection)
+        private void RegisterProperties(ObservableDictionary<string, JsonSchemaProperty>? oldCollection, ObservableDictionary<string, JsonSchemaProperty>? newCollection)
         {
             if (oldCollection != null)
             {
@@ -441,7 +443,7 @@ namespace NJsonSchema
             }
         }
 
-        private void RegisterSchemaDictionary<T>(ObservableDictionary<string, T> oldCollection, ObservableDictionary<string, T> newCollection)
+        private void RegisterSchemaDictionary<T>(ObservableDictionary<string, T>? oldCollection, ObservableDictionary<string, T>? newCollection)
             where T : JsonSchema
         {
             if (oldCollection != null)
@@ -456,7 +458,7 @@ namespace NJsonSchema
             }
         }
 
-        private void RegisterSchemaCollection(ObservableCollection<JsonSchema> oldCollection, ObservableCollection<JsonSchema> newCollection)
+        private void RegisterSchemaCollection(ObservableCollection<JsonSchema>? oldCollection, ObservableCollection<JsonSchema>? newCollection)
         {
             if (oldCollection != null)
             {
@@ -470,13 +472,13 @@ namespace NJsonSchema
             }
         }
 
-        private void InitializeSchemaCollection(object sender, NotifyCollectionChangedEventArgs e)
+        private void InitializeSchemaCollection(object? sender, NotifyCollectionChangedEventArgs? args)
         {
             if (sender is ObservableDictionary<string, JsonSchemaProperty> properties)
             {
                 foreach (var property in properties)
                 {
-                    property.Value.Name = property.Key;
+                    property.Value!.Name = property.Key;
                     property.Value.Parent = this;
                 }
             }

@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration
             return newResults;
         }
 
-        private static string GetActualBaseName(string baseTypeName)
+        private static string? GetActualBaseName(string? baseTypeName)
         {
             if (baseTypeName == null)
             {

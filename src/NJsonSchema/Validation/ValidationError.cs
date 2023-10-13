@@ -20,7 +20,7 @@ namespace NJsonSchema.Validation
         /// <param name="propertyPath">The property path. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-        public ValidationError(ValidationErrorKind errorKind, string propertyName, string propertyPath, JToken token, JsonSchema schema)
+        public ValidationError(ValidationErrorKind errorKind, string? propertyName, string? propertyPath, JToken? token, JsonSchema schema)
         {
             Kind = errorKind;
             Property = propertyName;
@@ -30,7 +30,7 @@ namespace NJsonSchema.Validation
             HasLineInfo = lineInfo != null && lineInfo.HasLineInfo();
             if (HasLineInfo)
             {
-                LineNumber = lineInfo.LineNumber;
+                LineNumber = lineInfo!.LineNumber;
                 LinePosition = lineInfo.LinePosition;
             }
             else
@@ -46,10 +46,10 @@ namespace NJsonSchema.Validation
         public ValidationErrorKind Kind { get; private set; }
 
         /// <summary>Gets the property name. </summary>
-        public string Property { get; private set; }
+        public string? Property { get; private set; }
 
         /// <summary>Gets the property path. </summary>
-        public string Path { get; private set; }
+        public string? Path { get; private set; }
 
         /// <summary>Indicates whether or not the error contains line information.</summary>
         public bool HasLineInfo { get; private set; }

@@ -98,9 +98,9 @@ namespace NJsonSchema.Tests.Conversion
             var property = schema.Properties[propertyName];
 
             Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, property.Type);
-            Assert.Equal(JsonObjectType.Object, property.ActualSchema.Item.ActualSchema.Type);
+            Assert.Equal(JsonObjectType.Object, property.ActualSchema.Item?.ActualSchema.Type);
             Assert.Contains(schema.Definitions, d => d.Key == "MySubtype");
-            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item.ActualSchema.Properties["Id"].Type);
+            Assert.Equal(JsonObjectType.String | JsonObjectType.Null, property.ActualSchema.Item?.ActualSchema.Properties["Id"].Type);
         }
     }
 }

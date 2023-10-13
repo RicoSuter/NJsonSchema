@@ -20,7 +20,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema ActualSchema => GetActualSchema(null);
+        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>());
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
@@ -93,7 +93,7 @@ namespace NJsonSchema
                 throw new InvalidOperationException(message);
             }
 
-            if (checkedSchemas?.Contains(this) == true)
+            if (checkedSchemas.Contains(this) == true)
             {
                 ThrowInvalidOperationException("Cyclic references detected.");
             }
@@ -105,13 +105,13 @@ namespace NJsonSchema
 
             if (HasReference)
             {
-                return GetActualSchemaReferences(checkedSchemas);
+                return GetActualSchemaReferences(checkedSchemas) ?? this;
             }
 
             return this;
         }
 
-        private JsonSchema GetActualSchemaReferences(List<JsonSchema> checkedSchemas)
+        private JsonSchema? GetActualSchemaReferences(List<JsonSchema> checkedSchemas)
         {
             checkedSchemas ??= new List<JsonSchema>();
             checkedSchemas.Add(this);
@@ -131,7 +131,7 @@ namespace NJsonSchema
                 return _anyOf[0].GetActualSchema(checkedSchemas);
             }
 
-            return Reference.GetActualSchema(checkedSchemas);
+            return Reference?.GetActualSchema(checkedSchemas);
         }
 
         #region Implementation of IJsonReference
@@ -142,11 +142,11 @@ namespace NJsonSchema
 
         /// <summary>Gets the parent object of this object. </summary>
         [JsonIgnore]
-        object IJsonReference.PossibleRoot => Parent;
+        object? IJsonReference.PossibleRoot => Parent;
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]
-        public override JsonSchema Reference
+        public override JsonSchema? Reference
         {
             get { return base.Reference; }
             set

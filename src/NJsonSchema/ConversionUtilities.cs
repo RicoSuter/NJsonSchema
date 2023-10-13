@@ -167,9 +167,9 @@ namespace NJsonSchema
         /// <summary>Trims white spaces from the text.</summary>
         /// <param name="text">The text.</param>
         /// <returns>The updated text.</returns>
-        public static string TrimWhiteSpaces(string text)
+        public static string TrimWhiteSpaces(string? text)
         {
-            return text?.Trim(_whiteSpaceChars);
+            return text?.Trim(_whiteSpaceChars) ?? string.Empty;
         }
 
         private static readonly char[] _lineBreakTrimChars = { '\n', '\t', ' ' };
@@ -177,14 +177,14 @@ namespace NJsonSchema
         /// <summary>Removes the line breaks from the text.</summary>
         /// <param name="text">The text.</param>
         /// <returns>The updated text.</returns>
-        public static string RemoveLineBreaks(string text)
+        public static string RemoveLineBreaks(string? text)
         {
             return text?.Replace("\r", "")
                 .Replace("\n", " \n")
                 .Replace("\n ", "\n")
                 .Replace("  \n", " \n")
                 .Replace("\n", "")
-                .Trim(_lineBreakTrimChars);
+                .Trim(_lineBreakTrimChars) ?? string.Empty;
         }
 
         /// <summary>Singularizes the given noun in plural.</summary>

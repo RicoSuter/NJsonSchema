@@ -10,7 +10,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="code">The code.</param>
         /// <param name="extendedClasses">The extended classes.</param>
         /// <param name="baseClasses">The base classes.</param>
-        public TypeScriptExtensionCode(string code, string[] extendedClasses, string[] baseClasses = null)
+        public TypeScriptExtensionCode(string code, string[] extendedClasses, string[]? baseClasses = null)
         {
             code = "\n" + code
                 .Replace("\r", string.Empty)

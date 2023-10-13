@@ -26,7 +26,7 @@ namespace NJsonSchema.Generation
             var jsonSchemaAttribute = cachedType.GetInheritedAttribute<JsonSchemaAttribute>();
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
             {
-                return jsonSchemaAttribute.Name;
+                return jsonSchemaAttribute!.Name!;
             }
 
             var nType = type.ToCachedType();

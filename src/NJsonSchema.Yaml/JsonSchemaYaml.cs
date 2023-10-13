@@ -34,7 +34,7 @@ namespace NJsonSchema.Yaml
         /// <param name="data">The JSON string.</param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromYamlAsync(string data, string documentPath)
+        public static async Task<JsonSchema> FromYamlAsync(string data, string? documentPath)
         {
             var factory = JsonAndYamlReferenceResolver.CreateJsonAndYamlReferenceResolverFactory(new DefaultTypeNameGenerator());
             return await FromYamlAsync(data, documentPath, factory).ConfigureAwait(false);
@@ -45,7 +45,7 @@ namespace NJsonSchema.Yaml
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
         /// <returns>The JSON Schema.</returns>
-        public static async Task<JsonSchema> FromYamlAsync(string data, string documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
+        public static async Task<JsonSchema> FromYamlAsync(string data, string? documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
             var deserializer = new DeserializerBuilder().Build();
             var yamlObject = deserializer.Deserialize(new StringReader(data));
@@ -61,9 +61,9 @@ namespace NJsonSchema.Yaml
         /// <returns>The YAML string.</returns>
         public static string ToYaml(this JsonSchema document)
         {
-            var json = document.ToJson();
+            var json = document.ToJson()!;
             var expConverter = new ExpandoObjectConverter();
-            dynamic deserializedObject = JsonConvert.DeserializeObject<ExpandoObject>(json, expConverter);
+            dynamic? deserializedObject = JsonConvert.DeserializeObject<ExpandoObject>(json, expConverter);
 
             var serializer = new Serializer();
             return serializer.Serialize(deserializedObject);
@@ -84,7 +84,7 @@ namespace NJsonSchema.Yaml
         /// <returns>The <see cref="JsonSchema" />.</returns>
         public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var data = DynamicApis.FileReadAllText(filePath);
+            var data = File.ReadAllText(filePath);
             return await FromYamlAsync(data, filePath, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 

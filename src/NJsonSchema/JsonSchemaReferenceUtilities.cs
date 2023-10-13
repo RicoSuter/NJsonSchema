@@ -93,7 +93,7 @@ namespace NJsonSchema
                 await base.VisitAsync(obj, cancellationToken).ConfigureAwait(false);
             }
 
-            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint, CancellationToken cancellationToken)
+            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string? typeNameHint, CancellationToken cancellationToken)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (reference.ReferencePath != null && reference.Reference == null)
@@ -137,7 +137,7 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint)
+            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint)
             {
                 if (reference.Reference != null)
                 {
@@ -149,8 +149,13 @@ namespace NJsonSchema
                     {
                         var externalReference = reference.Reference;
                         var externalReferenceRoot = externalReference.FindParentDocument();
-                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(
-                            externalReferenceRoot, externalReference, _contractResolver).TrimEnd('#');
+                        if (externalReferenceRoot != null)
+                        {
+                            var jsonPath = JsonPathUtilities.GetJsonPath(
+                                externalReferenceRoot, externalReference, _contractResolver)?.TrimEnd('#');
+
+                            reference.ReferencePath = externalReference.DocumentPath + jsonPath;
+                        }
                     }
                 }
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)

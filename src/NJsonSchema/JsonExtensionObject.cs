@@ -20,7 +20,7 @@ namespace NJsonSchema
     {
         /// <summary>Gets or sets the extension data (i.e. additional properties which are not directly defined by the JSON object).</summary>
         [JsonExtensionData]
-        public IDictionary<string, object> ExtensionData { get; set; }
+        public IDictionary<string, object?>? ExtensionData { get; set; }
     }
 
     /// <summary>Deserializes all JSON Schemas in the extension data property.</summary>
@@ -30,11 +30,11 @@ namespace NJsonSchema
 
         public override bool CanWrite => false;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.Null)
             {
-                var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType);
+                var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType)!;
                 serializer.Populate(reader, obj);
                 DeserializeExtensionDataSchemas(obj, serializer);
                 return obj;
@@ -51,7 +51,7 @@ namespace NJsonSchema
             return true;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
@@ -70,7 +70,7 @@ namespace NJsonSchema
             }
         }
 
-        private object TryDeserializeValueSchemas(object value, JsonSerializer serializer)
+        private object? TryDeserializeValueSchemas(object? value, JsonSerializer serializer)
         {
             if (value is JObject obj)
             {
@@ -87,7 +87,7 @@ namespace NJsonSchema
                     }
                 }
 
-                var dictionary = new Dictionary<string, object>();
+                var dictionary = new Dictionary<string, object?>();
                 foreach (var property in obj.Properties())
                 {
                     dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);

@@ -19,7 +19,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="settings">The settings.</param>
         /// <param name="additionalJsonConverters">The additional JSON converters.</param>
         /// <returns>The code.</returns>
-        public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
+        public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings, IEnumerable<string>? additionalJsonConverters)
         {
             var jsonConverters = GetJsonConverters(settings, additionalJsonConverters);
             var hasJsonConverters = jsonConverters.Any();
@@ -31,14 +31,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="settings">The settings.</param>
         /// <param name="additionalJsonConverters">The additional JSON converters.</param>
         /// <returns>The code.</returns>
-        public static string GenerateJsonConvertersArrayCode(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
+        public static string GenerateJsonConvertersArrayCode(CSharpGeneratorSettings settings, IEnumerable<string>? additionalJsonConverters)
         {
             var jsonConverters = GetJsonConverters(settings, additionalJsonConverters);
 
             return GenerateConverters(jsonConverters, settings.JsonLibrary);
         }
 
-        private static List<string> GetJsonConverters(CSharpGeneratorSettings settings, IEnumerable<string> additionalJsonConverters)
+        private static List<string> GetJsonConverters(CSharpGeneratorSettings settings, IEnumerable<string>? additionalJsonConverters)
         {
             return (settings.JsonConverters ?? Array.Empty<string>()).Concat(additionalJsonConverters ?? Array.Empty<string>()).ToList();
         }

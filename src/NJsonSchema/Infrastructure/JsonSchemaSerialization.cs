@@ -27,7 +27,7 @@ namespace NJsonSchema.Infrastructure
         private static bool _isWriting;
 
         [ThreadStatic]
-        private static JsonSerializerSettings _currentSerializerSettings;
+        private static JsonSerializerSettings? _currentSerializerSettings;
 
         /// <summary>Gets or sets the current schema type.</summary>
         public static SchemaType CurrentSchemaType
@@ -37,7 +37,7 @@ namespace NJsonSchema.Infrastructure
         }
 
         /// <summary>Gets the current serializer settings.</summary>
-        public static JsonSerializerSettings CurrentSerializerSettings
+        public static JsonSerializerSettings? CurrentSerializerSettings
         {
             get => _currentSerializerSettings;
             private set => _currentSerializerSettings = value;
@@ -85,8 +85,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
         [Obsolete("Use FromJsonAsync with cancellation token instead.")]
-        public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
+        public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string? documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
+            where T : notnull
         {
             return FromJsonAsync(json, schemaType, documentPath, referenceResolverFactory, contractResolver, CancellationToken.None);
         }
@@ -99,8 +100,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The deserialized schema.</returns>
-        public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string documentPath,
-        Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+        public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string? documentPath,
+            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+            where T : notnull
         {
             var loader = () => FromJson<T>(json, contractResolver);
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
@@ -114,8 +116,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The deserialized schema.</returns>
-        public static Task<T> FromJsonAsync<T>(Stream stream, SchemaType schemaType, string documentPath,
-        Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+        public static Task<T> FromJsonAsync<T>(Stream stream, SchemaType schemaType, string? documentPath,
+            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+            where T : notnull
         {
             var loader = () => FromJson<T>(stream, contractResolver);
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
@@ -124,10 +127,11 @@ namespace NJsonSchema.Infrastructure
         private static async Task<T> FromJsonWithLoaderAsync<T>(
             Func<T> loader,
             SchemaType schemaType,
-            string documentPath,
+            string? documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory,
             IContractResolver contractResolver,
             CancellationToken cancellationToken)
+            where T : notnull
         {
             cancellationToken.ThrowIfCancellationRequested();
             CurrentSchemaType = schemaType;
@@ -146,7 +150,7 @@ namespace NJsonSchema.Infrastructure
                 {
                     if (!string.IsNullOrEmpty(documentPath))
                     {
-                        referenceResolver.AddDocumentReference(documentPath, referenceSchema);
+                        referenceResolver.AddDocumentReference(documentPath!, referenceSchema);
                     }
                 }
 
@@ -164,7 +168,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="json">The JSON data.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
-        public static T FromJson<T>(string json, IContractResolver contractResolver)
+        public static T? FromJson<T>(string json, IContractResolver contractResolver)
         {
             IsWriting = true;
             UpdateCurrentSerializerSettings<T>(contractResolver);
@@ -183,7 +187,7 @@ namespace NJsonSchema.Infrastructure
         /// <param name="stream">The JSON data stream.</param>
         /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The deserialized schema.</returns>
-        public static T FromJson<T>(Stream stream, IContractResolver contractResolver)
+        public static T? FromJson<T>(Stream stream, IContractResolver contractResolver)
         {
             IsWriting = true;
             UpdateCurrentSerializerSettings<T>(contractResolver);
@@ -194,7 +198,6 @@ namespace NJsonSchema.Infrastructure
                 using var jsonReader = new JsonTextReader(reader);
 
                 var serializer = JsonSerializer.Create(CurrentSerializerSettings);
-
                 return serializer.Deserialize<T>(jsonReader);
             }
             finally

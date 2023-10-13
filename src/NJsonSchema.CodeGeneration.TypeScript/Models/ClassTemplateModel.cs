@@ -50,7 +50,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets the name for the discriminator check.</summary>
         public string DiscriminatorName => HasBaseDiscriminator ?
-            (_schema.ResponsibleDiscriminatorObject.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
+            (_schema.ResponsibleDiscriminatorObject!.Mapping.FirstOrDefault(m => m.Value.ActualTypeSchema == _schema.ActualTypeSchema).Key ?? _discriminatorName) :
             _discriminatorName;
 
         /// <summary>Gets a value indicating whether the class has a discriminator property.</summary>
@@ -60,7 +60,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasBaseDiscriminator => _schema.ResponsibleDiscriminatorObject != null;
 
         /// <summary>Gets the class discriminator property name (may be defined in a inherited class).</summary>
-        public string BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
+        public string? BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
         public bool HasDescription => !(_schema is JsonSchemaProperty) &&
@@ -95,7 +95,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string InterfaceInheritance => HasInheritance ? " extends I" + BaseClass : string.Empty;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema, true, string.Empty) : null;
+        public string? BaseClass => HasInheritance ? _resolver.Resolve(InheritedSchema!, true, string.Empty) : null;
 
         /// <summary>Gets or sets a value indicating whether a clone() method should be generated in the DTO classes.</summary>
         public bool GenerateCloneMethod => _settings.GenerateCloneMethod;
@@ -155,6 +155,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool GenerateTypeCheckFunctions => _settings.GenerateTypeCheckFunctions;
 
         /// <summary>Gets the inherited schema.</summary>
-        private JsonSchema InheritedSchema => _schema.InheritedSchema?.ActualSchema;
+        private JsonSchema? InheritedSchema => _schema.InheritedSchema?.ActualSchema;
     }
 }

@@ -110,7 +110,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string PropertySetterAccessModifier { get; set; }
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
-        public string[] JsonConverters { get; set; }
+        public string[]? JsonConverters { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).</summary>
         public bool GenerateImmutableArrayProperties { get; set; }
@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool HandleReferences { get; set; }
 
         /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).</summary>
-        public string JsonSerializerSettingsTransformationMethod { get; set; }
+        public string? JsonSerializerSettingsTransformationMethod { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: false).</summary>
         public bool GenerateJsonMethods { get; set; }

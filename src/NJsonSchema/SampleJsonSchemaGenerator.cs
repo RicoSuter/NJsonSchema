@@ -27,7 +27,7 @@ namespace NJsonSchema
             var token = JsonConvert.DeserializeObject<JToken>(json, new JsonSerializerSettings
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat
-            });
+            })!;
 
             var schema = new JsonSchema();
             Generate(token, schema, schema, "Anonymous");
@@ -47,7 +47,7 @@ namespace NJsonSchema
                 DateFormatHandling = DateFormatHandling.IsoDateFormat
             });
 
-            var token = serializer.Deserialize<JToken>(jsonReader);
+            var token = serializer.Deserialize<JToken>(jsonReader)!;
 
             var schema = new JsonSchema();
             Generate(token, schema, schema, "Anonymous");
@@ -58,7 +58,7 @@ namespace NJsonSchema
         {
             if (schema != rootSchema && token.Type == JTokenType.Object)
             {
-                JsonSchema referencedSchema = null;
+                JsonSchema? referencedSchema = null;
                 if (token is JObject obj)
                 {
                     var properties = obj.Properties();
@@ -145,17 +145,17 @@ namespace NJsonSchema
                     break;
             }
 
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
             {
                 schema.Format = JsonFormatStrings.Date;
             }
 
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
             {
                 schema.Format = JsonFormatStrings.DateTime;
             }
 
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>(), "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
             {
                 schema.Format = JsonFormatStrings.Duration;
             }

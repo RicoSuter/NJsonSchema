@@ -23,7 +23,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <summary>Gets the default discriminiator name.</summary>
         public static string DefaultDiscriminatorName { get; } = "discriminator";
 
-        private readonly Type _baseType;
+        private readonly Type? _baseType;
         private readonly string _discriminator;
         private readonly bool _readTypeProperty;
 
@@ -81,15 +81,22 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             try
             {
                 _isWriting = true;
 
-                var jObject = JObject.FromObject(value, serializer);
-                jObject[_discriminator] = JToken.FromObject(GetDiscriminatorValue(value.GetType()));
-                writer.WriteToken(jObject.CreateReader());
+                if (value is not null)
+                {
+                    var jObject = JObject.FromObject(value, serializer);
+                    jObject[_discriminator] = JToken.FromObject(GetDiscriminatorValue(value.GetType()));
+                    writer.WriteToken(jObject.CreateReader());
+                }
+                else
+                {
+                    writer.WriteNull();
+                }
             }
             finally
             {
@@ -155,7 +162,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="existingValue">The existing value of object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
         /// <returns>The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var jObject = serializer.Deserialize<JObject>(reader);
             if (jObject == null)
@@ -202,30 +209,33 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="objectType">The object (base) type.</param>
         /// <param name="discriminatorValue">The discriminator value.</param>
         /// <returns></returns>
-        protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
+        protected virtual Type GetDiscriminatorType(JObject jObject, Type objectType, string? discriminatorValue)
         {
-            var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
-            if (jsonInheritanceAttributeSubtype != null)
+            if (discriminatorValue is not null)
             {
-                return jsonInheritanceAttributeSubtype;
-            }
+                var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
+                if (jsonInheritanceAttributeSubtype != null)
+                {
+                    return jsonInheritanceAttributeSubtype;
+                }
 
-            if (objectType.Name == discriminatorValue)
-            {
-                return objectType;
-            }
+                if (objectType.Name == discriminatorValue)
+                {
+                    return objectType;
+                }
 
-            var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminatorValue);
-            if (knownTypeAttributesSubtype != null)
-            {
-                return knownTypeAttributesSubtype;
-            }
+                var knownTypeAttributesSubtype = GetSubtypeFromKnownTypeAttributes(objectType, discriminatorValue);
+                if (knownTypeAttributesSubtype != null)
+                {
+                    return knownTypeAttributesSubtype;
+                }
 
-            var typeName = objectType.Namespace + "." + discriminatorValue;
-            var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
-            if (subtype != null)
-            {
-                return subtype;
+                var typeName = objectType.Namespace + "." + discriminatorValue;
+                var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+                if (subtype != null)
+                {
+                    return subtype;
+                }
             }
 
             if (_readTypeProperty)
@@ -240,7 +250,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
-        private Type GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
+        private Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
         {
             var type = objectType;
             do
@@ -276,7 +286,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return null;
         }
 
-        private static Type GetObjectSubtype(Type baseType, string discriminatorName)
+        private static Type? GetObjectSubtype(Type baseType, string discriminatorName)
         {
             var jsonInheritanceAttributes = baseType
                 .GetTypeInfo()
@@ -286,7 +296,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
         }
 
-        private static string GetSubtypeDiscriminator(Type objectType)
+        private static string? GetSubtypeDiscriminator(Type objectType)
         {
             var jsonInheritanceAttributes = objectType
                 .GetTypeInfo()

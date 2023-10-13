@@ -32,14 +32,14 @@ namespace NJsonSchema.Infrastructure
         /// <param name="jsonPropertyNames">One or more JSON properties to ignore.</param>
         public void IgnoreProperty(Type type, params string[] jsonPropertyNames)
         {
-            if (!_ignores.ContainsKey(type.FullName))
+            if (!_ignores.ContainsKey(type.FullName!))
             {
-                _ignores[type.FullName] = new HashSet<string>();
+                _ignores[type.FullName!] = new HashSet<string>();
             }
 
             foreach (var prop in jsonPropertyNames)
             {
-                _ignores[type.FullName].Add(prop);
+                _ignores[type.FullName!].Add(prop);
             }
         }
 
@@ -49,12 +49,12 @@ namespace NJsonSchema.Infrastructure
         /// <param name="newJsonPropertyName">The new JSON property name.</param>
         public void RenameProperty(Type type, string propertyName, string newJsonPropertyName)
         {
-            if (!_renames.ContainsKey(type.FullName))
+            if (!_renames.ContainsKey(type.FullName!))
             {
-                _renames[type.FullName] = new Dictionary<string, string>();
+                _renames[type.FullName!] = new Dictionary<string, string>();
             }
 
-            _renames[type.FullName][propertyName] = newJsonPropertyName;
+            _renames[type.FullName!][propertyName] = newJsonPropertyName;
         }
 
         /// <summary>Creates a JsonProperty for the given System.Reflection.MemberInfo.</summary>
@@ -65,7 +65,9 @@ namespace NJsonSchema.Infrastructure
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-            if (IsIgnored(property.DeclaringType, property.PropertyName))
+            if (property.DeclaringType != null && 
+                property.PropertyName != null && 
+                IsIgnored(property.DeclaringType, property.PropertyName))
             {
                 property.Ignored = true;
 
@@ -73,7 +75,9 @@ namespace NJsonSchema.Infrastructure
                 property.ShouldDeserialize = i => false;
             }
 
-            if (IsRenamed(property.DeclaringType, property.PropertyName, out var newJsonPropertyName))
+            if (property.DeclaringType != null &&
+                property.PropertyName != null &&
+                IsRenamed(property.DeclaringType, property.PropertyName, out var newJsonPropertyName))
             {
                 property.PropertyName = newJsonPropertyName;
             }
@@ -83,17 +87,17 @@ namespace NJsonSchema.Infrastructure
 
         private bool IsIgnored(Type type, string jsonPropertyName)
         {
-            if (!_ignores.ContainsKey(type.FullName))
+            if (!_ignores.ContainsKey(type.FullName!))
             {
                 return false;
             }
 
-            return _ignores[type.FullName].Contains(jsonPropertyName);
+            return _ignores[type.FullName!].Contains(jsonPropertyName);
         }
 
-        private bool IsRenamed(Type type, string jsonPropertyName, out string newJsonPropertyName)
+        private bool IsRenamed(Type type, string jsonPropertyName, out string? newJsonPropertyName)
         {
-            if (!_renames.TryGetValue(type.FullName, out var renames) || !renames.TryGetValue(jsonPropertyName, out newJsonPropertyName))
+            if (!_renames.TryGetValue(type.FullName!, out var renames) || !renames.TryGetValue(jsonPropertyName, out newJsonPropertyName))
             {
                 newJsonPropertyName = null;
                 return false;

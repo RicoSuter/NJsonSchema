@@ -127,7 +127,7 @@ namespace NJsonSchema.Generation
             }
 
             var json = JsonSerializer.Serialize(value, value.GetType(), serializerOptions);
-            return JsonSerializer.Deserialize<string>(json);
+            return JsonSerializer.Deserialize<string>(json)!;
         }
 
         /// <inheritdocs />
@@ -138,12 +138,12 @@ namespace NJsonSchema.Generation
 
         private string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
         {
-            dynamic jsonPropertyNameAttribute = accessorInfo.ContextAttributes
+            dynamic? jsonPropertyNameAttribute = accessorInfo.ContextAttributes
                 .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
 
-            if (jsonPropertyNameAttribute != null && !string.IsNullOrEmpty(jsonPropertyNameAttribute.Name))
+            if (!string.IsNullOrEmpty(jsonPropertyNameAttribute?.Name))
             {
-                return jsonPropertyNameAttribute.Name;
+                return jsonPropertyNameAttribute!.Name;
             }
 
             if (settings.SerializerOptions.PropertyNamingPolicy != null)

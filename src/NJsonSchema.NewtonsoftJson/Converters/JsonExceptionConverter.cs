@@ -46,7 +46,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             var exception = value as Exception;
             if (exception != null)
@@ -65,13 +65,16 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                 };
 
-                foreach (var property in GetExceptionProperties(value.GetType()))
+                if (value is not null)
                 {
-                    var propertyValue = property.Key.GetValue(exception);
-                    if (propertyValue != null)
+                    foreach (var property in GetExceptionProperties(value.GetType()))
                     {
-                        jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
-                            JToken.FromObject(propertyValue, serializer)));
+                        var propertyValue = property.Key.GetValue(exception);
+                        if (propertyValue != null)
+                        {
+                            jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
+                                JToken.FromObject(propertyValue, serializer)));
+                        }
                     }
                 }
 
@@ -95,7 +98,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="existingValue">The existing value of object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
         /// <returns>The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var jObject = serializer.Deserialize<JObject>(reader);
             if (jObject == null)
@@ -123,7 +126,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 resolver.IgnoreSerializableInterface = true;
             }
 
-            JToken token;
+            JToken? token;
             if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
             {
                 var discriminator = token.Value<string>();
@@ -150,29 +153,32 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             }
 
             var value = jObject.ToObject(objectType, newSerializer);
-            foreach (var property in GetExceptionProperties(value.GetType()))
+            if (value is not null)
             {
-                var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(property.Value));
-                var propertyValue = (object)jValue?.ToObject(property.Key.PropertyType);
-                if (property.Key.SetMethod != null)
+                foreach (var property in GetExceptionProperties(value.GetType()))
                 {
-                    property.Key.SetValue(value, propertyValue);
-                }
-                else
-                {
-                    var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
-
-                    field = GetField(objectType, "m_" + fieldNameSuffix);
-                    if (field != null)
+                    var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(property.Value));
+                    var propertyValue = (object?)jValue?.ToObject(property.Key.PropertyType);
+                    if (property.Key.SetMethod != null)
                     {
-                        field.SetValue(value, propertyValue);
+                        property.Key.SetValue(value, propertyValue);
                     }
                     else
                     {
-                        field = GetField(objectType, "_" + fieldNameSuffix);
+                        var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
+
+                        field = GetField(objectType, "m_" + fieldNameSuffix);
                         if (field != null)
                         {
                             field.SetValue(value, propertyValue);
+                        }
+                        else
+                        {
+                            field = GetField(objectType, "_" + fieldNameSuffix);
+                            if (field != null)
+                            {
+                                field.SetValue(value, propertyValue);
+                            }
                         }
                     }
                 }
@@ -186,7 +192,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return value;
         }
 
-        private FieldInfo GetField(Type type, string fieldName)
+        private FieldInfo? GetField(Type type, string fieldName)
         {
             var typeInfo = type.GetTypeInfo();
             var field = typeInfo.GetDeclaredField(fieldName);
@@ -206,7 +212,8 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 var propertyName = attribute != null ? attribute.PropertyName : property.Name;
 
-                if (!new[] { "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult" }.Contains(propertyName))
+                if (propertyName is not null &&
+                    !new[] { "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult" }.Contains(propertyName))
                 {
                     result[property] = propertyName;
                 }

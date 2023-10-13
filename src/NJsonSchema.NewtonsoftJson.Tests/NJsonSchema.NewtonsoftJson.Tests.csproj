@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>net6.0;net462</TargetFrameworks>
         <IsPackable>false</IsPackable>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>

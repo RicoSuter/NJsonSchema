@@ -19,9 +19,8 @@ namespace NJsonSchema.Generation
         /// <summary>
         /// 
         /// </summary>
-        public SystemTextJsonSchemaGeneratorSettings()
+        public SystemTextJsonSchemaGeneratorSettings() : base(new SystemTextJsonReflectionService())
         {
-            ReflectionService = new SystemTextJsonReflectionService();
         }
 
         /// <summary>Gets or sets the System.Text.Json serializer options.</summary>

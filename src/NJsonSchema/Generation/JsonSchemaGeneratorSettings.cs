@@ -22,8 +22,10 @@ namespace NJsonSchema.Generation
     public abstract class JsonSchemaGeneratorSettings : IXmlDocsSettings
     {
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
-        public JsonSchemaGeneratorSettings()
+        public JsonSchemaGeneratorSettings(IReflectionService reflectionService)
         {
+            ReflectionService = reflectionService;
+
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.Null;
             DefaultDictionaryValueReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
 

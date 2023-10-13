@@ -212,13 +212,13 @@ namespace NJsonSchema.Generation
         public TSchemaType GenerateWithReference<TSchemaType>(
             ContextualType contextualType,
             JsonSchemaResolver schemaResolver,
-            Action<TSchemaType, JsonSchema> transformation = null)
+            Action<TSchemaType, JsonSchema>? transformation = null)
             where TSchemaType : JsonSchema, new()
         {
             return GenerateWithReferenceAndNullability(contextualType, false, schemaResolver, transformation);
         }
 
-        /// <summary>Generetes a schema directly or referenced for the requested schema type;
+        /// <summary>Generates a schema directly or referenced for the requested schema type;
         /// also adds nullability if required by looking at the type's <see cref="JsonTypeDescription" />.</summary>
         /// <typeparam name="TSchemaType">The resulted schema type which may reference the actual schema.</typeparam>
         /// <param name="contextualType">The type of the schema to generate.</param>
@@ -227,7 +227,7 @@ namespace NJsonSchema.Generation
         /// <returns>The requested schema object.</returns>
         public TSchemaType GenerateWithReferenceAndNullability<TSchemaType>(
             ContextualType contextualType, JsonSchemaResolver schemaResolver,
-            Action<TSchemaType, JsonSchema> transformation = null)
+            Action<TSchemaType, JsonSchema>? transformation = null)
             where TSchemaType : JsonSchema, new()
         {
             var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
@@ -243,7 +243,7 @@ namespace NJsonSchema.Generation
         /// <returns>The requested schema object.</returns>
         public virtual TSchemaType GenerateWithReferenceAndNullability<TSchemaType>(
             ContextualType contextualType, bool isNullable, JsonSchemaResolver schemaResolver,
-            Action<TSchemaType, JsonSchema> transformation = null)
+            Action<TSchemaType, JsonSchema>? transformation = null)
             where TSchemaType : JsonSchema, new()
         {
             var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
@@ -306,7 +306,7 @@ namespace NJsonSchema.Generation
 
             // See https://github.com/RicoSuter/NJsonSchema/issues/531
             var useDirectReference = Settings.AllowReferencesWithProperties ||
-                !JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema)).Properties().Any(); // TODO: Improve performance
+                JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema))?.Properties()?.Any() == false; // TODO: Improve performance
 
             if (useDirectReference && referencingSchema._oneOf.Count == 0)
             {
@@ -337,7 +337,7 @@ namespace NJsonSchema.Generation
         {
             var contextualType = typeDescription.ContextualType;
 
-            dynamic displayAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+            dynamic? displayAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
             if (displayAttribute != null)
             {
                 // GetName returns null if the Name property on the attribute is not specified.
@@ -348,7 +348,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            dynamic defaultValueAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
+            dynamic? defaultValueAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DefaultValueAttribute");
             if (defaultValueAttribute != null)
             {
                 if (typeDescription.IsEnum &&
@@ -362,11 +362,16 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            dynamic regexAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
+            dynamic? regexAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
             if (regexAttribute != null)
             {
                 if (typeDescription.IsDictionary)
                 {
+                    if (schema.AdditionalPropertiesSchema == null)
+                    {
+                        schema.AdditionalPropertiesSchema = new JsonSchema();
+                    }
+
                     schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
                 }
                 else
@@ -387,33 +392,33 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            dynamic minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MinLengthAttribute");
-            if (minLengthAttribute != null && minLengthAttribute.Length != null)
+            dynamic? minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MinLengthAttribute");
+            if (minLengthAttribute?.Length != null)
             {
                 if (typeDescription.Type == JsonObjectType.String)
                 {
-                    schema.MinLength = minLengthAttribute.Length;
+                    schema.MinLength = minLengthAttribute?.Length;
                 }
                 else if (typeDescription.Type == JsonObjectType.Array)
                 {
-                    schema.MinItems = minLengthAttribute.Length;
+                    schema.MinItems = minLengthAttribute?.Length;
                 }
             }
 
-            dynamic maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
-            if (maxLengthAttribute != null && maxLengthAttribute.Length != null)
+            dynamic? maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+            if (maxLengthAttribute?.Length != null)
             {
                 if (typeDescription.Type == JsonObjectType.String)
                 {
-                    schema.MaxLength = maxLengthAttribute.Length;
+                    schema.MaxLength = maxLengthAttribute?.Length;
                 }
                 else if (typeDescription.Type == JsonObjectType.Array)
                 {
-                    schema.MaxItems = maxLengthAttribute.Length;
+                    schema.MaxItems = maxLengthAttribute?.Length;
                 }
             }
 
-            dynamic stringLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.StringLengthAttribute");
+            dynamic? stringLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.StringLengthAttribute");
             if (stringLengthAttribute != null)
             {
                 if (typeDescription.Type == JsonObjectType.String)
@@ -423,7 +428,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            dynamic dataTypeAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DataTypeAttribute");
+            dynamic? dataTypeAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DataTypeAttribute");
             if (dataTypeAttribute != null)
             {
                 var dataType = dataTypeAttribute.DataType.ToString();
@@ -438,14 +443,14 @@ namespace NJsonSchema.Generation
         /// <param name="type">The value type.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The converted default value.</returns>
-        public virtual object ConvertDefaultValue(ContextualType type, object defaultValue)
+        public virtual object? ConvertDefaultValue(ContextualType type, object? defaultValue)
         {
             if (defaultValue != null && defaultValue.GetType().GetTypeInfo().IsEnum)
             {
                 var hasStringEnumConverter = Settings.ReflectionService.IsStringEnum(type, Settings);
                 if (hasStringEnumConverter)
                 {
-                    return defaultValue.ToString();
+                    return defaultValue?.ToString();
                 }
                 else
                 {
@@ -461,7 +466,7 @@ namespace NJsonSchema.Generation
         /// <summary>Generates the example from the type's xml docs.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The JToken or null.</returns>
-        public virtual object GenerateExample(ContextualType type)
+        public virtual object? GenerateExample(ContextualType type)
         {
             if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
@@ -481,7 +486,7 @@ namespace NJsonSchema.Generation
         /// <summary>Generates the example from the accesor's xml docs.</summary>
         /// <param name="accessorInfo">The accessor info.</param>
         /// <returns>The JToken or null.</returns>
-        public virtual object GenerateExample(ContextualAccessorInfo accessorInfo)
+        public virtual object? GenerateExample(ContextualAccessorInfo accessorInfo)
         {
             if (Settings.GenerateExamples && Settings.UseXmlDocumentation)
             {
@@ -498,7 +503,7 @@ namespace NJsonSchema.Generation
             return null;
         }
 
-        private object GenerateExample(string xmlDocs)
+        private object? GenerateExample(string xmlDocs)
         {
             try
             {
@@ -542,7 +547,7 @@ namespace NJsonSchema.Generation
             schema.Description = type.ToCachedType().GetDescription(Settings);
             schema.Example = GenerateExample(type.ToContextualType());
 
-            dynamic obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            dynamic? obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
             if (obsoleteAttribute != null)
             {
                 schema.IsDeprecated = true;
@@ -566,7 +571,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets the properties of the given type or null to take all properties.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The property names or null for all.</returns>
-        public virtual string[] GetTypeProperties(Type type)
+        public virtual string[]? GetTypeProperties(Type type)
         {
             if (type == typeof(Exception))
             {
@@ -590,7 +595,7 @@ namespace NJsonSchema.Generation
             typeDescription.ApplyType(schema);
 
             var jsonSchemaAttribute = contextualType.GetInheritedAttribute<JsonSchemaAttribute>();
-            var itemType = jsonSchemaAttribute?.ArrayItem.ToContextualType() ??
+            var itemType = jsonSchemaAttribute?.ArrayItem?.ToContextualType() ??
                            contextualType.EnumerableItemType ??
                            contextualType.GenericArguments.FirstOrDefault();
 
@@ -618,16 +623,16 @@ namespace NJsonSchema.Generation
                 schema.Item = JsonSchema.CreateAnySchema();
             }
 
-            dynamic minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
+            dynamic? minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
             if (minLengthAttribute != null && ObjectExtensions.HasProperty(minLengthAttribute, "Length"))
             {
-                schema.MinItems = minLengthAttribute.Length;
+                schema.MinItems = minLengthAttribute?.Length;
             }
 
-            dynamic maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
+            dynamic? maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
             if (maxLengthAttribute != null && ObjectExtensions.HasProperty(maxLengthAttribute, "Length"))
             {
-                schema.MaxItems = maxLengthAttribute.Length;
+                schema.MaxItems = maxLengthAttribute?.Length;
             }
         }
 
@@ -670,16 +675,16 @@ namespace NJsonSchema.Generation
                 schema.AllowAdditionalProperties = true;
             }
 
-            dynamic minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
+            dynamic? minLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MinLengthAttribute", TypeNameStyle.Name);
             if (minLengthAttribute != null && ObjectExtensions.HasProperty(minLengthAttribute, "Length"))
             {
-                schema.MinProperties = minLengthAttribute.Length;
+                schema.MinProperties = minLengthAttribute?.Length;
             }
 
-            dynamic maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
+            dynamic? maxLengthAttribute = contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("MaxLengthAttribute", TypeNameStyle.Name);
             if (maxLengthAttribute != null && ObjectExtensions.HasProperty(maxLengthAttribute, "Length"))
             {
-                schema.MaxProperties = maxLengthAttribute.Length;
+                schema.MaxProperties = maxLengthAttribute?.Length;
             }
         }
 
@@ -706,11 +711,11 @@ namespace NJsonSchema.Generation
                 else
                 {
                     // EnumMember only checked if StringEnumConverter is used
-                    var attributes = contextualType.Type.GetRuntimeField(enumName).GetCustomAttributes();
-                    dynamic enumMemberAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Runtime.Serialization.EnumMemberAttribute");
-                    if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
+                    var attributes = contextualType.Type.GetRuntimeField(enumName)?.GetCustomAttributes();
+                    dynamic? enumMemberAttribute = attributes?.FirstAssignableToTypeNameOrDefault("System.Runtime.Serialization.EnumMemberAttribute");
+                    if (!string.IsNullOrEmpty(enumMemberAttribute?.Value))
                     {
-                        schema.Enumeration.Add((string)enumMemberAttribute.Value);
+                        schema.Enumeration.Add((string)enumMemberAttribute!.Value);
                     }
                     else
                     {
@@ -862,7 +867,7 @@ namespace NJsonSchema.Generation
         public bool IsAbstractProperty(ContextualMemberInfo memberInfo)
         {
             return memberInfo is ContextualPropertyInfo propertyInfo &&
-                   !propertyInfo.PropertyInfo.DeclaringType.GetTypeInfo().IsInterface &&
+                   propertyInfo.PropertyInfo.DeclaringType?.GetTypeInfo().IsInterface == false &&
                    (propertyInfo.PropertyInfo.GetMethod?.IsAbstract == true || propertyInfo.PropertyInfo.SetMethod?.IsAbstract == true);
         }
 
@@ -942,7 +947,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private JsonSchema GenerateInheritance(ContextualType type, JsonSchema schema, JsonSchemaResolver schemaResolver)
+        private JsonSchema? GenerateInheritance(ContextualType type, JsonSchema schema, JsonSchemaResolver schemaResolver)
         {
             var baseType = type.BaseType;
             if (baseType != null && baseType.Type != typeof(object) && baseType.Type != typeof(ValueType))
@@ -1037,35 +1042,39 @@ namespace NJsonSchema.Generation
                 if (discriminatorConverter != null)
                 {
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
-
-                    // Existing property can be discriminator only if it has String type
-                    if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
+                    if (discriminatorName is not null)
                     {
-                        if (!existingProperty.ActualTypeSchema.Type.IsInteger() &&
-                            !existingProperty.ActualTypeSchema.Type.IsString())
+                        // Existing property can be discriminator only if it has String type
+                        if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                         {
-                            throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
+                            if (!existingProperty.ActualTypeSchema.Type.IsInteger() &&
+                                !existingProperty.ActualTypeSchema.Type.IsString())
+                            {
+                                throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + 
+                                    "' must be a string|int property on type '" + type.FullName + 
+                                    "' (it is recommended to not implement the discriminator property at all).");
+                            }
+
+                            existingProperty.IsRequired = true;
                         }
 
-                        existingProperty.IsRequired = true;
-                    }
-
-                    var discriminator = new OpenApiDiscriminator
-                    {
-                        JsonInheritanceConverter = discriminatorConverter,
-                        PropertyName = discriminatorName
-                    };
-
-                    typeSchema.DiscriminatorObject = discriminator;
-
-                    if (!typeSchema.Properties.ContainsKey(discriminatorName))
-                    {
-                        typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+                        var discriminator = new OpenApiDiscriminator
                         {
-                            Type = JsonObjectType.String,
-                            IsRequired = true
+                            JsonInheritanceConverter = discriminatorConverter,
+                            PropertyName = discriminatorName
                         };
-                    }
+
+                        typeSchema.DiscriminatorObject = discriminator;
+
+                        if (!typeSchema.Properties.ContainsKey(discriminatorName))
+                        {
+                            typeSchema.Properties[discriminatorName] = new JsonSchemaProperty
+                            {
+                                Type = JsonObjectType.String,
+                                IsRequired = true
+                            };
+                        }
+                    }                   
                 }
                 else
                 {
@@ -1075,12 +1084,12 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private object TryGetInheritanceDiscriminatorConverter(Type type)
+        private object? TryGetInheritanceDiscriminatorConverter(Type type)
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
 
             // support for NJsonSchema provided inheritance converters
-            dynamic jsonConverterAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(JsonConverterAttribute), TypeNameStyle.Name);
+            dynamic? jsonConverterAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(JsonConverterAttribute), TypeNameStyle.Name);
             if (jsonConverterAttribute != null)
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
@@ -1104,7 +1113,7 @@ namespace NJsonSchema.Generation
 
             if (jsonDerivedTypeAttributes.Any())
             {
-                dynamic jsonPolymorphicAttribute = typeAttributes
+                dynamic? jsonPolymorphicAttribute = typeAttributes
                     .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPolymorphicAttribute", TypeNameStyle.FullName);
                 return new SystemTextJsonInheritanceWrapper(jsonPolymorphicAttribute?.TypeDiscriminatorPropertyName ?? "$type", jsonDerivedTypeAttributes);
             }
@@ -1131,7 +1140,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private string TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)
+        private string? TryGetInheritanceDiscriminatorName(object jsonInheritanceConverter)
         {
             return ObjectExtensions.TryGetPropertyValue(
                 jsonInheritanceConverter,
@@ -1155,7 +1164,7 @@ namespace NJsonSchema.Generation
             JsonSchema parentSchema,
             ContextualAccessorInfo property,
             JsonTypeDescription propertyTypeDescription, string propertyName,
-            Attribute requiredAttribute, bool hasRequiredAttribute, bool isNullable, object defaultValue, JsonSchemaResolver schemaResolver)
+            Attribute? requiredAttribute, bool hasRequiredAttribute, bool isNullable, object? defaultValue, JsonSchemaResolver schemaResolver)
         {
             // TODO: Extension method on JsonSchema class?
 
@@ -1182,7 +1191,7 @@ namespace NJsonSchema.Generation
                     }
                 }
 
-                dynamic readOnlyAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
+                dynamic? readOnlyAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
                 if (readOnlyAttribute != null)
                 {
                     propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
@@ -1198,7 +1207,7 @@ namespace NJsonSchema.Generation
                     propertySchema.Example = GenerateExample(property);
                 }
 
-                dynamic obsoleteAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+                dynamic? obsoleteAttribute = property.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
                 if (obsoleteAttribute != null)
                 {
                     propertySchema.IsDeprecated = true;
@@ -1265,7 +1274,7 @@ namespace NJsonSchema.Generation
         /// <param name="accessorInfo"></param>
         /// <param name="parentType"></param>
         /// <returns></returns>
-        public dynamic GetDataMemberAttribute(ContextualAccessorInfo accessorInfo, Type parentType)
+        public dynamic? GetDataMemberAttribute(ContextualAccessorInfo accessorInfo, Type parentType)
         {
             if (!HasDataContractAttribute(parentType))
             {
@@ -1283,7 +1292,7 @@ namespace NJsonSchema.Generation
 
         private void ApplyRangeAttribute(JsonSchema schema, IEnumerable<Attribute> parentAttributes)
         {
-            dynamic rangeAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RangeAttribute");
+            dynamic? rangeAttribute = parentAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RangeAttribute");
             if (rangeAttribute != null)
             {
                 if (rangeAttribute.Minimum != null)
@@ -1352,7 +1361,7 @@ namespace NJsonSchema.Generation
         {
             if (extensionAttributes.Any())
             {
-                var extensionData = new Dictionary<string, object>();
+                var extensionData = new Dictionary<string, object?>();
                 foreach (var kvp in extensionAttributes
                     .SelectMany(attribute => attribute.ExtensionData))
                 {
