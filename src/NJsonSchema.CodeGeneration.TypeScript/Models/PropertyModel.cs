@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDescription => !string.IsNullOrEmpty(Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => _property.Description;
+        public string? Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
         public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
@@ -71,13 +71,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 if (IsArray)
                 {
                     return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.Item) &&
-                        _property.ActualTypeSchema?.Item.ActualSchema.Type.IsObject() == true;
+                        _property.ActualTypeSchema?.Item?.ActualSchema.Type.IsObject() == true;
                 }
 
                 if (IsDictionary)
                 {
                     return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.AdditionalPropertiesSchema) &&
-                        _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.IsObject() == true;
+                        _property.ActualTypeSchema?.AdditionalPropertiesSchema?.ActualSchema.Type.IsObject() == true;
                 }
 
                 return _resolver.SupportsConstructorConversion(_property) &&

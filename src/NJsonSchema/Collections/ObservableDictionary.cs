@@ -22,42 +22,43 @@ namespace NJsonSchema.Collections
         IDictionary<TKey, TValue>, INotifyCollectionChanged,
         INotifyPropertyChanged, IDictionary, 
         IReadOnlyDictionary<TKey, TValue>
+        where TKey : notnull
     {
-        private Dictionary<TKey, TValue> _dictionary;
+        private Dictionary<TKey, TValue?> _dictionary;
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         public ObservableDictionary()
         {
-            _dictionary = new Dictionary<TKey, TValue>();
+            _dictionary = new Dictionary<TKey, TValue?>();
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         /// <param name="dictionary">The dictionary to initialize this dictionary. </param>
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
+        public ObservableDictionary(IDictionary<TKey, TValue?> dictionary)
         {
-            _dictionary = new Dictionary<TKey, TValue>(dictionary);
+            _dictionary = new Dictionary<TKey, TValue?>(dictionary);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         /// <param name="comparer">The comparer. </param>
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(comparer);
+            _dictionary = new Dictionary<TKey, TValue?>(comparer);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         /// <param name="capacity">The capacity. </param>
         public ObservableDictionary(int capacity)
         {
-            _dictionary = new Dictionary<TKey, TValue>(capacity);
+            _dictionary = new Dictionary<TKey, TValue?>(capacity);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         /// <param name="dictionary">The dictionary to initialize this dictionary. </param>
         /// <param name="comparer">The comparer. </param>
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+        public ObservableDictionary(IDictionary<TKey, TValue?> dictionary, IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+            _dictionary = new Dictionary<TKey, TValue?>(dictionary, comparer);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
@@ -65,12 +66,12 @@ namespace NJsonSchema.Collections
         /// <param name="comparer">The comparer. </param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            _dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+            _dictionary = new Dictionary<TKey, TValue?>(capacity, comparer);
         }
 
         /// <summary>Adds multiple key-value pairs the the dictionary. </summary>
         /// <param name="items">The key-value pairs. </param>
-        public void AddRange(IDictionary<TKey, TValue> items)
+        public void AddRange(IDictionary<TKey, TValue?> items)
         {
             if (items == null)
             {
@@ -93,7 +94,7 @@ namespace NJsonSchema.Collections
                 }
                 else
                 {
-                    _dictionary = new Dictionary<TKey, TValue>(items);
+                    _dictionary = new Dictionary<TKey, TValue?>(items);
                 }
 
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());
@@ -104,9 +105,9 @@ namespace NJsonSchema.Collections
         /// <param name="key">The key. </param>
         /// <param name="value">The value. </param>
         /// <param name="add">If true and key already exists then an exception is thrown. </param>
-        private void Insert(TKey key, TValue value, bool add)
+        private void Insert(TKey key, TValue? value, bool add)
         {
-            TValue item;
+            TValue? item;
             if (_dictionary.TryGetValue(key, out item))
             {
                 if (add)
@@ -120,13 +121,13 @@ namespace NJsonSchema.Collections
                 }
 
                 _dictionary[key] = value;
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value),
-                    new KeyValuePair<TKey, TValue>(key, item));
+                OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue?>(key, value),
+                    new KeyValuePair<TKey, TValue?>(key, item));
             }
             else
             {
                 _dictionary[key] = value;
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
+                OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue?>(key, value));
             }
         }
 
@@ -149,7 +150,7 @@ namespace NJsonSchema.Collections
             }
         }
 
-        private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> changedItem)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
@@ -159,8 +160,8 @@ namespace NJsonSchema.Collections
             }
         }
 
-        private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem,
-            KeyValuePair<TKey, TValue> oldItem)
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> newItem,
+            KeyValuePair<TKey, TValue?> oldItem)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
@@ -215,7 +216,7 @@ namespace NJsonSchema.Collections
                 throw new ArgumentNullException("key");
             }
 
-            TValue value;
+            TValue? value;
             _dictionary.TryGetValue(key, out value);
 
             var removed = _dictionary.Remove(key);
@@ -230,16 +231,16 @@ namespace NJsonSchema.Collections
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return _dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value!);
         }
 
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
-        public ICollection<TValue> Values => _dictionary.Values;
+        public ICollection<TValue> Values => _dictionary.Values!;
 
         public TValue this[TKey key]
         {
-            get => _dictionary[key];
+            get => _dictionary[key]!;
             set => Insert(key, value, false);
         }
 
@@ -252,9 +253,9 @@ namespace NJsonSchema.Collections
             Insert(item.Key, item.Value, true);
         }
 
-        void IDictionary.Add(object key, object value)
+        void IDictionary.Add(object key, object? value)
         {
-            Insert((TKey) key, (TValue) value, true);
+            Insert((TKey) key, (TValue?)value, true);
         }
 
         public void Clear()
@@ -306,7 +307,7 @@ namespace NJsonSchema.Collections
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return _dictionary.Contains(item);
+            return _dictionary!.Contains(item);
         }
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
@@ -322,14 +323,14 @@ namespace NJsonSchema.Collections
         public int Count => _dictionary.Count;
 
         public bool IsSynchronized { get; private set; }
-        public object SyncRoot { get; private set; }
+        public object SyncRoot { get; } = new object();
 
         public bool IsReadOnly => ((IDictionary) _dictionary).IsReadOnly;
 
-        object IDictionary.this[object key]
+        object? IDictionary.this[object key]
         {
             get => this[(TKey) key];
-            set => this[(TKey) key] = (TValue) value;
+            set => this[(TKey) key] = (TValue?)value!;
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> item)
@@ -343,7 +344,7 @@ namespace NJsonSchema.Collections
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() => GetEnumerator();
 
-        public Dictionary<TKey, TValue>.Enumerator GetEnumerator() => _dictionary.GetEnumerator();
+        public Dictionary<TKey, TValue?>.Enumerator GetEnumerator() => _dictionary.GetEnumerator();
 
         #endregion
 
@@ -358,13 +359,13 @@ namespace NJsonSchema.Collections
 
         #region INotifyCollectionChanged interface
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         #endregion
 
         #region INotifyPropertyChanged interface
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion
     }

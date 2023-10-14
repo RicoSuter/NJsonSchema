@@ -18,15 +18,15 @@ namespace NJsonSchema.NewtonsoftJson.Generation
     /// <inheritdocs />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
-        private Dictionary<string, JsonContract> _cachedContracts = new Dictionary<string, JsonContract>();
+        private Dictionary<string, JsonContract?> _cachedContracts = new Dictionary<string, JsonContract?>();
 
         private JsonSerializerSettings _serializerSettings;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
-        public NewtonsoftJsonSchemaGeneratorSettings()
+        public NewtonsoftJsonSchemaGeneratorSettings() 
+            : base(new NewtonsoftJsonReflectionService())
         {
-            ReflectionService = new NewtonsoftJsonReflectionService();
-            SerializerSettings = new JsonSerializerSettings();
+            _serializerSettings = new JsonSerializerSettings();
         }
 
         /// <summary>Gets or sets the Newtonsoft JSON serializer settings.</summary>
@@ -44,12 +44,12 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         /// <returns>The contract resolver.</returns>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
         [JsonIgnore]
-        public IContractResolver ActualContractResolver => SerializerSettings.ContractResolver ?? new DefaultContractResolver();
+        public IContractResolver ActualContractResolver => SerializerSettings?.ContractResolver ?? new DefaultContractResolver();
 
         /// <summary>Gets the contract for the given type.</summary>
         /// <param name="type">The type.</param>
         /// <returns>The contract.</returns>
-        public JsonContract ResolveContract(Type type)
+        public JsonContract? ResolveContract(Type type)
         {
             var key = type.FullName;
             if (key == null)

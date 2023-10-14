@@ -50,7 +50,7 @@ namespace NJsonSchema.Visitors
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-        protected abstract IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint);
+        protected abstract IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint);
 
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
@@ -59,7 +59,7 @@ namespace NJsonSchema.Visitors
         /// <param name="checkedObjects">The checked objects.</param>
         /// <param name="replacer">The replacer.</param>
         /// <returns>The task.</returns>
-        protected virtual void Visit(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
+        protected virtual void Visit(object obj, string path, string? typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
         {
             if (obj == null || !checkedObjects.Add(obj))
             {
@@ -173,15 +173,19 @@ namespace NJsonSchema.Visitors
                 {
                     foreach (var property in contract.Properties.Where(p =>
                     {
-                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+                        var isJsonSchemaProperty =
+                            obj is JsonSchema &&
+                            p.UnderlyingName != null &&
+                            JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+
                         return !isJsonSchemaProperty && !p.Ignored &&
                                 p.ShouldSerialize?.Invoke(obj) != false;
                     }))
                     {
-                        var value = property.ValueProvider.GetValue(obj);
+                        var value = property.ValueProvider?.GetValue(obj);
                         if (value != null)
                         {
-                            Visit(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o));
+                            Visit(value, path + "/" + property.PropertyName, property.PropertyName!, checkedObjects, o => property.ValueProvider?.SetValue(obj, o));
                         }
                     }
                 }
@@ -189,17 +193,21 @@ namespace NJsonSchema.Visitors
                 {
                     foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
-                        Visit(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
+                        var value = dictionary[key];
+                        if (value != null)
                         {
-                            if (o != null)
+                            Visit(value, path + "/" + key, key.ToString(), checkedObjects, o =>
                             {
-                                dictionary[key] = (JsonSchema)o;
-                            }
-                            else
-                            {
-                                dictionary.Remove(key);
-                            }
-                        });
+                                if (o != null)
+                                {
+                                    dictionary[key] = (JsonSchema)o;
+                                }
+                                else
+                                {
+                                    dictionary.Remove(key);
+                                }
+                            });
+                        }
                     }
 
                     // Custom dictionary type with additional properties (OpenApiPathItem)

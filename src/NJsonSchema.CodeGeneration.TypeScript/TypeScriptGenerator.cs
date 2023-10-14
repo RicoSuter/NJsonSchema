@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptGenerator : GeneratorBase
     {
         private readonly TypeScriptTypeResolver _resolver;
-        private TypeScriptExtensionCode _extensionCode;
+        private TypeScriptExtensionCode? _extensionCode;
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>

@@ -14,15 +14,17 @@ namespace NJsonSchema
     /// <summary>A description of a JSON property of a JSON schema. </summary>
     public class JsonSchemaProperty : JsonSchema
     {
-        private object _parent;
+        private object? _parent;
 
         /// <summary>Gets or sets the name of the property. </summary>
         [JsonIgnore]
+#pragma warning disable CS8618
         public string Name { get; internal set; }
+#pragma warning restore CS8618
 
         /// <summary>Gets the parent schema of this property schema. </summary>
         [JsonIgnore]
-        public override object Parent
+        public override object? Parent
         {
             get { return _parent; }
             set
@@ -41,7 +43,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsRequired
         {
-            get { return ParentSchema.RequiredProperties.Contains(Name); }
+            get { return ParentSchema!.RequiredProperties.Contains(Name); }
             set
             {
                 if (ParentSchema == null)
@@ -84,7 +86,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>
         [JsonIgnore]
-        public bool IsInheritanceDiscriminator => ParentSchema.ActualDiscriminator == Name;
+        public bool IsInheritanceDiscriminator => ParentSchema!.ActualDiscriminator == Name;
 
         /// <summary>Determines whether the specified property null handling is nullable.</summary>
         /// <param name="schemaType">The schema type.</param>

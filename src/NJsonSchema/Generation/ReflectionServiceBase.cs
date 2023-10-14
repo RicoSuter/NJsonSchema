@@ -339,10 +339,10 @@ namespace NJsonSchema.Generation
 
         private bool HasStringEnumConverter(ContextualType contextualType)
         {
-            dynamic jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            dynamic? jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
             if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
-                var converterType = (Type)jsonConverterAttribute.ConverterType;
+                var converterType = jsonConverterAttribute?.ConverterType as Type;
                 if (converterType != null)
                 {
                     return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||

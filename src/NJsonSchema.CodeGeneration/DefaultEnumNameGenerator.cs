@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="value">The value.</param>
         /// <param name="schema">The schema.</param>
         /// <returns>The enumeration name.</returns>
-        public string Generate(int index, string name, object value, JsonSchema schema)
+        public string Generate(int index, string? name, object? value, JsonSchema schema)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration
                     break;
             }
 
-            if (name.StartsWith("-"))
+            if (name!.StartsWith("-"))
             {
                 name = "Minus" + name.Substring(1);
             }

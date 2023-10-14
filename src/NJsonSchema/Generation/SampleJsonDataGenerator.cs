@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.Generation
@@ -55,7 +56,7 @@ namespace NJsonSchema.Generation
                 schemaStack.Push(schema);
                 if (schemaStack.Count(s => s == schema) > _settings.MaxRecursionLevel)
                 {
-                    return null;
+                    return new JValue((object?)null);
                 }
 
                 if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
@@ -104,7 +105,7 @@ namespace NJsonSchema.Generation
                 {
                     if (schema.IsEnumeration)
                     {
-                        return JToken.FromObject(schema.Enumeration.First());
+                        return JToken.FromObject(schema.Enumeration.First()!);
                     }
                     else if (schema.Type.IsInteger())
                     {
@@ -124,26 +125,27 @@ namespace NJsonSchema.Generation
                     }
                 }
 
-                return null;
+                return new JValue((object?)null);
             }
             finally
             {
                 schemaStack.Pop();
             }
         }
+
         private JToken HandleNumberType(JsonSchema schema)
         {
-            if (schema.ExclusiveMinimumRaw != null)
+            if (schema.ExclusiveMinimumRaw?.Equals(true) == true && schema.Minimum != null)
             {
-                return JToken.FromObject((decimal)(float.Parse(schema.Minimum.ToString()) + 0.1));
+                return JToken.FromObject(decimal.Parse(schema.Minimum.Value.ToString(CultureInfo.InvariantCulture)) + 0.1m);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(decimal.Parse(schema.ExclusiveMinimum.ToString()));
+                return JToken.FromObject(decimal.Parse(schema.ExclusiveMinimum.Value.ToString(CultureInfo.InvariantCulture)));
             }
             else if (schema.Minimum.HasValue)
             {
-                return decimal.Parse(schema.Minimum.ToString());
+                return decimal.Parse(schema.Minimum.ToString()!);
             }
             return JToken.FromObject(0.0);
         }
@@ -165,7 +167,7 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0);
         }
 
-        private JToken HandleStringType(JsonSchema schema, JsonSchemaProperty property)
+        private JToken HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
         {
             if (schema.Format == JsonFormatStrings.Date)
             {

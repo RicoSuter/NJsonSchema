@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool ExportTypes => _settings.ExportTypes;
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _schema.ExtensionData;
 
         /// <summary>Gets the enum values.</summary>
         public List<EnumerationItemModel> Enums

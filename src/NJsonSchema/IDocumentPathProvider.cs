@@ -15,6 +15,6 @@ namespace NJsonSchema
     {
         /// <summary>Gets the document path (URI or file path).</summary>
         [JsonIgnore]
-        string DocumentPath { get; set; }
+        string? DocumentPath { get; set; }
     }
 }

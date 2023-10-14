@@ -21,7 +21,7 @@ namespace NJsonSchema.Validation
         /// <param name="errors">The error list. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
+        public MultiTypeValidationError(ValidationErrorKind kind, string? property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
 
             : base(kind, property, path, token, schema)
         {

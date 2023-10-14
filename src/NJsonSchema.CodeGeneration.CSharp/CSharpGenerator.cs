@@ -125,7 +125,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         private static void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
         {
             var propertyModels = properties as PropertyModel[] ?? properties.ToArray();
-            PropertyModel propertyWithSameNameAsClass = null;
+            PropertyModel? propertyWithSameNameAsClass = null;
             foreach (var p in propertyModels)
             {
                 if (p.PropertyName == typeName)

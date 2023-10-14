@@ -18,14 +18,14 @@ namespace NJsonSchema.Visitors
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-        protected abstract JsonSchema VisitSchema(JsonSchema schema, string path, string typeNameHint);
+        protected abstract JsonSchema VisitSchema(JsonSchema schema, string path, string? typeNameHint);
 
         /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
         /// <param name="reference">The visited schema.</param>
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-        protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint)
+        protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint)
         {
             if (reference is JsonSchema schema)
             {

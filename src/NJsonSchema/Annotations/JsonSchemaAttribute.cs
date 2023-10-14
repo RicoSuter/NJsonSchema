@@ -36,15 +36,15 @@ namespace NJsonSchema.Annotations
         }
 
         /// <summary>Gets or sets the name identifier of the schema which is used as key in the 'definitions' list.</summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>Gets the JSON Schema type (default: <see cref="JsonObjectType.None"/>, i.e. derived from <see cref="System.Type"/>).</summary>
         public JsonObjectType Type { get; private set; }
 
         /// <summary>Gets or sets the JSON format type (default: <c>null</c>, i.e. derived from <see cref="System.Type"/>).</summary>
-        public string Format { get; set; }
+        public string? Format { get; set; }
 
         /// <summary>Gets or sets the array item type.</summary>
-        public Type ArrayItem { get; set; }
+        public Type? ArrayItem { get; set; }
     }
 }

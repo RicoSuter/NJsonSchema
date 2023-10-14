@@ -31,7 +31,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="category">The category.</param>
         /// <param name="template">The template to render the code.</param>
         public CodeArtifact(string typeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, ITemplate template)
-            : this(typeName, null, type, language, category, template?.Render())
+            : this(typeName, null, type, language, category, template.Render())
         {
         }
 
@@ -42,8 +42,8 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="language">The artifact language.</param>
         /// <param name="category">The category.</param>
         /// <param name="template">The template to render the code.</param>
-        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, ITemplate template)
-            : this(typeName, baseTypeName, type, language, category, template?.Render())
+        public CodeArtifact(string typeName, string? baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, ITemplate template)
+            : this(typeName, baseTypeName, type, language, category, template.Render())
         {
         }
 
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="language">The artifact language.</param>
         /// <param name="category">The category.</param>
         /// <param name="code">The code.</param>
-        public CodeArtifact(string typeName, string baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, string code)
+        public CodeArtifact(string typeName, string? baseTypeName, CodeArtifactType type, CodeArtifactLanguage language, CodeArtifactCategory category, string code)
         {
             if (typeName == baseTypeName)
             {
@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration
         public string TypeName { get; }
 
         /// <summary>Gets the name of the base type (i.e. the name of the inherited class).</summary>
-        public string BaseTypeName { get; }
+        public string? BaseTypeName { get; }
 
         /// <summary>Gets the artifact type.</summary>
         public CodeArtifactType Type { get; }

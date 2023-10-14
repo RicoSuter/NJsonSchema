@@ -32,7 +32,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        public string TryResolve(JsonSchema schema, string typeNameHint)
+        public string? TryResolve(JsonSchema? schema, string? typeNameHint)
         {
             return schema != null ? Resolve(schema, false, typeNameHint) : null;
         }
@@ -42,13 +42,13 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="isNullable">Specifies whether the given type usage is nullable.</param>
         /// <param name="typeNameHint">The type name hint to use when generating the type and the type name is missing.</param>
         /// <returns>The type name.</returns>
-        public abstract string Resolve(JsonSchema schema, bool isNullable, string typeNameHint);
+        public abstract string Resolve(JsonSchema schema, bool isNullable, string? typeNameHint);
 
         /// <summary>Gets or generates the type name for the given schema.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        public virtual string GetOrGenerateTypeName(JsonSchema schema, string typeNameHint)
+        public virtual string GetOrGenerateTypeName(JsonSchema schema, string? typeNameHint)
         {
             schema = RemoveNullability(schema).ActualSchema;
 

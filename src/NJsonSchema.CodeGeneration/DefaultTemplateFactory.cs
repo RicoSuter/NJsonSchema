@@ -170,7 +170,7 @@ namespace NJsonSchema.CodeGeneration
             public string Render()
             {
                 var childScope = false;
-                TemplateContext templateContext = null;
+                TemplateContext? templateContext = null;
 
                 try
                 {
@@ -253,7 +253,7 @@ namespace NJsonSchema.CodeGeneration
                 {
                     if (childScope)
                     {
-                        templateContext.ReleaseScope();
+                        templateContext?.ReleaseScope();
                     }
                 }
             }

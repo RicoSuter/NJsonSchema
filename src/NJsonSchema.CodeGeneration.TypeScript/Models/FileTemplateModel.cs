@@ -21,10 +21,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets or sets the code of all types.</summary>
-        public string Types { get; set; }
+        public required string Types { get; set; }
 
         /// <summary>Gets or sets the extension code.</summary>
-        public TypeScriptExtensionCode ExtensionCode { get; set; }
+        public TypeScriptExtensionCode? ExtensionCode { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the file has module name.</summary>
         public bool HasModuleName => !string.IsNullOrEmpty(_settings.ModuleName);

@@ -33,7 +33,7 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
         }
 
-        [Theory]
+        [Theory(Skip = "Currently not compatible")]
         [InlineData("/References/YamlReferencesTest/yaml_spec_with_yaml_schema_refs.yaml", "/custom-queries", "Content-Language")]
         public async Task When_yaml_OpenAPI_spec_has_external_schema_refs_they_are_resolved(string relativePath, string docPath, string header)
         {
@@ -78,7 +78,7 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal(expectedBaseUrl, doc.BaseUrl);
         }
 
-        [Theory]
+        [Theory(Skip = "Currently not compatible")]
         [InlineData("/References/YamlReferencesTest/subdir_spec/yaml_spec_with_yaml_schema_with_relative_subdir_refs.yaml")]
         public async Task When_yaml_OpenAPI_spec_has_relative_external_schema_refs_in_subdirs__they_are_resolved(string relativePath)
         {

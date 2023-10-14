@@ -9,6 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -50,7 +51,7 @@ namespace NJsonSchema
         /// <param name="schema">The referenced schema.</param>
         public void AddDocumentReference(string documentPath, IJsonReference schema)
         {
-            _resolvedObjects[documentPath.Contains("://") ? documentPath : DynamicApis.GetFullPath(documentPath)] = schema;
+            _resolvedObjects[documentPath.Contains("://") ? documentPath : Path.GetFullPath(documentPath)] = schema;
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -174,14 +175,14 @@ namespace NJsonSchema
         public virtual string ResolveFilePath(string documentPath, string jsonPath)
         {
             var arr = Regex.Split(jsonPath, @"(?=#)");
-            return DynamicApis.PathCombine(DynamicApis.PathGetDirectoryName(documentPath), arr[0]);
+            return Path.Combine(Path.GetDirectoryName(documentPath)!, arr[0]);
         }
 
         private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, IContractResolver contractResolver, string jsonPath, bool append, CancellationToken cancellationToken)
         {
             try
             {
-                var fullPath = DynamicApis.GetFullPath(filePath);
+                var fullPath = Path.GetFullPath(filePath);
                 var arr = Regex.Split(jsonPath, @"(?=#)");
 
                 fullPath = DynamicApis.HandleSubdirectoryRelativeReferences(fullPath, jsonPath);
@@ -236,7 +237,7 @@ namespace NJsonSchema
             }
         }
 
-        private IJsonReference ResolveDocumentReference(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
+        private IJsonReference? ResolveDocumentReference(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
             {
@@ -259,7 +260,7 @@ namespace NJsonSchema
             return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
         }
 
-        private IJsonReference ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
+        private IJsonReference? ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
         {
             if (segments.Count == 0)
             {
@@ -267,11 +268,11 @@ namespace NJsonSchema
                 {
                     var settings = new JsonSerializerSettings { ContractResolver = contractResolver };
                     var json = JsonConvert.SerializeObject(obj, settings);
-                    return (IJsonReference)JsonConvert.DeserializeObject(json, targetType, settings);
+                    return JsonConvert.DeserializeObject(json, targetType, settings) as IJsonReference;
                 }
                 else
                 {
-                    return (IJsonReference)obj;
+                    return obj as IJsonReference;
                 }
             }
 
@@ -282,7 +283,7 @@ namespace NJsonSchema
             {
                 if (dictionary.Contains(firstSegment))
                 {
-                    return ResolveDocumentReference(dictionary[firstSegment], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                    return ResolveDocumentReference(dictionary[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
             }
             else if (obj is IEnumerable)
@@ -302,7 +303,7 @@ namespace NJsonSchema
                 var extensionObj = obj as IJsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
-                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
 
                 foreach (var member in obj
@@ -314,7 +315,10 @@ namespace NJsonSchema
                     if (pathSegment == firstSegment)
                     {
                         var value = member.GetValue(obj);
-                        return ResolveDocumentReference(value, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                        if (value != null)
+                        {
+                            return ResolveDocumentReference(value, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                        }
                     }
                 }
             }

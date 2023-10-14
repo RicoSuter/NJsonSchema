@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
         public string TopCode { get; protected set; } = string.Empty;
 
         /// <summary>Gets the extension code which is appended at the end of the generated code.</summary>
-        public string BottomCode { get; protected set; }
+        public string? BottomCode { get; protected set; }
 
 		/// <summary>Gets the body of the extension class.</summary>
 		/// <param name="className">The class name.</param>

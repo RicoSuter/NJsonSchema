@@ -35,11 +35,11 @@ namespace NJsonSchema
         public IDictionary<string, string> TypeNameMappings => _typeNameMappings;
 
         /// <inheritdoc />
-        public virtual string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
+        public virtual string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
         {
             if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
             {
-                typeNameHint = schema.DocumentPath.Replace("\\", "/").Split('/').Last();
+                typeNameHint = schema.DocumentPath!.Replace("\\", "/").Split('/').Last();
             }
 
             typeNameHint ??= "";
@@ -74,7 +74,7 @@ namespace NJsonSchema
         /// <param name="schema">The schema.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The type name.</returns>
-        protected virtual string Generate(JsonSchema schema, string typeNameHint)
+        protected virtual string Generate(JsonSchema schema, string? typeNameHint)
         {
             if (string.IsNullOrEmpty(typeNameHint) && schema.HasTypeNameTitle)
             {
@@ -95,9 +95,11 @@ namespace NJsonSchema
                     typeNameHint = mapping;
                 }
 
-                typeNameHint = GetLastSegment(typeNameHint);
+                typeNameHint = GetLastSegment(typeNameHint)!;
 
-                if (!reservedTypeNames.Contains(typeNameHint) && Array.IndexOf(_reservedTypeNames, typeNameHint) == -1)
+                if (typeNameHint != null &&
+                    !reservedTypeNames.Contains(typeNameHint) && 
+                    Array.IndexOf(_reservedTypeNames, typeNameHint) == -1)
                 {
                     return typeNameHint;
                 }
@@ -114,7 +116,7 @@ namespace NJsonSchema
             return GenerateAnonymousTypeName("Anonymous", reservedTypeNames);
         }
 
-        private static string GetLastSegment(string input)
+        private static string? GetLastSegment(string? input)
         {
             var lastSegment = input;
             if (input != null)

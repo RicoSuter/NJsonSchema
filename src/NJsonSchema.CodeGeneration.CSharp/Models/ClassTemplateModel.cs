@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
             if (schema.InheritedSchema != null)
             {
-                BaseClass = new ClassTemplateModel(BaseClassName, settings, resolver, schema.InheritedSchema, rootObject);
+                BaseClass = new ClassTemplateModel(BaseClassName!, settings, resolver, schema.InheritedSchema, rootObject);
                 AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
             }
             else
@@ -79,7 +79,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool GenerateAdditionalPropertiesProperty => HasAdditionalPropertiesType && !HasAdditionalPropertiesTypeInBaseClass;
 
         /// <summary>Gets the type of the additional properties.</summary>
-        public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
+        public string? AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
         //public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
         //    _schema.AdditionalPropertiesSchema,
         //    _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
         /// <summary>Gets the description.</summary>
-        public string Description => !string.IsNullOrEmpty(_schema.Description) ?
+        public string? Description => !string.IsNullOrEmpty(_schema.Description) ?
             _schema.Description : _schema.ActualTypeSchema.Description;
 
         /// <summary>Gets a value indicating whether the class style is INPC.</summary>
@@ -119,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDiscriminator => !string.IsNullOrEmpty(_schema.ActualDiscriminator);
 
         /// <summary>Gets the discriminator property name.</summary>
-        public string Discriminator => _schema.ActualDiscriminator;
+        public string? Discriminator => _schema.ActualDiscriminator;
 
         /// <summary>Gets a value indicating whether this class represents a tuple.</summary>
         public bool IsTuple => _schema.ActualTypeSchema.IsTuple;
@@ -133,12 +133,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasInheritance => _schema.InheritedTypeSchema != null;
 
         /// <summary>Gets the base class name.</summary>
-        public string BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema, false, string.Empty, false)
-                .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
-                .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
+        public string? BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema!, false, string.Empty, false)
+            .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
+            .Replace(_settings.DictionaryType + "<", _settings.DictionaryBaseType + "<") : null;
 
         /// <summary>Gets the base class model.</summary>
-        public ClassTemplateModel BaseClass { get; }
+        public ClassTemplateModel? BaseClass { get; }
 
         /// <summary>Gets a value indicating whether the class inherits from exception.</summary>
         public bool InheritsExceptionSchema => _resolver.ExceptionSchema != null &&
@@ -166,6 +166,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_schema.DeprecatedMessage);
 
         /// <summary>Gets the deprecated message.</summary>
-        public string DeprecatedMessage => _schema.DeprecatedMessage;
+        public string? DeprecatedMessage => _schema.DeprecatedMessage;
     }
 }

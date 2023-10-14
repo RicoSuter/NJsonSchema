@@ -36,7 +36,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="existingValue">The existing value of object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
         /// <returns>The object value.</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             return serializer.Deserialize(reader, objectType);
         }
@@ -45,9 +45,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false, serializer.ContractResolver);
+            if (value is not null)
+            {
+                JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false, serializer.ContractResolver);
+            }
+
             try
             {
                 _isWriting = true;

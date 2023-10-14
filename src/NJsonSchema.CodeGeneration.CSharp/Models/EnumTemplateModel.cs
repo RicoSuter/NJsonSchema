@@ -38,10 +38,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => _schema.Description;
+        public string? Description => _schema.Description;
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _schema.ExtensionData;
 
         /// <summary>Gets a value indicating whether the enum is of type string.</summary>
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;

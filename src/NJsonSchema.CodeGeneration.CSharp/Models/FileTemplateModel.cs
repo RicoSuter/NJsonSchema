@@ -12,12 +12,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     public class FileTemplateModel
     {
         /// <summary>Gets or sets the namespace.</summary>
-        public string Namespace { get; set; }
+        public required string Namespace { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
         public bool GenerateNullableReferenceTypes { get; set; }
 
         /// <summary>Gets or sets the types code.</summary>
-        public string TypesCode { get; set; }
+        public required string TypesCode { get; set; }
     }
 }

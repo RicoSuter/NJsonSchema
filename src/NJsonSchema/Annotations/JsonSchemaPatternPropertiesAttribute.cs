@@ -24,7 +24,7 @@ namespace NJsonSchema.Annotations
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaAttribute" /> class.</summary>
         /// <param name="regularExpression">The pattern property regular expression.</param>
         /// <param name="type">The pattern properties type.</param>
-        public JsonSchemaPatternPropertiesAttribute(string regularExpression, Type type)
+        public JsonSchemaPatternPropertiesAttribute(string regularExpression, Type? type)
         {
             RegularExpression = regularExpression;
             Type = type;
@@ -34,6 +34,6 @@ namespace NJsonSchema.Annotations
         public string RegularExpression { get; }
 
         /// <summary>Gets the pattern properties type.</summary>
-        public Type Type { get; }
+        public Type? Type { get; }
     }
 }
