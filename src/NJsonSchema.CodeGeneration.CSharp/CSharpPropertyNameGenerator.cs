@@ -9,15 +9,21 @@
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
-    public class CSharpPropertyNameGenerator : IPropertyNameGenerator
+    public sealed class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
+        private static readonly char[] _reservedFirstPassChars = { '"', '\'', '@', '?', '!', '$', '[', ']', '(', ')', '.', '=', '+' };
+        private static readonly char[] _reservedSecondPassChars = { '*', ':', '-', '#', '&' };
+
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
         /// <returns>The new name.</returns>
-        public virtual string Generate(JsonSchemaProperty property)
+        public string Generate(JsonSchemaProperty property)
         {
-            return ConversionUtilities.ConvertToUpperCamelCase(property.Name
-                    .Replace("\"", string.Empty)
+            var name = property.Name;
+
+            if (name.IndexOfAny(_reservedFirstPassChars) != -1)
+            {
+                name = name.Replace("\"", string.Empty)
                     .Replace("'", string.Empty)
                     .Replace("@", string.Empty)
                     .Replace("?", string.Empty)
@@ -29,12 +35,22 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace(")", string.Empty)
                     .Replace(".", "-")
                     .Replace("=", "-")
-                    .Replace("+", "plus"), true)
-                .Replace("*", "Star")
-                .Replace(":", "_")
-                .Replace("-", "_")
-                .Replace("#", "_")
-                .Replace("&", "And");
+                    .Replace("+", "plus");
+            }
+
+            name = ConversionUtilities.ConvertToUpperCamelCase(name, true);
+
+            if (name.IndexOfAny(_reservedSecondPassChars) != -1)
+            {
+                name = name
+                    .Replace("*", "Star")
+                    .Replace(":", "_")
+                    .Replace("-", "_")
+                    .Replace("#", "_")
+                    .Replace("&", "And");
+            }
+
+            return name;
         }
     }
 }
