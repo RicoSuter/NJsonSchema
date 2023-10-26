@@ -51,7 +51,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             var dschema = schema.Definitions["EmptyClassInheritingDictionary"];
 
-            Assert.Equal(0, dschema.AllOf.Count);
+            Assert.Empty(dschema.AllOf);
             Assert.True(dschema.IsDictionary);
 
             if (inlineNamedDictionaries)

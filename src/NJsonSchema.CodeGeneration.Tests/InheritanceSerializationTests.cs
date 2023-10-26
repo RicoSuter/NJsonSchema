@@ -183,7 +183,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         }
 
         [Fact]
-        public void JsonInheritanceConverter_is_thread_safe()
+        public async Task JsonInheritanceConverter_is_thread_safe()
         {
             //// Arrange
             var tasks = new List<Task>();
@@ -196,7 +196,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             }
 
             //// Act
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks.ToArray());
 
             //// Assert
             // No exceptions

@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             //// Assert
             var dictionarySchema = schema.Definitions["EmptyClassInheritingDictionary"];
 
-            Assert.Equal(0, dictionarySchema.AllOf.Count);
+            Assert.Empty(dictionarySchema.AllOf);
             Assert.True(dictionarySchema.IsDictionary);
             Assert.Contains("Foobar.", data);
             Assert.Contains("Foobar.", code);
