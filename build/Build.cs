@@ -11,7 +11,6 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
 
-using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
@@ -50,13 +49,13 @@ partial class Build : NukeBuild
         if (!string.IsNullOrWhiteSpace(versionPrefix))
         {
             IsTaggedBuild = true;
-            Info($"Tag version {versionPrefix} from Git found, using it as version prefix");
+            Serilog.Log.Information("Tag version {VersionPrefix} from Git found, using it as version prefix", versionPrefix);
         }
         else
         {
-            var propsDocument = XDocument.Parse(TextTasks.ReadAllText(SourceDirectory / "Directory.Build.props"));
+            var propsDocument = XDocument.Parse((SourceDirectory / "Directory.Build.props").ReadAllText());
             versionPrefix = propsDocument.Element("Project").Element("PropertyGroup").Element("VersionPrefix").Value;
-            Info($"Version prefix {versionPrefix} read from Directory.Build.props");
+            Serilog.Log.Information("Version prefix {VersionPrefix} read from Directory.Build.props", versionPrefix);
         }
 
         return versionPrefix;
@@ -85,18 +84,18 @@ partial class Build : NukeBuild
         }
 
         using var _ = Block("BUILD SETUP");
-        Info("Configuration:\t" + Configuration);
-        Info("Version prefix:\t" + VersionPrefix);
-        Info("Version suffix:\t" + VersionSuffix);
-        Info("Tagged build:\t" + IsTaggedBuild);
+        Serilog.Log.Information("Configuration:\t {Configuration}" , Configuration);
+        Serilog.Log.Information("Version prefix:\t {VersionPrefix}" , VersionPrefix);
+        Serilog.Log.Information("Version suffix:\t {VersionSuffix}" , VersionSuffix);
+        Serilog.Log.Information("Tagged build:\t {IsTaggedBuild}" , IsTaggedBuild);
     }
 
     Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            EnsureCleanDirectory(ArtifactsDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(x => x.DeleteDirectory());
+            ArtifactsDirectory.CreateOrCleanDirectory();
         });
 
     Target Restore => _ => _
@@ -156,7 +155,7 @@ partial class Build : NukeBuild
                 nugetVersion += "-" + VersionSuffix;
             }
 
-            EnsureCleanDirectory(ArtifactsDirectory);
+            ArtifactsDirectory.CreateOrCleanDirectory();
 
             DotNetPack(s => s
                 .SetProcessWorkingDirectory(SourceDirectory)
