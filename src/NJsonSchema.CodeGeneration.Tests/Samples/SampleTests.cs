@@ -101,7 +101,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var errors = schema.Validate(dataJson);
 
             //// Assert
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var errors = schema.Validate(data);
 
             //// Assert
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
     }
 }
