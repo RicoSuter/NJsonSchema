@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;netstandard2.0;net462</TargetFrameworks>
@@ -7,6 +7,10 @@
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.Annotations\NJsonSchema.Annotations.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Namotion.Reflection" />
