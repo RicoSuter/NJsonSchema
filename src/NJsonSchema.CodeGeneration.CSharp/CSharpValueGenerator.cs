@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             "System.Guid",
             "System.Uri"
-        }; 
+        };
 
         /// <summary>Initializes a new instance of the <see cref="CSharpValueGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>

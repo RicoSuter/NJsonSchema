@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -76,17 +77,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsDictionaryValueNewableObject = typeSchema.AdditionalPropertiesSchema != null && IsNewableObject(typeSchema.AdditionalPropertiesSchema, parameters),
                 IsDictionaryValueDate = IsDate(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
                 IsDictionaryValueDateTime = IsDateTime(typeSchema.AdditionalPropertiesSchema?.ActualSchema?.Format, parameters.Settings.DateTimeType),
-              
-                IsDictionaryValueNewableArray = 
+
+                IsDictionaryValueNewableArray =
                     typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true &&
                     typeSchema.AdditionalPropertiesSchema.Item != null &&
                     IsNewableObject(typeSchema.AdditionalPropertiesSchema.Item, parameters),
-                
-                DictionaryValueArrayItemType = 
+
+                DictionaryValueArrayItemType =
                     typeSchema.AdditionalPropertiesSchema?.ActualSchema?.IsArray == true ?
-                    parameters.Resolver.TryResolve(typeSchema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" : 
+                    parameters.Resolver.TryResolve(typeSchema.AdditionalPropertiesSchema.Item, "Anonymous") ?? "any" :
                     "any",
-                
+
                 // Array
                 IsArray = typeSchema.IsArray,
                 ArrayItemType = parameters.Resolver.TryResolve(typeSchema.Item, parameters.TypeNameHint) ?? "any",
