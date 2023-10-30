@@ -18,6 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation
 {
@@ -700,6 +701,7 @@ namespace NJsonSchema.Generation
             schema.EnumerationNames.Clear();
             schema.IsFlagEnumerable = contextualType.GetInheritedAttribute<FlagsAttribute>() != null;
 
+            Func<object, string?>? enumValueConverter = null;
             var underlyingType = Enum.GetUnderlyingType(contextualType.Type);
             foreach (var enumName in Enum.GetNames(contextualType.Type))
             {
@@ -711,16 +713,16 @@ namespace NJsonSchema.Generation
                 else
                 {
                     // EnumMember only checked if StringEnumConverter is used
-                    var attributes = contextualType.Type.GetRuntimeField(enumName)?.GetCustomAttributes();
-                    dynamic? enumMemberAttribute = attributes?.FirstAssignableToTypeNameOrDefault("System.Runtime.Serialization.EnumMemberAttribute");
-                    if (!string.IsNullOrEmpty(enumMemberAttribute?.Value))
+                    var enumMemberAttribute = contextualType.Type.GetRuntimeField(enumName)?.GetCustomAttribute<EnumMemberAttribute>();
+                    if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
                     {
-                        schema.Enumeration.Add((string)enumMemberAttribute!.Value);
+                        schema.Enumeration.Add(enumMemberAttribute.Value);
                     }
                     else
                     {
+                        enumValueConverter ??= Settings.ReflectionService.GetEnumValueConverter(Settings);
                         var value = Enum.Parse(contextualType.Type, enumName);
-                        schema.Enumeration.Add(Settings.ReflectionService.ConvertEnumValue(value, Settings));
+                        schema.Enumeration.Add(enumValueConverter(value));
                     }
                 }
 

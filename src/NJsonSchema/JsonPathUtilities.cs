@@ -94,7 +94,7 @@ namespace NJsonSchema
             if (searchedObjects.ContainsKey(obj))
             {
                 searchedObjects[obj] = basePath;
-                if (searchedObjects.All(p => p.Value != null))
+                if (searchedObjects.All(static p => p.Value != null))
                 {
                     return true;
                 }

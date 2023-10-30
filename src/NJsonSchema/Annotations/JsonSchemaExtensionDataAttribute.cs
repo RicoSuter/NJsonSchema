@@ -33,7 +33,7 @@ namespace NJsonSchema.Annotations
         /// <summary>Gets the value.</summary>
         public object Value { get; }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> ExtensionData => new Dictionary<string, object>
         {
             { Key, Value }

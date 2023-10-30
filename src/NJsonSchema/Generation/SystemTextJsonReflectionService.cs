@@ -17,20 +17,16 @@ using System.Text.Json.Serialization;
 
 namespace NJsonSchema.Generation
 {
-    /// <inheritdocs />
+    /// <inheritdoc />
     public class SystemTextJsonReflectionService : ReflectionServiceBase<SystemTextJsonSchemaGeneratorSettings>
     {
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            foreach (var accessorInfo in contextualType
-                .Properties
-                .OfType<ContextualAccessorInfo>()
-                .Concat(contextualType.Fields)
-                .Where(p => p.MemberInfo.DeclaringType == contextualType.Type))
+            foreach (var accessorInfo in contextualType.Properties.OfType<ContextualAccessorInfo>().Concat(contextualType.Fields))
             {
-                if (accessorInfo.MemberInfo is FieldInfo fieldInfo &&
-                    (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute))))
+                if (accessorInfo.MemberInfo.DeclaringType != contextualType.Type ||
+                    (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute)))))
                 {
                     continue;
                 }
@@ -70,7 +66,7 @@ namespace NJsonSchema.Generation
 
                 if (!ignored)
                 {
-                    var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
+                    var propertyTypeDescription = GetDescription(accessorInfo.AccessorType, settings.DefaultReferenceTypeNullHandling, settings);
                     var propertyName = GetPropertyName(accessorInfo, settings);
 
                     var propertyAlreadyExists = schema.Properties.ContainsKey(propertyName);
@@ -82,7 +78,7 @@ namespace NJsonSchema.Generation
                         }
                         else
                         {
-                            throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + contextualType.Type.FullName + "'.");
+                            throw new InvalidOperationException($"The JSON property '{propertyName}' is defined multiple times on type '{contextualType.Type.FullName}'.");
                         }
                     }
 
@@ -104,17 +100,16 @@ namespace NJsonSchema.Generation
             }
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override bool IsStringEnum(ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings)
         {
             var hasGlobalStringEnumConverter = settings.SerializerOptions.Converters.OfType<JsonStringEnumConverter>().Any();
             return hasGlobalStringEnumConverter || base.IsStringEnum(contextualType, settings);
         }
 
-        /// <inheritdocs />
-        public override string ConvertEnumValue(object value, SystemTextJsonSchemaGeneratorSettings settings)
+        /// <inheritdoc />
+        public override Func<object, string?> GetEnumValueConverter(SystemTextJsonSchemaGeneratorSettings settings)
         {
-            // TODO(performance): How to improve this one here?
             var serializerOptions = new JsonSerializerOptions();
             foreach (var converter in settings.SerializerOptions.Converters)
             {
@@ -126,17 +121,16 @@ namespace NJsonSchema.Generation
                 serializerOptions.Converters.Add(new JsonStringEnumConverter());
             }
 
-            var json = JsonSerializer.Serialize(value, value.GetType(), serializerOptions);
-            return JsonSerializer.Deserialize<string>(json)!;
+            return x => JsonSerializer.Deserialize<string?>(JsonSerializer.Serialize(x, x.GetType(), serializerOptions));
         }
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
         {
             return GetPropertyName(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
         }
 
-        private string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
+        private static string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
         {
             dynamic? jsonPropertyNameAttribute = accessorInfo.ContextAttributes
                 .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
