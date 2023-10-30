@@ -67,6 +67,7 @@ namespace NJsonSchema
                         .Select(t => t.Value)
                         .FirstOrDefault(s =>
                             s.Type == JsonObjectType.Object &&
+                            properties.Any() &&
                             properties.All(p => s.Properties.ContainsKey(p.Name)));
                 }
 
