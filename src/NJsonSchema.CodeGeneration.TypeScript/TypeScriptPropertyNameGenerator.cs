@@ -6,32 +6,43 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Generates the property name for a given TypeScript <see cref="JsonSchemaProperty"/>.</summary>
-    public class TypeScriptPropertyNameGenerator : IPropertyNameGenerator
+    public sealed class TypeScriptPropertyNameGenerator : IPropertyNameGenerator
     {
-        /// <summary>Gets or sets the reserved names.</summary>
-        public IEnumerable<string> ReservedPropertyNames { get; set; } = new List<string> { "constructor" };
+        private static readonly char[] _reservedFirstPassChars = { '"', '@', '?', '.', '=', '+' };
+        private static readonly char[] _reservedSecondPassChars = { '*', ':', '-' };
 
-        /// <summary>Generates the property name.</summary>
-        /// <param name="property">The property.</param>
-        /// <returns>The new name.</returns>
-        public virtual string Generate(JsonSchemaProperty property)
+        /// <summary>Gets or sets the reserved names.</summary>
+        public HashSet<string> ReservedPropertyNames { get; set; } = new(StringComparer.Ordinal) { "constructor", "init", "fromJS", "toJSON" };
+
+        /// <inheritdoc />
+        public string Generate(JsonSchemaProperty property)
         {
-            var name = ConversionUtilities.ConvertToLowerCamelCase(property.Name
-                    .Replace("\"", string.Empty)
+            var name = property.Name;
+
+            if (name.IndexOfAny(_reservedFirstPassChars) != -1)
+            {
+                name = name.Replace("\"", string.Empty)
                     .Replace("@", string.Empty)
                     .Replace("?", string.Empty)
                     .Replace(".", "-")
                     .Replace("=", "-")
-                    .Replace("+", "plus"), true)
-                .Replace("*", "Star")
-                .Replace(":", "_")
-                .Replace("-", "_");
+                    .Replace("+", "plus");
+            }
+
+            name = ConversionUtilities.ConvertToLowerCamelCase(name, true);
+
+            if (name.IndexOfAny(_reservedSecondPassChars) != -1)
+            {
+                name = name.Replace("*", "Star")
+                    .Replace(":", "_")
+                    .Replace("-", "_");
+            }
 
             if (ReservedPropertyNames.Contains(name))
             {

@@ -7,10 +7,8 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.Generation
@@ -133,19 +131,19 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private JToken HandleNumberType(JsonSchema schema)
+        private static JToken HandleNumberType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw?.Equals(true) == true && schema.Minimum != null)
             {
-                return JToken.FromObject(decimal.Parse(schema.Minimum.Value.ToString(CultureInfo.InvariantCulture)) + 0.1m);
+                return JToken.FromObject(schema.Minimum.Value + 0.1m);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(decimal.Parse(schema.ExclusiveMinimum.Value.ToString(CultureInfo.InvariantCulture)));
+                return JToken.FromObject(schema.ExclusiveMinimum.Value);
             }
             else if (schema.Minimum.HasValue)
             {
-                return decimal.Parse(schema.Minimum.ToString()!);
+                return schema.Minimum.Value;
             }
             return JToken.FromObject(0.0);
         }
@@ -167,7 +165,7 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0);
         }
 
-        private JToken HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
+        private static JToken HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
         {
             if (schema.Format == JsonFormatStrings.Date)
             {
