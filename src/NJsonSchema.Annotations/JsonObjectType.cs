@@ -2,7 +2,11 @@
 
 namespace NJsonSchema.Annotations;
 
-/// <summary>Enumeration of the possible object types. </summary>
+/// <summary>
+/// Enumeration of the possible object types.
+///
+/// Keep in sync with NJsonSchema.JsonObjectType
+/// </summary>
 [Flags]
 public enum JsonObjectType
 {

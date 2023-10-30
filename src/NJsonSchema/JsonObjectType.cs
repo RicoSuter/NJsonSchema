@@ -11,7 +11,11 @@ using Newtonsoft.Json;
 
 namespace NJsonSchema
 {
-    /// <summary>Enumeration of the possible object types. </summary>
+    /// <summary>
+    /// Enumeration of the possible object types.
+    ///
+    /// Keep in sync with <see cref="Annotations.JsonObjectType"/>
+    /// </summary>
     [Flags]
     public enum JsonObjectType
     {
@@ -33,7 +37,7 @@ namespace NJsonSchema
 
         /// <summary>A null. </summary>
         [JsonProperty("null")]
-        Null = 8, 
+        Null = 8,
 
         /// <summary>An number value. </summary>
         [JsonProperty("number")]
