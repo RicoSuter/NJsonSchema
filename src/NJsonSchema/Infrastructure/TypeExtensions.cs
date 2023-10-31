@@ -59,20 +59,20 @@ namespace NJsonSchema.Infrastructure
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)
         {
-            var jsonPropertyAttribute = accessorInfo.AccessorType.GetContextAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = accessorInfo.GetAttribute<JsonPropertyAttribute>(true);
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
             {
                 return jsonPropertyAttribute.PropertyName!;
             }
 
-            var dataMemberAttribute = accessorInfo.AccessorType.GetContextAttribute<DataMemberAttribute>();
+            var dataMemberAttribute = accessorInfo.GetAttribute<DataMemberAttribute>(true);
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
                 var dataContractAttribute = accessorInfo
                     .MemberInfo
                     .DeclaringType?
                     .ToCachedType()
-                    .GetInheritedAttribute<DataContractAttribute>();
+                    .GetAttribute<DataContractAttribute>(true);
 
                 if (dataContractAttribute != null)
                 {
@@ -89,7 +89,9 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static string? GetDescription(this CachedType type, IXmlDocsSettings xmlDocsSettings)
         {
-            var attributes = type is ContextualType contextualType ? contextualType.ContextAttributes : type.InheritedAttributes;
+            var attributes = type is ContextualType contextualType ? 
+                contextualType.GetContextOrTypeAttributes<Attribute>(true) : 
+                type.GetAttributes(true);
 
             var description = GetDescription(attributes);
             if (description != null)
@@ -115,7 +117,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static string? GetDescription(this ContextualAccessorInfo accessorInfo, IXmlDocsSettings xmlDocsSettings)
         {
-            var description = GetDescription(accessorInfo.AccessorType.Attributes);
+            var description = GetDescription(accessorInfo.GetAttributes(true));
             if (description != null)
             {
                 return description;
@@ -139,7 +141,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The description or null if no description is available.</returns>
         public static string? GetDescription(this ContextualParameterInfo parameter, IXmlDocsSettings xmlDocsSettings)
         {
-            var description = GetDescription(parameter.ContextAttributes);
+            var description = GetDescription(parameter.GetAttributes(true));
             if (description != null)
             {
                 return description;

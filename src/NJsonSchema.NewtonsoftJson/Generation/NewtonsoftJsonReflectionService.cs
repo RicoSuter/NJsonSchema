@@ -39,7 +39,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         /// <inheritdoc />
         public override bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = contextualType.GetContextAttribute<JsonPropertyAttribute>(true);
             if (jsonPropertyAttribute != null && jsonPropertyAttribute.Required == Required.DisallowNull)
             {
                 return false;
@@ -117,7 +117,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 // TODO: Remove this hacky code (used to support serialization of exceptions and restore the old behavior [pre 9.x])
                 foreach (var accessorInfo in contextualAccessors.Where(m => allowedProperties == null || allowedProperties.Contains(m.Name)))
                 {
-                    var attribute = accessorInfo.GetContextAttribute<JsonPropertyAttribute>();
+                    var attribute = accessorInfo.GetAttribute<JsonPropertyAttribute>(true);
                     var memberType = (accessorInfo as ContextualPropertyInfo)?.PropertyInfo.PropertyType ??
                                      (accessorInfo as ContextualFieldInfo)?.FieldInfo.FieldType;
 
@@ -173,7 +173,9 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     }
                 }
 
-                var requiredAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                var requiredAttribute = accessorInfo
+                    .GetAttributes(true)
+                    .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                 var hasJsonNetAttributeRequired = jsonProperty.Required == Required.Always || jsonProperty.Required == Required.AllowNull;
                 var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
