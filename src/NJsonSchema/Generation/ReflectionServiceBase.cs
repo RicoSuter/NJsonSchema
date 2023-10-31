@@ -38,7 +38,7 @@ namespace NJsonSchema.Generation
             var type = contextualType.OriginalType;
             var isNullable = IsNullable(contextualType, defaultReferenceTypeNullHandling);
 
-            var jsonSchemaTypeAttribute = contextualType.GetAttribute<JsonSchemaTypeAttribute>();
+            var jsonSchemaTypeAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaTypeAttribute>(true);
             if (jsonSchemaTypeAttribute != null)
             {
                 type = jsonSchemaTypeAttribute.Type;
@@ -50,7 +50,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            var jsonSchemaAttribute = contextualType.GetAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaAttribute>(true); ;
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
@@ -235,12 +235,12 @@ namespace NJsonSchema.Generation
         /// <returns>true if the type can be null.</returns>
         public virtual bool IsNullable(ContextualType contextualType, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.GetContextAttributes(true).FirstAssignableToTypeNameOrDefault("NotNullAttribute", TypeNameStyle.Name) != null)
             {
                 return false;
             }
 
-            if (contextualType.ContextAttributes.FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
+            if (contextualType.GetContextAttributes(true).FirstAssignableToTypeNameOrDefault("CanBeNullAttribute", TypeNameStyle.Name) != null)
             {
                 return true;
             }
@@ -283,7 +283,7 @@ namespace NJsonSchema.Generation
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = contextualType.TypeName;
+            var parameterTypeName = contextualType.Name;
             return parameterTypeName == "IFormFile" ||
                    contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
                    contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
@@ -298,7 +298,7 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         private bool IsIAsyncEnumerableType(ContextualType contextualType)
         {
-            return contextualType.TypeName == "IAsyncEnumerable`1";
+            return contextualType.Name == "IAsyncEnumerable`1";
         }
 
         /// <summary>Checks whether the given type is an array type.</summary>
@@ -311,7 +311,7 @@ namespace NJsonSchema.Generation
                 return false;
             }
 
-            if (contextualType.TypeName == "ObservableCollection`1")
+            if (contextualType.Name == "ObservableCollection`1")
             {
                 return true;
             }
@@ -327,7 +327,7 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.TypeName == "IDictionary`2" || contextualType.TypeName == "IReadOnlyDictionary`2")
+            if (contextualType.Name == "IDictionary`2" || contextualType.Name == "IReadOnlyDictionary`2")
             {
                 return true;
             }
@@ -339,7 +339,10 @@ namespace NJsonSchema.Generation
 
         private bool HasStringEnumConverter(ContextualType contextualType)
         {
-            dynamic? jsonConverterAttribute = contextualType.Attributes?.FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            dynamic? jsonConverterAttribute = contextualType
+                .GetContextOrTypeAttributes(true)?
+                .FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+
             if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
                 var converterType = jsonConverterAttribute?.ConverterType as Type;

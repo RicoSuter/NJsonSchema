@@ -40,14 +40,14 @@ namespace NJsonSchema.Generation
                 }
 
                 if (accessorInfo.Name == "EqualityContract" &&
-                    accessorInfo.ContextAttributes.OfType<CompilerGeneratedAttribute>().Any())
+                    accessorInfo.IsAttributeDefined<CompilerGeneratedAttribute>(true))
                 {
                     continue;
                 }
 
                 var propertyIgnored = false;
                 var jsonIgnoreAttribute = accessorInfo
-                    .ContextAttributes
+                    .GetAttributes(true)
                     .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
 
                 if (jsonIgnoreAttribute != null)
@@ -61,8 +61,8 @@ namespace NJsonSchema.Generation
 
                 var ignored = propertyIgnored
                     || schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo)
-                    || accessorInfo.ContextAttributes
-                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
+                    || accessorInfo.GetAttributes(true)
+                        .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
 
                 if (!ignored)
                 {
@@ -82,7 +82,9 @@ namespace NJsonSchema.Generation
                         }
                     }
 
-                    var requiredAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                    var requiredAttribute = accessorInfo
+                        .GetAttributes(true)
+                        .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                     var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
@@ -132,7 +134,7 @@ namespace NJsonSchema.Generation
 
         private static string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
         {
-            dynamic? jsonPropertyNameAttribute = accessorInfo.ContextAttributes
+            dynamic? jsonPropertyNameAttribute = accessorInfo.GetAttributes(true)
                 .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
 
             if (!string.IsNullOrEmpty(jsonPropertyNameAttribute?.Name))

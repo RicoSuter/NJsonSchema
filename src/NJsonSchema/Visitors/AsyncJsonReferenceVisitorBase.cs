@@ -219,11 +219,11 @@ namespace NJsonSchema.Visitors
 
                     // Custom dictionary type with additional properties (OpenApiPathItem)
                     var contextualType = obj.GetType().ToContextualType();
-                    if (contextualType.InheritedAttributes.OfType<JsonConverterAttribute>().Any())
+                    if (contextualType.IsAttributeDefined<JsonConverterAttribute>(true))
                     {
                         foreach (var property in contextualType.Type.GetContextualProperties()
                             .Where(p => p.MemberInfo.DeclaringType == contextualType.Type &&
-                                        !p.GetContextAttributes<JsonIgnoreAttribute>().Any()))
+                                        !p.IsAttributeDefined<JsonIgnoreAttribute>(true)))
                         {
                             var value = property.GetValue(obj);
                             if (value != null)
