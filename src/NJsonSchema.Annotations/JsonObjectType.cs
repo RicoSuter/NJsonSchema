@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NJsonSchema.Annotations;
+namespace NJsonSchema;
 
 /// <summary>
 /// Enumeration of the possible object types.
