@@ -3,8 +3,7 @@ using Nuke.Common.CI.GitHubActions;
 [GitHubActionsAttribute(
     "pr",
     GitHubActionsImage.WindowsLatest,
-    //GitHubActionsImage.UbuntuLatest,
-    //GitHubActionsImage.MacOsLatest,
+    GitHubActionsImage.UbuntuLatest,
     OnPullRequestBranches = new[] { "master", "main" },
     OnPullRequestIncludePaths = new[] { "**/*.*" },
     OnPullRequestExcludePaths = new[] { "**/*.md" },
@@ -15,8 +14,7 @@ using Nuke.Common.CI.GitHubActions;
 [GitHubActionsAttribute(
     "build",
     GitHubActionsImage.WindowsLatest,
-    //GitHubActionsImage.UbuntuLatest,
-    //GitHubActionsImage.MacOsLatest,
+    GitHubActionsImage.UbuntuLatest,
     OnPushBranches = new[] { "master", "main" },
     OnPushTags = new[] { "v*.*.*", "v*.*.*-*" },
     OnPushIncludePaths = new[] { "**/*.*" },
