@@ -50,7 +50,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            var jsonSchemaAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaAttribute>(true); ;
+            var jsonSchemaAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaAttribute>(true);
             if (jsonSchemaAttribute != null)
             {
                 var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
