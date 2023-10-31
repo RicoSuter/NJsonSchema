@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using NJsonSchema.Annotations;
+using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {

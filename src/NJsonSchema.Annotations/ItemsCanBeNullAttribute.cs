@@ -8,12 +8,11 @@
 
 using System;
 
-namespace NJsonSchema.Annotations
+namespace NJsonSchema.Annotations;
+
+/// <summary>Annotation to specify that array items or dictionary values are nullable.</summary>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue |
+                AttributeTargets.Field)]
+public class ItemsCanBeNullAttribute : Attribute
 {
-    /// <summary>Annotation to specify that array items or dictionary values are nullable.</summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue |
-                    AttributeTargets.Field)]
-    public class ItemsCanBeNullAttribute : Attribute
-    {
-    }
 }

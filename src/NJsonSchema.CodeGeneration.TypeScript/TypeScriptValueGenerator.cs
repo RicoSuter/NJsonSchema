@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -72,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
                 if (schema != null && allowsNull == false && isOptional == false)
                 {
-                    if (typeResolver.GeneratesType(schema) && 
+                    if (typeResolver.GeneratesType(schema) &&
                         !schema.ActualTypeSchema.IsEnumeration &&
                         !schema.ActualTypeSchema.IsAbstract)
                     {

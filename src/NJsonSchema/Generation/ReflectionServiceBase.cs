@@ -53,13 +53,25 @@ namespace NJsonSchema.Generation
             var jsonSchemaAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaAttribute>(true); ;
             if (jsonSchemaAttribute != null)
             {
-                var classType = jsonSchemaAttribute.Type != JsonObjectType.None ? jsonSchemaAttribute.Type : JsonObjectType.Object;
+                var classType = ToJsonObjectType(jsonSchemaAttribute.Type);
+                if (classType == JsonObjectType.None)
+                {
+                    classType = JsonObjectType.Object;
+                }
+
                 var format = !string.IsNullOrEmpty(jsonSchemaAttribute.Format) ? jsonSchemaAttribute.Format : null;
                 return JsonTypeDescription.Create(contextualType, classType, isNullable, format);
             }
 
             return GetDescription(contextualType, settings, type, isNullable, defaultReferenceTypeNullHandling);
         }
+
+        /// <summary>
+        /// Convert <see cref="Annotations.JsonObjectType"/> into <see cref="JsonObjectType"/>
+        /// </summary>
+        /// <param name="jsonObjectType"></param>
+        /// <returns></returns>
+        protected JsonObjectType ToJsonObjectType(Annotations.JsonObjectType jsonObjectType) => (JsonObjectType) jsonObjectType;
 
         /// <summary>Creates a <see cref="JsonTypeDescription"/> from a <see cref="Type"/>. </summary>
         /// <param name="contextualType">The type.</param>

@@ -15,10 +15,10 @@ namespace NJsonSchema.Tests.Generation
         {
             public MyPoint Point { get; set; }
 
-            [JsonSchema(JsonObjectType.String, Format = "point")]
+            [JsonSchema(Annotations.JsonObjectType.String, Format = "point")]
             public AnnotationClass ClassAsString { get; set; }
 
-            [JsonSchema(JsonObjectType.String, Format = "point")]
+            [JsonSchema(Annotations.JsonObjectType.String, Format = "point")]
             public class MyPoint
             {
                 public decimal X { get; set; }
@@ -145,7 +145,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(0, errors.Count);
         }
 
-        [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
+        [JsonSchema(Annotations.JsonObjectType.Array, ArrayItem = typeof(string))]
         public class ArrayModel : IEnumerable<string>
         {
             public IEnumerator<string> GetEnumerator()
@@ -172,7 +172,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(JsonObjectType.String, schema.Item.Type);
         }
 
-        [JsonSchema(JsonObjectType.Array, ArrayItem = typeof(string))]
+        [JsonSchema(Annotations.JsonObjectType.Array, ArrayItem = typeof(string))]
         public class ArrayModel<T> : List<T>
         {
         }
@@ -197,7 +197,7 @@ namespace NJsonSchema.Tests.Generation
             public MyStruct? NullableStruct { get; set; }
         }
 
-        [JsonSchema(JsonObjectType.String)]
+        [JsonSchema(Annotations.JsonObjectType.String)]
         public struct MyStruct
         {
         }

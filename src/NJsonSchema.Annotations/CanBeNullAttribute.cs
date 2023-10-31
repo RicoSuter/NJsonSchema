@@ -8,11 +8,17 @@
 
 using System;
 
-namespace NJsonSchema.Annotations
+namespace NJsonSchema.Annotations;
+
+/// <summary>Indicates that the value of the marked element is nullable.</summary>
+[AttributeUsage(
+    AttributeTargets.Method |
+    AttributeTargets.Parameter |
+    AttributeTargets.Property |
+    AttributeTargets.ReturnValue |
+    AttributeTargets.Delegate |
+    AttributeTargets.Field |
+    AttributeTargets.Event)]
+public class CanBeNullAttribute : Attribute
 {
-    /// <summary>Indicates that the marked class is ignored during the JSON Schema generation.</summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public class JsonSchemaIgnoreAttribute : Attribute
-    {
-    }
 }

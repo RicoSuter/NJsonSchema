@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NJsonSchema.Annotations;
 
 namespace NJsonSchema
 {

@@ -5,6 +5,21 @@ using Xunit;
 
 namespace NJsonSchema.Tests.Generation.SystemTextJson
 {
+#if NETFRAMEWORK
+    file static class StringExtensions {
+        /// <summary>
+        /// Mimic .NET 6+ String.ReplaceLineEndings
+        /// </summary>
+        public static string ReplaceLineEndings(this string content, string lineSeparator = "\n")
+        {
+            return string.Join(
+                lineSeparator,
+                content.Replace("\r\n", "\n").Split('\r', '\n', '\f', '\u0085', '\u2028', '\u2029')
+            );
+        }
+    }
+#endif
+
     public class SystemTextJsonInheritanceTests
     {
         public class Apple : Fruit
@@ -30,19 +45,22 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         {
             //// Act
             var schema = JsonSchema.FromType<Fruit>();
-            var data = schema.ToJson();
+            var data = schema.ToJson().ReplaceLineEndings();
 
             //// Assert
             Assert.NotNull(data);
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);
-            Assert.Contains(@"""discriminator"": {
-    ""propertyName"": ""k"",
-    ""mapping"": {
-      ""a"": ""#/definitions/Apple"",
-      ""o"": ""#/definitions/Orange""
-    }
-  },", data);
+            Assert.Contains(
+                """
+                      "discriminator": {
+                        "propertyName": "k",
+                        "mapping": {
+                          "a": "#/definitions/Apple",
+                          "o": "#/definitions/Orange"
+                        }
+                      },
+                    """.ReplaceLineEndings(), data);
         }
 
 #if !NETFRAMEWORK
@@ -70,19 +88,22 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         {
             //// Act
             var schema = JsonSchema.FromType<Fruit2>();
-            var data = schema.ToJson();
+            var data = schema.ToJson().ReplaceLineEndings();
 
             //// Assert
             Assert.NotNull(data);
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);
-            Assert.Contains(@"""discriminator"": {
-    ""propertyName"": ""k"",
-    ""mapping"": {
-      ""a"": ""#/definitions/Apple2"",
-      ""o"": ""#/definitions/Orange2""
-    }
-  },", data);
+            Assert.Contains(
+                """
+                      "discriminator": {
+                        "propertyName": "k",
+                        "mapping": {
+                          "a": "#/definitions/Apple2",
+                          "o": "#/definitions/Orange2"
+                        }
+                      },
+                    """.ReplaceLineEndings(), data);
         }
 
 #endif
