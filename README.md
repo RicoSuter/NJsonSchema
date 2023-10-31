@@ -17,13 +17,12 @@ NJsonSchema is a .NET library to read, generate and validate JSON Schema draft v
 The library uses [Json.NET](http://james.newtonking.com/json) to read and write JSON data and [Namotion.Reflection](https://github.com/RicoSuter/Namotion.Reflection) for additional .NET reflection APIs.
 
 **NuGet packages:** 
-- [NJsonSchema](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest) (.NET Standard 1.0 & 2.0/.NET 4.5/.NET 4.0): JSON Schema parsing, validation and generation classes
-- [NJsonSchema.Yaml](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.Yaml/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5): Read and write JSON Schemas from YAML
-- [NJsonSchema.CodeGeneration](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Base classes to generate code from a JSON Schema
-- [NJsonSchema.CodeGeneration.CSharp](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.CSharp/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates CSharp classes
-- [NJsonSchema.CodeGeneration.TypeScript](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.TypeScript/versions/latest) (.NET Standard 1.3 & 2.0/.NET 4.5.1): Generates TypeScript interfaces or classes
-
-The NuGet packages may require the **Microsoft.NETCore.Portable.Compatibility** package on .NET Core/UWP targets (if mscorlib is missing). 
+- [NJsonSchema](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema/versions/latest) : JSON Schema parsing, validation and generation classes
+- [NJsonSchema.Annotations](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.Annotations/versions/latest) : JSON Schema annotations controlling serialization
+- [NJsonSchema.Yaml](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.Yaml/versions/latest) : Read and write JSON Schemas from YAML
+- [NJsonSchema.CodeGeneration](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration/versions/latest) : Base classes to generate code from a JSON Schema
+- [NJsonSchema.CodeGeneration.CSharp](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.CSharp/versions/latest) : Generates CSharp classes
+- [NJsonSchema.CodeGeneration.TypeScript](https://apimundo.com/organizations/nuget-org/nuget-feeds/public/packages/NJsonSchema.CodeGeneration.TypeScript/versions/latest) : Generates TypeScript interfaces or classes
 
 Preview NuGet Feed: https://www.myget.org/F/njsonschema/api/v3/index.json
 
@@ -34,7 +33,7 @@ Preview NuGet Feed: https://www.myget.org/F/njsonschema/api/v3/index.json
 - [Generate JSON Schema from sample JSON data](https://github.com/RicoSuter/NJsonSchema/wiki/SampleJsonSchemaGenerator) (`JsonSchema.FromSampleJson()`)
 - Support for schema references ($ref) (relative, URL and file)
 - Generate C# and TypeScript code from JSON Schema
-- Support for .NET Core (via PCL 259 / .NET Standard 1.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
+- Supports .NET Standard 2.0, also see [XML Documentation](https://github.com/NJsonSchema/NJsonSchema/wiki/XML-Documentation))
 - Supports JSON Schema, Swagger and OpenAPI DTO schemas
 
 NJsonSchema is heavily used in [NSwag](http://nswag.org), a Swagger API toolchain for .NET which generates client code for Web API services. NSwag also provides command line tools to use the NJsonSchema's JSON Schema generator (command `types2swagger`). 
