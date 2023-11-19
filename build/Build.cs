@@ -53,7 +53,7 @@ partial class Build : NukeBuild
         }
         else
         {
-            var propsDocument = XDocument.Parse((SourceDirectory / "Directory.Build.props").ReadAllText());
+            var propsDocument = XDocument.Parse((RootDirectory / "Directory.Build.props").ReadAllText());
             versionPrefix = propsDocument.Element("Project").Element("PropertyGroup").Element("VersionPrefix").Value;
             Serilog.Log.Information("Version prefix {VersionPrefix} read from Directory.Build.props", versionPrefix);
         }
@@ -128,7 +128,7 @@ partial class Build : NukeBuild
             var framework = "";
             if (!IsRunningOnWindows)
             {
-                framework = "net6.0";
+                framework = "net8.0";
             }
 
             DotNetTest(s => s

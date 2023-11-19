@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0;net462</TargetFrameworks>
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn),1998,1591,618</NoWarn>
         <Nullable>disable</Nullable>
@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net462'" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net6.0'" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net8.0'" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />

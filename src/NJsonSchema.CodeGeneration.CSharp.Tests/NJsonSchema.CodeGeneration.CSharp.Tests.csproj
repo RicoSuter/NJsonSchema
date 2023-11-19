@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn),1587,1998,1591,618,SYSLIB0012</NoWarn>
@@ -16,8 +16,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net6.0'" />
-        <PackageReference Condition="'$(TargetFramework)' == 'net6.0'" Include="System.ComponentModel.Annotations" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Condition="'$(TargetFramework)' == 'net8.0'" Include="System.ComponentModel.Annotations" />
     </ItemGroup>
 
     <ItemGroup>
