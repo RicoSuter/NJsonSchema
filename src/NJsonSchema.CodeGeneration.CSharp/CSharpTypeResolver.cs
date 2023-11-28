@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
 using System;
 using System.Linq;
 
@@ -91,9 +90,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var type = schema.ActualTypeSchema.Type;
             if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
             {
-                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
-                    JsonObjectType.Integer :
-                    JsonObjectType.String;
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
+                    ? JsonObjectType.Integer
+                    : JsonObjectType.String;
             }
 
             if (type.IsNumber())
@@ -165,22 +164,30 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return isNullable && Settings.DateType?.ToLowerInvariant() != "string" ? Settings.DateType + "?" : Settings.DateType + nullableReferenceType;
+                return isNullable && Settings.DateType?.ToLowerInvariant() != "string"
+                    ? Settings.DateType + "?"
+                    : Settings.DateType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.DateTime)
             {
-                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string" ? Settings.DateTimeType + "?" : Settings.DateTimeType + nullableReferenceType;
+                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string"
+                    ? Settings.DateTimeType + "?"
+                    : Settings.DateTimeType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.Time)
             {
-                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType + nullableReferenceType;
+                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string"
+                    ? Settings.TimeType + "?"
+                    : Settings.TimeType + nullableReferenceType;
             }
 
             if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
             {
-                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType + nullableReferenceType;
+                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string"
+                    ? Settings.TimeSpanType + "?"
+                    : Settings.TimeSpanType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.Uri)
@@ -250,19 +257,20 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "int?" : "int";
         }
 
-        private static string ResolveNumber(JsonSchema schema, bool isNullable)
+        private string ResolveNumber(JsonSchema schema, bool isNullable)
         {
-            if (schema.Format == JsonFormatStrings.Decimal)
+            var numberType = schema.Format switch
             {
-                return isNullable ? "decimal?" : "decimal";
-            }
+                JsonFormatStrings.Decimal => Settings.NumberDecimalType,
+                JsonFormatStrings.Double => Settings.NumberDoubleType,
+                JsonFormatStrings.Float => Settings.NumberFloatType,
+                _ => Settings.NumberType
+            };
 
-            if (schema.Format == JsonFormatStrings.Float)
-            {
-                return isNullable ? "float?" : "float";
-            }
+            if (string.IsNullOrWhiteSpace(numberType))
+                numberType = "double";
 
-            return isNullable ? "double?" : "double";
+            return isNullable ? numberType + "?" : numberType;
         }
 
         private string ResolveArrayOrTuple(JsonSchema schema)
