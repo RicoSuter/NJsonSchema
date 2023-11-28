@@ -65,7 +65,7 @@ namespace NJsonSchema.Yaml.Tests.References
         }
 
         [Theory]
-        [InlineData("https://www.zuora.com/developer/yaml/swagger.yaml", "https://rest.zuora.com/")]
+        [InlineData("https://developer.zuora.com/yaml/swagger.yaml", "https://rest.zuora.com/")]
         public async Task When_yaml_OpenAPI_spec_is__served_with_gzip_compression__it_works(string inputYamlUrl, string expectedBaseUrl)
         {
             //// Act
