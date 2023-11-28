@@ -1,6 +1,6 @@
 using Nuke.Common.CI.GitHubActions;
 
-[GitHubActionsAttribute(
+[GitHubActions(
     "pr",
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.UbuntuLatest,
@@ -11,7 +11,7 @@ using Nuke.Common.CI.GitHubActions;
     InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack) },
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" }),
 ]
-[GitHubActionsAttribute(
+[GitHubActions(
     "build",
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.UbuntuLatest,
