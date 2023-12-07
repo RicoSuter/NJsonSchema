@@ -40,6 +40,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ClassStyle = CSharpClassStyle.Poco;
             JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
 
+            OptionalPropertiesWriteDefaultValue = false;
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
             TypeAccessModifier = "public";
@@ -61,6 +62,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
         public string Namespace { get; set; }
+
+        /// <summary>Writes default value for optional properties when using JsonLibrary:SystemTextJson (default: false)</summary>
+        public bool OptionalPropertiesWriteDefaultValue { get; set; }
 
         /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON
         /// (sets Required.Always when the property is required) (default: true).</summary>

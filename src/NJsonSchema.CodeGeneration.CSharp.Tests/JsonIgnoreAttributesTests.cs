@@ -173,5 +173,106 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 Normalized(code)
             );
         }
+
+        [Fact]
+        public async Task When_using_SystemTextJson_and_OptionalPropertiesWriteDefaultValue_is_false_JsonIgnoreAttributes_are_still_generated_for_optional_properties()
+        {
+            //// Arrange
+            var schema = await JsonSchema.FromJsonAsync(@"{
+                ""type"": ""object"",
+                ""required"": [],
+                ""properties"": {
+                    ""optionalRef"": { ""type"": ""string"" },
+                    ""optionalValue"": { ""type"": ""integer"", ""format"": ""int32"" },
+                    ""optionalNullableValue"": { ""type"": [""integer"", ""null""], ""format"": ""int32"" }
+                }
+            }");
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                OptionalPropertiesWriteDefaultValue = false
+            });
+
+            static string Normalized(string str) =>
+                Regex.Replace(str, @"\s+", " ");
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            /// Assert
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalRef"")]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+                "),
+                Normalized(code)
+            );
+
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalValue"")]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+                "),
+                Normalized(code)
+            );
+
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalNullableValue"")]
+                    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+                "),
+                Normalized(code)
+            );
+        }
+
+        [Fact]
+        public async Task When_using_SystemTextJson_and_OptionalPropertiesWriteDefaultValue_is_true_JsonIgnoreAttributes_are_not_generated_for_optional_properties()
+        {
+            //// Arrange
+            var schema = await JsonSchema.FromJsonAsync(@"{
+                ""type"": ""object"",
+                ""required"": [],
+                ""properties"": {
+                    ""optionalRef"": { ""type"": ""string"" },
+                    ""optionalValue"": { ""type"": ""integer"", ""format"": ""int32"" },
+                    ""optionalNullableValue"": { ""type"": [""integer"", ""null""], ""format"": ""int32"" }
+                }
+            }");
+
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                OptionalPropertiesWriteDefaultValue = true
+            });
+
+            static string Normalized(string str) =>
+                Regex.Replace(str, @"\s+", " ");
+
+            //// Act
+            var code = generator.GenerateFile("MyClass");
+
+            /// Assert
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalRef"")]
+                "),
+                Normalized(code)
+            );
+
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalValue"")]
+                "),
+                Normalized(code)
+            );
+
+            Assert.Contains(
+                Normalized(@"
+                    [System.Text.Json.Serialization.JsonPropertyName(""optionalNullableValue"")]
+                "),
+                Normalized(code)
+            );
+        }
     }
 }

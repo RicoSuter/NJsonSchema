@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
         public string? JsonIgnoreCondition => _property switch
         {
-            { IsRequired: false } => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault",
+            { IsRequired: false } when !_settings.OptionalPropertiesWriteDefaultValue => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault",
             { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
             _ => null
         };
