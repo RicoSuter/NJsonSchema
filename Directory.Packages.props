@@ -9,11 +9,11 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageVersion Include="Namotion.Reflection" Version="3.1.0" />
+    <PackageVersion Include="Namotion.Reflection" Version="3.1.1" />
     <PackageVersion Include="NBench" Version="2.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NodaTime" Version="3.1.9" />
-    <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0-preview008" />
+    <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0-preview011" />
     <PackageVersion Include="Pro.NBench.xUnit" Version="2.0.0" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="4.4.0" />
     <PackageVersion Include="System.Text.Json" Version="4.7.2" />
