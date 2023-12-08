@@ -53,9 +53,6 @@
 {%-   endif -%}
 {%- if UseSystemTextJson %}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
-{%-   if property.HasJsonIgnoreCondition %}
-    [System.Text.Json.Serialization.JsonIgnore(Condition = {{ property.JsonIgnoreCondition }})]   
-{%-   endif -%}
 {%-   if property.IsStringEnumArray %}
     // TODO(system.text.json): Add string enum item converter
 {%-   endif -%}
