@@ -74,6 +74,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             };
             var output = await PrepareAsync(settings);
 
+            //// Assert
+            Assert.Contains("dateOfBirth = ko.observable<Date>();", output);
+            Assert.Contains("init(_data?: any) {", output);
+
             await Verify(output).UseParameters(style, version);
         }
 
