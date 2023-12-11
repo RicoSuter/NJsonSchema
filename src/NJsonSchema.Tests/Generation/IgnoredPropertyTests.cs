@@ -18,6 +18,15 @@ namespace NJsonSchema.Tests.Generation
             public string IgnoreMe;
         }
 
+        [Fact]
+        public async Task When_IgnoreJsonIgnore_is_specified_marked_fields_are_included()
+        {
+            var json = NewtonsoftJsonSchemaGenerator.FromType<Mno>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                IgnoreProperty = prop => false
+            }).ToJson();
+            Assert.Contains("IgnoreMe", json);
+        }
 
         [Fact]
         public async Task When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
