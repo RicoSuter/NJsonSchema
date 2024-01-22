@@ -62,7 +62,8 @@ namespace NJsonSchema.Generation
                 var ignored = propertyIgnored
                     || schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo)
                     || accessorInfo.GetAttributes(true)
-                        .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
+                        .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null
+                    || settings.ExcludedTypeNames.Contains(accessorInfo.AccessorType.Type.FullName);
 
                 if (!ignored)
                 {
