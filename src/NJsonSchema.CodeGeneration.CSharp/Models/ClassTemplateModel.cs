@@ -53,6 +53,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether to use System.Text.Json</summary>
         public bool UseSystemTextJson => _settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
 
+        /// <summary>Gets a value indicating whether to use System.Text.Json polymorphic serialization</summary>
+        public bool UseSystemTextJsonPolymorphicSerialization => _settings.JsonPolymorphicSerializationStyle == CSharpJsonPolymorphicSerializationStyle.SystemTextJson;
+
         /// <summary>Gets or sets the class name.</summary>
         public override string ClassName { get; }
 

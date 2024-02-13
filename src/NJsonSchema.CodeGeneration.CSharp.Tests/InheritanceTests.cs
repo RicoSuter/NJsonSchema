@@ -156,6 +156,33 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("[JsonInheritanceAttribute(\"PersianCat\", typeof(PersianCat))]", code);
         }
 
+        [Fact]
+        public async Task When_definitions_inherit_from_root_schema_and_STJ_polymorphism()
+        {
+            //// Arrange
+            var path = GetTestDirectory() + "/References/Animal.json";
+
+            //// Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson
+            });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.Contains("public abstract partial class Animal", code);
+            Assert.Contains("public partial class Cat : Animal", code);
+            Assert.Contains("public partial class PersianCat : Cat", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"discriminator\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(Cat), typeDiscriminator: \"Cat\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(PersianCat), typeDiscriminator: \"PersianCat\")]", code);
+        }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
