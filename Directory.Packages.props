@@ -25,6 +25,6 @@
   <ItemGroup>
     <GlobalPackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
     <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
-    <GlobalPackageReference Include="PolySharp" Version="1.13.2" />
+    <GlobalPackageReference Include="PolySharp" Version="1.14.1" />
   </ItemGroup>
 </Project>

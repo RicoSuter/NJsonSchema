@@ -296,7 +296,7 @@ namespace NJsonSchema.Generation
         /// </remarks>
         /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        private bool IsIAsyncEnumerableType(ContextualType contextualType)
+        private static bool IsIAsyncEnumerableType(ContextualType contextualType)
         {
             return contextualType.Name == "IAsyncEnumerable`1";
         }
@@ -337,7 +337,7 @@ namespace NJsonSchema.Generation
                     !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
-        private bool HasStringEnumConverter(ContextualType contextualType)
+        private static bool HasStringEnumConverter(ContextualType contextualType)
         {
             dynamic? jsonConverterAttribute = contextualType
                 .GetContextOrTypeAttributes(true)?

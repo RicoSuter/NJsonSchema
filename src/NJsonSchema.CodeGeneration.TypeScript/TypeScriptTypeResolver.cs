@@ -56,7 +56,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets a value indicating whether the schema supports constructor conversion.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The result.</returns>
+#pragma warning disable CA1822
         public bool SupportsConstructorConversion(JsonSchema? schema)
+#pragma warning restore CA1822
         {
             return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
         }
@@ -109,7 +111,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
             {
-                return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
+                return TypeScriptTypeResolver.ResolveInteger(schema.ActualTypeSchema, typeNameHint);
             }
 
             if (type.IsBoolean())
@@ -167,7 +169,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
 
+#pragma warning disable CA2208
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+#pragma warning restore CA2208
                     }
 
                     return $"{{ [key: {keyType}]: {valueType}; }}";
@@ -290,7 +294,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "string";
         }
 
-        private string ResolveInteger(JsonSchema schema, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, string? typeNameHint)
         {
             return "number";
         }

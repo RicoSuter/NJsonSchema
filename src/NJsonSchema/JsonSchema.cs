@@ -51,10 +51,10 @@ namespace NJsonSchema
         internal ObservableCollection<JsonSchema> _items;
 
         private bool _allowAdditionalItems = true;
-        private JsonSchema? _additionalItemsSchema = null;
+        private JsonSchema? _additionalItemsSchema;
 
         private bool _allowAdditionalProperties = true;
-        private JsonSchema? _additionalPropertiesSchema = null;
+        private JsonSchema? _additionalPropertiesSchema;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema"/> class. </summary>
         public JsonSchema()
@@ -812,7 +812,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents an tuple type (an array where each item may have a different type).</summary>
         [JsonIgnore]
-        public bool IsTuple => Type.IsArray() && Items?.Any() == true;
+        public bool IsTuple => Type.IsArray() && Items?.Count > 0;
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties or PatternProperties contain a schema).</summary>
         [JsonIgnore]

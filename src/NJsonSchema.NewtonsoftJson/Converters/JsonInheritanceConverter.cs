@@ -250,7 +250,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
-        private Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
+        private static Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
         {
             var type = objectType;
             do
@@ -265,10 +265,10 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                     else if (attribute.MethodName != null)
                     {
-                        var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, new object[0]);
+                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, Array.Empty<object>());
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminator)

@@ -146,7 +146,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
                 else
                 {
+#pragma warning disable CA2208
                     throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+#pragma warning restore CA2208
                 }
 
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);

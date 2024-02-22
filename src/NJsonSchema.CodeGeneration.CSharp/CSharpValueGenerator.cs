@@ -67,11 +67,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())
                     {
-                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<", StringComparison.Ordinal)
                             ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
 
-                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<", StringComparison.Ordinal)
                             ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
@@ -93,11 +93,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
             switch (format)
             {
                 case JsonFormatStrings.Byte:
-                    return "(byte)" + Convert.ToByte(value).ToString(CultureInfo.InvariantCulture);
+                    return "(byte)" + Convert.ToByte(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
                 case JsonFormatStrings.Integer:
-                    return Convert.ToInt32(value).ToString(CultureInfo.InvariantCulture);
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
                 case JsonFormatStrings.Long:
-                    return Convert.ToInt64(value) + "L";
+                    return Convert.ToInt64(value, CultureInfo.InvariantCulture) + "L";
                 case JsonFormatStrings.Double:
                     return ConvertNumberToString(value) + "D";
                 case JsonFormatStrings.Float:

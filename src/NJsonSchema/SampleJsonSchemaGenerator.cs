@@ -202,7 +202,7 @@ namespace NJsonSchema
             }
         }
 
-        private void MergeAndAssignItemSchemas(JsonSchema rootSchema, JsonSchema schema, List<JsonSchema> itemSchemas, string typeNameHint)
+        private static void MergeAndAssignItemSchemas(JsonSchema rootSchema, JsonSchema schema, List<JsonSchema> itemSchemas, string typeNameHint)
         {
             var firstItemSchema = itemSchemas.First();
             var itemSchema = new JsonSchema
@@ -222,7 +222,7 @@ namespace NJsonSchema
             schema.Item = new JsonSchema { Reference = itemSchema };
         }
 
-        private void AddSchemaDefinition(JsonSchema rootSchema, JsonSchema schema, string typeNameHint)
+        private static void AddSchemaDefinition(JsonSchema rootSchema, JsonSchema schema, string typeNameHint)
         {
             if (string.IsNullOrEmpty(typeNameHint) || rootSchema.Definitions.ContainsKey(typeNameHint))
             {

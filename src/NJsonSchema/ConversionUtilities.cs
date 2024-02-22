@@ -138,7 +138,7 @@ namespace NJsonSchema
                         else
                         {
                             literal.Append(@"\u");
-                            literal.Append(((int) c).ToString("x4"));
+                            literal.Append(((int) c).ToString("x4", CultureInfo.InvariantCulture));
                         }
 
                         break;
@@ -197,7 +197,7 @@ namespace NJsonSchema
                 return "Person";
             }
 
-            return word.EndsWith("s") ? word.Substring(0, word.Length - 1) : word;
+            return word.EndsWith('s') ? word.Substring(0, word.Length - 1) : word;
         }
 
         /// <summary>Add tabs to the given string.</summary>
@@ -303,7 +303,7 @@ namespace NJsonSchema
 
         private static string ConvertDashesToCamelCase(string input)
         {
-            if (input.IndexOf('-') == -1)
+            if (!input.Contains('-'))
             {
                 // no conversion necessary
                 return input;

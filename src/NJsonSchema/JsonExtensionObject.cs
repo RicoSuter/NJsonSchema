@@ -36,7 +36,7 @@ namespace NJsonSchema
             {
                 var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType)!;
                 serializer.Populate(reader, obj);
-                DeserializeExtensionDataSchemas(obj, serializer);
+                ExtensionDataDeserializationConverter.DeserializeExtensionDataSchemas(obj, serializer);
                 return obj;
             }
             else
@@ -59,7 +59,7 @@ namespace NJsonSchema
         /// <summary>Transforms the extension data so that contained schemas are correctly deserialized.</summary>
         /// <param name="extensionObject">The extension object.</param>
         /// <param name="serializer">The serializer.</param>
-        internal void DeserializeExtensionDataSchemas(IJsonExtensionObject extensionObject, JsonSerializer serializer)
+        internal static void DeserializeExtensionDataSchemas(IJsonExtensionObject extensionObject, JsonSerializer serializer)
         {
             if (extensionObject.ExtensionData != null)
             {
@@ -70,7 +70,7 @@ namespace NJsonSchema
             }
         }
 
-        private object? TryDeserializeValueSchemas(object? value, JsonSerializer serializer)
+        private static object? TryDeserializeValueSchemas(object? value, JsonSerializer serializer)
         {
             if (value is JObject obj)
             {

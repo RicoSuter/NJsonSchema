@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using Namotion.Reflection;
@@ -154,7 +155,7 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
-                    ExclusiveMaximum = Convert.ToDecimal(value);
+                    ExclusiveMaximum = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -176,7 +177,7 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
-                    ExclusiveMinimum = Convert.ToDecimal(value);
+                    ExclusiveMinimum = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
                 }
             }
         }

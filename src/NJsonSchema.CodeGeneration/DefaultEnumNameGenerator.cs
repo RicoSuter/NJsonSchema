@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -29,48 +30,37 @@ namespace NJsonSchema.CodeGeneration
                 return "Empty";
             }
 
-            switch (name)
+            name = name switch
             {
-                case ("="):
-                    name = "Eq";
-                    break;
-                case ("!="):
-                    name = "Ne";
-                    break;
-                case (">"):
-                    name = "Gt";
-                    break;
-                case ("<"):
-                    name = "Lt";
-                    break;
-                case (">="):
-                    name = "Ge";
-                    break;
-                case ("<="):
-                    name = "Le";
-                    break;
-                case ("~="):
-                    name = "Approx";
-                    break;
-            }
+                "=" => "Eq",
+                "!=" => "Ne",
+                ">" => "Gt",
+                "<" => "Lt",
+                ">=" => "Ge",
+                "<=" => "Le",
+                "~=" => "Approx",
+                _ => name
+            };
 
-            if (name!.StartsWith("-"))
+#pragma warning disable CS8604 // Possible null reference argument.
+            if (name.StartsWith('-'))
+#pragma warning restore CS8604 // Possible null reference argument.
             {
                 name = "Minus" + name.Substring(1);
             }
 
-            if (name.StartsWith("+"))
+            if (name.StartsWith('+'))
             {
                 name = "Plus" + name.Substring(1);
             }
 
-            if (name.StartsWith("_-"))
+            if (name.StartsWith("_-", StringComparison.Ordinal))
             {
                 name = "__" + name.Substring(2);
             }
 
             return _invalidNameCharactersPattern.Replace(ConversionUtilities.ConvertToUpperCamelCase(name
-                .Replace(":", "-").Replace(@"""", @""), true), "_");
+                .Replace(":", "-").Replace(@"""", ""), firstCharacterMustBeAlpha: true), "_");
         }
     }
 }
