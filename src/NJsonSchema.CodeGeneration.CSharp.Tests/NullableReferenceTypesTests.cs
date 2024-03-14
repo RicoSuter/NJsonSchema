@@ -245,5 +245,48 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("public string Required { get; set; } = default!;", code);
             Assert.Contains("public string? Optional { get; set; } = default!;", code);
         }
+
+        [Fact]
+        public async Task
+            When_generating_from_json_schema_string_property_with_reference_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property()
+        {
+            //// Arrange
+            var schemaJson = @"
+            {
+                ""type"": ""object"",
+                ""required"": [
+                    ""required""
+                ],
+                ""properties"": {
+                    ""required"": { ""$ref"": ""#/$defs/requiredString"" },
+                    ""optional"": { ""$ref"": ""#/$defs/optionalString"" }
+                },
+                ""$defs"": {
+                    ""requiredString"": { ""type"": ""string"" },
+                    ""optionalString"": { ""type"": ""string"" }
+                }
+            }
+            ";
+
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+
+            //// Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.OpenApi3,
+                DateType = "string",
+                DateTimeType = "string",
+                TimeType = "string",
+                TimeSpanType = "string",
+                GenerateNullableReferenceTypes = true,
+                GenerateOptionalPropertiesAsNullable = true
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("public string Required { get; set; } = default!;", code);
+            Assert.Contains("public string? Optional { get; set; } = default!;", code);
+        }
     }
 }
