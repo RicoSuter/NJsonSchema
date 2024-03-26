@@ -62,12 +62,14 @@ namespace NJsonSchema
             }
 
             var typeName = Generate(schema, typeNameHint);
+            typeName = RemoveIllegalCharacters(typeName);
+
             if (string.IsNullOrEmpty(typeName) || reservedTypeNames.Contains(typeName))
             {
                 typeName = GenerateAnonymousTypeName(typeNameHint, reservedTypeNames);
             }
 
-            return RemoveIllegalCharacters(typeName);
+            return typeName;
         }
 
         /// <summary>Generates the type name for the given schema.</summary>
