@@ -22,7 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.0.314" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="Microsoft.CSharp">
