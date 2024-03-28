@@ -39,6 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             ClassStyle = CSharpClassStyle.Poco;
             JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
+            JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.NSwag;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
@@ -119,6 +120,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
         public CSharpJsonLibrary JsonLibrary { get; set; }
+
+        /// <summary>Gets or sets the CSharp JSON polymorphic serialization style (default: 'NSwag', 'SystemTextJson' is experimental/not complete).</summary>
+        public CSharpJsonPolymorphicSerializationStyle JsonPolymorphicSerializationStyle { get; set; }
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }

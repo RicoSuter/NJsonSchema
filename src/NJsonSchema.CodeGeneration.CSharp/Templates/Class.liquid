@@ -5,13 +5,21 @@
 {%- endif -%}
 {%- if HasDiscriminator -%}
 {%- if UseSystemTextJson -%}
+{%- if UseSystemTextJsonPolymorphicSerialization -%}
+[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "{{ Discriminator }}")]
+{%- else -%}
 [JsonInheritanceConverter(typeof({{ ClassName }}), "{{ Discriminator }}")]
+{%- endif -%}
 {%- else -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {%- endif -%}
 {%- for derivedClass in DerivedClasses -%}
 {%- if derivedClass.IsAbstract != true -%}
+{%- if UseSystemTextJson and UseSystemTextJsonPolymorphicSerialization -%}
+[System.Text.Json.Serialization.JsonDerivedType(typeof({{ derivedClass.ClassName }}), typeDiscriminator: "{{ derivedClass.Discriminator }}")]
+{%- else -%}
 [JsonInheritanceAttribute("{{ derivedClass.Discriminator }}", typeof({{ derivedClass.ClassName }}))]
+{%- endif -%}
 {%- endif -%}
 {%- endfor -%}
 {%- endif -%}
