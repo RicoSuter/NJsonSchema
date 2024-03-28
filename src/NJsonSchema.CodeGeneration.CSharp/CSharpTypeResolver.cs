@@ -217,7 +217,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "bool?" : "bool";
         }
 
-        private string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Byte)
             {

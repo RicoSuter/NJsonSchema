@@ -43,7 +43,9 @@ namespace NJsonSchema.Converters
     public class JsonInheritanceConverter<TBase> : JsonConverter<TBase?>
     {
         /// <summary>Gets the list of additional known types.</summary>
+#pragma warning disable CA1000
         public static IDictionary<string, Type> AdditionalKnownTypes { get; } = new Dictionary<string, Type>();
+#pragma warning restore CA1000
 
         private readonly string _discriminatorName;
 
@@ -132,9 +134,9 @@ namespace NJsonSchema.Converters
         {
             if (discriminatorValue != null)
             {
-                if (AdditionalKnownTypes.ContainsKey(discriminatorValue))
+                if (AdditionalKnownTypes.TryGetValue(discriminatorValue, out Type? value))
                 {
-                    return AdditionalKnownTypes[discriminatorValue];
+                    return value;
                 }
 
                 var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
@@ -183,11 +185,10 @@ namespace NJsonSchema.Converters
                     }
                     else if (attribute.MethodName != null)
                     {
-                        var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = method.Invoke(null, new object[0]) as IEnumerable<Type>;
-                            if (types != null)
+                            if (method.Invoke(null, Array.Empty<object>()) is IEnumerable<Type> types)
                             {
                                 foreach (var knownType in types)
                                 {

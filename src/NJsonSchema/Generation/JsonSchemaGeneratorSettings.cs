@@ -36,7 +36,7 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
 
-            ExcludedTypeNames = new string[0];
+            ExcludedTypeNames = Array.Empty<string>();
 
             UseXmlDocumentation = true;
             ResolveExternalXmlDocumentation = true;
@@ -62,7 +62,7 @@ namespace NJsonSchema.Generation
         public bool GenerateKnownTypes { get; set; } = true;
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
-        public bool GenerateXmlObjects { get; set; } = false;
+        public bool GenerateXmlObjects { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }

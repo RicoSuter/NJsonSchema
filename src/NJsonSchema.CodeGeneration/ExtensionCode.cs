@@ -33,12 +33,12 @@ namespace NJsonSchema.CodeGeneration
 		/// <exception cref="InvalidOperationException">The extension class is not defined.</exception>
 		public string GetExtensionClassBody(string className)
         {
-			if (!ExtensionClasses.ContainsKey(className))
+			if (!ExtensionClasses.TryGetValue(className, out string? value))
             {
                 throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
             }
 
-            var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
+            var match = Regex.Match(value, "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
             return match.Groups[3].Value;
         }
     }

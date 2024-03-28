@@ -8,6 +8,7 @@
 
 using NJsonSchema.Annotations;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -78,8 +79,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     Value = value.ToString(),
-                                    InternalValue = valueInt64.ToString(),
-                                    InternalFlagValue = valueInt64.ToString()
+                                    InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
+                                    InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                             else
@@ -89,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     Value = value.ToString(),
                                     InternalValue = value.ToString(),
-                                    InternalFlagValue = (1 << i).ToString()
+                                    InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                         }
@@ -102,8 +103,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                             {
                                 Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                 Value = value.ToString(),
-                                InternalValue = i.ToString(),
-                                InternalFlagValue = (1 << i).ToString()
+                                InternalValue = i.ToString(CultureInfo.InvariantCulture),
+                                InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                             });
                         }
                     }

@@ -81,13 +81,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <inheritdoc />
-        protected override string GenerateFile(IEnumerable<CodeArtifact> artifactCollection)
+        protected override string GenerateFile(IEnumerable<CodeArtifact> artifacts)
         {
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
                 GenerateNullableReferenceTypes = Settings.GenerateNullableReferenceTypes,
-                TypesCode = artifactCollection.Concatenate()
+                TypesCode = artifacts.Concatenate()
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);

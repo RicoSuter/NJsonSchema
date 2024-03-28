@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
         private string GetLiquidTemplate(string language, string template)
         {
-            if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
+            if (!template.EndsWith('!') && !string.IsNullOrEmpty(_settings.TemplateDirectory))
             {
                 var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
