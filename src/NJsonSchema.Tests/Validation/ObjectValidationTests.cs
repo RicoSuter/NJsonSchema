@@ -24,6 +24,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.Equal(ValidationErrorKind.ObjectExpected, errors.First().Kind);
+            Assert.Equal("10", errors.First().Token?.ToString());
         }
 
         [Fact]
@@ -47,6 +48,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal("Foo", errors.First().Property);
             Assert.Equal("#/Foo", errors.First().Path);
             Assert.Equal(ValidationErrorKind.PropertyRequired, errors.First().Kind);
+            Assert.Equal("{}", errors.First().Token?.ToString());
         }
 
         [Fact]
@@ -134,6 +136,7 @@ namespace NJsonSchema.Tests.Validation
             Assert.Equal(ValidationErrorKind.StringExpected, errors.First().Kind);
             Assert.Equal("Foo", errors.First().Property);
             Assert.Equal("#/Foo", errors.First().Path);
+            Assert.Equal("10", errors.First().Token?.ToString());
         }
 
         [Fact]
@@ -180,6 +183,7 @@ namespace NJsonSchema.Tests.Validation
 
             //// Assert
             Assert.Equal(ValidationErrorKind.NoAdditionalPropertiesAllowed, errors.First().Kind);
+            Assert.Equal("\"foo\": 5", errors.First().Token?.ToString());
         }
 
         [Fact]
