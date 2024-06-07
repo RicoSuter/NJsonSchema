@@ -45,6 +45,12 @@ namespace NJsonSchema.Generation
                     continue;
                 }
 
+                if (accessorInfo.MemberInfo is PropertyInfo propInfo &&
+                    propInfo.GetIndexParameters().Length > 0)
+                {
+                    continue;
+                }
+
                 var propertyIgnored = false;
                 var jsonIgnoreAttribute = accessorInfo
                     .GetAttributes(true)
