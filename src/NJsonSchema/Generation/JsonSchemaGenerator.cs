@@ -1089,7 +1089,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private object? TryGetInheritanceDiscriminatorConverter(Type type)
+        private SystemTextJsonInheritanceWrapper? TryGetInheritanceDiscriminatorConverter(Type type)
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
 
