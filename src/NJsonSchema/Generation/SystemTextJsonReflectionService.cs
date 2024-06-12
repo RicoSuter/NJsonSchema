@@ -32,8 +32,8 @@ namespace NJsonSchema.Generation
                 }
 
                 if (accessorInfo.MemberInfo is PropertyInfo propertyInfo &&
-                    (propertyInfo.GetMethod?.IsPrivate == true || propertyInfo.GetMethod?.IsStatic == true) &&
-                    (propertyInfo.SetMethod?.IsPrivate == true || propertyInfo.SetMethod?.IsStatic == true) &&
+                    (propertyInfo.GetMethod == null || propertyInfo.GetMethod.IsPrivate == true || propertyInfo.GetMethod.IsStatic == true) &&
+                    (propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsPrivate == true || propertyInfo.SetMethod.IsStatic == true) &&
                     !propertyInfo.IsDefined(typeof(DataMemberAttribute)))
                 {
                     continue;
