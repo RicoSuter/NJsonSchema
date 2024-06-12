@@ -5,10 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
-    <PackageVersion Include="Fluid.Core" Version="2.5.0" />
+    <PackageVersion Include="Fluid.Core" Version="2.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageVersion Include="Namotion.Reflection" Version="3.1.1" />
     <PackageVersion Include="NBench" Version="2.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
@@ -18,13 +18,13 @@
     <PackageVersion Include="System.ComponentModel.Annotations" Version="4.4.0" />
     <PackageVersion Include="System.Text.Json" Version="4.7.2" />
     <PackageVersion Include="Verify.XUnit" Version="14.7.0" />
-    <PackageVersion Include="xunit" Version="2.5.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
-    <PackageVersion Include="YamlDotNet" Version="13.7.1" />
+    <PackageVersion Include="xunit" Version="2.8.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageVersion Include="YamlDotNet" Version="15.1.4" />
   </ItemGroup>
   <ItemGroup>
     <GlobalPackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
-    <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <GlobalPackageReference Include="PolySharp" Version="1.14.1" />
   </ItemGroup>
 </Project>
