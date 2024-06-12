@@ -1089,6 +1089,7 @@ namespace NJsonSchema.Generation
             }
         }
 
+#pragma warning disable CA1859
         private object? TryGetInheritanceDiscriminatorConverter(Type type)
         {
             var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
@@ -1099,8 +1100,8 @@ namespace NJsonSchema.Generation
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
                 if (converterType != null && (
-                    converterType.IsAssignableToTypeName("JsonInheritanceConverter", TypeNameStyle.Name) || // Newtonsoft's converter
-                    converterType.IsAssignableToTypeName("JsonInheritanceConverter`1", TypeNameStyle.Name) // System.Text.Json's converter
+                        converterType.IsAssignableToTypeName("JsonInheritanceConverter", TypeNameStyle.Name) || // Newtonsoft's converter
+                        converterType.IsAssignableToTypeName("JsonInheritanceConverter`1", TypeNameStyle.Name) // System.Text.Json's converter
                     ))
                 {
                     return ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterParameters") &&
@@ -1125,6 +1126,8 @@ namespace NJsonSchema.Generation
 
             return null;
         }
+#pragma warning restore CA1859
+
 
         private sealed class SystemTextJsonInheritanceWrapper
         {
