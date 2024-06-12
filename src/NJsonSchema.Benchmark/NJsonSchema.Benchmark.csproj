@@ -6,6 +6,7 @@
         <NoWarn>$(NoWarn),xUnit1013</NoWarn>
         <SignAssembly>false</SignAssembly>
         <Nullable>disable</Nullable>
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>

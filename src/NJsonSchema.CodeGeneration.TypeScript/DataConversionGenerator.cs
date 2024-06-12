@@ -147,7 +147,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "dayjs";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 
@@ -168,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "toFormat('yyyy-MM-dd')";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 
@@ -207,7 +207,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "toISOString()";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 

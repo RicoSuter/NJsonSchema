@@ -21,9 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs">
-      <Link>EnumExtensions.cs</Link>
-    </Compile>
+    <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs" Link="EnumExtensions.cs" />
+    <Compile Include="..\NJsonSchema\Infrastructure\Polyfills.cs" Link="Polyfills.cs" />
   </ItemGroup>
 
 </Project>

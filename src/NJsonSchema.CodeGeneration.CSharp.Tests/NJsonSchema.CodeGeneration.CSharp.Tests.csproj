@@ -6,6 +6,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn),1587,1998,1591,618,SYSLIB0012</NoWarn>
         <Nullable>disable</Nullable>
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>

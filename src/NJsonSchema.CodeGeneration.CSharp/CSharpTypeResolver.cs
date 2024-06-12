@@ -60,19 +60,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 throw new ArgumentNullException(nameof(schema));
             }
 
-            schema = GetResolvableSchema(schema);
-
-            if (schema == ExceptionSchema)
-            {
-                return "System.Exception";
-            }
-
             // Primitive schemas (no new type)
             if (Settings.GenerateOptionalPropertiesAsNullable &&
                 schema is JsonSchemaProperty property &&
                 !property.IsRequired)
             {
                 isNullable = true;
+            }
+
+            schema = GetResolvableSchema(schema);
+
+            if (schema == ExceptionSchema)
+            {
+                return "System.Exception";
             }
 
             var markAsNullableType = Settings.GenerateNullableReferenceTypes && isNullable;
@@ -217,7 +217,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "bool?" : "bool";
         }
 
-        private string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Byte)
             {

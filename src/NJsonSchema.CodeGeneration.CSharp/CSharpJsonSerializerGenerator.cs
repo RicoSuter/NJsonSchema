@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public static string GenerateJsonSerializerParameterCode(CSharpGeneratorSettings settings, IEnumerable<string>? additionalJsonConverters)
         {
             var jsonConverters = GetJsonConverters(settings, additionalJsonConverters);
-            var hasJsonConverters = jsonConverters.Any();
+            var hasJsonConverters = jsonConverters.Count > 0;
 
             return GenerateForJsonLibrary(settings, jsonConverters, hasJsonConverters);
         }
@@ -95,24 +95,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private static string GenerateConverters(List<string> jsonConverters, CSharpJsonLibrary jsonLibrary)
         {
-            if (jsonConverters.Any())
+            if (jsonConverters.Count > 0)
             {
-                switch (jsonLibrary)
+                return jsonLibrary switch
                 {
-                    case CSharpJsonLibrary.NewtonsoftJson:
-                        return "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
-
-                    case CSharpJsonLibrary.SystemTextJson:
-                        return "new System.Text.Json.Serialization.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }";
-
-                    default: // TODO: possibly add more json converters
-                        return string.Empty;
-                }
+                    CSharpJsonLibrary.NewtonsoftJson => "new Newtonsoft.Json.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }",
+                    CSharpJsonLibrary.SystemTextJson => "new System.Text.Json.Serialization.JsonConverter[] { " + string.Join(", ", jsonConverters.Select(c => "new " + c + "()")) + " }",
+                    _ => string.Empty
+                };
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
     }
 }

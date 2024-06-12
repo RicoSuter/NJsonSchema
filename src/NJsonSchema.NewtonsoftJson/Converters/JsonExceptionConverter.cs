@@ -67,7 +67,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
 
                 if (value is not null)
                 {
-                    foreach (var property in GetExceptionProperties(value.GetType()))
+                    foreach (var property in JsonExceptionConverter.GetExceptionProperties(value.GetType()))
                     {
                         var propertyValue = property.Key.GetValue(exception);
                         if (propertyValue != null)
@@ -109,7 +109,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var newSerializer = new JsonSerializer();
             newSerializer.ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType());
 
-            var field = GetField(typeof(DefaultContractResolver), "_sharedCache");
+            var field = JsonExceptionConverter.GetField(typeof(DefaultContractResolver), "_sharedCache");
             if (field != null)
             {
                 field.SetValue(newSerializer.ContractResolver, false);
@@ -130,7 +130,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
             {
                 var discriminator = token.Value<string>();
-                if (objectType.Name.Equals(discriminator) == false)
+                if (objectType.Name.Equals(discriminator, StringComparison.Ordinal) == false)
                 {
                     var exceptionType = Type.GetType("System." + discriminator, false);
                     if (exceptionType != null)
@@ -155,7 +155,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var value = jObject.ToObject(objectType, newSerializer);
             if (value is not null)
             {
-                foreach (var property in GetExceptionProperties(value.GetType()))
+                foreach (var property in JsonExceptionConverter.GetExceptionProperties(value.GetType()))
                 {
                     var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(property.Value));
                     var propertyValue = (object?)jValue?.ToObject(property.Key.PropertyType);
@@ -167,14 +167,14 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     {
                         var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
 
-                        field = GetField(objectType, "m_" + fieldNameSuffix);
+                        field = JsonExceptionConverter.GetField(objectType, "m_" + fieldNameSuffix);
                         if (field != null)
                         {
                             field.SetValue(value, propertyValue);
                         }
                         else
                         {
-                            field = GetField(objectType, "_" + fieldNameSuffix);
+                            field = JsonExceptionConverter.GetField(objectType, "_" + fieldNameSuffix);
                             if (field != null)
                             {
                                 field.SetValue(value, propertyValue);
@@ -192,19 +192,25 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return value;
         }
 
-        private FieldInfo? GetField(Type type, string fieldName)
+        private static FieldInfo? GetField(Type type, string fieldName)
         {
             var typeInfo = type.GetTypeInfo();
             var field = typeInfo.GetDeclaredField(fieldName);
             if (field == null && typeInfo.BaseType != null)
             {
-                return GetField(typeInfo.BaseType, fieldName);
+                return JsonExceptionConverter.GetField(typeInfo.BaseType, fieldName);
             }
 
             return field;
         }
 
-        private IDictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
+
+        private static readonly HashSet<string> ignoredExceptionProperties = new()
+        {
+            "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"
+        };
+
+        private static Dictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
         {
             var result = new Dictionary<PropertyInfo, string>();
             foreach (var property in exceptionType.GetRuntimeProperties().Where(p => p.GetMethod?.IsPublic == true))
@@ -212,8 +218,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 var propertyName = attribute != null ? attribute.PropertyName : property.Name;
 
-                if (propertyName is not null &&
-                    !new[] { "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult" }.Contains(propertyName))
+                if (propertyName is not null && !ignoredExceptionProperties.Contains(propertyName))
                 {
                     result[property] = propertyName;
                 }
@@ -221,7 +226,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return result;
         }
 
-        private void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, IContractResolver resolver, JsonSerializer serializer)
+        private static void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, IContractResolver resolver, JsonSerializer serializer)
         {
             var field = typeof(Exception).GetTypeInfo().GetDeclaredField(fieldName);
             var jsonPropertyName = resolver is DefaultContractResolver ? ((DefaultContractResolver)resolver).GetResolvedPropertyName(propertyName) : propertyName;

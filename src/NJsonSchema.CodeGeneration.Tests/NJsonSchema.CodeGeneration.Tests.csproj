@@ -5,6 +5,7 @@
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn),1998,1591,618</NoWarn>
         <Nullable>disable</Nullable>
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>

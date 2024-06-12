@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -69,7 +70,7 @@ namespace NJsonSchema.CodeGeneration
             }
 
             // resolve arrays
-            if (baseTypeName.EndsWith("[]"))
+            if (baseTypeName.EndsWith("[]", StringComparison.Ordinal))
             {
                 return baseTypeName.Substring(0, baseTypeName.Length - 2);
             }

@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _unsupportedFormatStrings = new List<string>()
+        private readonly HashSet<string> _unsupportedFormatStrings = new()
         {
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
@@ -110,7 +109,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the default value as string literal.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The string literal.</returns>
+#pragma warning disable CA1822
         protected string GetDefaultAsStringLiteral(JsonSchema schema)
+#pragma warning restore CA1822
         {
             return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty) + "\"";
         }
@@ -118,7 +119,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Converts a number to its string representation.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The string.</returns>
+#pragma warning disable CA1822
         protected string ConvertNumberToString(object value)
+#pragma warning restore CA1822
         {
             if (value is byte)
             {

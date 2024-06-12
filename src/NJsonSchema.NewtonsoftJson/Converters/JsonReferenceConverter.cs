@@ -17,7 +17,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         // TODO: Use converter for JsonSchema4!
 
         [ThreadStatic]
-        private static bool _isWriting = false;
+        private static bool _isWriting;
 
         /// <summary>Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter" /> can write JSON.</summary>
         public override bool CanWrite => !_isWriting;
