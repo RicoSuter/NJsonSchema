@@ -46,6 +46,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = false;
             EnforceFlagEnums = false;
+            UseRequiredKeyword = false;
 
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
@@ -146,6 +147,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
         public bool EnforceFlagEnums { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the C# 11 "required" keyword should be used for required properties (default: false). </summary>
+        public bool UseRequiredKeyword { get; set; }
 
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.</summary>
         public bool InlineNamedDictionaries { get; set; }
