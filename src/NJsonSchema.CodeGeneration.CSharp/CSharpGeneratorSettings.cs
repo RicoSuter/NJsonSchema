@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             ClassStyle = CSharpClassStyle.Poco;
             JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
-            JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.NSwag;
+            JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.NJsonSchema;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
