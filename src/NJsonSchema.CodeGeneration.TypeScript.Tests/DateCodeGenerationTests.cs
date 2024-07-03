@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 		'myTimeSpan': { 'type': 'string', 'format': 'time-span' }
 	}
 }";
-        
+
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
@@ -149,6 +149,26 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_date_handling_is_dayjs_then_duration_property_is_generated_in_class()
+        {
+            //// Arrange
+            var schema = await JsonSchema.FromJsonAsync(Json);
+
+            //// Act
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Class,
+                DateTimeType = TypeScriptDateTimeType.DayJS
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            //// Assert
+            Assert.Contains("myTimeSpan: dayjs.Duration", code);
+            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? dayjs.duration(((val: string) => {  const [days, rest] = val.split('.');  const [hours, minutes, seconds, milliseconds] = rest.split(/[:.]/);    return dayjs.duration({    days: parseInt(days),    hours: parseInt(hours),    minutes: parseInt(minutes),    seconds: parseInt(seconds),    milliseconds: parseInt(milliseconds),  });  })(_data[\"myTimeSpan\"].toString())) : <any>undefined;", code);
+            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('D.HH:mm:ss.SSS') : <any>undefined;", code);
+        }
+
+        [Fact]
         public async Task When_date_handling_is_date_then_date_property_is_generated_in_class()
         {
             //// Arrange
@@ -168,7 +188,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
             Assert.Contains("function formatDate(", code);
         }
-        
+
         [Fact]
         public async Task When_date_handling_is_date_then_date_property_is_generated_in_class_with_local_timezone_conversion()
         {

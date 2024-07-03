@@ -54,7 +54,7 @@ if ({{ Value }}) {
     {% if IsDate -%}
 {{ Variable }} = {{ Value }} ? {{ StringToDateOnlyCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateOnlyCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
     {% elsif IsDateTime -%}
-{{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ Value }}.toString()) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
+{{ Variable }} = {{ Value }} ? {{ StringToDateCode }}({{ ConstructDateTimeWith }}) : {% if HasDefaultValue %}{{ StringToDateCode }}({{ DefaultValue }}){% else %}<any>{{ NullValue }}{% endif %};
     {% else -%}
 {%       if HasDefaultValue or NullValue != "undefined" -%}
 {{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};

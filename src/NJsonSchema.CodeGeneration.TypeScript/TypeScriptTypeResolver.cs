@@ -287,7 +287,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
                 if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                 {
-                    return "dayjs.Dayjs";
+                    return "dayjs.Duration";
                 }
             }
 

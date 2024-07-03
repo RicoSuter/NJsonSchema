@@ -67,6 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsNewableObject = IsNewableObject(parameters.Schema, parameters),
                 IsDate = IsDate(typeSchema.Format, parameters.Settings.DateTimeType),
                 IsDateTime = IsDateTime(typeSchema.Format, parameters.Settings.DateTimeType),
+                ConstructDateTimeWith = ConstructDateTimeWith(parameters.Value, typeSchema.Format, parameters.Settings.DateTimeType),
 
                 // Dictionary
                 IsDictionary = typeSchema.IsDictionary,
@@ -144,6 +145,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "DateTime.fromISO";
 
                 case TypeScriptDateTimeType.DayJS:
+                    if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
+                    {
+                        return "dayjs.duration";
+                    }
+
                     return "dayjs";
 
                 default:
@@ -201,7 +207,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 case TypeScriptDateTimeType.DayJS:
                     if (typeSchema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
                     {
-                        return "format('d.hh:mm:ss.SSS')";
+                        return "format('D.HH:mm:ss.SSS')";
                     }
 
                     return "toISOString()";
@@ -268,6 +274,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
             }
             return false;
+        }
+
+        private static string ConstructDateTimeWith(string? value, string? format, TypeScriptDateTimeType type)
+        {
+            if (type == TypeScriptDateTimeType.DayJS &&
+                format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
+            {
+                return $"((val: string) => {{  const [days, rest] = val.split('.');  const [hours, minutes, seconds, milliseconds] = rest.split(/[:.]/);    return dayjs.duration({{    days: parseInt(days),    hours: parseInt(hours),    minutes: parseInt(minutes),    seconds: parseInt(seconds),    milliseconds: parseInt(milliseconds),  }});  }})({value}.toString())";
+            }
+
+            return value + ".toString()";
         }
 
 
