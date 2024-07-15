@@ -19,6 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
+        private readonly ClassTemplateModel _classTemplateModel;
         private readonly JsonSchemaProperty _property;
         private readonly TypeScriptTypeResolver _resolver;
 
@@ -35,6 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             TypeScriptGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)
         {
+            _classTemplateModel = classTemplateModel;
             _property = property;
             _resolver = typeResolver;
             _parentTypeName = parentTypeName;
@@ -51,7 +53,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string? Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type =>
+            //_settings.TypeStyle == TypeScriptTypeStyle.Interface && 
+            //_classTemplateModel.HasInheritance && 
+            //InterfaceName == _classTemplateModel.BaseDiscriminator ? 
+            //_classTemplateModel.DiscriminatorName :
+            _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?

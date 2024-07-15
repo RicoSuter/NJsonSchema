@@ -1,14 +1,15 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
+using VerifyXunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
+    [UsesVerify]
     public class TypeScriptDiscriminatorTests
     {
         [JsonConverter(typeof(JsonInheritanceConverter), nameof(Type))]
@@ -66,8 +67,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            await VerifyHelper.Verify(code);
         }
-        
+
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
@@ -89,6 +91,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
@@ -112,8 +115,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export interface SecondChild extends Base", code);
             Assert.Contains("Child: OneChild | SecondChild;", code);
             Assert.Contains("Children: (OneChild | SecondChild)[];", code);
+            await VerifyHelper.Verify(code);
         }
-        
+
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_class()
         {
@@ -135,6 +139,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export class SecondChild extends Base", code);
             Assert.Contains("child: OneChild | SecondChild;", code);
             Assert.Contains("children: (OneChild | SecondChild)[];", code);
+            await VerifyHelper.Verify(code);
         }
     }
 }
