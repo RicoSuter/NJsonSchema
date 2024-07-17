@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections.Generic;
 using System.Threading.Tasks;

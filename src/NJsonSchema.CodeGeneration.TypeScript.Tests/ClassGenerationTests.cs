@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System;
@@ -8,14 +7,12 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using VerifyXunit;
 using Xunit;
 
 using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
-    [UsesVerify]
     public class ClassGenerationTests
     {
         public class MyClassTest

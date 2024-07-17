@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Collections;

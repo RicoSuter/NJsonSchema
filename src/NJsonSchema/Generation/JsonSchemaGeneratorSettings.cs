@@ -64,7 +64,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
         public bool GenerateXmlObjects { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
+        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="T:ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are

@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Annotations;
-using NJsonSchema.CodeGeneration.CSharp;
+﻿using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;
 

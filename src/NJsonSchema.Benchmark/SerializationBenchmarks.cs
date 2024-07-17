@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using NBench;
 using Pro.NBench.xUnit.XunitExtensions;
 using Xunit;
-using Xunit.Abstractions;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -15,12 +13,6 @@ namespace NJsonSchema.Benchmark
         private JsonSchema _schema;
         private Counter _counter;
         private string _json;
-
-        public SerializationBenchmarks(ITestOutputHelper output)
-        {
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new XunitTraceListener(output));
-        }
 
         [PerfSetup]
         public void Setup(BenchmarkContext context)
