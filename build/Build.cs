@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
@@ -83,7 +84,7 @@ partial class Build : NukeBuild
             VersionSuffix = $"dev-{DateTime.UtcNow:yyyyMMdd-HHmm}";
         }
 
-        using var _ = Block("BUILD SETUP");
+        Serilog.Log.Information("BUILD SETUP");
         Serilog.Log.Information("Configuration:\t {Configuration}" , Configuration);
         Serilog.Log.Information("Version prefix:\t {VersionPrefix}" , VersionPrefix);
         Serilog.Log.Information("Version suffix:\t {VersionSuffix}" , VersionSuffix);
@@ -118,11 +119,15 @@ partial class Build : NukeBuild
                 .EnableNoRestore()
                 .SetDeterministic(IsServerBuild)
                 .SetContinuousIntegrationBuild(IsServerBuild)
+                // ensure we don't generate too much output in CI run
+                // 0  Turns off emission of all warning messages
+                // 1  Displays severe warning messages
+                .SetWarningLevel(IsServerBuild ? 0 : 1)
             );
         });
 
     Target Test => _ => _
-        .After(Compile)
+        .DependsOn(Compile)
         .Executes(() =>
         {
             var framework = "";
@@ -135,7 +140,9 @@ partial class Build : NukeBuild
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
                 .EnableNoRestore()
+                .EnableNoBuild()
                 .SetFramework(framework)
+                .When(GitHubActions.Instance is not null, x => x.SetLoggers("GitHubActions"))
             );
         });
 

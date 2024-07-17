@@ -1,4 +1,3 @@
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Threading.Tasks;

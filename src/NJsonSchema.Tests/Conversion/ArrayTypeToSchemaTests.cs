@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.NewtonsoftJson.Generation;
