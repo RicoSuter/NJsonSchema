@@ -90,8 +90,8 @@ export interface IOneChild extends IBase {
 }
 
 export enum EBase {
-    OneChild = 0,
-    SecondChild = 1,
+    OneChild = "OneChild",
+    SecondChild = "SecondChild",
 }
 
 export class SecondChild extends Base implements ISecondChild {

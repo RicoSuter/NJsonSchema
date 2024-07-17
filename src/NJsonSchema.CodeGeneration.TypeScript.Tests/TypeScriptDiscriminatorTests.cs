@@ -6,6 +6,7 @@ using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 using VerifyXunit;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -20,6 +21,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public abstract EBase Type { get; }
         }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum EBase
         {
             OneChild,
@@ -56,6 +58,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 GenerateAbstractProperties = true,
             });
             var data = schema.ToJson();
+            var json = JsonConvert.SerializeObject(new OneChild());
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

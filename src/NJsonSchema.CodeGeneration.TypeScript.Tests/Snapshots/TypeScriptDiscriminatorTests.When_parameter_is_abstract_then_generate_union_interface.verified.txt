@@ -15,17 +15,17 @@ export interface Base {
 
 export interface OneChild extends Base {
     A: string;
-    Type: EBase;
+    Type: EBase.OneChild;
 }
 
 export enum EBase {
-    OneChild = 0,
-    SecondChild = 1,
+    OneChild = "OneChild",
+    SecondChild = "SecondChild",
 }
 
 export interface SecondChild extends Base {
     B: string;
-    Type: EBase;
+    Type: EBase.SecondChild;
 }
 
 export interface MyClass {

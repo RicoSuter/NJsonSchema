@@ -13,16 +13,16 @@ export interface Base {
     Type: EBase;
 }
 
-export type EBase = 0 | 1;
+export type EBase = "OneChild" | "SecondChild";
 
 export interface OneChild extends Base {
     A: string;
-    Type: EBase;
+    Type: 'OneChild';
 }
 
 export interface SecondChild extends Base {
     B: string;
-    Type: EBase;
+    Type: 'SecondChild';
 }
 
 export interface MyClass {

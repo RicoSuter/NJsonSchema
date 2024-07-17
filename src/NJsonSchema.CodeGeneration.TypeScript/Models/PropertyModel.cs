@@ -53,12 +53,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string? Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type =>
-            //_settings.TypeStyle == TypeScriptTypeStyle.Interface && 
-            //_classTemplateModel.HasInheritance && 
-            //InterfaceName == _classTemplateModel.BaseDiscriminator ? 
-            //_classTemplateModel.DiscriminatorName :
-            _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type
+        {
+            get
+            {
+                if (_settings.TypeStyle == TypeScriptTypeStyle.Interface &&
+                    _classTemplateModel.HasInheritance &&
+                    InterfaceName == _classTemplateModel.BaseDiscriminator)
+                {
+                    // use string type as the discriminator property type in specialized interfaces
+                    if (_property.ActualTypeSchema.IsEnumeration &&
+                        _settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                    {
+                        return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) + "." +
+                            _classTemplateModel.DiscriminatorName;
+                    }
+                    else
+                    {
+                        return $"'{_classTemplateModel.DiscriminatorName}'";
+                    }
+                }
+                else
+                {
+                    return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+                }
+            }
+        }
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
