@@ -166,8 +166,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Contains("_0562 = <any>\"0562\",", code);
-            Assert.Contains("_0532 = <any>\"0532\",", code);
+            Assert.Contains("_0562 = \"0562\",", code);
+            Assert.Contains("_0532 = \"0532\",", code);
         }
 
         public class ClassWithStringEnum
