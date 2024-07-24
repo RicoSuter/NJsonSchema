@@ -80,5 +80,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
             Assert.Contains("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
         }
+
+        [Fact]
+        public async Task When_using_STJ_polymorphic_serialization_then_NSwag_inheritance_converter_and_attributes_are_not_generated()
+        {
+            //// Arrange
+            var json = JsonSchema.FromType<MyContainer>();
+            var data = json.ToJson();
+
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings
+            {
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson
+            });
+
+            //// Act
+            var code = generator.GenerateFile();
+
+            //// Assert
+            Assert.DoesNotContain("[JsonInheritanceConverter", code);
+            Assert.DoesNotContain("[JsonInheritanceAttribute", code);
+            Assert.DoesNotContain("public class JsonInheritanceConverter", code);
+        }
     }
 }
