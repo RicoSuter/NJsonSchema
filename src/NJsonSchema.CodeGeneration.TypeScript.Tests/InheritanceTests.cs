@@ -9,10 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using VerifyXunit;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
+    [UsesVerify]
     public class InheritanceTests
     {
         public class MyContainer
@@ -141,6 +143,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.Contains("export function isExceptionBase(object: any): object is ExceptionBase {", code);
             Assert.Contains("function isMyException(object: any): object is MyException {", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]

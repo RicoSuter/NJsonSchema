@@ -59,6 +59,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             {
                 if (_settings.TypeStyle == TypeScriptTypeStyle.Interface &&
                     _classTemplateModel.HasInheritance &&
+                    _classTemplateModel.HasDiscriminator == false &&
                     InterfaceName == _classTemplateModel.BaseDiscriminator)
                 {
                     // use string type as the discriminator property type in specialized interfaces

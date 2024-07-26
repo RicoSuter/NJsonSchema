@@ -2,6 +2,9 @@
 /** {{ Description }} */
 {%- endif -%}
 {% if ExportTypes %}export {% endif %}interface {{ ClassName }}{{ Inheritance }} {
+{%- if HasBaseDiscriminator == false and HasInheritance -%}
+    {{ BaseDiscriminator }}: '{{ DiscriminatorName }}';
+{%- endif -%}
 {%- for property in Properties -%}
 {%-     if property.HasDescription -%}
     /** {{ property.Description }} */
