@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 

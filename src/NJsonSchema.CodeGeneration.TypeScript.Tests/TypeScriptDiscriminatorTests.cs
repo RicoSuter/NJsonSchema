@@ -5,12 +5,10 @@ using System.Runtime.Serialization;
 using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using VerifyXunit;
 using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
-    [UsesVerify]
     public class TypeScriptDiscriminatorTests
     {
         [JsonConverter(typeof(JsonInheritanceConverter), nameof(Type))]

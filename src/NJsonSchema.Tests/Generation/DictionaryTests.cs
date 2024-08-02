@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Generation;
-using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;

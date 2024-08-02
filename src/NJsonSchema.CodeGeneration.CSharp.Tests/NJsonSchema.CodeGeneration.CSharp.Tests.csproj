@@ -18,7 +18,6 @@
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net8.0'" />
-        <PackageReference Condition="'$(TargetFramework)' == 'net8.0'" Include="System.ComponentModel.Annotations" />
     </ItemGroup>
 
     <ItemGroup>

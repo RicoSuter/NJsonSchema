@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
 using NodaTime;
 using Xunit;

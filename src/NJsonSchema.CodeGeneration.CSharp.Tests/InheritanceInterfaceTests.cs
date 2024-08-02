@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
