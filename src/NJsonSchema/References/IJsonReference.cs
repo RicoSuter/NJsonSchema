@@ -20,6 +20,6 @@ namespace NJsonSchema.References
 
         /// <summary>Gets the parent object which may be the root. </summary>
         [JsonIgnore]
-        object PossibleRoot { get; }
+        object? PossibleRoot { get; }
     }
 }

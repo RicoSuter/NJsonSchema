@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
@@ -22,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_interface_has_properties_then_properties_are_included_in_schema()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
@@ -42,7 +43,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_class_implements_interface_then_properties_are_included_in_schema()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings());
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
 
             //// Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings

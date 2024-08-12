@@ -17,7 +17,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _unsupportedFormatStrings = new List<string>()
+        private readonly HashSet<string> _unsupportedFormatStrings = new()
         {
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public virtual string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public virtual string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             if (schema.Default == null || !useSchemaDefault)
             {
@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
             }
 
-            if (schema.Type.IsString() && _unsupportedFormatStrings.Contains(schema.Format) == false)
+            if (schema.Type.IsString() && (schema.Format == null || _unsupportedFormatStrings.Contains(schema.Format) == false))
             {
                 return GetDefaultAsStringLiteral(schema);
             }
@@ -86,7 +86,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The number literal.</returns>
-        public abstract string GetNumericValue(JsonObjectType type, object value, string format);
+        public abstract string GetNumericValue(JsonObjectType type, object value, string? format);
 
         /// <summary>Gets the enum default value.</summary>
         /// <param name="schema">The schema.</param>
@@ -94,14 +94,14 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="typeNameHint">The type name hint.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The enum default value.</returns>
-        protected virtual string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
+        protected virtual string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string? typeNameHint, TypeResolverBase typeResolver)
         {
             var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
             var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
             var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
                 ? actualSchema.EnumerationNames.ElementAt(index)
-                : schema.Default.ToString();
+                : schema.Default?.ToString();
 
             return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
         }
@@ -109,15 +109,19 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the default value as string literal.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The string literal.</returns>
+#pragma warning disable CA1822
         protected string GetDefaultAsStringLiteral(JsonSchema schema)
+#pragma warning restore CA1822
         {
-            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default.ToString()) + "\"";
+            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty) + "\"";
         }
 
         /// <summary>Converts a number to its string representation.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The string.</returns>
+#pragma warning disable CA1822
         protected string ConvertNumberToString(object value)
+#pragma warning restore CA1822
         {
             if (value is byte)
             {
@@ -179,7 +183,7 @@ namespace NJsonSchema.CodeGeneration
                 return (string)value;
             }
 
-            return null;
+            return value.ToString();
         }
     }
 }

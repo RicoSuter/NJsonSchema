@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             "System.Guid",
             "System.Uri"
-        }; 
+        };
 
         /// <summary>Initializes a new instance of the <see cref="CSharpValueGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -38,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public override string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
@@ -66,15 +67,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())
                     {
-                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<", StringComparison.Ordinal)
                             ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
 
-                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<", StringComparison.Ordinal)
                             ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
-                        return $"new {targetType}()";
+                        return schema.IsAbstract ? null : $"new {targetType}()";
                     }
                 }
             }
@@ -87,32 +88,27 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The C# number literal.</returns>
-        public override string GetNumericValue(JsonObjectType type, object value, string format)
+        public override string GetNumericValue(JsonObjectType type, object value, string? format)
         {
-            if (value != null)
+            switch (format)
             {
-                switch (format)
-                {
-                    case JsonFormatStrings.Byte:
-                        return "(byte)" + Convert.ToByte(value).ToString(CultureInfo.InvariantCulture);
-                    case JsonFormatStrings.Integer:
-                        return Convert.ToInt32(value).ToString(CultureInfo.InvariantCulture);
-                    case JsonFormatStrings.Long:
-                        return Convert.ToInt64(value) + "L";
-                    case JsonFormatStrings.Double:
-                        return ConvertNumberToString(value) + "D";
-                    case JsonFormatStrings.Float:
-                        return ConvertNumberToString(value) + "F";
-                    case JsonFormatStrings.Decimal:
-                        return ConvertNumberToString(value) + "M";
-                    default:
-                        return type.IsInteger() ?
-                            ConvertNumberToString(value) :
-                            ConvertNumberToString(value) + "D";
-                }
+                case JsonFormatStrings.Byte:
+                    return "(byte)" + Convert.ToByte(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                case JsonFormatStrings.Integer:
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                case JsonFormatStrings.Long:
+                    return Convert.ToInt64(value, CultureInfo.InvariantCulture) + "L";
+                case JsonFormatStrings.Double:
+                    return ConvertNumberToString(value) + "D";
+                case JsonFormatStrings.Float:
+                    return ConvertNumberToString(value) + "F";
+                case JsonFormatStrings.Decimal:
+                    return ConvertNumberToString(value) + "M";
+                default:
+                    return type.IsInteger() ?
+                        ConvertNumberToString(value) :
+                        ConvertNumberToString(value) + "D";
             }
-
-            return null;
         }
 
         /// <summary>Gets the enum default value.</summary>
@@ -121,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <param name="typeNameHint">The type name hint.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The enum default value.</returns>
-        protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string typeNameHint, TypeResolverBase typeResolver)
+        protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string? typeNameHint, TypeResolverBase typeResolver)
         {
             return _settings.Namespace + "." + base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
         }

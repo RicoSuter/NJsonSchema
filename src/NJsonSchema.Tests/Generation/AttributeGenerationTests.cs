@@ -1,4 +1,5 @@
 using NJsonSchema.Annotations;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -10,15 +11,13 @@ namespace NJsonSchema.Tests.Generation
 {
     public class AttributeGenerationTests
     {
-#if !LEGACY
-
         [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Items"];
 
             //// Assert
@@ -32,7 +31,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["String"];
 
             //// Assert
@@ -40,15 +39,13 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(5, property.MaxLength);
         }
 
-#endif
-
         [Fact]
         public async Task When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
         {
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Double"];
 
             //// Assert
@@ -62,7 +59,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["DoubleOnlyMin"];
 
             //// Assert
@@ -76,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Integer"];
 
             //// Assert
@@ -91,7 +88,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Display"];
 
             //// Assert
@@ -106,7 +103,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["DisplayWithResource"];
 
             //// Assert
@@ -121,7 +118,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -135,7 +132,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Required"];
 
             //// Assert
@@ -149,7 +146,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
             //// Assert
@@ -164,7 +161,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<AttributeTestClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["ReadOnly"];
 
             //// Assert
@@ -173,16 +170,12 @@ namespace NJsonSchema.Tests.Generation
 
         public class AttributeTestClass
         {
-#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
-#endif
             public string[] Items { get; set; }
 
-#if !LEGACY
             [MinLength(3)]
             [MaxLength(5)]
-#endif
             public string String { get; set; }
 
             [Range(5.5, 10.5)]
@@ -226,7 +219,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<ClassWithTypedRange>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithTypedRange>();
             var property = schema.Properties["Foo"];
 
             //// Assert
@@ -244,7 +237,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_dictionary_property_has_attributes_then_they_are_generated_correctly()
         {
             // Act
-            var schema = JsonSchema.FromType<ClassWithDictionary>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDictionary>();
             var json = schema.ToJson();
 
             // Assert
@@ -263,7 +256,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_array_property_has_attributes_then_they_are_generated_correctly()
         {
             // Act
-            var schema = JsonSchema.FromType<ClassWithArray>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithArray>();
             var json = schema.ToJson();
 
             // Assert
@@ -281,7 +274,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
         {
             //// Act
-            var schema = JsonSchema.FromType<ClassWithRegexDictionaryProperty>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRegexDictionaryProperty>();
             var json = schema.ToJson();
 
             //// Assert

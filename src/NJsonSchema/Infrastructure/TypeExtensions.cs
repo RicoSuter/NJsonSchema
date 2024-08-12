@@ -12,43 +12,68 @@ using NJsonSchema.Generation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
+        private static ReaderWriterLockSlim _namesLock = new ReaderWriterLockSlim();
         private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
-        internal static string GetName(this ContextualAccessorInfo accessorInfo)
+        public static string GetName(this ContextualAccessorInfo accessorInfo)
         {
-            if (!_names.ContainsKey(accessorInfo))
+            _namesLock.EnterUpgradeableReadLock();
+            try
             {
-                lock (_names)
+                if (_names.TryGetValue(accessorInfo, out var name))
                 {
-                    if (!_names.ContainsKey(accessorInfo))
+                    return name;
+                }
+
+                _namesLock.EnterWriteLock();
+                try
+                {
+                    if (_names.TryGetValue(accessorInfo, out name))
                     {
-                        _names[accessorInfo] = GetNameWithoutCache(accessorInfo);
+                        return name;
                     }
+
+                    name = GetNameWithoutCache(accessorInfo);
+                    _names[accessorInfo] = name;
+                    return name;
+                }
+                finally
+                {
+                    _namesLock.ExitWriteLock();
                 }
             }
-            return _names[accessorInfo];
+            finally
+            {
+                _namesLock.ExitUpgradeableReadLock();
+            }
         }
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)
         {
-            var jsonPropertyAttribute = accessorInfo.AccessorType.GetContextAttribute<JsonPropertyAttribute>();
+            var jsonPropertyAttribute = accessorInfo.GetAttribute<JsonPropertyAttribute>(true);
             if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
             {
-                return jsonPropertyAttribute.PropertyName;
+                return jsonPropertyAttribute.PropertyName!;
             }
 
-            var dataMemberAttribute = accessorInfo.AccessorType.GetContextAttribute<DataMemberAttribute>();
+            var dataMemberAttribute = accessorInfo.GetAttribute<DataMemberAttribute>(true);
             if (dataMemberAttribute != null && !string.IsNullOrEmpty(dataMemberAttribute.Name))
             {
-                var dataContractAttribute = accessorInfo.MemberInfo.DeclaringType.ToCachedType().GetInheritedAttribute<DataContractAttribute>();
+                var dataContractAttribute = accessorInfo
+                    .MemberInfo
+                    .DeclaringType?
+                    .ToCachedType()
+                    .GetAttribute<DataContractAttribute>(true);
+
                 if (dataContractAttribute != null)
                 {
                     return dataMemberAttribute.Name;
@@ -62,9 +87,11 @@ namespace NJsonSchema.Infrastructure
         /// <param name="type">The member info</param>
         /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this CachedType type, IXmlDocsSettings xmlDocsSettings)
+        public static string? GetDescription(this CachedType type, IXmlDocsSettings xmlDocsSettings)
         {
-            var attributes = type is ContextualType contextualType ? contextualType.ContextAttributes : type.InheritedAttributes;
+            var attributes = type is ContextualType contextualType ? 
+                contextualType.GetContextOrTypeAttributes<Attribute>(true) : 
+                type.GetAttributes(true);
 
             var description = GetDescription(attributes);
             if (description != null)
@@ -74,7 +101,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = type.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = type.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -88,9 +115,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="accessorInfo">The accessor info.</param>
         /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualAccessorInfo accessorInfo, IXmlDocsSettings xmlDocsSettings)
+        public static string? GetDescription(this ContextualAccessorInfo accessorInfo, IXmlDocsSettings xmlDocsSettings)
         {
-            var description = GetDescription(accessorInfo.AccessorType.Attributes);
+            var description = GetDescription(accessorInfo.GetAttributes(true));
             if (description != null)
             {
                 return description;
@@ -98,7 +125,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = accessorInfo.MemberInfo.GetXmlDocsSummary(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -112,9 +139,9 @@ namespace NJsonSchema.Infrastructure
         /// <param name="parameter">The parameter.</param>
         /// <param name="xmlDocsSettings">The XML Docs settings.</param>
         /// <returns>The description or null if no description is available.</returns>
-        public static string GetDescription(this ContextualParameterInfo parameter, IXmlDocsSettings xmlDocsSettings)
+        public static string? GetDescription(this ContextualParameterInfo parameter, IXmlDocsSettings xmlDocsSettings)
         {
-            var description = GetDescription(parameter.ContextAttributes);
+            var description = GetDescription(parameter.GetAttributes(true));
             if (description != null)
             {
                 return description;
@@ -122,7 +149,7 @@ namespace NJsonSchema.Infrastructure
 
             if (xmlDocsSettings.UseXmlDocumentation)
             {
-                var summary = parameter.GetXmlDocs(xmlDocsSettings.ResolveExternalXmlDocumentation);
+                var summary = parameter.GetXmlDocs(xmlDocsSettings.GetXmlDocsOptions());
                 if (summary != string.Empty)
                 {
                     return summary;
@@ -132,16 +159,16 @@ namespace NJsonSchema.Infrastructure
             return null;
         }
 
-        private static string GetDescription(IEnumerable<Attribute> attributes)
+        private static string? GetDescription(IEnumerable<Attribute> attributes)
         {
-            dynamic descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
-            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+            dynamic? descriptionAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DescriptionAttribute");
+            if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute?.Description))
             {
-                return descriptionAttribute.Description;
+                return descriptionAttribute!.Description;
             }
             else
             {
-                dynamic displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+                dynamic? displayAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
                 if (displayAttribute != null)
                 {
                     // GetDescription returns null if the Description property on the attribute is not specified.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NJsonSchema.Generation;
 using Xunit;
 using Namotion.Reflection;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -36,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var svc = new DefaultReflectionService();
+            var svc = new NewtonsoftJsonReflectionService();
 
             //// Assert
             foreach (var check in checks)
@@ -73,7 +74,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var svc = new DefaultReflectionService();
+            var svc = new NewtonsoftJsonReflectionService();
 
             //// Assert
             foreach (var check in checks)

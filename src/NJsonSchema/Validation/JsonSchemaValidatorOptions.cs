@@ -8,14 +8,8 @@ namespace NJsonSchema.Validation
     /// <summary>Class to configure the behavior of <see cref="JsonSchemaValidator"/>. </summary>
     public class JsonSchemaValidatorSettings
     {
-        private StringComparer _propertyStringComparer;
-
         /// <summary>Gets or sets the <see cref="StringComparer"/> used to compare object properties.</summary>
-        public StringComparer PropertyStringComparer
-        {
-            get => _propertyStringComparer ?? StringComparer.Ordinal;
-            set => _propertyStringComparer = value;
-        }
+        public StringComparer PropertyStringComparer { get; set; } = StringComparer.Ordinal;
 
         /// <summary>Gets or sets the format validators.</summary>
         public IEnumerable<IFormatValidator> FormatValidators { get; set; } = new IFormatValidator[]

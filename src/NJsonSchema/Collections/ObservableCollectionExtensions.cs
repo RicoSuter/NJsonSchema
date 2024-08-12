@@ -40,7 +40,7 @@ namespace NJsonSchema
             }
 
             ThrowNoMatchingElement();
-            return default;
+            return default!;
         }
 
         public static T First<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
@@ -55,10 +55,10 @@ namespace NJsonSchema
             }
 
             ThrowNoMatchingElement();
-            return default;
+            return default!;
         }
 
-        public static T FirstOrDefault<T>(this ObservableCollection<T> collection, Func<T, bool> predicate) where T : class
+        public static T? FirstOrDefault<T>(this ObservableCollection<T> collection, Func<T, bool> predicate) where T : class
         {
             for (var i = 0; i < collection.Count; ++i)
             {
@@ -72,7 +72,7 @@ namespace NJsonSchema
             return null;
         }
 
-        public static T FirstOrDefault<T>(this ObservableCollection<T> collection) where T : class
+        public static T? FirstOrDefault<T>(this ObservableCollection<T> collection) where T : class
         {
             if (collection.Count > 0)
             {

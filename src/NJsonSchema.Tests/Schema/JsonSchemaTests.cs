@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -424,6 +425,29 @@ namespace NJsonSchema.Tests.Schema
             //// Assert
             Assert.NotNull(schema);
             Assert.Contains("The identity type.", json);
+        }
+
+        [Fact]
+        public void When_there_are_multiple_empty_objects_in_json_sample_data_generate_different_type_definitions_foreach()
+        {
+            //https://github.com/RicoSuter/NJsonSchema/issues/1415
+
+           var schema = JsonSchema.FromSampleJson(@"
+              [
+                {
+                  ""Data"": {
+                    ""EmptyObj"": {},
+                    ""ArrayObj"": {
+                      ""AnotherEmptyObj"": {}
+                    }
+                  }
+                }
+              ]
+            ");
+
+            var json = schema.ToJson();
+
+            Assert.Equal(3, Regex.Matches(json, "AnotherEmptyObj").Count);
         }
     }
 }

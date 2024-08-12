@@ -7,8 +7,10 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
+using NJsonSchema.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.Generation
@@ -40,123 +42,136 @@ namespace NJsonSchema.Generation
         /// <returns>The JSON token.</returns>
         public JToken Generate(JsonSchema schema)
         {
-            return Generate(schema, new HashSet<JsonSchema>());
+            var stack = new Stack<JsonSchema>();
+            stack.Push(schema);
+            return Generate(schema, stack);
         }
 
-        private JToken Generate(JsonSchema schema, HashSet<JsonSchema> usedSchemas)
+        private JToken Generate(JsonSchema schema, Stack<JsonSchema> schemaStack)
         {
             var property = schema as JsonSchemaProperty;
             schema = schema.ActualSchema;
-            if (usedSchemas.Contains(schema))
+            try
             {
-                return null;
-            }
-
-            if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
-            {
-                usedSchemas.Add(schema);
-
-                var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
-                var properties = GetPropertiesToGenerate(schemas);
-
-                var obj = new JObject();
-                foreach (var p in properties)
+                schemaStack.Push(schema);
+                if (schemaStack.Count(s => s == schema) > _settings.MaxRecursionLevel)
                 {
-                    obj[p.Key] = Generate(p.Value, usedSchemas);
+                    return new JValue((object?)null);
                 }
-                return obj;
-            }
-            else if (schema.Default != null)
-            {
-                return JToken.FromObject(schema.Default);
-            }
-            else if (schema.Type.IsArray())
-            {
-                if (schema.Item != null)
+
+                if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
                 {
-                    var array = new JArray();
-                    var item = Generate(schema.Item, usedSchemas);
-                    if (item != null)
+                    var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
+                    var properties = GetPropertiesToGenerate(schemas);
+
+                    var obj = new JObject();
+                    foreach (var p in properties)
                     {
-                        array.Add(item);
+                        obj[p.Key] = Generate(p.Value, schemaStack);
                     }
-                    return array;
-                }
-                else if (schema.Items.Count > 0)
-                {
-                    var array = new JArray();
-                    foreach (var item in schema.Items)
-                    {
-                        array.Add(Generate(item, usedSchemas));
-                    }
-                    return array;
-                }
-            }
-            else
-            {
-                if (schema.IsEnumeration)
-                {
-                    return JToken.FromObject(schema.Enumeration.First());
-                }
-                else if (schema.Type.IsInteger())
-                {
-                    return HandleIntegerType(schema);
-                }
-                else if (schema.Type.IsNumber())
-                {
-                    return HandleNumberType(schema);
-                }
-                else if (schema.Type.IsString())
-                {
-                    return HandleStringType(schema, property);
-                }
-                else if (schema.Type.IsBoolean())
-                {
-                    return JToken.FromObject(false);
-                }
-            }
 
-            return null;
+                    return obj;
+                }
+                else if (schema.Default != null)
+                {
+                    return JToken.FromObject(schema.Default);
+                }
+                else if (schema.Type.IsArray())
+                {
+                    if (schema.Item != null)
+                    {
+                        var array = new JArray();
+
+                        var item = Generate(schema.Item, schemaStack);
+                        if (item != null)
+                        {
+                            array.Add(item);
+                        }
+
+                        return array;
+                    }
+                    else if (schema.Items.Count > 0)
+                    {
+                        var array = new JArray();
+                        foreach (var item in schema.Items)
+                        {
+                            array.Add(Generate(item, schemaStack));
+                        }
+
+                        return array;
+                    }
+                }
+                else
+                {
+                    if (schema.IsEnumeration)
+                    {
+                        return JToken.FromObject(schema.Enumeration.First()!);
+                    }
+                    else if (schema.Type.IsInteger())
+                    {
+                        return SampleJsonDataGenerator.HandleIntegerType(schema);
+                    }
+                    else if (schema.Type.IsNumber())
+                    {
+                        return HandleNumberType(schema);
+                    }
+                    else if (schema.Type.IsString())
+                    {
+                        return HandleStringType(schema, property);
+                    }
+                    else if (schema.Type.IsBoolean())
+                    {
+                        return JToken.FromObject(false);
+                    }
+                }
+
+                return new JValue((object?)null);
+            }
+            finally
+            {
+                schemaStack.Pop();
+            }
         }
-        private JToken HandleNumberType(JsonSchema schema)
+
+        private static JToken HandleNumberType(JsonSchema schema)
         {
-            if (schema.ExclusiveMinimumRaw != null)
+            if (schema.ExclusiveMinimumRaw?.Equals(true) == true && schema.Minimum != null)
             {
-                return JToken.FromObject((decimal)(float.Parse(schema.Minimum.ToString()) + 0.1));
+                return JToken.FromObject(schema.Minimum.Value + 0.1m);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(decimal.Parse(schema.ExclusiveMinimum.ToString()));
+                return JToken.FromObject(schema.ExclusiveMinimum.Value);
             }
             else if (schema.Minimum.HasValue)
             {
-                return decimal.Parse(schema.Minimum.ToString());
+                return schema.Minimum.Value;
             }
             return JToken.FromObject(0.0);
         }
 
-        private JToken HandleIntegerType(JsonSchema schema)
+        private static JToken HandleIntegerType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw));
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum));
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
             }
             else if (schema.Minimum.HasValue)
             {
-                return Convert.ToInt32(schema.Minimum);
+                return Convert.ToInt32(schema.Minimum, CultureInfo.InvariantCulture);
             }
             return JToken.FromObject(0);
         }
 
-        private JToken HandleStringType(JsonSchema schema, JsonSchemaProperty property)
+        private static JToken HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
         {
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"));
+                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             }
             else if (schema.Format == JsonFormatStrings.DateTime)
             {

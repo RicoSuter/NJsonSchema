@@ -23,19 +23,16 @@ namespace NJsonSchema.Generation
         {
             var cachedType = type.ToCachedType();
 
-            var jsonSchemaAttribute = cachedType.GetInheritedAttribute<JsonSchemaAttribute>();
+            var jsonSchemaAttribute = cachedType.GetAttribute<JsonSchemaAttribute>(true);
+
             if (!string.IsNullOrEmpty(jsonSchemaAttribute?.Name))
             {
-                return jsonSchemaAttribute.Name;
+                return jsonSchemaAttribute!.Name!;
             }
 
             var nType = type.ToCachedType();
 
-#if !NET40
             if (nType.Type.IsConstructedGenericType)
-#else
-            if (nType.Type.IsGenericType)
-#endif
             {
                 return GetName(nType).Split('`').First() + "Of" +
                        string.Join("And", nType.GenericArguments
@@ -48,10 +45,10 @@ namespace NJsonSchema.Generation
         private static string GetName(CachedType cType)
         {
             return
-                cType.TypeName == "Int16" ? GetNullableDisplayName(cType, "Short") :
-                cType.TypeName == "Int32" ? GetNullableDisplayName(cType, "Integer") :
-                cType.TypeName == "Int64" ? GetNullableDisplayName(cType, "Long") :
-                GetNullableDisplayName(cType, cType.TypeName);
+                cType.Name == "Int16" ? GetNullableDisplayName(cType, "Short") :
+                cType.Name == "Int32" ? GetNullableDisplayName(cType, "Integer") :
+                cType.Name == "Int64" ? GetNullableDisplayName(cType, "Long") :
+                GetNullableDisplayName(cType, cType.Name);
         }
 
         private static string GetNullableDisplayName(CachedType type, string actual)

@@ -10,7 +10,6 @@ using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Reflection;
-using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 using Newtonsoft.Json.Linq;
 
@@ -21,7 +20,7 @@ namespace NJsonSchema
     {
         /// <summary>Gets or sets the discriminator property name.</summary>
         [JsonProperty("propertyName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string PropertyName { get; set; }
+        public string? PropertyName { get; set; }
 
         /// <summary>Gets or sets the discriminator mappings.</summary>
         [JsonProperty("mapping", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -30,25 +29,19 @@ namespace NJsonSchema
 
         /// <summary>The currently used <see cref="JsonInheritanceConverter"/>.</summary>
         [JsonIgnore]
-        public object JsonInheritanceConverter { get; set; }
+        public object? JsonInheritanceConverter { get; set; }
 
         /// <summary>Adds a discriminator mapping for the given type and schema based on the used <see cref="JsonInheritanceConverter"/>.</summary>
         /// <param name="type">The type.</param>
         /// <param name="schema">The schema.</param>
         public void AddMapping(Type type, JsonSchema schema)
         {
-            dynamic converter = JsonInheritanceConverter;
-
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
-#if LEGACY
-                .GetMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
-#else
-                .GetRuntimeMethod(nameof(Converters.JsonInheritanceConverter.GetDiscriminatorValue), new Type[] { typeof(Type) });
-#endif
+                .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
 
             if (getDiscriminatorValueMethod != null)
             {
-                var discriminatorValue = converter.GetDiscriminatorValue(type);
+                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, new[] { type } )!;
                 Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else
@@ -69,7 +62,7 @@ namespace NJsonSchema
                 return true;
             }
 
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
             {
                 var openApiMapping = serializer.Deserialize<Dictionary<string, string>>(reader);
                 if (openApiMapping != null && existingValue != null)
@@ -88,7 +81,7 @@ namespace NJsonSchema
                 return existingValue;
             }
 
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             {
                 var internalMapping = value as IDictionary<string, JsonSchema>;
                 if (internalMapping != null)
@@ -96,7 +89,7 @@ namespace NJsonSchema
                     var openApiMapping = new Dictionary<string, string>();
                     foreach (var tuple in internalMapping)
                     {
-                        openApiMapping[tuple.Key] = ((IJsonReferenceBase)tuple.Value).ReferencePath;
+                        openApiMapping[tuple.Key] = ((IJsonReferenceBase)tuple.Value).ReferencePath!;
                     }
 
                     var jObject = JObject.FromObject(openApiMapping, serializer);
@@ -104,7 +97,7 @@ namespace NJsonSchema
                 }
                 else
                 {
-                    writer.WriteValue((string)null);
+                    writer.WriteValue((string?)null);
                 }
             }
         }

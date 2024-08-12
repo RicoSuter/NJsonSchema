@@ -19,6 +19,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
+        private readonly ClassTemplateModel _classTemplateModel;
         private readonly JsonSchemaProperty _property;
         private readonly TypeScriptTypeResolver _resolver;
 
@@ -35,6 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             TypeScriptGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)
         {
+            _classTemplateModel = classTemplateModel;
             _property = property;
             _resolver = typeResolver;
             _parentTypeName = parentTypeName;
@@ -48,10 +50,35 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDescription => !string.IsNullOrEmpty(Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => _property.Description;
+        public string? Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type
+        {
+            get
+            {
+                if (_settings.TypeStyle == TypeScriptTypeStyle.Interface &&
+                    _classTemplateModel.HasInheritance &&
+                    InterfaceName == _classTemplateModel.BaseDiscriminator)
+                {
+                    // use string type as the discriminator property type in specialized interfaces
+                    if (_property.ActualTypeSchema.IsEnumeration &&
+                        _settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                    {
+                        return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) + "." +
+                            _classTemplateModel.DiscriminatorName;
+                    }
+                    else
+                    {
+                        return $"'{_classTemplateModel.DiscriminatorName}'";
+                    }
+                }
+                else
+                {
+                    return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+                }
+            }
+        }
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
@@ -71,13 +98,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 if (IsArray)
                 {
                     return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.Item) &&
-                        _property.ActualTypeSchema?.Item.ActualSchema.Type.IsObject() == true;
+                        _property.ActualTypeSchema?.Item?.ActualSchema.Type.IsObject() == true;
                 }
 
                 if (IsDictionary)
                 {
                     return _resolver.SupportsConstructorConversion(_property.ActualTypeSchema?.AdditionalPropertiesSchema) &&
-                        _property.ActualTypeSchema?.AdditionalPropertiesSchema.ActualSchema.Type.IsObject() == true;
+                        _property.ActualTypeSchema?.AdditionalPropertiesSchema?.ActualSchema.Type.IsObject() == true;
                 }
 
                 return _resolver.SupportsConstructorConversion(_property) &&

@@ -12,10 +12,12 @@ using Newtonsoft.Json;
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The code generator settings base.</summary>
-    public class CodeGeneratorSettingsBase
+    public abstract class CodeGeneratorSettingsBase
     {
         /// <summary>Initializes a new instance of the <see cref="CodeGeneratorSettingsBase"/> class.</summary>
+#pragma warning disable CS8618
         public CodeGeneratorSettingsBase()
+#pragma warning restore CS8618
         {
             GenerateDefaultValues = true;
             ExcludedTypeNames = Array.Empty<string>();
@@ -47,7 +49,7 @@ namespace NJsonSchema.CodeGeneration
         public ITemplateFactory TemplateFactory { get; set; }
 
         /// <summary>Gets or sets the template directory path.</summary>
-        public string TemplateDirectory { get; set; }
+        public string? TemplateDirectory { get; set; }
 
         /// <summary>Gets or sets the output language specific value generator.</summary>
         [JsonIgnore]

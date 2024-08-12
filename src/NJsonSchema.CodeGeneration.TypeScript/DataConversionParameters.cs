@@ -12,13 +12,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class DataConversionParameters
     {
         /// <summary>Gets the variable.</summary>
-        public string Variable { get; set; }
+        public string? Variable { get; set; }
 
         /// <summary>Gets the value.</summary>
-        public string Value { get; set; }
+        public string? Value { get; set; }
 
         /// <summary>Gets the schema.</summary>
-        public JsonSchema Schema { get; set; }
+        public required JsonSchema Schema { get; set; }
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public bool IsPropertyNullable { get; set; }
@@ -27,15 +27,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         public bool CheckNewableObject { get; set; } = true;
 
         /// <summary>Gets the type name hint.</summary>
-        public string TypeNameHint { get; set; }
+        public string? TypeNameHint { get; set; }
 
         /// <summary>Gets the resolver.</summary>
-        public TypeScriptTypeResolver Resolver { get; set; }
+        public required TypeScriptTypeResolver Resolver { get; set; }
 
         /// <summary>Gets or sets the null value.</summary>
         public TypeScriptNullValue NullValue { get; set; }
 
         /// <summary>Gets or sets the settings.</summary>
-        public TypeScriptGeneratorSettings Settings { get; set; }
+        public required TypeScriptGeneratorSettings Settings { get; set; }
     }
 }

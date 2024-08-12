@@ -1,10 +1,9 @@
 using Nuke.Common.CI.GitHubActions;
 
-[GitHubActionsAttribute(
+[GitHubActions(
     "pr",
     GitHubActionsImage.WindowsLatest,
-    //GitHubActionsImage.UbuntuLatest,
-    //GitHubActionsImage.MacOsLatest,
+    GitHubActionsImage.UbuntuLatest,
     OnPullRequestBranches = new[] { "master", "main" },
     OnPullRequestIncludePaths = new[] { "**/*.*" },
     OnPullRequestExcludePaths = new[] { "**/*.md" },
@@ -12,13 +11,12 @@ using Nuke.Common.CI.GitHubActions;
     InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack) },
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" }),
 ]
-[GitHubActionsAttribute(
+[GitHubActions(
     "build",
     GitHubActionsImage.WindowsLatest,
-    //GitHubActionsImage.UbuntuLatest,
-    //GitHubActionsImage.MacOsLatest,
+    GitHubActionsImage.UbuntuLatest,
     OnPushBranches = new[] { "master", "main" },
-    OnPushTags = new[] { "v*.*.*" },
+    OnPushTags = new[] { "v*.*.*", "v*.*.*-*" },
     OnPushIncludePaths = new[] { "**/*.*" },
     OnPushExcludePaths = new[] { "**/*.md" },
     PublishArtifacts = true,

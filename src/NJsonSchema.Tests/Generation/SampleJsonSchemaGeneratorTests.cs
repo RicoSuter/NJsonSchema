@@ -1,4 +1,4 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.Annotations;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation

@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="schema">The schema</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The code.</returns>
-        public IEnumerable<CodeArtifact> GenerateTypes(JsonSchema schema, string typeNameHint)
+        public IEnumerable<CodeArtifact> GenerateTypes(JsonSchema schema, string? typeNameHint)
         {
             _resolver.Resolve(schema, false, typeNameHint); // register root type
             return GenerateTypes();
@@ -60,7 +60,7 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Generates the the whole file containing all needed types.</summary>
         /// <returns>The code</returns>
-        public string GenerateFile(JsonSchema schema, string typeNameHint)
+        public string GenerateFile(JsonSchema schema, string? typeNameHint)
         {
             var artifacts = GenerateTypes(schema, typeNameHint);
             return GenerateFile(artifacts);

@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <GenerateProgramFile>true</GenerateProgramFile>
-    <ApplicationIcon />
-    <OutputType>Exe</OutputType>
-    <StartupObject />
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj" />
-    <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Tests\**\*.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <GenerateProgramFile>true</GenerateProgramFile>
+        <ApplicationIcon />
+        <OutputType>Exe</OutputType>
+        <StartupObject />
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj" />
+        <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Tests\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,9 +17,12 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task Properties_should_match_custom_resolver()
         {
-            var schema = JsonSchema.FromType<Person>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                ContractResolver = new CustomContractResolver()
+                SerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CustomContractResolver()
+                }
             });
 
             var data = schema.ToJson();

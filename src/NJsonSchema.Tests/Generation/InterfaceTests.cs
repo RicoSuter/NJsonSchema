@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -31,7 +32,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<BusinessCategory>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<BusinessCategory>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true
             });

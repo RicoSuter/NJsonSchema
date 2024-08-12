@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
+using NJsonSchema.NewtonsoftJson.Converters;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation

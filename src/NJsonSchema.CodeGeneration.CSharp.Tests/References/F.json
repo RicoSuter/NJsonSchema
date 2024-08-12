@@ -1,0 +1,9 @@
+{
+    "type": "object",
+    "properties": {
+        "name": {
+            "$ref": "./G.json",
+            "description": "This is the type of G"
+        }
+    }
+}

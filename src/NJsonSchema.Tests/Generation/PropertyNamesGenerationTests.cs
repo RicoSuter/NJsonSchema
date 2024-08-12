@@ -1,7 +1,9 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -24,9 +26,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.Default
+                SerializerSettings =
+                {
+                    ContractResolver = new DefaultContractResolver()
+                }
             });
 
             var data = schema.ToJson();
@@ -44,9 +49,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.CamelCase
+                SerializerSettings =
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                }
             });
 
             var data = schema.ToJson();
@@ -64,9 +72,12 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<Foo>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultPropertyNameHandling = PropertyNameHandling.SnakeCase
+                SerializerSettings =
+                {
+                    ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy(false, true) }
+                }
             });
 
             var data = schema.ToJson();

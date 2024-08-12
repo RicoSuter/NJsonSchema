@@ -22,11 +22,11 @@ namespace NJsonSchema.Infrastructure
 
             if ((property.Required == Required.Default || property.Required == Required.DisallowNull) &&
                 property.PropertyType != typeof(string) &&
-                typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
+                typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(property.PropertyType?.GetTypeInfo()))
             {
                 property.ShouldSerialize = instance =>
                 {
-                    var enumerable = instance != null ? property.ValueProvider.GetValue(instance) as IEnumerable : null;
+                    var enumerable = instance != null ? property.ValueProvider?.GetValue(instance) as IEnumerable : null;
                     if (enumerable != null)
                     {
                         return enumerable.GetEnumerator().MoveNext();

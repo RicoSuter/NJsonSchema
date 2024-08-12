@@ -2,6 +2,7 @@
 using NJsonSchema.Generation;
 using System.Collections.Generic;
 using Xunit;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -21,7 +22,7 @@ namespace NJsonSchema.Tests.Generation
         public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_AllowAdditionalProperties_is_true()
         {
             // Act
-            var schema = JsonSchema.FromType<Employee>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Employee>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
@@ -35,12 +36,12 @@ namespace NJsonSchema.Tests.Generation
         public void When_AlwaysAllowAdditionalObjectProperties_is_used_then_AdditionalPropertiesSchema_is_ok()
         {
             // Act
-            var schemaTrue = JsonSchema.FromType<Dictionary<string, string>>(new JsonSchemaGeneratorSettings
+            var schemaTrue = NewtonsoftJsonSchemaGenerator.FromType<Dictionary<string, string>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = true
             });
 
-            var schemaFalse = JsonSchema.FromType<Dictionary<string, string>>(new JsonSchemaGeneratorSettings
+            var schemaFalse = NewtonsoftJsonSchemaGenerator.FromType<Dictionary<string, string>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 AlwaysAllowAdditionalObjectProperties = false
             });

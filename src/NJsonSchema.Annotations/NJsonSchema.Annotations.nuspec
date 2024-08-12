@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <description>$description$</description>
+    <tags>json schema validation generator .net</tags>
+    <projectUrl>http://NJsonSchema.org</projectUrl>
+    <license type="expression">MIT</license>
+  </metadata>
+  <files>
+    <file src="bin\Release\NJsonSchema.Annotations.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+    <file src="bin\Release\NJsonSchema.Annotations.pdb" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+    <file src="bin\Release\NJsonSchema.Annotations.xml" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10" />
+
+    <file src="bin\Release\NJsonSchema.Annotations.dll" target="lib\netstandard2.0" />
+    <file src="bin\Release\NJsonSchema.Annotations.pdb" target="lib\netstandard2.0" />
+    <file src="bin\Release\NJsonSchema.Annotations.xml" target="lib\netstandard2.0" />
+
+    <file src="bin\Release\NJsonSchema.Annotations.dll" target="lib\net462" />
+    <file src="bin\Release\NJsonSchema.Annotations.pdb" target="lib\net462" />
+    <file src="bin\Release\NJsonSchema.Annotations.xml" target="lib\net462" />
+  </files>
+</package>

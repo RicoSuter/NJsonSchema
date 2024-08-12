@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="JsonInheritanceConverter.cs" company="NJsonSchema">
+// <copyright file="JsonInheritanceAttribute.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>

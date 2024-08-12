@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
     public class TypeScriptGenerator : GeneratorBase
     {
         private readonly TypeScriptTypeResolver _resolver;
-        private TypeScriptExtensionCode _extensionCode;
+        private TypeScriptExtensionCode? _extensionCode;
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptGenerator"/> class.</summary>
         /// <param name="schema">The schema.</param>
@@ -96,7 +96,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.FormatDate", new object());
                 yield return new CodeArtifact("formatDate", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
             }
-
+            if (artifacts.Any(r => r.Code.Contains("parseDateOnly(")))
+            {
+                var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ParseDateOnly", new object());
+                yield return new CodeArtifact("parseDateOnly", CodeArtifactType.Function, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Utility, template);
+            }
+            
             if (Settings.HandleReferences)
             {
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", "File.ReferenceHandling", new object());
@@ -141,7 +146,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
                 else
                 {
+#pragma warning disable CA2208
                     throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+#pragma warning restore CA2208
                 }
 
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);

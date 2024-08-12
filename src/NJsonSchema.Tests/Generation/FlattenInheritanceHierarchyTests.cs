@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -11,18 +13,21 @@ namespace NJsonSchema.Tests.Generation
         public class Person
         {
             public string Name { get; set; }
+
             public List<string> Schedule { get; set; }
         }
 
         public class Teacher : Person
         {
             public string Class { get; set; }
-            public List<Schedule> Schedule { get; set; }
+
+            public new List<Schedule> Schedule { get; set; }
         }
 
         public class Schedule
         {
             int a { get; set; }
+
             int b { get; set; }
         }
 
@@ -30,14 +35,17 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_properties_are_in_one_schema()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String,
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                },
                 FlattenInheritanceHierarchy = true
             };
 
             //// Act
-            var schema = JsonSchema.FromType(typeof(Teacher), settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -69,15 +77,18 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_interface_properties_are_in_one_schema()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
-                DefaultEnumHandling = EnumHandling.String,
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                },
                 GenerateAbstractProperties = true,
                 FlattenInheritanceHierarchy = true
             };
 
             //// Act
-            var schema = JsonSchema.FromType<IFoo>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<IFoo>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -100,14 +111,14 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_and_generate_abstract_properties_works()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
                 FlattenInheritanceHierarchy = true
             };
 
             //// Act
-            var schema = JsonSchema.FromType<Test>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -117,13 +128,13 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_works()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             };
 
             //// Act
-            var schema = JsonSchema.FromType<Test>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -149,10 +160,10 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_JsonSchemaFlattenAttribute_is_used_on_class_then_inherited_classed_are_merged()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings();
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings();
 
             //// Act
-            var schema = JsonSchema.FromType<A>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<A>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -168,16 +179,16 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true,
             };
 
             //// Act 
-            var TeacherSchema = JsonSchema.FromType(typeof(Teacher), settings);
+            var TeacherSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var TacherData = TeacherSchema.ToJson();
 
-            var PersonSchema = JsonSchema.FromType(typeof(Person), settings);
+            var PersonSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Person), settings);
             var PersonData = PersonSchema.ToJson();
 
             //// Assert

@@ -50,7 +50,7 @@ namespace NJsonSchema.Visitors
         /// <param name="path">The path.</param>
         /// <param name="typeNameHint">The type name hint.</param>
         /// <returns>The task.</returns>
-        protected abstract IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint);
+        protected abstract IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint);
 
         /// <summary>Processes an object.</summary>
         /// <param name="obj">The object to process.</param>
@@ -59,7 +59,7 @@ namespace NJsonSchema.Visitors
         /// <param name="checkedObjects">The checked objects.</param>
         /// <param name="replacer">The replacer.</param>
         /// <returns>The task.</returns>
-        protected virtual void Visit(object obj, string path, string typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
+        protected virtual void Visit(object obj, string path, string? typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
         {
             if (obj == null || !checkedObjects.Add(obj))
             {
@@ -85,75 +85,75 @@ namespace NJsonSchema.Visitors
 
                 if (schema.AdditionalItemsSchema != null)
                 {
-                    Visit(schema.AdditionalItemsSchema, path + "/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o);
+                    Visit(schema.AdditionalItemsSchema, $"{path}/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o);
                 }
 
                 if (schema.AdditionalPropertiesSchema != null)
                 {
-                    Visit(schema.AdditionalPropertiesSchema, path + "/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o);
+                    Visit(schema.AdditionalPropertiesSchema, $"{path}/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o);
                 }
 
                 if (schema.Item != null)
                 {
-                    Visit(schema.Item, path + "/items", null, checkedObjects, o => schema.Item = (JsonSchema)o);
+                    Visit(schema.Item, $"{path}/items", null, checkedObjects, o => schema.Item = (JsonSchema)o);
                 }
 
                 var items = schema._items;
                 for (var i = 0; i < items.Count; i++)
                 {
                     var index = i;
-                    Visit(items[i], path + "/items[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o));
+                    Visit(items[i], $"{path}/items[{i}]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o));
                 }
 
                 var allOf = schema._allOf;
                 for (var i = 0; i < allOf.Count; i++)
                 {
                     var index = i;
-                    Visit(allOf[i], path + "/allOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o));
+                    Visit(allOf[i], $"{path}/allOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o));
                 }
 
                 var anyOf = schema._anyOf;
                 for (var i = 0; i < anyOf.Count; i++)
                 {
                     var index = i;
-                    Visit(anyOf[i], path + "/anyOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o));
+                    Visit(anyOf[i], $"{path}/anyOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o));
                 }
 
                 var oneOf = schema._oneOf;
                 for (var i = 0; i < oneOf.Count; i++)
                 {
                     var index = i;
-                    Visit(oneOf[i], path + "/oneOf[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o));
+                    Visit(oneOf[i], $"{path}/oneOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o));
                 }
 
                 if (schema.Not != null)
                 {
-                    Visit(schema.Not, path + "/not", null, checkedObjects, o => schema.Not = (JsonSchema)o);
+                    Visit(schema.Not, $"{path}/not", null, checkedObjects, o => schema.Not = (JsonSchema)o);
                 }
 
                 if (schema.DictionaryKey != null)
                 {
-                    Visit(schema.DictionaryKey, path + "/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o);
+                    Visit(schema.DictionaryKey, $"{path}/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o);
                 }
 
                 if (schema.DiscriminatorRaw != null)
                 {
-                    Visit(schema.DiscriminatorRaw, path + "/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o);
+                    Visit(schema.DiscriminatorRaw, $"{path}/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o);
                 }
 
                 foreach (var p in schema.Properties.ToArray())
                 {
-                    Visit(p.Value, path + "/properties/" + p.Key, p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o);
+                    Visit(p.Value, $"{path}/properties/{p.Key}", p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o);
                 }
 
                 foreach (var p in schema.PatternProperties.ToArray())
                 {
-                    Visit(p.Value, path + "/patternProperties/" + p.Key, null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o);
+                    Visit(p.Value, $"{path}/patternProperties/{p.Key}", null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o);
                 }
 
                 foreach (var p in schema.Definitions.ToArray())
                 {
-                    Visit(p.Value, path + "/definitions/" + p.Key, p.Key, checkedObjects, o =>
+                    Visit(p.Value, $"{path}/definitions/{p.Key}", p.Key, checkedObjects, o =>
                     {
                         if (o != null)
                         {
@@ -167,21 +167,20 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (!(obj is string) && !(obj is JToken) && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
+            if (obj is not string && obj is not JToken && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    foreach (var property in contract.Properties.Where(p =>
+                    foreach (var property in contract.Properties)
                     {
-                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
-                        return !isJsonSchemaProperty && !p.Ignored &&
-                                p.ShouldSerialize?.Invoke(obj) != false;
-                    }))
-                    {
-                        var value = property.ValueProvider.GetValue(obj);
-                        if (value != null)
+                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(property.UnderlyingName!);
+                        if (!isJsonSchemaProperty && !property.Ignored && property.ShouldSerialize?.Invoke(obj) != false)
                         {
-                            Visit(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider.SetValue(obj, o));
+                            var value = property.ValueProvider?.GetValue(obj);
+                            if (value != null)
+                            {
+                                Visit(value, $"{path}/{property.PropertyName}", property.PropertyName, checkedObjects, o => property.ValueProvider?.SetValue(obj, o));
+                            }
                         }
                     }
                 }
@@ -189,31 +188,37 @@ namespace NJsonSchema.Visitors
                 {
                     foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
-                        Visit(dictionary[key], path + "/" + key, key.ToString(), checkedObjects, o =>
+                        var value = dictionary[key];
+                        if (value != null)
                         {
-                            if (o != null)
+                            Visit(value, $"{path}/{key}", key.ToString(), checkedObjects, o =>
                             {
-                                dictionary[key] = (JsonSchema)o;
-                            }
-                            else
-                            {
-                                dictionary.Remove(key);
-                            }
-                        });
+                                if (o != null)
+                                {
+                                    dictionary[key] = (JsonSchema)o;
+                                }
+                                else
+                                {
+                                    dictionary.Remove(key);
+                                }
+                            });
+                        }
                     }
 
                     // Custom dictionary type with additional properties (OpenApiPathItem)
                     var contextualType = obj.GetType().ToContextualType();
-                    if (contextualType.GetInheritedAttributes<JsonConverterAttribute>().Any())
+                    if (contextualType.IsAttributeDefined<JsonConverterAttribute>(true))
                     {
-                        foreach (var property in contextualType.Type.GetContextualProperties()
-                            .Where(p => p.MemberInfo.DeclaringType == contextualType.Type &&
-                                        !p.GetContextAttributes<JsonIgnoreAttribute>().Any()))
+                        foreach (var property in contextualType.Type.GetContextualProperties())
                         {
-                            var value = property.GetValue(obj);
-                            if (value != null)
+                            if (property.MemberInfo.DeclaringType == contextualType.Type && 
+                                !property.IsAttributeDefined<JsonIgnoreAttribute>(true))
                             {
-                                Visit(value, path + "/" + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o));
+                                var value = property.GetValue(obj);
+                                if (value != null)
+                                {
+                                    Visit(value, $"{path}/{property.Name}", property.Name, checkedObjects, o => property.SetValue(obj, o));
+                                }
                             }
                         }
                     }
@@ -224,7 +229,7 @@ namespace NJsonSchema.Visitors
                     for (var i = 0; i < items.Length; i++)
                     {
                         var index = i;
-                        Visit(items[i], path + "[" + i + "]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
+                        Visit(items[i], $"{path}[{i}]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
                     }
                 }
                 else if (obj is IEnumerable enumerable)
@@ -232,7 +237,7 @@ namespace NJsonSchema.Visitors
                     var items = enumerable.OfType<object>().ToArray();
                     for (var i = 0; i < items.Length; i++)
                     {
-                        Visit(items[i], path + "[" + i + "]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
+                        Visit(items[i], $"{path}[{i}]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
                     }
                 }
             }

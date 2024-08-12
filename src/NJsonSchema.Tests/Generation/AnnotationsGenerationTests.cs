@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -30,7 +31,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<AnnotationClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AnnotationClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -45,7 +46,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_annotation_is_available_then_type_and_format_can_be_customized()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<AnnotationClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AnnotationClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -66,7 +67,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_DateTime_property_has_JsonSchemaDate_attribute_then_format_and_type_is_correct()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<DateAttributeClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DateAttributeClass>();
             var data = schema.ToJson();
 
             //// Act
@@ -89,7 +90,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<MultipleOfClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MultipleOfClass>();
             var property = schema.Properties["Number"];
 
             //// Assert
@@ -162,7 +163,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ArrayModel>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ArrayModel>();
 
             //// Act
             var data = schema.ToJson();
@@ -180,7 +181,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_has_array_item_type_defined_then_schema_has_this_item_type2()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<ArrayModel<string>>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ArrayModel<string>>();
 
             //// Act
             var data = schema.ToJson();
@@ -205,7 +206,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_property_is_struct_then_it_is_not_nullable()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<MyStructContainer>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStructContainer>();
 
             //// Act
             var data = schema.ToJson();
@@ -227,7 +228,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<StringLengthAttributeClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<StringLengthAttributeClass>();
 
             //// Assert
             var property = schema.Properties["Foo"];
@@ -248,7 +249,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_MinLengthAttribute_is_set_then_minItems_or_minLength_is_set()
         {
-            var schema = JsonSchema.FromType<MinLengthAttributeClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MinLengthAttributeClass>();
 
             var arrayProperty = schema.Properties["Items"];
             Assert.Equal(1, arrayProperty.MinItems);
@@ -269,7 +270,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_MaxLengthAttribute_is_set_then_maxItems_or_maxLength_is_set()
         {
-            var schema = JsonSchema.FromType<MaxLengthAttributeClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MaxLengthAttributeClass>();
 
             var arrayProperty = schema.Properties["Items"];
             Assert.Equal(100, arrayProperty.MaxItems);
@@ -290,7 +291,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<StringRequiredClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<StringRequiredClass>();
 
             //// Assert
             var property = schema.Properties["Foo"];
@@ -311,7 +312,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<DtoRequiredClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DtoRequiredClass>();
             var json = schema.ToJson();
 
             //// Assert
@@ -362,7 +363,7 @@ namespace NJsonSchema.Tests.Generation
         [InlineData(nameof(DataTypeAttributeClass.Url2), "uri")]
         public async Task When_DataTypeAttribute_is_set_then_the_format_property_should_come_from_the_attribute(string propertyName, string expectedFormat)
         {
-            var schema = JsonSchema.FromType<DataTypeAttributeClass>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<DataTypeAttributeClass>();
             var property = schema.Properties[propertyName];
 
             Assert.Equal(expectedFormat, property.Format);
@@ -388,7 +389,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_is_ignored_then_it_is_not_in_definitions()
         {
             /// Act
-            var schema = JsonSchema.FromType<Student>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Student>();
             var json = schema.ToJson();
 
             /// Assert

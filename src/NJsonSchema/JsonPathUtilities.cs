@@ -11,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Namotion.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
@@ -26,7 +25,7 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-        public static string GetJsonPath(object rootObject, object searchedObject)
+        public static string? GetJsonPath(object rootObject, object searchedObject)
         {
             // TODO: Remove this overload?
             return GetJsonPath(rootObject, searchedObject, new DefaultContractResolver());
@@ -39,7 +38,7 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-        public static string GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
+        public static string? GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
         {
             return GetJsonPaths(rootObject, new List<object> { searchedObject }, contractResolver)[searchedObject];
         }
@@ -51,20 +50,15 @@ namespace NJsonSchema
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-#if !LEGACY
-        public static IReadOnlyDictionary<object, string> GetJsonPaths(object rootObject,
+        public static IReadOnlyDictionary<object, string?> GetJsonPaths(object rootObject,
             IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#else
-        public static IDictionary<object, string> GetJsonPaths(object rootObject,
-            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
-#endif
         {
             if (rootObject == null)
             {
                 throw new ArgumentNullException(nameof(rootObject));
             }
 
-            var mappings = searchedObjects.ToDictionary(o => o, o => (string)null);
+            var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null);
             FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
 
             if (mappings.Any(p => p.Value == null))
@@ -77,7 +71,7 @@ namespace NJsonSchema
             return mappings;
         }
 
-        private static bool FindJsonPaths(object obj, Dictionary<object, string> searchedObjects,
+        private static bool FindJsonPaths(object obj, Dictionary<object, string?> searchedObjects,
             string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
         {
             if (obj == null)
@@ -87,10 +81,8 @@ namespace NJsonSchema
 
             var type = obj.GetType();
             if (type == typeof(string)
-#if !NETSTANDARD1_0
                 || type.IsPrimitive
                 || type.IsEnum
-#endif
                 || type == typeof(JValue)
                 || checkedObjects.Contains(obj)
             )
@@ -102,7 +94,7 @@ namespace NJsonSchema
             if (searchedObjects.ContainsKey(obj))
             {
                 searchedObjects[obj] = basePath;
-                if (searchedObjects.All(p => p.Value != null))
+                if (searchedObjects.All(static p => p.Value != null))
                 {
                     return true;
                 }
@@ -115,7 +107,8 @@ namespace NJsonSchema
             {
                 foreach (DictionaryEntry pair in dictionary)
                 {
-                    if (FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects, contractResolver))
+                    if (pair.Value != null && 
+                        FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects, contractResolver))
                     {
                         return true;
                     }
@@ -126,7 +119,8 @@ namespace NJsonSchema
                 for (var i = 0; i < list.Count; ++i)
                 {
                     var item = list[i];
-                    if (FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
+                    if (item != null && 
+                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
                     {
                         return true;
                     }
@@ -137,7 +131,8 @@ namespace NJsonSchema
                 var i = 0;
                 foreach (var item in enumerable)
                 {
-                    if (FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
+                    if (item != null &&
+                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
                     {
                         return true;
                     }
@@ -155,13 +150,11 @@ namespace NJsonSchema
                             continue;
                         }
 
-                        var value = jsonProperty.ValueProvider.GetValue(obj);
-                        if (value != null)
+                        var value = jsonProperty.ValueProvider?.GetValue(obj);
+                        if (value != null &&
+                            FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonProperty.PropertyName, checkedObjects, contractResolver))
                         {
-                            if (FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonProperty.PropertyName, checkedObjects, contractResolver))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
 
@@ -171,7 +164,8 @@ namespace NJsonSchema
                         if (extensionDataProperty != null)
                         {
                             var value = extensionDataProperty.GetValue(obj);
-                            if (FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
+                            if (value != null && 
+                                FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
                             {
                                 return true;
                             }

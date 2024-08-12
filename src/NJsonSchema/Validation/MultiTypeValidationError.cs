@@ -21,35 +21,28 @@ namespace NJsonSchema.Validation
         /// <param name="errors">The error list. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-#if !LEGACY
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
-#else
-        public MultiTypeValidationError(ValidationErrorKind kind, string property, string path, IDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
-#endif
+        public MultiTypeValidationError(ValidationErrorKind kind, string? property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
+
             : base(kind, property, path, token, schema)
         {
             Errors = errors;
         }
 
         /// <summary>Gets the errors for each validated type. </summary>
-#if !LEGACY
         public IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> Errors { get; private set; }
-#else
-        public IDictionary<JsonObjectType, ICollection<ValidationError>> Errors { get; private set; }
-#endif
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            var output = string.Format("{0}: {1}\n", Kind, Path);
+            var output = $"{Kind}: {Path}\n";
             foreach (var error in Errors)
             {
                 output += "{" + error.Key + ":\n";
                 foreach (var validationError in error.Value)
                 {
-                    output += string.Format("  {0}\n", validationError.ToString().Replace("\n", "\n  "));
+                    output += $"  {validationError.ToString().Replace("\n", "\n  ")}\n";
                 }
                 output += "}\n";
             }

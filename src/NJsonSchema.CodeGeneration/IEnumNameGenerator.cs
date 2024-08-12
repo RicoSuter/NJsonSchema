@@ -17,6 +17,6 @@ namespace NJsonSchema.CodeGeneration
         /// <param name="value">The value.</param>
         /// <param name="schema">The schema.</param>
         /// <returns>The enumeration name.</returns>
-        string Generate(int index, string name, object value, JsonSchema schema);
+        string Generate(int index, string? name, object? value, JsonSchema schema);
     }
 }

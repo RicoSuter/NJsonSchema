@@ -42,7 +42,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool ExportTypes => _settings.ExportTypes;
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _schema.ExtensionData;
 
         /// <summary>Gets the enum values.</summary>
         public List<EnumerationItemModel> Enums
@@ -62,9 +62,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         entries.Add(new EnumerationItemModel
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                            Value = _schema.Type.IsInteger() ?
-                                value.ToString() :
-                                (_settings.TypeScriptVersion < 2.4m ? "<any>" : "") + "\"" + value + "\"",
+                            Value = _schema.Type.IsInteger() ? value.ToString() : "\"" + value + "\"",
                         });
                     }
                 }

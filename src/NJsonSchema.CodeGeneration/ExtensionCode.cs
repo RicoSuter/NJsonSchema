@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration
         public string TopCode { get; protected set; } = string.Empty;
 
         /// <summary>Gets the extension code which is appended at the end of the generated code.</summary>
-        public string BottomCode { get; protected set; }
+        public string? BottomCode { get; protected set; }
 
 		/// <summary>Gets the body of the extension class.</summary>
 		/// <param name="className">The class name.</param>
@@ -33,12 +33,12 @@ namespace NJsonSchema.CodeGeneration
 		/// <exception cref="InvalidOperationException">The extension class is not defined.</exception>
 		public string GetExtensionClassBody(string className)
         {
-			if (!ExtensionClasses.ContainsKey(className))
+			if (!ExtensionClasses.TryGetValue(className, out string? value))
             {
                 throw new InvalidOperationException("The extension class '" + className + "' is not defined.");
             }
 
-            var match = Regex.Match(ExtensionClasses[className], "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
+            var match = Regex.Match(value, "(.*?)class (.*?){(.*)}", RegexOptions.Singleline);
             return match.Groups[3].Value;
         }
     }

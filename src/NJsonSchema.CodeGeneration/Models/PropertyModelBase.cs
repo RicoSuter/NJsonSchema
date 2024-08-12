@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool HasDefaultValue => !string.IsNullOrEmpty(DefaultValue);
 
         /// <summary>Gets the default value as string.</summary>
-        public string DefaultValue => ValueGenerator.GetDefaultValue(_property,
+        public string? DefaultValue => ValueGenerator.GetDefaultValue(_property,
             _property.IsNullable(_settings.SchemaType), Type, _property.Name, _settings.GenerateDefaultValues, _typeResolver);
 
         /// <summary>Gets the name of the property.</summary>
@@ -68,10 +68,10 @@ namespace NJsonSchema.CodeGeneration.Models
             _property.ActualTypeSchema.Item.ActualSchema.Type.IsString();
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _property.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _property.ExtensionData;
 
         /// <summary>Gets the JSON Schema format property.</summary>
-        public string Format => _property.ActualSchema.Format;
+        public string? Format => _property.ActualSchema.Format;
 
         /// <summary>Gets the type name hint for the property.</summary>
         protected string GetTypeNameHint()

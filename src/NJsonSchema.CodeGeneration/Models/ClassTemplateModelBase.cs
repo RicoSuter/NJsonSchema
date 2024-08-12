@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration.Models
             _rootObject = rootObject;
             _resolver = resolver;
 
-            SchemaTitle = _schema?.Title;
+            SchemaTitle = _schema.Title;
         }
 
         /// <summary>Gets the class.</summary>
@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>
         /// Gets the original title of the class (schema title).
         /// </summary>
-        public string SchemaTitle { get; }
+        public string? SchemaTitle { get; }
 
         /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
         public bool IsObject => _schema.ActualTypeSchema.IsObject;
@@ -46,18 +46,19 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool IsAbstract => _schema.ActualTypeSchema.IsAbstract;
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _schema.ExtensionData;
 
         /// <summary>Gets the derived class names (discriminator key/type name).</summary>
         public ICollection<DerivedClassModel> DerivedClasses => _schema
             .GetDerivedSchemas(_rootObject)
-            .Select(p => new DerivedClassModel(p.Value, p.Key, _schema.ActualSchema.ResponsibleDiscriminatorObject, _resolver))
+            .Where(p => _schema.ActualSchema.ResponsibleDiscriminatorObject != null)
+            .Select(p => new DerivedClassModel(p.Value!, p.Key, _schema.ActualSchema.ResponsibleDiscriminatorObject!, _resolver))
             .ToList();
 
         /// <summary>The model of a derived class.</summary>
         public class DerivedClassModel
         {
-            internal DerivedClassModel(string typeName, JsonSchema schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
+            internal DerivedClassModel(string? typeName, JsonSchema schema, OpenApiDiscriminator discriminator, TypeResolverBase resolver)
             {
                 var mapping = discriminator.Mapping.SingleOrDefault(m => m.Value.ActualTypeSchema == schema.ActualTypeSchema);
 
@@ -66,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.Models
 
                 Discriminator =
                     mapping.Value != null ? mapping.Key :
-                    !string.IsNullOrEmpty(typeName) ? typeName :
+                    !string.IsNullOrEmpty(typeName) ? typeName! :
                     ClassName;
             }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -97,7 +98,7 @@ var x = 10;";
         public async Task When_classes_have_extension_code_then_class_body_is_copied()
         {
             //// Arrange
-            var schema = JsonSchema.FromType<Foo>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
 
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings

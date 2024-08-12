@@ -15,11 +15,11 @@ namespace NJsonSchema
     {
         /// <summary>Gets the parent schema of the XML object schema. </summary>
         [JsonIgnore]
-        public JsonSchema ParentSchema { get; internal set; }
+        public JsonSchema? ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the name of the xml object. </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Name { get; internal set; }
+        public string? Name { get; internal set; }
 
         /// <summary>Gets or sets if the array elements are going to be wrapped or not. </summary>
         [JsonProperty("wrapped", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -27,11 +27,11 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the URL of the namespace definition. </summary>
         [JsonProperty("namespace", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Namespace { get; internal set; }
+        public string? Namespace { get; internal set; }
 
         /// <summary>Gets or sets the prefix for the name. </summary>
         [JsonProperty("prefix", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public string Prefix { get; internal set; }
+        public string? Prefix { get; internal set; }
 
         /// <summary>Gets or sets if the property definition translates into an attribute instead of an element. </summary>
         [JsonProperty("attribute", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]

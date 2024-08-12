@@ -16,19 +16,19 @@ namespace NJsonSchema.References
     public abstract class JsonReferenceBase<T> : IJsonReferenceBase
         where T : class, IJsonReference
     {
-        private T _reference;
+        private T? _reference;
 
         /// <summary>Gets the document path (URI or file path) for resolving relative references.</summary>
         [JsonIgnore]
-        public string DocumentPath { get; set; }
+        public string? DocumentPath { get; set; }
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
         [JsonProperty("$ref", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        string IJsonReferenceBase.ReferencePath { get; set; }
+        string? IJsonReferenceBase.ReferencePath { get; set; }
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]
-        public virtual T Reference
+        public virtual T? Reference
         {
             get => _reference;
             set
@@ -43,10 +43,10 @@ namespace NJsonSchema.References
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]
-        IJsonReference IJsonReferenceBase.Reference
+        IJsonReference? IJsonReferenceBase.Reference
         {
             get => Reference;
-            set => Reference = (T)value;
+            set => Reference = (T?)value;
         }
     }
 }

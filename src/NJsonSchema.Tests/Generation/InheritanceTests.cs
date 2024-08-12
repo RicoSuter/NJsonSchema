@@ -4,9 +4,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NJsonSchema.Converters;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.SchemaProcessors;
+using NJsonSchema.NewtonsoftJson.Converters;
+using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -84,7 +85,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_generating_type_with_inheritance_then_allOf_has_one_item()
         {
             //// Act
-            var schema = JsonSchema.FromType<Teacher>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
 
             //// Assert
             Assert.NotNull(schema.ActualProperties["Class"]);
@@ -110,7 +111,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<CC>(new JsonSchemaGeneratorSettings
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<CC>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             });
@@ -162,7 +163,7 @@ namespace NJsonSchema.Tests.Generation
 
 
             //// Act
-            var schema = JsonSchema.FromType<Animal>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Animal>();
             var data = schema.ToJson();
 
             //// Assert
@@ -191,7 +192,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_discriminator_is_externally_defined_then_it_is_generated()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
                 {
@@ -200,7 +201,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType<ViewModelThing>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ViewModelThing>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -223,7 +224,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_discriminator_is_externally_defined_then_it_is_generated_without_exception()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
                 {
@@ -232,7 +233,7 @@ namespace NJsonSchema.Tests.Generation
             };
 
             //// Act
-            var schema = JsonSchema.FromType<ViewModelThingWithTwoProperties>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ViewModelThingWithTwoProperties>(settings);
             var data = schema.ToJson();
 
             //// Assert
@@ -305,7 +306,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            var schema = JsonSchema.FromType<BaseClass_WithStringDiscriminant>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<BaseClass_WithStringDiscriminant>();
 
             //// Assert
             Assert.NotNull(schema.Properties["Kind"]);
@@ -329,7 +330,7 @@ namespace NJsonSchema.Tests.Generation
             //// Arrange
 
             //// Act
-            JsonSchema GetSchema() => JsonSchema.FromType<BaseClass_WithObjectDiscriminant>();
+            JsonSchema GetSchema() => NewtonsoftJsonSchemaGenerator.FromType<BaseClass_WithObjectDiscriminant>();
             Action getSchemaAction = () => GetSchema();
 
             //// Assert
@@ -350,13 +351,13 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_inherits_from_dictionary_then_allOf_contains_base_dictionary_schema_and_actual_schema()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };
 
             //// Act
-            var schema = JsonSchema.FromType<Foo>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(settings);
             var json = schema.ToJson();
 
             //// Assert
@@ -392,13 +393,13 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_class_with_discriminator_has_base_class_then_mapping_is_placed_in_type_schema_and_not_root()
         {
             //// Arrange
-            var settings = new JsonSchemaGeneratorSettings
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };
 
             //// Act
-            var schema = JsonSchema.FromType<ExceptionContainer>(settings);
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>(settings);
             var json = schema.ToJson();
 
             //// Assert
@@ -431,7 +432,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_using_JsonInheritanceAttribute_then_schema_is_correct()
         {
             //// Act
-            var schema = JsonSchema.FromType<Fruit>();
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<Fruit>();
             var data = schema.ToJson();
 
             //// Assert

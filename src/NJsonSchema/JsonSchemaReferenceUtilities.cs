@@ -93,18 +93,18 @@ namespace NJsonSchema
                 await base.VisitAsync(obj, cancellationToken).ConfigureAwait(false);
             }
 
-            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string typeNameHint, CancellationToken cancellationToken)
+            protected override async Task<IJsonReference> VisitJsonReferenceAsync(IJsonReference reference, string path, string? typeNameHint, CancellationToken cancellationToken)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (reference.ReferencePath != null && reference.Reference == null)
                 {
                     if (_replaceRefsRound)
                     {
-                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
+                        if (path.EndsWith("/definitions/" + typeNameHint, StringComparison.Ordinal) || path.EndsWith("/schemas/" + typeNameHint, StringComparison.Ordinal))
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -112,7 +112,7 @@ namespace NJsonSchema
                     {
                         // load $refs and add them to "definitions"
                         reference.Reference = await _referenceResolver
-                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
+                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
                             .ConfigureAwait(false);
                     }
                 }
@@ -137,7 +137,7 @@ namespace NJsonSchema
                 _contractResolver = contractResolver;
             }
 
-            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string typeNameHint)
+            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint)
             {
                 if (reference.Reference != null)
                 {
@@ -149,8 +149,13 @@ namespace NJsonSchema
                     {
                         var externalReference = reference.Reference;
                         var externalReferenceRoot = externalReference.FindParentDocument();
-                        reference.ReferencePath = externalReference.DocumentPath + JsonPathUtilities.GetJsonPath(
-                            externalReferenceRoot, externalReference, _contractResolver).TrimEnd('#');
+                        if (externalReferenceRoot != null)
+                        {
+                            var jsonPath = JsonPathUtilities.GetJsonPath(
+                                externalReferenceRoot, externalReference, _contractResolver)?.TrimEnd('#');
+
+                            reference.ReferencePath = externalReference.DocumentPath + jsonPath;
+                        }
                     }
                 }
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)

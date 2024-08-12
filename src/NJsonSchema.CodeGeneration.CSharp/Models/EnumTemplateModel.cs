@@ -6,7 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -38,10 +40,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => _schema.Description;
+        public string? Description => _schema.Description;
 
         /// <summary>Gets the property extension data.</summary>
-        public IDictionary<string, object> ExtensionData => _schema.ExtensionData;
+        public IDictionary<string, object?>? ExtensionData => _schema.ExtensionData;
 
         /// <summary>Gets a value indicating whether the enum is of type string.</summary>
         public bool IsStringEnum => _schema.Type != JsonObjectType.Integer;
@@ -51,6 +53,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets or sets if we output as Bit Flags.</summary>
         public bool IsEnumAsBitFlags => _settings.EnforceFlagEnums || _schema.IsFlagEnumerable;
+
+        /// <summary>Gets a value indicating whether the enum needs an other base type to representing an extended value range.</summary>
+        public bool HasExtendedValueRange => _schema.Format == JsonFormatStrings.Long;
 
         /// <summary>Gets the enum values.</summary>
         public IEnumerable<EnumerationItemModel> Enums
@@ -74,8 +79,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     Value = value.ToString(),
-                                    InternalValue = valueInt64.ToString(),
-                                    InternalFlagValue = valueInt64.ToString()
+                                    InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
+                                    InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                             else
@@ -85,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     Value = value.ToString(),
                                     InternalValue = value.ToString(),
-                                    InternalFlagValue = (1 << i).ToString()
+                                    InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                         }
@@ -98,8 +103,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                             {
                                 Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                 Value = value.ToString(),
-                                InternalValue = i.ToString(),
-                                InternalFlagValue = (1 << i).ToString()
+                                InternalValue = i.ToString(CultureInfo.InvariantCulture),
+                                InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                             });
                         }
                     }

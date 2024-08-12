@@ -23,7 +23,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
             DateTimeType = "System.DateTimeOffset";
             TimeType = "System.TimeSpan";
             TimeSpanType = "System.TimeSpan";
-
+            
+            NumberType = "double";
+            NumberFloatType = "float";
+            NumberDoubleType = "double";
+            NumberDecimalType = "decimal";
+            
             ArrayType = "System.Collections.Generic.ICollection";
             ArrayInstanceType = "System.Collections.ObjectModel.Collection";
             ArrayBaseType = "System.Collections.ObjectModel.Collection";
@@ -78,7 +83,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
         public string TimeSpanType { get; set; }
+        
+        /// <summary>Gets or sets the number .NET type (default: "double").</summary>
+        public string NumberType { get; set; }
+        
+        /// <summary>Gets or sets the number with double format .NET type (default: "double").</summary>
+        public string NumberDoubleType { get; set; }
+        
+        /// <summary>Gets or sets the number with float format .NET type (default: "float").</summary>
+        public string NumberFloatType { get; set; }
 
+        /// <summary>Gets or sets the number with decimal format .NET type (default: "decimal").</summary>
+        public string NumberDecimalType { get; set; }
+        
         /// <summary>Gets or sets the generic array .NET type (default: 'ICollection').</summary>
         public string ArrayType { get; set; }
 
@@ -96,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the generic dictionary .NET type which is used as base class (default: 'Dictionary').</summary>
         public string DictionaryBaseType { get; set; }
-
+        
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
 
@@ -110,7 +127,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public string PropertySetterAccessModifier { get; set; }
 
         /// <summary>Gets or sets the custom Json.NET converters (class names) which are registered for serialization and deserialization.</summary>
-        public string[] JsonConverters { get; set; }
+        public string[]? JsonConverters { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to remove the setter for non-nullable array properties (default: false).</summary>
         public bool GenerateImmutableArrayProperties { get; set; }
@@ -122,7 +139,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public bool HandleReferences { get; set; }
 
         /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).</summary>
-        public string JsonSerializerSettingsTransformationMethod { get; set; }
+        public string? JsonSerializerSettingsTransformationMethod { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: false).</summary>
         public bool GenerateJsonMethods { get; set; }

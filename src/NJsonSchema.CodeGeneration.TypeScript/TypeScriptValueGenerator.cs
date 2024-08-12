@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -29,6 +30,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
         }
 
+        /// <summary>Gets the enum default value.</summary>
+        /// <param name="schema">The schema.</param>
+        /// <param name="actualSchema">The actual schema.</param>
+        /// <param name="typeNameHint">The type name hint.</param>
+        /// <param name="typeResolver">The type resolver.</param>
+        /// <returns>The enum default value.</returns>
+        protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string? typeNameHint, TypeResolverBase typeResolver)
+        {
+            if (schema.Default is not null &&
+                typeResolver is TypeScriptTypeResolver { Settings.EnumStyle: TypeScriptEnumStyle.StringLiteral })
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+
+            return base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
+        }
+
         /// <summary>Gets the default value code.</summary>
         /// <param name="schema">The schema.</param>
         /// <param name="allowsNull">Specifies whether the default value assignment also allows null.</param>
@@ -37,14 +55,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="useSchemaDefault">if set to <c>true</c> uses the default value from the schema if available.</param>
         /// <param name="typeResolver">The type resolver.</param>
         /// <returns>The code.</returns>
-        public override string GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
+        public override string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
             var value = base.GetDefaultValue(schema, allowsNull, targetType, typeNameHint, useSchemaDefault, typeResolver);
             if (value == null)
             {
                 if (schema.Default != null && useSchemaDefault)
                 {
-                    if (schema.Type.IsString() && 
+                    if (schema.Type.IsString() &&
+                        schema.Format is not null &&
                         _supportedFormatStrings.Contains(schema.Format))
                     {
                         return GetDefaultAsStringLiteral(schema);
@@ -54,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
                 if (schema != null && allowsNull == false && isOptional == false)
                 {
-                    if (typeResolver.GeneratesType(schema) && 
+                    if (typeResolver.GeneratesType(schema) &&
                         !schema.ActualTypeSchema.IsEnumeration &&
                         !schema.ActualTypeSchema.IsAbstract)
                     {
@@ -81,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <param name="value">The value to convert.</param>
         /// <param name="format">Optional schema format</param>
         /// <returns>The TypeScript number literal.</returns>
-        public override string GetNumericValue(JsonObjectType type, object value, string format)
+        public override string GetNumericValue(JsonObjectType type, object value, string? format)
         {
             return ConvertNumberToString(value);
         }

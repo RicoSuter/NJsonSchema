@@ -35,7 +35,7 @@ namespace NJsonSchema
         /// <param name="typeNameHint">The type name hint.</param>
         /// <exception cref="ArgumentNullException"><paramref name="schema"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentException">The root schema cannot be appended.</exception>
-        public virtual void AppendSchema(JsonSchema schema, string typeNameHint)
+        public virtual void AppendSchema(JsonSchema schema, string? typeNameHint)
         {
             if (schema == null)
             {

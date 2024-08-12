@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Annotations;
 using System.Globalization;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -45,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
 
         /// <summary>Gets the description.</summary>
-        public string Description => _property.Description;
+        public string? Description => _property.Description;
 
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
@@ -64,17 +65,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
                 (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
             )) == false;
-            
-        /// <summary>Indicates whether or not this property has a <see cref="JsonIgnoreCondition"/>.</summary>
-        public bool HasJsonIgnoreCondition => JsonIgnoreCondition != null;
 
-        /// <summary>Returns the System.Text.Json.Serialization.JsonIgnoreCondition value to be applied to the property.</summary>
-        public string JsonIgnoreCondition => _property switch {
-            { IsRequired: false } => "System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull",
-            { IsRequired: true } when _settings.RequiredPropertiesMustBeDefined => "System.Text.Json.Serialization.JsonIgnoreCondition.Never",
-            _ => null
-        };
-            
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequiredCode
         {
@@ -82,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 if (_settings.RequiredPropertiesMustBeDefined && _property.IsRequired)
                 {
-                    if (!_property.IsNullable(_settings.SchemaType))
+                    if (!IsNullable)
                     {
                         return "Newtonsoft.Json.Required.Always";
                     }
@@ -93,7 +84,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
                 else
                 {
-                    if (!_property.IsNullable(_settings.SchemaType))
+                    if (!IsNullable)
                     {
                         return "Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore";
                     }
@@ -282,7 +273,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         }
 
         /// <summary>Gets the regular expression value for the regular expression attribute.</summary>
-        public string RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
+        public string? RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
         public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type.IsString();
@@ -297,9 +288,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_property.DeprecatedMessage);
 
         /// <summary>Gets the deprecated message.</summary>
-        public string DeprecatedMessage => _property.DeprecatedMessage;
+        public string? DeprecatedMessage => _property.DeprecatedMessage;
 
-        private string GetSchemaFormat(JsonSchema schema)
+        private string? GetSchemaFormat(JsonSchema schema)
         {
             if (Type == "long" || Type == "long?")
             {
