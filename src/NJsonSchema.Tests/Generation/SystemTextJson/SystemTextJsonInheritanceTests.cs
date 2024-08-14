@@ -106,6 +106,46 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                     """.ReplaceLineEndings(), data);
         }
 
+        public class Dalmation : Dog
+        {
+            public string Foo { get; set; }
+        }
+
+        public class Poodle : Dog
+        {
+            public string Bar { get; set; }
+        }
+
+        [JsonDerivedType(typeof(Dalmation), 1)]
+        [JsonDerivedType(typeof(Poodle), 2)]
+        [JsonPolymorphic(TypeDiscriminatorPropertyName = "breed")]
+        public class Dog
+        {
+            public string Baz { get; set; }
+        }
+
+        [Fact]
+        public async Task When_using_native_attributes_and_integer_discriminator_in_SystemTextJson_then_schema_is_correct()
+        {
+            //// Act
+            var schema = JsonSchema.FromType<Dog>();
+            var data = schema.ToJson().ReplaceLineEndings();
+
+            //// Assert
+            Assert.NotNull(data);
+            Assert.Contains(@"""1"": """, data);
+            Assert.Contains(@"""2"": """, data);
+            Assert.Contains(
+                """
+                      "discriminator": {
+                        "propertyName": "breed",
+                        "mapping": {
+                          "1": "#/definitions/Dalmation",
+                          "2": "#/definitions/Poodle"
+                        }
+                      },
+                    """.ReplaceLineEndings(), data);
+        }
 #endif
     }
 }
