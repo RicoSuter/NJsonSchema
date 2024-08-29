@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <authors>$author$</authors>
+        <description>$description$</description>
+        <tags>json schema validation source generator codegen .net</tags>
+        <projectUrl>http://NJsonSchema.org</projectUrl>
+        <licenseUrl>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</licenseUrl>
+    </metadata>
+</package>

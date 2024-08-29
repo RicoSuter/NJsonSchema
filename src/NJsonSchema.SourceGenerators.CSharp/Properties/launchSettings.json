@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DebugGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\NJsonSchema.Demo\\NJsonSchema.Demo.csproj"
+    }
+  }
+}

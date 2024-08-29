@@ -14,9 +14,12 @@
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NodaTime" Version="3.1.9" />
     <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0-preview011" />
+    <PackageVersion Include="Parlot" Version="0.0.25.0" />
     <PackageVersion Include="Pro.NBench.xUnit" Version="2.0.0" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="4.4.0" />
     <PackageVersion Include="System.Text.Json" Version="4.7.2" />
+    <PackageVersion Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Verify.XUnit" Version="14.7.0" />
     <PackageVersion Include="xunit" Version="2.8.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
