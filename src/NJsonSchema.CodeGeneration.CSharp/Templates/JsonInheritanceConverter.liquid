@@ -100,7 +100,7 @@ public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.Js
                 return attribute.Type;
         }
 
-        return objectType;
+        return null;
     }
 
     private string GetSubtypeDiscriminator(System.Type objectType)
