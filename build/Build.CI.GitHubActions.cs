@@ -4,26 +4,25 @@ using Nuke.Common.CI.GitHubActions;
     "pr",
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.UbuntuLatest,
-    OnPullRequestBranches = new[] { "master", "main" },
-    OnPullRequestIncludePaths = new[] { "**/*.*" },
-    OnPullRequestExcludePaths = new[] { "**/*.md" },
+    OnPullRequestBranches = ["master", "main"],
+    OnPullRequestIncludePaths = ["**/*.*"],
+    OnPullRequestExcludePaths = ["**/*.md"],
     PublishArtifacts = false,
-    InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack) },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" }),
+    InvokedTargets = [nameof(Compile), nameof(Test), nameof(Pack)],
+    CacheKeyFiles = ["global.json", "src/**/*.csproj", "src/**/package.json"],
+    ConcurrencyCancelInProgress = true)
 ]
 [GitHubActions(
     "build",
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = new[] { "master", "main" },
-    OnPushTags = new[] { "v*.*.*", "v*.*.*-*" },
-    OnPushIncludePaths = new[] { "**/*.*" },
-    OnPushExcludePaths = new[] { "**/*.md" },
+    OnPushBranches = ["master", "main"],
+    OnPushTags = ["v*.*.*", "v*.*.*-*"],
+    OnPushIncludePaths = ["**/*.*"],
+    OnPushExcludePaths = ["**/*.md"],
     PublishArtifacts = true,
-    InvokedTargets = new[] { nameof(Compile), nameof(Test), nameof(Pack), nameof(Publish) },
-    ImportSecrets = new [] { "NUGET_API_KEY", "MYGET_API_KEY" },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj", "src/**/package.json" })
+    InvokedTargets = [nameof(Compile), nameof(Test), nameof(Pack), nameof(Publish)],
+    ImportSecrets = ["NUGET_API_KEY", "MYGET_API_KEY"],
+    CacheKeyFiles = ["global.json", "src/**/*.csproj", "src/**/package.json"])
 ]
-public partial class Build
-{
-}
+public partial class Build;
