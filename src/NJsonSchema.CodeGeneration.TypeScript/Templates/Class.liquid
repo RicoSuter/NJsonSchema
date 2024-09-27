@@ -30,7 +30,7 @@
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
-{%         endif -%} 
+{%         endif -%}
 {%         if ConvertConstructorInterfaceData -%}
 {%             for property in Properties -%}
 {%                 if property.SupportsConstructorConversion -%}
