@@ -57,7 +57,7 @@ var x = 10;";
             var code = Code;
 
             //// Act
-            var extensionCode = new TypeScriptExtensionCode(code, new[] { "Foo", "Bar" }, new [] { "BaseClass" });
+            var extensionCode = new TypeScriptExtensionCode(code, ["Foo", "Bar"], ["BaseClass"]);
 
             //// Assert
             Assert.True(extensionCode.ExtensionClasses.ContainsKey("Foo"));
@@ -103,7 +103,7 @@ var x = 10;";
             //// Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                ExtendedClasses = new[] { "Foo", "Bar" },
+                ExtendedClasses = ["Foo", "Bar"],
                 ExtensionCode = Code
             });
             var code = generator.GenerateFile();
@@ -131,7 +131,7 @@ export class UseHttpCookiesForApi {
 }";
 
             //// Act
-            var extensionCode = new TypeScriptExtensionCode(code, Array.Empty<string>(), new[] { "UseHttpCookiesForApi" });
+            var extensionCode = new TypeScriptExtensionCode(code, [], ["UseHttpCookiesForApi"]);
 
             //// Assert
             Assert.Empty(extensionCode.ExtensionClasses);

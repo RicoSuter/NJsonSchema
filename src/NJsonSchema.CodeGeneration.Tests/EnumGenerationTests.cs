@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             //// Assert
-            Assert.Equal(3, code.Split(new[] { "export enum " }, StringSplitOptions.None).Count()); // two found
+            Assert.Equal(3, code.Split(["export enum "], StringSplitOptions.None).Count()); // two found
         }
 
         [Fact]
@@ -104,8 +104,9 @@ namespace NJsonSchema.CodeGeneration.Tests
             Assert.Contains("public enum Bar2\n", code);
 
             Assert.Contains(" B = 5,", code); // B must be 5 even if B = 1 is first defined
-            Assert.Equal(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
-            Assert.Equal(3, code.Split(new[] { "[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
+            Assert.Equal(3, code.Split(["public enum "], StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
+            Assert.Equal(3, code.Split(
+                ["[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"], StringSplitOptions.None).Count()); // two found
         }
 
         [Fact]

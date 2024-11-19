@@ -20,7 +20,7 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema ActualSchema => GetActualSchema(new List<JsonSchema>());
+        public virtual JsonSchema ActualSchema => GetActualSchema([]);
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
@@ -113,7 +113,7 @@ namespace NJsonSchema
 
         private JsonSchema? GetActualSchemaReferences(List<JsonSchema> checkedSchemas)
         {
-            checkedSchemas ??= new List<JsonSchema>();
+            checkedSchemas ??= [];
             checkedSchemas.Add(this);
 
             if (HasAllOfSchemaReference)

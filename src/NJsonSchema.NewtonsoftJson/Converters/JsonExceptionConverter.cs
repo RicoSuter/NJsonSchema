@@ -200,10 +200,8 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         }
 
 
-        private static readonly HashSet<string> ignoredExceptionProperties = new()
-        {
-            "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"
-        };
+        private static readonly HashSet<string> ignoredExceptionProperties =
+            ["Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"];
 
         private static Dictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
         {

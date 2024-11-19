@@ -37,11 +37,11 @@ namespace NJsonSchema
         public void AddMapping(Type type, JsonSchema schema)
         {
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
-                .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
+                .GetRuntimeMethod("GetDiscriminatorValue", [typeof(Type)]);
 
             if (getDiscriminatorValueMethod != null)
             {
-                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, new[] { type } )!;
+                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, [type])!;
                 Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else

@@ -15,7 +15,8 @@ namespace NJsonSchema.Validation.FormatValidators
     /// <summary>Validator for DateTime format.</summary>
     public class DateTimeFormatValidator : IFormatValidator
     {
-        private readonly string[] _acceptableFormats = new [] {
+        private readonly string[] _acceptableFormats =
+        [
             "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFK",
             "yyyy-MM-dd' 'HH:mm:ss.FFFFFFFK",
             "yyyy-MM-dd'T'HH:mm:ssK",
@@ -31,7 +32,7 @@ namespace NJsonSchema.Validation.FormatValidators
             "yyyyMMdd",
             "yyyy-MM",
             "yyyy"
-        };
+        ];
 
         /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.DateTime;

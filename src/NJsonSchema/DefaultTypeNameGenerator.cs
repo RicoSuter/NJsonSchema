@@ -17,10 +17,10 @@ namespace NJsonSchema
     /// <summary>Converts the last part of the full type name to upper case.</summary>
     public class DefaultTypeNameGenerator : ITypeNameGenerator
     {
-        private static readonly char[] TypeNameHintCleanupChars = { '[', ']', '<', '>', ',', ' ' };
+        private static readonly char[] TypeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
 
         private readonly Dictionary<string, string> _typeNameMappings = new();
-        private string[] _reservedTypeNames = { "object" };
+        private string[] _reservedTypeNames = ["object"];
 
         // TODO: Expose as options to UI and cmd line?
 

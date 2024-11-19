@@ -106,7 +106,7 @@ namespace NJsonSchema
                 allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
             }
 
-            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, new HashSet<object>())
+            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, [])
                          ?? throw new InvalidOperationException($"Could not resolve the path '{jsonPath}'.");
 
             return schema;

@@ -310,7 +310,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 if (Settings.UseLeafType)
                 {
                     var itemTypes = Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                        .Split([UnionPipe], StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => GetNullableItemType(schema, prefix + x))
                         .ToList();
 

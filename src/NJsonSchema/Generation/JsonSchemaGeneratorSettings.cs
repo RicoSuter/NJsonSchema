@@ -36,7 +36,7 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
 
-            ExcludedTypeNames = Array.Empty<string>();
+            ExcludedTypeNames = [];
 
             UseXmlDocumentation = true;
             ResolveExternalXmlDocumentation = true;

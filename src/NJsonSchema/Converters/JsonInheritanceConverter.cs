@@ -188,7 +188,7 @@ namespace NJsonSchema.Converters
                         var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            if (method.Invoke(null, Array.Empty<object>()) is IEnumerable<Type> types)
+                            if (method.Invoke(null, []) is IEnumerable<Type> types)
                             {
                                 foreach (var knownType in types)
                                 {

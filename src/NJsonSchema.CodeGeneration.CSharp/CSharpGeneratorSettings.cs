@@ -50,10 +50,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
-            {
+            TemplateFactory = new DefaultTemplateFactory(this, [
                 typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
-            });
+            ]);
 
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;

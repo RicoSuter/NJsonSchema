@@ -34,7 +34,7 @@ namespace NJsonSchema.Infrastructure
         {
             if (!_ignores.TryGetValue(type.FullName!, out HashSet<string>? value))
             {
-                value = new HashSet<string>();
+                value = [];
                 _ignores[type.FullName!] = value;
             }
 

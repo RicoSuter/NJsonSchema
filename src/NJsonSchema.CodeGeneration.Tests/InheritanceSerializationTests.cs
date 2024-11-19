@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.Tests
 
         public static Type[] GetTypes()
         {
-            return new Type[] { typeof(SubClass3) };
+            return [typeof(SubClass3)];
         }
     }
 
@@ -88,11 +88,11 @@ namespace NJsonSchema.CodeGeneration.Tests
                 {
                     Foo = "foo",
                     Bar = "bar",
-                    SubElements = new List<SubClass>
-                    {
+                    SubElements =
+                    [
                         new SubClass1 { Prop1 = "x" },
-                        new SubClass3 { Prop2 = "x", Prop3 = "y"}
-                    }
+                        new SubClass3 { Prop2 = "x", Prop3 = "y" }
+                    ]
                 }
             };
 
@@ -120,11 +120,11 @@ namespace NJsonSchema.CodeGeneration.Tests
                 {
                     Foo = "foo",
                     Bar = "bar",
-                    SubElements = new List<SubClass>
-                    {
+                    SubElements =
+                    [
                         new SubClass1 { Prop1 = "x" },
-                        new SubClass3 { Prop2 = "x", Prop3 = "y"}
-                    }
+                        new SubClass3 { Prop2 = "x", Prop3 = "y" }
+                    ]
                 }
             };
 
@@ -193,7 +193,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             }
 
             //// Act
-            await Task.WhenAll(tasks.ToArray());
+            await Task.WhenAll([.. tasks]);
 
             //// Assert
             // No exceptions

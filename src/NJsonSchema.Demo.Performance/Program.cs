@@ -62,7 +62,7 @@ namespace NJsonSchema.Demo.Performance
     {
         public static Type[] GetKnownTypes()
         {
-            return new[] { typeof(Pen), typeof(Pencil) };
+            return [typeof(Pen), typeof(Pencil)];
         }
 
         public string Baz { get; set; }

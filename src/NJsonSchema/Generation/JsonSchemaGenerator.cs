@@ -577,7 +577,7 @@ namespace NJsonSchema.Generation
         {
             if (type == typeof(Exception))
             {
-                return new[] { "InnerException", "Message", "Source", "StackTrace" };
+                return ["InnerException", "Message", "Source", "StackTrace"];
             }
 
             return null;
