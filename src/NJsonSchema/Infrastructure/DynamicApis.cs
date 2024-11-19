@@ -51,20 +51,18 @@ namespace NJsonSchema.Infrastructure
                 throw new NotSupportedException("The System.Net.Http.HttpClient API is not available on this platform.");
             }
 
-            using (dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType!)!)
-            using (dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType!, new[] { handler })!)
-            {
-                handler.UseDefaultCredentials = true;
+            using dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType!)!;
+            using dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType!, [handler])!;
+            handler.UseDefaultCredentials = true;
 
-                // enable all decompression methods
-                var calculatedAllValue = GenerateAllDecompressionMethodsEnumValue();
-                var allDecompressionMethodsValue = Enum.ToObject(DecompressionMethodsType!, calculatedAllValue);
-                handler.AutomaticDecompression = (dynamic)allDecompressionMethodsValue;
+            // enable all decompression methods
+            var calculatedAllValue = GenerateAllDecompressionMethodsEnumValue();
+            var allDecompressionMethodsValue = Enum.ToObject(DecompressionMethodsType!, calculatedAllValue);
+            handler.AutomaticDecompression = (dynamic)allDecompressionMethodsValue;
 
-                var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            }
+            var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         // see https://learn.microsoft.com/en-us/dotnet/api/system.net.decompressionmethods?view=net-7.0
@@ -121,8 +119,6 @@ namespace NJsonSchema.Infrastructure
                     if (Directory.Exists(fileDir))
                     {
                         var fileName = Path.GetFileName(fullPath);
-                        var pathPieces = fullPath.Replace("\\", "/").Split('/');
-                        var subDirPiece = pathPieces[pathPieces.Length - 2];
                         foreach (var subDir in Directory.GetDirectories(fileDir))
                         {
                             var expectedFile = Path.Combine(subDir, fileName);

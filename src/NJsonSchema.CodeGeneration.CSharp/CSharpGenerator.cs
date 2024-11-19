@@ -144,7 +144,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     number++;
                 }
 
-                propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
+                propertyWithSameNameAsClass.PropertyName += number;
             }
         }
 

@@ -94,7 +94,7 @@ namespace NJsonSchema.Yaml.Tests.References
             var schema = OK.Content["application/json"];
             JsonSchemaProperty items = schema.Schema.ActualSchema.ActualProperties["items"];
             var innerProperties = items.Item.ActualSchema.ActualProperties;
-            string[] expectedProperties = new string[] { "id", "systemName", "name", "smallImageID", "helpText" };
+            string[] expectedProperties = ["id", "systemName", "name", "smallImageID", "helpText"];
 
             foreach (string property in expectedProperties)
             {

@@ -270,7 +270,7 @@ namespace NJsonSchema.Generation
                             }
                             else
                             {
-                                schema.Type = schema.Type | JsonObjectType.Null;
+                                schema.Type |= JsonObjectType.Null;
                             }
                         }
                         else if (Settings.SchemaType == SchemaType.OpenApi3 || Settings.GenerateCustomNullableProperties)
@@ -577,7 +577,7 @@ namespace NJsonSchema.Generation
         {
             if (type == typeof(Exception))
             {
-                return new[] { "InnerException", "Message", "Source", "StackTrace" };
+                return ["InnerException", "Message", "Source", "StackTrace"];
             }
 
             return null;

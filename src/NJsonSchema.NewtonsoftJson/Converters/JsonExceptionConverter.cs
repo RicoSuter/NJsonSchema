@@ -106,14 +106,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 return null;
             }
 
-            var newSerializer = new JsonSerializer();
-            newSerializer.ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType());
+            var newSerializer = new JsonSerializer
+            {
+                ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType())
+            };
 
             var field = JsonExceptionConverter.GetField(typeof(DefaultContractResolver), "_sharedCache");
-            if (field != null)
-            {
-                field.SetValue(newSerializer.ContractResolver, false);
-            }
+            field?.SetValue(newSerializer.ContractResolver, false);
 
             dynamic resolver = newSerializer.ContractResolver;
             if (newSerializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableAttribute") != null)
@@ -126,8 +125,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 resolver.IgnoreSerializableInterface = true;
             }
 
-            JToken? token;
-            if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
+            if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out JToken? token))
             {
                 var discriminator = token.Value<string>();
                 if (objectType.Name.Equals(discriminator, StringComparison.Ordinal) == false)
@@ -175,10 +173,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         else
                         {
                             field = JsonExceptionConverter.GetField(objectType, "_" + fieldNameSuffix);
-                            if (field != null)
-                            {
-                                field.SetValue(value, propertyValue);
-                            }
+                            field?.SetValue(value, propertyValue);
                         }
                     }
                 }
@@ -205,10 +200,8 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         }
 
 
-        private static readonly HashSet<string> ignoredExceptionProperties = new()
-        {
-            "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"
-        };
+        private static readonly HashSet<string> ignoredExceptionProperties =
+            ["Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"];
 
         private static Dictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
         {

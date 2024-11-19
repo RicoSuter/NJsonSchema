@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = "base64"
                          };
 
-            var value = Convert.ToBase64String(new byte[] { 101, 22, 87, 25 });
+            var value = Convert.ToBase64String([101, 22, 87, 25]);
             var token = new JValue(value);
 
             //// Act
@@ -78,7 +78,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = JsonFormatStrings.Byte
                          };
 
-            var value = Convert.ToBase64String(new byte[] { 101, 22, 87, 25 });
+            var value = Convert.ToBase64String([101, 22, 87, 25]);
             var token = new JValue(value);
 
             //// Act
@@ -98,7 +98,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = "base64"
                          };
 
-            var value = Convert.ToBase64String(new byte[] { 1, 2, 3 });
+            var value = Convert.ToBase64String([1, 2, 3]);
             var token = new JValue(value);
 
             //// Act
@@ -118,7 +118,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = JsonFormatStrings.Byte
                          };
 
-            var value = Convert.ToBase64String(new byte[] { 1, 2, 3 });
+            var value = Convert.ToBase64String([1, 2, 3]);
             var token = new JValue(value);
 
             //// Act

@@ -32,9 +32,9 @@ namespace NJsonSchema.Tests.Generation
 #nullable enable
         public class ClassWithArrayOfNullable
         {
-            public string?[] Array { get; set; } = new string?[0];
+            public string?[] Array { get; set; } = [];
 
-            public List<string?> List { get; set; } = new List<string?>();
+            public List<string?> List { get; set; } = [];
         }
 #nullable restore
 

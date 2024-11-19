@@ -46,8 +46,8 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.True(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once
-            Assert.True(json.Split(new[] { "\"$ref\": \"#/definitions/MetadataSchemaType\"" }, StringSplitOptions.None).Length == 3); // both classes reference the enum
+            Assert.True(json.Split(["x-enumNames"], StringSplitOptions.None).Length == 2); // enum is defined only once
+            Assert.True(json.Split(["\"$ref\": \"#/definitions/MetadataSchemaType\""], StringSplitOptions.None).Length == 3); // both classes reference the enum
         }
 
         public class ContainerWithEnumDictionary

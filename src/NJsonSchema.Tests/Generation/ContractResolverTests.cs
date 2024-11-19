@@ -68,10 +68,15 @@ namespace NJsonSchema.Tests.Generation
                 return contract;
             }
 
-            static HashSet<string> _systemConverters = new HashSet<string>(new[] {
-                "System.ComponentModel.ComponentConverter",
-                "System.ComponentModel.ReferenceConverter",
-                "System.ComponentModel.CollectionConverter" });
+            static HashSet<string> _systemConverters =
+            [
+                ..new[]
+                {
+                    "System.ComponentModel.ComponentConverter",
+                    "System.ComponentModel.ReferenceConverter",
+                    "System.ComponentModel.CollectionConverter"
+                }
+            ];
 
             public static bool CanNonSystemTypeDescriptorConvertString(Type type)
             {

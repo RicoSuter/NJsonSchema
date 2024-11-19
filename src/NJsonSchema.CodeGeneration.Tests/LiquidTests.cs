@@ -75,11 +75,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 TemplateDirectory = "Templates"
             };
-            var templateFactory = new DefaultTemplateFactory(settings, Array.Empty<Assembly>());
+            var templateFactory = new DefaultTemplateFactory(settings, []);
             var template1 = templateFactory.CreateTemplate("csharp", "elseif", new object());
 
             // Act
-            var ex = Assert.Throws<InvalidOperationException>(() => template1.Render());
+            var ex = Assert.Throws<InvalidOperationException>(template1.Render);
 
             // Assert
             Assert.Contains(", did you use 'elseif' instead of correct 'elsif'?", ex.Message);

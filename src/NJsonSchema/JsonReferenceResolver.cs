@@ -40,8 +40,10 @@ namespace NJsonSchema
         /// <returns>The factory.</returns>
         public static Func<JsonSchema, JsonReferenceResolver> CreateJsonReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
-                new JsonReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema)
+            {
+                return new JsonReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            }
 
             return ReferenceResolverFactory;
         }
@@ -99,16 +101,13 @@ namespace NJsonSchema
         public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
-            for (int i = 0; i < allSegments.Count; i++)
+            for (var i = 0; i < allSegments.Count; i++)
             {
                 allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
             }
 
-            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, new HashSet<object>());
-            if (schema == null)
-            {
-                throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
-            }
+            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, [])
+                         ?? throw new InvalidOperationException($"Could not resolve the path '{jsonPath}'.");
 
             return schema;
         }
@@ -299,8 +298,7 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                int index;
-                if (int.TryParse(firstSegment, out index))
+                if (int.TryParse(firstSegment, out var index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)

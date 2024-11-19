@@ -66,14 +66,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             AssertCompile(output);
         }
 
-        class CustomPropertyNameGenerator : IPropertyNameGenerator
+        private class CustomPropertyNameGenerator : IPropertyNameGenerator
         {
             public string Generate(JsonSchemaProperty property)
             {
                 return "MyCustom" + ConversionUtilities.ConvertToUpperCamelCase(property.Name, true);
             }
         }
-        class CustomTypeNameGenerator : ITypeNameGenerator
+
+        private class CustomTypeNameGenerator : ITypeNameGenerator
         {
             public string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
             {
@@ -134,10 +135,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             //// Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var settings = new CSharpGeneratorSettings();
+            var settings = new CSharpGeneratorSettings
+            {
+                TypeNameGenerator = new CustomTypeNameGenerator(),
+                PropertyNameGenerator = new CustomPropertyNameGenerator()
+            };
 
-            settings.TypeNameGenerator = new CustomTypeNameGenerator();
-            settings.PropertyNameGenerator = new CustomPropertyNameGenerator();
             var generator = new CSharpGenerator(schema, settings);
 
             //// Act
@@ -454,8 +457,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
-            var settings = new CSharpGeneratorSettings();
-            settings.Namespace = "MyNamespace";
+            var settings = new CSharpGeneratorSettings
+            {
+                Namespace = "MyNamespace"
+            };
             var generator = new CSharpGenerator(schema, settings);
             return generator;
         }
@@ -664,11 +669,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public void When_object_has_generic_name_then_it_is_transformed()
         {
             //// Arrange
-            var schema = new JsonSchema();
-            schema.Type = JsonObjectType.Object;
-            schema.Properties["foo"] = new JsonSchemaProperty
+            var schema = new JsonSchema
             {
-                Type = JsonObjectType.Number
+                Type = JsonObjectType.Object,
+                Properties =
+                {
+                    ["foo"] = new JsonSchemaProperty
+                    {
+                        Type = JsonObjectType.Number
+                    }
+                }
             };
 
             //// Act
@@ -2006,7 +2016,7 @@ public static Person FromJson(string data)
             var generator = await CreateGeneratorAsync();
             generator.Settings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
             generator.Settings.GenerateJsonMethods = true;
-            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+            generator.Settings.JsonConverters = ["CustomConverter1", "CustomConverter2"];
 
             //// Act
             var output = generator.GenerateFile("MyClass");
@@ -2083,7 +2093,7 @@ public static Person FromJson(string data)
             var generator = await CreateGeneratorAsync();
             generator.Settings.JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
             generator.Settings.GenerateJsonMethods = true;
-            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+            generator.Settings.JsonConverters = ["CustomConverter1", "CustomConverter2"];
 
             //// Act
             var output = generator.GenerateFile("MyClass");

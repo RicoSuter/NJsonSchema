@@ -107,8 +107,7 @@ namespace NJsonSchema.Collections
         /// <param name="add">If true and key already exists then an exception is thrown. </param>
         private void Insert(TKey key, TValue? value, bool add)
         {
-            TValue? item;
-            if (_dictionary.TryGetValue(key, out item))
+            if (_dictionary.TryGetValue(key, out TValue? item))
             {
                 if (add)
                 {
@@ -215,9 +214,6 @@ namespace NJsonSchema.Collections
             {
                 throw new ArgumentNullException(nameof(key));
             }
-
-            TValue? value;
-            _dictionary.TryGetValue(key, out value);
 
             var removed = _dictionary.Remove(key);
             if (removed)
