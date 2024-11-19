@@ -97,6 +97,10 @@ namespace NJsonSchema
             {
                 return true;
             }
+            else if (schemaType == SchemaType.OpenApi3 && IsRequired == false)
+            {
+                return true;
+            }
 
             return base.IsNullable(schemaType);
         }
