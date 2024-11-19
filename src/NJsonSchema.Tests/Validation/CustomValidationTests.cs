@@ -33,9 +33,10 @@ namespace NJsonSchema.Tests.Validation
 
         private class CustomDateTimeFormatValidator : IFormatValidator
         {
-            private readonly string[] _acceptableFormats = {
+            private readonly string[] _acceptableFormats =
+            [
                 "yyyy'-'MM'-'dd HH':'mm':'ss':'ff"
-            };
+            ];
 
             /// <summary>
             /// Gets the format attributes value.

@@ -30,7 +30,8 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema : IDocumentPathProvider
     {
-        internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
+        internal static readonly HashSet<string> JsonSchemaPropertiesCache =
+            [..typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray()];
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
 
@@ -314,7 +315,7 @@ namespace NJsonSchema
                     new List<JsonSchema> { this.InheritedSchema } :
                     new List<JsonSchema>();
 
-                return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
+                return [.. inheritedSchema, .. inheritedSchema.SelectMany(s => s.AllInheritedSchemas)];
             }
         }
 
@@ -1075,7 +1076,7 @@ namespace NJsonSchema
 
             if (EnumerationNames == null)
             {
-                EnumerationNames = new Collection<string>();
+                EnumerationNames = [];
             }
         }
 #pragma warning restore CS8774

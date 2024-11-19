@@ -42,11 +42,11 @@ namespace NJsonSchema.Tests.Generation
             private static WithoutXmlAttributesDefined Data => new WithoutXmlAttributesDefined()
             {
                 Foo = "stringvalue",
-                StringArray = new[] { "S1" },
-                IntArray = new[] { 1 },
-                DoubleArray = new double[] { 1 },
-                DecimalArray = new decimal[] { 1 },
-                InternalItem = new[] { new WithoutXmlAttributeItem() { Name = "Test" } },
+                StringArray = ["S1"],
+                IntArray = [1],
+                DoubleArray = [1],
+                DecimalArray = [1],
+                InternalItem = [new WithoutXmlAttributeItem() { Name = "Test" }],
                 ShouldBeThisPropertyName = new WithXmlAttribute() { Name = "Test2" }
             };
 
@@ -273,11 +273,11 @@ namespace NJsonSchema.Tests.Generation
             {
                 Foo = "stringvalue",
                 MightBeAAttribute = "stringvalue",
-                StringArray = new[] { "S1" },
-                TheInts = new[] { 1 },
-                InternalItems = new[] { new WithXmlAttributeItem() { Name = "Test" } },
+                StringArray = ["S1"],
+                TheInts = [1],
+                InternalItems = [new WithXmlAttributeItem() { Name = "Test" }],
                 ReferenceProperty = new WithXmlAttributeProperty() { Name = "Test" },
-                ExternalItems2 = new[] { new WithXmlAttributeItem2() { Name = "Test" } },
+                ExternalItems2 = [new WithXmlAttributeItem2() { Name = "Test" }],
             };
 
             public static string CreateTestXml()

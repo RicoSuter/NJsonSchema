@@ -65,7 +65,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 converters.Add(new StringEnumConverter());
             }
 
-            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, converters.ToArray()));
+            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, [.. converters]));
         }
 
         /// <inheritdoc />

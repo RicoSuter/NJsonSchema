@@ -360,7 +360,7 @@ export class ExceptionBase extends generated.ExceptionBase {
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings 
             {
                 ExtensionCode = extensionCode,
-                ExtendedClasses = new[] { "ExceptionBase" },
+                ExtendedClasses = ["ExceptionBase"],
             });
 
             //// Act

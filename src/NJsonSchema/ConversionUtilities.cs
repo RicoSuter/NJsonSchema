@@ -162,7 +162,7 @@ namespace NJsonSchema
         }
 
 
-        private static readonly char[] _whiteSpaceChars = { '\n', '\r', '\t', ' ' };
+        private static readonly char[] _whiteSpaceChars = ['\n', '\r', '\t', ' '];
 
         /// <summary>Trims white spaces from the text.</summary>
         /// <param name="text">The text.</param>
@@ -172,7 +172,7 @@ namespace NJsonSchema
             return text?.Trim(_whiteSpaceChars) ?? string.Empty;
         }
 
-        private static readonly char[] _lineBreakTrimChars = { '\n', '\t', ' ' };
+        private static readonly char[] _lineBreakTrimChars = ['\n', '\t', ' '];
 
         /// <summary>Removes the line breaks from the text.</summary>
         /// <param name="text">The text.</param>

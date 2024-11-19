@@ -2016,7 +2016,7 @@ public static Person FromJson(string data)
             var generator = await CreateGeneratorAsync();
             generator.Settings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
             generator.Settings.GenerateJsonMethods = true;
-            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+            generator.Settings.JsonConverters = ["CustomConverter1", "CustomConverter2"];
 
             //// Act
             var output = generator.GenerateFile("MyClass");
@@ -2093,7 +2093,7 @@ public static Person FromJson(string data)
             var generator = await CreateGeneratorAsync();
             generator.Settings.JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
             generator.Settings.GenerateJsonMethods = true;
-            generator.Settings.JsonConverters = new[] { "CustomConverter1", "CustomConverter2" };
+            generator.Settings.JsonConverters = ["CustomConverter1", "CustomConverter2"];
 
             //// Act
             var output = generator.GenerateFile("MyClass");

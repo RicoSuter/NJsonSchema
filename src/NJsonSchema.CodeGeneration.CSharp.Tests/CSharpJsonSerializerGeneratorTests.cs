@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var settings = new CSharpGeneratorSettings
             {
                 JsonLibrary = CSharpJsonLibrary.NewtonsoftJson,
-                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+                JsonConverters = ["CustomConverter1", "CustomConverter2"]
             };
 
             //// Act
@@ -68,7 +68,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             {
                 JsonLibrary = CSharpJsonLibrary.NewtonsoftJson,
                 HandleReferences = true,
-                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" },
+                JsonConverters = ["CustomConverter1", "CustomConverter2"],
                 JsonSerializerSettingsTransformationMethod = "TestJsonSerializerSettingsTransformationMethod",
             };
 
@@ -88,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var settings = new CSharpGeneratorSettings
             {
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson,
-                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+                JsonConverters = ["CustomConverter1", "CustomConverter2"]
             };
 
             //// Act
@@ -107,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var settings = new CSharpGeneratorSettings
             {
                 JsonLibrary = CSharpJsonLibrary.NewtonsoftJson,
-                JsonConverters = new string[] { "CustomConverter1", "CustomConverter2" }
+                JsonConverters = ["CustomConverter1", "CustomConverter2"]
             };
 
             //// Act

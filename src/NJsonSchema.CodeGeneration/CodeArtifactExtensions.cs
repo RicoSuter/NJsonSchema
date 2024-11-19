@@ -31,7 +31,7 @@ namespace NJsonSchema.CodeGeneration
             var newResults = new List<CodeArtifact>(results);
 
             // we need new list to iterate as we modify the original
-            var resultIterator = results as List<CodeArtifact> ?? newResults.ToList();
+            var resultIterator = results as List<CodeArtifact> ?? [.. newResults];
             foreach (var result in resultIterator)
             {
                 if (!string.IsNullOrEmpty(GetActualBaseName(result.BaseTypeName)))

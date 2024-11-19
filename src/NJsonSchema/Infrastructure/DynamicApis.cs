@@ -52,7 +52,7 @@ namespace NJsonSchema.Infrastructure
             }
 
             using dynamic handler = (IDisposable)Activator.CreateInstance(HttpClientHandlerType!)!;
-            using dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType!, new[] { handler })!;
+            using dynamic client = (IDisposable)Activator.CreateInstance(HttpClientType!, [handler])!;
             handler.UseDefaultCredentials = true;
 
             // enable all decompression methods

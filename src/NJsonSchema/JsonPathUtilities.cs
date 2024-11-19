@@ -59,7 +59,7 @@ namespace NJsonSchema
             }
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null);
-            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
+            FindJsonPaths(rootObject, mappings, "#", [], contractResolver);
 
             if (mappings.Any(p => p.Value == null))
             {

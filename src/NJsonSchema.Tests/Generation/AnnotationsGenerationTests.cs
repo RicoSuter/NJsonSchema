@@ -112,7 +112,7 @@ namespace NJsonSchema.Tests.Generation
         public async Task When_multipleOf_is_fraction_then_it_is_validated_correctly()
         {
             //// Arrange
-            List<SimpleClass> testClasses = new List<SimpleClass>();
+            List<SimpleClass> testClasses = [];
             for (int i = 0; i < 100; i++)
             {
                 testClasses.Add(new SimpleClass((decimal)(0.1 * i)));

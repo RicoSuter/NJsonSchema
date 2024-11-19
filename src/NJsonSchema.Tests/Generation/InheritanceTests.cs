@@ -277,10 +277,10 @@ namespace NJsonSchema.Tests.Generation
             /// Act
             var vm = JsonConvert.DeserializeObject<ViewModelThing>(json, new JsonSerializerSettings
             {
-                Converters = new[]
-                {
+                Converters =
+                [
                     new JsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
-                }
+                ]
             });
 
             /// Assert

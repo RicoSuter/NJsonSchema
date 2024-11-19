@@ -12,8 +12,8 @@ namespace NJsonSchema.Validation
         public StringComparer PropertyStringComparer { get; set; } = StringComparer.Ordinal;
 
         /// <summary>Gets or sets the format validators.</summary>
-        public IEnumerable<IFormatValidator> FormatValidators { get; set; } = new IFormatValidator[]
-        {
+        public IEnumerable<IFormatValidator> FormatValidators { get; set; } =
+        [
             new DateTimeFormatValidator(),
             new DateFormatValidator(),
             new EmailFormatValidator(),
@@ -27,7 +27,7 @@ namespace NJsonSchema.Validation
             new ByteFormatValidator(),
             new Base64FormatValidator(),
             new UuidFormatValidator()
-        };
+        ];
 
         /// <summary>
         /// Adds a custom format validator to the <see cref="FormatValidators"/> array.
@@ -37,7 +37,7 @@ namespace NJsonSchema.Validation
         {
             FormatValidators = this
                 .FormatValidators
-                .Union(new[] { formatValidator })
+                .Union([formatValidator])
                 .ToArray();
         }
     }

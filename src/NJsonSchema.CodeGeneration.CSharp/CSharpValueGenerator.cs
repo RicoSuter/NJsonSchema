@@ -17,11 +17,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
     public class CSharpValueGenerator : ValueGeneratorBase
     {
         private readonly CSharpGeneratorSettings _settings;
-        private readonly List<string> _typesWithStringConstructor = new List<string>()
-        {
+        private readonly List<string> _typesWithStringConstructor =
+        [
             "System.Guid",
             "System.Uri"
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="CSharpValueGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>
