@@ -1,4 +1,5 @@
-﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+﻿{%- if UseSystemTextJsonPolymorphicSerialization == false -%}
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {%- if UseSystemTextJson -%}
 internal class JsonInheritanceConverterAttribute : System.Text.Json.Serialization.JsonConverterAttribute
 {
@@ -245,4 +246,5 @@ public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         return objectType.Name;
     }
 }
+{%- endif -%}
 {%- endif -%}
