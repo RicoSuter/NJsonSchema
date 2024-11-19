@@ -84,6 +84,11 @@ namespace NJsonSchema
             return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false, cancellationToken).ConfigureAwait(false);
         }
 
+        private static string UnescapeReferenceSegment(string segment)
+        {
+            return segment.Replace("~1", "/").Replace("~0", "~");
+        }
+
         /// <summary>Resolves a document reference.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path to resolve.</param>
@@ -94,6 +99,11 @@ namespace NJsonSchema
         public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
+            for (int i = 0; i < allSegments.Count; i++)
+            {
+                allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
+            }
+
             var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, new HashSet<object>());
             if (schema == null)
             {
