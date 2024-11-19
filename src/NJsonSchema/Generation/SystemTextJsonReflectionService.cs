@@ -74,7 +74,7 @@ namespace NJsonSchema.Generation
                 if (!ignored)
                 {
                     var propertyTypeDescription = GetDescription(accessorInfo.AccessorType, settings.DefaultReferenceTypeNullHandling, settings);
-                    var propertyName = GetPropertyName(accessorInfo, settings);
+                    var propertyName = GetPropertyNameInternal(accessorInfo, settings);
 
                     var propertyAlreadyExists = schema.Properties.ContainsKey(propertyName);
                     if (propertyAlreadyExists)
@@ -136,10 +136,10 @@ namespace NJsonSchema.Generation
         /// <inheritdoc />
         public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
         {
-            return GetPropertyName(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
+            return GetPropertyNameInternal(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
         }
 
-        private static string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
+        private static string GetPropertyNameInternal(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
         {
             dynamic? jsonPropertyNameAttribute = accessorInfo.GetAttributes(true)
                 .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);
