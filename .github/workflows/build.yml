@@ -5,7 +5,7 @@
 #
 #     - To turn off auto-generation set:
 #
-#         [GitHubActions (AutoGenerate = false)]
+#         [CustomGitHubActions (AutoGenerate = false)]
 #
 #     - To trigger manual generation invoke:
 #
@@ -33,6 +33,10 @@ jobs:
     name: windows-latest
     runs-on: windows-latest
     steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0
       - uses: actions/checkout@v4
       - name: 'Cache: .nuke/temp, ~/.nuget/packages'
         uses: actions/cache@v4
@@ -56,6 +60,10 @@ jobs:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0
       - uses: actions/checkout@v4
       - name: 'Cache: .nuke/temp, ~/.nuget/packages'
         uses: actions/cache@v4
