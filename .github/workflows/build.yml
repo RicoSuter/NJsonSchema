@@ -48,6 +48,7 @@ jobs:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
       - name: 'Publish: artifacts'
         uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
         with:
           name: artifacts
           path: artifacts
@@ -70,6 +71,7 @@ jobs:
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
       - name: 'Publish: artifacts'
         uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
         with:
           name: artifacts
           path: artifacts

@@ -21,6 +21,7 @@ using Nuke.Common.CI.GitHubActions;
     OnPushIncludePaths = ["**/*.*"],
     OnPushExcludePaths = ["**/*.md"],
     PublishArtifacts = true,
+    PublishCondition = "runner.os == 'Windows'",
     InvokedTargets = [nameof(Compile), nameof(Test), nameof(Pack), nameof(Publish)],
     ImportSecrets = ["NUGET_API_KEY", "MYGET_API_KEY"],
     CacheKeyFiles = ["global.json", "src/**/*.csproj", "src/**/package.json"])
