@@ -1141,7 +1141,7 @@ namespace NJsonSchema.Generation
 
             public string DiscriminatorName { get; }
 
-            public string? GetDiscriminatorValue(Type type)
+            public string GetDiscriminatorValue(Type type)
             {
                 return _jsonDerivedTypeAttributes.FirstOrDefault(a => a.DerivedType == type)?.TypeDiscriminator?.ToString()
                     ?? throw new InvalidOperationException($"Discriminator value for {type.FullName} not found.");
