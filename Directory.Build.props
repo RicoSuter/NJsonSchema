@@ -25,6 +25,7 @@
         <Nullable>enable</Nullable>
 
         <UseArtifactsOutput>true</UseArtifactsOutput>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     </PropertyGroup>
 
@@ -33,7 +34,6 @@
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <!--
-          [IDE0005] Using directive is unnecessary
           [IDE0008] Use explicit type instead of 'var'
           [IDE0019] Use pattern matching
           [IDE0021] Use block body for constructor
@@ -64,9 +64,10 @@
           [CA1510] Use 'ArgumentNullException.ThrowIfNull' instead of explicitly throwing a new exception instance
           [CA1716] rename parameter property so that it no longer conflicts with the reserved language keyword
           [CA1720] Identifier 'xxx' contains type name
+          [CA1870] Use a cached 'SearchValues' instance for improved searching performance
           [CA2263] Prefer the generic overload 'System.Enum.GetValues<TEnum>()'
         -->
-        <NoWarn>$(NoWarn);IDE0005;IDE0008;IDE0019;IDE0021;IDE0022;IDE0025;IDE0027;IDE0028;IDE0029;IDE0032;IDE0039;IDE0045;IDE0046;IDE0055;IDE0057;IDE0059;IDE0060;IDE0074;IDE0078;IDE0083;IDE0090;IDE0100;IDE0130;IDE0160;IDE0260;IDE0290;IDE1005;CA1200;CA1510;CA1716;CA1720;CA2263</NoWarn>
+        <NoWarn>$(NoWarn);IDE0008;IDE0019;IDE0021;IDE0022;IDE0025;IDE0027;IDE0028;IDE0029;IDE0032;IDE0039;IDE0045;IDE0046;IDE0055;IDE0057;IDE0059;IDE0060;IDE0074;IDE0078;IDE0083;IDE0090;IDE0100;IDE0130;IDE0160;IDE0260;IDE0290;IDE1005;CA1200;CA1510;CA1716;CA1720;CA1870;CA2263</NoWarn>
     </PropertyGroup>
 
 </Project>

@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.CodeGeneration

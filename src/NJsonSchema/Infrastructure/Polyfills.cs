@@ -1,6 +1,5 @@
-using System;
-
 // ReSharper disable once CheckNamespace
+
 namespace NJsonSchema;
 
 internal static class Polyfills
@@ -18,6 +17,6 @@ internal static class Polyfills
 
 #if NETFRAMEWORK
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    internal static bool Contains(this ReadOnlySpan<string> source, string c) => source.IndexOf(c) != -1;
+    internal static bool Contains(this System.ReadOnlySpan<string> source, string c) => System.MemoryExtensions.IndexOf(source, c) != -1;
 #endif
 }
