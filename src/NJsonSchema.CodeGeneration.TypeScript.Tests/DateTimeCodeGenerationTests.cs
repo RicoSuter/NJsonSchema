@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 

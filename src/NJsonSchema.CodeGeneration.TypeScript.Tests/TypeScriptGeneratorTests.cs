@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
+﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;

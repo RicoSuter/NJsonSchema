@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 

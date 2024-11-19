@@ -308,7 +308,7 @@ namespace NJsonSchema.CodeGeneration
             }
 
             private static ValueTask<Completion> RenderTemplate(
-                List<Expression> arguments,
+                IReadOnlyList<Expression> arguments,
                 TextWriter writer,
                 TextEncoder encoder,
                 TemplateContext context)
