@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
 using System;
 
 namespace NJsonSchema.CodeGeneration.TypeScript

@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using System;
 using System.Globalization;
 

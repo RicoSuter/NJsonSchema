@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFrameworks>net8.0;net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
         <Nullable>disable</Nullable>
         <EnableNETAnalyzers>false</EnableNETAnalyzers>

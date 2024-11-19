@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;

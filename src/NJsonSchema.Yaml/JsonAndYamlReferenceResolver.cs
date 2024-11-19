@@ -38,6 +38,7 @@ namespace NJsonSchema.Yaml
 
         /// <summary>Resolves a file reference.</summary>
         /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
@@ -47,6 +48,7 @@ namespace NJsonSchema.Yaml
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url, CancellationToken cancellationToken = default)
         {

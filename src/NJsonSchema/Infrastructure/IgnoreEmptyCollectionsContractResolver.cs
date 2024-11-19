@@ -8,7 +8,6 @@
 
 using System.Collections;
 using System.Reflection;
-using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

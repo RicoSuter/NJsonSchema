@@ -9,7 +9,6 @@
 using System;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 using System.Linq;
-using NJsonSchema.CodeGeneration.Models;
 using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.TypeScript

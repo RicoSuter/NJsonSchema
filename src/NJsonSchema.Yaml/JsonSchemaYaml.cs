@@ -44,6 +44,7 @@ namespace NJsonSchema.Yaml
         /// <param name="data">The JSON string.</param>
         /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema> FromYamlAsync(string data, string? documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
@@ -81,6 +82,7 @@ namespace NJsonSchema.Yaml
         /// <summary>Creates a JSON Schema from a JSON file.</summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The <see cref="JsonSchema" />.</returns>
         public static async Task<JsonSchema> FromFileAsync(string filePath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
@@ -91,6 +93,7 @@ namespace NJsonSchema.Yaml
         /// <summary>Creates a JSON Schema from an URL.</summary>
         /// <param name="url">The URL.</param>
         /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The <see cref="JsonSchema"/>.</returns>
         public static async Task<JsonSchema> FromUrlAsync(string url, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {

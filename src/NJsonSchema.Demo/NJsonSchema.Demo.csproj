@@ -8,6 +8,7 @@
         <OutputType>Exe</OutputType>
         <StartupObject />
         <Nullable>disable</Nullable>
+        <NoWarn>$(NoWarn);CS1591;IDE0005</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
