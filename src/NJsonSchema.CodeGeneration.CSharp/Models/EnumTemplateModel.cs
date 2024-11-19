@@ -168,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
             else
             {
-                valueInt64 = default(long);
+                valueInt64 = default;
                 return false;
             }
         }

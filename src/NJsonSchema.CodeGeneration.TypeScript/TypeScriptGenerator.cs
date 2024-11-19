@@ -53,8 +53,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The code.</returns>
         public override IEnumerable<CodeArtifact> GenerateTypes()
         {
-            _extensionCode = _extensionCode ??
-                new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+            _extensionCode ??= new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
 
             return GenerateTypes(_extensionCode);
         }

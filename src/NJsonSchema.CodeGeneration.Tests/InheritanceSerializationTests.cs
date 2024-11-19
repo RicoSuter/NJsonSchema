@@ -189,10 +189,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var tasks = new List<Task>();
             for (int i = 0; i < 100; i++)
             {
-                tasks.Add(Task.Run(async () =>
-                {
-                    await When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized();
-                }));
+                tasks.Add(Task.Run(When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized));
             }
 
             //// Act
@@ -300,12 +297,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile();
 
             var assembly = Compile(code);
-            var type = assembly.GetType("foo.Foo");
-            if (type == null)
-            {
-                throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
-            }
-
+            var type = assembly.GetType("foo.Foo") ?? throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
             var bar = JsonConvert.DeserializeObject(@"{""discriminator"":""bar""}", type);
 
             //// Assert
@@ -331,19 +323,17 @@ namespace NJsonSchema.CodeGeneration.Tests
                 MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
                 MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"));
 
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            var result = compilation.Emit(stream);
+
+            if (!result.Success)
             {
-                var result = compilation.Emit(stream);
-
-                if (!result.Success)
-                {
-                    throw new Exception(String.Join(", ", result.Diagnostics
-                        .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
-                        .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
-                }
-
-                return Assembly.Load(stream.GetBuffer());
+                throw new Exception(String.Join(", ", result.Diagnostics
+                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
+                    .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
             }
+
+            return Assembly.Load(stream.GetBuffer());
         }
     }
 }

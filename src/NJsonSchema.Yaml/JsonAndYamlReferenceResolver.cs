@@ -28,8 +28,10 @@ namespace NJsonSchema.Yaml
         /// <returns>The factory.</returns>
         public static Func<JsonSchema, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
-                new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema)
+            {
+                return new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            }
 
             return ReferenceResolverFactory;
         }

@@ -291,7 +291,7 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                 {
-                    Items = new ObservableCollection<JsonSchema>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t)));
+                    Items = new ObservableCollection<JsonSchema>(((JArray)value).Select(FromJsonWithCurrentSettings));
                 }
                 else if (value != null)
                 {

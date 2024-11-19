@@ -91,8 +91,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }");
 
             //// Act
-            var settings = new CSharpGeneratorSettings();
-            settings.GenerateDefaultValues = true;
+            var settings = new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true
+            };
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();
@@ -117,8 +119,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }");
 
             //// Act
-            var settings = new CSharpGeneratorSettings();
-            settings.GenerateDefaultValues = true;
+            var settings = new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true
+            };
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();
@@ -149,8 +153,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }");
 
             // Act
-            var settings = new CSharpGeneratorSettings();
-            settings.GenerateDefaultValues = true;
+            var settings = new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true
+            };
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();
@@ -181,8 +187,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }");
 
             // Act
-            var settings = new CSharpGeneratorSettings();
-            settings.GenerateDefaultValues = true;
+            var settings = new CSharpGeneratorSettings
+            {
+                GenerateDefaultValues = true
+            };
 
             var generator = new CSharpGenerator(document, settings);
             var code = generator.GenerateFile();
