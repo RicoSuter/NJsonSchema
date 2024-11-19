@@ -1,4 +1,6 @@
 ﻿using NJsonSchema.Converters;
+using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
@@ -61,6 +63,16 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
                         }
                       },
                     """.ReplaceLineEndings(), data);
+        }
+
+        [Fact]
+        public async Task When_discriminator_is_wrong_then_no_stackoverflow()
+        {
+            //// Act & Assert
+            Assert.Throws<InvalidOperationException>(() => // Throws "Could not find subtype of..."
+            {
+                JsonSerializer.Deserialize<Fruit>("{\"k\": \"invalid\"}");
+            });            
         }
 
 #if !NETFRAMEWORK

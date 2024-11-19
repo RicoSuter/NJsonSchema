@@ -85,7 +85,7 @@ namespace NJsonSchema.Converters
         /// <inheritdoc />
         public override void Write(Utf8JsonWriter writer, TBase? value, JsonSerializerOptions options)
         {
-            if (value is not null)
+            if (value != null)
             {
                 writer.WriteStartObject();
                 writer.WriteString(_discriminatorName, GetDiscriminatorValue(value.GetType()));
