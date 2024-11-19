@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration
             return new LiquidTemplate(
                 language,
                 template,
-                (lang, name) => GetLiquidTemplate(lang, name),
+                GetLiquidTemplate,
                 model,
                 GetToolchainVersion(),
                 _settings);
@@ -91,10 +91,8 @@ namespace NJsonSchema.CodeGeneration
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
             {
-                using (var reader = new StreamReader(resource))
-                {
-                    return reader.ReadToEnd();
-                }
+                using var reader = new StreamReader(resource);
+                return reader.ReadToEnd();
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");

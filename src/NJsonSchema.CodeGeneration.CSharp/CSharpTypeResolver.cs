@@ -268,7 +268,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             };
 
             if (string.IsNullOrWhiteSpace(numberType))
+            {
                 numberType = "double";
+            }
 
             return isNullable ? numberType + "?" : numberType;
         }

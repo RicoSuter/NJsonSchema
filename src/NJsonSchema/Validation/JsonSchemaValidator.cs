@@ -49,15 +49,13 @@ namespace NJsonSchema.Validation
         /// <returns>The list of validation errors.</returns>
         public ICollection<ValidationError> Validate(string jsonData, JsonSchema schema, SchemaType schemaType = SchemaType.JsonSchema)
         {
-            using (var reader = new StringReader(jsonData))
-            using (var jsonReader = new JsonTextReader(reader)
+            using var reader = new StringReader(jsonData);
+            using var jsonReader = new JsonTextReader(reader)
             {
                 DateParseHandling = DateParseHandling.None
-            })
-            {
-                var jsonObject = JToken.ReadFrom(jsonReader);
-                return Validate(jsonObject, schema, schemaType);
-            }
+            };
+            var jsonObject = JToken.ReadFrom(jsonReader);
+            return Validate(jsonObject, schema, schemaType);
         }
 
         /// <summary>Validates the given JSON token.</summary>
@@ -417,7 +415,7 @@ namespace NJsonSchema.Validation
             return !string.IsNullOrEmpty(propertyPath) ? propertyPath + "." + propertyName : propertyName;
         }
 
-        private static void ValidateMaxProperties(JToken token, IList<JProperty> properties, JsonSchema schema, string? propertyName, string propertyPath, List<ValidationError> errors)
+        private static void ValidateMaxProperties(JToken token, List<JProperty> properties, JsonSchema schema, string? propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (schema.MaxProperties > 0 && properties.Count > schema.MaxProperties)
             {
@@ -425,7 +423,7 @@ namespace NJsonSchema.Validation
             }
         }
 
-        private static void ValidateMinProperties(JToken token, IList<JProperty> properties, JsonSchema schema, string? propertyName, string propertyPath, List<ValidationError> errors)
+        private static void ValidateMinProperties(JToken token, List<JProperty> properties, JsonSchema schema, string? propertyName, string propertyPath, List<ValidationError> errors)
         {
             if (schema.MinProperties > 0 && properties.Count < schema.MinProperties)
             {

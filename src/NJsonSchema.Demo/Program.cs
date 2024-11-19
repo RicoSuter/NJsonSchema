@@ -10,7 +10,7 @@ namespace NJsonSchema.Demo
 {
     public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
