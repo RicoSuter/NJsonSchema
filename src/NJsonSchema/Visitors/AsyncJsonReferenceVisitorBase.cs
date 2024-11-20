@@ -173,7 +173,7 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (!(obj is string) && !(obj is JToken) && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
+            if (obj is not string && obj is not JToken && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {

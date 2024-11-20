@@ -171,8 +171,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var discriminator = jObject.GetValue(_discriminator, StringComparison.OrdinalIgnoreCase)?.Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
-            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
-            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+            if (serializer.ContractResolver.ResolveContract(subtype) is not JsonObjectContract objectContract || objectContract.Properties.All(p => p.PropertyName != _discriminator))
             {
                 jObject.Remove(_discriminator);
             }

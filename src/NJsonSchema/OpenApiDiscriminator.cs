@@ -81,8 +81,7 @@ namespace NJsonSchema
 
             public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             {
-                var internalMapping = value as IDictionary<string, JsonSchema>;
-                if (internalMapping != null)
+                if (value is IDictionary<string, JsonSchema> internalMapping)
                 {
                     var openApiMapping = new Dictionary<string, string>();
                     foreach (var tuple in internalMapping)

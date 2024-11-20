@@ -144,7 +144,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 var minimum = schema.Minimum;
                 if (minimum.HasValue && schema.IsExclusiveMinimum)
                 {
-                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    if (propertyFormat is JsonFormatStrings.Integer or JsonFormatStrings.Long)
                     {
                         minimum++;
                     }
@@ -176,7 +176,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 var maximum = schema.Maximum;
                 if (maximum.HasValue && schema.IsExclusiveMaximum)
                 {
-                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    if (propertyFormat is JsonFormatStrings.Integer or JsonFormatStrings.Long)
                     {
                         maximum--;
                     }
@@ -291,7 +291,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         private string? GetSchemaFormat(JsonSchema schema)
         {
-            if (Type == "long" || Type == "long?")
+            if (Type is "long" or "long?")
             {
                 return JsonFormatStrings.Long;
             }

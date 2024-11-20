@@ -45,8 +45,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            var exception = value as Exception;
-            if (exception != null)
+            if (value is Exception exception)
             {
                 var resolver = serializer.ContractResolver as DefaultContractResolver ?? _defaultContractResolver;
 
@@ -62,16 +61,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                 };
 
-                if (value is not null)
+                foreach (var property in GetExceptionProperties(exception.GetType()))
                 {
-                    foreach (var property in JsonExceptionConverter.GetExceptionProperties(value.GetType()))
+                    var propertyValue = property.Key.GetValue(exception);
+                    if (propertyValue != null)
                     {
-                        var propertyValue = property.Key.GetValue(exception);
-                        if (propertyValue != null)
-                        {
-                            jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
-                                JToken.FromObject(propertyValue, serializer)));
-                        }
+                        jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
+                            JToken.FromObject(propertyValue, serializer)));
                     }
                 }
 

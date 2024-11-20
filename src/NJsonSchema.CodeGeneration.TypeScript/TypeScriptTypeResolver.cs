@@ -219,8 +219,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "string";
                 }
             }
-            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                     Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
+            else if (Settings.DateTimeType is TypeScriptDateTimeType.MomentJS or TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
                 {

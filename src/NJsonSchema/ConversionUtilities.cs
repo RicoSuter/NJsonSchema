@@ -128,7 +128,7 @@ namespace NJsonSchema
                         break;
                     default:
                         // ASCII printable character
-                        if (c >= 0x20 && c <= 0x7e)
+                        if (c is >= (char)0x20 and <= (char)0x7e)
                         {
                             literal.Append(c);
                             // As UTF16 escaped character
