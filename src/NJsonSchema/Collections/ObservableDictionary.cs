@@ -130,30 +130,21 @@ namespace NJsonSchema.Collections
         private void OnPropertyChanged(string propertyName)
         {
             var copy = PropertyChanged;
-            if (copy != null)
-            {
-                copy(this, new PropertyChangedEventArgs(propertyName));
-            }
+            copy?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void OnCollectionChanged()
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> changedItem)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, changedItem, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem, 0));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> newItem,
@@ -161,20 +152,14 @@ namespace NJsonSchema.Collections
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem, 0));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, newItems, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItems, 0));
         }
 
         private void OnPropertyChanged()
