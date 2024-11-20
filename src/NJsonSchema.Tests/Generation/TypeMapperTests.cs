@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using NJsonSchema.Generation.TypeMappers;
+﻿using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 

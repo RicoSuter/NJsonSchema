@@ -1,6 +1,4 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.NewtonsoftJson.Generation;
 using NodaTime;

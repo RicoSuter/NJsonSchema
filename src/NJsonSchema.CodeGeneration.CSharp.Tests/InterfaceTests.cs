@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests

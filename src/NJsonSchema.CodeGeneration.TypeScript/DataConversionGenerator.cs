@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Generates data conversion code.</summary>

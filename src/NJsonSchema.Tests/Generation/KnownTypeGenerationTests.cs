@@ -1,7 +1,5 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
-using System;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation

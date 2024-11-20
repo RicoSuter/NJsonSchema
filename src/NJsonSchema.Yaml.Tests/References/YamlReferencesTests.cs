@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using NSwag;
-using System.Threading.Tasks;
 using Xunit;
 
 #pragma warning disable SYSLIB0012

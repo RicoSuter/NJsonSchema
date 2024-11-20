@@ -1,8 +1,5 @@
-﻿using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Newtonsoft.Json.Converters;

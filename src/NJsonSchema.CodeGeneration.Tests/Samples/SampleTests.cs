@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.NewtonsoftJson.Generation;

@@ -1,8 +1,6 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
-using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Demo.Performance
 {

@@ -7,8 +7,6 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using System;
-using System.Linq;
 
 namespace NJsonSchema.Infrastructure
 {

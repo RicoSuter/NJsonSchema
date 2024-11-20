@@ -1,8 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Xunit;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests

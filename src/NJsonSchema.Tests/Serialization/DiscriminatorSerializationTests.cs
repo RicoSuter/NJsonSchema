@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization

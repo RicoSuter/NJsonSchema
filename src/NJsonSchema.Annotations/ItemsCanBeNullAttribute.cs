@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Annotations;
 
 /// <summary>Annotation to specify that array items or dictionary values are nullable.</summary>

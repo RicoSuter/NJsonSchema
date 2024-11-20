@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;

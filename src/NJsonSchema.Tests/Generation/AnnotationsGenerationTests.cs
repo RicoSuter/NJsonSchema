@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;

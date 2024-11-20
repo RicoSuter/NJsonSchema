@@ -1,8 +1,6 @@
 ﻿using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System;
 using System.Globalization;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation

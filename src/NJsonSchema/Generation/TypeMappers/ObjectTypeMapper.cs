@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Generation.TypeMappers
 {
     /// <summary>Maps .NET type to a generated JSON Schema describing an object.</summary>

@@ -9,10 +9,7 @@
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using NJsonSchema.Generation;
-using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {

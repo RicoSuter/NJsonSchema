@@ -6,12 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides dynamic access to framework APIs.</summary>

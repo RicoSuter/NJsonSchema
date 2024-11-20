@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;

@@ -2,8 +2,6 @@
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
