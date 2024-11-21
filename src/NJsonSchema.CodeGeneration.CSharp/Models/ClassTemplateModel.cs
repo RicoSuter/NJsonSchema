@@ -93,7 +93,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public IEnumerable<PropertyModel> AllProperties { get; }
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
+        public bool HasDescription => _schema is not JsonSchemaProperty &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 

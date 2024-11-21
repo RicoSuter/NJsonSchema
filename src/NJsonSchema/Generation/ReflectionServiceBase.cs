@@ -152,14 +152,12 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Duration);
             }
 
-            if (originalType.FullName == "NodaTime.LocalDate" ||
-                originalType.FullName == "System.DateOnly")
+            if (originalType.FullName is "NodaTime.LocalDate" or "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (originalType.FullName == "NodaTime.LocalTime" ||
-                originalType.FullName == "System.TimeOnly")
+            if (originalType.FullName is "NodaTime.LocalTime" or "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
@@ -325,7 +323,7 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.Name == "IDictionary`2" || contextualType.Name == "IReadOnlyDictionary`2")
+            if (contextualType.Name is "IDictionary`2" or "IReadOnlyDictionary`2")
             {
                 return true;
             }

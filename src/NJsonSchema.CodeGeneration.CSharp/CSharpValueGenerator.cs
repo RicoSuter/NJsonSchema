@@ -49,14 +49,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         return $"new {targetType}({stringLiteral})";
                     }
 
-                    if (targetType == "System.DateTime" || targetType == "System.DateTime?")
+                    if (targetType is "System.DateTime" or "System.DateTime?")
                     {
                         var stringLiteral = GetDefaultAsStringLiteral(schema);
                         return $"System.DateTime.Parse({stringLiteral})";
                     }
                 }
 
-                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
+                var isOptional = schema is JsonSchemaProperty { IsRequired: false };
 
                 schema = schema.ActualSchema;
                 if (schema != null && allowsNull == false && isOptional == false)

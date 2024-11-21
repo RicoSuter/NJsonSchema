@@ -204,9 +204,7 @@ namespace NJsonSchema.Validation
 
         private void ValidateString(JToken token, JsonSchema schema, JsonObjectType type, string? propertyName, string propertyPath, List<ValidationError> errors)
         {
-            var isString = token.Type == JTokenType.String || token.Type == JTokenType.Date ||
-                           token.Type == JTokenType.Guid || token.Type == JTokenType.TimeSpan ||
-                           token.Type == JTokenType.Uri;
+            var isString = token.Type is JTokenType.String or JTokenType.Date or JTokenType.Guid or JTokenType.TimeSpan or JTokenType.Uri;
 
             if (isString)
             {
@@ -255,7 +253,7 @@ namespace NJsonSchema.Validation
                 errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath, token, schema));
             }
 
-            if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
+            if (token.Type is JTokenType.Float or JTokenType.Integer)
             {
                 try
                 {
@@ -336,7 +334,7 @@ namespace NJsonSchema.Validation
 
         private static void ValidateObject(JToken token, JsonSchema schema, JsonObjectType type, string? propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.IsObject() && !(token is JObject))
+            if (type.IsObject() && token is not JObject)
             {
                 errors.Add(new ValidationError(ValidationErrorKind.ObjectExpected, propertyName, propertyPath, token, schema));
             }

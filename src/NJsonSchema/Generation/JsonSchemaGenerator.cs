@@ -376,8 +376,7 @@ namespace NJsonSchema.Generation
                 }
             }
 
-            if (typeDescription.Type == JsonObjectType.Number ||
-                typeDescription.Type == JsonObjectType.Integer)
+            if (typeDescription.Type is JsonObjectType.Number or JsonObjectType.Integer)
             {
                 JsonSchemaGenerator.ApplyRangeAttribute(schema, contextualType.GetContextAttributes(true));
 
@@ -893,8 +892,7 @@ namespace NJsonSchema.Generation
                         var methodInfo = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (methodInfo != null)
                         {
-                            var knownTypes = methodInfo.Invoke(null, null) as IEnumerable<Type>;
-                            if (knownTypes != null)
+                            if (methodInfo.Invoke(null, null) is IEnumerable<Type> knownTypes)
                             {
                                 foreach (var knownType in knownTypes)
                                 {

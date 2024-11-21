@@ -67,8 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     }
                 }
 
-                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
-                if (schema != null && allowsNull == false && isOptional == false)
+                if (!allowsNull && schema is JsonSchemaProperty { IsRequired: false } == false)
                 {
                     if (typeResolver.GeneratesType(schema) &&
                         !schema.ActualTypeSchema.IsEnumeration &&
