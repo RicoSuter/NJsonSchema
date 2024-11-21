@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-
-namespace NJsonSchema.CodeGeneration.TypeScript.Tests
+﻿namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class ClassOrderTests
     {

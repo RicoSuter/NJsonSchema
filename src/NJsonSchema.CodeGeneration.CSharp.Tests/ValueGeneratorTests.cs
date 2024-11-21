@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;

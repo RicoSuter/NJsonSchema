@@ -1,7 +1,3 @@
-using System;
-using VerifyTests;
-using VerifyXunit;
-
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests;
 
 public static class VerifyHelper

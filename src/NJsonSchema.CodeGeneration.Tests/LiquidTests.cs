@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using Fluid;
 using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;

@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Threading;
-using System.Threading.Tasks;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors

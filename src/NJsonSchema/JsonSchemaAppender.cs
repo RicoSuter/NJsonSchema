@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema
 {
     /// <summary>Appends a schema to a document (i.e. another schema).</summary>

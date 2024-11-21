@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Xunit;
-
-namespace NJsonSchema.CodeGeneration.TypeScript.Tests
+﻿namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class DateCodeGenerationTests
     {

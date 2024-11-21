@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using NBench;
 using Pro.NBench.xUnit.XunitExtensions;
 using Xunit;

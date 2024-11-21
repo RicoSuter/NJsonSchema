@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Reflection;
 using NJsonSchema.References;
 using Newtonsoft.Json.Linq;

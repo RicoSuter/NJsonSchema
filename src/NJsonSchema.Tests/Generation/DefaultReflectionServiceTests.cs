@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NJsonSchema.Generation;
+﻿using NJsonSchema.Generation;
 using Xunit;
 using Namotion.Reflection;
 using NJsonSchema.NewtonsoftJson.Generation;

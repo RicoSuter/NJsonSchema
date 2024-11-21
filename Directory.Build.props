@@ -23,6 +23,7 @@
         <LangVersion>latest</LangVersion>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
 
         <UseArtifactsOutput>true</UseArtifactsOutput>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

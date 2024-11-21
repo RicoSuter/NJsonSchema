@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;

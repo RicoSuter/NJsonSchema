@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>The class template base class.</summary>

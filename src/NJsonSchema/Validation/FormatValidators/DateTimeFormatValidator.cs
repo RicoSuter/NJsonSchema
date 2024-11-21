@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 using Newtonsoft.Json.Linq;
-using System;
 using System.Globalization;
 
 namespace NJsonSchema.Validation.FormatValidators

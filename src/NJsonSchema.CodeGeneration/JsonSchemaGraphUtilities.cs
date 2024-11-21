@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using NJsonSchema.Visitors;
 
 namespace NJsonSchema.CodeGeneration

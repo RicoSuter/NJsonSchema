@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;

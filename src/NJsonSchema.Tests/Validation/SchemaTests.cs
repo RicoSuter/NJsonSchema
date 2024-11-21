@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using NJsonSchema.Validation;
+﻿using NJsonSchema.Validation;
 using Xunit;
 
 namespace NJsonSchema.Tests.Validation

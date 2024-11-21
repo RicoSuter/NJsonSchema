@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Xunit;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;

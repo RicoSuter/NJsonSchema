@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json.Serialization;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Schema

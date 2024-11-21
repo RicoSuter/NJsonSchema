@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
-
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests;

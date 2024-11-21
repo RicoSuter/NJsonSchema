@@ -6,11 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Linq;
 using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using System;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;

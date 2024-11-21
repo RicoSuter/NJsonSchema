@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
 namespace NJsonSchema.Generation.TypeMappers
 {
     /// <summary>The context object for the <see cref="ITypeMapper"/> interface.</summary>
