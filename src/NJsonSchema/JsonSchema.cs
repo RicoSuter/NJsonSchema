@@ -1022,55 +1022,16 @@ namespace NJsonSchema
         private void Initialize()
 #pragma warning disable CS8774
         {
-            if (Items == null)
-            {
-                Items = new ObservableCollection<JsonSchema>();
-            }
-
-            if (Properties == null)
-            {
-                Properties = new ObservableDictionary<string, JsonSchemaProperty>();
-            }
-
-            if (PatternProperties == null)
-            {
-                PatternProperties = new ObservableDictionary<string, JsonSchemaProperty>();
-            }
-
-            if (Definitions == null)
-            {
-                Definitions = new ObservableDictionary<string, JsonSchema>();
-            }
-
-            if (RequiredProperties == null)
-            {
-                RequiredProperties = new Collection<string>();
-            }
-
-            if (AllOf == null)
-            {
-                AllOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (AnyOf == null)
-            {
-                AnyOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (OneOf == null)
-            {
-                OneOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (Enumeration == null)
-            {
-                Enumeration = new Collection<object?>();
-            }
-
-            if (EnumerationNames == null)
-            {
-                EnumerationNames = [];
-            }
+            Items ??= new ObservableCollection<JsonSchema>();
+            Properties ??= new ObservableDictionary<string, JsonSchemaProperty>();
+            PatternProperties ??= new ObservableDictionary<string, JsonSchemaProperty>();
+            Definitions ??= new ObservableDictionary<string, JsonSchema>();
+            RequiredProperties ??= new Collection<string>();
+            AllOf ??= new ObservableCollection<JsonSchema>();
+            AnyOf ??= new ObservableCollection<JsonSchema>();
+            OneOf ??= new ObservableCollection<JsonSchema>();
+            Enumeration ??= new Collection<object?>();
+            EnumerationNames ??= [];
         }
 #pragma warning restore CS8774
 

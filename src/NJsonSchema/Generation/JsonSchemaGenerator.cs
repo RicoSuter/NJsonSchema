@@ -366,10 +366,7 @@ namespace NJsonSchema.Generation
             {
                 if (typeDescription.IsDictionary)
                 {
-                    if (schema.AdditionalPropertiesSchema == null)
-                    {
-                        schema.AdditionalPropertiesSchema = new JsonSchema();
-                    }
+                    schema.AdditionalPropertiesSchema ??= new JsonSchema();
 
                     schema.AdditionalPropertiesSchema.Pattern = regexAttribute.Pattern;
                 }
@@ -1202,15 +1199,8 @@ namespace NJsonSchema.Generation
                     propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
                 }
 
-                if (propertySchema.Description == null)
-                {
-                    propertySchema.Description = property.GetDescription(Settings);
-                }
-
-                if (propertySchema.Example == null)
-                {
-                    propertySchema.Example = GenerateExample(property);
-                }
+                propertySchema.Description ??= property.GetDescription(Settings);
+                propertySchema.Example ??= GenerateExample(property);
 
                 dynamic? obsoleteAttribute = property.GetAttributes(true).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
                 if (obsoleteAttribute != null)
