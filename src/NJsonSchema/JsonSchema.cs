@@ -238,14 +238,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>
         [JsonIgnore]
-        public bool IsBinary
-        {
-            get
-            {
-                return Type.IsFile() ||
-                    (Type.IsString() && Format == JsonFormatStrings.Binary);
-            }
-        }
+        public bool IsBinary => Type.IsFile() || (Type.IsString() && Format == JsonFormatStrings.Binary);
 
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
@@ -529,7 +522,7 @@ namespace NJsonSchema
         [JsonProperty("x-dictionaryKey", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema? DictionaryKey
         {
-            get { return _dictionaryKey; }
+            get => _dictionaryKey;
             set
             {
                 _dictionaryKey = value;
@@ -544,7 +537,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchemaProperty> Properties
         {
-            get { return _properties; }
+            get => _properties;
             internal set
             {
                 if (_properties != value)
@@ -560,7 +553,7 @@ namespace NJsonSchema
         [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonXmlObject? Xml
         {
-            get { return _xmlObject; }
+            get => _xmlObject;
             set
             {
                 _xmlObject = value;
@@ -579,7 +572,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchemaProperty> PatternProperties
         {
-            get { return _patternProperties; }
+            get => _patternProperties;
             internal set
             {
                 if (_patternProperties != value)
@@ -595,7 +588,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? Item
         {
-            get { return _item; }
+            get => _item;
             set
             {
                 if (_item != value)
@@ -614,7 +607,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> Items
         {
-            get { return _items; }
+            get => _items;
             internal set
             {
                 if (_items != value)
@@ -635,7 +628,7 @@ namespace NJsonSchema
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema? Not
         {
-            get { return _not; }
+            get => _not;
             set
             {
                 _not = value;
@@ -650,7 +643,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchema> Definitions
         {
-            get { return _definitions; }
+            get => _definitions;
             internal set
             {
                 if (_definitions != value)
@@ -666,7 +659,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> AllOf
         {
-            get { return _allOf; }
+            get => _allOf;
             internal set
             {
                 if (_allOf != value)
@@ -682,7 +675,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> AnyOf
         {
-            get { return _anyOf; }
+            get => _anyOf;
             internal set
             {
                 if (_anyOf != value)
@@ -698,7 +691,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> OneOf
         {
-            get { return _oneOf; }
+            get => _oneOf;
             internal set
             {
                 if (_oneOf != value)
@@ -715,7 +708,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool AllowAdditionalItems
         {
-            get { return _allowAdditionalItems; }
+            get => _allowAdditionalItems;
             set
             {
                 if (_allowAdditionalItems != value)
@@ -734,7 +727,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? AdditionalItemsSchema
         {
-            get { return _additionalItemsSchema; }
+            get => _additionalItemsSchema;
             set
             {
                 if (_additionalItemsSchema != value)
@@ -753,7 +746,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool AllowAdditionalProperties
         {
-            get { return _allowAdditionalProperties; }
+            get => _allowAdditionalProperties;
             set
             {
                 if (_allowAdditionalProperties != value)
@@ -772,7 +765,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? AdditionalPropertiesSchema
         {
-            get { return _additionalPropertiesSchema; }
+            get => _additionalPropertiesSchema;
             set
             {
                 if (_additionalPropertiesSchema != value)

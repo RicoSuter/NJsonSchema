@@ -30,7 +30,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>The source type.</summary>
         [Obsolete("Use ContextualType to obtain this instead.")]
-        public Type Type { get => ContextualType.OriginalType; }
+        public Type Type => ContextualType.OriginalType;
 
         /// <summary>The source contextual type.</summary>
         public ContextualType ContextualType { get; }

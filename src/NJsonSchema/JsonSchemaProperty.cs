@@ -26,7 +26,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public override object? Parent
         {
-            get { return _parent; }
+            get => _parent;
             set
             {
                 var initialize = _parent == null;
@@ -43,7 +43,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool IsRequired
         {
-            get { return ParentSchema!.RequiredProperties.Contains(Name); }
+            get => ParentSchema!.RequiredProperties.Contains(Name);
             set
             {
                 if (ParentSchema == null)
