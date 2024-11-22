@@ -48,7 +48,6 @@
           [IDE0059] Unnecessary assignment of a value
           [IDE0060] Remove unused parameter
           [IDE0090] 'new' expression can be simplified
-          [IDE0100] Remove redundant equality
           [IDE0130] Namespace does not match folder structure
           [IDE0160] Convert to block scoped namespace
           [IDE0290] Use primary constructor
@@ -59,7 +58,7 @@
           [CA1870] Use a cached 'SearchValues' instance for improved searching performance
           [CA2263] Prefer the generic overload 'System.Enum.GetValues<TEnum>()'
         -->
-        <NoWarn>$(NoWarn);IDE0008;IDE0021;IDE0022;IDE0029;IDE0032;IDE0039;IDE0045;IDE0046;IDE0055;IDE0057;IDE0059;IDE0060;IDE0090;IDE0100;IDE0130;IDE0160;IDE0290;CA1200;CA1510;CA1716;CA1720;CA1870;CA2263</NoWarn>
+        <NoWarn>$(NoWarn);IDE0008;IDE0021;IDE0022;IDE0029;IDE0032;IDE0039;IDE0045;IDE0046;IDE0055;IDE0057;IDE0059;IDE0060;IDE0090;IDE0130;IDE0160;IDE0290;CA1200;CA1510;CA1716;CA1720;CA1870;CA2263</NoWarn>
     </PropertyGroup>
 
 </Project>

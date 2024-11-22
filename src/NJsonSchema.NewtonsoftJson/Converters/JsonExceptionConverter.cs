@@ -121,7 +121,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out JToken? token))
             {
                 var discriminator = token.Value<string>();
-                if (objectType.Name.Equals(discriminator, StringComparison.Ordinal) == false)
+                if (!objectType.Name.Equals(discriminator, StringComparison.Ordinal))
                 {
                     var exceptionType = Type.GetType("System." + discriminator, false);
                     if (exceptionType != null)

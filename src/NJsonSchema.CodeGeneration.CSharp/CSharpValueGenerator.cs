@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 var isOptional = schema is JsonSchemaProperty { IsRequired: false };
 
                 schema = schema.ActualSchema;
-                if (schema != null && allowsNull == false && isOptional == false)
+                if (schema != null && !allowsNull && !isOptional)
                 {
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())

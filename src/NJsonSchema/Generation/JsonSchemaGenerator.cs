@@ -811,8 +811,8 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (contextualType.OriginalType.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name) == false &&
-                (contextualType.OriginalType.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) == true ||
+            if (!contextualType.OriginalType.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name) &&
+                (contextualType.OriginalType.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
                  contextualType.OriginalType == typeof(object)))
             {
                 if (Settings.SchemaType == SchemaType.Swagger2)
@@ -1176,9 +1176,9 @@ namespace NJsonSchema.Generation
                 }
 
                 if (hasRequiredAttribute &&
-                    propertyTypeDescription.IsEnum == false &&
+                    !propertyTypeDescription.IsEnum &&
                     propertyTypeDescription.Type == JsonObjectType.String &&
-                    requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+                    !requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false))
                 {
                     propertySchema.MinLength = 1;
                 }
@@ -1230,7 +1230,7 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (accessorInfo.IsAttributeDefined<JsonPropertyAttribute>(true) == false &&
+            if (!accessorInfo.IsAttributeDefined<JsonPropertyAttribute>(true) &&
                 HasDataContractAttribute(parentType) &&
                 GetDataMemberAttribute(accessorInfo, parentType) == null)
             {
