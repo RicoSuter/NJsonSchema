@@ -28,7 +28,7 @@ namespace NJsonSchema.CodeGeneration
         {
             private readonly JsonSchema _baseSchema;
 
-            public Dictionary<JsonSchema, string?> DerivedSchemas { get; } = new Dictionary<JsonSchema, string?>();
+            public Dictionary<JsonSchema, string?> DerivedSchemas { get; } = [];
 
             public DerivedSchemaVisitor(JsonSchema baseSchema)
             {

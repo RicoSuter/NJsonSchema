@@ -17,7 +17,7 @@ namespace NJsonSchema.Infrastructure
     public static class TypeExtensions
     {
         private static readonly ReaderWriterLockSlim _namesLock = new();
-        private static readonly Dictionary<ContextualMemberInfo, string> _names = new();
+        private static readonly Dictionary<ContextualMemberInfo, string> _names = [];
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>

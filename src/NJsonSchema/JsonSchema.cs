@@ -300,17 +300,7 @@ namespace NJsonSchema
         /// <summary>Gets the list of all inherited/parent schemas.</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
-        public IReadOnlyCollection<JsonSchema> AllInheritedSchemas
-        {
-            get
-            {
-                var inheritedSchema = this.InheritedSchema != null ?
-                    new List<JsonSchema> { this.InheritedSchema } :
-                    new List<JsonSchema>();
-
-                return [.. inheritedSchema, .. inheritedSchema.SelectMany(s => s.AllInheritedSchemas)];
-            }
-        }
+        public IReadOnlyCollection<JsonSchema> AllInheritedSchemas => InheritedSchema != null ? [InheritedSchema, ..InheritedSchema.AllInheritedSchemas] : [];
 
         /// <summary>Determines whether the given schema is the parent schema of this schema (i.e. super/base class).</summary>
         /// <param name="schema">The possible subtype schema.</param>
@@ -926,8 +916,8 @@ namespace NJsonSchema
         public bool InheritsSchema(JsonSchema parentSchema)
         {
             return parentSchema != null && ActualSchema
-                .AllInheritedSchemas.Concat(new List<JsonSchema> { this })
-                .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
+                .AllInheritedSchemas.Concat([this])
+                .Any(s => s.ActualSchema == parentSchema.ActualSchema);
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
@@ -1026,11 +1016,11 @@ namespace NJsonSchema
             Properties ??= new ObservableDictionary<string, JsonSchemaProperty>();
             PatternProperties ??= new ObservableDictionary<string, JsonSchemaProperty>();
             Definitions ??= new ObservableDictionary<string, JsonSchema>();
-            RequiredProperties ??= new Collection<string>();
+            RequiredProperties ??= [];
             AllOf ??= new ObservableCollection<JsonSchema>();
             AnyOf ??= new ObservableCollection<JsonSchema>();
             OneOf ??= new ObservableCollection<JsonSchema>();
-            Enumeration ??= new Collection<object?>();
+            Enumeration ??= [];
             EnumerationNames ??= [];
         }
 #pragma warning restore CS8774

@@ -15,8 +15,8 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly HashSet<string> _unsupportedFormatStrings = new()
-        {
+        private readonly HashSet<string> _unsupportedFormatStrings =
+        [
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
             JsonFormatStrings.Time,
@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Uuid,
             JsonFormatStrings.Base64,
 #pragma warning restore CS0618 // Type or member is obsolete
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>

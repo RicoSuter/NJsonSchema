@@ -16,7 +16,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
     /// <inheritdoc />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
-        private readonly Dictionary<string, JsonContract?> _cachedContracts = new();
+        private readonly Dictionary<string, JsonContract?> _cachedContracts = [];
 
         private JsonSerializerSettings _serializerSettings;
 

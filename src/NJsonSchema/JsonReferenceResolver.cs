@@ -20,7 +20,7 @@ namespace NJsonSchema
     public class JsonReferenceResolver
     {
         private readonly JsonSchemaAppender _schemaAppender;
-        private readonly Dictionary<string, IJsonReference> _resolvedObjects = new Dictionary<string, IJsonReference>();
+        private readonly Dictionary<string, IJsonReference> _resolvedObjects = [];
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
         /// <param name="schemaAppender">The schema appender.</param>

@@ -37,7 +37,7 @@ namespace NJsonSchema
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static string? GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
         {
-            return GetJsonPaths(rootObject, new List<object> { searchedObject }, contractResolver)[searchedObject];
+            return GetJsonPaths(rootObject, [searchedObject], contractResolver)[searchedObject];
         }
 
         /// <summary>Gets the JSON path of the given object.</summary>
