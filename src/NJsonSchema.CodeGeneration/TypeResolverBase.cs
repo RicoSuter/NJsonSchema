@@ -137,7 +137,7 @@ namespace NJsonSchema.CodeGeneration
                 return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(_settings.SchemaType), null);
             }
 
-            if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
+            if (!schema.AllowAdditionalProperties && schema.PatternProperties.Any())
             {
                 var valueTypes = new HashSet<string>(schema.PatternProperties
                     .Select(p => Resolve(p.Value, p.Value.IsNullable(_settings.SchemaType), null))

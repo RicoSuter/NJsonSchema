@@ -298,8 +298,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Item != null)
             {
-                var isObject = schema.Item.ActualSchema.Type.IsObject() == true;
-                var isDictionary = schema.Item.ActualSchema.IsDictionary == true;
+                var isObject = schema.Item.ActualSchema.Type.IsObject();
+                var isDictionary = schema.Item.ActualSchema.IsDictionary;
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
 
                 if (Settings.UseLeafType)

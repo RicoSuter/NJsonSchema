@@ -808,7 +808,7 @@ namespace NJsonSchema
                                  _patternProperties.Count == 0 &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
-                                 IsEnumeration == false;
+                                !IsEnumeration;
 
         #endregion
 

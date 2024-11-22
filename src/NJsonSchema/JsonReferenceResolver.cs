@@ -312,7 +312,7 @@ namespace NJsonSchema
                 foreach (var member in obj
                     .GetType()
                     .GetContextualAccessors()
-                    .Where(p => p.IsAttributeDefined<JsonIgnoreAttribute>(true) == false))
+                    .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(true)))
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)

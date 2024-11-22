@@ -30,8 +30,8 @@ namespace NJsonSchema.Generation
                 }
 
                 if (accessorInfo.MemberInfo is PropertyInfo propertyInfo &&
-                    (propertyInfo.GetMethod == null || propertyInfo.GetMethod.IsPrivate == true || propertyInfo.GetMethod.IsStatic == true) &&
-                    (propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsPrivate == true || propertyInfo.SetMethod.IsStatic == true) &&
+                    (propertyInfo.GetMethod == null || propertyInfo.GetMethod.IsPrivate || propertyInfo.GetMethod.IsStatic) &&
+                    (propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsPrivate || propertyInfo.SetMethod.IsStatic) &&
                     !propertyInfo.IsDefined(typeof(DataMemberAttribute)))
                 {
                     continue;
@@ -99,7 +99,7 @@ namespace NJsonSchema.Generation
                         schema.RequiredProperties.Add(propertyName);
                     }
 
-                    var isNullable = propertyTypeDescription.IsNullable && hasRequiredAttribute == false;
+                    var isNullable = propertyTypeDescription.IsNullable && !hasRequiredAttribute;
 
                     // TODO: Add default value
                     schemaGenerator.AddProperty(schema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, hasRequiredAttribute, isNullable, null, schemaResolver);

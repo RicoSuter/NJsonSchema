@@ -51,7 +51,7 @@ namespace NJsonSchema
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false &&
+                                               !IsEnumeration &&
                                                _allOf.Count == 1 &&
                                                _allOf.Any(s => s.HasReference);
 
@@ -64,7 +64,7 @@ namespace NJsonSchema
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false &&
+                                               !IsEnumeration &&
                                                _oneOf.Count == 1 &&
                                                _oneOf.Any(s => s.HasReference);
 
@@ -77,7 +77,7 @@ namespace NJsonSchema
                                                _patternProperties.Count == 0 &&
                                                AdditionalPropertiesSchema == null &&
                                                MultipleOf == null &&
-                                               IsEnumeration == false &&
+                                               !IsEnumeration &&
                                                _anyOf.Count == 1 &&
                                                _anyOf.Any(s => s.HasReference);
 
@@ -91,7 +91,7 @@ namespace NJsonSchema
                 throw new InvalidOperationException(message);
             }
 
-            if (checkedSchemas.Contains(this) == true)
+            if (checkedSchemas.Contains(this))
             {
                 ThrowInvalidOperationException("Cyclic references detected.");
             }

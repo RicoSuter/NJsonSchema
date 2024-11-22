@@ -93,7 +93,7 @@ namespace NJsonSchema
         /// <returns>true if the type can be null.</returns>
         public override bool IsNullable(SchemaType schemaType)
         {
-            if (schemaType == SchemaType.Swagger2 && IsRequired == false)
+            if (schemaType == SchemaType.Swagger2 && !IsRequired)
             {
                 return true;
             }

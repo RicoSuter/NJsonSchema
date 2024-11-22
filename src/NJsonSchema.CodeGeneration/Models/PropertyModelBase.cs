@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Models
         protected string GetTypeNameHint()
         {
             var propertyName = PropertyName;
-            if (_property.IsEnumeration == false)
+            if (!_property.IsEnumeration)
             {
                 return propertyName;
             }

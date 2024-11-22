@@ -59,7 +59,7 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
             }
 
-            if (schema.Type.IsString() && (schema.Format == null || _unsupportedFormatStrings.Contains(schema.Format) == false))
+            if (schema.Type.IsString() && (schema.Format == null || !_unsupportedFormatStrings.Contains(schema.Format)))
             {
                 return GetDefaultAsStringLiteral(schema);
             }
