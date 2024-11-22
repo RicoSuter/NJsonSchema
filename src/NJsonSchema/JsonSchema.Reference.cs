@@ -146,7 +146,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public override JsonSchema? Reference
         {
-            get { return base.Reference; }
+            get => base.Reference;
             set
             {
                 base.Reference = value;
