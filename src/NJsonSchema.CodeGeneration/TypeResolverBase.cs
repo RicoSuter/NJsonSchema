@@ -12,7 +12,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class TypeResolverBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = new();
+        internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = [];
         private readonly HashSet<string> _reservedTypeNames = [];
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>

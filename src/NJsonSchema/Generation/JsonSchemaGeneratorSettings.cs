@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.ObjectModel;
 using System.Reflection;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
@@ -107,11 +106,11 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
-        public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+        public ICollection<ITypeMapper> TypeMappers { get; set; } = [];
 
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
-        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
+        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = [];
 
         /// <summary>Gets or sets a value indicating whether to generate x-nullable properties (Swagger 2 only).</summary>
         public bool GenerateCustomNullableProperties { get; set; }

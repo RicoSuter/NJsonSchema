@@ -16,7 +16,7 @@ namespace NJsonSchema
     {
         private static readonly char[] TypeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
 
-        private readonly Dictionary<string, string> _typeNameMappings = new();
+        private readonly Dictionary<string, string> _typeNameMappings = [];
         private string[] _reservedTypeNames = ["object"];
 
         // TODO: Expose as options to UI and cmd line?

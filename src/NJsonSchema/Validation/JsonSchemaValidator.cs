@@ -93,7 +93,7 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            var types = GetTypes(schema).ToDictionary(t => t, t => (ICollection<ValidationError>)new List<ValidationError>());
+            var types = GetTypes(schema).ToDictionary(t => t, ICollection<ValidationError> (t) => []);
             if (types.Count > 1)
             {
                 foreach (var type in types)
@@ -561,8 +561,10 @@ namespace NJsonSchema.Validation
                 return null;
             }
 
-            var errorDictionary = new Dictionary<JsonSchema, ICollection<ValidationError>>();
-            errorDictionary.Add(schema, errors);
+            var errorDictionary = new Dictionary<JsonSchema, ICollection<ValidationError>>
+            {
+                { schema, errors }
+            };
 
             return new ChildSchemaValidationError(errorKind, property, path, errorDictionary, token, schema);
         }

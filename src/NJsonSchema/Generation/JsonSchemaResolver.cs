@@ -11,7 +11,7 @@ namespace NJsonSchema.Generation
     /// <summary>Manager which resolves types to schemas and appends missing schemas to the root object.</summary>
     public class JsonSchemaResolver : JsonSchemaAppender
     {
-        private readonly Dictionary<string, JsonSchema> _mappings = new Dictionary<string, JsonSchema>();
+        private readonly Dictionary<string, JsonSchema> _mappings = [];
         private readonly JsonSchemaGeneratorSettings _settings;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaResolver" /> class.</summary>

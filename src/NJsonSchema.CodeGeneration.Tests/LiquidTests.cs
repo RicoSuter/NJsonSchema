@@ -11,7 +11,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             public string Foo { get; } = "Foo.";
 
-            public Dictionary<string, object> Bar { get; } = new Dictionary<string, object>();
+            public Dictionary<string, object> Bar { get; } = [];
         }
 
         [Fact]
