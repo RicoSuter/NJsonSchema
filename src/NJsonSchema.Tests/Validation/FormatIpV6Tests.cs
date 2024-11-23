@@ -9,34 +9,34 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_ipv6_incorrect_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.IpV6;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.IpV6Expected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_ipv6_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.IpV6;
 
             var token = new JValue("::1");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

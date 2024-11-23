@@ -1,6 +1,10 @@
 ﻿using NJsonSchema.Converters;
 using System.Text.Json;
+
+#if !NETFRAMEWORK
 using System.Text.Json.Serialization;
+#endif
+
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation.SystemTextJson
@@ -43,11 +47,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_using_JsonInheritanceAttribute_and_SystemTextJson_then_schema_is_correct()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<Fruit>();
             var data = schema.ToJson().ReplaceLineEndings();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);
@@ -66,7 +70,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_discriminator_is_wrong_then_no_stackoverflow()
         {
-            //// Act & Assert
+            // Act & Assert
             Assert.Throws<InvalidOperationException>(() => // Throws "Could not find subtype of..."
             {
                 JsonSerializer.Deserialize<Fruit>("{\"k\": \"invalid\"}");
@@ -96,11 +100,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_using_native_attributes_in_SystemTextJson_then_schema_is_correct()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<Fruit2>();
             var data = schema.ToJson().ReplaceLineEndings();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);
@@ -137,11 +141,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_using_native_attributes_and_integer_discriminator_in_SystemTextJson_then_schema_is_correct()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<Dog>();
             var data = schema.ToJson().ReplaceLineEndings();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.Contains(@"""1"": """, data);
             Assert.Contains(@"""2"": """, data);

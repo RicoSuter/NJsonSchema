@@ -13,11 +13,11 @@ namespace NJsonSchema.Tests.Generation
         [InlineData(typeof(Dictionary<decimal?, short?>), "DictionaryOfNullableDecimalAndNullableShort")]
         public void When_display_name_is_retrieved_then_string_is_correct(Type type, string expectedName)
         {
-            //// Act
+            // Act
             var generator = new DefaultSchemaNameGenerator();
             var name = generator.Generate(type);
 
-            //// Assert
+            // Assert
             Assert.Equal(expectedName, name);
         }
     }

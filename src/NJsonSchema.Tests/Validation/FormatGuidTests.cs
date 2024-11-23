@@ -9,24 +9,24 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_guid_incorrect_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Guid;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.GuidExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_guid_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Guid;
@@ -34,10 +34,10 @@ namespace NJsonSchema.Tests.Validation
             var guid = Guid.NewGuid().ToString(); 
             var token = new JValue(guid);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

@@ -26,9 +26,9 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_inherits_from_interface_then_properties_for_interface_are_generated()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<BusinessCategory>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true
@@ -36,7 +36,7 @@ namespace NJsonSchema.Tests.Generation
 
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(2, schema.Definitions["ICategory"].Properties.Count);
         }
     }

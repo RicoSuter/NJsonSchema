@@ -10,7 +10,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_ReferenceTypeNullHandling_is_Null_then_nullability_is_correct()
         {
-            //// Arrange
+            // Arrange
             var checks = new Dictionary<Type, bool>
             {
                 { typeof(bool), false },
@@ -34,10 +34,10 @@ namespace NJsonSchema.Tests.Generation
                 { typeof(Dictionary<string, string>), true },
             };
 
-            //// Act
+            // Act
             var svc = new NewtonsoftJsonReflectionService();
 
-            //// Assert
+            // Assert
             foreach (var check in checks)
             {
                 Assert.Equal(check.Value, svc.IsNullable(check.Key.ToContextualType(), ReferenceTypeNullHandling.Null));
@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_ReferenceTypeNullHandling_is_NotNull_then_nullability_is_correct()
         {
-            //// Arrange
+            // Arrange
             var checks = new Dictionary<Type, bool>
             {
                 { typeof(bool), false },
@@ -71,10 +71,10 @@ namespace NJsonSchema.Tests.Generation
                 { typeof(Dictionary<string, string>), false },
             };
 
-            //// Act
+            // Act
             var svc = new NewtonsoftJsonReflectionService();
 
-            //// Assert
+            // Assert
             foreach (var check in checks)
             {
                 Assert.Equal(check.Value, svc.IsNullable(check.Key.ToContextualType(), ReferenceTypeNullHandling.NotNull));

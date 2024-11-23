@@ -13,26 +13,26 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_in_round_trip_then_json_should_be_the_same()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            /// Act
+            // Act
             var schemaData1 = JsonConvert.SerializeObject(schema, Formatting.Indented);
             var schema2 = JsonConvert.DeserializeObject<JsonSchema>(schemaData1);
             var schemaData2 = JsonConvert.SerializeObject(schema2, Formatting.Indented);
 
-            //// Assert
+            // Assert
             Assert.Equal(schemaData1, schemaData2);
         }
 
         [Fact]
         public async Task When_converting_simple_property_then_property_must_be_in_schema()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["Integer"].Type);
             Assert.Equal(JsonObjectType.Number, schema.Properties["Decimal"].Type);
             Assert.Equal(JsonObjectType.Number, schema.Properties["Double"].Type);
@@ -44,10 +44,10 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_nullable_simple_property_then_property_must_be_in_schema()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer | JsonObjectType.Null, schema.Properties["NullableInteger"].Type);
             Assert.Equal(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDecimal"].Type);
             Assert.Equal(JsonObjectType.Number | JsonObjectType.Null, schema.Properties["NullableDouble"].Type);
@@ -57,40 +57,40 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_property_with_description_then_description_should_be_in_schema()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.Equal("Test", schema.Properties["Integer"].Description);
         }
 
         [Fact]
         public async Task When_converting_required_property_then_it_should_be_required_in_schema()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["RequiredReference"].IsRequired);
         }
 
         [Fact]
         public async Task When_converting_regex_property_then_it_should_be_set_as_pattern()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.Equal("regex", schema.Properties["RegexString"].Pattern);
         }
 
         [Fact]
         public async Task When_converting_range_property_then_it_should_be_set_as_min_max()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.Equal(5, schema.Properties["RangeInteger"].Minimum);
             Assert.Equal(10, schema.Properties["RangeInteger"].Maximum);
         }
@@ -98,10 +98,10 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_not_nullable_properties_then_they_should_have_null_type()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.False(schema.Properties["Integer"].IsRequired);
             Assert.False(schema.Properties["Decimal"].IsRequired);
             Assert.False(schema.Properties["Double"].IsRequired);
@@ -118,10 +118,10 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_generating_nullable_primitive_properties_then_they_should_have_null_type()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["NullableInteger"].Type.HasFlag(JsonObjectType.Null));
             Assert.True(schema.Properties["NullableDecimal"].Type.HasFlag(JsonObjectType.Null));
             Assert.True(schema.Properties["NullableDouble"].Type.HasFlag(JsonObjectType.Null));
@@ -131,10 +131,10 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_property_is_renamed_then_the_name_must_be_correct()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("abc"));
             Assert.False(schema.Properties.ContainsKey("ChangedName"));
         }
@@ -142,11 +142,11 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_object_then_it_should_be_correct()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             var property = schema.Properties["Reference"];
             Assert.True(property.IsNullable(SchemaType.JsonSchema));
             Assert.Contains(schema.Definitions, d => d.Key == "MySubtype");
@@ -155,11 +155,11 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_enum_then_enum_array_must_be_set()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>(new NewtonsoftJsonSchemaGeneratorSettings());
             var property = schema.Properties["Color"];
 
-            //// Assert
+            // Assert
             Assert.Equal(3, property.ActualTypeSchema.Enumeration.Count); // Color property has StringEnumConverter
             Assert.True(property.ActualTypeSchema.Enumeration.Contains("Red"));
             Assert.True(property.ActualTypeSchema.Enumeration.Contains("Green"));
@@ -174,16 +174,16 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_type_is_JObject_then_generated_type_is_any()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithJObjectProperty>();
             var schemaData = schema.ToJson();
             var property = schema.Properties["Property"];
 
-            //// Assert
+            // Assert
             Assert.True(property.IsNullable(SchemaType.JsonSchema));
             Assert.True(property.ActualTypeSchema.IsAnyType);
             Assert.True(property.ActualTypeSchema.AllowAdditionalItems);
-            Assert.Equal(0, property.Properties.Count);
+            Assert.Empty(property.Properties);
         }
 
         [Fact]
@@ -206,10 +206,10 @@ namespace NJsonSchema.Tests.Conversion
 
         private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
-            //// Assert
+            // Assert
             var property = schema.Properties[propertyName];
 
             Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, property.Type);

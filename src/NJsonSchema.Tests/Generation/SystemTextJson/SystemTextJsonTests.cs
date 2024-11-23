@@ -26,11 +26,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_property_is_readonly_then_its_in_the_schema()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<HealthCheckResult>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.Contains(@"Name", data);
             Assert.Contains(@"Description", data);
@@ -50,14 +50,14 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_type_is_excluded_then_it_should_not_be_in_the_schema()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<ContainerType1>(new SystemTextJsonSchemaGeneratorSettings
             {
                 ExcludedTypeNames = [typeof(NestedType1).FullName]
             });
             var data = schema.ToJson();
             
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.DoesNotContain(@"NestedType1", data);
             Assert.Contains(@"Property", data);
@@ -79,11 +79,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_type_is_excluded_with_json_schema_ignore_attribute_then_it_should_not_be_in_the_schema()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<ContainerType2>();
             var data = schema.ToJson();
             
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.DoesNotContain(@"NestedType2", data);
             Assert.Contains(@"Property", data);
@@ -92,11 +92,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_property_is_private_and_readonly_then_its_not_in_the_schema()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<HealthCheckResult>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.False(data.Contains("PrivateReadOnlyProperty1"), data);
             Assert.False(data.Contains("PrivateReadOnlyProperty2"), data);
@@ -105,11 +105,11 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public async Task When_property_is_static_readonly_then_its_not_in_the_schema()
         {
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<HealthCheckResult>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.False(data.Contains("PublicReadOnlyStaticProperty"), data);
             Assert.False(data.Contains("PrivateReadOnlyStaticProperty"), data);

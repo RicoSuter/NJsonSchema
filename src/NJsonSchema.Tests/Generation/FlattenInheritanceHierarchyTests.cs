@@ -23,15 +23,15 @@ namespace NJsonSchema.Tests.Generation
 
         public class Schedule
         {
-            int a { get; set; }
+            private int a { get; set; }
 
-            int b { get; set; }
+            private int b { get; set; }
         }
 
         [Fact]
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_properties_are_in_one_schema()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -41,11 +41,11 @@ namespace NJsonSchema.Tests.Generation
                 FlattenInheritanceHierarchy = true
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("Name"));
             Assert.True(schema.Properties.ContainsKey("Class"));
         }
@@ -73,7 +73,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_FlattenInheritanceHierarchy_is_enabled_then_all_interface_properties_are_in_one_schema()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -84,11 +84,11 @@ namespace NJsonSchema.Tests.Generation
                 FlattenInheritanceHierarchy = true
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<IFoo>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(3, schema.Properties.Count);
             Assert.True(schema.Properties.ContainsKey("Foo"));
             Assert.True(schema.Properties.ContainsKey("Bar"));
@@ -107,34 +107,34 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_and_generate_abstract_properties_works()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
                 FlattenInheritanceHierarchy = true
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
         }
 
         [Fact]
         public async Task When_class_inherits_from_dictionary_then_flatten_inheritance_works()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
         }
 
         public class A : B
@@ -156,14 +156,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_JsonSchemaFlattenAttribute_is_used_on_class_then_inherited_classed_are_merged()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings();
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<A>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Definitions.ContainsKey("B"));
             Assert.False(schema.Definitions.ContainsKey("C"));
 
@@ -175,20 +175,20 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true,
             };
 
-            //// Act 
+            // Act 
             var TeacherSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Teacher), settings);
             var TacherData = TeacherSchema.ToJson();
 
             var PersonSchema = NewtonsoftJsonSchemaGenerator.FromType(typeof(Person), settings);
             var PersonData = PersonSchema.ToJson();
 
-            //// Assert
+            // Assert
             // Teacher correct schema
             Assert.True(TeacherSchema.Definitions.ContainsKey("Schedule"));
             Assert.True(TeacherSchema.Properties["Schedule"].Item.HasReference);

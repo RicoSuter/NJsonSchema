@@ -47,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var data = schema.ToJson();
             var json = JsonConvert.SerializeObject(new OneChild());
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
             await VerifyHelper.Verify(code);
         }
@@ -71,14 +71,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -87,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
             await VerifyHelper.Verify(code);
         }
@@ -95,11 +95,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_interface()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface OneChild extends Base", code);
             Assert.Contains("export interface SecondChild extends Base", code);
             Assert.Contains("Child: OneChild | SecondChild;", code);
@@ -119,11 +119,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_class()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
@@ -132,7 +132,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export class OneChild extends Base", code);
             Assert.Contains("export class SecondChild extends Base", code);
             Assert.Contains("child: OneChild | SecondChild;", code);

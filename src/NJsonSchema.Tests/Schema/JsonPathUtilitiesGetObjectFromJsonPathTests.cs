@@ -8,7 +8,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_object_is_in_property_then_path_should_be_built_correctly()
         {
-            //// Arrange
+            // Arrange
             var objectToSearch = new JsonSchema();
             var obj = new
             {
@@ -19,18 +19,18 @@ namespace NJsonSchema.Tests.Schema
                 }
             };
 
-            //// Act
+            // Act
             var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2", typeof(JsonSchema), new DefaultContractResolver());
 
-            //// Assert
+            // Assert
             Assert.Equal(foundObject, objectToSearch);
         }
 
         [Fact]
         public async Task When_object_is_in_list_then_path_should_be_built_correctly()
         {
-            //// Arrange
+            // Arrange
             var objectToSearch = new JsonSchema();
             var obj = new
             {
@@ -45,18 +45,18 @@ namespace NJsonSchema.Tests.Schema
                 }
             };
 
-            //// Act
+            // Act
             var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2", typeof(JsonSchema), new DefaultContractResolver());
 
-            //// Assert
+            // Assert
             Assert.Equal(foundObject, objectToSearch);
         }
 
         [Fact]
         public async Task When_object_is_in_dictionary_then_path_should_be_built_correctly()
         {
-            //// Arrange
+            // Arrange
             var objectToSearch = new JsonSchema();
             var obj = new
             {
@@ -71,32 +71,32 @@ namespace NJsonSchema.Tests.Schema
                 }
             };
 
-            //// Act
+            // Act
             var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3", typeof(JsonSchema), new DefaultContractResolver());
 
-            //// Assert
+            // Assert
             Assert.Equal(foundObject, objectToSearch);
         }
 
         [Fact]
         public async Task When_object_is_root_then_path_should_be_built_correctly()
         {
-            //// Arrange
+            // Arrange
             var objectToSearch = new JsonSchema();
 
-            //// Act
+            // Act
             var resolver = new JsonReferenceResolver(null);
             var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#", typeof(JsonSchema), new DefaultContractResolver());
 
-            //// Assert
+            // Assert
             Assert.Equal(foundObject, objectToSearch);
         }
 
         //[Fact]
         //public async Task When_object_is_in_external_file_then_path_should_be_built_correctly()
         //{
-        //    //// Arrange
+        //    // Arrange
         //    var schemaToReference = new JsonSchema4 {DocumentPath = "some_schema.json"};
         //    var referencingSchema = new JsonSchema4
         //    {
@@ -104,10 +104,10 @@ namespace NJsonSchema.Tests.Schema
         //        Reference = schemaToReference
         //    };
 
-        //    //// Act
+        //    // Act
         //    var result = referencingSchema.ToJson();
 
-        //    //// Assert
+        //    // Assert
         //    Assert.True(result.Contains("some_schema.json#"));
         //}
     }

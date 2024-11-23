@@ -21,7 +21,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_primitive_type_mapping_is_available_for_type_then_it_is_called()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 TypeMappers =
@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Generation
                 }
             });
 
-            //// Assert
+            // Assert
             var json = schema.ToJson();
             var property = schema.Properties["Bar1"].ActualTypeSchema;
 
@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_object_type_mapping_is_available_for_type_then_it_is_called()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 TypeMappers =
@@ -65,7 +65,7 @@ namespace NJsonSchema.Tests.Generation
                 }
             });
 
-            //// Assert
+            // Assert
             var json = schema.ToJson();
 
             var property1 = schema.Properties["Bar1"];
@@ -109,7 +109,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_generic_type_mapper_is_defined_then_it_is_called_and_the_refs_are_correct()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyFoo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 TypeMappers =
@@ -118,7 +118,7 @@ namespace NJsonSchema.Tests.Generation
                 }
             });
 
-            //// Assert
+            // Assert
             var json = schema.ToJson();
             Assert.True(schema.Definitions.ContainsKey("MyBar"));
             Assert.False(schema.Definitions.ContainsKey("MyWrapperOfMyBar"));

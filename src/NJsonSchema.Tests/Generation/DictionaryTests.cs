@@ -25,11 +25,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_dictionary_key_is_enum_then_csharp_has_enum_key()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Mapping"].IsDictionary);
             Assert.True(schema.Properties["Mapping"].DictionaryKey.ActualSchema.IsEnumeration);
 
@@ -43,11 +43,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.JsonSchema));
 
@@ -58,7 +58,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable_Swagger2()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2,
@@ -66,7 +66,7 @@ namespace NJsonSchema.Tests.Generation
             });
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.Swagger2));
 
@@ -77,7 +77,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_value_type_is_nullable_then_json_schema_is_nullable_OpenApi3()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3,
@@ -85,7 +85,7 @@ namespace NJsonSchema.Tests.Generation
             });
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Mapping3"].IsDictionary);
             Assert.True(schema.Properties["Mapping3"].AdditionalPropertiesSchema.IsNullable(SchemaType.OpenApi3));
 

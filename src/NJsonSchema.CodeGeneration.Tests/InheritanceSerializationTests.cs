@@ -64,19 +64,19 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_JsonInheritanceConverter_is_passed_null_it_deserializes_to_null()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var result = JsonConvert.DeserializeObject<SubClass>("null");
 
-            //// Assert
+            // Assert
             Assert.Null(result);
         }
 
         [Fact]
         public async Task When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized()
         {
-            //// Arrange
+            // Arrange
             var container = new Container
             {
                 Animal = new Dog
@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 }
             };
 
-            //// Act
+            // Act
             var json = JsonConvert.SerializeObject(container, Formatting.Indented);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
@@ -99,7 +99,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schemaJson = schema.ToJson();
             var errors = schema.Validate(json);
 
-            //// Assert
+            // Assert
             Assert.True(deserializedContainer.Animal is Dog);
             Assert.True((deserializedContainer.Animal as Dog).SubElements.First() is SubClass1);
             Assert.True((deserializedContainer.Animal as Dog).SubElements[1] is SubClass3);
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_serializer_setting_is_changed_then_converter_uses_correct_settings()
         {
-            //// Arrange
+            // Arrange
             var container = new Container
             {
                 Animal = new Dog
@@ -123,12 +123,12 @@ namespace NJsonSchema.CodeGeneration.Tests
                 }
             };
 
-            //// Act
+            // Act
             var settings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
             var json = JsonConvert.SerializeObject(container, Formatting.Indented, settings);
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
-            //// Assert
+            // Assert
             Assert.Contains("prop3", json);
             Assert.DoesNotContain("Prop3", json);
         }
@@ -156,7 +156,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_dates_are_converted_then_JsonInheritanceConverter_should_inherit_settings()
         {
-            //// Arrange
+            // Arrange
             var offset = new TimeSpan(10, 0, 0);
             var x = new A
             {
@@ -167,12 +167,12 @@ namespace NJsonSchema.CodeGeneration.Tests
                 }
             };
 
-            //// Act
+            // Act
             var settings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.DateTimeOffset };
             var json = JsonConvert.SerializeObject(x, Formatting.Indented, settings);
             var deserialized = JsonConvert.DeserializeObject<A>(json, settings);
 
-            //// Assert
+            // Assert
             Assert.Equal(deserialized.created.Offset, offset);
             Assert.Equal(deserialized.subclass.created.Offset, offset);
         }
@@ -180,34 +180,34 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task JsonInheritanceConverter_is_thread_safe()
         {
-            //// Arrange
+            // Arrange
             var tasks = new List<Task>();
             for (int i = 0; i < 100; i++)
             {
                 tasks.Add(Task.Run(When_JsonInheritanceConverter_is_used_then_inheritance_is_correctly_serialized_and_deserialized));
             }
 
-            //// Act
+            // Act
             await Task.WhenAll([.. tasks]);
 
-            //// Assert
+            // Assert
             // No exceptions
         }
 
         [Fact]
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_field_is_set()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
 
-            //// Act
+            // Act
             var baseSchema = schema.Properties["Animal"].ActualTypeSchema.ActualSchema;
             var discriminator = baseSchema.ActualDiscriminator;
             var property = baseSchema.Properties["discriminator"];
 
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(property);
             Assert.True(property.IsRequired);
             Assert.Equal("discriminator", discriminator);
@@ -216,14 +216,14 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_JsonInheritanceConverter_is_set_then_discriminator_mappings_are_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
-            //// Act
+            // Act
             var baseSchema = schema.Definitions["SubClass"].ActualSchema;
 
-            //// Assert
+            // Assert
             Assert.Equal(3, baseSchema.ActualDiscriminatorObject.Mapping.Count);
             Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass1"));
             Assert.True(baseSchema.ActualDiscriminatorObject.Mapping.ContainsKey("SubClass2"));
@@ -233,14 +233,14 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_CSharp_is_correctly_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("public string Discriminator {", code); // discriminator property is not generated
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code); // attribute is generated
             Assert.Contains("class JsonInheritanceConverter", code); // converter is generated
@@ -249,18 +249,18 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_schema_contains_discriminator_and_inheritance_hierarchy_then_TypeScript_is_correctly_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var json = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class
             });
             var code = generator.GenerateFile("Container");
 
-            //// Assert
+            // Assert
             Assert.Contains("export class Container", code);
             Assert.Contains("export class Animal", code);
             Assert.Contains("export class Dog", code);
@@ -282,20 +282,20 @@ namespace NJsonSchema.CodeGeneration.Tests
 #endif
         public async Task Subtypes_are_serialized_with_correct_discriminator()
         {
-            //// Arrange
+            // Arrange
             var json = await JsonSchema.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
             var data = json.ToJson();
 
             var generator = new CSharpGenerator(json, new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
             var assembly = Compile(code);
             var type = assembly.GetType("foo.Foo") ?? throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
             var bar = JsonConvert.DeserializeObject(@"{""discriminator"":""bar""}", type);
 
-            //// Assert
+            // Assert
             Assert.Contains(@"""bar""", JsonConvert.SerializeObject(bar));
         }
 

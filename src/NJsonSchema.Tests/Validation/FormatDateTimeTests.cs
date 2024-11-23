@@ -9,102 +9,102 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_date_time_incorrect_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.DateTimeExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_date_time_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("2014-12-01 11:00:01");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_format_date_time_with_non_iso8601_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("25/01/2015");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.DateTimeExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_date_time_with_iso8601_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("2015-01-25T15:43:30Z");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_format_date_time_with_iso8601_with_timezone_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("2015-01-25T15:43:30+10:00");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
         
         [Fact]
         public void When_format_date_time_with_iso8601_and_fractional_seconds_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
             var token = new JValue("2015-01-25T15:43:30.1234567Z");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

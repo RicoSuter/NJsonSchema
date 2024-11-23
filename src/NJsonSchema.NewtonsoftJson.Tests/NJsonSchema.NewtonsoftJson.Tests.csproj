@@ -3,8 +3,8 @@
     <PropertyGroup>
         <TargetFrameworks>net8.0;net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <Nullable>disable</Nullable>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
     </PropertyGroup>
 
     <PropertyGroup>

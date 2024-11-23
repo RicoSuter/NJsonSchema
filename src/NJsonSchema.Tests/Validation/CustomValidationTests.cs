@@ -11,7 +11,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_date_time_correct_with_custom_validator_passed_then_no_errors()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Type = JsonObjectType.String,
@@ -20,13 +20,13 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue("2014-12-01 11:00:01:55");
 
-            //// Act
+            // Act
             var settings = new JsonSchemaValidatorSettings();
             settings.AddCustomFormatValidator(new CustomDateTimeFormatValidator());
 
             var errors = schema.Validate(token, settings);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 

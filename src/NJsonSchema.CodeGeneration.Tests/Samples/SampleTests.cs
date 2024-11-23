@@ -73,7 +73,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
         [Fact]
         public async Task When_JSON_contains_DateTime_is_available_then_string_validator_validates_correctly()
         {
-            //// Arrange
+            // Arrange
             var schemaJson = @"{
             ""$schema"": ""http://json-schema.org/draft-04/schema#"",
             ""type"": ""object"",
@@ -95,17 +95,17 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
                 ""PatternDate"":""2012-11-07T00:00:00Z""
             }";
 
-            //// Act
+            // Act
             var errors = schema.Validate(dataJson);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public async Task When_JSON_contains_DateTime_is_available_then_JObject_validator_validates_correctly()
         {
-            //// Arrange
+            // Arrange
             var schemaJson = @"{
             ""$schema"": ""http://json-schema.org/draft-04/schema#"",
             ""type"": ""object"",
@@ -129,10 +129,10 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
 
             var value = data["SimpleDate"].Value<string>(); // not original format
 
-            //// Act
+            // Act
             var errors = schema.Validate(data);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

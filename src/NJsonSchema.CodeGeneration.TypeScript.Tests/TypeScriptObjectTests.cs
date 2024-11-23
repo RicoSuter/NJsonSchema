@@ -10,13 +10,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
+        public void When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("Test: any;", code);
         }
 
@@ -34,13 +34,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_dictionary_value_is_object_then_typescript_uses_any()
+        public void When_dictionary_value_is_object_then_typescript_uses_any()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionaryObjectTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -48,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("Test: { [key: string]: any; };", code);
         }
     }

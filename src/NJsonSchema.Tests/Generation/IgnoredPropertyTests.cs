@@ -19,13 +19,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_field_has_JsonIgnoreAttribute_then_it_is_ignored()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Mno>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("IgnoreMe", json);
         }
 
@@ -41,13 +41,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_field_has_no_DataMemberAttribute_then_it_is_ignored()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Xyz>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("IgnoreMe", json);
         }
 
@@ -73,13 +73,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_indexer_property_has_ignore_attribute_then_it_is_ignored()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(2, schema.Properties.Count);
         }
     }

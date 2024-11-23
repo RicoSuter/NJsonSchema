@@ -7,7 +7,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_string_property_has_maxlength_then_stringlength_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].MaxLength);
             Assert.Equal(50, schema.Properties["value"].ActualSchema.MaxLength);
 
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_string_property_has_minlength_then_stringlength_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -70,7 +70,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].MinLength);
             Assert.Equal(40, schema.Properties["value"].ActualSchema.MinLength);
 
@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_int_property_has_maximum_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -100,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Maximum);
             Assert.Equal(20, schema.Properties["value"].ActualSchema.Maximum);
 
@@ -119,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_int32_property_has_minimum_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -138,7 +138,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -146,7 +146,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
@@ -157,7 +157,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_int64_property_has_minimum_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -176,7 +176,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -184,7 +184,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
@@ -195,7 +195,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_integer_property_has_minimum_and_maximum_that_are_int64_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -214,7 +214,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -222,7 +222,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-10000000000m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(10000000000m, schema.Properties["value"].ActualSchema.Maximum);
@@ -235,7 +235,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_integer_property_has_minimum_and_maximum_with_exclusive_true_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -256,7 +256,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -264,7 +264,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-100000000m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(100000000m, schema.Properties["value"].ActualSchema.Maximum);
@@ -279,7 +279,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_number_property_has_minimum_and_maximum_with_exclusive_true_and_multipleof_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -301,7 +301,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -309,7 +309,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-100000000.5m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(100000000.5m, schema.Properties["value"].ActualSchema.Maximum);
@@ -324,7 +324,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_number_property_has_minimum_and_maximum_that_are_double_then_range_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -343,7 +343,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -351,7 +351,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(-10000000000m, schema.Properties["value"].ActualSchema.Minimum);
             Assert.Equal(10000000000m, schema.Properties["value"].ActualSchema.Maximum);
@@ -364,7 +364,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_string_property_has_pattern_then_regularexpression_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string regularExpression = "[a-zA-Z0-9]{5,56}";
             const string json = @"{
                         'type': 'object',
@@ -383,7 +383,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -391,7 +391,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["value"].Pattern);
             Assert.Equal(regularExpression, schema.Properties["value"].ActualSchema.Pattern);
 
@@ -402,7 +402,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_array_property_has_maxitems_then_maxlength_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -423,7 +423,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -431,7 +431,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Equal(0, schema.Properties["value"].MaxItems);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MaxItems);
 
@@ -442,7 +442,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_array_property_has_minitems_then_minlength_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             const string json = @"{
                 'type': 'object',
                 'required': [ 'value' ],
@@ -463,7 +463,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -472,7 +472,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("Message");
 
-            //// Assert
+            // Assert
             Assert.Equal(0, schema.Properties["value"].MinItems);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MinItems);
 

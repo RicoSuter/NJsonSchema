@@ -16,16 +16,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_property_is_optional_and_GenerateNullableOptionalProperties_is_not_set_then_CSharp_property_is_not_nullable()
+        public void When_property_is_optional_and_GenerateNullableOptionalProperties_is_not_set_then_CSharp_property_is_not_nullable()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -34,22 +34,22 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public int Property { get; set; }", code);
             Assert.Contains("public int Property2 { get; set; }", code);
         }
 
         [Fact]
-        public async Task When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
+        public void When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public int? Property { get; set; }", code);
             Assert.Contains("public int Property2 { get; set; }", code);
         }

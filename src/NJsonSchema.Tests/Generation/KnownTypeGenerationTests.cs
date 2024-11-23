@@ -56,13 +56,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_KnownType_attribute_exists_then_specified_classes_are_also_generated()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(schema.Definitions, s => s.Key == "Teacher");
             Assert.Contains(schema.Definitions, s => s.Key == "SpecialTeacher");
         }
@@ -70,13 +70,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_KnownType_attribute_includes_method_name_then_specified_classes_are_also_generated()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Container>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(schema.Definitions, s => s.Key == "Pen");
             Assert.Contains(schema.Definitions, s => s.Key == "Pencil");
         }

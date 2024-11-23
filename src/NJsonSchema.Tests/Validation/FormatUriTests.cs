@@ -9,34 +9,34 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_uri_incorrect_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Uri;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.UriExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_uri_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Uri;
 
             var token = new JValue("http://rsuter.com");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

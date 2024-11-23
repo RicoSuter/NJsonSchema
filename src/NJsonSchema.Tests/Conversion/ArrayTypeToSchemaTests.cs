@@ -20,7 +20,7 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_type_inheriting_from_dictionary_then_it_should_be_correct()
         {
-            //// Act
+            // Act
             var dict = new DictionarySubType();
             dict.Foo = "abc";
             dict.Add("bar", new List<string> { "a", "b" });
@@ -29,7 +29,7 @@ namespace NJsonSchema.Tests.Conversion
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionarySubType>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Object, schema.ActualTypeSchema.Type);
             Assert.DoesNotContain("Foo", json);
             Assert.DoesNotContain("foo", json);
@@ -87,11 +87,11 @@ namespace NJsonSchema.Tests.Conversion
 
         private async Task When_converting_smth_then_items_must_correctly_be_loaded(string propertyName)
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             var property = schema.Properties[propertyName];
 
             Assert.Equal(JsonObjectType.Array | JsonObjectType.Null, property.Type);

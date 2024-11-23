@@ -76,14 +76,14 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public void SystemTextJson_When_class_has_object_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
-            //// Act
+            // Act
             var schema = JsonSchemaGenerator.FromType<ClassWithObjectExtensionData>(new SystemTextJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
 
-            //// Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            // Assert
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.AllowAdditionalProperties);
             Assert.True(schema.AdditionalPropertiesSchema.ActualSchema.IsAnyType);
         }
@@ -91,14 +91,14 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
         [Fact]
         public void SystemTextJson_When_class_has_JsonElement_Dictionary_with_JsonExtensionDataAttribute_on_property_then_AdditionalProperties_schema_is_set()
         {
-            //// Act
+            // Act
             var schema = JsonSchemaGenerator.FromType<ClassWithJsonElementExtensionData>(new SystemTextJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             });
 
-            //// Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            // Assert
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.AllowAdditionalProperties);
             Assert.True(schema.AdditionalPropertiesSchema.ActualSchema.IsAnyType);
         }
