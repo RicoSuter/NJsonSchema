@@ -9,7 +9,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_is_any_of_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.AnyOf.Add(new JsonSchema
             {
@@ -22,17 +22,17 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(10);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Fact]
         public void When_is_not_any_of_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.AnyOf.Add(new JsonSchema
             {
@@ -45,10 +45,10 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(1.5);
             
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             var error = (ChildSchemaValidationError)errors.First();
             Assert.Equal(ValidationErrorKind.NotAnyOf, error.Kind);
             Assert.Same(schema, error.Schema);
@@ -59,7 +59,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_is_all_of_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.AnyOf.Add(new JsonSchema
             {
@@ -72,17 +72,17 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue("Foo");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Fact]
         public void When_is_not_all_of_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.AllOf.Add(new JsonSchema
             {
@@ -95,10 +95,10 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(5);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.NotAllOf, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_is_one_of_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.OneOf.Add(new JsonSchema
             {
@@ -119,17 +119,17 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(10);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Fact]
         public void When_is_not_one_of_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.OneOf.Add(new JsonSchema
             {
@@ -142,10 +142,10 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(5);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.NotOneOf, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -153,7 +153,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_one_of_matches_multiple_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.OneOf.Add(new JsonSchema
             {
@@ -170,10 +170,10 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(5);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.NotOneOf, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -181,7 +181,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_matches_excluded_schema_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Not = new JsonSchema
             {
@@ -190,10 +190,10 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue("Foo");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.ExcludedSchemaValidates, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -201,7 +201,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_not_matches_excluded_schema_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Not = new JsonSchema
             {
@@ -210,11 +210,11 @@ namespace NJsonSchema.Tests.Validation
 
             var token = new JValue(5);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
     }
 }

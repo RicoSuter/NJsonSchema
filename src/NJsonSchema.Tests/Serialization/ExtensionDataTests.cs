@@ -10,14 +10,14 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public async Task When_definition_entry_is_null_then_it_is_deserialized_correctly()
         {
-            //// Arrange
+            // Arrange
             var json = @"{ ""definitions"": { ""abc"": null } }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.False(schema.Definitions.ContainsKey("abc"));
             Assert.DoesNotContain("abc", json2);
         }
@@ -25,17 +25,17 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public void When_schema_has_extension_data_property_then_property_is_in_serialized_json()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.ExtensionData = new Dictionary<string, object>
             {
                 { "Test", 123 }
             };
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(@"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""Test"": 123
@@ -45,33 +45,33 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public async Task When_json_schema_contains_unknown_data_then_extension_data_is_filled()
         {
-            //// Arrange
+            // Arrange
             var json =
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""Test"": 123
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Assert
+            // Assert
             Assert.Equal((long)123, schema.ExtensionData["Test"]);
         }
 
         [Fact]
         public async Task When_no_extension_data_is_available_then_property_is_null()
         {
-            //// Arrange
+            // Arrange
             var json =
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Assert
+            // Assert
             Assert.Null(schema.ExtensionData);
         }
 
@@ -86,26 +86,26 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public async Task When_extension_data_attribute_is_used_on_class_then_extension_data_property_is_set()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
-            //// Assert
+            // Assert
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
         }
 
         [Fact]
         public async Task When_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTest>();
 
-            //// Assert
+            // Assert
             Assert.Equal(2, schema.Properties["Property"].ExtensionData["Foo"]);
             Assert.Equal(3, schema.Properties["Property"].ExtensionData["Bar"]);
         }
@@ -143,10 +143,10 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public async Task When_extension_data_interface_is_used_on_property_then_extension_data_property_is_set()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyCustomAttributeTest>();
 
-            //// Assert
+            // Assert
             Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
             Assert.Equal("My custom logic", schema.Properties["Property"].ExtensionData["My custom key"]);
         }
@@ -154,7 +154,7 @@ namespace NJsonSchema.Tests.Serialization
         [Fact]
         public async Task When_reference_references_schema_in_custom_properties_then_the_references_are_resolved()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
@@ -205,11 +205,11 @@ namespace NJsonSchema.Tests.Serialization
   }
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var json2 = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(json.Replace("\r", string.Empty), json2.Replace("\r", string.Empty));
         }
     }

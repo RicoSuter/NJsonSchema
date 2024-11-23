@@ -25,26 +25,26 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_generating_schema_with_object_property_then_additional_properties_are_not_allowed()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.False(schema.Properties["Bar"].ActualTypeSchema.AllowAdditionalProperties);
         }
 
         [Fact]
         public async Task When_generating_DateTimeOffset_property_then_format_datetime_must_be_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.String, schema.Properties["Time"].Type);
             Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["Time"].Format);
         }
@@ -52,13 +52,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_generating_schema_with_dictionary_property_then_it_must_allow_additional_properties()
         {
-            //// Arrange
+            // Arrange
             
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Dictionary"].ActualSchema.AllowAdditionalProperties);
             Assert.Equal(JsonObjectType.String, schema.Properties["Dictionary"].ActualSchema.AdditionalPropertiesSchema.ActualSchema.Type);
             // "#/definitions/ref_7de8187d_d860_41fa_a17b_3f395c053cae"
@@ -67,13 +67,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains("#/definitions/Bar", schemaData);
         }
 
@@ -118,7 +118,7 @@ namespace NJsonSchema.Tests.Generation
             var errors = schema.Validate(data);
 
             // Assert
-            Assert.Equal(0, errors.Count);
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.ActualProperties.ContainsKey("Bar"));
         }
         
@@ -198,12 +198,12 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.ActualProperties.ContainsKey("MyField"));
         }
         
         [DataContract]
-        class ClassWithPrivateDataMember2
+        private class ClassWithPrivateDataMember2
         {
 #pragma warning disable CS0169
             [DataMember(Name = nameof(MyField))] 
@@ -223,13 +223,13 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.ActualProperties.ContainsKey("MyField"));
             Assert.Equal(JsonObjectType.Integer, schema.Properties["MyField"].Type);
         }
         
         [DataContract]
-        class ClassWithPrivateDataMember3
+        private class ClassWithPrivateDataMember3
         {
             [DataMember]
             private string MyField { get; set; }
@@ -243,7 +243,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.ActualProperties.ContainsKey("MyField"));
         }
 

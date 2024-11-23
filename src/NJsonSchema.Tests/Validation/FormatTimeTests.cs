@@ -13,85 +13,85 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_time_incorrect_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("10 am");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.TimeExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_time_positive_offset_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("14:30:00+02:00");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_format_time_has_negative_offset_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("14:30:00-02:00");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_format_time_is_utc_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("14:30:00Z");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_format_time_secfrac_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("14:30:00.1234567+02:00");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
@@ -102,17 +102,17 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_time_is_not_utc_or_offset_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
             var token = new JValue("14:30:00");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

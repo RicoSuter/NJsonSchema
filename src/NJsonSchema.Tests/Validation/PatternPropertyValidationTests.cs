@@ -9,7 +9,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_there_are_no_properties_matching_pattern_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
@@ -19,10 +19,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add("123", new JObject());
             token.Add("qwe123", new JObject());
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(2, errors.Count());
             foreach (var validationError in errors)
             {
@@ -33,7 +33,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_there_are_properties_matching_pattern_but_types_doesnt_match_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
@@ -43,10 +43,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add("qwerty", new JArray());
             token.Add("wsad", new JValue("test"));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(2, errors.Count());
             Assert.True(errors.All(error => error.Kind == ValidationErrorKind.AdditionalPropertiesNotValid));
         }
@@ -54,7 +54,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_there_are_properties_matching_pattern_and_types_matches_then_validation_succeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.AllowAdditionalProperties = false;
@@ -64,10 +64,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add("qwerty", new JObject());
             token.Add("wsad", new JObject());
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
         

@@ -3,9 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
-        <NoWarn>$(NoWarn),1587,1998,1591,618,SYSLIB0012</NoWarn>
         <Nullable>disable</Nullable>
-        <EnableNETAnalyzers>false</EnableNETAnalyzers>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

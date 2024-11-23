@@ -92,7 +92,7 @@ namespace NJsonSchema.Tests.Generation
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<WithoutXmlAttributesDefined>(new NewtonsoftJsonSchemaGeneratorSettings() { GenerateXmlObjects = true });
             
-            //// Assert
+            // Assert
             AssertTypeWithoutXmlAttributes(schema);
         }
 
@@ -156,7 +156,7 @@ namespace NJsonSchema.Tests.Generation
             var schemaData = schema.ToJson();
             var schemaObject = JObject.Parse(schemaData);
 
-            //// Assert
+            // Assert
             var propertyXml = schemaObject["xml"];
             Assert.Equal("ArrayOfWithoutXmlAttributesDefined", propertyXml["name"]);
             Assert.True(propertyXml["wrapped"].Value<bool>());
@@ -328,7 +328,7 @@ namespace NJsonSchema.Tests.Generation
                 GenerateXmlObjects = true
             });
             
-            //// Assert
+            // Assert
             AssertTypeWithXmlAttributes(schema, schema);
         }
 
@@ -488,7 +488,7 @@ namespace NJsonSchema.Tests.Generation
                 GenerateXmlObjects = true
             });
 
-            //// Assert
+            // Assert
             var fooProperty = schema.Properties["Foo"];
 
             Assert.Null(fooProperty.Xml);

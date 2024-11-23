@@ -5,7 +5,7 @@
         [Fact]
         public void When_class_order_is_wrong_then_classes_are_correctly_reordered()
         {
-            //// Arrange
+            // Arrange
             var classes = new List<CodeArtifact>
             {
                 new CodeArtifact("Car", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, ""),
@@ -16,11 +16,11 @@
                 new CodeArtifact("Person", CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Undefined, "")
             };
 
-            //// Act
+            // Act
             classes = classes.OrderByBaseDependency().ToList();
             var order = string.Join(", ", classes.Select(c => c.TypeName));
 
-            //// Assert
+            // Assert
             Assert.Equal("Car, Fruit, Apple, Person, Teacher, Professor", order);
         }
     }

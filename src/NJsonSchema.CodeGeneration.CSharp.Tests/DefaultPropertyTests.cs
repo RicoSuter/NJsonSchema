@@ -89,7 +89,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
               }
             }");
 
-            //// Act
+            // Act
             var settings = new CSharpGeneratorSettings
             {
                 GenerateDefaultValues = true
@@ -117,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
               }
             }");
 
-            //// Act
+            // Act
             var settings = new CSharpGeneratorSettings
             {
                 GenerateDefaultValues = true

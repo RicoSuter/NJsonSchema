@@ -9,20 +9,20 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_json_is_array_then_validate_should_not_throw_an_exception()
         {
-            //// Act
+            // Act
             var svc = await JsonSchema.FromJsonAsync(@"{ ""type"": ""array"", ""items"": { ""type"":""string"" } }");
 
-            //// Assert
-            Assert.Equal(0, svc.Validate(JToken.Parse("[]")).Count);
-            Assert.Equal(0, svc.Validate(JToken.Parse(@"[""test""]")).Count);
-            Assert.Equal(0, svc.Validate("[]").Count);
-            Assert.Equal(0, svc.Validate(@"[""test""]").Count);
+            // Assert
+            Assert.Empty(svc.Validate(JToken.Parse("[]")));
+            Assert.Empty(svc.Validate(JToken.Parse(@"[""test""]")));
+            Assert.Empty(svc.Validate("[]"));
+            Assert.Empty(svc.Validate(@"[""test""]"));
         }
 
         [Fact]
         public async Task When_type_is_array_and_items_and_item_is_not_defined_then_any_items_are_allowed()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
                 'properties': {
                     'emptySchema': { 'type': 'array' }
@@ -30,28 +30,28 @@ namespace NJsonSchema.Tests.Validation
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var errors1 = schema.Validate("{ 'emptySchema': [1, 2, 'abc'] }");
             var errors2 = schema.Validate("{ 'emptySchema': 123 }");
 
-            //// Assert
-            Assert.Equal(0, errors1.Count);
-            Assert.Equal(1, errors2.Count);
+            // Assert
+            Assert.Empty(errors1);
+            Assert.Single(errors2);
         }
 
         [Fact]
         public void When_token_is_not_array_then_validation_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
 
             var token = new JValue(10);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.ArrayExpected, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
         }
@@ -59,7 +59,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_tuple_correct_then_it_should_pass()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.Items.Add(new JsonSchema { Type = JsonObjectType.String });
@@ -69,17 +69,17 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue("Foo"));
             token.Add(new JValue(5));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_tuple_too_large_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.Items.Add(new JsonSchema { Type = JsonObjectType.String });
@@ -91,10 +91,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue(5));
             token.Add(new JValue(5));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooManyItemsInTuple, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
@@ -103,7 +103,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_array_item_are_valid_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.Item = new JsonSchema();
@@ -113,17 +113,17 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue("Foo"));
             token.Add(new JValue("Bar"));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_second_item_validation_fails_then_path_should_be_correct()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.Item = new JsonSchema();
@@ -133,10 +133,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue("Foo"));
             token.Add(new JValue(10));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.ArrayItemNotValid, errors.First().Kind);
 
@@ -150,7 +150,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_max_item_does_not_match_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.MaxItems = 1;
@@ -161,10 +161,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue("Foo"));
             token.Add(new JValue("Bar"));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooManyItems, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
@@ -173,7 +173,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_min_items_does_not_match_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.MinItems = 2;
@@ -183,10 +183,10 @@ namespace NJsonSchema.Tests.Validation
             var token = new JArray();
             token.Add(new JValue("Foo"));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.TooFewItems, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
@@ -195,7 +195,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_unique_items_does_not_match_then_it_should_fail()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
             schema.UniqueItems = true;
@@ -206,10 +206,10 @@ namespace NJsonSchema.Tests.Validation
             token.Add(new JValue("Foo"));
             token.Add(new JValue("Foo"));
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
@@ -218,7 +218,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_null_is_allowed_then_properties_are_not_checked()
         {
-            //// Arrange
+            // Arrange
             var schemaJson = @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""type"": ""array"",
@@ -233,11 +233,11 @@ namespace NJsonSchema.Tests.Validation
 }";
             var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
-            //// Act
+            // Act
             var errors = schema.Validate("[{\"value\":2},null]");
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
     }
 }

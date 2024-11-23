@@ -9,34 +9,34 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_time_span_incorrect_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.TimeSpan;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.TimeSpanExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_time_span_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.TimeSpan;
 
             var token = new JValue("1:30:45");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

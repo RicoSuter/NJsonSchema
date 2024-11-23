@@ -23,7 +23,7 @@ namespace NJsonSchema.Tests.Generation
 
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("firstName"));
             Assert.Equal("firstName", schema.Properties["firstName"].Name);
 
@@ -65,7 +65,7 @@ namespace NJsonSchema.Tests.Generation
                 return contract;
             }
 
-            static HashSet<string> _systemConverters =
+            private static HashSet<string> _systemConverters =
             [
                 ..new[]
                 {
@@ -121,13 +121,13 @@ namespace NJsonSchema.Tests.Generation
             public override string ToString() => StringValue;
         }
 
-        interface IStringConvertable
+        private interface IStringConvertable
         {
             string StringValue { get; set; }
             string ToString();
         }
 
-        class StringConverter<T> : TypeConverter where T : IStringConvertable, new()
+        private sealed class StringConverter<T> : TypeConverter where T : IStringConvertable, new()
         {
             public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
                 => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);

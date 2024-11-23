@@ -37,7 +37,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyController>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ContainerWithEnumDictionary>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
@@ -110,7 +110,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -137,7 +137,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithoutFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =

@@ -14,13 +14,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_array_property_is_required_then_array_instance_can_be_changed()
+        public void When_array_property_is_required_then_array_instance_can_be_changed()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ArrayTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public Foo<string> ArrayProperty { get; set; } = new Bar<string>();", code);
         }
 
@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_array_item_is_nullable_then_generated_CSharp_is_correct()
+        public void When_array_item_is_nullable_then_generated_CSharp_is_correct()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithNullableArrayItems>();

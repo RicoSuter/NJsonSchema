@@ -22,13 +22,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_inherits_from_IEnumerable_then_it_should_become_a_json_array_type()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Smth>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Array, schema.Type);
             Assert.Equal(JsonObjectType.String, schema.Item.Type);
         }
@@ -41,13 +41,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_open_generic_type_is_generated_then_no_exception_is_thrown()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType(typeof(A<>));
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(json);
         }
     }

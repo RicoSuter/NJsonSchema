@@ -50,13 +50,13 @@ var x = 10;";
         [Fact]
         public void When_extension_code_is_processed_then_code_and_classes_are_correctly_detected_and_converted()
         {
-            //// Arrange
+            // Arrange
             var code = Code;
 
-            //// Act
+            // Act
             var extensionCode = new TypeScriptExtensionCode(code, ["Foo", "Bar"], ["BaseClass"]);
 
-            //// Assert
+            // Assert
             Assert.True(extensionCode.ExtensionClasses.ContainsKey("Foo"));
             Assert.StartsWith("export class Foo extends Foo {", extensionCode.ExtensionClasses["Foo"]);
 
@@ -92,12 +92,12 @@ var x = 10;";
         }
 
         [Fact]
-        public async Task When_classes_have_extension_code_then_class_body_is_copied()
+        public void When_classes_have_extension_code_then_class_body_is_copied()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 ExtendedClasses = ["Foo", "Bar"],
@@ -105,7 +105,7 @@ var x = 10;";
             });
             var code = generator.GenerateFile();
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("FooBase", code);
             Assert.DoesNotContain("BarBase", code);
             Assert.DoesNotContain("generated.", code);
@@ -117,7 +117,7 @@ var x = 10;";
         [Fact]
         public void When_extension_code_has_comment_then_it_is_processed_correctly()
         {
-            //// Arrange
+            // Arrange
             var code = @"// This is the class that uses HTTP
 
 export class UseHttpCookiesForApi {
@@ -127,10 +127,10 @@ export class UseHttpCookiesForApi {
     }
 }";
 
-            //// Act
+            // Act
             var extensionCode = new TypeScriptExtensionCode(code, [], ["UseHttpCookiesForApi"]);
 
-            //// Assert
+            // Assert
             Assert.Empty(extensionCode.ExtensionClasses);
             Assert.DoesNotContain("UseHttpCookiesForApi", extensionCode.BottomCode);
             Assert.Contains("UseHttpCookiesForApi", extensionCode.TopCode);

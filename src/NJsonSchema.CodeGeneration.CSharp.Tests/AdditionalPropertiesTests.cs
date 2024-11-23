@@ -10,7 +10,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered()
         {
-            //// Arrange
+            // Arrange
             var json =
 @"{ 
     ""properties"": {
@@ -33,11 +33,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
             var code = generator.GenerateFile("Person");
 
-            //// Assert
+            // Assert
             Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
             Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
@@ -46,7 +46,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_using_SystemTextJson_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{ 
     ""properties"": {
@@ -69,14 +69,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings()
             {
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson
             });
             var code = generator.GenerateFile("Person");
 
-            //// Assert
+            // Assert
             Assert.Contains("[System.Text.Json.Serialization.JsonExtensionData]", code);
             Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
             Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
@@ -128,14 +128,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings()
             {
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson
             });
             var code = generator.GenerateFile("Person");
 
-            //// Assert
+            // Assert
             var matches = Regex.Matches(code, @"(\[System\.Text\.Json\.Serialization\.JsonExtensionData\])");
             
             // There are two matches, the Person class and the Pet class
@@ -204,7 +204,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings()
             {
                 JsonLibrary = CSharpJsonLibrary.SystemTextJson
@@ -212,7 +212,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             
             var code = generator.GenerateFile("SommeDummyClass");
 
-            //// Assert
+            // Assert
             var matches = Regex.Matches(code, @"(\[System\.Text\.Json\.Serialization\.JsonExtensionData\])");
             
             // There are two matches, the SommeDummyClass class and the Animal class

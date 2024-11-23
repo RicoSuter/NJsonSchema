@@ -12,7 +12,7 @@ namespace NJsonSchema.Tests.References
         [Fact]
         public async Task When_definitions_is_nested_then_refs_work()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
 	""type"": ""object"", 
 	""properties"": {
@@ -29,41 +29,41 @@ namespace NJsonSchema.Tests.References
 	}
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var j = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
         }
 
         [Fact]
         public async Task When_schema_references_collection_in_definitions_it_works()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_collection_reference.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
-            Assert.Equal(1, schema.Definitions.Count);
+            Assert.Single(schema.Definitions);
             Assert.Equal("./collection.json", schema.Definitions["collection"].DocumentPath);
         }
 
         [Fact]
         public async Task When_schema_references_external_schema_then_it_is_inlined_with_ToJson()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_reference.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Definitions.ContainsKey("Animal"));
             Assert.Contains("\"$ref\": \"#/definitions/Animal\"", json);
         }
@@ -71,37 +71,37 @@ namespace NJsonSchema.Tests.References
         [Fact]
         public async Task When_document_has_indirect_external_ref_than_it_is_loaded()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_reference.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
-            Assert.Equal(1, schema.Definitions.Count);
+            // Assert
+            Assert.Single(schema.Definitions);
             Assert.Equal("FooAnimal", schema.Definitions.Single().Key);
         }
 
         [Fact]
         public async Task When_document_has_indirect_external_ref_to_a_definition_than_it_is_loaded()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/LocalReferencesTests/schema_with_indirect_subreference.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
-            Assert.Equal(1, schema.Definitions.Count);
+            // Assert
+            Assert.Single(schema.Definitions);
             Assert.Equal("SubAnimal", schema.Definitions.Single().Key);
         }
 
         [Fact]
         public async Task When_reference_is_registered_in_custom_resolver_it_should_not_try_to_access_file()
         {
-            //// Arrange
+            // Arrange
             var externalSchema = await JsonSchema.FromJsonAsync(
             @"{
                 ""type"": ""object"", 
@@ -131,10 +131,10 @@ namespace NJsonSchema.Tests.References
                 }
             }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(schemaJson, ".", factory);
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema);
         }
 
@@ -143,7 +143,7 @@ namespace NJsonSchema.Tests.References
         [InlineData("b#r")] // Non-escaped ill-formed JSON Pointer
         public async Task When_definitions_have_sharp_in_type_name(string referenceTypeName)
         {
-            //// Arrange
+            // Arrange
             var json = $@"{{
 	""type"": ""object"", 
 	""properties"": {{
@@ -158,25 +158,25 @@ namespace NJsonSchema.Tests.References
 	}}
 }}";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var j = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
         }
 
         [Fact]
         public async Task When_schema_references_external_schema_placed_in_directory_with_sharp_in_name()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/LocalReferencesTests/dir_with_#/first.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.ActualTypeSchema.Type);
         }
 

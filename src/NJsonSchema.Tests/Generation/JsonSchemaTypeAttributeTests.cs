@@ -20,14 +20,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_type_of_primitive_properties_are_changed_then_the_schemas_are_correct()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassPrimitiveJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
             Assert.True(schema.Properties["Bar"].Type.HasFlag(JsonObjectType.Integer));
             Assert.False(schema.Properties["Bar"].HasReference);
@@ -51,14 +51,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_type_of_array_properties_are_changed_then_the_schemas_are_correct()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassArrayJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
             Assert.True(schema.Properties["Bar"].Type.HasFlag(JsonObjectType.Array));
             Assert.False(schema.Properties["Bar"].HasReference);
@@ -89,14 +89,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_type_of_complex_properties_are_changed_then_the_schemas_are_correct()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassComplexJsonSchemaTypeAttributes>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Bar"].IsNullable(SchemaType.JsonSchema));
             Assert.False(schema.Properties["Baz"].ActualTypeSchema.IsNullable(SchemaType.JsonSchema));
             Assert.True(schema.Properties["Bar"].ActualTypeSchema.Type.HasFlag(JsonObjectType.Object));
@@ -124,14 +124,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_JsonSchemaTypeAttribute_is_on_class_then_property_defines_nullability()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithReference>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties["Abc"].IsNullable(SchemaType.JsonSchema));
             Assert.False(schema.Properties["Def"].IsNullable(SchemaType.JsonSchema));
 

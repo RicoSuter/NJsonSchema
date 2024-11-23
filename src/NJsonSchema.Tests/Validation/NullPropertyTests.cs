@@ -8,7 +8,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_property_can_be_null_then_null_is_allowed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Properties["test"] = new JsonSchemaProperty
             {
@@ -19,12 +19,12 @@ namespace NJsonSchema.Tests.Validation
                 Type = JsonObjectType.String
             };
 
-            //// Act
+            // Act
             var data = "{ 'test': null }";
             var errors = schema.Validate(data);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         public class NullablePropertyClass<T>
@@ -43,18 +43,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_object_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<QueryRule>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -63,18 +63,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_number_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<int?>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -83,18 +83,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_string_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<string>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -103,18 +103,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_boolean_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<bool?>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -123,18 +123,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_array_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<int[]>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Theory]
@@ -143,18 +143,18 @@ namespace NJsonSchema.Tests.Validation
         [InlineData(SchemaType.Swagger2)]
         public async Task When_enum_property_can_be_null_then_null_is_allowed(SchemaType schemaType)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<NullablePropertyClass<AttributeTargets?>>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = schemaType
             });
 
-            //// Act
+            // Act
             var data = "{ 'Value': null }";
             var errors = schema.Validate(data, schemaType);
 
-            //// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
     }
 }
