@@ -10,6 +10,7 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
@@ -128,18 +129,11 @@ partial class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            var framework = "";
-            if (!IsRunningOnWindows)
-            {
-                framework = "net8.0";
-            }
-
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
                 .EnableNoRestore()
                 .EnableNoBuild()
-                .SetFramework(framework)
                 .When(GitHubActions.Instance is not null, x => x.SetLoggers("GitHubActions"))
             );
         });
