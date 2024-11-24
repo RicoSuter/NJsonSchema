@@ -50,9 +50,8 @@ namespace NJsonSchema.Generation
                 }
 
                 var propertyIgnored = false;
-                var jsonIgnoreAttribute = accessorInfo
-                    .GetAttributes(true)
-                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
+                var attributes = accessorInfo.GetAttributes(true).ToArray();
+                var jsonIgnoreAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
 
                 if (jsonIgnoreAttribute != null)
                 {
@@ -65,9 +64,8 @@ namespace NJsonSchema.Generation
 
                 var ignored = propertyIgnored
                     || schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo)
-                    || accessorInfo.GetAttributes(true)
-                        .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null
-                    || settings.ExcludedTypeNames.Contains(accessorInfo.AccessorType.Type.FullName);
+                    || attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null
+                    || Array.IndexOf(settings.ExcludedTypeNames, accessorInfo.AccessorType.Type.FullName) != -1;
 
                 if (!ignored)
                 {
@@ -87,9 +85,7 @@ namespace NJsonSchema.Generation
                         }
                     }
 
-                    var requiredAttribute = accessorInfo
-                        .GetAttributes(true)
-                        .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                    var requiredAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                     var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
