@@ -104,12 +104,14 @@ namespace NJsonSchema
                 }
 
                 var count = 1;
+                string typeName;
                 do
                 {
                     count++;
-                } while (reservedTypeNames.Contains(typeNameHint + count));
+                    typeName = ConversionUtilities.ConvertToUpperCamelCase(typeNameHint + count, true);
+                } while (reservedTypeNames.Contains(typeName));
 
-                return typeNameHint + count;
+                return typeName;
             }
 
             return GenerateAnonymousTypeName("Anonymous", reservedTypeNames);
