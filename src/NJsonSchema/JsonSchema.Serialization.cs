@@ -122,11 +122,11 @@ namespace NJsonSchema
             {
                 if (value is string)
                 {
-                    Discriminator = (string)value;
+                    Discriminator = (string) value;
                 }
                 else if (value != null)
                 {
-                    DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
+                    DiscriminatorObject = ((JObject) value).ToObject<OpenApiDiscriminator>();
                 }
             }
         }
@@ -139,12 +139,12 @@ namespace NJsonSchema
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object? ExclusiveMaximumRaw
         {
-            get => ExclusiveMaximum ?? (IsExclusiveMaximum ? (object)true : null);
+            get => ExclusiveMaximum ?? (IsExclusiveMaximum ? (object) true : null);
             set
             {
                 if (value is bool)
                 {
-                    IsExclusiveMaximum = (bool)value;
+                    IsExclusiveMaximum = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -161,12 +161,12 @@ namespace NJsonSchema
         [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object? ExclusiveMinimumRaw
         {
-            get => ExclusiveMinimum ?? (IsExclusiveMinimum ? (object)true : null);
+            get => ExclusiveMinimum ?? (IsExclusiveMinimum ? (object) true : null);
             set
             {
                 if (value is bool)
                 {
-                    IsExclusiveMinimum = (bool)value;
+                    IsExclusiveMinimum = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -200,7 +200,7 @@ namespace NJsonSchema
             {
                 if (value is bool)
                 {
-                    AllowAdditionalItems = (bool)value;
+                    AllowAdditionalItems = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -254,7 +254,7 @@ namespace NJsonSchema
             {
                 if (value is bool)
                 {
-                    AllowAdditionalProperties = (bool)value;
+                    AllowAdditionalProperties = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -288,7 +288,7 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                 {
-                    Items = new ObservableCollection<JsonSchema>(((JArray)value).Select(FromJsonWithCurrentSettings));
+                    Items = new ObservableCollection<JsonSchema>(((JArray) value).Select(FromJsonWithCurrentSettings));
                 }
                 else if (value != null)
                 {
@@ -315,7 +315,7 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                 {
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
+                    Type = ((JArray) value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
                 }
                 else
                 {
@@ -367,8 +367,8 @@ namespace NJsonSchema
         internal IDictionary<string, JsonSchemaProperty>? PatternPropertiesRaw
         {
             get => _patternProperties is { Count: > 0 }
-                    ? PatternProperties.ToDictionary(p => p.Key, p => p.Value)
-                    : null;
+                ? PatternProperties.ToDictionary(p => p.Key, p => p.Value)
+                : null;
             set => PatternProperties = value != null ? new ObservableDictionary<string, JsonSchemaProperty>(value!) : [];
         }
 
@@ -460,7 +460,7 @@ namespace NJsonSchema
 
         private void InitializeSchemaCollection(object? sender, NotifyCollectionChangedEventArgs? args)
         {
-            if (sender is ObservableDictionary<string, JsonSchemaProperty> properties)
+            if (sender is ObservableDictionary<string, JsonSchemaProperty> { Count: > 0 } properties)
             {
                 foreach (var property in properties)
                 {
@@ -468,24 +468,35 @@ namespace NJsonSchema
                     property.Value.Parent = this;
                 }
             }
-            else if (sender is ObservableCollection<JsonSchema> items)
+            else if (sender is ObservableCollection<JsonSchema> { Count: > 0 } items)
             {
                 foreach (var item in items)
                 {
                     item.Parent = this;
                 }
             }
-            else if (sender is ObservableDictionary<string, JsonSchema> collection)
+            else if (sender is ObservableDictionary<string, JsonSchema> { Count: > 0 } collection)
             {
-                foreach (var pair in collection.ToArray())
+                List<string>? keysToRemove = null;
+                foreach (var pair in collection)
                 {
                     if (pair.Value == null)
                     {
-                        collection.Remove(pair.Key);
+                        keysToRemove ??= [];
+                        keysToRemove.Add(pair.Key);
                     }
                     else
                     {
                         pair.Value.Parent = this;
+                    }
+                }
+
+                if (keysToRemove != null)
+                {
+                    for (var i = 0; i < keysToRemove.Count; i++)
+                    {
+                        var key = keysToRemove[i];
+                        collection.Remove(key);
                     }
                 }
             }
