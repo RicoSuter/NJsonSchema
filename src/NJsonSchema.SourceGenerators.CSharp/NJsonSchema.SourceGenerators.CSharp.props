@@ -1,0 +1,11 @@
+<Project>
+    <ItemGroup>
+        <CompilerVisibleProperty Include="NJsonSchema_GenerateOptionalPropertiesAsNullable" />
+	    <CompilerVisibleProperty Include="NJsonSchema_Namespace" />
+		
+	    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="NJsonSchema_GenerateOptionalPropertiesAsNullable" />
+	    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="NJsonSchema_Namespace" />
+	    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="NJsonSchema_TypeNameHint" />
+	    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="NJsonSchema_FileName" />
+    </ItemGroup>
+</Project>

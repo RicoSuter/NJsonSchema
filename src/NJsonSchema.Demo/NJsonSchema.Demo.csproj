@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../NJsonSchema.SourceGenerators.CSharp/NJsonSchema.SourceGenerators.CSharp.props" />
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -10,14 +11,26 @@
         <Nullable>disable</Nullable>
         <NoWarn>$(NoWarn);CS1591;IDE0005</NoWarn>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <ProjectReference Include="..\NJsonSchema.Benchmark\NJsonSchema.Benchmark.csproj" />
         <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+        <ProjectReference Include="..\NJsonSchema.SourceGenerators.CSharp\NJsonSchema.SourceGenerators.CSharp.csproj"
+                          ReferenceOutputAssembly="false"
+                          OutputItemType="Analyzer" />
     </ItemGroup>
 
     <ItemGroup>
         <None Update="Tests\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles 
+            Include="schema.json" 
+            NJsonSchema_GenerateOptionalPropertiesAsNullable="true" 
+            NJsonSchema_Namespace="NJsonSchema.Demo.Generated" 
+            NJsonSchema_TypeNameHint="PersonGenerated" 
+            NJsonSchema_FileName="Person.g.cs" />
     </ItemGroup>
 
 </Project>

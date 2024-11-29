@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="NJsonSchema.SourceGenerators.CSharp.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <NoWarn>$(NoWarn);1701;1702;NU5128</NoWarn>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" PrivateAssets="All">
+        <SetTargetFramework>TargetFramework=netstandard2.0</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" GeneratePathProperty="true" />
+    <PackageReference Include="Namotion.Reflection" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Fluid.Core" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Parlot" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="System.Text.Encodings.Web" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" GeneratePathProperty="true" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NJsonSchema.SourceGenerators.CSharp.nuspec" />
+
+    <None Include="$(PkgFluid_Core)\lib\netstandard2.0\Fluid.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgNamotion_Reflection)\lib\netstandard2.0\Namotion.Reflection.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgMicrosoft_Extensions_FileProviders_Abstractions)\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgParlot)\lib\netstandard2.0\Parlot.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\NJsonSchema.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\NJsonSchema.Annotations.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\NJsonSchema.CodeGeneration.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />    
+    <None Include="$(OutputPath)\NJsonSchema.CodeGeneration.CSharp.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+      
+    <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" Visible="true" />
+    
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GetTargetPathDependsOn>
+        $(GetTargetPathDependsOn);GetDependencyTargetPaths
+    </GetTargetPathDependsOn>
+  </PropertyGroup>
+
+  <Target Name="GetDependencyTargetPaths">
+    <ItemGroup>
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgFluid_Core)\lib\netstandard2.0\Fluid.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgNamotion_Reflection)\lib\netstandard2.0\Namotion.Reflection.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgMicrosoft_Extensions_FileProviders_Abstractions)\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(PkgParlot)\lib\netstandard2.0\Parlot.dll" IncludeRuntimeDependency="false" />
+        
+        <TargetPathWithTargetPlatformMoniker Include="$(OutputPath)\NJsonSchema.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(OutputPath)\NJsonSchema.Annotations.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(OutputPath)\NJsonSchema.CodeGeneration.dll" IncludeRuntimeDependency="false" />
+        <TargetPathWithTargetPlatformMoniker Include="$(OutputPath)\NJsonSchema.CodeGeneration.CSharp.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>
+  </Target>
+
+</Project>
