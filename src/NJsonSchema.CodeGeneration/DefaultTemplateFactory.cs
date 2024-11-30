@@ -168,7 +168,8 @@ namespace NJsonSchema.CodeGeneration
                 try
                 {
                     var templateDirectory = _settings.TemplateDirectory ?? string.Empty;
-                    // use language and template name as key for faster lookup than using the content
+                    // use language, template name and template directory as key for faster lookup than using the content
+                    // template directory as part of key is requred for processing multiple files since files may use different TemplateDirectory for same language
                     var key = (_language, _template, templateDirectory);
                     var template = Templates.GetOrAdd(key, _ =>
                     {
