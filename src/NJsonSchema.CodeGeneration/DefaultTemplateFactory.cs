@@ -94,11 +94,11 @@ namespace NJsonSchema.CodeGeneration
         }
 
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
-        private string GetLiquidTemplate(string language, string template)
+        private string GetLiquidTemplate(string language, string template, string templateDirectory)
         {
-            if (!template.EndsWith('!') && !string.IsNullOrEmpty(_settings.TemplateDirectory))
+            if (!template.EndsWith('!') && !string.IsNullOrEmpty(templateDirectory))
             {
-                var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
+                var templateFilePath = Path.Combine(templateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
                 {
                     return File.ReadAllText(templateFilePath);
@@ -111,7 +111,7 @@ namespace NJsonSchema.CodeGeneration
         private sealed class LiquidTemplate : ITemplate
         {
             internal const string TemplateTagName = "template";
-            private static readonly ConcurrentDictionary<(string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string), IFluidTemplate>();
+            private static readonly ConcurrentDictionary<(string, string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string, string), IFluidTemplate>();
 
             static LiquidTemplate()
             {
@@ -132,7 +132,7 @@ namespace NJsonSchema.CodeGeneration
 
             private readonly string _language;
             private readonly string _template;
-            private readonly Func<string, string, string> _templateContentLoader;
+            private readonly Func<string, string, string, string> _templateContentLoader;
             private readonly object _model;
             private readonly string _toolchainVersion;
             private readonly CodeGeneratorSettingsBase _settings;
@@ -147,7 +147,7 @@ namespace NJsonSchema.CodeGeneration
             public LiquidTemplate(
                 string language,
                 string template,
-                Func<string, string, string> templateContentLoader,
+                Func<string, string, string, string> templateContentLoader,
                 object model,
                 string toolchainVersion,
                 CodeGeneratorSettingsBase settings)
@@ -167,12 +167,13 @@ namespace NJsonSchema.CodeGeneration
 
                 try
                 {
+                    var templateDirectory = _settings.TemplateDirectory ?? string.Empty;
                     // use language and template name as key for faster lookup than using the content
-                    var key = (_language, _template);
+                    var key = (_language, _template, templateDirectory);
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
-                        var templateContent = _templateContentLoader(_language, _template);
+                        var templateContent = _templateContentLoader(_language, _template, templateDirectory);
                         var data = templateContent.Replace("\r", "");
                         data = "\n" + data;
 
