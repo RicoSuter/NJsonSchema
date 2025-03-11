@@ -126,15 +126,9 @@ namespace NJsonSchema.Validation
             }
         }
 
-        private static readonly IEnumerable<JsonObjectType> JsonObjectTypes = Enum
-            .GetValues(typeof(JsonObjectType))
-            .Cast<JsonObjectType>()
-            .Where(t => t != JsonObjectType.None)
-            .ToList();
-
         private static IEnumerable<JsonObjectType> GetTypes(JsonSchema schema)
         {
-            return JsonObjectTypes.Where(t => schema.Type.HasFlag(t));
+            return JsonSchema.JsonObjectTypes.Where(t => schema.Type.HasFlag(t));
         }
 
         private void ValidateAnyOf(JToken token, JsonSchema schema, string? propertyName, string propertyPath, List<ValidationError> errors)

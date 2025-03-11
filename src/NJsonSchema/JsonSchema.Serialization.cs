@@ -22,10 +22,14 @@ namespace NJsonSchema
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema : IJsonExtensionObject
     {
-        private static readonly JsonObjectType[] _jsonObjectTypeValues = Enum.GetValues(typeof(JsonObjectType))
-            .OfType<JsonObjectType>()
-            .Where(v => v != JsonObjectType.None)
-            .ToArray();
+        internal static readonly List<JsonObjectType> JsonObjectTypes =
+#if NET8_0_OR_GREATER
+            Enum.GetValues<JsonObjectType>()
+#else
+            Enum.GetValues(typeof(JsonObjectType)).Cast<JsonObjectType>()
+#endif
+            .Where(static v => v != JsonObjectType.None)
+            .ToList();
 
 
         // keep a reference so we don't need to create a delegate each time
@@ -331,7 +335,7 @@ namespace NJsonSchema
         {
             _typeRaw = new Lazy<object?>(() =>
             {
-                var flags = _jsonObjectTypeValues
+                var flags = JsonObjectTypes
                     .Where(v => Type.HasFlag(v))
                     .ToArray();
 
