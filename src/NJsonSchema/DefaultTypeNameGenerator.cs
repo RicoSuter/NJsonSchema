@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Buffers;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,7 +15,13 @@ namespace NJsonSchema
     /// <summary>Converts the last part of the full type name to upper case.</summary>
     public class DefaultTypeNameGenerator : ITypeNameGenerator
     {
-        private static readonly char[] TypeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
+        private static readonly char[] _typeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
+
+#if NET8_0_OR_GREATER
+        private static readonly SearchValues<char> TypeNameHintCleanupChars = SearchValues.Create(_typeNameHintCleanupChars);
+#else
+        private static readonly char[] TypeNameHintCleanupChars = _typeNameHintCleanupChars;
+#endif
 
         private readonly Dictionary<string, string> _typeNameMappings = [];
         private string[] _reservedTypeNames = ["object"];
@@ -36,13 +43,14 @@ namespace NJsonSchema
         {
             if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
             {
-                typeNameHint = schema.DocumentPath!.Replace("\\", "/").Split('/').Last();
+                var parts = schema.DocumentPath!.Replace("\\", "/").Split('/');
+                typeNameHint = parts[^1];
             }
 
             typeNameHint ??= "";
 
             // check with one pass before doing iterations
-            var requiresCleanup = !string.IsNullOrEmpty(typeNameHint) && typeNameHint.IndexOfAny(TypeNameHintCleanupChars) != -1;
+            var requiresCleanup = typeNameHint.AsSpan().IndexOfAny(TypeNameHintCleanupChars) != -1;
 
             if (requiresCleanup)
             {
