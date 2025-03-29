@@ -153,7 +153,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public async Task When_property_name_is_created_by_custom_fun_then_parameter_name_is_correct_for_record()
+        public void When_property_name_is_created_by_custom_fun_then_parameter_name_is_correct_for_record()
         {
             //// Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Address>();

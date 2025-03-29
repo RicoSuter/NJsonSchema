@@ -41,7 +41,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_schema_contains_range_and_format_then_code_is_correctly_generated(string propertyType,
             string propertyFormat, string expectedRange)
         {
-            /// Arrange
+            // Arrange
             var json = $$"""
                          {
                              "type": "object",
@@ -56,7 +56,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                          """;
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains($"[System.ComponentModel.DataAnnotations.Range({expectedRange})]", code);
         }
 
