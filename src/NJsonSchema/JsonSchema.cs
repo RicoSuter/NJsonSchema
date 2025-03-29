@@ -505,7 +505,7 @@ namespace NJsonSchema
 
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
-        public ICollection<object?> Enumeration { get; internal set; }
+        public ICollection<object?> Enumeration { get; set; }
 
         /// <summary>Gets a value indicating whether this is enumeration.</summary>
         [JsonIgnore]
