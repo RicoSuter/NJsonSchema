@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
 
         /// <summary>Gets a value indicating whether the property's corresponding constructor parameter should be optional.</summary>
-        public bool RenderOptionalCtorArgument => IsNullable && _property.IsRequired;
+        public bool RenderOptionalCtorArgument => IsNullable && !_property.IsRequired;
 
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
