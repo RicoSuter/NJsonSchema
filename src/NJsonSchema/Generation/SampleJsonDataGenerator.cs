@@ -7,10 +7,7 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 
 namespace NJsonSchema.Generation
 {
@@ -108,7 +105,7 @@ namespace NJsonSchema.Generation
                     }
                     else if (schema.Type.IsInteger())
                     {
-                        return HandleIntegerType(schema);
+                        return SampleJsonDataGenerator.HandleIntegerType(schema);
                     }
                     else if (schema.Type.IsNumber())
                     {
@@ -149,19 +146,19 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0.0);
         }
 
-        private JToken HandleIntegerType(JsonSchema schema)
+        private static JToken HandleIntegerType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw));
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum));
+                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
             }
             else if (schema.Minimum.HasValue)
             {
-                return Convert.ToInt32(schema.Minimum);
+                return Convert.ToInt32(schema.Minimum, CultureInfo.InvariantCulture);
             }
             return JToken.FromObject(0);
         }
@@ -170,7 +167,7 @@ namespace NJsonSchema.Generation
         {
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"));
+                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             }
             else if (schema.Format == JsonFormatStrings.DateTime)
             {

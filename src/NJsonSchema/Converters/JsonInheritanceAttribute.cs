@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Converters
 {
     /// <summary>Defines a child class in the inheritance chain.</summary>

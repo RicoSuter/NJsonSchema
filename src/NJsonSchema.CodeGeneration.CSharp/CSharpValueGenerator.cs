@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -17,11 +14,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
     public class CSharpValueGenerator : ValueGeneratorBase
     {
         private readonly CSharpGeneratorSettings _settings;
-        private readonly List<string> _typesWithStringConstructor = new List<string>()
-        {
+        private readonly List<string> _typesWithStringConstructor =
+        [
             "System.Guid",
             "System.Uri"
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="CSharpValueGenerator" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -52,26 +49,26 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         return $"new {targetType}({stringLiteral})";
                     }
 
-                    if (targetType == "System.DateTime" || targetType == "System.DateTime?")
+                    if (targetType is "System.DateTime" or "System.DateTime?")
                     {
                         var stringLiteral = GetDefaultAsStringLiteral(schema);
                         return $"System.DateTime.Parse({stringLiteral})";
                     }
                 }
 
-                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
+                var isOptional = schema is JsonSchemaProperty { IsRequired: false };
 
                 schema = schema.ActualSchema;
-                if (schema != null && allowsNull == false && isOptional == false)
+                if (schema != null && !allowsNull && !isOptional)
                 {
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())
                     {
-                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<", StringComparison.Ordinal)
                             ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
 
-                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<")
+                        targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<", StringComparison.Ordinal)
                             ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
 
@@ -93,11 +90,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             switch (format)
             {
                 case JsonFormatStrings.Byte:
-                    return "(byte)" + Convert.ToByte(value).ToString(CultureInfo.InvariantCulture);
+                    return "(byte)" + Convert.ToByte(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
                 case JsonFormatStrings.Integer:
-                    return Convert.ToInt32(value).ToString(CultureInfo.InvariantCulture);
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
                 case JsonFormatStrings.Long:
-                    return Convert.ToInt64(value) + "L";
+                    return Convert.ToInt64(value, CultureInfo.InvariantCulture) + "L";
+                case JsonFormatStrings.ULong:
+                    return Convert.ToUInt64(value, CultureInfo.InvariantCulture) + "UL";
                 case JsonFormatStrings.Double:
                     return ConvertNumberToString(value) + "D";
                 case JsonFormatStrings.Float:

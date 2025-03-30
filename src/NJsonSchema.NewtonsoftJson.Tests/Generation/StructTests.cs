@@ -24,14 +24,14 @@ namespace NJsonSchema.NewtonsoftJson.Tests.Generation
         [Fact]
         public void Should_have_a_shared_struct_schema()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<UserDefinedClass>();
             var data = schema.ToJson();
 
-            //// Assert
-            Assert.Equal(1, schema.Definitions.Count);
+            // Assert
+            Assert.Single(schema.Definitions);
         }
     }
 }

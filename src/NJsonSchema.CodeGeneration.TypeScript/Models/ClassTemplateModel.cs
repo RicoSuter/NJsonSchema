@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Models
@@ -39,8 +37,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             Properties = _schema.ActualProperties.Values
-                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface ||
-                            v.IsInheritanceDiscriminator == false)
+                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface || !v.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
                 .ToList();
         }
@@ -63,7 +60,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string? BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
+        public bool HasDescription => _schema is not JsonSchemaProperty &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
@@ -104,7 +101,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool GenerateConstructorInterface => _settings.GenerateConstructorInterface;
 
         /// <summary>Gets or sets a value indicating whether POJO objects in the constructor data are converted to DTO instances (default: true).</summary>
-        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData && Properties.Any(p => p.SupportsConstructorConversion);
+        public bool ConvertConstructorInterfaceData => _settings.ConvertConstructorInterfaceData && Properties.Exists(p => p.SupportsConstructorConversion);
 
         /// <summary>Gets the null value.</summary>
         public string NullValue => _settings.NullValue.ToString().ToLowerInvariant();
@@ -134,13 +131,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HandleReferences => _settings.HandleReferences;
 
         /// <summary>Gets a value indicating whether the type has properties.</summary>
-        public bool HasProperties => Properties.Any();
+        public bool HasProperties => Properties.Count > 0;
 
         /// <summary>Gets the property models.</summary>
         public List<PropertyModel> Properties { get; }
 
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
-        public bool HasDefaultValues => Properties.Any(p => p.HasDefaultValue);
+        public bool HasDefaultValues => Properties.Exists(p => p.HasDefaultValue);
 
         /// <summary>Gets a value indicating whether </summary>
         public bool RequiresStrictPropertyInitialization => _settings.RequiresStrictPropertyInitialization;

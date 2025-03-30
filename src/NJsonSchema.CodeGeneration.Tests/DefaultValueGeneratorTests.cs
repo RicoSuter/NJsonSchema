@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Annotations;
-using NJsonSchema.CodeGeneration.CSharp;
+﻿using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
 using Xunit;
 
@@ -26,9 +25,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_int_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Integer,
@@ -40,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "int", "int", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "int", "int", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("6", csharpValue);
             Assert.Equal("6", typescriptValue);
         }
@@ -48,9 +47,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_long_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Integer,
@@ -63,7 +62,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "long", "long", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "long", "long", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("6000000000L", csharpValue);
             Assert.Equal("6000000000", typescriptValue);
         }
@@ -71,9 +70,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_double_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
@@ -86,7 +85,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("1234.567D", csharpValue);
             Assert.Equal("1234.567", typescriptValue);
         }
@@ -94,9 +93,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_double_without_format_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
@@ -108,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "double", "double", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "double", "double", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("1234.567D", csharpValue);
             Assert.Equal("1234.567", typescriptValue);
         }
@@ -116,9 +115,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_float_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Number,
@@ -131,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "float", "float", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "float", "float", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("1234.567F", csharpValue);
             Assert.Equal("1234.567", typescriptValue);
         }
@@ -139,9 +138,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_bool_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Boolean,
@@ -153,7 +152,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "bool", "bool", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "bool", "bool", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("true", csharpValue);
             Assert.Equal("true", typescriptValue);
         }
@@ -161,9 +160,9 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_string_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.String,
@@ -175,7 +174,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = _csharpGenerator.GetDefaultValue(schema, true, "string", "string", true, _csharpTypeResolver);
             var typescriptValue = _typescriptGenerator.GetDefaultValue(schema, true, "string", "string", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("\"test\\\\test\\\"test\\r\\ntest\"", csharpValue);
             Assert.Equal("\"test\\\\test\\\"test\\r\\ntest\"", typescriptValue);
         }
@@ -191,12 +190,12 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_default_value_of_enum_it_is_generated_in_CSharp_and_TypeScript_correctly()
         {
-            //// Arrange
+            // Arrange
             var csharpSettings = new CSharpGeneratorSettings { EnumNameGenerator = new MyEnumNameGenerator(), Namespace = "Ns" };
             var csharpGenerator = new CSharpValueGenerator(csharpSettings);
             var csharpTypeResolver = new CSharpTypeResolver(csharpSettings);
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.String,
@@ -215,7 +214,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = csharpGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true, csharpTypeResolver);
             var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("Ns.MyEnum.bar", csharpValue);
             Assert.Equal("MyEnum.bar", typescriptValue);
         }
@@ -226,7 +225,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public void When_schema_has_a_default_value_for_an_enum_and_uses_enumstyle_stringliteral_it_defaults_to_the_stringliteral()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.String,
@@ -242,22 +241,22 @@ namespace NJsonSchema.CodeGeneration.Tests
             var typescriptGenerator = new TypeScriptValueGenerator(typescriptSettings);
             var typescriptTypeResolver = new TypeScriptTypeResolver(typescriptSettings);
 
-            //// Act
+            // Act
             var typescriptValue = typescriptGenerator.GetDefaultValue(schema, true, "MyEnum", "MyEnum", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Equal("\"Bar\"", typescriptValue);
         }
 
         [Fact]
         public void When_schema_has_required_abstract_class_it_generates_no_default_value_for_in_CSharp_and_TypeScript()
         {
-            //// Arrange
+            // Arrange
             var csharpSettings = new CSharpGeneratorSettings();
             var csharpGenerator = new CSharpValueGenerator(csharpSettings);
             var csharpTypeResolver = new CSharpTypeResolver(csharpSettings);
 
-            //// Act
+            // Act
             var schema = new JsonSchema()
             {
                 Type = JsonObjectType.Object,
@@ -271,7 +270,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var csharpValue = csharpGenerator.GetDefaultValue(schema, false, "BaseClass", "BaseClass", true, csharpTypeResolver);
             var typescriptValue = typescriptGenerator.GetDefaultValue(schema, false, "BaseClass", "BaseClass", true, typescriptTypeResolver);
 
-            //// Assert
+            // Assert
             Assert.Null(csharpValue);
             Assert.Null(typescriptValue);
         }

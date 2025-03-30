@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using NBench;
+﻿using NBench;
 using NJsonSchema.Tests.Generation;
 using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace NJsonSchema.Benchmark
 {
@@ -10,12 +8,6 @@ namespace NJsonSchema.Benchmark
     {
         private Counter _counter;
         private JsonInheritanceConverterTests _tests;
-
-        public JsonInheritanceConverterBenchmarks(ITestOutputHelper output)
-        {
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new XunitTraceListener(output));
-        }
 
         [PerfSetup]
         public void Setup(BenchmarkContext context)

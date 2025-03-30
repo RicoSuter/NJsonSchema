@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
@@ -16,16 +14,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
+        public void When_property_is_required_then_required_attribute_is_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -33,26 +31,26 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
             Assert.Contains("public object Property { get; set; }", code);
         }
 
         [Fact]
-        public async Task When_property_is_required_then_required_attribute_is_rendered()
+        public void When_property_is_required_then_required_attribute_is_rendered()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>();
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("[System.ComponentModel.DataAnnotations.Required]", code);
             Assert.Contains("public object Property { get; set; }", code);
         }
@@ -63,16 +61,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
+        public void When_property_is_not_required_then_required_attribute_is_not_rendered_in_Swagger_mode()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithoutRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -80,27 +78,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("[Required]", code);
             Assert.Contains("public object Property { get; set; }", code);
         }
 
 
         [Fact]
-        public async Task When_property_is_not_required_then_required_attribute_is_not_rendered()
+        public void When_property_is_not_required_then_required_attribute_is_not_rendered()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithoutRequiredObject>();
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("[Required]", code);
             Assert.Contains("public object Property { get; set; }", code);
         }

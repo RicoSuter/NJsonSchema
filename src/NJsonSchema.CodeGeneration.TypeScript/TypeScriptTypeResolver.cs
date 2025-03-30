@@ -6,10 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System;
-using System.Linq;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>
@@ -56,7 +52,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <summary>Gets a value indicating whether the schema supports constructor conversion.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The result.</returns>
+#pragma warning disable CA1822
         public bool SupportsConstructorConversion(JsonSchema? schema)
+#pragma warning restore CA1822
         {
             return schema?.ActualSchema.ResponsibleDiscriminatorObject == null;
         }
@@ -109,7 +107,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
             {
-                return ResolveInteger(schema.ActualTypeSchema, typeNameHint);
+                return TypeScriptTypeResolver.ResolveInteger(schema.ActualTypeSchema, typeNameHint);
             }
 
             if (type.IsBoolean())
@@ -167,7 +165,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
 
+#pragma warning disable CA2208
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+#pragma warning restore CA2208
                     }
 
                     return $"{{ [key: {keyType}]: {valueType}; }}";
@@ -219,8 +219,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "string";
                 }
             }
-            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                     Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
+            else if (Settings.DateTimeType is TypeScriptDateTimeType.MomentJS or TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
                 {
@@ -290,7 +289,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "string";
         }
 
-        private string ResolveInteger(JsonSchema schema, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, string? typeNameHint)
         {
             return "number";
         }
@@ -299,14 +298,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Item != null)
             {
-                var isObject = schema.Item.ActualSchema.Type.IsObject() == true;
-                var isDictionary = schema.Item.ActualSchema.IsDictionary == true;
+                var isObject = schema.Item.ActualSchema.Type.IsObject();
+                var isDictionary = schema.Item.ActualSchema.IsDictionary;
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
 
                 if (Settings.UseLeafType)
                 {
                     var itemTypes = Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                        .Split([UnionPipe], StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => GetNullableItemType(schema, prefix + x))
                         .ToList();
 

@@ -1,11 +1,8 @@
-﻿using System.Threading.Tasks;
-using Newtonsoft.Json;
-using NJsonSchema.Generation;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
+using Newtonsoft.Json.Converters;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -19,6 +16,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public abstract EBase Type { get; }
         }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum EBase
         {
             OneChild,
@@ -49,14 +47,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
             var data = schema.ToJson();
+            var json = JsonConvert.SerializeObject(new OneChild());
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -64,21 +63,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            await VerifyHelper.Verify(code);
         }
-        
+
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
@@ -87,18 +87,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_interface()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
@@ -107,21 +108,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export interface OneChild extends Base", code);
             Assert.Contains("export interface SecondChild extends Base", code);
             Assert.Contains("Child: OneChild | SecondChild;", code);
             Assert.Contains("Children: (OneChild | SecondChild)[];", code);
+            await VerifyHelper.Verify(code);
         }
-        
+
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_class()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
@@ -130,11 +132,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export class OneChild extends Base", code);
             Assert.Contains("export class SecondChild extends Base", code);
             Assert.Contains("child: OneChild | SecondChild;", code);
             Assert.Contains("children: (OneChild | SecondChild)[];", code);
+            await VerifyHelper.Verify(code);
         }
     }
 }

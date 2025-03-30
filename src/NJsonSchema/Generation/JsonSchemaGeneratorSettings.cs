@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Reflection;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
@@ -36,7 +33,7 @@ namespace NJsonSchema.Generation
             TypeNameGenerator = new DefaultTypeNameGenerator();
             SchemaNameGenerator = new DefaultSchemaNameGenerator();
 
-            ExcludedTypeNames = new string[0];
+            ExcludedTypeNames = [];
 
             UseXmlDocumentation = true;
             ResolveExternalXmlDocumentation = true;
@@ -62,9 +59,9 @@ namespace NJsonSchema.Generation
         public bool GenerateKnownTypes { get; set; } = true;
 
         /// <summary>Gets or sets a value indicating whether to generate xmlObject representation for definitions (default: false).</summary>
-        public bool GenerateXmlObjects { get; set; } = false;
+        public bool GenerateXmlObjects { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="ObsoleteAttribute"/>.</summary>
+        /// <summary>Gets or sets a value indicating whether to ignore properties with the <see cref="T:ObsoleteAttribute"/>.</summary>
         public bool IgnoreObsoleteProperties { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to use $ref references even if additional properties are
@@ -109,11 +106,11 @@ namespace NJsonSchema.Generation
 
         /// <summary>Gets or sets the type mappings.</summary>
         [JsonIgnore]
-        public ICollection<ITypeMapper> TypeMappers { get; set; } = new Collection<ITypeMapper>();
+        public ICollection<ITypeMapper> TypeMappers { get; set; } = [];
 
         /// <summary>Gets or sets the schema processors.</summary>
         [JsonIgnore]
-        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = new Collection<ISchemaProcessor>();
+        public ICollection<ISchemaProcessor> SchemaProcessors { get; } = [];
 
         /// <summary>Gets or sets a value indicating whether to generate x-nullable properties (Swagger 2 only).</summary>
         public bool GenerateCustomNullableProperties { get; set; }

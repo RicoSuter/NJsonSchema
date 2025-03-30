@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Yaml
@@ -28,14 +25,17 @@ namespace NJsonSchema.Yaml
         /// <returns>The factory.</returns>
         public static Func<JsonSchema, JsonReferenceResolver> CreateJsonAndYamlReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
-                new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema)
+            {
+                return new JsonAndYamlReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            }
 
             return ReferenceResolverFactory;
         }
 
         /// <summary>Resolves a file reference.</summary>
         /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="NotSupportedException">The System.IO.File API is not available on this platform.</exception>
         public override async Task<IJsonReference> ResolveFileReferenceAsync(string filePath, CancellationToken cancellationToken = default)
@@ -45,6 +45,7 @@ namespace NJsonSchema.Yaml
 
         /// <summary>Resolves an URL reference.</summary>
         /// <param name="url">The URL.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <exception cref="NotSupportedException">The HttpClient.GetAsync API is not available on this platform.</exception>
         public override async Task<IJsonReference> ResolveUrlReferenceAsync(string url, CancellationToken cancellationToken = default)
         {

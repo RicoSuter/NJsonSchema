@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
-using System.Linq;
 using NJsonSchema.Annotations;
 using System.Reflection;
 using Namotion.Reflection;
@@ -154,14 +152,12 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Duration);
             }
 
-            if (originalType.FullName == "NodaTime.LocalDate" ||
-                originalType.FullName == "System.DateOnly")
+            if (originalType.FullName is "NodaTime.LocalDate" or "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (originalType.FullName == "NodaTime.LocalTime" ||
-                originalType.FullName == "System.TimeOnly")
+            if (originalType.FullName is "NodaTime.LocalTime" or "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
@@ -253,8 +249,7 @@ namespace NJsonSchema.Generation
             var isValueType = contextualType.Type != typeof(string) &&
                               contextualType.TypeInfo.IsValueType;
 
-            return isValueType == false &&
-                   defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
+            return !isValueType && defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
         }
 
         /// <summary>Checks whether the give type is a string enum.</summary>
@@ -296,7 +291,7 @@ namespace NJsonSchema.Generation
         /// </remarks>
         /// <param name="contextualType">The type.</param>
         /// <returns>true or false.</returns>
-        private bool IsIAsyncEnumerableType(ContextualType contextualType)
+        private static bool IsIAsyncEnumerableType(ContextualType contextualType)
         {
             return contextualType.Name == "IAsyncEnumerable`1";
         }
@@ -327,7 +322,7 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.Name == "IDictionary`2" || contextualType.Name == "IReadOnlyDictionary`2")
+            if (contextualType.Name is "IDictionary`2" or "IReadOnlyDictionary`2")
             {
                 return true;
             }
@@ -337,7 +332,7 @@ namespace NJsonSchema.Generation
                     !contextualType.TypeInfo.BaseType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDictionary)));
         }
 
-        private bool HasStringEnumConverter(ContextualType contextualType)
+        private static bool HasStringEnumConverter(ContextualType contextualType)
         {
             dynamic? jsonConverterAttribute = contextualType
                 .GetContextOrTypeAttributes(true)?

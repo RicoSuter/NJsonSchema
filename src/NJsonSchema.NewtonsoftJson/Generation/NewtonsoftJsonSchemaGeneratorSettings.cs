@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
@@ -18,7 +16,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
     /// <inheritdoc />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
-        private Dictionary<string, JsonContract?> _cachedContracts = new Dictionary<string, JsonContract?>();
+        private readonly Dictionary<string, JsonContract?> _cachedContracts = [];
 
         private JsonSerializerSettings _serializerSettings;
 

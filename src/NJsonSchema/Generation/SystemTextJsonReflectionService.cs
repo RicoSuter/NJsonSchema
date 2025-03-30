@@ -7,8 +7,6 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
@@ -32,8 +30,8 @@ namespace NJsonSchema.Generation
                 }
 
                 if (accessorInfo.MemberInfo is PropertyInfo propertyInfo &&
-                    (propertyInfo.GetMethod?.IsPrivate == true || propertyInfo.GetMethod?.IsStatic == true) &&
-                    (propertyInfo.SetMethod?.IsPrivate == true || propertyInfo.SetMethod?.IsStatic == true) &&
+                    (propertyInfo.GetMethod == null || propertyInfo.GetMethod.IsPrivate || propertyInfo.GetMethod.IsStatic) &&
+                    (propertyInfo.SetMethod == null || propertyInfo.SetMethod.IsPrivate || propertyInfo.SetMethod.IsStatic) &&
                     !propertyInfo.IsDefined(typeof(DataMemberAttribute)))
                 {
                     continue;
@@ -45,10 +43,15 @@ namespace NJsonSchema.Generation
                     continue;
                 }
 
+                if (accessorInfo.MemberInfo is PropertyInfo propInfo &&
+                    propInfo.GetIndexParameters().Length > 0)
+                {
+                    continue;
+                }
+
                 var propertyIgnored = false;
-                var jsonIgnoreAttribute = accessorInfo
-                    .GetAttributes(true)
-                    .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
+                var attributes = accessorInfo.GetAttributes(true).ToArray();
+                var jsonIgnoreAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonIgnoreAttribute", TypeNameStyle.FullName);
 
                 if (jsonIgnoreAttribute != null)
                 {
@@ -61,13 +64,13 @@ namespace NJsonSchema.Generation
 
                 var ignored = propertyIgnored
                     || schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo)
-                    || accessorInfo.GetAttributes(true)
-                        .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null;
+                    || attributes.FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonExtensionDataAttribute", TypeNameStyle.FullName) != null
+                    || Array.IndexOf(settings.ExcludedTypeNames, accessorInfo.AccessorType.Type.FullName) != -1;
 
                 if (!ignored)
                 {
                     var propertyTypeDescription = GetDescription(accessorInfo.AccessorType, settings.DefaultReferenceTypeNullHandling, settings);
-                    var propertyName = GetPropertyName(accessorInfo, settings);
+                    var propertyName = GetPropertyNameInternal(accessorInfo, settings);
 
                     var propertyAlreadyExists = schema.Properties.ContainsKey(propertyName);
                     if (propertyAlreadyExists)
@@ -82,9 +85,7 @@ namespace NJsonSchema.Generation
                         }
                     }
 
-                    var requiredAttribute = accessorInfo
-                        .GetAttributes(true)
-                        .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                    var requiredAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
                     var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
@@ -94,7 +95,7 @@ namespace NJsonSchema.Generation
                         schema.RequiredProperties.Add(propertyName);
                     }
 
-                    var isNullable = propertyTypeDescription.IsNullable && hasRequiredAttribute == false;
+                    var isNullable = propertyTypeDescription.IsNullable && !hasRequiredAttribute;
 
                     // TODO: Add default value
                     schemaGenerator.AddProperty(schema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, hasRequiredAttribute, isNullable, null, schemaResolver);
@@ -129,10 +130,10 @@ namespace NJsonSchema.Generation
         /// <inheritdoc />
         public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
         {
-            return GetPropertyName(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
+            return GetPropertyNameInternal(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
         }
 
-        private static string GetPropertyName(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
+        private static string GetPropertyNameInternal(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)
         {
             dynamic? jsonPropertyNameAttribute = accessorInfo.GetAttributes(true)
                 .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyNameAttribute", TypeNameStyle.FullName);

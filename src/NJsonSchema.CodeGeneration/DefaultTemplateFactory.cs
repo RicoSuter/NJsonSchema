@@ -6,16 +6,11 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
 using Fluid.Values;
@@ -49,7 +44,7 @@ namespace NJsonSchema.CodeGeneration
             return new LiquidTemplate(
                 language,
                 template,
-                (lang, name) => GetLiquidTemplate(lang, name),
+                GetLiquidTemplate,
                 model,
                 GetToolchainVersion(),
                 _settings);
@@ -91,21 +86,19 @@ namespace NJsonSchema.CodeGeneration
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
             {
-                using (var reader = new StreamReader(resource))
-                {
-                    return reader.ReadToEnd();
-                }
+                using var reader = new StreamReader(resource);
+                return reader.ReadToEnd();
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
         }
 
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
-        private string GetLiquidTemplate(string language, string template)
+        private string GetLiquidTemplate(string language, string template, string templateDirectory)
         {
-            if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
+            if (!template.EndsWith('!') && !string.IsNullOrEmpty(templateDirectory))
             {
-                var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
+                var templateFilePath = Path.Combine(templateDirectory, template + ".liquid");
                 if (File.Exists(templateFilePath))
                 {
                     return File.ReadAllText(templateFilePath);
@@ -118,7 +111,7 @@ namespace NJsonSchema.CodeGeneration
         private sealed class LiquidTemplate : ITemplate
         {
             internal const string TemplateTagName = "template";
-            private static readonly ConcurrentDictionary<(string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string), IFluidTemplate>();
+            private static readonly ConcurrentDictionary<(string, string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string, string), IFluidTemplate>();
 
             static LiquidTemplate()
             {
@@ -139,7 +132,7 @@ namespace NJsonSchema.CodeGeneration
 
             private readonly string _language;
             private readonly string _template;
-            private readonly Func<string, string, string> _templateContentLoader;
+            private readonly Func<string, string, string, string> _templateContentLoader;
             private readonly object _model;
             private readonly string _toolchainVersion;
             private readonly CodeGeneratorSettingsBase _settings;
@@ -154,7 +147,7 @@ namespace NJsonSchema.CodeGeneration
             public LiquidTemplate(
                 string language,
                 string template,
-                Func<string, string, string> templateContentLoader,
+                Func<string, string, string, string> templateContentLoader,
                 object model,
                 string toolchainVersion,
                 CodeGeneratorSettingsBase settings)
@@ -174,12 +167,14 @@ namespace NJsonSchema.CodeGeneration
 
                 try
                 {
-                    // use language and template name as key for faster lookup than using the content
-                    var key = (_language, _template);
+                    var templateDirectory = _settings.TemplateDirectory ?? string.Empty;
+                    // use language, template name and template directory as key for faster lookup than using the content
+                    // template directory as part of key is requred for processing multiple files since files may use different TemplateDirectory for same language
+                    var key = (_language, _template, templateDirectory);
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
-                        var templateContent = _templateContentLoader(_language, _template);
+                        var templateContent = _templateContentLoader(_language, _template, templateDirectory);
                         var data = templateContent.Replace("\r", "");
                         data = "\n" + data;
 
@@ -308,7 +303,7 @@ namespace NJsonSchema.CodeGeneration
             }
 
             private static ValueTask<Completion> RenderTemplate(
-                List<Expression> arguments,
+                IReadOnlyList<Expression> arguments,
                 TextWriter writer,
                 TextEncoder encoder,
                 TemplateContext context)

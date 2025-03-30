@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -25,11 +24,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_example_xml_docs_is_defined_then_examples_can_be_defined()
         {
-            /// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractClass>();
             var json = schema.ToJson(Formatting.None);
 
-            /// Assert
+            // Assert
             Assert.Contains(@"Foobar.", json);
             Assert.Contains(@"""x-example"":{""foo"":""bar""}", json);
             Assert.Contains(@"""x-example"":{""abc"":""def""}", json);

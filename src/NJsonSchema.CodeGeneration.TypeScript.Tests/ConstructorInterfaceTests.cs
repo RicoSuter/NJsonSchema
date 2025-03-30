@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -52,13 +48,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
+        public void When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 GenerateConstructorInterface = true,
@@ -68,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
 
             Assert.DoesNotContain("new MyClass(", output);
             // address property is converted:
@@ -94,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_array_of_string_dictionary_is_used_with_ConvertConstructorInterfaceData_then_it_should_be_ignored()
         {
-            //// Arrange
+            // Arrange
             var json = @"
 {
     ""type"": ""object"",
@@ -112,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 GenerateConstructorInterface = true,
@@ -122,7 +118,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("custom4: { [key: string]: string; }[];", output);
         }
     }

@@ -1,12 +1,8 @@
-using System;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
@@ -36,22 +32,22 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_string_and_integer_enum_used_then_two_enums_are_generated_in_typescript()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Equal(3, code.Split(new[] { "export enum " }, StringSplitOptions.None).Count()); // two found
+            // Assert
+            Assert.Equal(3, code.Split(["export enum "], StringSplitOptions.None).Count()); // two found
         }
 
         [Fact]
         public async Task When_export_types_is_true_add_export_before_enum_in_typescript()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
@@ -60,18 +56,18 @@ namespace NJsonSchema.CodeGeneration.Tests
                 ExportTypes = true
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, typeScriptGeneratorSettings);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("export enum", code);
         }
 
         [Fact]
         public async Task When_add_export_keyword_is_false_dont_add_export_before_enum_in_typescript()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
@@ -80,47 +76,48 @@ namespace NJsonSchema.CodeGeneration.Tests
                 ExportTypes = false
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, typeScriptGeneratorSettings);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("export enum", code);
         }
 
         [Fact]
         public async Task When_string_and_integer_enum_used_then_one_enum_is_generated_in_CSharp()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema);
             var code = generator.GenerateFile("MyClass").Replace("\r", "");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("Ref_", code);
             Assert.Contains("public enum Bar\n", code);
             Assert.Contains("public enum Bar2\n", code);
 
             Assert.Contains(" B = 5,", code); // B must be 5 even if B = 1 is first defined
-            Assert.Equal(3, code.Split(new[] { "public enum " }, StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
-            Assert.Equal(3, code.Split(new[] { "[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]" }, StringSplitOptions.None).Count()); // two found
+            Assert.Equal(3, code.Split(["public enum "], StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
+            Assert.Equal(3, code.Split(
+                ["[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"], StringSplitOptions.None).Count()); // two found
         }
 
         [Fact]
         public async Task When_byte_enum_is_generated_then_no_exception_occurs()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DifferentEnumTypeTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             // No exception
         }
 
@@ -139,15 +136,15 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_enum_has_string_value_then_CS_code_has_EnumMember_attribute()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithStringEnum>();
             var schemaData = schema.ToJson();
             
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
             Assert.Contains("_0562 = 0,", code);
             Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0532\")]", code);
@@ -157,17 +154,17 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_enum_has_string_value_then_TS_code_has_string_value()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithStringEnum>();
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 1.8m });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("_0562 = <any>\"0562\",", code);
-            Assert.Contains("_0532 = <any>\"0532\",", code);
+            // Assert
+            Assert.Contains("_0562 = \"0562\",", code);
+            Assert.Contains("_0532 = \"0532\",", code);
         }
 
         public class ClassWithStringEnum
@@ -189,15 +186,15 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_enum_has_integer_value_then_CS_code_has_EnumMember_attribute()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithIntegerEnum>();
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.DoesNotContain("[EnumMember(Value = \"0562\")]", code);
             Assert.Contains("_0562 = 10,", code);
             Assert.DoesNotContain("[EnumMember(Value = \"0532\")]", code);
@@ -207,15 +204,15 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_enum_has_integer_value_then_TS_code_has_string_value()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithIntegerEnum>();
             var schemaData = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("_0562 = 10,", code);
             Assert.Contains("_0532 = 15,", code);
         }
@@ -234,7 +231,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_enum_has_no_names_and_string_value_starts_with_number_then_underline_is_generated()
         {
-            //// Arrange
+            // Arrange
             var schemaData = @"{
   ""type"": ""object"",
   ""properties"": {
@@ -260,11 +257,11 @@ namespace NJsonSchema.CodeGeneration.Tests
 }";
             var schema = await JsonSchema.FromJsonAsync(schemaData);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema);
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
             Assert.Contains("_0562 = 0,", code);
             Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"\"\"0532\"\"\")]", code);
@@ -277,7 +274,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         [Fact]
         public async Task When_property_is_nullable_and_enum_allows_null_then_no_exception_is_thrown()
         {
-            //// Arrange
+            // Arrange
             var json = @"{  
    ""type"":""object"",
    ""properties"":{  
@@ -299,11 +296,11 @@ namespace NJsonSchema.CodeGeneration.Tests
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
             var code = generator.GenerateFile("Foo");
 
-            //// Assert
+            // Assert
             Assert.NotNull(code);
         }
     }

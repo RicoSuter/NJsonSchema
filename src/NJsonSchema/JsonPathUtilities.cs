@@ -6,10 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -40,7 +37,7 @@ namespace NJsonSchema
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static string? GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
         {
-            return GetJsonPaths(rootObject, new List<object> { searchedObject }, contractResolver)[searchedObject];
+            return GetJsonPaths(rootObject, [searchedObject], contractResolver)[searchedObject];
         }
 
         /// <summary>Gets the JSON path of the given object.</summary>
@@ -59,12 +56,14 @@ namespace NJsonSchema
             }
 
             var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null);
-            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(), contractResolver);
+            FindJsonPaths(rootObject, mappings, "#", [], contractResolver);
 
             if (mappings.Any(p => p.Value == null))
             {
+                var errorItems = mappings.Where(p => p.Value == null).Select(x => x.Key.GetType().FullName);
                 throw new InvalidOperationException("Could not find the JSON path of a referenced schema: " +
-                                                    "Manually referenced schemas must be added to the " +
+                                                     string.Join(",", errorItems) +
+                                                    ". Manually referenced schemas must be added to the " +
                                                     "'Definitions' of a parent schema.");
             }
 

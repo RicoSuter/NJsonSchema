@@ -1,6 +1,4 @@
-using System.Linq;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using NJsonSchema.Validation;
 using Xunit;
 
@@ -11,34 +9,34 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_hostname_incorrect_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Hostname;
 
             var token = new JValue("foo:bar");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.HostnameExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_hostname_is_ip_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Hostname;
 
             var token = new JValue("rsuter.com");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

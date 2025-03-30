@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Annotations;
 
 /// <summary>Registers an schema processor for the given class.</summary>

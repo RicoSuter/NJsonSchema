@@ -1,5 +1,4 @@
-﻿using NJsonSchema.Annotations;
-using Xunit;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -8,9 +7,10 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void PrimitiveProperties()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 int: 1, 
+                float: 340282346638528859811704183484516925440.0,
                 str: ""abc"", 
                 bool: true, 
                 date: ""2012-07-19"", 
@@ -19,14 +19,15 @@ namespace NJsonSchema.Tests.Generation
             }";
             var generator = new SampleJsonSchemaGenerator();
 
-            //// Act
+            // Act
             var schema = generator.Generate(data);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["int"].Type);
             Assert.Equal(JsonObjectType.String, schema.Properties["str"].Type);
             Assert.Equal(JsonObjectType.Boolean, schema.Properties["bool"].Type);
+            Assert.Equal(JsonObjectType.Number, schema.Properties["float"].Type);
 
             Assert.Equal(JsonObjectType.String, schema.Properties["date"].Type);
             Assert.Equal(JsonFormatStrings.Date, schema.Properties["date"].Format);
@@ -39,9 +40,39 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public void OpenApi3Properties()
+        {
+            // Arrange
+            var data = @"{
+                int: 12345, 
+                long: 1736347656630,
+                float: 340282346638528859811704183484516925440.0,
+                double: 340282346638528859811704183484516925440123456.0,
+            }";
+            var generator = new SampleJsonSchemaGenerator(new SampleJsonSchemaGeneratorSettings {SchemaType = SchemaType.OpenApi3});
+
+            // Act
+            var schema = generator.Generate(data);
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["int"].Type);
+            Assert.Equal(JsonFormatStrings.Integer, schema.Properties["int"].Format);
+
+            Assert.Equal(JsonObjectType.Integer, schema.Properties["long"].Type);
+            Assert.Equal(JsonFormatStrings.Long, schema.Properties["long"].Format);
+
+            Assert.Equal(JsonObjectType.Number, schema.Properties["float"].Type);
+            Assert.Equal(JsonFormatStrings.Float, schema.Properties["float"].Format);
+
+            Assert.Equal(JsonObjectType.Number, schema.Properties["double"].Type);
+            Assert.Equal(JsonFormatStrings.Double, schema.Properties["double"].Format);
+        }
+
+        [Fact]
         public void ComplexArrayProperty()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 persons: [
                     {
@@ -55,12 +86,12 @@ namespace NJsonSchema.Tests.Generation
                 ]
             }";
 
-            //// Act
+            // Act
             var schema = JsonSchema.FromSampleJson(data);
             var json = schema.ToJson();
             var property = schema.Properties["persons"].ActualTypeSchema;
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Array, property.Type);
             Assert.Equal(3, property.Item.ActualSchema.Properties.Count);
             Assert.True(schema.Definitions.ContainsKey("Person"));
@@ -69,7 +100,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void MergedSchemas()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
     ""Address"": {
         ""Street"": [
@@ -93,11 +124,11 @@ namespace NJsonSchema.Tests.Generation
     }
 }";
 
-            //// Act
+            // Act
             var schema = JsonSchema.FromSampleJson(data);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(3, schema.Definitions.Count);
             Assert.True(schema.Definitions.ContainsKey("Street"));
             Assert.True(schema.Definitions.ContainsKey("House"));
@@ -107,18 +138,18 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void PrimitiveArrayProperty()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 array: [ 1, true ]
             }";
             var generator = new SampleJsonSchemaGenerator();
 
-            //// Act
+            // Act
             var schema = generator.Generate(data);
             var json = schema.ToJson();
             var property = schema.Properties["array"].ActualTypeSchema;
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Array, property.Type);
             Assert.Equal(JsonObjectType.Integer, property.Item.ActualSchema.Type);
         }

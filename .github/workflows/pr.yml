@@ -5,7 +5,7 @@
 #
 #     - To turn off auto-generation set:
 #
-#         [GitHubActions (AutoGenerate = false)]
+#         [CustomGitHubActions (AutoGenerate = false)]
 #
 #     - To trigger manual generation invoke:
 #
@@ -25,14 +25,22 @@ on:
       - '**/*.*'
       - '!**/*.md'
 
+concurrency:
+  group: ${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   windows-latest:
     name: windows-latest
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0
+      - uses: actions/checkout@v4
       - name: 'Cache: .nuke/temp, ~/.nuget/packages'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             .nuke/temp
@@ -44,9 +52,13 @@ jobs:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0
+      - uses: actions/checkout@v4
       - name: 'Cache: .nuke/temp, ~/.nuget/packages'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             .nuke/temp

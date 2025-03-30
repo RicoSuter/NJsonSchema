@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Xunit;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
@@ -8,7 +7,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_double_is_bigger_then_decimal_then_validation_works()
         {
-            /// Arrange
+            // Arrange
             const string json = @"{
                 'schema': 'http://json-schema.org/draft-04/schema',
                 'title': 'NumberWithCircleVisualisationData',
@@ -29,13 +28,13 @@ namespace NJsonSchema.Tests.Validation
                 'UpperLimit': 1.1111111111111111E+101
             }";
 
-            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
+            var validationSchema = await JsonSchema.FromJsonAsync(json);
 
-            /// Act
+            // Act
             var errors = validationSchema.Validate(data);
 
-            /// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
 
         [Fact(Skip = "Ignored")]
@@ -43,7 +42,7 @@ namespace NJsonSchema.Tests.Validation
         {
             // See https://github.com/RicoSuter/NJsonSchema/issues/568
 
-            /// Arrange
+            // Arrange
             const string json = @"{
   ""type"": ""object"",
   ""properties"": {
@@ -60,14 +59,13 @@ namespace NJsonSchema.Tests.Validation
                 ""property1"": 34545734242323232423434
             }";
 
-            var validationSchema = JsonSchema.FromJsonAsync(json).Result;
+            var validationSchema = await JsonSchema.FromJsonAsync(json);
 
-            /// Act
+            // Act
             var errors = validationSchema.Validate(data);
 
-            /// Assert
-            Assert.Equal(0, errors.Count);
+            // Assert
+            Assert.Empty(errors);
         }
-
     }
 }

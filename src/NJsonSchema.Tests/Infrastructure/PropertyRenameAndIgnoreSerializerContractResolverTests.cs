@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 using Xunit;
 
@@ -10,17 +9,17 @@ namespace NJsonSchema.Tests.Infrastructure
         [Fact]
         public void When_property_is_renamed_then_it_does_not_land_in_extension_data()
         {
-            //// Arrange
+            // Arrange
             var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             resolver.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readOnly");
             resolver.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
 
             var json = "{ \"readOnly\": true, \"nullable\": true, \"additionalProperties\": { \"nullable\": true } }";
 
-            //// Act
+            // Act
             var obj = JsonSchemaSerialization.FromJson<JsonSchemaProperty>(json, resolver);
 
-            //// Assert
+            // Assert
             Assert.True(obj.IsReadOnly);
             Assert.True(obj.IsNullableRaw);
             Assert.True(obj.AdditionalPropertiesSchema.IsNullableRaw);
@@ -35,18 +34,18 @@ namespace NJsonSchema.Tests.Infrastructure
         [Fact]
         public void When_property_is_renamed_then_json_is_correct()
         {
-            //// Arrange
+            // Arrange
             var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             resolver.RenameProperty(typeof(MyClass), "foo", "bar");
 
             var obj = new MyClass();
             obj.Foo = "abc";
 
-            //// Act
+            // Act
             var json = JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ContractResolver = resolver });
             obj = JsonConvert.DeserializeObject<MyClass>(json, new JsonSerializerSettings { ContractResolver = resolver });
 
-            //// Assert
+            // Assert
             Assert.Contains("bar", json);
             Assert.Contains("abc", obj.Foo);
         }
@@ -66,7 +65,7 @@ namespace NJsonSchema.Tests.Infrastructure
         [Fact]
         public void When_property_is_ignored_then_refs_ignore_it()
         {
-            //// Arrange
+            // Arrange
             var contractResolver = new PropertyRenameAndIgnoreSerializerContractResolver();
             contractResolver.IgnoreProperty(typeof(ClassWithDoubleProperties), "definitions1");
 
@@ -83,11 +82,11 @@ namespace NJsonSchema.Tests.Infrastructure
                 }
             };
 
-            //// Act
+            // Act
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(foo, false, contractResolver);
             var json = JsonConvert.SerializeObject(foo, Formatting.Indented, new JsonSerializerSettings { ContractResolver = contractResolver });
 
-            //// Assert
+            // Assert
             Assert.Contains("#/definitions2/Bar", json);
             Assert.DoesNotContain("#/definitions1/Bar", json);
         }

@@ -6,16 +6,13 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Generates the property name for a given TypeScript <see cref="JsonSchemaProperty"/>.</summary>
     public sealed class TypeScriptPropertyNameGenerator : IPropertyNameGenerator
     {
-        private static readonly char[] _reservedFirstPassChars = { '"', '@', '?', '.', '=', '+' };
-        private static readonly char[] _reservedSecondPassChars = { '*', ':', '-' };
+        private static readonly char[] _reservedFirstPassChars = ['"', '@', '?', '.', '=', '+'];
+        private static readonly char[] _reservedSecondPassChars = ['*', '#', ':', '-'];
 
         /// <summary>Gets or sets the reserved names.</summary>
         public HashSet<string> ReservedPropertyNames { get; set; } = new(StringComparer.Ordinal) { "constructor", "init", "fromJS", "toJSON" };
@@ -40,6 +37,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             if (name.IndexOfAny(_reservedSecondPassChars) != -1)
             {
                 name = name.Replace("*", "Star")
+                    .Replace("#", "_")
                     .Replace(":", "_")
                     .Replace("-", "_");
             }

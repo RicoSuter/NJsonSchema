@@ -6,11 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Linq;
 using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using System;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;
@@ -65,7 +63,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 converters.Add(new StringEnumConverter());
             }
 
-            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, converters.ToArray()));
+            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, [.. converters]));
         }
 
         /// <inheritdoc />
@@ -87,8 +85,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             var contract = settings.ResolveContract(contextualType.Type);
 
             var allowedProperties = schemaGenerator.GetTypeProperties(contextualType.Type);
-            var objectContract = contract as JsonObjectContract;
-            if (objectContract != null && allowedProperties == null)
+            if (allowedProperties == null && contract is JsonObjectContract objectContract)
             {
                 foreach (var jsonProperty in objectContract.Properties.Where(p => p.DeclaringType == contextualType.Type))
                 {
@@ -156,7 +153,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
-            if (jsonProperty.Ignored == false && schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo) == false)
+            if (!jsonProperty.Ignored && !schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo))
             {
                 var propertyName = GetPropertyName(jsonProperty, accessorInfo, settings);
                 var propertyAlreadyExists = parentSchema.Properties.ContainsKey(propertyName);
@@ -177,7 +174,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     .GetAttributes(true)
                     .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
-                var hasJsonNetAttributeRequired = jsonProperty.Required == Required.Always || jsonProperty.Required == Required.AllowNull;
+                var hasJsonNetAttributeRequired = jsonProperty.Required is Required.Always or Required.AllowNull;
                 var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
 
                 var hasRequiredAttribute = requiredAttribute != null;
@@ -186,9 +183,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                var isNullable = propertyTypeDescription.IsNullable &&
-                    hasRequiredAttribute == false &&
-                    (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
+                var isNullable = propertyTypeDescription.IsNullable && !hasRequiredAttribute && jsonProperty.Required is Required.Default or Required.AllowNull;
 
                 var defaultValue = jsonProperty.DefaultValue;
 

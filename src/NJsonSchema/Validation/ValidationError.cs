@@ -25,6 +25,7 @@ namespace NJsonSchema.Validation
             Kind = errorKind;
             Property = propertyName;
             Path = propertyPath != null ? "#/" + propertyPath : "#";
+            Token = token;
 
             var lineInfo = token as IJsonLineInfo;
             HasLineInfo = lineInfo != null && lineInfo.HasLineInfo();
@@ -63,12 +64,15 @@ namespace NJsonSchema.Validation
         /// <summary>Gets the schema element that contains the validation rule. </summary>
         public JsonSchema Schema { get; private set; }
 
+        /// <summary>Gets the JToken of the element failed the validation. </summary>
+        public JToken? Token { get; private set; }
+
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            return string.Format("{0}: {1}", Kind, Path);
+            return $"{Kind}: {Path}";
         }
     }
 }

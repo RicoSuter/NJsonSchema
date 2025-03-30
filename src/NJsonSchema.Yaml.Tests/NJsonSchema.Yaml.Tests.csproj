@@ -1,10 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <Nullable>disable</Nullable>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- Remove the underscores from member name -->
+        <NoWarn>$(NoWarn),CA1707</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,7 +19,6 @@
         <PackageReference Include="NSwag.Core.Yaml" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
         <PackageReference Include="NodaTime" />
     </ItemGroup>
 

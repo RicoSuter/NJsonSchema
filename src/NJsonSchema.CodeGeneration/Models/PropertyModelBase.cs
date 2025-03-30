@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>The property template model base class.</summary>
@@ -77,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Models
         protected string GetTypeNameHint()
         {
             var propertyName = PropertyName;
-            if (_property.IsEnumeration == false)
+            if (!_property.IsEnumeration)
             {
                 return propertyName;
             }

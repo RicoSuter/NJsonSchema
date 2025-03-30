@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using NJsonSchema.Visitors;
 
 namespace NJsonSchema.CodeGeneration
@@ -29,7 +28,7 @@ namespace NJsonSchema.CodeGeneration
         {
             private readonly JsonSchema _baseSchema;
 
-            public Dictionary<JsonSchema, string?> DerivedSchemas { get; } = new Dictionary<JsonSchema, string?>();
+            public Dictionary<JsonSchema, string?> DerivedSchemas { get; } = [];
 
             public DerivedSchemaVisitor(JsonSchema baseSchema)
             {

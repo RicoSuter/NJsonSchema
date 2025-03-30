@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Annotations;
 
 /// <summary>Annotation to merge all inherited properties into this class/schema.</summary>

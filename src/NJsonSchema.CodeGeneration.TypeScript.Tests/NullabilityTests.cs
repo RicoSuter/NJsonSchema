@@ -2,16 +2,13 @@
 using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class NullabilityTests
     {
         [Fact]
-        public async Task Strict_nullability_in_TypeScript2()
+        public void Strict_nullability_in_TypeScript2()
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(
                 new NewtonsoftJsonSchemaGeneratorSettings
@@ -171,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public async Task When_array_item_is_nullable_then_generated_TypeScript_is_correct()
+        public void When_array_item_is_nullable_then_generated_TypeScript_is_correct()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithNullableArrayItems>();

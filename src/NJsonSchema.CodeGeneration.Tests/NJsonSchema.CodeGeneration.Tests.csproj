@@ -1,26 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <NoWarn>$(NoWarn),1998,1591,618</NoWarn>
+        <NoWarn>$(NoWarn),1998,1591,618,IDE1006</NoWarn>
         <Nullable>disable</Nullable>
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net462'" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Condition="'$(TargetFramework)' == 'net462'" Include="System.ComponentModel.DataAnnotations" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+        <Reference Condition="'$(TargetFramework)' == 'net472'" Include="System.ComponentModel.DataAnnotations" />
     </ItemGroup>
 
     <ItemGroup>

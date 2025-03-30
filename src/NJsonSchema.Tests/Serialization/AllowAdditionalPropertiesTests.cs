@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
@@ -21,11 +20,11 @@ namespace NJsonSchema.Tests.Serialization
         [InlineData(SchemaType.Swagger2, "{\"additionalProperties\":{}}", true)]
         public async Task When_schema_JSON_is_deserialized_then_AllowAdditionalProperties_is_correct(SchemaType schemaType, string json, bool expectedAllowAdditionalProperties)
         {
-            //// Act
+            // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
 
-            //// Assert
+            // Assert
             Assert.Equal(expectedAllowAdditionalProperties, schema.AllowAdditionalProperties);
         }
 
@@ -37,11 +36,11 @@ namespace NJsonSchema.Tests.Serialization
         {
             // default schema (new JsonSchema) has always AllowAdditionalProperties = true
 
-            //// Act
+            // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var json = JsonSchemaSerialization.ToJson(new JsonSchema(), schemaType, new DefaultContractResolver(), Formatting.None);
 
-            //// Assert
+            // Assert
             Assert.Equal(expectedJson, json);
         }
 
@@ -54,11 +53,11 @@ namespace NJsonSchema.Tests.Serialization
         [InlineData(SchemaType.Swagger2, false, "{}")]
         public void When_AllowAdditionalProperties_is_true_then_JSON_is_correct(SchemaType schemaType, bool allowAdditionalProperties, string expectedJson)
         {
-            //// Act
+            // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var json = JsonSchemaSerialization.ToJson(new JsonSchema { AllowAdditionalProperties = allowAdditionalProperties }, schemaType, new DefaultContractResolver(), Formatting.None);
 
-            //// Assert
+            // Assert
             Assert.Equal(expectedJson, json);
         }
     }

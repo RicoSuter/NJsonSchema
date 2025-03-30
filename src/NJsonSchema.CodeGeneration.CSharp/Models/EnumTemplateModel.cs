@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -36,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string Name { get; }
 
         /// <summary>Gets a value indicating whether the enum has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => _schema is not JsonSchemaProperty && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
         public string? Description => _schema.Description;
@@ -77,9 +75,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 entries.Add(new EnumerationItemModel
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
+                                    OriginalName = name,
                                     Value = value.ToString(),
-                                    InternalValue = valueInt64.ToString(),
-                                    InternalFlagValue = valueInt64.ToString()
+                                    InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
+                                    InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                             else
@@ -87,9 +86,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 entries.Add(new EnumerationItemModel
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
+                                    OriginalName = name,
                                     Value = value.ToString(),
                                     InternalValue = value.ToString(),
-                                    InternalFlagValue = (1 << i).ToString()
+                                    InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
                             }
                         }
@@ -101,9 +101,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                             entries.Add(new EnumerationItemModel
                             {
                                 Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
+                                OriginalName = name,
                                 Value = value.ToString(),
-                                InternalValue = i.ToString(),
-                                InternalFlagValue = (1 << i).ToString()
+                                InternalValue = i.ToString(CultureInfo.InvariantCulture),
+                                InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                             });
                         }
                     }
@@ -167,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
             else
             {
-                valueInt64 = default(long);
+                valueInt64 = default;
                 return false;
             }
         }

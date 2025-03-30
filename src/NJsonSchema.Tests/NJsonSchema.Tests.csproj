@@ -1,15 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <Nullable>disable</Nullable>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
     </PropertyGroup>
 
     <PropertyGroup>
         <DocumentationFile>bin\Debug\$(TargetFramework)\NJsonSchema.Tests.xml</DocumentationFile>
         <NoWarn>$(NoWarn),618,1587,1998,1591</NoWarn>
+        <!-- Remove the underscores from member name -->
+        <NoWarn>$(NoWarn),CA1707</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,8 +24,10 @@
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
         <PackageReference Include="NodaTime" />
-        <Reference Condition="'$(TargetFramework)' == 'net462'" Include="System.ComponentModel.DataAnnotations"></Reference>
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Condition="'$(TargetFramework)' == 'net472'" Include="System.ComponentModel.DataAnnotations"></Reference>
     </ItemGroup>
 
     <ItemGroup>

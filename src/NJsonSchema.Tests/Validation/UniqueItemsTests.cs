@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
+﻿using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {
@@ -9,7 +7,7 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_unique_items_is_set_and_items_are_objects_then_validation_works()
         {
-            //// Arrange
+            // Arrange
             var jsonSchema = @"{
     ""$schema"": ""http://json-schema.org/draft-04/schema#"",
     ""title"": ""Config"",
@@ -42,11 +40,11 @@ namespace NJsonSchema.Tests.Validation
     ""value"": ""b""
 }]";
             
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var errors = schema.Validate(jsonData).ToList();
 
-            //// Assert
+            // Assert
             Assert.Single(errors);
         }
     }

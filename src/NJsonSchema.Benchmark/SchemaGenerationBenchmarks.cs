@@ -1,22 +1,13 @@
-﻿using System;
-using System.Diagnostics;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using NBench;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace NJsonSchema.Benchmark
 {
     public class SchemaGenerationBenchmarks
     {
         private Counter _counter;
-
-        public SchemaGenerationBenchmarks(ITestOutputHelper output)
-        {
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new XunitTraceListener(output));
-        }
 
         [PerfSetup]
         public void Setup(BenchmarkContext context)
@@ -69,7 +60,7 @@ namespace NJsonSchema.Benchmark
         {
             public static Type[] GetKnownTypes()
             {
-                return new[] { typeof(Pen), typeof(Pencil) };
+                return [typeof(Pen), typeof(Pencil)];
             }
 
             public string Baz { get; set; }

@@ -1,4 +1,5 @@
-﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+﻿{%- if UseSystemTextJsonPolymorphicSerialization == false -%}
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple = true)]
 internal class JsonInheritanceAttribute : System.Attribute
 {
@@ -12,3 +13,4 @@ internal class JsonInheritanceAttribute : System.Attribute
 
     public System.Type Type { get; }
 }
+{%- endif -%}

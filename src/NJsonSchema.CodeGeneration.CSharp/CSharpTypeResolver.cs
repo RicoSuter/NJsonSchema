@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Linq;
-
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>
@@ -60,19 +57,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 throw new ArgumentNullException(nameof(schema));
             }
 
-            schema = GetResolvableSchema(schema);
-
-            if (schema == ExceptionSchema)
-            {
-                return "System.Exception";
-            }
-
             // Primitive schemas (no new type)
             if (Settings.GenerateOptionalPropertiesAsNullable &&
                 schema is JsonSchemaProperty property &&
                 !property.IsRequired)
             {
                 isNullable = true;
+            }
+
+            schema = GetResolvableSchema(schema);
+
+            if (schema == ExceptionSchema)
+            {
+                return "System.Exception";
             }
 
             var markAsNullableType = Settings.GenerateNullableReferenceTypes && isNullable;
@@ -197,12 +194,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
-            if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
+            if (schema.Format is JsonFormatStrings.Guid or JsonFormatStrings.Uuid)
             {
                 return isNullable ? "System.Guid?" : "System.Guid";
             }
 
-            if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
+            if (schema.Format is JsonFormatStrings.Base64 or JsonFormatStrings.Byte)
             {
                 return "byte[]" + nullableReferenceType;
             }
@@ -217,24 +214,24 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "bool?" : "bool";
         }
 
-        private string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Byte)
             {
                 return isNullable ? "byte?" : "byte";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.ULong || schema.Format == "ulong")
+            if (schema.Format is JsonFormatStrings.ULong or "ulong")
             {
                 return isNullable ? "ulong?" : "ulong";
             }
@@ -268,7 +265,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             };
 
             if (string.IsNullOrWhiteSpace(numberType))
+            {
                 numberType = "double";
+            }
 
             return isNullable ? numberType + "?" : numberType;
         }

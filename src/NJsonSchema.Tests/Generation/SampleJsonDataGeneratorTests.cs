@@ -2,7 +2,6 @@
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Generation
@@ -40,15 +39,15 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_sample_data_is_generated_from_schema_then_properties_are_set()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var generator = new SampleJsonDataGenerator();
 
-            //// Act
+            // Act
             var token = generator.Generate(schema);
             var obj = token as JObject;
 
-            //// Assert
+            // Assert
             Assert.NotNull(obj.Property(nameof(Person.FirstName)));
             Assert.NotNull(obj.Property(nameof(Person.LastName)));
             Assert.NotNull(obj.Property(nameof(Person.MainAddress)));
@@ -58,15 +57,15 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_sample_data_is_generated_from_schema_with_base_then_properties_are_set()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Student>();
             var generator = new SampleJsonDataGenerator();
 
-            //// Act
+            // Act
             var token = generator.Generate(schema);
             var obj = token as JObject;
 
-            //// Assert
+            // Assert
             Assert.NotNull(obj.Property(nameof(Student.Course)));
             Assert.NotNull(obj.Property(nameof(Person.FirstName)));
             Assert.NotNull(obj.Property(nameof(Person.LastName)));
@@ -77,22 +76,22 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void Default_values_are_set_for_arrays()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Measurements>();
             var generator = new SampleJsonDataGenerator();
 
-            //// Act
+            // Act
             var token = generator.Generate(schema);
             var obj = token as JObject;
 
-            //// Assert
+            // Assert
             Assert.Equal(new JArray(new int[] { 1, 2, 3 }), obj.GetValue(nameof(Measurements.Weights)));
         }
 
         [Fact]
         public async Task When_generateOptionalProperties_is_false_then_optional_properties_are_not_set()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -126,11 +125,11 @@ namespace NJsonSchema.Tests.Generation
                 GenerateOptionalProperties = false
             });
 
-            //// Act
+            // Act
             var token = generator.Generate(schema);
             var obj = token as JObject;
 
-            //// Assert
+            // Assert
             Assert.NotNull(obj.Property("isrequired"));
             Assert.Null(obj.Property("isoptional"));
         }
@@ -138,7 +137,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task PropertyWithIntegerMinimumDefiniton()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -176,20 +175,20 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
-            Assert.Equal(0, validationResult.Count);
+            Assert.Empty(validationResult);
             Assert.Equal(1, testJson.SelectToken("body.numberContent.value").Value<int>());
         }
 
         [Fact]
         public async Task SchemaWithRecursiveDefinition()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -233,10 +232,10 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var footerToken = testJson.SelectToken("body.numberContent.data.numberContent.value");
             Assert.NotNull(footerToken);
 
@@ -249,7 +248,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task GeneratorAdheresToMaxRecursionLevel()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -277,10 +276,10 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator(new SampleJsonDataGeneratorSettings() { MaxRecursionLevel = 2 });
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var secondBodyToken = testJson.SelectToken("body.body");
             Assert.NotNull(secondBodyToken);
 
@@ -296,7 +295,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task SchemaWithDefinitionUseMultipleTimes()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -338,23 +337,23 @@ namespace NJsonSchema.Tests.Generation
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
 
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var footerToken = testJson.SelectToken("footer.value");
             Assert.NotNull(footerToken);
 
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
-            Assert.Equal(0, validationResult.Count);
+            Assert.Empty(validationResult);
             Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
         }
 
         [Fact]
         public async Task PropertyWithFloatMinimumDefinition()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -392,20 +391,20 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
-            Assert.Equal(0, validationResult.Count);
+            Assert.Empty(validationResult);
             Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
         }
 
         [Fact]
         public async Task PropertyWithDefaultDefiniton()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -442,13 +441,13 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
-            Assert.Equal(0, validationResult.Count);
+            Assert.Empty(validationResult);
             Assert.Equal(42, testJson.SelectToken("body.numberContent.value").Value<int>());
         }
 
@@ -457,7 +456,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task PropertyExclusiveMinimumDefiniton()
         {
-            //// Arrange
+            // Arrange
             var data = @"{
                 ""$schema"": ""http://json-schema.org/draft-04/schema#"",
                 ""title"": ""test schema"",
@@ -496,13 +495,13 @@ namespace NJsonSchema.Tests.Generation
               }";
             var generator = new SampleJsonDataGenerator();
             var schema = await JsonSchema.FromJsonAsync(data);
-            //// Act
+            // Act
             var testJson = generator.Generate(schema);
 
-            //// Assert
+            // Assert
             var validationResult = schema.Validate(testJson);
             Assert.NotNull(validationResult);
-            Assert.Equal(0, validationResult.Count);
+            Assert.Empty(validationResult);
             Assert.Equal(1.1, testJson.SelectToken("body.numberContent.value").Value<double>());
         }
     }

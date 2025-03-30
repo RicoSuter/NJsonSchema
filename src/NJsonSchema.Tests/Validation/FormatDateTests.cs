@@ -1,6 +1,4 @@
-using System.Linq;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using NJsonSchema.Validation;
 using Xunit;
 
@@ -11,51 +9,51 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public void When_format_date_incorrect_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Date;
 
             var token = new JValue("test");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.DateExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_date_time_then_validation_fails()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Date;
 
             var token = new JValue("2014-12-01 11:54");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Equal(ValidationErrorKind.DateExpected, errors.First().Kind);
         }
 
         [Fact]
         public void When_format_date_correct_then_validation_succeeds()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Date;
 
             var token = new JValue("2014-12-01");
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
     }

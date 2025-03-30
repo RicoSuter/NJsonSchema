@@ -8,7 +8,6 @@
 
 using System.Collections;
 using System.Reflection;
-using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -16,25 +15,30 @@ namespace NJsonSchema.Infrastructure
 {
     internal sealed class IgnoreEmptyCollectionsContractResolver : PropertyRenameAndIgnoreSerializerContractResolver
     {
+        private static readonly TypeInfo enumerableType = typeof(IEnumerable).GetTypeInfo();
+
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-            if ((property.Required == Required.Default || property.Required == Required.DisallowNull) &&
+            if (property.Required is Required.Default or Required.DisallowNull &&
+                property.PropertyType is { IsPrimitive: false } &&
                 property.PropertyType != typeof(string) &&
-                typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(property.PropertyType?.GetTypeInfo()))
+                enumerableType.IsAssignableFrom(property.PropertyType.GetTypeInfo()))
             {
                 property.ShouldSerialize = instance =>
                 {
-                    var enumerable = instance != null ? property.ValueProvider?.GetValue(instance) as IEnumerable : null;
-                    if (enumerable != null)
+                    var value = instance != null ? property.ValueProvider?.GetValue(instance) : null;
+                    if (value is ICollection collection)
+                    {
+                        return collection.Count > 0;
+                    }
+                    if (value is IEnumerable enumerable)
                     {
                         return enumerable.GetEnumerator().MoveNext();
                     }
-                    else
-                    {
-                        return true;
-                    }
+
+                    return true;
                 };
             }
 

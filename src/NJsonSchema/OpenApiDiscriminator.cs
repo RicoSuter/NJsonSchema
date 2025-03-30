@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Reflection;
 using NJsonSchema.References;
 using Newtonsoft.Json.Linq;
@@ -37,11 +35,11 @@ namespace NJsonSchema
         public void AddMapping(Type type, JsonSchema schema)
         {
             var getDiscriminatorValueMethod = JsonInheritanceConverter?.GetType()
-                .GetRuntimeMethod("GetDiscriminatorValue", new Type[] { typeof(Type) });
+                .GetRuntimeMethod("GetDiscriminatorValue", [typeof(Type)]);
 
             if (getDiscriminatorValueMethod != null)
             {
-                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, new[] { type } )!;
+                var discriminatorValue = (string)getDiscriminatorValueMethod.Invoke(JsonInheritanceConverter, [type])!;
                 Mapping[discriminatorValue] = new JsonSchema { Reference = schema.ActualSchema };
             }
             else
@@ -83,8 +81,7 @@ namespace NJsonSchema
 
             public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
             {
-                var internalMapping = value as IDictionary<string, JsonSchema>;
-                if (internalMapping != null)
+                if (value is IDictionary<string, JsonSchema> internalMapping)
                 {
                     var openApiMapping = new Dictionary<string, string>();
                     foreach (var tuple in internalMapping)

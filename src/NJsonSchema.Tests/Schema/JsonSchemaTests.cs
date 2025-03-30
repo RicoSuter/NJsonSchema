@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -18,13 +15,13 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public void When_creating_schema_without_setting_properties_then_it_is_empty()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
 
-            //// Act
+            // Act
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(
 @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#""
@@ -35,7 +32,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_schema_contains_refs_then_they_should_be_resolved()
         {
-            //// Arrange
+            // Arrange
             var data =
 @"{
     ""id"": ""http://some.site.somewhere/entry-schema#"",
@@ -73,10 +70,10 @@ namespace NJsonSchema.Tests.Schema
 }
 ";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(data);
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.Definitions["diskDevice"]);
             Assert.True(schema.Properties["storage"].OneOf.All(p => p != null));
         }
@@ -84,7 +81,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_deserializing_schema_then_it_should_be_read_correctly()
         {
-            //// Arrange
+            // Arrange
             var data =
 @"{
 	""title"": ""Example Schema"",
@@ -105,11 +102,11 @@ namespace NJsonSchema.Tests.Schema
 	""required"": [""firstName"", ""lastName""]
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(data);
             var x = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(3, schema.Properties.Count);
             Assert.Equal(JsonObjectType.Object, schema.Type);
         }
@@ -117,7 +114,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_deserializing_multiple_types_then_flags_should_be_set_correctly()
         {
-            //// Arrange
+            // Arrange
             var data =
 @"{
   ""type"": [
@@ -126,10 +123,10 @@ namespace NJsonSchema.Tests.Schema
   ]
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(data);
 
-            //// Assert
+            // Assert
             Assert.True(schema.Type.HasFlag(JsonObjectType.String));
             Assert.True(schema.Type.HasFlag(JsonObjectType.Null));
         }
@@ -137,16 +134,16 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_deserializing_single_type_then_flags_should_be_set_correctly()
         {
-            //// Arrange
+            // Arrange
             var data =
 @"{
   ""type"": ""string""
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(data);
 
-            //// Assert
+            // Assert
             Assert.True(schema.Type.HasFlag(JsonObjectType.String));
             Assert.Equal(JsonObjectType.String, schema.Type);
         }
@@ -154,45 +151,45 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_deserializing_schema_it_should_not_stackoverflow()
         {
-            //// Arrange
+            // Arrange
             var data =
 @"{
     ""x-dateTime"": ""2016-07-28T14:39:37.937Z""
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(data);
             var x = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.ExtensionData.First().Value is DateTime);
         }
 
         [Fact]
         public void When_setting_single_type_then_it_should_be_serialized_correctly()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
 
-            //// Act
+            // Act
             schema.Type = JsonObjectType.Integer;
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(@"""type"": ""integer""", data);
         }
 
         [Fact]
         public void When_setting_multiple_type_then_it_should_be_serialized_correctly()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
 
-            //// Act
+            // Act
             schema.Type = JsonObjectType.Integer | JsonObjectType.Object;
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(@"  ""type"": [
     ""integer"",
     ""object""
@@ -202,13 +199,13 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public void When_adding_property_to_schema_then_parent_should_be_set()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
 
-            //// Act
+            // Act
             schema.Properties.Add("test", new JsonSchemaProperty());
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("test"));
             Assert.Equal(schema, schema.Properties["test"].ParentSchema);
         }
@@ -216,36 +213,36 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public void When_setting_property_required_then_the_key_should_be_added()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Properties["test"] = new JsonSchemaProperty();
 
-            //// Act
+            // Act
             schema.Properties["test"].IsRequired = true;
 
-            //// Assert
+            // Assert
             Assert.True(schema.RequiredProperties.Contains("test"));
         }
 
         [Fact]
         public void When_setting_property_not_required_then_the_key_should_be_added()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Properties["test"] = new JsonSchemaProperty();
             schema.RequiredProperties.Add("test");
 
-            //// Act
+            // Act
             schema.Properties["test"].IsRequired = false;
 
-            //// Assert
+            // Assert
             Assert.False(schema.RequiredProperties.Contains("test"));
         }
 
         [Fact]
         public void When_number_property_is_null_and_not_required_then_it_is_invalid()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Properties["test"] = new JsonSchemaProperty
             {
@@ -253,17 +250,17 @@ namespace NJsonSchema.Tests.Schema
                 IsRequired = false
             };
 
-            //// Act
+            // Act
             var errors = schema.Validate("{ test: null }");
 
-            //// Assert
-            Assert.Equal(1, errors.Count);
+            // Assert
+            Assert.Single(errors);
         }
 
         [Fact]
         public void When_property_matches_one_of_the_types_then_it_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonSchemaProperty
@@ -274,17 +271,17 @@ namespace NJsonSchema.Tests.Schema
             var token = new JObject();
             token["Foo"] = new JValue(5);
 
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_property_type_not_specified_then_anything_should_succeed()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Object;
             schema.Properties["Foo"] = new JsonSchemaProperty();
@@ -293,17 +290,17 @@ namespace NJsonSchema.Tests.Schema
             var token = new JObject();
             token["Foo"] = new JValue(5);
             token["Bar"] = new JValue("Bar");
-            //// Act
+            // Act
             var errors = schema.Validate(token);
 
-            //// Assert
+            // Assert
             Assert.Empty(errors);
         }
 
         [Fact]
         public void When_DateTimeOffset_is_validated_then_it_should_not_throw()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Type = JsonObjectType.String
@@ -313,12 +310,12 @@ namespace NJsonSchema.Tests.Schema
 
             try
             {
-                //// Act
+                // Act
                 schema.Validate(token);
             }
             catch
             {
-                //// Assert
+                // Assert
                 throw new Exception("Validating JToken with a DateTimeOffset value threw an exception.");
             }
         }
@@ -326,7 +323,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_schema_has_cyclic_references_then_exception_is_thrown()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""type"": ""object"",
@@ -338,11 +335,11 @@ namespace NJsonSchema.Tests.Schema
 }";
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                //// Act
+                // Act
                 var schema = await JsonSchema.FromJsonAsync(json);
                 var data = schema.ToJson();
 
-                //// Assert
+                // Assert
                 var propertySchema = schema.Properties["topProp"].ActualTypeSchema;
             });
         }
@@ -350,7 +347,7 @@ namespace NJsonSchema.Tests.Schema
         [Fact]
         public async Task When_schema_is_loaded_then_all_refs_are_resolved()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
   ""$schema"": ""http://json-schema.org/draft-04/schema#"",
   ""type"": ""object"",
@@ -374,11 +371,11 @@ namespace NJsonSchema.Tests.Schema
   }
 }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.AllOf.First().Reference);
         }
 
@@ -387,29 +384,29 @@ namespace NJsonSchema.Tests.Schema
         {
             // https://github.com/NJsonSchema/NJsonSchema/issues/288
 
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromUrlAsync("http://schemas.sportradar.com/bsa/json/v1/endpoints/soccer/team_profile.json");
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(json);
         }
 
         [Fact]
         public async Task When_schema_has_metadata_properties_it_can_still_be_read()
         {
-            //// Arrange
+            // Arrange
             var json = @"{ ""type"": ""object"", ""additionalProperties"": false, ""properties"": { ""$type"": 
                 { ""type"": ""string"", ""enum"": [ ""file"" ] }, ""Id"": { ""type"": ""string"", 
                 ""format"": ""guid"" }, ""Name"": { ""type"": ""string"" } }, ""required"": [ ""$type"", ""Id"", ""Name"" ] }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Assert
+            // Assert
             // No exception
         }
 
@@ -422,7 +419,7 @@ namespace NJsonSchema.Tests.Schema
                 @"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json");
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema);
             Assert.Contains("The identity type.", json);
         }

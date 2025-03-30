@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Linq;
-
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
     /// <summary>The DateFormatConverterTemplateModel.</summary>

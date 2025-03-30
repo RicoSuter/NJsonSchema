@@ -4,27 +4,25 @@
     <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
-    <PackageVersion Include="Fluid.Core" Version="2.5.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageVersion Include="Namotion.Reflection" Version="3.1.1" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="Fluid.Core" Version="2.21.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="Namotion.Reflection" Version="3.3.0" />
     <PackageVersion Include="NBench" Version="2.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="NodaTime" Version="3.1.9" />
-    <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0-preview011" />
+    <PackageVersion Include="NodaTime" Version="3.2.1" />
+    <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0" />
     <PackageVersion Include="Pro.NBench.xUnit" Version="2.0.0" />
-    <PackageVersion Include="System.ComponentModel.Annotations" Version="4.4.0" />
-    <PackageVersion Include="System.Text.Json" Version="4.7.2" />
-    <PackageVersion Include="Verify.XUnit" Version="14.7.0" />
-    <PackageVersion Include="xunit" Version="2.5.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
-    <PackageVersion Include="YamlDotNet" Version="13.7.1" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="Verify.XUnit" Version="28.14.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    <PackageVersion Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
-    <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
-    <GlobalPackageReference Include="PolySharp" Version="1.13.2" />
+    <GlobalPackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
+    <GlobalPackageReference Include="PolySharp" Version="1.15.0" />
   </ItemGroup>
 </Project>

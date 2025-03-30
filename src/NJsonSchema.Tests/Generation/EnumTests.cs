@@ -1,10 +1,5 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NJsonSchema.Generation;
 using Xunit;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -42,13 +37,13 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyController>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
             // Assert
-            Assert.True(json.Split(new[] { "x-enumNames" }, StringSplitOptions.None).Length == 2); // enum is defined only once
-            Assert.True(json.Split(new[] { "\"$ref\": \"#/definitions/MetadataSchemaType\"" }, StringSplitOptions.None).Length == 3); // both classes reference the enum
+            Assert.True(json.Split(["x-enumNames"], StringSplitOptions.None).Length == 2); // enum is defined only once
+            Assert.True(json.Split(["\"$ref\": \"#/definitions/MetadataSchemaType\""], StringSplitOptions.None).Length == 3); // both classes reference the enum
         }
 
         public class ContainerWithEnumDictionary
@@ -61,7 +56,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ContainerWithEnumDictionary>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
@@ -115,7 +110,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -142,7 +137,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithoutFlags>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =

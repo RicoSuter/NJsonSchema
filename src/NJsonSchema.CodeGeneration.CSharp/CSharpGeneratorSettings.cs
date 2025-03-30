@@ -39,6 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             ClassStyle = CSharpClassStyle.Poco;
             JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
+            JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.NJsonSchema;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
@@ -46,13 +47,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = false;
             EnforceFlagEnums = false;
+            UseRequiredKeyword = false;
 
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
-            {
+            TemplateFactory = new DefaultTemplateFactory(this, [
                 typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
-            });
+            ]);
 
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
@@ -120,6 +121,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
         public CSharpJsonLibrary JsonLibrary { get; set; }
 
+        /// <summary>Gets or sets the CSharp JSON polymorphic serialization style (default: 'NJsonSchema', 'SystemTextJson' is experimental/not complete).</summary>
+        public CSharpJsonPolymorphicSerializationStyle JsonPolymorphicSerializationStyle { get; set; }
+
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }
 
@@ -147,6 +151,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
         public bool EnforceFlagEnums { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether the C# 11 "required" keyword should be used for required properties (default: false). </summary>
+        public bool UseRequiredKeyword { get; set; }
+
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.</summary>
         public bool InlineNamedDictionaries { get; set; }
 
@@ -164,5 +171,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Generate C# 9.0 record types instead of record-like classes.</summary>
         public bool GenerateNativeRecords { get; set; }
+
+        /// <summary>
+        /// The prefix appended when generating a field based on the property name. Default is "_";
+        /// </summary>
+        public string FieldNamePrefix { get; set; } = "_";
+        
     }
 }

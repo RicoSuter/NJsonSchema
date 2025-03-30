@@ -8,6 +8,9 @@
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <NukeExcludeConfig>true</NukeExcludeConfig>
+    <NukeExcludeDirectoryBuild>true</NukeExcludeDirectoryBuild>
+    <NukeExcludeLogs>true</NukeExcludeLogs>
     <IsPackable>false</IsPackable>
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
@@ -18,8 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="7.0.6" />
-    <PackageDownload Include="NuGet.CommandLine" Version="[5.11.0]" />
+    <PackageReference Include="Nuke.Common" Version="9.0.4" />
   </ItemGroup>
 
 </Project>

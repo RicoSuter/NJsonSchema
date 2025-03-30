@@ -1,14 +1,8 @@
-﻿using System.Threading.Tasks;
-using NJsonSchema.Annotations;
-using NJsonSchema.NewtonsoftJson.Generation;
-using VerifyXunit;
-using Xunit;
-
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests;
 
-[UsesVerify]
 public class PropertyNameTests
 {
     private class TypeWithRestrictedProperties

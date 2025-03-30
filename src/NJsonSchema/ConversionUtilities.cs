@@ -7,8 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -130,7 +128,7 @@ namespace NJsonSchema
                         break;
                     default:
                         // ASCII printable character
-                        if (c >= 0x20 && c <= 0x7e)
+                        if (c is >= (char)0x20 and <= (char)0x7e)
                         {
                             literal.Append(c);
                             // As UTF16 escaped character
@@ -138,7 +136,7 @@ namespace NJsonSchema
                         else
                         {
                             literal.Append(@"\u");
-                            literal.Append(((int) c).ToString("x4"));
+                            literal.Append(((int) c).ToString("x4", CultureInfo.InvariantCulture));
                         }
 
                         break;
@@ -162,7 +160,7 @@ namespace NJsonSchema
         }
 
 
-        private static readonly char[] _whiteSpaceChars = { '\n', '\r', '\t', ' ' };
+        private static readonly char[] _whiteSpaceChars = ['\n', '\r', '\t', ' '];
 
         /// <summary>Trims white spaces from the text.</summary>
         /// <param name="text">The text.</param>
@@ -172,7 +170,7 @@ namespace NJsonSchema
             return text?.Trim(_whiteSpaceChars) ?? string.Empty;
         }
 
-        private static readonly char[] _lineBreakTrimChars = { '\n', '\t', ' ' };
+        private static readonly char[] _lineBreakTrimChars = ['\n', '\t', ' '];
 
         /// <summary>Removes the line breaks from the text.</summary>
         /// <param name="text">The text.</param>
@@ -197,7 +195,7 @@ namespace NJsonSchema
                 return "Person";
             }
 
-            return word.EndsWith("s") ? word.Substring(0, word.Length - 1) : word;
+            return word.EndsWith('s') ? word.Substring(0, word.Length - 1) : word;
         }
 
         /// <summary>Add tabs to the given string.</summary>
@@ -303,7 +301,7 @@ namespace NJsonSchema
 
         private static string ConvertDashesToCamelCase(string input)
         {
-            if (input.IndexOf('-') == -1)
+            if (!input.Contains('-'))
             {
                 // no conversion necessary
                 return input;

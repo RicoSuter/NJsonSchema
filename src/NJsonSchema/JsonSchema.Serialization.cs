@@ -6,12 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -24,10 +22,14 @@ namespace NJsonSchema
     [JsonConverter(typeof(ExtensionDataDeserializationConverter))]
     public partial class JsonSchema : IJsonExtensionObject
     {
-        private static readonly JsonObjectType[] _jsonObjectTypeValues = Enum.GetValues(typeof(JsonObjectType))
-            .OfType<JsonObjectType>()
-            .Where(v => v != JsonObjectType.None)
-            .ToArray();
+        internal static readonly List<JsonObjectType> JsonObjectTypes =
+#if NET8_0_OR_GREATER
+            Enum.GetValues<JsonObjectType>()
+#else
+            Enum.GetValues(typeof(JsonObjectType)).Cast<JsonObjectType>()
+#endif
+            .Where(static v => v != JsonObjectType.None)
+            .ToList();
 
 
         // keep a reference so we don't need to create a delegate each time
@@ -124,11 +126,11 @@ namespace NJsonSchema
             {
                 if (value is string)
                 {
-                    Discriminator = (string)value;
+                    Discriminator = (string) value;
                 }
                 else if (value != null)
                 {
-                    DiscriminatorObject = ((JObject)value).ToObject<OpenApiDiscriminator>();
+                    DiscriminatorObject = ((JObject) value).ToObject<OpenApiDiscriminator>();
                 }
             }
         }
@@ -141,12 +143,12 @@ namespace NJsonSchema
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object? ExclusiveMaximumRaw
         {
-            get { return ExclusiveMaximum ?? (IsExclusiveMaximum ? (object)true : null); }
+            get => ExclusiveMaximum ?? (IsExclusiveMaximum ? (object) true : null);
             set
             {
                 if (value is bool)
                 {
-                    IsExclusiveMaximum = (bool)value;
+                    IsExclusiveMaximum = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -154,7 +156,7 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
-                    ExclusiveMaximum = Convert.ToDecimal(value);
+                    ExclusiveMaximum = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -163,12 +165,12 @@ namespace NJsonSchema
         [JsonProperty("exclusiveMinimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object? ExclusiveMinimumRaw
         {
-            get { return ExclusiveMinimum ?? (IsExclusiveMinimum ? (object)true : null); }
+            get => ExclusiveMinimum ?? (IsExclusiveMinimum ? (object) true : null);
             set
             {
                 if (value is bool)
                 {
-                    IsExclusiveMinimum = (bool)value;
+                    IsExclusiveMinimum = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -176,7 +178,7 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
-                    ExclusiveMinimum = Convert.ToDecimal(value);
+                    ExclusiveMinimum = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -202,7 +204,7 @@ namespace NJsonSchema
             {
                 if (value is bool)
                 {
-                    AllowAdditionalItems = (bool)value;
+                    AllowAdditionalItems = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -256,7 +258,7 @@ namespace NJsonSchema
             {
                 if (value is bool)
                 {
-                    AllowAdditionalProperties = (bool)value;
+                    AllowAdditionalProperties = (bool) value;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -290,7 +292,7 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                 {
-                    Items = new ObservableCollection<JsonSchema>(((JArray)value).Select(t => FromJsonWithCurrentSettings(t)));
+                    Items = new ObservableCollection<JsonSchema>(((JArray) value).Select(FromJsonWithCurrentSettings));
                 }
                 else if (value != null)
                 {
@@ -317,7 +319,7 @@ namespace NJsonSchema
             {
                 if (value is JArray)
                 {
-                    Type = ((JArray)value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
+                    Type = ((JArray) value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
                 }
                 else
                 {
@@ -333,7 +335,7 @@ namespace NJsonSchema
         {
             _typeRaw = new Lazy<object?>(() =>
             {
-                var flags = _jsonObjectTypeValues
+                var flags = JsonObjectTypes
                     .Where(v => Type.HasFlag(v))
                     .ToArray();
 
@@ -354,79 +356,67 @@ namespace NJsonSchema
         [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<string>? RequiredPropertiesRaw
         {
-            get { return RequiredProperties != null && RequiredProperties.Count > 0 ? RequiredProperties : null; }
-            set { RequiredProperties = value ?? new List<string>(); }
+            get => RequiredProperties != null && RequiredProperties.Count > 0 ? RequiredProperties : null;
+            set => RequiredProperties = value ?? [];
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchemaProperty>? PropertiesRaw
         {
             get => _properties != null && _properties.Count > 0 ? Properties : null;
-            set
-            {
-                Properties = value != null ?
-                    new ObservableDictionary<string, JsonSchemaProperty>(value!) :
-                    new ObservableDictionary<string, JsonSchemaProperty>();
-            }
+            set => Properties = value != null ? new ObservableDictionary<string, JsonSchemaProperty>(value!) : [];
         }
 
         [JsonProperty("patternProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchemaProperty>? PatternPropertiesRaw
         {
-            get
-            {
-                return _patternProperties != null && _patternProperties.Count > 0 ?
-                    PatternProperties.ToDictionary(p => p.Key, p => p.Value) : null;
-            }
-            set
-            {
-                PatternProperties = value != null ?
-                    new ObservableDictionary<string, JsonSchemaProperty>(value!) :
-                    new ObservableDictionary<string, JsonSchemaProperty>();
-            }
+            get => _patternProperties is { Count: > 0 }
+                ? PatternProperties.ToDictionary(p => p.Key, p => p.Value)
+                : null;
+            set => PatternProperties = value != null ? new ObservableDictionary<string, JsonSchemaProperty>(value!) : [];
         }
 
         [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchema>? DefinitionsRaw
         {
-            get { return Definitions != null && Definitions.Count > 0 ? Definitions : null; }
-            set { Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value!) : new ObservableDictionary<string, JsonSchema>(); }
+            get => Definitions != null && Definitions.Count > 0 ? Definitions : null;
+            set => Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value!) : [];
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal Collection<string>? EnumerationNamesRaw
         {
-            get { return EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null; }
-            set { EnumerationNames = value != null ? new ObservableCollection<string>(value) : new ObservableCollection<string>(); }
+            get => EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null;
+            set => EnumerationNames = value != null ? new ObservableCollection<string>(value) : [];
         }
 
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<object?>? EnumerationRaw
         {
-            get { return Enumeration != null && Enumeration.Count > 0 ? Enumeration : null; }
-            set { Enumeration = value != null ? new ObservableCollection<object?>(value) : new ObservableCollection<object?>(); }
+            get => Enumeration != null && Enumeration.Count > 0 ? Enumeration : null;
+            set => Enumeration = value != null ? new ObservableCollection<object?>(value) : [];
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? AllOfRaw
         {
-            get { return _allOf != null && _allOf.Count > 0 ? AllOf : null; }
-            set { AllOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
+            get => _allOf != null && _allOf.Count > 0 ? AllOf : null;
+            set => AllOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
         [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? AnyOfRaw
         {
-            get { return _anyOf != null && _anyOf.Count > 0 ? AnyOf : null; }
-            set { AnyOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
+            get => _anyOf != null && _anyOf.Count > 0 ? AnyOf : null;
+            set => AnyOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
         [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? OneOfRaw
         {
-            get { return _oneOf != null && _oneOf.Count > 0 ? OneOf : null; }
-            set { OneOf = value != null ? new ObservableCollection<JsonSchema>(value) : new ObservableCollection<JsonSchema>(); }
+            get => _oneOf != null && _oneOf.Count > 0 ? OneOf : null;
+            set => OneOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
         private void RegisterProperties(ObservableDictionary<string, JsonSchemaProperty>? oldCollection, ObservableDictionary<string, JsonSchemaProperty>? newCollection)
@@ -474,7 +464,7 @@ namespace NJsonSchema
 
         private void InitializeSchemaCollection(object? sender, NotifyCollectionChangedEventArgs? args)
         {
-            if (sender is ObservableDictionary<string, JsonSchemaProperty> properties)
+            if (sender is ObservableDictionary<string, JsonSchemaProperty> { Count: > 0 } properties)
             {
                 foreach (var property in properties)
                 {
@@ -482,24 +472,35 @@ namespace NJsonSchema
                     property.Value.Parent = this;
                 }
             }
-            else if (sender is ObservableCollection<JsonSchema> items)
+            else if (sender is ObservableCollection<JsonSchema> { Count: > 0 } items)
             {
                 foreach (var item in items)
                 {
                     item.Parent = this;
                 }
             }
-            else if (sender is ObservableDictionary<string, JsonSchema> collection)
+            else if (sender is ObservableDictionary<string, JsonSchema> { Count: > 0 } collection)
             {
-                foreach (var pair in collection.ToArray())
+                List<string>? keysToRemove = null;
+                foreach (var pair in collection)
                 {
                     if (pair.Value == null)
                     {
-                        collection.Remove(pair.Key);
+                        keysToRemove ??= [];
+                        keysToRemove.Add(pair.Key);
                     }
                     else
                     {
                         pair.Value.Parent = this;
+                    }
+                }
+
+                if (keysToRemove != null)
+                {
+                    for (var i = 0; i < keysToRemove.Count; i++)
+                    {
+                        var key = keysToRemove[i];
+                        collection.Remove(key);
                     }
                 }
             }

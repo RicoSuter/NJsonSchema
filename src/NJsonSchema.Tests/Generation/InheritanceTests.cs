@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.Generation.SchemaProcessors;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
@@ -17,7 +12,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
@@ -40,10 +35,10 @@ namespace NJsonSchema.Tests.Generation
                 ]
             }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.InheritedSchema);
             Assert.Equal(2, schema.ActualProperties.Count);
             Assert.True(schema.ActualProperties.ContainsKey("prop1"));
@@ -53,7 +48,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_schema()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
@@ -72,22 +67,22 @@ namespace NJsonSchema.Tests.Generation
                 ]
             }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.InheritedSchema);
-            Assert.Equal(1, schema.ActualProperties.Count);
+            Assert.Single(schema.ActualProperties);
             Assert.True(schema.ActualProperties.ContainsKey("prop1"));
         }
 
         [Fact]
         public async Task When_generating_type_with_inheritance_then_allOf_has_one_item()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.ActualProperties["Class"]);
 
             Assert.Equal(2, schema.AllOf.Count);
@@ -108,16 +103,16 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_generating_type_with_inheritance_and_flattening_then_schema_has_all_properties_of_inherited_classes()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<CC>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 FlattenInheritanceHierarchy = true
             });
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(4, schema.Properties.Count);
         }
 
@@ -159,14 +154,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_root_schema_is_inherited_then_schema_is_generated()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Animal>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
         }
 
@@ -191,7 +186,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_discriminator_is_externally_defined_then_it_is_generated()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
@@ -200,11 +195,11 @@ namespace NJsonSchema.Tests.Generation
                 }
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ViewModelThing>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Definitions.ContainsKey(nameof(CommonThingBase)));
             Assert.True(schema.Definitions.ContainsKey(nameof(ACommonThing)));
             Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
@@ -223,7 +218,7 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_discriminator_is_externally_defined_then_it_is_generated_without_exception()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaProcessors =
@@ -232,11 +227,11 @@ namespace NJsonSchema.Tests.Generation
                 }
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ViewModelThingWithTwoProperties>(settings);
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Definitions.ContainsKey(nameof(CommonThingBase)));
             Assert.True(schema.Definitions.ContainsKey(nameof(ACommonThing)));
             Assert.True(schema.Definitions.ContainsKey(nameof(BCommonThing)));
@@ -248,26 +243,26 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_serializing_object_with_inheritance_then_discriminator_is_added()
         {
-            /// Arrange
+            // Arrange
             var thing = new ViewModelThing
             {
                 CommonThing = new ACommonThing()
             };
 
-            /// Act
+            // Act
             var json = JsonConvert.SerializeObject(thing, Formatting.Indented, new[]
             {
                 new JsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
             });
 
-            /// Assert
+            // Assert
             Assert.Contains("\"discriminator\": \"ACommonThing\"", json);
         }
 
         [Fact]
         public async Task When_deserializing_object_with_inheritance_then_correct_type_is_generated()
         {
-            /// Arrange
+            // Arrange
             var json =
             @"{
               ""CommonThing"": {
@@ -275,16 +270,16 @@ namespace NJsonSchema.Tests.Generation
               }
             }";
 
-            /// Act
+            // Act
             var vm = JsonConvert.DeserializeObject<ViewModelThing>(json, new JsonSerializerSettings
             {
-                Converters = new[]
-                {
+                Converters =
+                [
                     new JsonInheritanceConverter(typeof(CommonThingBase), "discriminator")
-                }
+                ]
             });
 
-            /// Assert
+            // Assert
             Assert.Equal(typeof(ACommonThing), vm.CommonThing.GetType());
         }
 
@@ -303,12 +298,12 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task Existing_string_property_can_be_discriminant()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<BaseClass_WithStringDiscriminant>();
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema.Properties["Kind"]);
         }
 
@@ -327,13 +322,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task Existing_non_string_property_cant_be_discriminant()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             JsonSchema GetSchema() => NewtonsoftJsonSchemaGenerator.FromType<BaseClass_WithObjectDiscriminant>();
             Action getSchemaAction = () => GetSchema();
 
-            //// Assert
+            // Assert
             Assert.Throws<InvalidOperationException>(getSchemaAction);
         }
 
@@ -350,17 +345,17 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_inherits_from_dictionary_then_allOf_contains_base_dictionary_schema_and_actual_schema()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(settings);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             var bar = schema.Definitions["Bar"];
 
             Assert.Equal(2, bar.AllOf.Count);
@@ -392,17 +387,17 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_class_with_discriminator_has_base_class_then_mapping_is_placed_in_type_schema_and_not_root()
         {
-            //// Arrange
+            // Arrange
             var settings = new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.OpenApi3
             };
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>(settings);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             var exceptionBase = schema.Definitions["ExceptionBase"];
 
             Assert.Null(exceptionBase.DiscriminatorObject);
@@ -431,11 +426,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_using_JsonInheritanceAttribute_then_schema_is_correct()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Fruit>();
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.NotNull(data);
             Assert.Contains(@"""a"": """, data);
             Assert.Contains(@"""o"": """, data);

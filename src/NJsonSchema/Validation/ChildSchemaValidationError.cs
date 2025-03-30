@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Validation
@@ -35,13 +34,13 @@ namespace NJsonSchema.Validation
         /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
-            var output = string.Format("{0}: {1}\n", Kind, Path);
+            var output = $"{Kind}: {Path}\n";
             foreach (var error in Errors)
             {
                 output += "{\n";
                 foreach (var validationError in error.Value)
                 {
-                    output += string.Format("  {0}\n", validationError.ToString().Replace("\n", "\n  "));
+                    output += $"  {validationError.ToString().Replace("\n", "\n  ")}\n";
                 }
                 output += "}\n";
             }

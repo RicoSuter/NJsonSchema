@@ -9,18 +9,15 @@
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using NJsonSchema.Generation;
-using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
-        private static ReaderWriterLockSlim _namesLock = new ReaderWriterLockSlim();
-        private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
+        private static readonly ReaderWriterLockSlim _namesLock = new();
+        private static readonly Dictionary<ContextualMemberInfo, string> _names = [];
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>

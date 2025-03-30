@@ -11,8 +11,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
     public sealed class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
-        private static readonly char[] _reservedFirstPassChars = { '"', '\'', '@', '?', '!', '$', '[', ']', '(', ')', '.', '=', '+' };
-        private static readonly char[] _reservedSecondPassChars = { '*', ':', '-', '#', '&' };
+        private static readonly char[] _reservedFirstPassChars = ['"', '\'', '@', '?', '!', '$', '[', ']', '(', ')', '.', '=', '+', '|'
+        ];
+        private static readonly char[] _reservedSecondPassChars = ['*', ':', '-', '#', '&'];
 
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
@@ -35,7 +36,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace(")", string.Empty)
                     .Replace(".", "-")
                     .Replace("=", "-")
-                    .Replace("+", "plus");
+                    .Replace("+", "plus")
+                    .Replace("|", "_");
             }
 
             name = ConversionUtilities.ConvertToUpperCamelCase(name, true);

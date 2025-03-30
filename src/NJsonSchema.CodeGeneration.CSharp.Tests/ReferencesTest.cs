@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Infrastructure;
-using System;
-using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -14,17 +11,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_ref_is_definitions_no_types_are_duplicated()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/E.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public enum C", code);
             Assert.DoesNotContain("public enum C2", code);
         }
@@ -32,17 +29,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_ref_is_file_no_types_are_duplicated()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/A.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public enum C", code);
             Assert.DoesNotContain("public enum C2", code);
         }
@@ -50,10 +47,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_ref_is_file_and_it_contains_nullable_property_then_generated_property_is_also_nullable()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/F.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var generatorSettings = new CSharpGeneratorSettings
             {
@@ -61,16 +58,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             };
             var generator = new CSharpGenerator(schema, generatorSettings);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
+            // Assert
             Assert.Contains("public string? Name", code);
         }
 
         private string GetTestDirectory()
         {
+#pragma warning disable SYSLIB0012
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+#pragma warning restore SYSLIB0012
             var uri = new UriBuilder(codeBase);
             return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }
@@ -121,13 +120,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.OpenApi3, null, factory, new DefaultContractResolver());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.OpenApi3, null, factory, new DefaultContractResolver(), CancellationToken.None);
 
             // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var code = generator.GenerateFile("MyClass");
 
-            //// Act
+            // Act
             Assert.Contains("class BusinessException", code);
             Assert.Contains("class ValidationException", code);
             Assert.DoesNotContain("AdditionalProperties", code);
@@ -166,13 +165,13 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.Swagger2, null, factory, new DefaultContractResolver());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.Swagger2, null, factory, new DefaultContractResolver(), CancellationToken.None);
 
             // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
             var code = generator.GenerateFile("MyClass");
 
-            //// Act
+            // Act
             Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
         }
     }

@@ -3,9 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateProgramFile>false</GenerateProgramFile>
-        <NoWarn>$(NoWarn),xUnit1013</NoWarn>
+        <NoWarn>$(NoWarn),xUnit1013;CS1591</NoWarn>
         <SignAssembly>false</SignAssembly>
         <Nullable>disable</Nullable>
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,10 +20,6 @@
         <PackageReference Include="Pro.NBench.xUnit" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     </ItemGroup>
 
     <ItemGroup>

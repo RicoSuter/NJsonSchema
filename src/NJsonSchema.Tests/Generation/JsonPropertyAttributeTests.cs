@@ -1,7 +1,5 @@
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
@@ -12,13 +10,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_name_of_JsonPropertyAttribute_is_set_then_it_is_used_as_json_property_name()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyJsonPropertyTestClass>();
 
-            //// Act
+            // Act
             var property = schema.Properties["NewName"];
 
-            //// Assert
+            // Assert
             Assert.Equal("NewName", property.Name);
         }
 
@@ -36,13 +34,13 @@ namespace NJsonSchema.Tests.Generation
                 }
             };
 
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyJsonPropertyTestClass>(settings);
 
-            //// Act
+            // Act
             var property = schema.Properties["NewName"];
 
-            //// Assert
+            // Assert
             Assert.Equal("NewName", property.Name);
         }
 
@@ -57,26 +55,26 @@ namespace NJsonSchema.Tests.Generation
                 }
             };
 
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyJsonPropertyTestClass>(settings);
 
-            //// Act
+            // Act
             var property = schema.Properties["newName"];
 
-            //// Assert
+            // Assert
             Assert.Equal("newName", property.Name);
         }
 
         [Fact]
         public async Task When_required_is_always_in_JsonPropertyAttribute_then_the_property_is_required()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyJsonPropertyTestClass>();
 
-            //// Act
+            // Act
             var property = schema.Properties["Required"];
 
-            //// Assert
+            // Assert
             Assert.True(property.IsRequired);
         }
 

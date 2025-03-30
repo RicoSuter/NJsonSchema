@@ -6,20 +6,13 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
@@ -30,7 +23,8 @@ namespace NJsonSchema
     /// <summary>A base class for describing a JSON schema. </summary>
     public partial class JsonSchema : IDocumentPathProvider
     {
-        internal static readonly HashSet<string> JsonSchemaPropertiesCache = new HashSet<string>(typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray());
+        internal static readonly HashSet<string> JsonSchemaPropertiesCache =
+            [..typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray()];
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
 
@@ -51,10 +45,10 @@ namespace NJsonSchema
         internal ObservableCollection<JsonSchema> _items;
 
         private bool _allowAdditionalItems = true;
-        private JsonSchema? _additionalItemsSchema = null;
+        private JsonSchema? _additionalItemsSchema;
 
         private bool _allowAdditionalProperties = true;
-        private JsonSchema? _additionalPropertiesSchema = null;
+        private JsonSchema? _additionalPropertiesSchema;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchema"/> class. </summary>
         public JsonSchema()
@@ -244,14 +238,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>
         [JsonIgnore]
-        public bool IsBinary
-        {
-            get
-            {
-                return Type.IsFile() ||
-                    (Type.IsString() && Format == JsonFormatStrings.Binary);
-            }
-        }
+        public bool IsBinary => Type.IsFile() || (Type.IsString() && Format == JsonFormatStrings.Binary);
 
         /// <summary>Gets the inherited/parent schema (most probable base schema in allOf).</summary>
         /// <remarks>Used for code generation.</remarks>
@@ -306,17 +293,7 @@ namespace NJsonSchema
         /// <summary>Gets the list of all inherited/parent schemas.</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
-        public IReadOnlyCollection<JsonSchema> AllInheritedSchemas
-        {
-            get
-            {
-                var inheritedSchema = this.InheritedSchema != null ?
-                    new List<JsonSchema> { this.InheritedSchema } :
-                    new List<JsonSchema>();
-
-                return inheritedSchema.Concat(inheritedSchema.SelectMany(s => s.AllInheritedSchemas)).ToList();
-            }
-        }
+        public IReadOnlyCollection<JsonSchema> AllInheritedSchemas => InheritedSchema != null ? [InheritedSchema, ..InheritedSchema.AllInheritedSchemas] : [];
 
         /// <summary>Determines whether the given schema is the parent schema of this schema (i.e. super/base class).</summary>
         /// <param name="schema">The possible subtype schema.</param>
@@ -545,7 +522,7 @@ namespace NJsonSchema
         [JsonProperty("x-dictionaryKey", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema? DictionaryKey
         {
-            get { return _dictionaryKey; }
+            get => _dictionaryKey;
             set
             {
                 _dictionaryKey = value;
@@ -560,7 +537,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchemaProperty> Properties
         {
-            get { return _properties; }
+            get => _properties;
             internal set
             {
                 if (_properties != value)
@@ -576,7 +553,7 @@ namespace NJsonSchema
         [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonXmlObject? Xml
         {
-            get { return _xmlObject; }
+            get => _xmlObject;
             set
             {
                 _xmlObject = value;
@@ -595,7 +572,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchemaProperty> PatternProperties
         {
-            get { return _patternProperties; }
+            get => _patternProperties;
             internal set
             {
                 if (_patternProperties != value)
@@ -611,7 +588,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? Item
         {
-            get { return _item; }
+            get => _item;
             set
             {
                 if (_item != value)
@@ -630,7 +607,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> Items
         {
-            get { return _items; }
+            get => _items;
             internal set
             {
                 if (_items != value)
@@ -651,7 +628,7 @@ namespace NJsonSchema
         [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public JsonSchema? Not
         {
-            get { return _not; }
+            get => _not;
             set
             {
                 _not = value;
@@ -666,7 +643,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public IDictionary<string, JsonSchema> Definitions
         {
-            get { return _definitions; }
+            get => _definitions;
             internal set
             {
                 if (_definitions != value)
@@ -682,7 +659,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> AllOf
         {
-            get { return _allOf; }
+            get => _allOf;
             internal set
             {
                 if (_allOf != value)
@@ -698,7 +675,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> AnyOf
         {
-            get { return _anyOf; }
+            get => _anyOf;
             internal set
             {
                 if (_anyOf != value)
@@ -714,7 +691,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public ICollection<JsonSchema> OneOf
         {
-            get { return _oneOf; }
+            get => _oneOf;
             internal set
             {
                 if (_oneOf != value)
@@ -731,7 +708,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool AllowAdditionalItems
         {
-            get { return _allowAdditionalItems; }
+            get => _allowAdditionalItems;
             set
             {
                 if (_allowAdditionalItems != value)
@@ -750,7 +727,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? AdditionalItemsSchema
         {
-            get { return _additionalItemsSchema; }
+            get => _additionalItemsSchema;
             set
             {
                 if (_additionalItemsSchema != value)
@@ -769,7 +746,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public bool AllowAdditionalProperties
         {
-            get { return _allowAdditionalProperties; }
+            get => _allowAdditionalProperties;
             set
             {
                 if (_allowAdditionalProperties != value)
@@ -788,7 +765,7 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonSchema? AdditionalPropertiesSchema
         {
-            get { return _additionalPropertiesSchema; }
+            get => _additionalPropertiesSchema;
             set
             {
                 if (_additionalPropertiesSchema != value)
@@ -812,7 +789,7 @@ namespace NJsonSchema
 
         /// <summary>Gets a value indicating whether the schema represents an tuple type (an array where each item may have a different type).</summary>
         [JsonIgnore]
-        public bool IsTuple => Type.IsArray() && Items?.Any() == true;
+        public bool IsTuple => Type.IsArray() && Items?.Count > 0;
 
         /// <summary>Gets a value indicating whether the schema represents a dictionary type (no properties and AdditionalProperties or PatternProperties contain a schema).</summary>
         [JsonIgnore]
@@ -831,7 +808,7 @@ namespace NJsonSchema
                                  _patternProperties.Count == 0 &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
-                                 IsEnumeration == false;
+                                !IsEnumeration;
 
         #endregion
 
@@ -932,8 +909,8 @@ namespace NJsonSchema
         public bool InheritsSchema(JsonSchema parentSchema)
         {
             return parentSchema != null && ActualSchema
-                .AllInheritedSchemas.Concat(new List<JsonSchema> { this })
-                .Any(s => s.ActualSchema == parentSchema.ActualSchema) == true;
+                .AllInheritedSchemas.Concat([this])
+                .Any(s => s.ActualSchema == parentSchema.ActualSchema);
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
@@ -1028,55 +1005,16 @@ namespace NJsonSchema
         private void Initialize()
 #pragma warning disable CS8774
         {
-            if (Items == null)
-            {
-                Items = new ObservableCollection<JsonSchema>();
-            }
-
-            if (Properties == null)
-            {
-                Properties = new ObservableDictionary<string, JsonSchemaProperty>();
-            }
-
-            if (PatternProperties == null)
-            {
-                PatternProperties = new ObservableDictionary<string, JsonSchemaProperty>();
-            }
-
-            if (Definitions == null)
-            {
-                Definitions = new ObservableDictionary<string, JsonSchema>();
-            }
-
-            if (RequiredProperties == null)
-            {
-                RequiredProperties = new Collection<string>();
-            }
-
-            if (AllOf == null)
-            {
-                AllOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (AnyOf == null)
-            {
-                AnyOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (OneOf == null)
-            {
-                OneOf = new ObservableCollection<JsonSchema>();
-            }
-
-            if (Enumeration == null)
-            {
-                Enumeration = new Collection<object?>();
-            }
-
-            if (EnumerationNames == null)
-            {
-                EnumerationNames = new Collection<string>();
-            }
+            Items ??= new ObservableCollection<JsonSchema>();
+            Properties ??= new ObservableDictionary<string, JsonSchemaProperty>();
+            PatternProperties ??= new ObservableDictionary<string, JsonSchemaProperty>();
+            Definitions ??= new ObservableDictionary<string, JsonSchema>();
+            RequiredProperties ??= [];
+            AllOf ??= new ObservableCollection<JsonSchema>();
+            AnyOf ??= new ObservableCollection<JsonSchema>();
+            OneOf ??= new ObservableCollection<JsonSchema>();
+            Enumeration ??= [];
+            EnumerationNames ??= [];
         }
 #pragma warning restore CS8774
 

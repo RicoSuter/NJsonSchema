@@ -6,10 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -18,8 +15,8 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _unsupportedFormatStrings = new List<string>()
-        {
+        private readonly HashSet<string> _unsupportedFormatStrings =
+        [
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
             JsonFormatStrings.Time,
@@ -32,7 +29,7 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Uuid,
             JsonFormatStrings.Base64,
 #pragma warning restore CS0618 // Type or member is obsolete
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -62,7 +59,7 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
             }
 
-            if (schema.Type.IsString() && (schema.Format == null || _unsupportedFormatStrings.Contains(schema.Format) == false))
+            if (schema.Type.IsString() && (schema.Format == null || !_unsupportedFormatStrings.Contains(schema.Format)))
             {
                 return GetDefaultAsStringLiteral(schema);
             }
@@ -110,7 +107,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the default value as string literal.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The string literal.</returns>
+#pragma warning disable CA1822
         protected string GetDefaultAsStringLiteral(JsonSchema schema)
+#pragma warning restore CA1822
         {
             return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty) + "\"";
         }
@@ -118,7 +117,9 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Converts a number to its string representation.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The string.</returns>
+#pragma warning disable CA1822
         protected string ConvertNumberToString(object value)
+#pragma warning restore CA1822
         {
             if (value is byte)
             {

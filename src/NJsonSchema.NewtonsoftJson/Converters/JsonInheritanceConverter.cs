@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -173,8 +171,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var discriminator = jObject.GetValue(_discriminator, StringComparison.OrdinalIgnoreCase)?.Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
-            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
-            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+            if (serializer.ContractResolver.ResolveContract(subtype) is not JsonObjectContract objectContract || objectContract.Properties.All(p => p.PropertyName != _discriminator))
             {
                 jObject.Remove(_discriminator);
             }
@@ -250,7 +247,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
-        private Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
+        private static Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
         {
             var type = objectType;
             do
@@ -265,10 +262,10 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                     else if (attribute.MethodName != null)
                     {
-                        var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, new object[0]);
+                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, []);
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminator)

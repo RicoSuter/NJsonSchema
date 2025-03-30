@@ -7,12 +7,14 @@
 {%- if IsEnumAsBitFlags -%}
 [System.Flags]
 {%- endif -%}
+{%- template Enum.Annotations -%}
 {{ TypeAccessModifier }} enum {{ Name }}{%- if HasExtendedValueRange %} : long{% endif %}
 {
 {%- for enum in Enums %}
 {%-   if IsStringEnum -%}
     [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
 {%-   endif -%}
+{%- template Enum.Member.Annotations -%}
 {%- if IsEnumAsBitFlags -%}
     {{ enum.Name }} = {{ enum.InternalFlagValue }},
 {%- else -%}

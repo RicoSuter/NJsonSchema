@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
 using Xunit;
@@ -74,13 +70,13 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_validating_from_string_parse_line_information()
         {
-            //// Arrange
+            // Arrange
             await InitAsync();
 
-            //// Act
+            // Act
             var errors = Schema.Validate(Json);
 
-            //// Assert
+            // Assert
             Assert.Equal(7, errors.Count); // Seven validation errors expected.
             Assert.Equal(3, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotOneOf).Errors.Count); // Three NotOneOf clause violations expected
             Assert.Equal(2, errors.OfType<ChildSchemaValidationError>().Single(error => error.Kind == ValidationErrorKind.NotAllOf).Errors.Count); // Two NotAllOf clause violations expected
@@ -90,10 +86,10 @@ namespace NJsonSchema.Tests.Validation
         [Fact]
         public async Task When_validating_from_jtoken_parse_line_information_if_exists()
         {
-            //// Arrange
+            // Arrange
             await InitAsync();
 
-            //// Act
+            // Act
             var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Load });
             var errorsWithInfo = Schema.Validate(tokenWithInfo);
             var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Ignore });
@@ -101,7 +97,7 @@ namespace NJsonSchema.Tests.Validation
             var tokenNoInfoDeserialize = JsonConvert.DeserializeObject<JToken>(Json);
             var errorsNoInfoDeserialize = Schema.Validate(tokenNoInfoDeserialize);
 
-            //// Assert
+            // Assert
             ValidateErrors(errorsWithInfo, true);
             ValidateErrors(errorsNoInfoParse, false);
             ValidateErrors(errorsNoInfoDeserialize, false);

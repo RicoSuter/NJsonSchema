@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Linq;
 using System.Reflection;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -34,13 +32,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             ValueGenerator = new TypeScriptValueGenerator(this);
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
-            {
+            TemplateFactory = new DefaultTemplateFactory(this, [
                 typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly
-            });
+            ]);
 
-            ClassTypes = Array.Empty<string>();
-            ExtendedClasses = Array.Empty<string>();
+            ClassTypes = [];
+            ExtendedClasses = [];
 
             InlineNamedDictionaries = false;
             GenerateTypeCheckFunctions = false;

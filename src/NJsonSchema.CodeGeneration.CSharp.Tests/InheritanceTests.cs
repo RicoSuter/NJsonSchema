@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.NewtonsoftJson.Converters;
@@ -27,18 +23,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works()
+        public void When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
+            // Assert
             var dictionarySchema = schema.Definitions["EmptyClassInheritingDictionary"];
 
             Assert.Empty(dictionarySchema.AllOf);
@@ -72,18 +68,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
+        public void When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
+            // Assert
             Assert.Contains("Foobar.", data);
             Assert.Contains("Foobar.", code);
 
@@ -94,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_property_references_any_schema_with_inheritance_then_property_type_is_correct()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
     ""type"": ""object"",
     ""properties"": {
@@ -128,27 +124,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
+            // Assert
             Assert.Contains("public Dog Dog { get; set; }", code);
         }
 
         [Fact]
         public async Task When_definitions_inherit_from_root_schema()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/Animal.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Record });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
+            // Assert
             Assert.Contains("public abstract partial class Animal", code);
             Assert.Contains("public partial class Cat : Animal", code);
             Assert.Contains("public partial class PersianCat : Cat", code);
@@ -156,9 +152,38 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("[JsonInheritanceAttribute(\"PersianCat\", typeof(PersianCat))]", code);
         }
 
+        [Fact]
+        public async Task When_definitions_inherit_from_root_schema_and_STJ_polymorphism()
+        {
+            // Arrange
+            var path = GetTestDirectory() + "/References/Animal.json";
+
+            // Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson
+            });
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.Contains("public abstract partial class Animal", code);
+            Assert.Contains("public partial class Cat : Animal", code);
+            Assert.Contains("public partial class PersianCat : Cat", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"discriminator\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(Cat), typeDiscriminator: \"Cat\")]", code);
+            Assert.Contains("[System.Text.Json.Serialization.JsonDerivedType(typeof(PersianCat), typeDiscriminator: \"PersianCat\")]", code);
+        }
+
         private string GetTestDirectory()
         {
+#pragma warning disable SYSLIB0012
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+#pragma warning restore SYSLIB0012
             var uri = new UriBuilder(codeBase);
             return Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
         }

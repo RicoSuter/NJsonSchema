@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System.Runtime.Serialization;
 using Xunit;
@@ -18,14 +17,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_DataContractRequired_is_set_then_undefined_is_not_allowed()
         {
-            //// Assert
+            // Assert
             Assert.Throws<JsonSerializationException>(() => JsonConvert.DeserializeObject<Person>(@"{}"));
         }
 
         [Fact]
         public void When_DataContractRequired_is_set_then_null_is_allowed()
         {
-            //// Act
+            // Act
             JsonConvert.DeserializeObject<Person>(@"{""middleName"": null}");
             // Assert: Does not throw
         }
@@ -33,11 +32,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_DataContractRequired_is_set_property_is_nullable_in_OpenApi3()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.ActualProperties["middleName"].IsRequired);
             Assert.True(schema.ActualProperties["middleName"].IsNullable(SchemaType.OpenApi3));
         }
@@ -45,11 +44,11 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_DataContractRequired_is_set_property_is_not_nullable_in_Swagger2()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.Swagger2 });
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.ActualProperties["middleName"].IsRequired);
             Assert.False(schema.ActualProperties["middleName"].IsNullable(SchemaType.Swagger2));
 

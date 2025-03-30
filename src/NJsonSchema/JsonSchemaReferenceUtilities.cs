@@ -6,11 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
@@ -100,11 +95,11 @@ namespace NJsonSchema
                 {
                     if (_replaceRefsRound)
                     {
-                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
+                        if (path.EndsWith("/definitions/" + typeNameHint, StringComparison.Ordinal) || path.EndsWith("/schemas/" + typeNameHint, StringComparison.Ordinal))
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -112,7 +107,7 @@ namespace NJsonSchema
                     {
                         // load $refs and add them to "definitions"
                         reference.Reference = await _referenceResolver
-                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
+                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
                             .ConfigureAwait(false);
                     }
                 }

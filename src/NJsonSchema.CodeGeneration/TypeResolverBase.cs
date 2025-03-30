@@ -6,17 +6,14 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The type resolver base.</summary>
     public abstract class TypeResolverBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = new();
-        private readonly HashSet<string> _reservedTypeNames = new();
+        internal readonly Dictionary<JsonSchema, string> _generatedTypeNames = [];
+        private readonly HashSet<string> _reservedTypeNames = [];
 
         /// <summary>Initializes a new instance of the <see cref="TypeResolverBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -140,7 +137,7 @@ namespace NJsonSchema.CodeGeneration
                 return Resolve(schema.AdditionalPropertiesSchema, schema.AdditionalPropertiesSchema.ActualSchema.IsNullable(_settings.SchemaType), null);
             }
 
-            if (schema.AllowAdditionalProperties == false && schema.PatternProperties.Any())
+            if (!schema.AllowAdditionalProperties && schema.PatternProperties.Any())
             {
                 var valueTypes = new HashSet<string>(schema.PatternProperties
                     .Select(p => Resolve(p.Value, p.Value.IsNullable(_settings.SchemaType), null))

@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -30,7 +28,7 @@ namespace NJsonSchema.CodeGeneration
             var newResults = new List<CodeArtifact>(results);
 
             // we need new list to iterate as we modify the original
-            var resultIterator = results as List<CodeArtifact> ?? newResults.ToList();
+            var resultIterator = results as List<CodeArtifact> ?? [.. newResults];
             foreach (var result in resultIterator)
             {
                 if (!string.IsNullOrEmpty(GetActualBaseName(result.BaseTypeName)))
@@ -69,7 +67,7 @@ namespace NJsonSchema.CodeGeneration
             }
 
             // resolve arrays
-            if (baseTypeName.EndsWith("[]"))
+            if (baseTypeName.EndsWith("[]", StringComparison.Ordinal))
             {
                 return baseTypeName.Substring(0, baseTypeName.Length - 2);
             }

@@ -4,7 +4,6 @@
 
 [![Azure DevOps](https://img.shields.io/azure-devops/build/rsuter/NJsonSchema/17/master.svg)](https://rsuter.visualstudio.com/NJsonSchema/_build?definitionId=17)
 [![Nuget](https://img.shields.io/nuget/v/NJsonSchema.svg)](https://www.nuget.org/packages?q=NJsonSchema)
-[![MyGet](https://img.shields.io/myget/njsonschema/v/NJsonSchema.svg?label=preview%20nuget)](https://www.myget.org/feed/Packages/njsonschema)
 [![Discord](https://img.shields.io/badge/Discord-join%20chat-1dce73.svg)](https://discord.gg/BxQNy25WF6)
 [![StackOverflow](https://img.shields.io/badge/questions-on%20StackOverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/njsonschema)
 [![Wiki](https://img.shields.io/badge/docs-in%20wiki-orange.svg?style=flat)](https://github.com/RicoSuter/njsonschema/wiki)
@@ -419,6 +418,117 @@ export interface IPerson {
     birthday: Date;
     company: Company | undefined;
     cars: Car[] | undefined;
+}
+```
+
+## NJsonSchema.SampleJsonSchemaGenerator usage
+
+The `NJsonSchema.SampleJsonSchemaGenerator` can be used to generate a JSON Schema from sample JSON data:
+
+### JSON Schema Specification
+
+By default, the `NJsonSchema.SampleJsonSchemaGenerator` generates a JSON Schema based on the JSON Schema specification. See: [JSON Schema Specification](https://json-schema.org/specification) 
+
+```csharp
+var generator = new SampleJsonSchemaGenerator(new SampleJsonSchemaGeneratorSettings());
+
+var schema = generator.Generate("{...}");
+```
+
+**Input:**
+
+```json
+{
+  "int": 1,
+  "float": 340282346638528859811704183484516925440.0,
+  "str": "abc",
+  "bool": true,
+  "date": "2012-07-19",
+  "datetime": "2012-07-19 10:11:11",
+  "timespan": "10:11:11"
+}
+```
+
+**Output:**
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "int": {
+      "type": "integer"
+    },
+    "float": {
+      "type": "number"
+    },
+    "str": {
+      "type": "string"
+    },
+    "bool": {
+      "type": "boolean"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "datetime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timespan": {
+      "type": "string",
+      "format": "duration"
+    }
+  }
+}
+```
+
+### OpenApi Specification
+
+To generate a JSON Schema for OpenApi, provide the `SchemaType.OpenApi3` in the settings. See: [OpenApi Specification](https://swagger.io/specification/)
+
+```csharp
+var generator = new SampleJsonSchemaGenerator(new SampleJsonSchemaGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
+
+var schema = generator.Generate("{...}");
+```
+
+**Input:**
+
+```json
+{
+  "int": 12345,
+  "long": 1736347656630,
+  "float": 340282346638528859811704183484516925440.0,
+  "double": 340282346638528859811704183484516925440123456.0,
+}
+```
+
+**Output:**
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "int": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "long": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "float": {
+      "type": "number",
+      "format": "float"
+    },
+    "double": {
+      "type": "number",
+      "format": "double"
+    }
+  }
 }
 ```
 

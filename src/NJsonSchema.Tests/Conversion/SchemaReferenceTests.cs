@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace NJsonSchema.Tests.Conversion
@@ -9,58 +8,58 @@ namespace NJsonSchema.Tests.Conversion
         [Fact]
         public async Task When_converting_a_circular_referencing_person_type_then_references_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(schema, schema.Properties["Car"].ActualTypeSchema.Properties["Person"].ActualTypeSchema);
         }
 
         [Fact]
         public async Task When_converting_a_circular_referencing_car_type_then_references_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Car>();
 
-            //// Assert
+            // Assert
             Assert.Equal(schema, schema.Properties["Person"].ActualTypeSchema.Properties["Car"].ActualTypeSchema);
         }
 
         [Fact]
         public async Task When_converting_a_referencing_type_then_path_is_in_json()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(@"""$ref"": ""#""", json);
         }
 
         [Fact]
         public async Task When_converting_a_referencing_type_then_absolute_reference_path_is_in_json()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<House>();
 
-            //// Act
+            // Act
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Contains(@"""$ref"": ""#/definitions/Person", json);
         }
 
         [Fact]
         public async Task When_ref_is_nested_then_it_should_be_resolved()
         {
-            /// Arrange
+            // Arrange
             var json = @"
 {
     ""$schema"": ""http://json-schema.org/draft-04/schema#"",
@@ -85,10 +84,10 @@ namespace NJsonSchema.Tests.Conversion
     }
 }";
 
-            /// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            /// Assert
+            // Assert
             var jsonOutput = schema.ToJson();
             Assert.NotNull(jsonOutput);
         }

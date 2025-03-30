@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Annotations;
 
 /// <summary>Indicates that the value of the marked element could never be <c>null</c>.</summary>

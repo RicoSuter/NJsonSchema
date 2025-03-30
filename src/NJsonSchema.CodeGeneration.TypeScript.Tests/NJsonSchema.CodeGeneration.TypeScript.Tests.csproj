@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
         <Nullable>disable</Nullable>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Condition="'$(TargetFramework)' == 'net462'" Include="System.ComponentModel.DataAnnotations" />
+        <Reference Condition="'$(TargetFramework)' == 'net472'" Include="System.ComponentModel.DataAnnotations" />
     </ItemGroup>
 
     <ItemGroup>

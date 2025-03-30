@@ -1,8 +1,6 @@
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Xunit;
 
@@ -23,9 +21,9 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_property_name_is_default_then_schema_has_reflected_names()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -36,7 +34,7 @@ namespace NJsonSchema.Tests.Generation
 
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("BarBar1JsonProperty"));
             Assert.Equal("BarBar1JsonProperty", schema.Properties["BarBar1JsonProperty"].Name);
             Assert.True(schema.Properties.ContainsKey("BarBar2DataMember"));
@@ -46,9 +44,9 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_property_name_is_camel_then_schema_has_camel_names()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -59,7 +57,7 @@ namespace NJsonSchema.Tests.Generation
 
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("barBar1JsonProperty"));
             Assert.Equal("barBar1JsonProperty", schema.Properties["barBar1JsonProperty"].Name);
             Assert.True(schema.Properties.ContainsKey("barBar2DataMember"));
@@ -69,9 +67,9 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_property_name_is_snake_then_schema_has_snake_names()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SerializerSettings =
@@ -82,7 +80,7 @@ namespace NJsonSchema.Tests.Generation
 
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("bar_bar1_json_property"));
             Assert.Equal("bar_bar1_json_property", schema.Properties["bar_bar1_json_property"].Name);
             Assert.True(schema.Properties.ContainsKey("bar_bar2_data_member"));
