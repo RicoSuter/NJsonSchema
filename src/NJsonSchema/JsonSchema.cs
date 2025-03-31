@@ -1014,6 +1014,7 @@ namespace NJsonSchema
         [MemberNotNull(nameof(_oneOf))]
         [MemberNotNull(nameof(Enumeration))]
         [MemberNotNull(nameof(EnumerationNames))]
+        [MemberNotNull(nameof(EnumerationDescriptions))]
         private void Initialize()
 #pragma warning disable CS8774
         {
@@ -1027,6 +1028,7 @@ namespace NJsonSchema
             OneOf ??= new ObservableCollection<JsonSchema>();
             Enumeration ??= [];
             EnumerationNames ??= [];
+            EnumerationDescriptions ??= [];
         }
 #pragma warning restore CS8774
 
