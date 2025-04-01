@@ -20,6 +20,9 @@ namespace NJsonSchema.CodeGeneration.Models
         /// <summary>Gets or sets the value.</summary>
         public required string Value { get; set; }
 
+        /// <summary>Gets or sets the description.</summary>
+        public string? Description { get; set; }
+
         /// <summary>Gets or sets the internal value (e.g. the underlying/system value).</summary>
         public string? InternalValue { get; set; }
 

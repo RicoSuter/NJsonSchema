@@ -65,6 +65,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     var value = _schema.Enumeration.ElementAt(i);
                     if (value != null)
                     {
+                        var description = _schema.EnumerationDescriptions.Count > i ?
+                            _schema.EnumerationDescriptions.ElementAt(i) : null;
                         if (_schema.Type.IsInteger())
                         {
                             var name = _schema.EnumerationNames.Count > i ?
@@ -77,6 +79,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
                                     Value = value.ToString(),
+                                    Description = description,
                                     InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
                                     InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
                                 });
@@ -88,6 +91,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
                                     Value = value.ToString(),
+                                    Description = description,
                                     InternalValue = value.ToString(),
                                     InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
@@ -103,6 +107,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                 OriginalName = name,
                                 Value = value.ToString(),
+                                Description = description,
                                 InternalValue = i.ToString(CultureInfo.InvariantCulture),
                                 InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                             });

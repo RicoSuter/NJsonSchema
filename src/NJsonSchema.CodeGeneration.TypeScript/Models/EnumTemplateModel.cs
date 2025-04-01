@@ -56,12 +56,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         var name = _schema.EnumerationNames.Count > i ?
                             _schema.EnumerationNames.ElementAt(i) :
                             _schema.Type.IsInteger() ? "_" + value : value.ToString();
+                        var description = _schema.EnumerationDescriptions.Count > i ?
+                            _schema.EnumerationDescriptions.ElementAt(i) : null;
 
                         entries.Add(new EnumerationItemModel
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             OriginalName = name,
                             Value = _schema.Type.IsInteger() ? value.ToString() : "\"" + value + "\"",
+                            Description = description,
                         });
                     }
                 }

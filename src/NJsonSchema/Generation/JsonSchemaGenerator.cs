@@ -14,6 +14,7 @@ using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 using System.Collections;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -697,12 +698,23 @@ namespace NJsonSchema.Generation
             schema.Type = typeDescription.Type;
             schema.Enumeration.Clear();
             schema.EnumerationNames.Clear();
+            schema.EnumerationDescriptions.Clear();
             schema.IsFlagEnumerable = contextualType.IsAttributeDefined<FlagsAttribute>(true);
 
             Func<object, string?>? enumValueConverter = null;
             var underlyingType = Enum.GetUnderlyingType(contextualType.Type);
             foreach (var enumName in Enum.GetNames(contextualType.Type))
             {
+                string? enumDescription = null;
+                var field = contextualType.Type.GetRuntimeField(enumName);
+                // Retrieve the Description attribute value, if present.
+                var descriptionAttribute = field?.GetCustomAttribute<DescriptionAttribute>();
+
+                if (descriptionAttribute != null)
+                {
+                    enumDescription = descriptionAttribute.Description;
+                }
+
                 if (typeDescription.Type == JsonObjectType.Integer)
                 {
                     var value = Convert.ChangeType(Enum.Parse(contextualType.Type, enumName), underlyingType, CultureInfo.InvariantCulture);
@@ -711,7 +723,7 @@ namespace NJsonSchema.Generation
                 else
                 {
                     // EnumMember only checked if StringEnumConverter is used
-                    var enumMemberAttribute = contextualType.Type.GetRuntimeField(enumName)?.GetCustomAttribute<EnumMemberAttribute>();
+                    var enumMemberAttribute = field?.GetCustomAttribute<EnumMemberAttribute>();
                     if (enumMemberAttribute != null && !string.IsNullOrEmpty(enumMemberAttribute.Value))
                     {
                         schema.Enumeration.Add(enumMemberAttribute.Value);
@@ -725,6 +737,7 @@ namespace NJsonSchema.Generation
                 }
 
                 schema.EnumerationNames.Add(enumName);
+                schema.EnumerationDescriptions.Add(enumDescription);
             }
 
             if (typeDescription.Type == JsonObjectType.Integer && Settings.GenerateEnumMappingDescription)

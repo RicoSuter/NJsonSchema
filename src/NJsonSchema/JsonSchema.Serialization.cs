@@ -139,6 +139,10 @@ namespace NJsonSchema
         [JsonIgnore]
         public Collection<string> EnumerationNames { get; set; }
 
+        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
+        [JsonIgnore]
+        public Collection<string?> EnumerationDescriptions { get; set; }
+
         /// <summary>Gets or sets a value indicating whether the maximum value is excluded. </summary>
         [JsonProperty("exclusiveMaximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal object? ExclusiveMaximumRaw
@@ -384,11 +388,58 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal Collection<string>? EnumerationNamesDashedRaw
+        {
+            get => EnumerationNamesRaw;
+            set
+            {
+                if (EnumerationNamesRaw?.Count == 0 && value != null) {
+                    EnumerationNamesRaw = value;
+                }
+            }
+        }
+
+        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal Collection<string>? EnumerationVarnamesRaw
+        {
+            get => EnumerationNamesRaw;
+            set
+            {
+                if (EnumerationNamesRaw?.Count == 0 && value != null) {
+                    EnumerationNamesRaw = value;
+                }
+            }
+        }
+
+        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal Collection<string>? EnumerationNamesRaw
         {
             get => EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null;
             set => EnumerationNames = value != null ? new ObservableCollection<string>(value) : [];
+        }
+
+        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
+        [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal Collection<string?>? EnumerationDescriptionsDashedRaw
+        {
+            get => EnumerationDescriptionsRaw;
+            set
+            {
+                if (EnumerationDescriptionsRaw?.Count == 0 && value != null) {
+                    EnumerationDescriptionsRaw = value;
+                }
+            }
+        }
+
+        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
+        [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal Collection<string?>? EnumerationDescriptionsRaw
+        {
+            get => EnumerationDescriptions != null && EnumerationDescriptions.Count > 0 ? EnumerationDescriptions : null;
+            set => EnumerationDescriptions = value != null ? new ObservableCollection<string?>(value) : [];
         }
 
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
