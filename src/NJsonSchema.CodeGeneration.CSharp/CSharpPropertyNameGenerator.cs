@@ -11,9 +11,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
     /// <summary>Generates the property name for a given CSharp <see cref="JsonSchemaProperty"/>.</summary>
     public sealed class CSharpPropertyNameGenerator : IPropertyNameGenerator
     {
-        private static readonly char[] _reservedFirstPassChars = ['"', '\'', '@', '?', '!', '$', '[', ']', '(', ')', '.', '=', '+', '|'
-        ];
-        private static readonly char[] _reservedSecondPassChars = ['*', ':', '-', '#', '&'];
+        private const string FirstPassChars = "\"'@?!$[]().=+|";
+#if NET8_0_OR_GREATER
+        private static readonly System.Buffers.SearchValues<char> _reservedFirstPassChars = System.Buffers.SearchValues.Create(FirstPassChars);
+#else
+        private static readonly char[] _reservedFirstPassChars = FirstPassChars.ToCharArray();
+#endif
+
+        private const string SecondPassChars = "*:-#&";
+#if NET8_0_OR_GREATER
+        private static readonly System.Buffers.SearchValues<char> _reservedSecondPassChars = System.Buffers.SearchValues.Create(SecondPassChars);
+#else
+        private static readonly char[] _reservedSecondPassChars = SecondPassChars.ToCharArray();
+#endif
 
         /// <summary>Generates the property name.</summary>
         /// <param name="property">The property.</param>
@@ -22,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var name = property.Name;
 
-            if (name.IndexOfAny(_reservedFirstPassChars) != -1)
+            if (name.AsSpan().IndexOfAny(_reservedFirstPassChars) != -1)
             {
                 name = name.Replace("\"", string.Empty)
                     .Replace("'", string.Empty)
@@ -42,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             name = ConversionUtilities.ConvertToUpperCamelCase(name, true);
 
-            if (name.IndexOfAny(_reservedSecondPassChars) != -1)
+            if (name.AsSpan().IndexOfAny(_reservedSecondPassChars) != -1)
             {
                 name = name
                     .Replace("*", "Star")

@@ -64,6 +64,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     if (schema.Type.IsArray() ||
                         schema.Type.IsObject())
                     {
+#pragma warning disable CA1845 // use span-based not available on all target frameworks
                         targetType = !string.IsNullOrEmpty(_settings.DictionaryInstanceType) && targetType.StartsWith(_settings.DictionaryType + "<", StringComparison.Ordinal)
                             ? _settings.DictionaryInstanceType + targetType.Substring(_settings.DictionaryType.Length)
                             : targetType;
@@ -71,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                         targetType = !string.IsNullOrEmpty(_settings.ArrayInstanceType) && targetType.StartsWith(_settings.ArrayType + "<", StringComparison.Ordinal)
                             ? _settings.ArrayInstanceType + targetType.Substring(_settings.ArrayType.Length)
                             : targetType;
-
+#pragma warning restore CA1845
                         return schema.IsAbstract ? null : $"new {targetType}()";
                     }
                 }

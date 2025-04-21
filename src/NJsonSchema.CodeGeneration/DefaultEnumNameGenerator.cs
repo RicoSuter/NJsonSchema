@@ -40,6 +40,8 @@ namespace NJsonSchema.CodeGeneration
                 _ => name
             };
 
+#pragma warning disable CA1845 // use span based version, not available on all target frameworks
+
 #pragma warning disable CS8604 // Possible null reference argument.
             if (name.StartsWith('-'))
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -56,6 +58,7 @@ namespace NJsonSchema.CodeGeneration
             {
                 name = "__" + name.Substring(2);
             }
+#pragma warning restore CA1845
 
             return _invalidNameCharactersPattern.Replace(ConversionUtilities.ConvertToUpperCamelCase(name
                 .Replace(":", "-").Replace(@"""", ""), firstCharacterMustBeAlpha: true), "_");

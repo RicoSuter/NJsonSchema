@@ -1,32 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net462;net8.0</TargetFrameworks>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Templates\Class.Body.liquid" />
-    <None Remove="Templates\Class.Constructor.Record.liquid" />
-    <None Update="NJsonSchema.CodeGeneration.CSharp.nuspec" />
-    <None Update="NJsonSchema.snk" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Templates\Class.Body.liquid" />
+        <None Remove="Templates\Class.Constructor.Record.liquid" />
+        <None Update="NJsonSchema.CodeGeneration.CSharp.nuspec" />
+        <None Update="NJsonSchema.snk" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\*.liquid" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Templates\*.liquid" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs">
-      <Link>EnumExtensions.cs</Link>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs">
+            <Link>EnumExtensions.cs</Link>
+        </Compile>
+    </ItemGroup>
 
 </Project>
