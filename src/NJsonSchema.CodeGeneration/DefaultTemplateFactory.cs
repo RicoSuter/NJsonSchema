@@ -348,6 +348,8 @@ namespace NJsonSchema.CodeGeneration
         /// </summary>
         private sealed class UnsafeMemberAccessStrategy : DefaultMemberAccessStrategy
         {
+            private readonly ConcurrentDictionary<Type, object?> _handledTypes = new();
+
             private readonly MemberAccessStrategy baseMemberAccessStrategy = new DefaultMemberAccessStrategy();
 
             public override IMemberAccessor GetAccessor(Type type, string name)
@@ -358,7 +360,12 @@ namespace NJsonSchema.CodeGeneration
                     return accessor;
                 }
 
-                baseMemberAccessStrategy.Register(type);
+                if (!_handledTypes.ContainsKey(type))
+                {
+                    baseMemberAccessStrategy.Register(type);
+                    _handledTypes.TryAdd(type, null);
+                }
+
                 accessor = baseMemberAccessStrategy.GetAccessor(type, name);
                 return accessor;
             }
