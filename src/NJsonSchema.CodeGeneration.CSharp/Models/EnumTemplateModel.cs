@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
-                                    Value = value.ToString(),
+                                    Value = value.ToString()!,
                                     InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
                                     InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
                                 });
@@ -87,7 +87,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
-                                    Value = value.ToString(),
+                                    Value = value.ToString()!,
                                     InternalValue = value.ToString(),
                                     InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
@@ -101,8 +101,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                             entries.Add(new EnumerationItemModel
                             {
                                 Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                                OriginalName = name,
-                                Value = value.ToString(),
+                                OriginalName = name!,
+                                Value = value.ToString()!,
                                 InternalValue = i.ToString(CultureInfo.InvariantCulture),
                                 InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                             });

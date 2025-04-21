@@ -74,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     else
                     {
                         index = classCode.IndexOf("class", StringComparison.Ordinal);
-                        index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
+                        index = classCode.IndexOf('{', index) + 1;
 
                         var code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
                         yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);

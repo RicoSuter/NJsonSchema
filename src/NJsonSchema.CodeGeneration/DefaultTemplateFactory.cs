@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">The assembly containting liquid templates could not be found.</exception>
         protected Assembly GetLiquidAssembly(string name)
         {
-            var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
+            var assembly = _assemblies.FirstOrDefault(a => a.FullName?.Contains(name) == true);
             if (assembly != null)
             {
                 return assembly;

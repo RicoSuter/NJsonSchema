@@ -67,7 +67,7 @@ namespace NJsonSchema.CodeGeneration
 
             if (schema.Type.IsBoolean())
             {
-                return schema.Default.ToString().ToLowerInvariant();
+                return schema.Default.ToString()!.ToLowerInvariant();
             }
 
             if (schema.Type.IsInteger() ||
@@ -181,7 +181,7 @@ namespace NJsonSchema.CodeGeneration
                 return (string)value;
             }
 
-            return value.ToString();
+            return value.ToString()!;
         }
     }
 }
