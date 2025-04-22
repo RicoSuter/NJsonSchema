@@ -278,11 +278,38 @@ namespace NJsonSchema.Generation
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = contextualType.Name;
-            return parameterTypeName == "IFormFile" ||
-                   contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
-                   contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
-                   contextualType.TypeInfo.ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+            if (contextualType.Name == "IFormFile")
+            {
+                return true;
+            }
+
+            var typeInfo = contextualType.TypeInfo;
+            if (typeInfo.IsArray || typeInfo.IsPrimitive)
+            {
+                // cannot be posted file or implement interface
+                return false;
+            }
+
+            // HttpPostedFile is sealed
+            if (contextualType.Name == "HttpPostedFile")
+            {
+                return true;
+            }
+
+            if (contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name))
+            {
+                return true;
+            }
+
+            foreach (var i in typeInfo.GetInterfaces())
+            {
+                if (i.Name == "IFormFile")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
