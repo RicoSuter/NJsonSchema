@@ -396,10 +396,14 @@ namespace NJsonSchema
         [JsonIgnore]
         public JsonObjectType Type
         {
-            get => _type; set
+            get => _type;
+            set
             {
-                _type = value;
-                ResetTypeRaw();
+                if (_type != value)
+                {
+                    _type = value;
+                    ResetTypeRaw();
+                }
             }
         }
 

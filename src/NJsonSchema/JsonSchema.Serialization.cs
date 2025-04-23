@@ -317,16 +317,9 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is JArray)
-                {
-                    Type = ((JArray) value).Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()));
-                }
-                else
-                {
-                    Type = ConvertStringToJsonObjectType(value as string);
-                }
-
-                ResetTypeRaw();
+                Type = value is JArray array
+                    ? array.Aggregate(JsonObjectType.None, (type, token) => type | ConvertStringToJsonObjectType(token.ToString()))
+                    : ConvertStringToJsonObjectType(value as string);
             }
         }
 
@@ -336,20 +329,16 @@ namespace NJsonSchema
             _typeRaw = new Lazy<object?>(() =>
             {
                 var flags = JsonObjectTypes
-                    .Where(v => Type.HasFlag(v))
+                    .Where(x => Type.HasFlag(x))
+                    .Select(object (x) => new JValue(x.ToString().ToLowerInvariant()))
                     .ToArray();
 
-                if (flags.Length > 1)
+                return flags.Length switch
                 {
-                    return new JArray(flags.Select(f => new JValue(f.ToString().ToLowerInvariant())));
-                }
-
-                if (flags.Length == 1)
-                {
-                    return new JValue(flags[0].ToString().ToLowerInvariant());
-                }
-
-                return null;
+                    > 1 => new JArray(flags),
+                    1 => flags[0],
+                    _ => null
+                };
             });
         }
 
