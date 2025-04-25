@@ -1,4 +1,4 @@
-﻿using Xunit;
+﻿using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
@@ -37,8 +37,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].MaxLength);
             Assert.Equal(50, schema.Properties["value"].ActualSchema.MaxLength);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.StringLength(50)]\n" +
-                            "        public string Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -74,8 +75,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].MinLength);
             Assert.Equal(40, schema.Properties["value"].ActualSchema.MinLength);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 40)]\n" +
-                            "        public string Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -112,8 +114,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Maximum);
             Assert.Equal(20, schema.Properties["value"].ActualSchema.Maximum);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(int.MinValue, 20)]\n" +
-                            "        public int Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -150,8 +153,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(10, int.MaxValue)]\n" +
-                            "        public int Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -188,8 +192,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Minimum);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(10L, long.MaxValue)]\n" +
-                            "        public long Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -228,8 +233,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10000000000m, schema.Properties["value"].ActualSchema.Maximum);
 
             // expect the integer to be converted to an int64
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-10000000000L, 10000000000L)]\n" +
-                            "        public long Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -272,8 +278,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
 
             // expect the integer to be converted to an int64
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-99999999, 99999999)]\n" +
-                            "        public int Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -317,8 +324,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.True(schema.Properties["value"].ActualSchema.IsExclusiveMinimum);
 
             // expect the integer to be converted to an int64
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-100000000.4999D, 100000000.4999D)]\n" +
-                            "        public double Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -357,8 +365,50 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10000000000m, schema.Properties["value"].ActualSchema.Maximum);
 
             // expect the integer to be converted to an int64
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(-10000000000D, 10000000000D)]\n" +
-                            "        public double Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
+        }
+
+        [Fact(Skip = "Existing bug")]
+        public async Task When_number_property_has_minimum_and_maximum_that_are_decimal_then_range_attribute_is_rendered()
+        {
+            // Arrange
+            const string json = @"{
+                'type': 'object',
+                'required': [ 'value' ],
+                'properties': {
+                    'value': {
+                        '$ref': '#/definitions/theNumber'
+                    }
+                },
+                'definitions': {
+                    'theNumber': {
+                        'type': 'number',
+                        'format': 'decimal',
+                        'minimum': -100.50,
+                        'maximum': 100.50,
+                    }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2
+            });
+            var code = generator.GenerateFile("Message");
+
+            // Assert
+            Assert.Null(schema.Properties["value"].Minimum);
+            Assert.Equal(-100.50m, schema.Properties["value"].ActualSchema.Minimum);
+            Assert.Equal(100.50m, schema.Properties["value"].ActualSchema.Maximum);
+
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -395,8 +445,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["value"].Pattern);
             Assert.Equal(regularExpression, schema.Properties["value"].ActualSchema.Pattern);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.RegularExpression(@\"" + regularExpression + "\")]\n" +
-                            "        public string Value { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -435,8 +486,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(0, schema.Properties["value"].MaxItems);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MaxItems);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.MaxLength(10)]\n" +
-                            "        public Array10 Value { get; set; } = new Array10();\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Fact]
@@ -476,8 +528,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(0, schema.Properties["value"].MinItems);
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MinItems);
 
-            Assert.Contains("[System.ComponentModel.DataAnnotations.MinLength(10)]\n" +
-                            "        public System.Collections.Generic.ICollection<string> Value { get; set; } = new System.Collections.ObjectModel.Collection<string>();\n", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
     }
 }

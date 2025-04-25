@@ -1,5 +1,5 @@
-﻿using NJsonSchema.NewtonsoftJson.Generation;
-using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
+﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests;
 
@@ -21,6 +21,6 @@ public class PropertyNameTests
         var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 4.3m });
         var output = generator.GenerateFile(nameof(TypeWithRestrictedProperties));
 
-        await Verify(output);
+        await VerifyHelper.Verify(output);
     }
 }

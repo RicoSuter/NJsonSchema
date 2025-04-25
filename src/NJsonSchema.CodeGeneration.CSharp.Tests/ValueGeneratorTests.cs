@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -14,7 +14,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_schema_contains_range_then_code_is_correctly_generated()
+        public async Task When_schema_contains_range_then_code_is_correctly_generated()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<RangeClass>();
@@ -28,7 +28,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("[System.ComponentModel.DataAnnotations.Range(2, int.MaxValue)]", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
 
         [Theory]
@@ -127,7 +129,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public System.DateTime? DateTime { get; set; } = System.DateTime.Parse(\"31.12.9999 23:59:59\");", code);
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompiles(code);
         }
     }
 }

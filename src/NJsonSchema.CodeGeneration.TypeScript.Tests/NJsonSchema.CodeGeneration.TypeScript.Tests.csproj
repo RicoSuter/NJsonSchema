@@ -27,4 +27,8 @@
         <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="..\NJsonSchema.CodeGeneration.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+    </ItemGroup>
+
 </Project>

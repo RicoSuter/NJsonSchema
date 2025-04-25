@@ -4,7 +4,7 @@ using NJsonSchema.NewtonsoftJson.Generation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             };
             var output = await PrepareAsync(settings);
 
-            await Verify(output).UseParameters(style, version);
+            await VerifyHelper.Verify(output).UseParameters(style, version);
         }
 
         private static Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
