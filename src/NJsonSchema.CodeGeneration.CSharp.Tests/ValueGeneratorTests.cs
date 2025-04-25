@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [InlineData("integer", JsonFormatStrings.ULong, "1UL, ulong.MaxValue")]
         [InlineData("number", JsonFormatStrings.Float, "1F, float.MaxValue")]
         [InlineData("number", JsonFormatStrings.Double, "1D, double.MaxValue")]
-        [InlineData("number", JsonFormatStrings.Decimal, "1M, decimal.MaxValue")]
+        [InlineData("number", JsonFormatStrings.Decimal, "typeof(decimal), \"1\", \"79228162514264337593543950335\"")]
         public async Task When_schema_contains_range_and_format_then_code_is_correctly_generated(string propertyType,
             string propertyFormat, string expectedRange)
         {

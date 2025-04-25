@@ -370,7 +370,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             CodeCompiler.AssertCompile(code);
         }
 
-        [Fact(Skip = "Existing bug")]
+        [Fact]
         public async Task When_number_property_has_minimum_and_maximum_that_are_decimal_then_range_attribute_is_rendered()
         {
             // Arrange

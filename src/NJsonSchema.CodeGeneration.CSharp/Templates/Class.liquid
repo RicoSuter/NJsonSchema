@@ -71,7 +71,11 @@
     [System.ComponentModel.DataAnnotations.Required{% if property.AllowEmptyStrings %}(AllowEmptyStrings = true){% endif %}]
 {%-   endif -%}
 {%-   if property.RenderRangeAttribute -%}
+    {%-   if property.RangeType -%}
+    [System.ComponentModel.DataAnnotations.Range(typeof({{ property.RangeType }}), "{{ property.RangeMinimumValue }}", "{{ property.RangeMaximumValue }}")]
+    {%-   else -%}
     [System.ComponentModel.DataAnnotations.Range({{ property.RangeMinimumValue }}, {{ property.RangeMaximumValue }})]
+    {%-   endif -%}
 {%-   endif -%}
 {%-   if property.RenderStringLengthAttribute -%}
     [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
