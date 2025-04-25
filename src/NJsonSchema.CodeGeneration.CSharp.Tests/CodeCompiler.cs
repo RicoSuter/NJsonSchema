@@ -5,7 +5,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests;
 
 public class CodeCompiler
 {
-    public static void AssertCompiles(string source)
+    public static void AssertCompile(string source)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
@@ -13,6 +13,8 @@ public class CodeCompiler
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
             .Select(x => MetadataReference.CreateFromFile(x.Location))
             .Append(MetadataReference.CreateFromFile(typeof(System.ComponentModel.DataAnnotations.RangeAttribute).Assembly.Location))
+            .Append(MetadataReference.CreateFromFile(typeof(System.Collections.ObjectModel.ObservableCollection<>).Assembly.Location))
+            .Append(MetadataReference.CreateFromFile(typeof(System.Text.Json.Serialization.JsonConverter).Assembly.Location))
             .ToList();
 
         CSharpCompilation compilation = CSharpCompilation.Create(

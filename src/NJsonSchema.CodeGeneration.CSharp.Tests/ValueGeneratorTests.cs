@@ -30,7 +30,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             // Assert
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -131,7 +131,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             // Assert
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

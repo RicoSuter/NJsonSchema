@@ -39,7 +39,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -235,7 +235,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -280,7 +280,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -326,7 +326,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -367,7 +367,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact(Skip = "Existing bug")]
@@ -408,7 +408,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -447,7 +447,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -488,7 +488,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -530,7 +530,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             await VerifyHelper.Verify(code);
 
-            CodeCompiler.AssertCompiles(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }
