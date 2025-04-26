@@ -121,67 +121,27 @@ namespace NJsonSchema.CodeGeneration
         protected string ConvertNumberToString(object value)
 #pragma warning restore CA1822
         {
-            if (value is byte)
-            {
-                return ((byte)value).ToString(CultureInfo.InvariantCulture);
-            }
+            return ConvertToNumberToStringCore(value);
+        }
 
-            if (value is sbyte)
+        internal static string ConvertToNumberToStringCore(object value)
+        {
+            return value switch
             {
-                return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is short)
-            {
-                return ((short)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is ushort)
-            {
-                return ((ushort)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is int)
-            {
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is uint)
-            {
-                return ((uint)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is long)
-            {
-                return ((long)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is ulong)
-            {
-                return ((ulong)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is float)
-            {
-                return ((float)value).ToString("r", CultureInfo.InvariantCulture);
-            }
-
-            if (value is double)
-            {
-                return ((double)value).ToString("r", CultureInfo.InvariantCulture);
-            }
-
-            if (value is decimal)
-            {
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is string stringValue && Regex.IsMatch(stringValue, "^[0-9]+(\\.[0-9]+)?$"))
-            {
-                return (string)value;
-            }
-
-            return value.ToString()!;
+                byte b => b.ToString(CultureInfo.InvariantCulture),
+                sbyte value1 => value1.ToString(CultureInfo.InvariantCulture),
+                short s => s.ToString(CultureInfo.InvariantCulture),
+                ushort value1 => value1.ToString(CultureInfo.InvariantCulture),
+                int i => i.ToString(CultureInfo.InvariantCulture),
+                uint u => u.ToString(CultureInfo.InvariantCulture),
+                long l => l.ToString(CultureInfo.InvariantCulture),
+                ulong value1 => value1.ToString(CultureInfo.InvariantCulture),
+                float f => f.ToString("r", CultureInfo.InvariantCulture),
+                double d => d.ToString("r", CultureInfo.InvariantCulture),
+                decimal value1 => value1.ToString(CultureInfo.InvariantCulture),
+                string stringValue when Regex.IsMatch(stringValue, "^[0-9]+(\\.[0-9]+)?$") => stringValue,
+                _ => value.ToString()!
+            };
         }
     }
 }

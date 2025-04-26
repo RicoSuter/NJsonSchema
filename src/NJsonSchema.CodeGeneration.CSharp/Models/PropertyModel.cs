@@ -7,9 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
-using System.Runtime;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
 {
@@ -141,6 +139,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
+        private bool IsDecimalRange => GetSchemaFormat(_property.ActualSchema) is JsonFormatStrings.Decimal;
+
+        /// <summary>
+        /// The type of range attribute, used when the value is not double or integer.
+        /// </summary>
+        public string? RangeType => IsDecimalRange ? "decimal" : null;
+
         /// <summary>Gets the minimum value of the range attribute.</summary>
         public string RangeMinimumValue
         {
@@ -167,6 +172,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         // TODO - add support for doubles, singles and decimals here
                     }
                 }
+
+                if (IsDecimalRange)
+                {
+                    // special case decimals
+                    return ValueGeneratorBase.ConvertToNumberToStringCore(minimum.GetValueOrDefault(decimal.MinValue));
+                }
+
                 return minimum.HasValue
                     ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
                     : type + "." + nameof(double.MinValue);
@@ -198,6 +210,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     {
                         // TODO - add support for doubles, singles and decimals here
                     }
+                }
+
+                if (IsDecimalRange)
+                {
+                    // special case decimals
+                    return ValueGeneratorBase.ConvertToNumberToStringCore(maximum.GetValueOrDefault(decimal.MaxValue));
                 }
 
                 return maximum.HasValue
