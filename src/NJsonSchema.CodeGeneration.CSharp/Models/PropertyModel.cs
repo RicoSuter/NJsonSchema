@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -14,10 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
-        private readonly JsonSchemaProperty _property;
-        private readonly CSharpGeneratorSettings _settings;
-        private readonly CSharpTypeResolver _resolver;
-        private static readonly string[] RangeFormats =
+        private static readonly HashSet<string?> RangeFormats =
         [
             JsonFormatStrings.Integer,
             JsonFormatStrings.Float,
@@ -27,6 +25,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             JsonFormatStrings.Decimal
         ];
 
+        private readonly JsonSchemaProperty _property;
+        private readonly CSharpGeneratorSettings _settings;
+        private readonly CSharpTypeResolver _resolver;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyModel"/> class.</summary>
         /// <param name="classTemplateModel">The class template model.</param>
@@ -180,7 +181,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
+                    ? ValueGenerator.GetNumericValue(schema.Type, EnsureBounds(propertyFormat, minimum.Value), format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -219,9 +220,32 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(schema.Type, maximum.Value, format)
+                    ? ValueGenerator.GetNumericValue(schema.Type, EnsureBounds(propertyFormat, maximum.Value), format)
                     : type + "." + nameof(double.MaxValue);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static decimal EnsureBounds(string? propertyFormat, decimal value)
+        {
+            return propertyFormat switch
+            {
+                JsonFormatStrings.Integer => Clamp(value, int.MinValue, int.MaxValue),
+                JsonFormatStrings.Long => Clamp(value, long.MinValue, long.MaxValue),
+                JsonFormatStrings.ULong => Clamp(value, ulong.MinValue, ulong.MaxValue),
+                _ => value,
+            };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static decimal Clamp(decimal value, decimal min, decimal max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            return value > max ? max : value;
         }
 
         /// <summary>Gets a value indicating whether to render a string length attribute.</summary>
