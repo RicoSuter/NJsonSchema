@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.Validation.FormatValidators
 {
@@ -32,6 +33,10 @@ namespace NJsonSchema.Validation.FormatValidators
             "yyyy"
         ];
 
+        private static readonly Regex DateTimeRegexPattern =
+            new(@"^((?:(\d{4}-\d{2}-\d{2})([Tt_]| )(\d{2}:\d{2}:\d{2}(?:\.\d+)?))([Zz]|[\+-]\d{2}:\d{2}))$",
+                RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+
         /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.DateTime;
 
@@ -44,8 +49,9 @@ namespace NJsonSchema.Validation.FormatValidators
         /// <returns></returns>
         public bool IsValid(string value, JTokenType tokenType)
         {
-            return tokenType == JTokenType.Date 
-                || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dateTimeResult);
+            return tokenType == JTokenType.Date
+                   || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset _)
+                   || DateTimeRegexPattern.IsMatch(value);
         }
     }
 }
