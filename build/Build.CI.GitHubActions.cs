@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.CI.GitHubActions.Configuration;
@@ -47,6 +48,13 @@ class CustomGitHubActionsAttribute : GitHubActionsAttribute
         // only need to list the ones that are missing from default image
         newSteps.Insert(0, new GitHubActionsSetupDotNetStep(["9.0"]));
 
+        var onWindows = image.ToString().StartsWith("windows", StringComparison.OrdinalIgnoreCase);
+        if (onWindows)
+        {
+            newSteps.Insert(0, new GitHubActionsUseGnuTarStep());
+            newSteps.Insert(0, new GitHubActionsConfigureLongPathsStep());
+        }
+
         job.Steps = newSteps.ToArray();
         return job;
     }
@@ -79,6 +87,37 @@ class GitHubActionsSetupDotNetStep : GitHubActionsStep
                     }
                 }
             }
+        }
+    }
+}
+
+class GitHubActionsUseGnuTarStep : GitHubActionsStep
+{
+    public override void Write(CustomFileWriter writer)
+    {
+        writer.WriteLine("- if: ${{ runner.os == 'Windows' }}");
+        using (writer.Indent())
+        {
+            writer.WriteLine("name: 'Use GNU tar'");
+            writer.WriteLine("shell: cmd");
+            writer.WriteLine("run: |");
+            using (writer.Indent())
+            {
+                writer.WriteLine("echo \"Adding GNU tar to PATH\"");
+                writer.WriteLine("echo C:\\Program Files\\Git\\usr\\bin>>\"%GITHUB_PATH%\"");
+            }
+        }
+    }
+}
+
+class GitHubActionsConfigureLongPathsStep : GitHubActionsStep
+{
+    public override void Write(CustomFileWriter writer)
+    {
+        writer.WriteLine("- name: 'Allow long file path'");
+        using (writer.Indent())
+        {
+            writer.WriteLine("run: git config --system core.longpaths true");
         }
     }
 }

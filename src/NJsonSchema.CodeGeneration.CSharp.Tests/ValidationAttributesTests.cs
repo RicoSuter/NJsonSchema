@@ -239,6 +239,42 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_integer_property_has_minimum_and_maximum_that_are_too_large_or_small_for_int64()
+        {
+            // Arrange
+            const string json = @"{
+                'type': 'object',
+                'required': [ 'value' ],
+                'properties': {
+                    'value': {
+                        '$ref': '#/definitions/int10000000000'
+                    }
+                },
+                'definitions': {
+                    'int10000000000': {
+                      'type': 'integer',
+                      'format': 'int64',
+                      'maximum': 9223372036854780000.0,
+                      'minimum': -9223372036854780000.0
+                    }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.Swagger2
+            });
+            var code = generator.GenerateFile("Message");
+
+            await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_integer_property_has_minimum_and_maximum_with_exclusive_true_then_range_attribute_is_rendered_in_Swagger_mode()
         {
             // Arrange
