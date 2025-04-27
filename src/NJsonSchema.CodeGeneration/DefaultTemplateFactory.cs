@@ -310,7 +310,7 @@ namespace NJsonSchema.CodeGeneration
 
             public static ValueTask<FluidValue> Literal(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
-                var converted = "\"" + ConversionUtilities.ConvertToStringLiteral(input.ToStringValue()) + "\"";
+                var converted = ConversionUtilities.ConvertToStringLiteral(input.ToStringValue(), "\"", "\"");
                 return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
             }
         }

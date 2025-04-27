@@ -18,7 +18,14 @@ namespace NJsonSchema
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [JsonIgnore]
-        public virtual JsonSchema ActualSchema => GetActualSchema([]);
+        public virtual JsonSchema ActualSchema
+        {
+            get
+            {
+                var checkedSchemas = new CheckedSchemaContainer();
+                return GetActualSchema(ref checkedSchemas);
+            }
+        }
 
         /// <summary>Gets the type actual schema (e.g. the shared schema of a property, parameter, etc.).</summary>
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
@@ -29,12 +36,12 @@ namespace NJsonSchema
             get
             {
                 var schema = Reference != null ? Reference : this;
-                if (schema._allOf.Count > 1 && schema._allOf.Count(s => !s.HasReference && !s.IsDictionary) == 1)
+                if (schema._allOf.Count > 1 && schema._allOf.Count(static s => !s.HasReference && !s.IsDictionary) == 1)
                 {
-                    return schema._allOf.First(s => !s.HasReference && !s.IsDictionary).ActualSchema;
+                    return schema._allOf.First(static s => !s.HasReference && !s.IsDictionary).ActualSchema;
                 }
 
-                return schema._oneOf.FirstOrDefault(o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
+                return schema._oneOf.FirstOrDefault(static o => !o.IsNullable(SchemaType.JsonSchema))?.ActualSchema ?? ActualSchema;
             }
         }
 
@@ -81,10 +88,42 @@ namespace NJsonSchema
                                                _anyOf.Count == 1 &&
                                                _anyOf.Any(s => s.HasReference);
 
+        // more efficient holder for schema checks
+        private struct CheckedSchemaContainer
+        {
+            private int _count;
+            private JsonSchema _schema1;
+            private JsonSchema _schema2;
+            private List<JsonSchema> _schemas;
+
+            public void Add(JsonSchema schema)
+            {
+                if (_count == 0)
+                {
+                    _schema1 = schema;
+                }
+                else if (_count == 1)
+                {
+                    _schema2 = schema;
+                }
+                else
+                {
+                    _schemas ??= new List<JsonSchema>(3) { _schema1, _schema2 };
+                    _schemas.Add(schema);
+                }
+                _count++;
+            }
+
+            public readonly bool Contains(JsonSchema schema)
+            {
+                return _count > 0 &&  (ReferenceEquals(_schema1, schema) || ReferenceEquals(_schema2, schema) || _schemas?.Contains(schema) == true);
+            }
+        }
+
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
         [MethodImpl((MethodImplOptions) 256)] // aggressive inlining
-        private JsonSchema GetActualSchema(List<JsonSchema> checkedSchemas) // we use list here, there are usually very few items, if any
+        private JsonSchema GetActualSchema(ref CheckedSchemaContainer checkedSchemas)
         {
             static void ThrowInvalidOperationException(string message)
             {
@@ -103,33 +142,32 @@ namespace NJsonSchema
 
             if (HasReference)
             {
-                return GetActualSchemaReferences(checkedSchemas) ?? this;
+                return GetActualSchemaReferences(ref checkedSchemas) ?? this;
             }
 
             return this;
         }
 
-        private JsonSchema? GetActualSchemaReferences(List<JsonSchema> checkedSchemas)
+        private JsonSchema? GetActualSchemaReferences(ref CheckedSchemaContainer checkedSchemas)
         {
-            checkedSchemas ??= [];
             checkedSchemas.Add(this);
 
             if (HasAllOfSchemaReference)
             {
-                return _allOf[0].GetActualSchema(checkedSchemas);
+                return _allOf[0].GetActualSchema(ref checkedSchemas);
             }
 
             if (HasOneOfSchemaReference)
             {
-                return _oneOf[0].GetActualSchema(checkedSchemas);
+                return _oneOf[0].GetActualSchema(ref checkedSchemas);
             }
 
             if (HasAnyOfSchemaReference)
             {
-                return _anyOf[0].GetActualSchema(checkedSchemas);
+                return _anyOf[0].GetActualSchema(ref checkedSchemas);
             }
 
-            return Reference?.GetActualSchema(checkedSchemas);
+            return Reference?.GetActualSchema(ref checkedSchemas);
         }
 
         #region Implementation of IJsonReference

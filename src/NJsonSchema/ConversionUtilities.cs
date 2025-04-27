@@ -85,9 +85,17 @@ namespace NJsonSchema
         /// <summary>Converts the string to a string literal which can be used in C# or TypeScript code.</summary>
         /// <param name="input">The input.</param>
         /// <returns>The literal.</returns>
-        public static string ConvertToStringLiteral(string input)
+        public static string ConvertToStringLiteral(string input) => ConvertToStringLiteral(input, null, null);
+
+        internal static string ConvertToStringLiteral(string input, string? prefix, string? postfix)
         {
-            var literal = new StringBuilder(input.Length);
+            using var literal = new ValueStringBuilder(input.Length + (prefix?.Length ?? 0) + (postfix?.Length ?? 0));
+
+            if (prefix != null)
+            {
+                literal.Append(prefix);
+            }
+
             foreach (var c in input)
             {
                 switch (c)
@@ -142,6 +150,11 @@ namespace NJsonSchema
                 }
             }
 
+            if (postfix != null)
+            {
+                literal.Append(postfix);
+            }
+
             return literal.ToString();
         }
 
@@ -167,6 +180,14 @@ namespace NJsonSchema
         public static string TrimWhiteSpaces(string? text)
         {
             return text?.Trim(_whiteSpaceChars) ?? string.Empty;
+        }
+
+        /// <summary>Trims white spaces from the text.</summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The updated text.</returns>
+        public static ReadOnlySpan<char> TrimWhiteSpaces(ReadOnlySpan<char> text)
+        {
+            return text.Trim(_whiteSpaceChars);
         }
 
         private static readonly char[] _lineBreakTrimChars = ['\n', '\t', ' '];
@@ -207,9 +228,45 @@ namespace NJsonSchema
             {
                 return "";
             }
-            var stringWriter = new StringWriter(new StringBuilder(input.Length), CultureInfo.CurrentCulture);
-            Tab(input, tabCount, stringWriter);
-            return stringWriter.ToString();
+
+            var tabString = CreateTabString(tabCount);
+            if (tabString.Length == 0)
+            {
+                return input;
+            }
+
+            using var stringBuilder = new ValueStringBuilder(input.Length);
+            for (var i = 0; i < input.Length; i++)
+            {
+                var c = input[i];
+                stringBuilder.Append(c);
+                if (c == '\n')
+                {
+                    // only write if not entirely empty line
+                    var foundNonEmptyBeforeNewLine = false;
+                    for (var j = i + 1; j < input.Length; ++j)
+                    {
+                        var c2 = input[j];
+                        if (c2 == '\n')
+                        {
+                            break;
+                        }
+
+                        if (!char.IsWhiteSpace(c2))
+                        {
+                            foundNonEmptyBeforeNewLine = true;
+                            break;
+                        }
+                    }
+
+                    if (foundNonEmptyBeforeNewLine)
+                    {
+                        stringBuilder.Append(tabString);
+                    }
+                }
+            }
+
+            return stringBuilder.ToString();
         }
 
         /// <summary>Add tabs to the given string.</summary>

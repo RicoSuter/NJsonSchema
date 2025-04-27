@@ -837,9 +837,15 @@ namespace NJsonSchema
                 return true;
             }
 
-            if ((Type == JsonObjectType.None || Type.IsNull()) && _oneOf.Any(o => o.IsNullable(schemaType)))
+            if (Type == JsonObjectType.None || Type.IsNull())
             {
-                return true;
+                foreach (var schema in _oneOf)
+                {
+                    if (schema.IsNullable(schemaType))
+                    {
+                        return true;
+                    }
+                }
             }
 
             var actualSchema = ActualSchema;
