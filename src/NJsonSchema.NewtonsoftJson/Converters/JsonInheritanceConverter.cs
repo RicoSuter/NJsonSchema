@@ -241,7 +241,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 var typeInfo = jObject.GetValue("$type");
                 if (typeInfo != null)
                 {
-                    return Type.GetType(typeInfo.Value<string>());
+                    return Type.GetType(typeInfo.Value<string>()!)!;
                 }
             }
 
@@ -266,7 +266,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, []);
+                            var types = (IEnumerable<Type>) method.Invoke(null, [])!;
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminator)

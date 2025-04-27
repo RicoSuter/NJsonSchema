@@ -102,10 +102,10 @@ namespace NJsonSchema.NewtonsoftJson.Converters
 
             var newSerializer = new JsonSerializer
             {
-                ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType())
+                ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType())!
             };
 
-            var field = JsonExceptionConverter.GetField(typeof(DefaultContractResolver), "_sharedCache");
+            var field = GetField(typeof(DefaultContractResolver), "_sharedCache");
             field?.SetValue(newSerializer.ContractResolver, false);
 
             dynamic resolver = newSerializer.ContractResolver;
@@ -147,7 +147,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var value = jObject.ToObject(objectType, newSerializer);
             if (value is not null)
             {
-                foreach (var property in JsonExceptionConverter.GetExceptionProperties(value.GetType()))
+                foreach (var property in GetExceptionProperties(value.GetType()))
                 {
                     var jValue = jObject.GetValue(resolver.GetResolvedPropertyName(property.Value));
                     var propertyValue = (object?)jValue?.ToObject(property.Key.PropertyType);
@@ -157,16 +157,18 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                     else
                     {
-                        var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
+                        var fieldNameSuffix = char.IsLower(property.Value[0])
+                            ? property.Value
+                            : char.ToLowerInvariant(property.Value[0]) + property.Value.Substring(1);
 
-                        field = JsonExceptionConverter.GetField(objectType, "m_" + fieldNameSuffix);
+                        field = GetField(objectType, "m_" + fieldNameSuffix);
                         if (field != null)
                         {
                             field.SetValue(value, propertyValue);
                         }
                         else
                         {
-                            field = JsonExceptionConverter.GetField(objectType, "_" + fieldNameSuffix);
+                            field = GetField(objectType, "_" + fieldNameSuffix);
                             field?.SetValue(value, propertyValue);
                         }
                     }
@@ -187,7 +189,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var field = typeInfo.GetDeclaredField(fieldName);
             if (field == null && typeInfo.BaseType != null)
             {
-                return JsonExceptionConverter.GetField(typeInfo.BaseType, fieldName);
+                return GetField(typeInfo.BaseType, fieldName);
             }
 
             return field;
@@ -220,7 +222,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var property = jObject.Properties().FirstOrDefault(p => string.Equals(p.Name, jsonPropertyName, StringComparison.OrdinalIgnoreCase));
             if (property != null)
             {
-                var fieldValue = property.Value.ToObject(field.FieldType, serializer);
+                var fieldValue = property.Value.ToObject(field!.FieldType, serializer);
                 field.SetValue(value, fieldValue);
             }
         }
