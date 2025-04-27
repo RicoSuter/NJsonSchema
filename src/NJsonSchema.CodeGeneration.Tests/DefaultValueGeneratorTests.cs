@@ -1,6 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {

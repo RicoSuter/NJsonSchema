@@ -15,6 +15,7 @@ using NJsonSchema.Generation.TypeMappers;
 using NJsonSchema.Infrastructure;
 using System.Collections;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 

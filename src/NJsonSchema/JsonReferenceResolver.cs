@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;

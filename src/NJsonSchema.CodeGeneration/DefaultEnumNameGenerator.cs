@@ -60,8 +60,9 @@ namespace NJsonSchema.CodeGeneration
             }
 #pragma warning restore CA1845
 
-            return _invalidNameCharactersPattern.Replace(ConversionUtilities.ConvertToUpperCamelCase(name
-                .Replace(":", "-").Replace(@"""", ""), firstCharacterMustBeAlpha: true), "_");
+            var cleaned = name.Replace(':', '-').Replace(@"""", "");
+            var camelCase = ConversionUtilities.ConvertToUpperCamelCase(cleaned, firstCharacterMustBeAlpha: true);
+            return _invalidNameCharactersPattern.Replace(camelCase, "_");
         }
     }
 }

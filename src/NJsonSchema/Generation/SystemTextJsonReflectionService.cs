@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
 using Namotion.Reflection;
 using System.Reflection;
 using System.Runtime.CompilerServices;

@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NJsonSchema.CodeGeneration.CSharp.Tests
+﻿namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
     public class DefaultPropertyTests
     {

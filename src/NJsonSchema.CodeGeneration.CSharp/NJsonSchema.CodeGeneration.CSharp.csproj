@@ -23,4 +23,8 @@
         <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Using Remove="System.Linq" />
+    </ItemGroup>
+
 </Project>

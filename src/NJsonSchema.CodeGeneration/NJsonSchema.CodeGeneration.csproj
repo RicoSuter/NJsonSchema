@@ -21,6 +21,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Using Remove="System.Linq" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs" Link="EnumExtensions.cs" />
         <Compile Include="..\NJsonSchema\Infrastructure\Polyfills.cs" Link="Polyfills.cs" />
     </ItemGroup>

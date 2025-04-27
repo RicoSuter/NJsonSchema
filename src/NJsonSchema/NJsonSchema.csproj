@@ -1,28 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462;net8.0</TargetFrameworks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net462;net8.0</TargetFrameworks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NJsonSchema.Annotations\NJsonSchema.Annotations.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\NJsonSchema.Annotations\NJsonSchema.Annotations.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Namotion.Reflection" />
-    <PackageReference Include="Newtonsoft.Json" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Namotion.Reflection" />
+        <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
 
-  <ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
-    <PackageReference Include="System.Text.Json" />
-  </ItemGroup>
+    <ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+        <PackageReference Include="System.Text.Json" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Using Remove="System.Linq" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>

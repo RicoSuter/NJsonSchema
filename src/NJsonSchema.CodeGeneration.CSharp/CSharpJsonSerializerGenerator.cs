@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Generates JSON converter code.</summary>

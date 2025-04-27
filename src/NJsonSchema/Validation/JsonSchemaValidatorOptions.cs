@@ -1,4 +1,5 @@
-﻿using NJsonSchema.Validation.FormatValidators;
+﻿using System.Linq;
+using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema.Validation
 {

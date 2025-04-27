@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.Samples
 {

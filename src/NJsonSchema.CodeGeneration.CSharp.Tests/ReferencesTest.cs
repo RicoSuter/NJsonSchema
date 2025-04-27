@@ -2,7 +2,6 @@
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {

@@ -111,7 +111,7 @@ namespace NJsonSchema.Tests.Generation
 
             public string StringValue
             {
-                get { return string.Join("/", Path); ; }
+                get { return string.Join("/", Path); }
                 set { Path = new List<string>(value.Split('/')); }
             }
 
