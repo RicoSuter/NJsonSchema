@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration
         protected string GetDefaultAsStringLiteral(JsonSchema schema)
 #pragma warning restore CA1822
         {
-            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty) + "\"";
+            return ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty, "\"", "\"");
         }
 
         /// <summary>Converts a number to its string representation.</summary>

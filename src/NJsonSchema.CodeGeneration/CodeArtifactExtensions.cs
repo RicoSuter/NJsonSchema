@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -18,7 +19,21 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The result.</returns>
         public static string Concatenate(this IEnumerable<CodeArtifact> artifacts)
         {
-            return ConversionUtilities.TrimWhiteSpaces(string.Join("\n\n", artifacts.Select(p => p.Code)));
+            using var stringBuilder = new ValueStringBuilder();
+            foreach (var artifact in artifacts)
+            {
+                stringBuilder.Append(artifact.Code);
+                stringBuilder.Append("\n\n");
+            }
+
+            var span = stringBuilder.AsSpan();
+            if (span.Length > 0)
+            {
+                // remove extra
+                span = span[..^2];
+            }
+
+            return ConversionUtilities.TrimWhiteSpaces(span).ToString();
         }
 
         /// <summary>Reorders the results so that base classes are always before child classes.</summary>
