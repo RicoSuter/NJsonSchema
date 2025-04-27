@@ -93,7 +93,7 @@ namespace NJsonSchema.Generation
         public bool RequiresSchemaReference(IEnumerable<ITypeMapper> typeMappers)
         {
             var typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == ContextualType.OriginalType);
-            if (typeMapper == null && ContextualType.OriginalType.GetTypeInfo().IsGenericType)
+            if (typeMapper == null && ContextualType.OriginalType.IsGenericType)
             {
                 var genericType = ContextualType.OriginalType.GetGenericTypeDefinition();
                 typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == genericType);

@@ -442,7 +442,7 @@ namespace NJsonSchema.Generation
         /// <returns>The converted default value.</returns>
         public virtual object? ConvertDefaultValue(ContextualType type, object? defaultValue)
         {
-            if (defaultValue != null && defaultValue.GetType().GetTypeInfo().IsEnum)
+            if (defaultValue != null && defaultValue.GetType().IsEnum)
             {
                 var hasStringEnumConverter = Settings.ReflectionService.IsStringEnum(type, Settings);
                 if (hasStringEnumConverter)
@@ -544,7 +544,7 @@ namespace NJsonSchema.Generation
             schema.Description = type.ToCachedType().GetDescription(Settings);
             schema.Example = GenerateExample(type.ToContextualType());
 
-            dynamic? obsoleteAttribute = type.GetTypeInfo().GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            dynamic? obsoleteAttribute = type.GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
             if (obsoleteAttribute != null)
             {
                 schema.IsDeprecated = true;
@@ -553,7 +553,7 @@ namespace NJsonSchema.Generation
 
             if (Settings.GetActualGenerateAbstractSchema(type))
             {
-                schema.IsAbstract = type.GetTypeInfo().IsAbstract;
+                schema.IsAbstract = type.IsAbstract;
             }
 
             GenerateInheritanceDiscriminator(type, rootSchema, schema);
@@ -649,7 +649,7 @@ namespace NJsonSchema.Generation
             var genericTypeArguments = contextualType.GenericArguments;
 
             var keyType = genericTypeArguments.Length == 2 ? genericTypeArguments[0] : typeof(string).ToContextualType();
-            if (keyType.OriginalType.GetTypeInfo().IsEnum)
+            if (keyType.OriginalType.IsEnum)
             {
                 schema.DictionaryKey = GenerateWithReference<JsonSchema>(keyType, schemaResolver);
             }
@@ -803,7 +803,7 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema, new()
         {
             var typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == contextualType.OriginalType);
-            if (typeMapper == null && contextualType.OriginalType.GetTypeInfo().IsGenericType)
+            if (typeMapper == null && contextualType.OriginalType.IsGenericType)
             {
                 var genericType = contextualType.OriginalType.GetGenericTypeDefinition();
                 typeMapper = Settings.TypeMappers.FirstOrDefault(m => m.MappedType == genericType);
@@ -870,13 +870,13 @@ namespace NJsonSchema.Generation
 #pragma warning restore CA1822
         {
             return memberInfo is ContextualPropertyInfo propertyInfo &&
-                   propertyInfo.PropertyInfo.DeclaringType?.GetTypeInfo().IsInterface == false &&
+                   propertyInfo.PropertyInfo.DeclaringType?.IsInterface == false &&
                    (propertyInfo.PropertyInfo.GetMethod?.IsAbstract == true || propertyInfo.PropertyInfo.SetMethod?.IsAbstract == true);
         }
 
         private void GenerateKnownTypes(Type type, JsonSchemaResolver schemaResolver)
         {
-            var attributes = type.GetTypeInfo()
+            var attributes = type
                 .GetCustomAttributes(Settings.GetActualFlattenInheritanceHierarchy(type));
 
             if (Settings.GenerateKnownTypes)
@@ -1023,7 +1023,7 @@ namespace NJsonSchema.Generation
                     var contextualType = implementedInterface.ToContextualType();
                     var typeDescription = Settings.ReflectionService.GetDescription(contextualType, Settings);
                     if (!typeDescription.IsDictionary && !type.Type.IsArray &&
-                        !typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(implementedInterface.GetTypeInfo()))
+                        !typeof(IEnumerable).IsAssignableFrom(implementedInterface))
                     {
                         Settings.ReflectionService.GenerateProperties(schema, contextualType, Settings, this, schemaResolver);
                         var actualSchema = GenerateInheritance(contextualType, schema, schemaResolver);
@@ -1089,7 +1089,7 @@ namespace NJsonSchema.Generation
 #pragma warning disable CA1859
         private object? TryGetInheritanceDiscriminatorConverter(Type type)
         {
-            var typeAttributes = type.GetTypeInfo().GetCustomAttributes(false).OfType<Attribute>();
+            var typeAttributes = type.GetCustomAttributes(false).OfType<Attribute>();
 
             // support for NJsonSchema provided inheritance converters
             dynamic? jsonConverterAttribute = typeAttributes.FirstAssignableToTypeNameOrDefault(nameof(JsonConverterAttribute), TypeNameStyle.Name);

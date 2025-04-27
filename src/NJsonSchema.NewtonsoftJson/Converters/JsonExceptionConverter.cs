@@ -83,7 +83,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Exception).GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo());
+            return typeof(Exception).IsAssignableFrom(objectType);
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
@@ -185,8 +185,8 @@ namespace NJsonSchema.NewtonsoftJson.Converters
 
         private static FieldInfo? GetField(Type type, string fieldName)
         {
-            var typeInfo = type.GetTypeInfo();
-            var field = typeInfo.GetDeclaredField(fieldName);
+            var typeInfo = type;
+            var field = typeInfo.GetTypeInfo().GetDeclaredField(fieldName);
             if (field == null && typeInfo.BaseType != null)
             {
                 return GetField(typeInfo.BaseType, fieldName);
@@ -218,7 +218,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         private static void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, IContractResolver resolver, JsonSerializer serializer)
         {
             var field = typeof(Exception).GetTypeInfo().GetDeclaredField(fieldName);
-            var jsonPropertyName = resolver is DefaultContractResolver ? ((DefaultContractResolver)resolver).GetResolvedPropertyName(propertyName) : propertyName;
+            var jsonPropertyName = resolver is DefaultContractResolver contractResolver ? contractResolver.GetResolvedPropertyName(propertyName) : propertyName;
             var property = jObject.Properties().FirstOrDefault(p => string.Equals(p.Name, jsonPropertyName, StringComparison.OrdinalIgnoreCase));
             if (property != null)
             {

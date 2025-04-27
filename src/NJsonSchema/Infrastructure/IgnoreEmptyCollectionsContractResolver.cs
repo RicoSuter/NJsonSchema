@@ -15,7 +15,7 @@ namespace NJsonSchema.Infrastructure
 {
     internal sealed class IgnoreEmptyCollectionsContractResolver : PropertyRenameAndIgnoreSerializerContractResolver
     {
-        private static readonly TypeInfo enumerableType = typeof(IEnumerable).GetTypeInfo();
+        private static readonly Type enumerableType = typeof(IEnumerable);
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
@@ -24,7 +24,7 @@ namespace NJsonSchema.Infrastructure
             if (property.Required is Required.Default or Required.DisallowNull &&
                 property.PropertyType is { IsPrimitive: false } &&
                 property.PropertyType != typeof(string) &&
-                enumerableType.IsAssignableFrom(property.PropertyType.GetTypeInfo()))
+                enumerableType.IsAssignableFrom(property.PropertyType))
             {
                 property.ShouldSerialize = instance =>
                 {

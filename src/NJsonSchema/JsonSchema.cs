@@ -82,8 +82,8 @@ namespace NJsonSchema
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
         public static string ToolchainVersion => version;
 
-        private static readonly string version = typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
-            " (Newtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
+        private static readonly string version = typeof(JsonSchema).Assembly.GetName().Version +
+            " (Newtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
