@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Buffers;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -18,7 +18,7 @@ namespace NJsonSchema
         private static readonly char[] _typeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
 
 #if NET8_0_OR_GREATER
-        private static readonly SearchValues<char> TypeNameHintCleanupChars = SearchValues.Create(_typeNameHintCleanupChars);
+        private static readonly System.Buffers.SearchValues<char> TypeNameHintCleanupChars = System.Buffers.SearchValues.Create(_typeNameHintCleanupChars);
 #else
         private static readonly char[] TypeNameHintCleanupChars = _typeNameHintCleanupChars;
 #endif

@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,10 +29,9 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase(
-                (input[0].ToString().ToLowerInvariant() + (input.Length > 1 ? input.Substring(1) : ""))
-                .Replace(" ", "_")
-                .Replace("/", "_"));
+            var lowered = char.ToLowerInvariant(input[0]) + (input.Length > 1 ? input.Substring(1) : "");
+            var cleaned = lowered.Replace(' ', '_').Replace('/', '_');
+            input = ConvertDashesToCamelCase(cleaned);
 
             if (string.IsNullOrEmpty(input))
             {
@@ -57,9 +57,8 @@ namespace NJsonSchema
                 return string.Empty;
             }
 
-            input = ConvertDashesToCamelCase(Capitalize(input)
-                .Replace(" ", "_")
-                .Replace("/", "_"));
+            var cleaned = Capitalize(input).Replace(' ', '_').Replace('/', '_');
+            input = ConvertDashesToCamelCase(cleaned);
 
             if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
             {

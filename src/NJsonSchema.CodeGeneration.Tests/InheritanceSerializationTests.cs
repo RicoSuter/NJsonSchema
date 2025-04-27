@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using Xunit;
 using System.Reflection;
 using System.CodeDom.Compiler;
 using NJsonSchema.NewtonsoftJson.Converters;

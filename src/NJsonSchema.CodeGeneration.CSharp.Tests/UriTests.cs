@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {

@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp;
 

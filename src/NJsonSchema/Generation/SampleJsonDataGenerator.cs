@@ -8,6 +8,7 @@
 
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using System.Linq;
 
 namespace NJsonSchema.Generation
 {

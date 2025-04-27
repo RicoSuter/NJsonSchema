@@ -100,7 +100,7 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(json, contractResolver);
+            var loader = () => FromJson<T>(json, contractResolver)!;
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
         }
 
@@ -116,7 +116,7 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(stream, contractResolver);
+            var loader = () => FromJson<T>(stream, contractResolver)!;
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
         }
 

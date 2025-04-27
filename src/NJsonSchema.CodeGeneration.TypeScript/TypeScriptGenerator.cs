@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
 using NJsonSchema.CodeGeneration.TypeScript.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript

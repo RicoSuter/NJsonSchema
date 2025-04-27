@@ -8,6 +8,7 @@
 
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

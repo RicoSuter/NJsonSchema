@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Manages the generated types and converts JSON types to TypeScript types. </summary>

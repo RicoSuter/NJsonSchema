@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>Manages the generated types and converts JSON types to CSharp types. </summary>

@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using Fluid;
 using NJsonSchema.CodeGeneration.TypeScript;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {

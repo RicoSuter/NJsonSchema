@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
