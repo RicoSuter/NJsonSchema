@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Concurrent;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
@@ -16,12 +17,12 @@ namespace NJsonSchema.NewtonsoftJson.Generation
     /// <inheritdoc />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
-        private readonly Dictionary<string, JsonContract?> _cachedContracts = [];
+        private readonly ConcurrentDictionary<string, JsonContract?> _cachedContracts = [];
 
         private JsonSerializerSettings _serializerSettings;
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
-        public NewtonsoftJsonSchemaGeneratorSettings() 
+        public NewtonsoftJsonSchemaGeneratorSettings()
             : base(new NewtonsoftJsonReflectionService())
         {
             _serializerSettings = new JsonSerializerSettings();
@@ -31,7 +32,8 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         [JsonIgnore]
         public JsonSerializerSettings SerializerSettings
         {
-            get => _serializerSettings; set
+            get => _serializerSettings;
+            set
             {
                 _serializerSettings = value;
                 _cachedContracts.Clear();
@@ -55,20 +57,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 return null;
             }
 
-            if (!_cachedContracts.ContainsKey(key))
-            {
-                lock (_cachedContracts)
-                {
-                    if (!_cachedContracts.ContainsKey(key))
-                    {
-                        _cachedContracts[key] = !type.GetTypeInfo().IsGenericTypeDefinition ?
-                            ActualContractResolver.ResolveContract(type) :
-                            null;
-                    }
-                }
-            }
-
-            return _cachedContracts[key];
+            return _cachedContracts.GetOrAdd(key, s => !type.GetTypeInfo().IsGenericTypeDefinition ? ActualContractResolver.ResolveContract(type) : null);
         }
     }
 }
