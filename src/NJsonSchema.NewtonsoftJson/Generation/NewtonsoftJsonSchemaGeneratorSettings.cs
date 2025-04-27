@@ -57,7 +57,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 return null;
             }
 
-            return _cachedContracts.GetOrAdd(key, s => !type.GetTypeInfo().IsGenericTypeDefinition ? ActualContractResolver.ResolveContract(type) : null);
+            return _cachedContracts.GetOrAdd(key, s => !type.IsGenericTypeDefinition ? ActualContractResolver.ResolveContract(type) : null);
         }
     }
 }

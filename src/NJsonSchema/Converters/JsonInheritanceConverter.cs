@@ -154,7 +154,7 @@ namespace NJsonSchema.Converters
                 }
 
                 var typeName = objectType.Namespace + "." + discriminatorValue;
-                var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+                var subtype = objectType.Assembly.GetType(typeName);
                 if (subtype != null)
                 {
                     return subtype;
@@ -170,7 +170,7 @@ namespace NJsonSchema.Converters
             do
             {
                 var knownTypeAttributes = type
-                    .GetTypeInfo()
+                    
                     .GetCustomAttributes(false)
                     .Where(a => a.GetType().Name == "KnownTypeAttribute");
 
@@ -200,7 +200,7 @@ namespace NJsonSchema.Converters
                     }
                 }
 
-                type = type.GetTypeInfo().BaseType;
+                type = type.BaseType;
             } while (type != null);
 
             return null;
@@ -209,7 +209,7 @@ namespace NJsonSchema.Converters
         private static Type? GetObjectSubtype(Type baseType, string discriminatorValue)
         {
             var jsonInheritanceAttributes = baseType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
@@ -219,7 +219,7 @@ namespace NJsonSchema.Converters
         private static string? GetSubtypeDiscriminator(Type objectType)
         {
             var jsonInheritanceAttributes = objectType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 

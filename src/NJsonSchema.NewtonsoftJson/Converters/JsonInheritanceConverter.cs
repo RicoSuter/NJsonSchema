@@ -146,7 +146,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         return true;
                     }
 
-                    type = type.GetTypeInfo().BaseType;
+                    type = type.BaseType;
                 }
 
                 return false;
@@ -229,7 +229,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 }
 
                 var typeName = objectType.Namespace + "." + discriminatorValue;
-                var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+                var subtype = objectType.Assembly.GetType(typeName);
                 if (subtype != null)
                 {
                     return subtype;
@@ -253,7 +253,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var type = objectType;
             do
             {
-                var knownTypeAttributes = type.GetTypeInfo().GetCustomAttributes(false)
+                var knownTypeAttributes = type.GetCustomAttributes(false)
                     .Where(a => a.GetType().Name == "KnownTypeAttribute");
                 foreach (dynamic attribute in knownTypeAttributes)
                 {
@@ -278,7 +278,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         }
                     }
                 }
-                type = type.GetTypeInfo().BaseType;
+                type = type.BaseType;
             } while (type != null);
 
             return null;
@@ -287,7 +287,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         private static Type? GetObjectSubtype(Type baseType, string discriminatorName)
         {
             var jsonInheritanceAttributes = baseType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
@@ -297,7 +297,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         private static string? GetSubtypeDiscriminator(Type objectType)
         {
             var jsonInheritanceAttributes = objectType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 

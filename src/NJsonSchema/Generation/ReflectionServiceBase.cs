@@ -8,8 +8,10 @@
 
 using System.Collections;
 using System.Linq;
-using NJsonSchema.Annotations;
 using System.Reflection;
+
+using NJsonSchema.Annotations;
+
 using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
@@ -69,7 +71,7 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, TSettings settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            if (originalType.GetTypeInfo().IsEnum)
+            if (originalType.IsEnum)
             {
                 var isStringEnum = IsStringEnum(contextualType, settings);
                 return JsonTypeDescription.CreateForEnumeration(contextualType,
@@ -362,14 +364,19 @@ namespace NJsonSchema.Generation
 
         private static bool HasStringEnumConverter(ContextualType contextualType)
         {
-            dynamic? jsonConverterAttribute = contextualType
-                .GetContextOrTypeAttributes(true)?
-                .FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            dynamic? jsonConverterAttribute = null;
+            foreach (var a in contextualType.GetContextOrTypeAttributes(true))
+            {
+                if (a.GetType().Name == "JsonConverterAttribute")
+                {
+                    jsonConverterAttribute = a;
+                    break;
+                }
+            }
 
             if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
-                var converterType = jsonConverterAttribute?.ConverterType as Type;
-                if (converterType != null)
+                if (jsonConverterAttribute?.ConverterType is Type converterType)
                 {
                     return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||
                            converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName);

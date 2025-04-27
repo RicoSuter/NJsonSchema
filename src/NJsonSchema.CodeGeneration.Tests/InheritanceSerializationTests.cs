@@ -304,7 +304,7 @@ namespace NJsonSchema.CodeGeneration.Tests
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
 
-            var coreDir = Directory.GetParent(typeof(Enumerable).GetTypeInfo().Assembly.Location);            
+            var coreDir = Directory.GetParent(typeof(Enumerable).Assembly.Location);            
             compilation = compilation.AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),

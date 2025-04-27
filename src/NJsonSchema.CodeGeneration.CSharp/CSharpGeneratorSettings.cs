@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory(this, [
-                typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
+                typeof(CSharpGeneratorSettings).Assembly
             ]);
 
             InlineNamedArrays = false;

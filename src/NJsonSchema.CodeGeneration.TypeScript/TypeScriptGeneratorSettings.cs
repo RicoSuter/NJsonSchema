@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ValueGenerator = new TypeScriptValueGenerator(this);
             PropertyNameGenerator = new TypeScriptPropertyNameGenerator();
             TemplateFactory = new DefaultTemplateFactory(this, [
-                typeof(TypeScriptGeneratorSettings).GetTypeInfo().Assembly
+                typeof(TypeScriptGeneratorSettings).Assembly
             ]);
 
             ClassTypes = [];
