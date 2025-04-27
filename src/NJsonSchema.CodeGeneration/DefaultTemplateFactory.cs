@@ -24,6 +24,7 @@ namespace NJsonSchema.CodeGeneration
     {
         private readonly CodeGeneratorSettingsBase _settings;
         private readonly Assembly[] _assemblies;
+        private readonly Func<string, string, string, string> _templateContentLoader;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -32,6 +33,7 @@ namespace NJsonSchema.CodeGeneration
         {
             _settings = settings;
             _assemblies = assemblies;
+            _templateContentLoader = GetLiquidTemplate;
         }
 
         /// <summary>Creates a template for the given language, template name and template model.</summary>
@@ -45,7 +47,7 @@ namespace NJsonSchema.CodeGeneration
             return new LiquidTemplate(
                 language,
                 template,
-                GetLiquidTemplate,
+                _templateContentLoader,
                 model,
                 GetToolchainVersion(),
                 _settings);
@@ -146,15 +148,18 @@ namespace NJsonSchema.CodeGeneration
             private const string TabCountRegexString = @"(\s*)?\{%(-)?\s+template\s+([a-zA-Z0-9_.]+)(\s*?.*?)\s(-)?%}";
             private const string CsharpDocsRegexString = "(\n( )*)([^\n]*?) \\| csharpdocs }}";
             private const string TabRegexString = "(\n( )*)([^\n]*?) \\| tab }}";
+            private const string EmptyTemplateCleanupRegexString = @"^[ ]+__EMPTY-TEMPLATE__$[\n]{0,1}";
 
 #if NET8_0_OR_GREATER
             private static readonly Regex _tabCountRegex = TabCountRegex();
             private static readonly Regex _csharpDocsRegex = CsharpDocsRegex();
             private static readonly Regex _tabRegex = TabRegex();
+            private static readonly Regex _emptyTemplateCleanupRegex = EmptyTemplateCleanupRegex();
 #else
             private static readonly Regex _tabCountRegex = new(TabCountRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
             private static readonly Regex _csharpDocsRegex = new(CsharpDocsRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
             private static readonly Regex _tabRegex = new(TabRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _emptyTemplateCleanupRegex = new(EmptyTemplateCleanupRegexString, RegexOptions.Multiline | RegexOptions.Compiled);
 #endif
 
             public LiquidTemplate(
@@ -243,7 +248,7 @@ namespace NJsonSchema.CodeGeneration
                     var trimmed = render.Replace("\r", "").Trim('\n');
 
                     // clean up cases where we have called template but it produces empty output
-                    var withoutEmptyWhiteSpace = Regex.Replace(trimmed, @"^[ ]+__EMPTY-TEMPLATE__$[\n]{0,1}", string.Empty, RegexOptions.Multiline);
+                    var withoutEmptyWhiteSpace = _emptyTemplateCleanupRegex.Replace(trimmed, string.Empty);
 
                     // just to make sure we don't leak out marker
                     return withoutEmptyWhiteSpace.Replace("__EMPTY-TEMPLATE__", "");
@@ -275,6 +280,9 @@ namespace NJsonSchema.CodeGeneration
 
             [GeneratedRegex(TabRegexString, RegexOptions.Compiled | RegexOptions.Singleline)]
             private static partial Regex TabRegex();
+
+            [GeneratedRegex(EmptyTemplateCleanupRegexString, RegexOptions.Compiled | RegexOptions.Multiline)]
+            private static partial Regex EmptyTemplateCleanupRegex();
 #endif
         }
 
