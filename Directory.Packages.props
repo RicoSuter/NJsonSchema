@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageVersion Include="Namotion.Reflection" Version="3.3.0" />
+    <PackageVersion Include="Namotion.Reflection" Version="3.4.0" />
     <PackageVersion Include="NBench" Version="2.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NodaTime" Version="3.2.1" />
