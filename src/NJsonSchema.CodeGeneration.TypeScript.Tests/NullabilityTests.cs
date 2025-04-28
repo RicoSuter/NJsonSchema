@@ -186,5 +186,38 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
             Assert.Contains(": (string | null)[]", output);
         }
+
+        public class Complex
+        {
+            public int A { get; set; }
+        }
+        
+        public class ClassWithComplexNullableArrayItems
+        {
+            [NotNull]
+            [ItemsCanBeNull]
+            public List<Complex> Items { get; set; }
+        }
+
+        [Fact]
+        public void When_complex_array_item_is_nullable_then_generated_TypeScript_is_nullsafe()
+        {
+            // Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithComplexNullableArrayItems>();
+            var json = schema.ToJson();
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeScriptVersion = 2.7m,
+                NullValue = TypeScriptNullValue.Null
+            });
+
+            // Act
+            var output = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
+            Assert.Contains(": (Complex | null)[]", output);
+            Assert.Contains(".push(item ? item.toJSON() : <any>null)", output);
+        }
     }
 }

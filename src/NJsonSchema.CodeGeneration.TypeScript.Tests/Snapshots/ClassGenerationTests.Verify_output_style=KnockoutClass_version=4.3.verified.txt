@@ -214,7 +214,7 @@ export class MyClass {
         if (Array.isArray(array_)) {
             data["Array"] = [];
             for (let item of array_)
-                data["Array"].push(item.toJSON());
+                data["Array"].push(item ? item.toJSON() : <any>undefined);
         }
 
         let dictionary_: any = this.dictionary();
