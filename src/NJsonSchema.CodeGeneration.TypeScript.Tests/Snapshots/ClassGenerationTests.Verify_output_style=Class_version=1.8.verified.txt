@@ -188,7 +188,7 @@ export class MyClass implements IMyClass {
         if (Array.isArray(this.array)) {
             data["Array"] = [];
             for (let item of this.array)
-                data["Array"].push(item.toJSON());
+                data["Array"].push(item ? item.toJSON() : <any>undefined);
         }
         if (this.dictionary) {
             data["Dictionary"] = {};

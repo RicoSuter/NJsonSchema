@@ -169,7 +169,7 @@ export class MyClass implements IMyClass {
         if (Array.isArray(this.children)) {
             data["Children"] = [];
             for (let item of this.children)
-                data["Children"].push(item.toJSON());
+                data["Children"].push(item ? item.toJSON() : <any>undefined);
         }
         return data;
     }
