@@ -400,11 +400,6 @@ namespace NJsonSchema.CodeGeneration
 
                 accessor = baseMemberAccessStrategy.GetAccessor(type, name);
 
-                if (accessor == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 return accessor;
             }
         }
