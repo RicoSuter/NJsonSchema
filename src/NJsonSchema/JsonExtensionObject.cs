@@ -73,6 +73,19 @@ namespace NJsonSchema
             if (value is JObject obj)
             {
                 var isSchema = obj.Property("type") != null || obj.Property("properties") != null;
+
+                // special case "required" boolean property as it's contained in parameters for example and will always
+                // cause serialization exception when boolean value is tried to be injected to JsonSchema.Required which
+                // is a list of strings
+                if (isSchema)
+                {
+                    var requiredProperty = obj.Property("required");
+                    if (requiredProperty is { Value.Type: JTokenType.Boolean })
+                    {
+                        isSchema = false;
+                    }
+                }
+
                 if (isSchema)
                 {
                     try
