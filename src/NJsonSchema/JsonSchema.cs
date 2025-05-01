@@ -25,7 +25,9 @@ namespace NJsonSchema
     public partial class JsonSchema : IDocumentPathProvider
     {
         internal static readonly HashSet<string> JsonSchemaPropertiesCache =
-            [..typeof(JsonSchema).GetContextualProperties().Select(p => p.Name).ToArray()];
+        [
+            ..typeof(JsonSchema).GetContextualProperties().Select(p => p.Name)
+        ];
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
 

@@ -63,12 +63,11 @@ namespace NJsonSchema.Visitors
         protected virtual async Task VisitAsync(object obj, string path, string? typeNameHint, ISet<object> checkedObjects, Action<object> replacer, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (obj == null || checkedObjects.Contains(obj))
+
+            if (obj == null || obj is string || !checkedObjects.Add(obj))
             {
                 return;
             }
-
-            checkedObjects.Add(obj);
 
             if (obj is IJsonReference reference)
             {
@@ -174,21 +173,29 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (obj is not string && obj is not JToken && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
+            if (obj is not JToken && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
+                var pathPrefix = path + "/";
                 if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
                 {
-                    foreach (var property in contract.Properties.Where(p =>
+                    foreach (var p in contract.Properties)
                     {
-                        bool isJsonSchemaProperty = obj is JsonSchema && p.UnderlyingName != null && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
-                        return !isJsonSchemaProperty && !p.Ignored &&
-                                p.ShouldSerialize?.Invoke(obj) != false;
-                    }))
-                    {
-                        var value = property.ValueProvider?.GetValue(obj);
+                        var isJsonSchemaProperty = obj is JsonSchema && p.UnderlyingName != null && JsonSchema.JsonSchemaPropertiesCache.Contains(p.UnderlyingName);
+                        if (isJsonSchemaProperty
+                            || p.Ignored
+                            || p.PropertyType == typeof(string)
+                            || p.PropertyType?.IsPrimitive == true
+                            || p.ShouldSerialize?.Invoke(obj) == false)
+                        {
+                            continue;
+                        }
+
+                        var value = p.ValueProvider?.GetValue(obj);
                         if (value != null)
                         {
-                            await VisitAsync(value, path + "/" + property.PropertyName, property.PropertyName, checkedObjects, o => property.ValueProvider?.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
+                            // to avoid closure allocations
+                            var temp = p.ValueProvider;
+                            await VisitAsync(value, pathPrefix + p.PropertyName, p.PropertyName, checkedObjects, o => temp?.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
                         }
                     }
                 }
@@ -199,7 +206,7 @@ namespace NJsonSchema.Visitors
                         var value = dictionary[key];
                         if (value != null)
                         {
-                            await VisitAsync(value, path + "/" + key, key.ToString(), checkedObjects, o =>
+                            await VisitAsync(value, pathPrefix + key, key.ToString(), checkedObjects, o =>
                             {
                                 if (o != null)
                                 {
@@ -224,7 +231,7 @@ namespace NJsonSchema.Visitors
                             var value = property.GetValue(obj);
                             if (value != null)
                             {
-                                await VisitAsync(value, path + "/" + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
+                                await VisitAsync(value, pathPrefix + property.Name, property.Name, checkedObjects, o => property.SetValue(obj, o), cancellationToken).ConfigureAwait(false);
                             }
                         }
                     }
