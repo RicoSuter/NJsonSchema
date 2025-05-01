@@ -21,6 +21,10 @@ namespace NJsonSchema
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
+        private static readonly List<ContextualAccessorInfo> JsonSchemaContextualAccessors = typeof(JsonSchema).GetContextualAccessors()
+            .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true))
+            .ToList();
+
         private readonly JsonSchemaAppender _schemaAppender;
         private readonly Dictionary<string, IJsonReference> _resolvedObjects = [];
 
@@ -312,10 +316,19 @@ namespace NJsonSchema
                     return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
 
-                foreach (var member in obj
-                    .GetType()
-                    .GetContextualAccessors()
-                    .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(true)))
+                IEnumerable<ContextualAccessorInfo> properties;
+                if (obj.GetType() == typeof(JsonSchema))
+                {
+                    properties = JsonSchemaContextualAccessors;
+                }
+                else
+                {
+                    properties = obj.GetType()
+                        .GetContextualAccessors()
+                        .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true));
+                }
+
+                foreach (var member in properties)
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)
