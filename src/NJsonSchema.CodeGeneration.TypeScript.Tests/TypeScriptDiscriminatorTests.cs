@@ -67,6 +67,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
             await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -91,6 +93,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
             await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -114,7 +118,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export interface SecondChild extends Base", code);
             Assert.Contains("Child: OneChild | SecondChild;", code);
             Assert.Contains("Children: (OneChild | SecondChild)[];", code);
+
             await VerifyHelper.Verify(code);
+
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -138,6 +145,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("export class SecondChild extends Base", code);
             Assert.Contains("child: OneChild | SecondChild;", code);
             Assert.Contains("children: (OneChild | SecondChild)[];", code);
+
             await VerifyHelper.Verify(code);
         }
     }
