@@ -98,7 +98,7 @@ namespace NJsonSchema
                     }
                 }
 
-                var dictionary = new Dictionary<string, object?>();
+                var dictionary = new Dictionary<string, object?>(obj.Count);
                 foreach (var property in obj.Properties())
                 {
                     dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);
