@@ -22,5 +22,7 @@ public class PropertyNameTests
         var output = generator.GenerateFile(nameof(TypeWithRestrictedProperties));
 
         await VerifyHelper.Verify(output);
+
+        CodeCompiler.AssertCompile(output);
     }
 }

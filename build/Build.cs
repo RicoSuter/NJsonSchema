@@ -10,6 +10,7 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Npm;
 using Nuke.Common.Utilities;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -30,7 +31,7 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Solution] readonly Solution Solution;
+    [Solution(GenerateProjects = true)] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
@@ -102,7 +103,21 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(s => s
-                .SetProjectFile(Solution));
+                .SetProjectFile(Solution)
+            );
+
+            if (IsServerBuild)
+            {
+                NpmTasks.NpmCi(_ => _
+                    .SetProcessWorkingDirectory(Solution._2_CodeGeneration.NJsonSchema_CodeGeneration_TypeScript_Tests.Directory)
+                );
+            }
+            else
+            {
+                NpmTasks.NpmInstall(_ => _
+                    .SetProcessWorkingDirectory(Solution._2_CodeGeneration.NJsonSchema_CodeGeneration_TypeScript_Tests.Directory)
+                );
+            }
         });
 
     Target Compile => _ => _
