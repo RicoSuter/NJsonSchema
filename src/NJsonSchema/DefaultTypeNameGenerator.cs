@@ -103,6 +103,7 @@ namespace NJsonSchema
                 }
 
                 typeNameHint = GetLastSegment(typeNameHint)!;
+                typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(typeNameHint, true);
 
                 if (typeNameHint != null &&
                     !reservedTypeNames.Contains(typeNameHint) && 
@@ -116,7 +117,7 @@ namespace NJsonSchema
                 do
                 {
                     count++;
-                    typeName = ConversionUtilities.ConvertToUpperCamelCase(typeNameHint + count, true);
+                    typeName = typeNameHint + count;
                 } while (reservedTypeNames.Contains(typeName));
 
                 return typeName;
