@@ -49,6 +49,25 @@ namespace NJsonSchema.Tests.Generation
             Assert.Equal(5.5m, property.Minimum);
             Assert.Equal(10.5m, property.Maximum);
         }
+        
+        [Theory]
+        [InlineData("en-US")]
+        [InlineData("de-DE")]
+        [InlineData("nb-NO")]
+        public async Task When_Range_attribute_is_set_on_decimal_then_minimum_and_maximum_are_set_regardless_of_culture(string culture)
+        {
+            // Arrange
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(culture);
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
+            var property = schema.Properties["Decimal"];
+
+            // Assert
+            Assert.Equal(5.5m, property.Minimum);
+            Assert.Equal(10.5m, property.Maximum);
+        }
 
         [Fact]
         public async Task When_Range_attribute_has_double_max_then_max_is_not_set()
@@ -177,6 +196,9 @@ namespace NJsonSchema.Tests.Generation
 
             [Range(5.5, 10.5)]
             public double Double { get; set; }
+
+            [Range(typeof(decimal), "5.5", "10.5")]
+            public double Decimal { get; set; }
 
             [Range(5.5, double.MaxValue)]
             public double DoubleOnlyMin { get; set; }

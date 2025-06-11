@@ -1300,7 +1300,7 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var minimum = (double)Convert.ChangeType(rangeAttribute.Minimum, typeof(double));
+                        var minimum = (double)Convert.ChangeType(rangeAttribute.Minimum, typeof(double), CultureInfo.InvariantCulture);
                         if (minimum > double.MinValue)
                         {
                             schema.Minimum = (decimal)minimum;
@@ -1308,7 +1308,7 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
-                        var minimum = (decimal)Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal));
+                        var minimum = (decimal)Convert.ChangeType(rangeAttribute.Minimum, typeof(decimal), CultureInfo.InvariantCulture);
                         if (minimum > decimal.MinValue)
                         {
                             schema.Minimum = minimum;
@@ -1320,7 +1320,7 @@ namespace NJsonSchema.Generation
                 {
                     if (rangeAttribute.OperandType == typeof(double))
                     {
-                        var maximum = (double)Convert.ChangeType(rangeAttribute.Maximum, typeof(double));
+                        var maximum = (double)Convert.ChangeType(rangeAttribute.Maximum, typeof(double), CultureInfo.InvariantCulture);
                         if (maximum < double.MaxValue)
                         {
                             schema.Maximum = (decimal)maximum;
@@ -1328,7 +1328,7 @@ namespace NJsonSchema.Generation
                     }
                     else
                     {
-                        var maximum = (decimal)Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal));
+                        var maximum = (decimal)Convert.ChangeType(rangeAttribute.Maximum, typeof(decimal), CultureInfo.InvariantCulture);
                         if (maximum < decimal.MaxValue)
                         {
                             schema.Maximum = maximum;
