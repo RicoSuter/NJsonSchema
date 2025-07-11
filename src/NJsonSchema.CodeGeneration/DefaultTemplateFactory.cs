@@ -121,10 +121,13 @@ namespace NJsonSchema.CodeGeneration
         {
             if (!template.EndsWith('!') && !string.IsNullOrEmpty(templateDirectory))
             {
-                var templateFilePath = Path.Combine(templateDirectory, template + ".liquid");
-                if (File.Exists(templateFilePath))
+                foreach (var directory in templateDirectory.Split([';'], StringSplitOptions.RemoveEmptyEntries))
                 {
-                    return File.ReadAllText(templateFilePath);
+                    var templateFilePath = Path.Combine(directory, template + ".liquid");
+                    if (File.Exists(templateFilePath))
+                    {
+                        return File.ReadAllText(templateFilePath);
+                    }
                 }
             }
 

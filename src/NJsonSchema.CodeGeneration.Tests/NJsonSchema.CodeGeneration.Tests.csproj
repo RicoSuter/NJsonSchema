@@ -29,6 +29,7 @@
 
     <ItemGroup>
         <None Update="Templates\*.liquid" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Templates2\*.liquid" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
 </Project>
