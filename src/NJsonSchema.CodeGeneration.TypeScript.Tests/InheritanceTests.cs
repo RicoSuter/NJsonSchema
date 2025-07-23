@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
                 if (convertConstructorInterfaceData)
                 {
-                    Assert.Contains("this.customDictionary = data.customDictionary && !(<any>data.customDictionary).toJSON ? new EmptyClassInheritingDictionary(data.customDictionary) : <EmptyClassInheritingDictionary>this.customDictionary;", code);
+                    Assert.Contains("this.customDictionary = data.customDictionary && !(data.customDictionary as any).toJSON ? new EmptyClassInheritingDictionary(data.customDictionary) : this.customDictionary as EmptyClassInheritingDictionary;", code);
                 }
                 else
                 {

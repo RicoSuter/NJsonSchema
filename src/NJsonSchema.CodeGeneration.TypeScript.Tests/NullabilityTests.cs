@@ -217,7 +217,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
             Assert.Contains(": (Complex | null)[]", output);
-            Assert.Contains(".push(item ? item.toJSON() : <any>null)", output);
+            Assert.Contains(".push(item ? item.toJSON() : null as any)", output);
         }
     }
 }

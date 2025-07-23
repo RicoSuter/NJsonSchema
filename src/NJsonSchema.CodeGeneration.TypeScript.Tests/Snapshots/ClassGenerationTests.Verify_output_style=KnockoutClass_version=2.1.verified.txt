@@ -97,7 +97,7 @@ export class MyClass {
             this.name(name_);
 
             var dateOfBirth_: any;
-                dateOfBirth_ = _data["DateOfBirth"] ? new Date(_data["DateOfBirth"].toString()) : <any>undefined;
+                dateOfBirth_ = _data["DateOfBirth"] ? new Date(_data["DateOfBirth"].toString()) : undefined as any;
             this.dateOfBirth(dateOfBirth_);
 
             var primitiveArray_: any;
@@ -113,7 +113,7 @@ export class MyClass {
                 primitiveDictionary_ = {} as any;
                 for (let key in _data["PrimitiveDictionary"]) {
                     if (_data["PrimitiveDictionary"].hasOwnProperty(key))
-                        (<any>primitiveDictionary_)[key] = _data["PrimitiveDictionary"][key];
+                        (primitiveDictionary_ as any)[key] = _data["PrimitiveDictionary"][key];
                 }
             }
             this.primitiveDictionary(primitiveDictionary_);
@@ -131,13 +131,13 @@ export class MyClass {
                 dateDictionary_ = {} as any;
                 for (let key in _data["DateDictionary"]) {
                     if (_data["DateDictionary"].hasOwnProperty(key))
-                        (<any>dateDictionary_)[key] = _data["DateDictionary"][key] ? new Date(_data["DateDictionary"][key].toString()) : <any>undefined;
+                        (dateDictionary_ as any)[key] = _data["DateDictionary"][key] ? new Date(_data["DateDictionary"][key].toString()) : undefined as any;
                 }
             }
             this.dateDictionary(dateDictionary_);
 
             var reference_: any;
-            reference_ = _data["Reference"] ? Student.fromJS(_data["Reference"]) : <any>undefined;
+            reference_ = _data["Reference"] ? Student.fromJS(_data["Reference"]) : undefined as any;
             this.reference(reference_);
 
             var array_: any;
@@ -153,7 +153,7 @@ export class MyClass {
                 dictionary_ = {} as any;
                 for (let key in _data["Dictionary"]) {
                     if (_data["Dictionary"].hasOwnProperty(key))
-                        (<any>dictionary_)[key] = _data["Dictionary"][key] ? Student.fromJS(_data["Dictionary"][key]) : new Student();
+                        (dictionary_ as any)[key] = _data["Dictionary"][key] ? Student.fromJS(_data["Dictionary"][key]) : new Student();
                 }
             }
             this.dictionary(dictionary_);
@@ -173,7 +173,7 @@ export class MyClass {
         data["Name"] = name_;
 
         let dateOfBirth_: any = this.dateOfBirth();
-        data["DateOfBirth"] = dateOfBirth_ ? dateOfBirth_.toISOString() : <any>undefined;
+        data["DateOfBirth"] = dateOfBirth_ ? dateOfBirth_.toISOString() : undefined as any;
 
         let primitiveArray_: any = this.primitiveArray();
         if (Array.isArray(primitiveArray_)) {
@@ -187,7 +187,7 @@ export class MyClass {
             data["PrimitiveDictionary"] = {};
             for (let key in primitiveDictionary_) {
                 if (primitiveDictionary_.hasOwnProperty(key))
-                    (<any>data["PrimitiveDictionary"])[key] = (<any>primitiveDictionary_)[key];
+                    (data["PrimitiveDictionary"] as any)[key] = (primitiveDictionary_ as any)[key];
             }
         }
 
@@ -203,18 +203,18 @@ export class MyClass {
             data["DateDictionary"] = {};
             for (let key in dateDictionary_) {
                 if (dateDictionary_.hasOwnProperty(key))
-                    (<any>data["DateDictionary"])[key] = dateDictionary_[key] ? dateDictionary_[key].toISOString() : <any>undefined;
+                    (data["DateDictionary"] as any)[key] = dateDictionary_[key] ? dateDictionary_[key].toISOString() : undefined as any;
             }
         }
 
         let reference_: any = this.reference();
-        data["Reference"] = reference_ ? reference_.toJSON() : <any>undefined;
+        data["Reference"] = reference_ ? reference_.toJSON() : undefined as any;
 
         let array_: any = this.array();
         if (Array.isArray(array_)) {
             data["Array"] = [];
             for (let item of array_)
-                data["Array"].push(item ? item.toJSON() : <any>undefined);
+                data["Array"].push(item ? item.toJSON() : undefined as any);
         }
 
         let dictionary_: any = this.dictionary();
@@ -222,7 +222,7 @@ export class MyClass {
             data["Dictionary"] = {};
             for (let key in dictionary_) {
                 if (dictionary_.hasOwnProperty(key))
-                    (<any>data["Dictionary"])[key] = dictionary_[key] ? dictionary_[key].toJSON() : <any>undefined;
+                    (data["Dictionary"] as any)[key] = dictionary_[key] ? dictionary_[key].toJSON() : undefined as any;
             }
         }
 

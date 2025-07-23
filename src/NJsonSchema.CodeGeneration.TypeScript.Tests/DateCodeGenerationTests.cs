@@ -54,8 +54,8 @@
 
             // Assert
             Assert.Contains("myDate: moment.Moment", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : undefined as any;", code);
         }
 
         [Fact]
@@ -74,8 +74,8 @@
 
             // Assert
             Assert.Contains("myTimeSpan: moment.Duration", code);
-            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? moment.duration(_data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('d.hh:mm:ss.SS', { trim: false }) : <any>undefined;", code);
+            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? moment.duration(_data[\"myTimeSpan\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.format('d.hh:mm:ss.SS', { trim: false }) : undefined as any;", code);
         }
 
         [Theory]
@@ -97,8 +97,8 @@
 
             // Assert
             Assert.Contains("myDate: DateTime", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? DateTime.fromISO(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.toFormat('yyyy-MM-dd') : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? DateTime.fromISO(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.toFormat('yyyy-MM-dd') : undefined as any;", code);
         }
 
         [Fact]
@@ -117,8 +117,8 @@
 
             // Assert
             Assert.Contains("myTimeSpan: Duration", code);
-            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? Duration.fromISO(_data[\"myTimeSpan\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.toString() : <any>undefined;", code);
+            Assert.Contains("this.myTimeSpan = _data[\"myTimeSpan\"] ? Duration.fromISO(_data[\"myTimeSpan\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myTimeSpan\"] = this.myTimeSpan ? this.myTimeSpan.toString() : undefined as any;", code);
         }
 
         [Theory]
@@ -140,8 +140,8 @@
 
             // Assert
             Assert.Contains("myDate: dayjs.Dayjs", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? dayjs(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? dayjs(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : undefined as any;", code);
         }
 
         [Fact]
@@ -160,8 +160,8 @@
 
             // Assert
             Assert.Contains("myDate: Date", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? new Date(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? new Date(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : undefined as any;", code);
             Assert.Contains("function formatDate(", code);
         }
         
@@ -182,8 +182,8 @@
 
             // Assert
             Assert.Contains("myDate: Date", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? parseDateOnly(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? parseDateOnly(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? formatDate(this.myDate) : undefined as any;", code);
             Assert.Contains("function formatDate(", code);
         }
 
@@ -206,8 +206,8 @@
 
             // Assert
             Assert.Contains("myDate: moment.Moment", code);
-            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment.parseZone(_data[\"myDate\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : <any>undefined;", code);
+            Assert.Contains("this.myDate = _data[\"myDate\"] ? moment.parseZone(_data[\"myDate\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"myDate\"] = this.myDate ? this.myDate.format('YYYY-MM-DD') : undefined as any;", code);
         }
 
         [Fact]

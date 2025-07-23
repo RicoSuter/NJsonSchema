@@ -68,13 +68,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             Assert.DoesNotContain("new MyClass(", output);
             // address property is converted:
-            Assert.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;", output);
+            Assert.Contains("this.address = data.address && !(data.address as any).toJSON ? new Address(data.address) : this.address as Address;", output);
             // cars items are converted:
-            Assert.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;", output);
+            Assert.Contains("this.cars[i] = item && !(item as any).toJSON ? new Car(item) : item as Car;", output);
             // skills values are converted:
-            Assert.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;", output);
+            Assert.Contains("this.skills[key] = item && !(item as any).toJSON ? new Skill(item) : item as Skill;", output);
             // student car is converted:
-            Assert.Contains("this.car = data.car && !(<any>data.car).toJSON ? new Car(data.car) : <Car>this.car;", output);
+            Assert.Contains("this.car = data.car && !(data.car as any).toJSON ? new Car(data.car) : this.car as Car;", output);
 
             // interface is correct
             Assert.Contains(@"export interface IMyClass {

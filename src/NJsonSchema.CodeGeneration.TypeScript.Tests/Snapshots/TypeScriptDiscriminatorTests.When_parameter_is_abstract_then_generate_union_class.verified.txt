@@ -17,7 +17,7 @@ export abstract class Base implements IBase {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+                    (this as any)[property] = (data as any)[property];
             }
         }
         this._discriminator = "Base";
@@ -140,14 +140,14 @@ export class MyClass implements IMyClass {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+                    (this as any)[property] = (data as any)[property];
             }
         }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.child = _data["Child"] ? OneChild | SecondChild.fromJS(_data["Child"]) : <any>undefined;
+            this.child = _data["Child"] ? OneChild | SecondChild.fromJS(_data["Child"]) : undefined as any;
             if (Array.isArray(_data["Children"])) {
                 this.children = [] as any;
                 for (let item of _data["Children"])
@@ -165,11 +165,11 @@ export class MyClass implements IMyClass {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["Child"] = this.child ? this.child.toJSON() : <any>undefined;
+        data["Child"] = this.child ? this.child.toJSON() : undefined as any;
         if (Array.isArray(this.children)) {
             data["Children"] = [];
             for (let item of this.children)
-                data["Children"].push(item ? item.toJSON() : <any>undefined);
+                data["Children"].push(item ? item.toJSON() : undefined as any);
         }
         return data;
     }

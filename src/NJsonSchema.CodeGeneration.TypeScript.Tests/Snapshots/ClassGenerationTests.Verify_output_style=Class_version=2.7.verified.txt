@@ -17,7 +17,7 @@ export class Person implements IPerson {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+                    (this as any)[property] = (data as any)[property];
             }
         }
     }
@@ -97,7 +97,7 @@ export class MyClass implements IMyClass {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+                    (this as any)[property] = (data as any)[property];
             }
         }
         if (!data) {
@@ -108,7 +108,7 @@ export class MyClass implements IMyClass {
     init(_data?: any) {
         if (_data) {
             this.name = _data["Name"] !== undefined ? _data["Name"] : "foo";
-            this.dateOfBirth = _data["DateOfBirth"] ? new Date(_data["DateOfBirth"].toString()) : <any>undefined;
+            this.dateOfBirth = _data["DateOfBirth"] ? new Date(_data["DateOfBirth"].toString()) : undefined as any;
             if (Array.isArray(_data["PrimitiveArray"])) {
                 this.primitiveArray = [] as any;
                 for (let item of _data["PrimitiveArray"])
@@ -118,7 +118,7 @@ export class MyClass implements IMyClass {
                 this.primitiveDictionary = {} as any;
                 for (let key in _data["PrimitiveDictionary"]) {
                     if (_data["PrimitiveDictionary"].hasOwnProperty(key))
-                        (<any>this.primitiveDictionary)![key] = _data["PrimitiveDictionary"][key];
+                        (this.primitiveDictionary as any)![key] = _data["PrimitiveDictionary"][key];
                 }
             }
             if (Array.isArray(_data["DateArray"])) {
@@ -130,10 +130,10 @@ export class MyClass implements IMyClass {
                 this.dateDictionary = {} as any;
                 for (let key in _data["DateDictionary"]) {
                     if (_data["DateDictionary"].hasOwnProperty(key))
-                        (<any>this.dateDictionary)![key] = _data["DateDictionary"][key] ? new Date(_data["DateDictionary"][key].toString()) : <any>undefined;
+                        (this.dateDictionary as any)![key] = _data["DateDictionary"][key] ? new Date(_data["DateDictionary"][key].toString()) : undefined as any;
                 }
             }
-            this.reference = _data["Reference"] ? Student.fromJS(_data["Reference"]) : <any>undefined;
+            this.reference = _data["Reference"] ? Student.fromJS(_data["Reference"]) : undefined as any;
             if (Array.isArray(_data["Array"])) {
                 this.array = [] as any;
                 for (let item of _data["Array"])
@@ -143,7 +143,7 @@ export class MyClass implements IMyClass {
                 this.dictionary = {} as any;
                 for (let key in _data["Dictionary"]) {
                     if (_data["Dictionary"].hasOwnProperty(key))
-                        (<any>this.dictionary)![key] = _data["Dictionary"][key] ? Student.fromJS(_data["Dictionary"][key]) : new Student();
+                        (this.dictionary as any)![key] = _data["Dictionary"][key] ? Student.fromJS(_data["Dictionary"][key]) : new Student();
                 }
             }
         }
@@ -159,7 +159,7 @@ export class MyClass implements IMyClass {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Name"] = this.name;
-        data["DateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toISOString() : <any>undefined;
+        data["DateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toISOString() : undefined as any;
         if (Array.isArray(this.primitiveArray)) {
             data["PrimitiveArray"] = [];
             for (let item of this.primitiveArray)
@@ -169,7 +169,7 @@ export class MyClass implements IMyClass {
             data["PrimitiveDictionary"] = {};
             for (let key in this.primitiveDictionary) {
                 if (this.primitiveDictionary.hasOwnProperty(key))
-                    (<any>data["PrimitiveDictionary"])[key] = (<any>this.primitiveDictionary)[key];
+                    (data["PrimitiveDictionary"] as any)[key] = (this.primitiveDictionary as any)[key];
             }
         }
         if (Array.isArray(this.dateArray)) {
@@ -181,20 +181,20 @@ export class MyClass implements IMyClass {
             data["DateDictionary"] = {};
             for (let key in this.dateDictionary) {
                 if (this.dateDictionary.hasOwnProperty(key))
-                    (<any>data["DateDictionary"])[key] = this.dateDictionary[key] ? this.dateDictionary[key].toISOString() : <any>undefined;
+                    (data["DateDictionary"] as any)[key] = this.dateDictionary[key] ? this.dateDictionary[key].toISOString() : undefined as any;
             }
         }
-        data["Reference"] = this.reference ? this.reference.toJSON() : <any>undefined;
+        data["Reference"] = this.reference ? this.reference.toJSON() : undefined as any;
         if (Array.isArray(this.array)) {
             data["Array"] = [];
             for (let item of this.array)
-                data["Array"].push(item ? item.toJSON() : <any>undefined);
+                data["Array"].push(item ? item.toJSON() : undefined as any);
         }
         if (this.dictionary) {
             data["Dictionary"] = {};
             for (let key in this.dictionary) {
                 if (this.dictionary.hasOwnProperty(key))
-                    (<any>data["Dictionary"])[key] = this.dictionary[key] ? this.dictionary[key].toJSON() : <any>undefined;
+                    (data["Dictionary"] as any)[key] = this.dictionary[key] ? this.dictionary[key].toJSON() : undefined as any;
             }
         }
         return data;
