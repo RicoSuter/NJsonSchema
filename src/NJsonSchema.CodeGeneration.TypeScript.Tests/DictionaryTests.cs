@@ -136,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
+            Assert.Contains("(this.resource as any)[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
         }
 
         [Fact]
@@ -197,7 +197,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key];", code);
+            Assert.Contains("(this.resource as any)[key] = _data[\"resource\"][key];", code);
         }
 
         public class DictionaryContainer
@@ -246,14 +246,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 Assert.DoesNotContain("this.foo = {};", code);
                 Assert.DoesNotContain("data[\"Foo\"] = {};", code);
 
-                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : <any>undefined;", code);
-                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : <any>undefined;", code);
+                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : undefined as any;", code);
+                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : undefined as any;", code);
 
                 Assert.Contains("foo: DisplayValueDictionary", code);
 
                 if (convertConstructorInterfaceData)
                 {
-                    Assert.Contains("this.foo = data.foo && !(<any>data.foo).toJSON ? new DisplayValueDictionary(data.foo) : <DisplayValueDictionary>this.foo;", code);
+                    Assert.Contains("this.foo = data.foo && !(data.foo as any).toJSON ? new DisplayValueDictionary(data.foo) : this.foo as DisplayValueDictionary;", code);
                 }
                 else
                 {

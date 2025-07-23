@@ -226,7 +226,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("this.a = _data[\"A\"] ? A.fromJS(_data[\"A\"]) : new A();", code);
 
             Assert.Contains("b: B;", code);
-            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : <any>undefined;", code);
+            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : undefined as any;", code);
         }
 
         [Fact]

@@ -51,8 +51,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.Contains("myDateTime: moment.Moment", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment(_data[\"MyDateTime\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined as any;", code);
         }
 
         [Theory]
@@ -74,8 +74,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.Contains("myDateTime: moment.Moment", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment.parseZone(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString(true) : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? moment.parseZone(_data[\"MyDateTime\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString(true) : undefined as any;", code);
         }
 
         [Theory]
@@ -97,8 +97,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.Contains("myDateTime: dayjs.Dayjs", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? dayjs(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? dayjs(_data[\"MyDateTime\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined as any;", code);
         }
         
         [Theory]
@@ -120,8 +120,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.Contains("myDateTime: Date", code);
-            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? new Date(_data[\"MyDateTime\"].toString()) : <any>undefined;", code);
-            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : <any>undefined;", code);
+            Assert.Contains("this.myDateTime = _data[\"MyDateTime\"] ? new Date(_data[\"MyDateTime\"].toString()) : undefined as any;", code);
+            Assert.Contains("data[\"MyDateTime\"] = this.myDateTime ? this.myDateTime.toISOString() : undefined as any;", code);
         }
 
         [Fact]
