@@ -1,4 +1,5 @@
-﻿using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
@@ -17,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public void When_interface_has_properties_then_properties_are_included_in_schema()
+        public async Task When_interface_has_properties_then_properties_are_included_in_schema()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
@@ -32,12 +33,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             Assert.Equal(2, schema.Properties.Count);
-            Assert.Contains("public string LastName { get; set; }\n", code);
-            Assert.Contains("public string FirstName { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_implements_interface_then_properties_are_included_in_schema()
+        public async Task When_class_implements_interface_then_properties_are_included_in_schema()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
@@ -52,8 +53,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             Assert.Equal(2, schema.Properties.Count);
-            Assert.Contains("public string LastName { get; set; }\n", code);
-            Assert.Contains("public string FirstName { get; set; }\n", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 

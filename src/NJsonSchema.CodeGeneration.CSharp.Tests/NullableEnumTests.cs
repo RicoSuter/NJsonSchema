@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -36,7 +37,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"public Sex? Sex", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

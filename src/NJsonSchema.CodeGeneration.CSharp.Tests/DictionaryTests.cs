@@ -1,5 +1,6 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System.ComponentModel.DataAnnotations;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
@@ -20,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public void When_dictionary_key_is_enum_then_csharp_has_enum_key()
+        public async Task When_dictionary_key_is_enum_then_csharp_has_enum_key()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
@@ -31,12 +32,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumDictionary ", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<PropertyName, string> EnumInterfaceDictionary ", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_dictionary_property_is_required_then_dictionary_instance_can_be_changed()
+        public async Task When_dictionary_property_is_required_then_dictionary_instance_can_be_changed()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumKeyDictionaryTest>();
@@ -52,7 +53,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public Foo<PropertyName, string> EnumInterfaceDictionary { get; set; } = new Bar<PropertyName, string>();", code);
+            await VerifyHelper.Verify(code);
         }
     }
 }

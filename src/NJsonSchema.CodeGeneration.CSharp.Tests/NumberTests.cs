@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp;
 
@@ -24,7 +25,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public double Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -48,7 +50,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public decimal Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -72,7 +75,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public double Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -96,7 +100,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public float Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -122,7 +127,7 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public customNumberType Amount", code);
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
@@ -148,7 +153,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public double Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -175,7 +181,8 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public double? Amount", code);
+        await VerifyHelper.Verify(code);
+        CodeCompiler.AssertCompile(code);
     }
    
     [Fact]
@@ -202,7 +209,7 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public customFloatType Amount", code);
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
@@ -229,7 +236,7 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public customDoubleType Amount", code);
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
@@ -256,6 +263,6 @@ public class NumberTests
         var code = generator.GenerateFile("MyClass");
 
         // Assert
-        Assert.Contains("public customDecimalType Amount", code);
+        await VerifyHelper.Verify(code);
     }
 }

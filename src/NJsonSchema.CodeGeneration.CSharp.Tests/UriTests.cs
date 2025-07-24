@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
@@ -11,7 +12,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
-        public void When_property_is_uri_then_csharp_output_is_also_uri()
+        public async Task When_property_is_uri_then_csharp_output_is_also_uri()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithUri>();
@@ -22,7 +23,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public System.Uri MyUri", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]

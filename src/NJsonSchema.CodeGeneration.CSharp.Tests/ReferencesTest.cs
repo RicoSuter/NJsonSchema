@@ -2,6 +2,7 @@
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.Infrastructure;
 using System.Reflection;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -21,8 +22,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public enum C", code);
-            Assert.DoesNotContain("public enum C2", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -39,8 +40,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public enum C", code);
-            Assert.DoesNotContain("public enum C2", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -61,7 +62,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public string? Name", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         private string GetTestDirectory()
@@ -126,9 +128,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Act
-            Assert.Contains("class BusinessException", code);
-            Assert.Contains("class ValidationException", code);
-            Assert.DoesNotContain("AdditionalProperties", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         [Fact]
@@ -171,7 +172,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Act
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

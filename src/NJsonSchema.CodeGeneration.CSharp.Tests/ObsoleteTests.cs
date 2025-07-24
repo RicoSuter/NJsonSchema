@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -30,7 +31,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_property_is_obsolete_then_obsolete_attribute_is_rendered()
+        public async Task When_property_is_obsolete_then_obsolete_attribute_is_rendered()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ObsoletePropertyTestClass>();
@@ -40,12 +41,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("[System.Obsolete]", code);
-            Assert.Contains("public string Property { get; set; }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_property_is_obsolete_with_a_message_then_obsolete_attribute_with_a_message_is_rendered()
+        public async Task When_property_is_obsolete_with_a_message_then_obsolete_attribute_with_a_message_is_rendered()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ObsoletePropertyWithMessageTestClass>();
@@ -55,12 +56,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("[System.Obsolete(\"Reason property is \\\"obsolete\\\"\")]", code);
-            Assert.Contains("public string Property { get; set; }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_is_obsolete_then_obsolete_attribute_is_rendered()
+        public async Task When_class_is_obsolete_then_obsolete_attribute_is_rendered()
         {
             // Arrange
 #pragma warning disable 612
@@ -72,12 +73,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("[System.Obsolete]", code);
-            Assert.Contains("public partial class ObsoleteTestClass", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_is_obsolete_with_a_message_then_obsolete_attribute_with_a_message_is_rendered()
+        public async Task When_class_is_obsolete_with_a_message_then_obsolete_attribute_with_a_message_is_rendered()
         {
             // Arrange
 #pragma warning disable 618
@@ -89,8 +90,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("[System.Obsolete(\"Reason class is \\\"obsolete\\\"\")]", code);
-            Assert.Contains("public partial class ObsoleteWithMessageTestClass", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }
