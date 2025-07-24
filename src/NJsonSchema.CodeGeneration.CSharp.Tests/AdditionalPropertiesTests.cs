@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;

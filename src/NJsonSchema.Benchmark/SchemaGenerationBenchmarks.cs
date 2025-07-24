@@ -15,7 +15,7 @@ namespace NJsonSchema.Benchmark
             _counter = context.GetCounter("Iterations");
         }
 
-        [NBenchFact]
+        [NBenchFact(Skip = "Can vary a lot when running on GitHub Actions")]
         [PerfBenchmark(
             NumberOfIterations = 3,
             RunTimeMilliseconds = 1000,
