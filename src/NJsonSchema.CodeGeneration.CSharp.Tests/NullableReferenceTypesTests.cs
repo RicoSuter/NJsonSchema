@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -16,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_property_is_optional_and_GenerateNullableReferenceTypes_is_not_set_then_CSharp_property_is_not_nullable()
+        public async Task When_property_is_optional_and_GenerateNullableReferenceTypes_is_not_set_then_CSharp_property_is_not_nullable()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
@@ -35,12 +36,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public object Property { get; set; }", code);
-            Assert.Contains("public object Property2 { get; set; }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
+        public async Task When_property_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property_is_nullable()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredObject>(new NewtonsoftJsonSchemaGeneratorSettings
@@ -59,8 +60,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public object? Property { get; set; } = default!;", code);
-            Assert.Contains("public object Property2 { get; set; } = default!;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -101,8 +102,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public object Property { get; set; }", code);
-            Assert.Contains("public object Property2 { get; set; } = new object();", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -143,8 +144,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public object? Property { get; set; } = default!;", code);
-            Assert.Contains("public object Property2 { get; set; } = new object();", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -191,8 +192,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public string Required { get; set; }", code);
-            Assert.Contains("public string Optional { get; set; }", code);
+            await VerifyHelper.Verify(code).UseParameters(format);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -239,8 +240,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public string Required { get; set; } = default!;", code);
-            Assert.Contains("public string? Optional { get; set; } = default!;", code);
+            await VerifyHelper.Verify(code).UseParameters(format);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -282,8 +283,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public string Required { get; set; } = default!;", code);
-            Assert.Contains("public string? Optional { get; set; } = default!;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

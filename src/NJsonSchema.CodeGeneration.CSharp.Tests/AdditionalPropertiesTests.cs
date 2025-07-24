@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -37,9 +38,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Person");
 
             // Assert
-            Assert.Contains("[Newtonsoft.Json.JsonExtensionData]", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
-            Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -76,9 +76,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Person");
 
             // Assert
-            Assert.Contains("[System.Text.Json.Serialization.JsonExtensionData]", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, object> AdditionalProperties", code);
-            Assert.Contains("get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -135,10 +134,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Person");
 
             // Assert
-            var matches = Regex.Matches(code, @"(\[System\.Text\.Json\.Serialization\.JsonExtensionData\])");
-            
-            // There are two matches, the Person class and the Pet class
-            Assert.Equal(2, matches.Count);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         [Fact]
@@ -212,10 +209,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("SommeDummyClass");
 
             // Assert
-            var matches = Regex.Matches(code, @"(\[System\.Text\.Json\.Serialization\.JsonExtensionData\])");
-            
-            // There are two matches, the SommeDummyClass class and the Animal class
-            Assert.Equal(2, matches.Count);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         public class Page
@@ -230,7 +225,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_dictionary_and_no_object_are_not_same()
+        public async Task When_AlwaysAllowAdditionalObjectProperties_is_set_then_dictionary_and_no_object_are_not_same()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Book>(new NewtonsoftJsonSchemaGeneratorSettings
@@ -251,12 +246,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Library");
 
             // Assert
-            Assert.Contains("public object Page", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Index", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_AlwaysAllowAdditionalObjectProperties_is_set_then_any_page_has_additional_properties()
+        public async Task When_AlwaysAllowAdditionalObjectProperties_is_set_then_any_page_has_additional_properties()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Book>(new NewtonsoftJsonSchemaGeneratorSettings
@@ -276,9 +271,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Library");
 
             // Assert
-            Assert.Contains("public Page Page", code);
-            Assert.Contains("IDictionary<string, object> AdditionalProperties", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, string> Index", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

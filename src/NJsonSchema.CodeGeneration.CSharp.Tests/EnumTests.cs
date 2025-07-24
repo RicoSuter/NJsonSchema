@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
@@ -30,7 +31,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public enum MyClassCategory", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -60,12 +62,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("[System.Flags]", code);
-            Assert.Contains("Commercial = 1,", code);
-            Assert.Contains("Residential = 2,", code);
-            Assert.Contains("Government = 4,", code);
-            Assert.Contains("Military = 8,", code);
-            Assert.Contains("Foreigngovernment = 16,", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -113,7 +111,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("PullrequestUpdated = 0,", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         public class MyStringEnumListTest
@@ -131,7 +130,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
+        public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
@@ -143,11 +142,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_enum_is_nullable_then_StringEnumConverter_is_set()
+        public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
@@ -159,8 +159,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]",
-                code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         public enum SomeEnum
@@ -176,7 +176,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_class_has_enum_array_property_then_enum_name_is_preserved()
+        public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<SomeClass>(new NewtonsoftJsonSchemaGeneratorSettings());
@@ -188,8 +188,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("SomeEnum", code);
-            Assert.DoesNotContain("Anonymous", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -229,7 +229,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.Contains("public enum FirstMetdodOfMetValueGroupChar", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -262,7 +263,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public MyClassStatus? Status { get; set; }", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -307,9 +309,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.DoesNotContain("__", code);
-            Assert.Contains("Eq = 0", code);
-
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -344,10 +345,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.DoesNotContain("__", code);
-            Assert.Contains("MinusFoo = 0", code);
-            Assert.Contains("PlusFoo = 1", code);
-
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -396,8 +395,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.DoesNotContain("public enum Anonymous", code);
-            Assert.Contains("public enum Status", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -444,23 +443,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.DoesNotContain("public enum Anonymous", code);
-            // Verify previous incorrect logic wasn't used to determine enum values (and doesn't generate duplicate incorrect values):
-            Assert.DoesNotContain("None = 1,", code);
-            Assert.DoesNotContain("FirstBit = 2,", code);
-            Assert.DoesNotContain("SecondBit = 4,", code);
-            Assert.DoesNotContain("ThirdBit = 8,", code);
-            Assert.DoesNotContain("FirstAndSecondBits = 16,", code);
-            Assert.DoesNotContain("All = 16,", code);
-            Assert.DoesNotContain("All = 32,", code);
-            // Verify correct logic:
-            Assert.Contains("public enum FlagsTestEnum", code);
-            Assert.Contains("None = 0,", code);
-            Assert.Contains("FirstBit = 1,", code);
-            Assert.Contains("SecondBit = 2,", code);
-            Assert.Contains("ThirdBit = 4,", code);
-            Assert.Contains("FirstAndSecondBits = 3,", code);
-            Assert.Contains("All = 7,", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
 
@@ -496,9 +480,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             //Assert
-            Assert.Contains("StringEnumConverter", code);
-            Assert.Contains("public FooMyProperty?", code);
-            Assert.Contains("Value3 = 4", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -533,10 +516,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            //Assert
-            Assert.Contains("StringEnumConverter", code);
-            Assert.Contains("public FooMyProperty?", code);
-            Assert.Contains("Value3 = 4", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -570,8 +552,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;",
-                code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -607,7 +589,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public enum ManyValuesTestEnum : long", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

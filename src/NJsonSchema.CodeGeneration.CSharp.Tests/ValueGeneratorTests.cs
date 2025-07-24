@@ -29,19 +29,17 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-
             CodeCompiler.AssertCompile(code);
         }
 
         [Theory]
-        [InlineData("integer", JsonFormatStrings.Integer, "1, int.MaxValue")]
-        [InlineData("integer", JsonFormatStrings.Long, "1L, long.MaxValue")]
-        [InlineData("integer", JsonFormatStrings.ULong, "1UL, ulong.MaxValue")]
-        [InlineData("number", JsonFormatStrings.Float, "1F, float.MaxValue")]
-        [InlineData("number", JsonFormatStrings.Double, "1D, double.MaxValue")]
-        [InlineData("number", JsonFormatStrings.Decimal, "typeof(decimal), \"1\", \"79228162514264337593543950335\"")]
-        public async Task When_schema_contains_range_and_format_then_code_is_correctly_generated(string propertyType,
-            string propertyFormat, string expectedRange)
+        [InlineData("integer", JsonFormatStrings.Integer)]
+        [InlineData("integer", JsonFormatStrings.Long)]
+        [InlineData("integer", JsonFormatStrings.ULong)]
+        [InlineData("number", JsonFormatStrings.Float)]
+        [InlineData("number", JsonFormatStrings.Double)]
+        [InlineData("number", JsonFormatStrings.Decimal)]
+        public async Task When_schema_contains_range_and_format_then_code_is_correctly_generated(string propertyType, string propertyFormat)
         {
             // Arrange
             var json = $$"""
@@ -67,7 +65,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains($"[System.ComponentModel.DataAnnotations.Range({expectedRange})]", code);
+            await VerifyHelper.Verify(code).UseParameters(propertyType, propertyFormat);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -100,7 +99,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public int? PageSize { get; set; } = 10;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -130,7 +130,6 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-
             CodeCompiler.AssertCompile(code);
         }
     }

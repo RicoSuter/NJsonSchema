@@ -1,4 +1,6 @@
-﻿namespace NJsonSchema.CodeGeneration.CSharp.Tests
+﻿using NJsonSchema.CodeGeneration.Tests;
+
+namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
     public class DefaultPropertyTests
     {
@@ -23,7 +25,8 @@
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.Contains("public int IntergerWithDefault { get; set; } = 5;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -46,7 +49,8 @@
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.Contains("public bool BoolWithDefault { get; set; } = false;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -69,8 +73,8 @@
             var gen = new CSharpGenerator(schema, settings);
             var output = gen.GenerateFile("MyClass");
 
-            Assert.Contains("public bool BoolWithDefault { get; set; }", output);
-            Assert.DoesNotContain("public bool BoolWithDefault { get; set; } = false;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -97,8 +101,8 @@
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("SomeOptionalProperty { get; set; } = D;", code);
-            Assert.Contains("double SomeOptionalProperty { get; set; } = 123D;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -125,8 +129,8 @@
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("SomeOptionalProperty { get; set; } = D;", code);
-            Assert.Contains("double SomeOptionalProperty { get; set; } = 123.456D;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         [Fact]
@@ -159,8 +163,8 @@
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> RequiredDictionary { get; set; } = new System.Collections.Generic.Dictionary<string, System.Collections.ObjectModel.Collection<string>>();", code);
-            Assert.Contains("System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> RequiredDictionary { get; set; } = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.ICollection<string>>();", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -193,8 +197,8 @@
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<string>> RequiredList { get; set; } = new System.Collections.ObjectModel.Collection<System.Collections.ObjectModel.Collection<string>>();", code);
-            Assert.Contains("System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<string>> RequiredList { get; set; } = new System.Collections.ObjectModel.Collection<System.Collections.Generic.ICollection<string>>();", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

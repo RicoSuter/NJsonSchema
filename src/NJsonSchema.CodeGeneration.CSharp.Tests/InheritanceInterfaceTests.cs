@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -39,7 +40,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public void When_schema_has_base_schema_then_it_is_referenced_with_Newtonsoft()
+        public async Task When_schema_has_base_schema_then_it_is_referenced_with_Newtonsoft()
         {
             // Arrange
             var json = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
@@ -52,13 +53,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code);
-            Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
-            Assert.Contains("public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_schema_has_base_schema_then_it_is_referenced_with_STJ()
+        public async Task When_schema_has_base_schema_then_it_is_referenced_with_STJ()
         {
             // Arrange
             var json = JsonSchema.FromType<MyContainer>();
@@ -71,13 +71,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             Assert.True(json.Properties["Item"].ActualTypeSchema.AllOf.First().HasReference);
-            Assert.Contains("[JsonInheritanceConverter(typeof(Fruit), \"discriminator\")]", code);
-            Assert.Contains("[JsonInheritanceAttribute(\"Banana\", typeof(Banana))]", code);
-            Assert.Contains("public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.JsonConverter<TBase>", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
-        public void When_using_STJ_polymorphic_serialization_then_NSwag_inheritance_converter_and_attributes_are_not_generated()
+        public async Task When_using_STJ_polymorphic_serialization_then_NSwag_inheritance_converter_and_attributes_are_not_generated()
         {
             // Arrange
             var json = JsonSchema.FromType<MyContainer>();
@@ -93,9 +91,8 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("[JsonInheritanceConverter", code);
-            Assert.DoesNotContain("[JsonInheritanceAttribute", code);
-            Assert.DoesNotContain("public class JsonInheritanceConverter", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }
