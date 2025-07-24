@@ -154,7 +154,8 @@ partial class Build : NukeBuild
         });
 
     Target Pack => _ => _
-        .After(Test, Compile)
+        .DependsOn(Compile)
+        .After(Test)
         .Produces(ArtifactsDirectory / "*.*")
         .Executes(() =>
         {
@@ -172,15 +173,15 @@ partial class Build : NukeBuild
             ArtifactsDirectory.CreateOrCleanDirectory();
 
             DotNetPack(s => s
-                .SetProcessWorkingDirectory(SourceDirectory)
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetProject(Solution)
                 .SetAssemblyVersion(VersionPrefix)
                 .SetFileVersion(VersionPrefix)
                 .SetInformationalVersion(VersionPrefix)
                 .SetVersion(nugetVersion)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
-                .SetDeterministic(IsServerBuild)
-                .SetContinuousIntegrationBuild(IsServerBuild)
             );
         });
 }
