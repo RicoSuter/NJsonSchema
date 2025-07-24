@@ -16,6 +16,7 @@ public static class VerifyHelper
                 "Generated using the NSwag toolchain",
                 "Generated using the NJsonSchema",
                 "[System.CodeDom.Compiler.GeneratedCode(\"NJsonSchema\"")
-            .UseDirectory("Snapshots");
+            .UseDirectory("Snapshots")
+            .AutoVerify(includeBuildServer: false);
     }
 }

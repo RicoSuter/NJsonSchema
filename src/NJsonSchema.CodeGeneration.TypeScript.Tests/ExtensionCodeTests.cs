@@ -1,4 +1,5 @@
-﻿using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -92,7 +93,7 @@ var x = 10;";
         }
 
         [Fact]
-        public void When_classes_have_extension_code_then_class_body_is_copied()
+        public async Task When_classes_have_extension_code_then_class_body_is_copied()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
@@ -106,12 +107,7 @@ var x = 10;";
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("FooBase", code);
-            Assert.DoesNotContain("BarBase", code);
-            Assert.DoesNotContain("generated.", code);
-
-            Assert.Contains("return this.firstName + ' ' + this.lastName;", code);
-            Assert.Contains("return this.bar ? this.bar.title : '';", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]

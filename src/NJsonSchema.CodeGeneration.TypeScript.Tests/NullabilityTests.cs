@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.Annotations;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
@@ -8,7 +9,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
     public class NullabilityTests
     {
         [Fact]
-        public void Strict_nullability_in_TypeScript2()
+        public async Task Strict_nullability_in_TypeScript2()
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(
                 new NewtonsoftJsonSchemaGeneratorSettings
@@ -21,14 +22,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var output = generator.GenerateFile("MyClass");
 
-            Assert.Contains("timeSpan: string;", output);
-            Assert.Contains("gender: Gender;", output);
-            Assert.Contains("address: Address;", output);
-            Assert.Contains("this.address = new Address();", output);
-
-            Assert.Contains("timeSpanOrNull: string | undefined;", output);
-            Assert.Contains("genderOrNull: Gender | undefined;", output);
-            Assert.Contains("addressOrNull: Address | undefined;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -69,7 +64,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain(": new ChildDto();", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -111,7 +107,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(": new ChildDto();", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -157,7 +154,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain(": new ChildDto();", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         public class ClassWithNullableArrayItems
@@ -168,7 +166,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_array_item_is_nullable_then_generated_TypeScript_is_correct()
+        public async Task When_array_item_is_nullable_then_generated_TypeScript_is_correct()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithNullableArrayItems>();
@@ -184,7 +182,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
-            Assert.Contains(": (string | null)[]", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         public class Complex
@@ -200,7 +199,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_complex_array_item_is_nullable_then_generated_TypeScript_is_nullsafe()
+        public async Task When_complex_array_item_is_nullable_then_generated_TypeScript_is_nullsafe()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithComplexNullableArrayItems>();
@@ -216,8 +215,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
-            Assert.Contains(": (Complex | null)[]", output);
-            Assert.Contains(".push(item ? item.toJSON() : null as any)", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
     }
 }

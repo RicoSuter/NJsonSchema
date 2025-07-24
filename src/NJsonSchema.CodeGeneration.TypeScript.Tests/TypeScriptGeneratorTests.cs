@@ -1,5 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
-using System.Text.RegularExpressions;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -41,11 +41,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             // Assert
-            Assert.Contains(@"export class Foo extends Anonymous implements IFoo {
-    prop1: string;
-    prop2: string;
-".Replace("\r", string.Empty), code);
-            Assert.Contains("class Anonymous", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -79,7 +76,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("Foo");
 
             // Assert
-            Assert.Contains("class Foo extends Bar", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -92,8 +90,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("Teacher");
 
             // Assert
-            Assert.Contains(@"lastName: string;", output);
-            Assert.Contains(@"Dictionary: { [key: string]: number; };", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -106,7 +104,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("Teacher");
 
             // Assert
-            Assert.Contains(@"FirstName: string;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -119,11 +118,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("Teacher");
 
             // Assert
-            Assert.Contains(@"interface Teacher extends Person", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_enum_has_description_then_typescript_has_comment()
+        public async Task When_enum_has_description_then_typescript_has_comment()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
@@ -134,7 +134,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"/** EnumDesc. *", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         /// <summary>
@@ -170,16 +171,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyFile");
 
             // Assert
-            Assert.Contains("export type MyFileColor = \"red\" | \"green\" | \"blue\" | \"black\";", code);
-            Assert.Contains("this.color = _data[\"color\"] !== undefined ? _data[\"color\"] : \"green\";", code);
-            Assert.Contains("this.color = \"green\";", code);
-
-            // This is the old code gen that used the enum prior to the fix for #1618
-            Assert.DoesNotContain("Color.Green", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_has_description_then_typescript_has_comment()
+        public async Task When_class_has_description_then_typescript_has_comment()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
@@ -190,11 +187,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"/** ClassDesc. *", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_property_has_description_then_csharp_has_xml_comment()
+        public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
@@ -207,11 +205,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"/** PropertyDesc. *", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_property_is_readonly_then_ts_property_is_also_readonly()
+        public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
@@ -225,11 +224,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"readonly Birthday", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_name_contains_dash_then_it_is_converted_to_upper_case()
+        public async Task When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
             // Arrange
             var schema = new JsonSchema();
@@ -244,11 +244,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"""foo-bar"": string;", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_type_name_is_missing_then_anonymous_name_is_generated()
+        public async Task When_type_name_is_missing_then_anonymous_name_is_generated()
         {
             // Arrange
             var schema = new JsonSchema();
@@ -259,7 +260,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain(@"interface  {", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         private static Task<TypeScriptGenerator> CreateGeneratorAsync()
@@ -300,8 +302,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("dict: { [key: string]: string; };", code); // property not nullable
-            Assert.Contains("this.dict = {};", code); // must be initialized with {}
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -391,11 +393,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain("Liquid error: ", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         [Fact]
-        public void When_a_nullable_array_property_exists_and_typestyle_is_null_then_init_should_assign_null()
+        public async Task When_a_nullable_array_property_exists_and_typestyle_is_null_then_init_should_assign_null()
         {
             // Arrange
             var schema = new JsonSchema
@@ -426,13 +429,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             // Assert
-            Assert.Matches(new Regex(
-                @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\snull as any;\s*}", RegexOptions.Singleline),
-                code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
         
         [Fact]
-        public void When_a_nullable_dict_property_exists_and_typestyle_is_null_then_init_should_assign_null()
+        public async Task When_a_nullable_dict_property_exists_and_typestyle_is_null_then_init_should_assign_null()
         {
             // Arrange
             var schema = new JsonSchema
@@ -463,9 +465,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
             // Assert
-            Assert.Matches(new Regex(
-                    @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\snull as any;\s*}", RegexOptions.Singleline),
-                code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

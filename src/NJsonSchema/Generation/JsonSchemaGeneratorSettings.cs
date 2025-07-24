@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Reflection;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using Namotion.Reflection;
