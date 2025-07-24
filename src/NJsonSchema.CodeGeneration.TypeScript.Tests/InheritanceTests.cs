@@ -4,6 +4,7 @@ using NJsonSchema.Infrastructure;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System.Runtime.Serialization;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -92,8 +93,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public ExceptionBase Exception { get; set; }
         }
 
+#if !NETFRAMEWORK
         [Fact]
-        public void When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
+        public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
@@ -106,17 +108,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             Assert.Contains("Foobar.", data);
-            Assert.Contains("Foobar.", code);
-
-            Assert.Contains("class ExceptionBase extends Exception", code);
-            Assert.Contains("class MyException extends ExceptionBase", code);
-
-            Assert.Contains("this._discriminator = \"MyException\";", code);
-            Assert.Contains("if (data[\"kind\"] === \"MyException\") {", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_interfaces_are_generated_with_inheritance_then_type_check_methods_are_generated()
+        public async Task When_interfaces_are_generated_with_inheritance_then_type_check_methods_are_generated()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
@@ -133,12 +130,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("export function isExceptionBase(object: any): object is ExceptionBase {", code);
-            Assert.Contains("function isMyException(object: any): object is MyException {", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
+        public async Task When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
@@ -154,12 +151,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("class ExceptionBase extends Exception", code);
-            Assert.Contains("class MyException extends ExceptionBase", code);
-
-            Assert.Contains("this._discriminator = \"FooBar\";", code);
-            Assert.Contains("if (data[\"kind\"] === \"FooBar\") {", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
+#endif
 
         [Theory]
         [InlineData(SchemaType.JsonSchema)]
@@ -244,10 +239,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("request!: any;", code);
-            Assert.DoesNotContain("request: any;", code);
-            Assert.Contains("this.request = new RequestBodyBase()", code);
-            Assert.Contains("this.request = new RequestBody()", code);
+            await VerifyHelper.Verify(code).UseParameters(schemaType);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -335,7 +328,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("SkillLevel2", code);
+            await VerifyHelper.Verify(code).UseParameters(schemaType);
+            CodeCompiler.AssertCompile(code);
         }
 
 

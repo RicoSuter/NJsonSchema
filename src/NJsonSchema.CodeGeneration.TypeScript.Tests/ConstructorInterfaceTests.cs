@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -48,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
+        public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
@@ -65,26 +66,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-
-            Assert.DoesNotContain("new MyClass(", output);
-            // address property is converted:
-            Assert.Contains("this.address = data.address && !(data.address as any).toJSON ? new Address(data.address) : this.address as Address;", output);
-            // cars items are converted:
-            Assert.Contains("this.cars[i] = item && !(item as any).toJSON ? new Car(item) : item as Car;", output);
-            // skills values are converted:
-            Assert.Contains("this.skills[key] = item && !(item as any).toJSON ? new Skill(item) : item as Skill;", output);
-            // student car is converted:
-            Assert.Contains("this.car = data.car && !(data.car as any).toJSON ? new Car(data.car) : this.car as Car;", output);
-
-            // interface is correct
-            Assert.Contains(@"export interface IMyClass {
-    supervisor: MyClass;
-    address: IAddress;
-    cars: ICar[];
-    skills: { [key: string]: ISkill; };
-    foo: Car[][];
-    bar: { [key: string]: Skill[]; };
-}".Replace("\r", "").Replace("\n", ""), output.Replace("\r", "").Replace("\n", ""));
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -119,7 +102,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("custom4: { [key: string]: string; }[];", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
     }
 }

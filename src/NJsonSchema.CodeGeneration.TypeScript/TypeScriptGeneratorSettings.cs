@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
-using System.Reflection;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {

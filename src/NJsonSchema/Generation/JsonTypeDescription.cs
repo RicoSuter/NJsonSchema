@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
-using System.Reflection;
 using Namotion.Reflection;
 using NJsonSchema.Generation.TypeMappers;
 

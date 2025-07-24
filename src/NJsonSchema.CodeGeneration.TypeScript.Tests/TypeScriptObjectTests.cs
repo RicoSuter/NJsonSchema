@@ -1,4 +1,5 @@
-﻿using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -10,7 +11,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
+        public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTest>();
@@ -25,7 +26,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("Test: any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         public class DictionaryObjectTest
@@ -34,7 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_dictionary_value_is_object_then_typescript_uses_any()
+        public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionaryObjectTest>();
@@ -49,7 +51,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("Test: { [key: string]: any; };", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

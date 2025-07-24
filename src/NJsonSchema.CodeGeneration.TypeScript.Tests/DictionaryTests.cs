@@ -1,4 +1,5 @@
-﻿using NJsonSchema.Generation;
+﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -16,7 +17,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_class_inherits_from_any_dictionary_then_interface_has_indexer_property()
+        public async Task When_class_inherits_from_any_dictionary_then_interface_has_indexer_property()
         {
             // Arrange
             var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
@@ -32,12 +33,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             // Assert
-            Assert.DoesNotContain("extends { [key: string]: any; }", code);
-            Assert.Contains("[key: string]: any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_inherits_from_any_dictionary_then_class_has_indexer_property()
+        public async Task When_class_inherits_from_any_dictionary_then_class_has_indexer_property()
         {
             // Arrange
             var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
@@ -53,13 +54,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             // Assert
-            Assert.DoesNotContain("extends { [key: string]: any; }", code);
-            Assert.DoesNotContain("super()", code);
-            Assert.Contains("[key: string]: any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_inherits_from_string_dictionary_then_interface_has_indexer_property()
+        public async Task When_class_inherits_from_string_dictionary_then_interface_has_indexer_property()
         {
             // Arrange
             var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
@@ -75,12 +75,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             // Assert
-            Assert.DoesNotContain("extends { [key: string]: string; }", code);
-            Assert.Contains("[key: string]: string | any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_class_inherits_from_string_dictionary_then_class_has_indexer_property()
+        public async Task When_class_inherits_from_string_dictionary_then_class_has_indexer_property()
         {
             // Arrange
             var schemaGenerator = new JsonSchemaGenerator(new NewtonsoftJsonSchemaGeneratorSettings
@@ -96,9 +96,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("MetadataDictionary");
 
             // Assert
-            Assert.DoesNotContain("extends { [key: string]: string; }", code);
-            Assert.DoesNotContain("super()", code);
-            Assert.Contains("[key: string]: string | any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -136,7 +135,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.Contains("(this.resource as any)[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -304,7 +304,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.DoesNotContain("[key in keyof typeof Istring]", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
     }
 }

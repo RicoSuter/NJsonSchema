@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Reflection;
-
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The generator settings.</summary>

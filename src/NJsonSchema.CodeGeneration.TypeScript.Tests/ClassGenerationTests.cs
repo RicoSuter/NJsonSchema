@@ -81,7 +81,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
-        public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             // Arrange
             var schema = new JsonSchema
@@ -121,13 +121,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("a: string[];", code);
-            Assert.Contains("this.a = [];", code);
-            Assert.Contains("b: string[];", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             // Arrange
             var schema = new JsonSchema
@@ -167,13 +166,12 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("a: { [key: string]: string; };", code);
-            Assert.Contains("this.a = {};", code);
-            Assert.Contains("b: { [key: string]: string; };", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
             // Arrange
             var schema = new JsonSchema
@@ -221,12 +219,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("a: A;", code);
-            Assert.Contains("this.a = new A();", code);
-            Assert.Contains("this.a = _data[\"A\"] ? A.fromJS(_data[\"A\"]) : new A();", code);
-
-            Assert.Contains("b: B;", code);
-            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : undefined as any;", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -235,9 +229,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = false });
 
             // Assert
-            Assert.DoesNotContain("export class Student extends Person implements IStudent {", code);
-            Assert.DoesNotContain("export interface IStudent extends IPerson {", code);
-            Assert.DoesNotContain("export interface IPerson {", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -246,7 +239,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = false });
 
             // Assert
-            Assert.DoesNotContain("export class Student extends Person {", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
@@ -259,8 +252,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
 
             // Assert
-            Assert.DoesNotContain("interface IStudent extends IPerson {", code);
-            Assert.DoesNotContain("interface IPerson {", code);
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -274,11 +267,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             });
 
             // Assert
-            Assert.DoesNotContain("let firstName_ = data[\"FirstName\"];", code);
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
-        public void When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
+        public async Task When_GenerateConstructorInterface_is_disabled_then_data_is_not_checked_and_default_initialization_is_always_exectued()
         {
             // Assert
             var schema = NewtonsoftJsonSchemaGenerator.FromType(
@@ -297,7 +290,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("if (!data) {", output);
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output);
         }
 
         [JsonConverter(typeof(JsonInheritanceConverter))]
