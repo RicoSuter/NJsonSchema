@@ -10,11 +10,10 @@ namespace ns
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("emptySchema", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public System.Collections.Generic.ICollection<object> EmptySchema { get; set; } = new System.Collections.ObjectModel.Collection<object>();
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

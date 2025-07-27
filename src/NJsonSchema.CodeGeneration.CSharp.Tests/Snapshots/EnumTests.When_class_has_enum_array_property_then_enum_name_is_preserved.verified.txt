@@ -21,12 +21,12 @@ namespace MyNamespace
 
     public partial class SomeClass
     {
+
         [Newtonsoft.Json.JsonProperty("SomeProperty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int SomeProperty { get; set; }
 
         [Newtonsoft.Json.JsonProperty("SomeEnums", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<SomeEnum> SomeEnums { get; set; }
-
 
     }
 }

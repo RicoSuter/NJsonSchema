@@ -11,22 +11,17 @@ namespace MyNamespace
     public abstract partial class AbstractAddress
     {
         [Newtonsoft.Json.JsonConstructor]
-
         protected AbstractAddress(string @city, string @streetName)
-
-
         {
-
             this.City = @city;
-
             this.StreetName = @streetName;
+        }
 
-        }    [Newtonsoft.Json.JsonProperty("city", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("city", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string City { get; }
 
         [Newtonsoft.Json.JsonProperty("streetName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StreetName { get; }
-
 
     }
 }

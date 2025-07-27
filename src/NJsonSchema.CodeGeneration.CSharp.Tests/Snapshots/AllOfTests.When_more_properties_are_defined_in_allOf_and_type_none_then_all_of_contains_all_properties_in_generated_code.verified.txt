@@ -10,21 +10,20 @@ namespace MyNamespace
 
     public partial class Foo : Anonymous
     {
+
         [Newtonsoft.Json.JsonProperty("prop1", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop1 { get; set; }
 
         [Newtonsoft.Json.JsonProperty("prop2", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop2 { get; set; }
 
-
     }
 
     public partial class Anonymous
     {
+
         [Newtonsoft.Json.JsonProperty("baseProperty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BaseProperty { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

@@ -31,10 +31,10 @@ namespace Foo
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("ConstructionCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public ConstructionCode ConstructionCode { get; set; } = Foo.ConstructionCode.NON_CBST;
-
 
     }
 }

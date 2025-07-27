@@ -10,12 +10,11 @@ namespace MyNamespace
 
     public partial class Message
     {
+
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MinLength(10)]
         public System.Collections.Generic.ICollection<string> Value { get; set; } = new System.Collections.ObjectModel.Collection<string>();
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

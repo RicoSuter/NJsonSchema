@@ -11,29 +11,21 @@ namespace MyNamespace
     public partial class Cat : Animal
     {
         [System.Text.Json.Serialization.JsonConstructor]
-
         public Cat()
-
-
             : base()
-
         {
-
         }
+
     }
 
     public partial class PersianCat : Cat
     {
         [System.Text.Json.Serialization.JsonConstructor]
-
         public PersianCat()
-
-
             : base()
-
         {
-
         }
+
     }
 
     [System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "discriminator")]
@@ -42,12 +34,8 @@ namespace MyNamespace
     public abstract partial class Animal
     {
         [System.Text.Json.Serialization.JsonConstructor]
-
         protected Animal()
-
-
         {
-
         }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;

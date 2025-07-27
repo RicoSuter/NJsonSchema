@@ -11,9 +11,9 @@ namespace MyNamespace
     [System.Obsolete]
     public partial class ObsoleteTestClass
     {
+
         [Newtonsoft.Json.JsonProperty("Property", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Property { get; set; }
-
 
     }
 }

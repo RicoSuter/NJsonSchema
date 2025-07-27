@@ -10,10 +10,9 @@ namespace MyNamespace
 
     public partial class PersonAddress
     {
+
         [Newtonsoft.Json.JsonProperty("Foo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Foo { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

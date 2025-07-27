@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]
         public int? PageSize { get; set; } = 10;
@@ -17,8 +18,6 @@ namespace MyNamespace
         [Newtonsoft.Json.JsonProperty("pagingSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]
         public int? PagingSize { get; set; } = 5;
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

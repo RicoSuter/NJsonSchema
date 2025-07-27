@@ -173,6 +173,28 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             CodeCompiler.AssertCompile(code);
         }
 
+        [Fact]
+        public async Task When_definition_inherits_parameters_from_base_come_first()
+        {
+            // Arrange
+            var path = GetTestDirectory() + "/References/Car.json";
+
+            // Act
+            var schema = await JsonSchema.FromFileAsync(path);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                SortConstructorParameters = false,
+            });
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
+        }
+
         private string GetTestDirectory()
         {
 #pragma warning disable SYSLIB0012

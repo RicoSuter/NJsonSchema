@@ -5,9 +5,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests;
 
 public class CodeCompiler
 {
-    public static void AssertCompile(string source)
+    public static void AssertCompile(string source, CSharpParseOptions options = null)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(source);
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
 
         var metadataReferences = AppDomain.CurrentDomain.GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))

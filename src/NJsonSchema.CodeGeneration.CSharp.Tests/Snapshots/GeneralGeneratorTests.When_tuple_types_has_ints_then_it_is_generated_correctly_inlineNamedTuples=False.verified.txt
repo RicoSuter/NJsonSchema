@@ -18,7 +18,6 @@ namespace MyNamespace
         }
 
 
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [Newtonsoft.Json.JsonExtensionData]
@@ -37,10 +36,10 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("OuterList", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public OuterList OuterList { get; set; } = new OuterList();
-
 
     }
 }

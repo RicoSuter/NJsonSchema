@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         /// <summary>
         /// Summary is here
         /// <br/>            
@@ -20,7 +21,6 @@ namespace MyNamespace
         /// </summary>
         [Newtonsoft.Json.JsonProperty("HelloMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string HelloMessage { get; set; }
-
 
     }
 }

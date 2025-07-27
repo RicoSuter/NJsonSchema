@@ -13,13 +13,12 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         /// <summary>
         /// This is the type of G
         /// </summary>
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string? Name { get; set; } = default!;
-
-
 
         private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 

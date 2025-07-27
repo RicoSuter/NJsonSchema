@@ -14,7 +14,6 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("Amember")]
         public string Amember { get; set; }
 
-
     }
 
     [System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "discriminator")]
@@ -25,7 +24,6 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("ID")]
         public long ID { get; set; }
 
-
     }
 
     public partial class MyContainer
@@ -33,7 +31,6 @@ namespace MyNamespace
 
         [System.Text.Json.Serialization.JsonPropertyName("Item")]
         public Banana Item { get; set; }
-
 
     }
 }

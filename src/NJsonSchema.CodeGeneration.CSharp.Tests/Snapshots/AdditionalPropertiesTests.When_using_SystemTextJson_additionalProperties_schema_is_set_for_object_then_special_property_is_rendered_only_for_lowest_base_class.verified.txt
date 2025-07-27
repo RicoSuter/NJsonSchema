@@ -14,7 +14,6 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("whiskers")]
         public string Whiskers { get; set; }
 
-
     }
 
     public partial class Pet : Animal
@@ -23,7 +22,6 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
 
-
     }
 
     public partial class Animal
@@ -31,8 +29,6 @@ namespace MyNamespace
 
         [System.Text.Json.Serialization.JsonPropertyName("category")]
         public string Category { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -50,8 +46,6 @@ namespace MyNamespace
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

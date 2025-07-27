@@ -10,10 +10,9 @@ namespace MyNamespace
 
     public partial class Pet
     {
+
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Name { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -33,10 +32,9 @@ namespace MyNamespace
 
     public partial class Anonymous
     {
+
         [Newtonsoft.Json.JsonProperty("dog", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Dog Dog { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

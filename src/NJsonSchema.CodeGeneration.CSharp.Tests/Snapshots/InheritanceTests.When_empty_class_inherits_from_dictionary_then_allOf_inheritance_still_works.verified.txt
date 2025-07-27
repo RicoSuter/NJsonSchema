@@ -18,9 +18,9 @@ namespace MyNamespace
 
     public partial class MyContainer
     {
+
         [Newtonsoft.Json.JsonProperty("CustomDictionary", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public EmptyClassInheritingDictionary CustomDictionary { get; set; }
-
 
     }
 }

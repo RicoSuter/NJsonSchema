@@ -10,10 +10,9 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("dateTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime? DateTime { get; set; } = System.DateTime.Parse("31.12.9999 23:59:59");
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

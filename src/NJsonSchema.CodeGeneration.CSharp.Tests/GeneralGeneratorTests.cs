@@ -1695,6 +1695,50 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             CodeCompiler.AssertCompile(output);
         }
 
+#if NETCOREAPP3_1_OR_GREATER || NET5_0_OR_GREATER
+        [Fact]
+        public async Task When_csharp_record_no_setter_in_record_and_constructor_provided()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                GenerateNativeRecords = true,
+                SortConstructorParameters = false
+            });
+
+            // Act
+            var output = generator.GenerateFile("Address");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output, new Microsoft.CodeAnalysis.CSharp.CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp9));
+        }
+
+        [Fact]
+        public async Task When_csharp_record_init_in_record_and_constructor_provided()
+        {
+            // Arrange
+            var schema = JsonSchema.FromType<Address>();
+            var data = schema.ToJson();
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Record,
+                SortConstructorParameters = false,
+                GenerateNativeRecords = true,
+            });
+
+            // Act
+            var output = generator.GenerateFile("Address");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CodeCompiler.AssertCompile(output, new Microsoft.CodeAnalysis.CSharp.CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp9));
+        }
+#endif
+
         public abstract class AbstractAddress
         {
             [JsonProperty("city")]

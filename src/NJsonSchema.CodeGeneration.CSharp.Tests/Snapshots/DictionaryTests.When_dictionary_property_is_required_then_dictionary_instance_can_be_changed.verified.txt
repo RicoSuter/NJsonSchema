@@ -21,13 +21,13 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("EnumDictionary", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Foo<PropertyName, string> EnumDictionary { get; set; }
 
         [Newtonsoft.Json.JsonProperty("EnumInterfaceDictionary", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public Foo<PropertyName, string> EnumInterfaceDictionary { get; set; } = new Bar<PropertyName, string>();
-
 
     }
 }

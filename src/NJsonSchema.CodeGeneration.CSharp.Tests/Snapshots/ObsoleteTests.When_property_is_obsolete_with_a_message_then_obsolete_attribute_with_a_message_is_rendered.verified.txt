@@ -10,10 +10,10 @@ namespace MyNamespace
 
     public partial class ObsoletePropertyWithMessageTestClass
     {
+
         [Newtonsoft.Json.JsonProperty("Property", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.Obsolete("Reason property is \"obsolete\"")]
         public string Property { get; set; }
-
 
     }
 }

@@ -50,8 +50,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 BaseClass = new ClassTemplateModel(BaseClassName!, settings, resolver, schema.InheritedSchema, rootObject);
                 _allProperties = new List<PropertyModel>(_properties.Count + BaseClass._allProperties.Count);
-                _allProperties.AddRange(_properties);
                 _allProperties.AddRange(BaseClass._allProperties);
+                _allProperties.AddRange(_properties);
             }
             else
             {
@@ -121,6 +121,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the class style is Record.</summary>
         public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
 
+        /// <summary>Gets the class type.</summary>
+        public string ClassType => _settings.GenerateNativeRecords ? "record" : "class";
+
         /// <summary>Gets a value indicating whether to generate records as C# 9.0 records.</summary>
         public bool GenerateNativeRecords => _settings.GenerateNativeRecords;
 
@@ -143,6 +146,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedTypeSchema != null;
+
+        /// <summary>Gets a value indicating whether the constructor parameters should be sorted.</summary>
+        public bool SortConstructorParameters => _settings.SortConstructorParameters;
 
         /// <summary>Gets the base class name.</summary>
         public string? BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema!, false, string.Empty, false)

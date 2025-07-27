@@ -10,9 +10,9 @@ namespace MyNamespace
 
     public abstract partial class AbstractClass
     {
+
         [Newtonsoft.Json.JsonProperty("Foo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Foo { get; set; }
-
 
     }
 }

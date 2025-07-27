@@ -10,9 +10,9 @@ namespace MyNamespace
 
     public partial class Banana : Fruit
     {
+
         [Newtonsoft.Json.JsonProperty("Amember", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Amember { get; set; }
-
 
     }
 
@@ -20,17 +20,17 @@ namespace MyNamespace
     [JsonInheritanceAttribute("Banana", typeof(Banana))]
     public partial class Fruit
     {
+
         [Newtonsoft.Json.JsonProperty("ID", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public long ID { get; set; }
-
 
     }
 
     public partial class MyContainer
     {
+
         [Newtonsoft.Json.JsonProperty("Item", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Banana Item { get; set; }
-
 
     }
 

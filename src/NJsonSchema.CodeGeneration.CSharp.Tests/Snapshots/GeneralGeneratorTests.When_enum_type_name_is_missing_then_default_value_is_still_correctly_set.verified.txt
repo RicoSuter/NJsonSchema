@@ -10,9 +10,9 @@ namespace Foo
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("ConstructionCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public MyClassConstructionCode ConstructionCode { get; set; } = Foo.MyClassConstructionCode.JOIST_MAS;
-
 
     }
 
