@@ -203,9 +203,12 @@ namespace NJsonSchema.Validation
 
             if (isString)
             {
-                var value = token.Type == JTokenType.Date && token is JValue jValue
-                    ? jValue.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture)
-                    : token.Value<string>();
+                var value = token.Type switch
+                {
+                    JTokenType.Date => (token as JValue)?.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture),
+                    JTokenType.Uri => (token as JValue)?.ToString(CultureInfo.InvariantCulture),
+                    _ => token.Value<string>()
+                };
 
                 if (value != null)
                 {
