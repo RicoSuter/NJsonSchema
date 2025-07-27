@@ -24,8 +24,5 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Generates Records - read only POCOs (Plain Old C# Objects).</summary>
         Record,
-
-        /// <summary>Generates C# Records.</summary>
-        CSharpRecord
     }
 }

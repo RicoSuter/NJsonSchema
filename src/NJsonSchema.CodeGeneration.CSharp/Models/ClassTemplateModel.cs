@@ -119,12 +119,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool RenderPrism => _settings.ClassStyle == CSharpClassStyle.Prism;
 
         /// <summary>Gets a value indicating whether the class style is Record.</summary>
-        public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record ||
-                                    _settings.ClassStyle == CSharpClassStyle.CSharpRecord;
+        public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
 
         /// <summary>Gets the class type.</summary>
-        public string ClassType => _settings.ClassStyle == CSharpClassStyle.CSharpRecord ?
-                                    "record" : "class";
+        public string ClassType => _settings.GenerateNativeRecords ? "record" : "class";
 
         /// <summary>Gets a value indicating whether to generate records as C# 9.0 records.</summary>
         public bool GenerateNativeRecords => _settings.GenerateNativeRecords;

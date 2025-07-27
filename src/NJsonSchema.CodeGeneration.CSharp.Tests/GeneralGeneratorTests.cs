@@ -1704,7 +1704,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.CSharpRecord,
+                ClassStyle = CSharpClassStyle.Record,
+                GenerateNativeRecords = true,
                 SortConstructorParameters = false
             });
 
@@ -1724,7 +1725,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var data = schema.ToJson();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
-                ClassStyle = CSharpClassStyle.CSharpRecord,
+                ClassStyle = CSharpClassStyle.Record,
                 SortConstructorParameters = false,
                 GenerateNativeRecords = true,
             });
