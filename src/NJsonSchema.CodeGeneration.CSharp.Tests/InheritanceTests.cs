@@ -176,10 +176,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_definition_inherits_parameters_from_base_come_first()
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + "/References/Car.json";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromFileAsync(path);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -187,14 +187,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 SortConstructorParameters = false,
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("public partial class Car : Vehicle", code);
-            Assert.Contains("Vehicle(string @id)", code);
-            Assert.Contains("Car(string @id, int @wheels)", code);
-            Assert.Contains("base(id)", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CodeCompiler.AssertCompile(code);
         }
 
         private string GetTestDirectory()
