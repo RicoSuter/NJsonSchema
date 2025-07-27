@@ -10,9 +10,9 @@ namespace MyNamespace
 
     public partial class MyByteTest
     {
+
         [Newtonsoft.Json.JsonProperty("Cell", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public byte? Cell { get; set; }
-
 
     }
 }

@@ -10,9 +10,9 @@ namespace MyNamespace
 
     public partial class MyRequiredNullableTest
     {
+
         [Newtonsoft.Json.JsonProperty("Foo", Required = Newtonsoft.Json.Required.Always)]
         public int Foo { get; set; }
-
 
     }
 }

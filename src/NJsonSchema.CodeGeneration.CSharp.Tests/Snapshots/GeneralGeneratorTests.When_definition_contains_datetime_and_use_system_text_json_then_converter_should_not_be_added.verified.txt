@@ -14,8 +14,6 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("a")]
         public System.DateTimeOffset? A { get; set; }
 
-
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]

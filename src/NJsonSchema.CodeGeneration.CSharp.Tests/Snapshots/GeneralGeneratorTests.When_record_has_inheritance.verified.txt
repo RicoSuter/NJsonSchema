@@ -11,65 +11,49 @@ namespace MyNamespace
     public partial class PostAddress : AbstractAddress
     {
         [Newtonsoft.Json.JsonConstructor]
-
         public PostAddress(string @city, int @houseNumber, string @streetName, string @zip)
-
-
             : base(city, streetName)
-
         {
-
             this.Zip = @zip;
-
             this.HouseNumber = @houseNumber;
+        }
 
-        }    [Newtonsoft.Json.JsonProperty("Zip", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("Zip", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Zip { get; }
 
         [Newtonsoft.Json.JsonProperty("HouseNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int HouseNumber { get; }
-
 
     }
 
     public abstract partial class AbstractAddress
     {
         [Newtonsoft.Json.JsonConstructor]
-
         protected AbstractAddress(string @city, string @streetName)
-
-
         {
-
             this.City = @city;
-
             this.StreetName = @streetName;
+        }
 
-        }    [Newtonsoft.Json.JsonProperty("city", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("city", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string City { get; }
 
         [Newtonsoft.Json.JsonProperty("streetName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StreetName { get; }
-
 
     }
 
     public partial class PersonAddress : PostAddress
     {
         [Newtonsoft.Json.JsonConstructor]
-
         public PersonAddress(string @addressee, string @city, int @houseNumber, string @streetName, string @zip)
-
-
             : base(city, houseNumber, streetName, zip)
-
         {
-
             this.Addressee = @addressee;
+        }
 
-        }    [Newtonsoft.Json.JsonProperty("Addressee", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonProperty("Addressee", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Addressee { get; }
-
 
     }
 }

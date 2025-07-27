@@ -35,7 +35,7 @@
 [System.Obsolete{% if HasDeprecatedMessage %}({{ DeprecatedMessage | literal }}){% endif %}]
 {% endif -%}
 {%- template Class.Annotations -%}
-{{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {% if GenerateNativeRecords %}record{% else %}class{% endif %} {{ClassName}} {%- template Class.Inheritance %}
+{{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {{ ClassType }} {{ClassName}} {%- template Class.Inheritance %}
 {
 {%- if IsTuple -%}
     public {{ ClassName }}({%- for tupleType in TupleTypes %}{{ tupleType }} item{{ forloop.index }}{%- if forloop.last == false %}, {% endif %}{% endfor %}) : base({%- for tupleType in TupleTypes %}item{{ forloop.index }}{%- if forloop.last == false %}, {% endif %}{% endfor %})
@@ -49,19 +49,19 @@
 {%- endfor -%}
 
 {%- endif -%}
-    {%- template Class.Constructor -%}
+    {% template Class.Constructor %}
 {%- if RenderRecord -%}
-    {% template Class.Constructor.Record -%}
-{%- endif -%}
+    {% template Class.Constructor.Record %}
+{%- endif %}
 {%- for property in Properties -%}
 {%-   if property.HasDescription -%}
     /// <summary>
     /// {{ property.Description | csharpdocs }}
     /// </summary>
 {%-   endif -%}
-{%- if UseSystemTextJson %}
+{%- if UseSystemTextJson -%}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
-{%-   if property.IsStringEnumArray %}
+{%-   if property.IsStringEnumArray -%}
     // TODO(system.text.json): Add string enum item converter
 {%-   endif -%}
 {%- else -%}
@@ -108,10 +108,9 @@
 {%-   endif -%}
     {%- template Class.Property.Annotations -%}
     public {% if UseRequiredKeyword and property.IsRequired %}required {% endif %}{{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% elsif RenderRecord and GenerateNativeRecords %}init; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false %} = default!;{% endif %}
-{% else %}
+{%- else -%}
     {
         get { return {{ property.FieldName }}; }
-
 {%-     if property.HasSetter -%}
 {%-         if RenderInpc -%}
         {{PropertySetterAccessModifier}}set
@@ -127,11 +126,10 @@
 {%-         endif -%}
 {%-     endif -%}
     }
-{%-   endif %}
+{%-   endif -%}
+
 {%- endfor -%}
-
 {%- if GenerateAdditionalPropertiesProperty -%}
-
     private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}>{% if GenerateNullableReferenceTypes %}?{% endif %} _additionalProperties;
 
 {%-       if UseSystemTextJson -%}
@@ -149,7 +147,6 @@
 {%- if GenerateJsonMethods -%}
     {% template Class.ToJson %}
     {% template Class.FromJson %}
-
 {%- endif -%}
 {%- if RenderInpc -%}
     {% template Class.Inpc %}

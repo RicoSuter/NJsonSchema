@@ -10,14 +10,13 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("A", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public A A { get; set; } = new A();
 
         [Newtonsoft.Json.JsonProperty("B", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public B B { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -32,10 +31,9 @@ namespace MyNamespace
 
     public partial class A
     {
+
         [Newtonsoft.Json.JsonProperty("A", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string A1 { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -50,10 +48,9 @@ namespace MyNamespace
 
     public partial class B
     {
+
         [Newtonsoft.Json.JsonProperty("A", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string A { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

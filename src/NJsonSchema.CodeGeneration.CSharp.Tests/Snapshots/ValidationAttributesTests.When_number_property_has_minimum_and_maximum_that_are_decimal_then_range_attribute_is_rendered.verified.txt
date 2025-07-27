@@ -10,11 +10,10 @@ namespace MyNamespace
 
     public partial class Message
     {
+
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Range(typeof(decimal), "-100.50", "100.50")]
         public decimal Value { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

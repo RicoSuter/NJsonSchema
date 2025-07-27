@@ -10,13 +10,12 @@ namespace ns
 
     public partial class Library
     {
+
         [Newtonsoft.Json.JsonProperty("Index", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, string> Index { get; set; }
 
         [Newtonsoft.Json.JsonProperty("Page", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public object Page { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

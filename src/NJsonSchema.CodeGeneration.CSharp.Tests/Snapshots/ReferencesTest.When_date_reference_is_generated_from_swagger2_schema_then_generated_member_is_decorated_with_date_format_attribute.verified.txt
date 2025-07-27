@@ -10,19 +10,19 @@ namespace MyNamespace
 
     public partial class MyType
     {
+
         [Newtonsoft.Json.JsonProperty("EntryDate", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
         public System.DateTimeOffset EntryDate { get; set; }
 
-
     }
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("MyType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public MyType MyType { get; set; }
-
 
     }
 

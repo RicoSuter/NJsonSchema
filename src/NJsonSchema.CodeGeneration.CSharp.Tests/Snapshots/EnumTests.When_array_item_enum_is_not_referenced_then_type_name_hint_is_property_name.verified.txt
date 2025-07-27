@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class NewOrderModel
     {
+
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Id { get; set; }
 
@@ -18,8 +19,6 @@ namespace MyNamespace
 
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public System.Collections.Generic.ICollection<Status> Status { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -34,10 +33,9 @@ namespace MyNamespace
 
     public partial class Foo
     {
+
         [Newtonsoft.Json.JsonProperty("foo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public NewOrderModel Foo1 { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

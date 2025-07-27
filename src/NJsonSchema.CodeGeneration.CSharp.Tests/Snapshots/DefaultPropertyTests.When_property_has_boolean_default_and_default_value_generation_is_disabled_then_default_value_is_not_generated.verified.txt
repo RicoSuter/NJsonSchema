@@ -10,10 +10,9 @@ namespace ns
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("boolWithDefault", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool BoolWithDefault { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

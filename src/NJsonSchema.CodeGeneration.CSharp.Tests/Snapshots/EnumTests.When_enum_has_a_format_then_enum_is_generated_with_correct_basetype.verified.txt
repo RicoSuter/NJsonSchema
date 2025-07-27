@@ -21,10 +21,9 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("foo", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ManyValuesTestEnum Foo { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

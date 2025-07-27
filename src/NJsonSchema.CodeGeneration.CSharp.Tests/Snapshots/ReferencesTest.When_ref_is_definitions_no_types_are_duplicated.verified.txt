@@ -13,6 +13,7 @@ namespace MyNamespace
     /// </summary>
     public partial class B
     {
+
         /// <summary>
         /// This is the ID of B
         /// </summary>
@@ -31,8 +32,6 @@ namespace MyNamespace
         /// </summary>
         [Newtonsoft.Json.JsonProperty("empty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public D Empty { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -67,7 +66,6 @@ namespace MyNamespace
     public partial class D
     {
 
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [Newtonsoft.Json.JsonExtensionData]
@@ -84,6 +82,7 @@ namespace MyNamespace
     /// </summary>
     public partial class MyClass
     {
+
         /// <summary>
         /// This is the type of E
         /// </summary>
@@ -94,8 +93,6 @@ namespace MyNamespace
         [Newtonsoft.Json.JsonProperty("signalPaths", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public object SignalPaths { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

@@ -15,46 +15,35 @@ namespace MyNamespace
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("lastName")]
         public string LastName { get; set; }
-
 
         [System.Text.Json.Serialization.JsonPropertyName("Birthday")]
         public System.DateTimeOffset Birthday { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("TimeSpan")]
         public System.TimeSpan TimeSpan { get; set; }
-
 
         [System.Text.Json.Serialization.JsonPropertyName("TimeSpanOrNull")]
         public System.TimeSpan? TimeSpanOrNull { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("Gender")]
         public Gender Gender { get; set; }
-
 
         [System.Text.Json.Serialization.JsonPropertyName("GenderOrNull")]
         public Gender? GenderOrNull { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("Address")]
         public Address Address { get; set; }
-
 
         [System.Text.Json.Serialization.JsonPropertyName("AddressOrNull")]
         public Address AddressOrNull { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("Array")]
         public System.Collections.Generic.ICollection<string> Array { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("Dictionary")]
         public System.Collections.Generic.IDictionary<string, int> Dictionary { get; set; }
-
 
         public string ToJson()
         {
@@ -80,7 +69,6 @@ namespace MyNamespace
             return System.Text.Json.JsonSerializer.Deserialize<Person>(data, options);
 
         }
-
     }
 
     public enum Gender
@@ -100,10 +88,8 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("Street")]
         public string Street { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("City")]
         public string City { get; set; }
-
 
         public string ToJson()
         {
@@ -129,7 +115,6 @@ namespace MyNamespace
             return System.Text.Json.JsonSerializer.Deserialize<Address>(data, options);
 
         }
-
     }
 
     public partial class MyClass : Person
@@ -137,7 +122,6 @@ namespace MyNamespace
 
         [System.Text.Json.Serialization.JsonPropertyName("Class")]
         public string Class { get; set; }
-
 
         public string ToJson()
         {
@@ -163,6 +147,5 @@ namespace MyNamespace
             return System.Text.Json.JsonSerializer.Deserialize<MyClass>(data, options);
 
         }
-
     }
 }

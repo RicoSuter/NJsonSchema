@@ -10,11 +10,10 @@ namespace MyNamespace
 
     public partial class Message
     {
+
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Range(-9223372036854775808L, 9223372036854775807L)]
         public long Value { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

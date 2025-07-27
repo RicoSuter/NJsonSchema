@@ -23,13 +23,13 @@ namespace MyNamespace
 
     public partial class MyStringEnumListTest
     {
+
         [Newtonsoft.Json.JsonProperty("Enums", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public System.Collections.Generic.ICollection<MyStringEnum> Enums { get; set; }
 
         [Newtonsoft.Json.JsonProperty("NullableEnum", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public MyStringEnum? NullableEnum { get; set; }
-
 
     }
 }

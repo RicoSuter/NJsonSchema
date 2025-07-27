@@ -10,9 +10,9 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("Content", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public byte[] Content { get; set; }
-
 
     }
 }

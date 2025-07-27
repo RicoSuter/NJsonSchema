@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class BusinessException
     {
+
         [Newtonsoft.Json.JsonProperty("customerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string CustomerId { get; set; }
 
@@ -18,7 +19,6 @@ namespace MyNamespace
 
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string UserId { get; set; }
-
 
     }
 
@@ -29,9 +29,9 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("Exception", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public BusinessException Exception { get; set; }
-
 
     }
 }

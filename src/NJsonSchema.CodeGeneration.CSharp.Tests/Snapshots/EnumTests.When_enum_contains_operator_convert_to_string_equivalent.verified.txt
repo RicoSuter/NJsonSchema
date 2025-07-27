@@ -62,11 +62,10 @@ namespace MyNamespace
 
     public partial class Foo
     {
+
         [Newtonsoft.Json.JsonProperty("foo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OperatorTestEnum? Foo1 { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

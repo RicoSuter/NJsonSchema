@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("FirstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
@@ -19,7 +20,6 @@ namespace MyNamespace
 
         [Newtonsoft.Json.JsonProperty("Age", Required = Newtonsoft.Json.Required.AllowNull)]
         public int? Age { get; set; }
-
 
     }
 }

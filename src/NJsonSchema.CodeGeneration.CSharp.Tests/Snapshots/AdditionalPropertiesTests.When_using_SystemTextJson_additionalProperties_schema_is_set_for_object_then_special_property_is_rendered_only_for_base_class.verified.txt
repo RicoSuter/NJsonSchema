@@ -14,11 +14,8 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("dog")]
         public Dog Dog { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("cat")]
         public Cat Cat { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -50,11 +47,8 @@ namespace MyNamespace
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
 
-
         [System.Text.Json.Serialization.JsonPropertyName("category")]
         public string Category { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

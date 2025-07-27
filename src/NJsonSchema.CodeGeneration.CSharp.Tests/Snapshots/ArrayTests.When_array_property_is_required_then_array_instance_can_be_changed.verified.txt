@@ -10,10 +10,10 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("ArrayProperty", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public Foo<string> ArrayProperty { get; set; } = new Bar<string>();
-
 
     }
 }

@@ -10,11 +10,10 @@ namespace MyNamespace
 
     public partial class Foo
     {
+
         [Newtonsoft.Json.JsonProperty("myProperty", Required = Newtonsoft.Json.Required.AllowNull)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public FooMyProperty? MyProperty { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

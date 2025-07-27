@@ -10,14 +10,13 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         /// <summary>
         /// The event identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("event", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public MyClassEvent Event { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

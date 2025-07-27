@@ -10,6 +10,7 @@ namespace MyNamespace
 
     public partial class Person
     {
+
         [Newtonsoft.Json.JsonProperty("FirstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public string FirstName { get; set; }
@@ -44,7 +45,6 @@ namespace MyNamespace
         [Newtonsoft.Json.JsonProperty("Dictionary", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, int> Dictionary { get; set; }
 
-
     }
 
     public enum Gender
@@ -60,20 +60,20 @@ namespace MyNamespace
 
     public partial class Address
     {
+
         [Newtonsoft.Json.JsonProperty("Street", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Street { get; set; }
 
         [Newtonsoft.Json.JsonProperty("City", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string City { get; set; }
 
-
     }
 
     public partial class MyClass : Person
     {
+
         [Newtonsoft.Json.JsonProperty("Class", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Class { get; set; }
-
 
     }
 }

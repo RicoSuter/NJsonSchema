@@ -10,10 +10,9 @@ namespace MyNamespace
 
     public partial class Anonymous
     {
+
         [Newtonsoft.Json.JsonProperty("someOptionalProperty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double SomeOptionalProperty { get; set; } = 123D;
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

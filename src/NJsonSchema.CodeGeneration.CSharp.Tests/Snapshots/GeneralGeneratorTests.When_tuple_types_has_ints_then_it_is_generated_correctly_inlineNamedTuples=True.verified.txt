@@ -15,10 +15,10 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("OuterList", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public OuterList OuterList { get; set; } = new OuterList();
-
 
     }
 }

@@ -12,14 +12,15 @@ namespace MyNamespace
     [JsonInheritanceAttribute("MyException", typeof(MyException))]
     public partial class ExceptionBase : Exception
     {
+
         [Newtonsoft.Json.JsonProperty("Foo", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Foo { get; set; }
-
 
     }
 
     public partial class Exception
     {
+
         [Newtonsoft.Json.JsonProperty("Message", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Message { get; set; }
 
@@ -32,7 +33,6 @@ namespace MyNamespace
         [Newtonsoft.Json.JsonProperty("StackTrace", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string StackTrace { get; set; }
 
-
     }
 
     /// <summary>
@@ -40,17 +40,17 @@ namespace MyNamespace
     /// </summary>
     public partial class MyException : ExceptionBase
     {
+
         [Newtonsoft.Json.JsonProperty("Bar", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Bar { get; set; }
-
 
     }
 
     public partial class ExceptionContainer
     {
+
         [Newtonsoft.Json.JsonProperty("Exception", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public ExceptionBase Exception { get; set; }
-
 
     }
 

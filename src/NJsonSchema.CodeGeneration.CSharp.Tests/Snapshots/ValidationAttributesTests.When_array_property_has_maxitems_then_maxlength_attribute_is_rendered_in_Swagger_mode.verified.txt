@@ -15,12 +15,11 @@ namespace MyNamespace
 
     public partial class Message
     {
+
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MaxLength(10)]
         public Array10 Value { get; set; } = new Array10();
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

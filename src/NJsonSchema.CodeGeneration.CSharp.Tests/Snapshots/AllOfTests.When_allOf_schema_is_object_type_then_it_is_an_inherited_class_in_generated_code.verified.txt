@@ -10,10 +10,9 @@ namespace MyNamespace
 
     public partial class Bar
     {
+
         [Newtonsoft.Json.JsonProperty("prop2", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop2 { get; set; }
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -28,9 +27,9 @@ namespace MyNamespace
 
     public partial class Foo : Bar
     {
+
         [Newtonsoft.Json.JsonProperty("prop1", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Prop1 { get; set; }
-
 
     }
 }

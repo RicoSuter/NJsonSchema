@@ -13,14 +13,13 @@ namespace MyNamespace
 
     public partial class MyClass
     {
+
         [Newtonsoft.Json.JsonProperty("Property", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public object? Property { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("property2", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public object Property2 { get; set; } = new object();
-
-
 
         private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 

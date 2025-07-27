@@ -10,11 +10,10 @@ namespace MyNamespace
 
     public partial class Anonymous
     {
+
         [Newtonsoft.Json.JsonProperty("requiredList", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<string>> RequiredList { get; set; } = new System.Collections.ObjectModel.Collection<System.Collections.Generic.ICollection<string>>();
-
-
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
