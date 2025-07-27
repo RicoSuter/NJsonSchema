@@ -364,7 +364,7 @@ namespace NJsonSchema
             }
 
             // we are removing at least one character
-            var sb = new StringBuilder(input.Length - 1);
+            var sb = new ValueStringBuilder(input.Length - 1);
             var caseFlag = false;
             foreach (var c in input)
             {
