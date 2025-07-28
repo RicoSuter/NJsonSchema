@@ -13,7 +13,7 @@ namespace NJsonSchema.CodeGeneration
     /// <summary>The default enumeration name generator.</summary>
     public class DefaultEnumNameGenerator : IEnumNameGenerator
     {
-        private static readonly Regex _invalidNameCharactersPattern = new Regex(@"[^\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]");
+        private static readonly Lazy<Regex> _invalidNameCharactersPattern = new(static () => new Regex(@"[^\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250)));
 
         /// <summary>Generates the enumeration name/key of the given enumeration entry.</summary>
         /// <param name="index">The index of the enumeration value (check <see cref="JsonSchema.Enumeration" /> and <see cref="JsonSchema.EnumerationNames" />).</param>
@@ -62,7 +62,7 @@ namespace NJsonSchema.CodeGeneration
 
             var cleaned = name.Replace(':', '-').Replace(@"""", "");
             var camelCase = ConversionUtilities.ConvertToUpperCamelCase(cleaned, firstCharacterMustBeAlpha: true);
-            return _invalidNameCharactersPattern.Replace(camelCase, "_");
+            return _invalidNameCharactersPattern.Value.Replace(camelCase, "_");
         }
     }
 }

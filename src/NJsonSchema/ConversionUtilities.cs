@@ -68,7 +68,7 @@ namespace NJsonSchema
             return input;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string Capitalize(string input)
         {
             if (char.IsUpper(input[0]))
