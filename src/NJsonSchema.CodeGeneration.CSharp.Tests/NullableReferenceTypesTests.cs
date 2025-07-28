@@ -153,7 +153,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [InlineData("date-time")]
         [InlineData("time")]
         [InlineData("time-span")]
-        public async Task When_generating_from_json_schema_string_property_with_date_or_time_format_is_optional_and_GenerateNullableOptionalProperties_is_not_set_then_CSharp_property(string format)
+        public async Task When_generating_from_json_schema_string_property_with_date_or_time_format(string format)
         {
             // Arrange
             var schemaJson = @"
@@ -201,7 +201,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [InlineData("date-time")]
         [InlineData("time")]
         [InlineData("time-span")]
-        public async Task When_generating_from_json_schema_string_property_with_date_or_time_format_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property(string format)
+        public async Task When_generating_property_with_datetime_format_is_optional_and_GenerateNullableOptionalProperties(string format)
         {
             // Arrange
             var schemaJson = @"
@@ -245,8 +245,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
-        public async Task
-            When_generating_from_json_schema_string_property_with_reference_is_optional_and_GenerateNullableOptionalProperties_is_set_then_CSharp_property()
+        public async Task When_generating_string_property_with_reference_is_optional_and_GenerateNullableOptionalProperties_is_set()
         {
             // Arrange
             var schemaJson = @"
