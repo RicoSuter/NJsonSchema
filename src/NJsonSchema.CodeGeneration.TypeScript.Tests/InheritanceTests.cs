@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [InlineData(true, true)]
         [InlineData(false, false)]
         [InlineData(true, false)]
-        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
+        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inline, bool convert)
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
@@ -36,8 +36,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeScriptVersion = 2.0m,
-                InlineNamedDictionaries = inlineNamedDictionaries,
-                ConvertConstructorInterfaceData = convertConstructorInterfaceData
+                InlineNamedDictionaries = inline,
+                ConvertConstructorInterfaceData = convert
             });
 
             // Act
@@ -49,7 +49,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Empty(dschema.AllOf);
             Assert.True(dschema.IsDictionary);
 
-            await VerifyHelper.Verify(code).UseParameters(inlineNamedDictionaries, convertConstructorInterfaceData);
+            await VerifyHelper.Verify(code).UseParameters(inline, convert);
             TypeScriptCompiler.AssertCompile(code);
         }
 

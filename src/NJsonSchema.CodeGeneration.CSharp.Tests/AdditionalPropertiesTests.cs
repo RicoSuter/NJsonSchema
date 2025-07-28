@@ -138,7 +138,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
         
         [Fact]
-        public async Task When_using_SystemTextJson_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered_only_for_lowest_base_class()
+        public async Task When_using_STJ_additionalProperties_schema_is_set_for_object_then_special_property_is_rendered_only_for_lowest_base()
         {
             var json =
                 @"{  

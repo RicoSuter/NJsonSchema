@@ -7,14 +7,15 @@
         <Nullable>disable</Nullable>
         <AnalysisLevel>latest-Minimal</AnalysisLevel>
         <NoWarn>$(NoWarn);1591</NoWarn>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="Verify.XUnit" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="Verify.XunitV3" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
     </ItemGroup>
 

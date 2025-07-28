@@ -7,17 +7,15 @@
         <Nullable>disable</Nullable>
         <AnalysisLevel>latest-Minimal</AnalysisLevel>
         <NoWarn>$(NoWarn);1591</NoWarn>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <!-- Remove the underscores from member name -->
         <NoWarn>$(NoWarn),CA1707</NoWarn>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NSwag.Core.Yaml" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
         <PackageReference Include="NodaTime" />
     </ItemGroup>
