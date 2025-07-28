@@ -10,12 +10,12 @@
 
 
 export interface Base {
-    Type: string;
+    type: string;
 }
 
 export interface OneChild extends Base {
-    A: string;
-    Type: EBase.OneChild;
+    a: string;
+    type: EBase;
 }
 
 export enum EBase {
@@ -24,11 +24,11 @@ export enum EBase {
 }
 
 export interface SecondChild extends Base {
-    B: string;
-    Type: EBase.SecondChild;
+    b: string;
+    type: EBase;
 }
 
 export interface MyClass {
-    Child: OneChild | SecondChild;
-    Children: (OneChild | SecondChild)[];
+    child: OneChild | SecondChild;
+    children: (OneChild | SecondChild)[];
 }

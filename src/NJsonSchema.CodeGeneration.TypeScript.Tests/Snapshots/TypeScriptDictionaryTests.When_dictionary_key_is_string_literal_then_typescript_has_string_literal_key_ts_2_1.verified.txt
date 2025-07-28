@@ -12,6 +12,6 @@
 export type PropertyName = 0 | 1;
 
 export interface MyClass {
-    Mapping: { [key in PropertyName]?: string; } | undefined;
-    Mapping2: { [key in PropertyName]?: string; } | undefined;
+    mapping: { [key in PropertyName]?: string; } | undefined;
+    mapping2: { [key in PropertyName]?: string; } | undefined;
 }

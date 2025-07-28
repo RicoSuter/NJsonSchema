@@ -10,22 +10,22 @@
 
 
 export interface Person {
-    FirstName: string | undefined;
-    LastName: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
 }
 
 export interface Student extends Person {
-    Study: string | undefined;
+    study: string | undefined;
 }
 
 export interface MyClass {
-    Name: string | undefined;
-    DateOfBirth: Date;
-    PrimitiveArray: number[] | undefined;
-    PrimitiveDictionary: { [key: string]: number; } | undefined;
-    DateArray: Date[] | undefined;
-    DateDictionary: { [key: string]: Date; } | undefined;
-    Reference: Student | undefined;
-    Array: Student[] | undefined;
-    Dictionary: { [key: string]: Student; } | undefined;
+    name: string | undefined;
+    dateOfBirth: Date;
+    primitiveArray: number[] | undefined;
+    primitiveDictionary: { [key: string]: number; } | undefined;
+    dateArray: Date[] | undefined;
+    dateDictionary: { [key: string]: Date; } | undefined;
+    reference: Student | undefined;
+    array: Student[] | undefined;
+    dictionary: { [key: string]: Student; } | undefined;
 }

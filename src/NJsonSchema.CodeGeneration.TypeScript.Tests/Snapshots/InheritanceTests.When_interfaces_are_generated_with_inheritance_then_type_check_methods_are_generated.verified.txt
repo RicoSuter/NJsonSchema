@@ -10,14 +10,14 @@
 
 
 export interface Exception {
-    Message: string;
-    InnerException: Exception | undefined;
-    Source: string | undefined;
-    StackTrace: string | undefined;
+    message: string;
+    innerException: Exception | undefined;
+    source: string | undefined;
+    stackTrace: string | undefined;
 }
 
 export interface ExceptionBase extends Exception {
-    Foo: string | undefined;
+    foo: string | undefined;
     kind: 'ExceptionBase';
 }
 
@@ -27,7 +27,7 @@ export function isExceptionBase(object: any): object is ExceptionBase {
 
 /** Foobar. */
 export interface MyException extends ExceptionBase {
-    Bar: string | undefined;
+    bar: string | undefined;
 }
 
 export function isMyException(object: any): object is MyException {
@@ -35,5 +35,5 @@ export function isMyException(object: any): object is MyException {
 }
 
 export interface ExceptionContainer {
-    Exception: ExceptionBase | undefined;
+    exception: ExceptionBase | undefined;
 }

@@ -10,17 +10,17 @@
 
 
 export interface Person {
-    FirstName: string;
+    firstName: string;
     lastName: string | undefined;
-    readonly Birthday: Date;
-    TimeSpan: string;
-    TimeSpanOrNull: string | undefined;
-    Gender: Gender;
-    GenderOrNull: Gender | undefined;
+    readonly birthday: Date;
+    timeSpan: string;
+    timeSpanOrNull: string | undefined;
+    gender: Gender;
+    genderOrNull: Gender | undefined;
     address: Address;
-    AddressOrNull: Address | undefined;
-    Array: string[] | undefined;
-    Dictionary: { [key: string]: number; } | undefined;
+    addressOrNull: Address | undefined;
+    array: string[] | undefined;
+    dictionary: { [key: string]: number; } | undefined;
 }
 
 export enum Gender {
@@ -29,10 +29,10 @@ export enum Gender {
 }
 
 export interface Address {
-    Street: string | undefined;
-    City: string | undefined;
+    street: string | undefined;
+    city: string | undefined;
 }
 
 export interface MyClass extends Person {
-    Class: string | undefined;
+    class: string | undefined;
 }

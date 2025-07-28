@@ -10,5 +10,5 @@
 
 
 export interface MyClass {
-    MyDateTime: moment.Moment;
+    myDateTime: moment.Moment;
 }

@@ -15,6 +15,6 @@ export enum Gender {
 }
 
 export interface MyClass {
-    Mapping: { [key: string]: Gender; };
-    Mapping2: { [key: string]: Gender; };
+    mapping: { [key: string]: Gender; };
+    mapping2: { [key: string]: Gender; };
 }
