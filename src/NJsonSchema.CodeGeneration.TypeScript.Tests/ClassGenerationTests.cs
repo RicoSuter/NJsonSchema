@@ -310,5 +310,27 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             public string MyStringProperty { get; set; }
         }
+
+        [Theory]
+        [InlineData(TypeScriptTypeStyle.Class)]
+        [InlineData(TypeScriptTypeStyle.Interface)]
+        public async Task When_generating_TypeScript_code_with_custom_PropertyNameGenerator_then_output_contains_expected_property_names(TypeScriptTypeStyle typeStyle)
+        {
+            var code = await PrepareAsync(new TypeScriptGeneratorSettings
+            {
+                TypeStyle = typeStyle,
+                GenerateConstructorInterface = false,
+                PropertyNameGenerator = new CustomPropertyNameGenerator(),
+
+            });
+
+            await VerifyHelper.Verify(code).UseParameters(typeStyle);
+            TypeScriptCompiler.AssertCompile(code);
+        }
+
+        private sealed class CustomPropertyNameGenerator : IPropertyNameGenerator
+        {
+            public string Generate(JsonSchemaProperty property) => $"XX_{property.Name}";
+        }
     }
 }
