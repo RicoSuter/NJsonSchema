@@ -122,7 +122,7 @@ namespace NJsonSchema
 
         /// <exception cref="InvalidOperationException">Cyclic references detected.</exception>
         /// <exception cref="InvalidOperationException">The schema reference path has not been resolved.</exception>
-        [MethodImpl((MethodImplOptions) 256)] // aggressive inlining
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private JsonSchema GetActualSchema(ref CheckedSchemaContainer checkedSchemas)
         {
             static void ThrowInvalidOperationException(string message)

@@ -24,10 +24,10 @@ export class MyItem implements IMyItem {
     init(_data?: any) {
         if (_data) {
             if (_data["extensions"]) {
-                (<any>this).extensions = {} as any;
+                (this as any).extensions = {} as any;
                 for (let key in _data["extensions"]) {
                     if (_data["extensions"].hasOwnProperty(key))
-                        ((<any>this).extensions as any)![key] = _data["extensions"][key];
+                        ((this as any).extensions as any)![key] = _data["extensions"][key];
                 }
             }
         }

@@ -39,7 +39,7 @@ export class Person implements IPerson {
         if (_data) {
             this.firstName = _data["FirstName"];
             this.lastName = _data["lastName"];
-            (<any>this).birthday = _data["Birthday"] ? new Date(_data["Birthday"].toString()) : undefined as any;
+            (this as any).birthday = _data["Birthday"] ? new Date(_data["Birthday"].toString()) : undefined as any;
             this.timeSpan = _data["TimeSpan"];
             this.timeSpanOrNull = _data["TimeSpanOrNull"];
             this.gender = _data["Gender"];

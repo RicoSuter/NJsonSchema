@@ -15,7 +15,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     /// <seealso cref="PropertyModelBase" />
     public class PropertyModel : PropertyModelBase
     {
-        private static readonly string _validPropertyNameRegex = "^[a-zA-Z_$][0-9a-zA-Z_$]*$";
+        private static readonly Lazy<Regex> _validPropertyNameRegex = new(static () => new Regex("^[a-zA-Z_$][0-9a-zA-Z_$]*$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250)));
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
-        public string InterfaceName => Regex.IsMatch(_property.Name, _validPropertyNameRegex) ? _property.Name : $"\"{_property.Name}\"";
+        public string InterfaceName => _validPropertyNameRegex.Value.IsMatch(_property.Name) ? _property.Name : $"\"{_property.Name}\"";
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);
@@ -159,8 +159,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 {
                     return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
                     {
-                        Variable = typeStyle == TypeScriptTypeStyle.Class ?
-                            (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
+                        Variable = typeStyle == TypeScriptTypeStyle.Class
+                            ? (IsReadOnly ? "(this as any)." : "this.") + PropertyName
+                            : PropertyName + "_",
                         Value = "_data[\"" + _property.Name + "\"]",
                         Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),
