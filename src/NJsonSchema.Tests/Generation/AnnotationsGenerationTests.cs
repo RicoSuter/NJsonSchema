@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {

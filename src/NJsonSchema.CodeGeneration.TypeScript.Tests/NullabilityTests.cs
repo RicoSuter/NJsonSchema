@@ -23,7 +23,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile("MyClass");
 
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         public class ClassWithNullableArrayItems
@@ -183,7 +183,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         public class Complex
@@ -216,7 +216,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
     }
 }

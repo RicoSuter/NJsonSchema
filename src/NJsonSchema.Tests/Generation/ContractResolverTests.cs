@@ -4,7 +4,6 @@ using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {

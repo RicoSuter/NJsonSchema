@@ -32,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -112,7 +112,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         public class MyStringEnumListTest
@@ -143,7 +143,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         public enum SomeEnum
@@ -189,7 +189,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -230,7 +230,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -264,7 +264,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -310,7 +310,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -346,7 +346,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -396,7 +396,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -444,7 +444,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
 
@@ -481,7 +481,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             //Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -518,7 +518,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -553,7 +553,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -590,7 +590,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

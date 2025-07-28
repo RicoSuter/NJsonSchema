@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NJsonSchema.Tests.Schema
+﻿namespace NJsonSchema.Tests.Schema
 {
     public class JsonPathUtilitiesGetJsonPathTests
     {

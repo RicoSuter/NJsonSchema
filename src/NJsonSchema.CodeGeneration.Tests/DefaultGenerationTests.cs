@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests
@@ -51,7 +52,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("public string Test { get; set; } = \"foo\";", code);
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
-using Xunit;
 
 namespace NJsonSchema.Tests.Infrastructure
 {

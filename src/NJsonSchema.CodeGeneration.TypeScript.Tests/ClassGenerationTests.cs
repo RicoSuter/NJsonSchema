@@ -122,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -220,7 +220,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -230,7 +230,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -253,7 +253,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -291,7 +291,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [JsonConverter(typeof(JsonInheritanceConverter))]

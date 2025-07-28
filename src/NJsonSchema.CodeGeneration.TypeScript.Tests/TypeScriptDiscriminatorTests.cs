@@ -66,7 +66,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -110,13 +110,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("export interface OneChild extends Base", code);
-            Assert.Contains("export interface SecondChild extends Base", code);
-            Assert.Contains("Child: OneChild | SecondChild;", code);
-            Assert.Contains("Children: (OneChild | SecondChild)[];", code);
-
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -137,6 +132,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
+            // TODO this fails
+            // TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

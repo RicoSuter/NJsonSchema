@@ -1,11 +1,12 @@
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests;
 
-public class CodeCompiler
+public class CSharpCompiler
 {
-    public static void AssertCompile(string source, CSharpParseOptions options = null)
+    public static Assembly AssertCompile(string source, CSharpParseOptions options = null, bool returnAssembly = false)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source, options);
 
@@ -25,13 +26,19 @@ public class CodeCompiler
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
         using var dllStream = new MemoryStream();
-        using var pdbStream = new MemoryStream();
 
-        var emitResult = compilation.Emit(dllStream, pdbStream);
+        var emitResult = compilation.Emit(dllStream);
         if (!emitResult.Success)
         {
             // emitResult.Diagnostics
             Assert.Empty(emitResult.Diagnostics);
         }
+
+        if (returnAssembly)
+        {
+            return Assembly.Load(dllStream.GetBuffer());
+        }
+
+        return null;
     }
 }

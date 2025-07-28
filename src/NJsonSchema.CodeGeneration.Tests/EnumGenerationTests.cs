@@ -2,7 +2,9 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.CodeGeneration.TypeScript;
+using NJsonSchema.CodeGeneration.TypeScript.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.Tests
@@ -60,7 +62,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("export enum", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -95,14 +98,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass").Replace("\r", "");
 
             // Assert
-            Assert.DoesNotContain("Ref_", code);
-            Assert.Contains("public enum Bar\n", code);
-            Assert.Contains("public enum Bar2\n", code);
-
-            Assert.Contains(" B = 5,", code); // B must be 5 even if B = 1 is first defined
-            Assert.Equal(3, code.Split(["public enum "], StringSplitOptions.None).Count()); // two found (one string and one integer based enum)
-            Assert.Equal(3, code.Split(
-                ["[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]"], StringSplitOptions.None).Count()); // two found
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -144,10 +141,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
-            Assert.Contains("_0562 = 0,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0532\")]", code);
-            Assert.Contains("_0532 = 1,", code);
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -162,8 +157,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("_0562 = \"0562\",", code);
-            Assert.Contains("_0532 = \"0532\",", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         public class ClassWithStringEnum
@@ -194,10 +189,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain("[EnumMember(Value = \"0562\")]", code);
-            Assert.Contains("_0562 = 10,", code);
-            Assert.DoesNotContain("[EnumMember(Value = \"0532\")]", code);
-            Assert.Contains("_0532 = 15,", code);
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -212,8 +205,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("_0562 = 10,", code);
-            Assert.Contains("_0532 = 15,", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         public class ClassWithIntegerEnum
@@ -261,13 +254,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"0562\")]", code);
-            Assert.Contains("_0562 = 0,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"\"\"0532\"\"\")]", code);
-            Assert.Contains("_0532 = 1,", code);
-            Assert.Contains("[System.Runtime.Serialization.EnumMember(Value = @\"a\\b\\c\")]", code);
-            Assert.Contains("A_b_c = 2,", code);
-
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]

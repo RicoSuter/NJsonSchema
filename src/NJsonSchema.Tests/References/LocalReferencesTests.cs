@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Xunit;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -65,7 +65,7 @@ namespace NJsonSchema.Tests.References
 
             // Assert
             Assert.True(schema.Definitions.ContainsKey("Animal"));
-            Assert.Contains("\"$ref\": \"#/definitions/Animal\"", json);
+            await VerifyHelper.Verify(json);
         }
 
         [Fact]

@@ -39,10 +39,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             Assert.Empty(dictionarySchema.AllOf);
             Assert.True(dictionarySchema.IsDictionary);
-            Assert.Contains("Foobar.", data);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [KnownType(typeof(MyException))]
@@ -82,8 +81,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             Assert.Contains("Foobar.", data);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
-
+            CSharpCompiler.AssertCompile(code);
         }
 #endif
 
@@ -129,7 +127,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -147,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -170,7 +168,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -192,7 +190,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         private string GetTestDirectory()

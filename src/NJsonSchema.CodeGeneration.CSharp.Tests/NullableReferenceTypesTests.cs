@@ -37,7 +37,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -145,7 +145,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -193,7 +193,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(format);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -241,7 +241,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(format);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -284,7 +284,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

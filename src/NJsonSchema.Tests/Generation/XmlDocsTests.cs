@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -29,10 +29,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson(Formatting.None);
 
             // Assert
-            Assert.Contains(@"Foobar.", json);
-            Assert.Contains(@"""x-example"":{""foo"":""bar""}", json);
-            Assert.Contains(@"""x-example"":{""abc"":""def""}", json);
-            Assert.Contains(@"""x-example"":""Bar.""", json);
+            await VerifyHelper.Verify(json);
         }
     }
 }

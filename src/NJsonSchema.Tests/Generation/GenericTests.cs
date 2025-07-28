@@ -1,6 +1,5 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
 using System.Collections;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {

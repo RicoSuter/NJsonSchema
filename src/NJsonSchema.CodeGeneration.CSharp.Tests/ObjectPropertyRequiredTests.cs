@@ -33,7 +33,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         private class ClassWithoutRequiredObject
@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
 
@@ -100,7 +100,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

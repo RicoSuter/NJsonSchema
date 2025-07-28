@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using Xunit;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.Tests.Schema
 {
@@ -166,7 +166,7 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [Fact]
-        public void When_setting_single_type_then_it_should_be_serialized_correctly()
+        public async Task When_setting_single_type_then_it_should_be_serialized_correctly()
         {
             // Arrange
             var schema = new JsonSchema();
@@ -176,7 +176,7 @@ namespace NJsonSchema.Tests.Schema
             var data = schema.ToJson();
 
             // Assert
-            Assert.Contains(@"""type"": ""integer""", data);
+            await VerifyHelper.Verify(data);
         }
 
         [Fact]

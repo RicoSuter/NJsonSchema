@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Infrastructure;
-using Xunit;
 
 namespace NJsonSchema.Tests.Serialization
 {
@@ -39,8 +39,7 @@ namespace NJsonSchema.Tests.Serialization
             var json2 = schema2.ToJson();
 
             // Assert
-            Assert.Contains(@"""propertyName"": ""discr""", json);
-            Assert.Contains(@"""Bar"": ""#/definitions/Foo""", json);
+            await VerifyHelper.Verify(json);
 
             Assert.Equal(json, json2);
 

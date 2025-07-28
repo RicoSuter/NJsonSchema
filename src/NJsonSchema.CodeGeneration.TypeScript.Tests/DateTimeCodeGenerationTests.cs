@@ -29,7 +29,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(convertDateToLocalTimezone);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -51,6 +51,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(convertDateToLocalTimezone);
+            TypeScriptCompiler.AssertCompile("import * as moment from 'moment';" + Environment.NewLine + code);
         }
 
         [Theory]
@@ -72,6 +73,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(convertDateToLocalTimezone);
+            TypeScriptCompiler.AssertCompile("import * as moment from 'moment';" + Environment.NewLine + code);
         }
 
         [Theory]
@@ -93,6 +95,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(convertDateToLocalTimezone);
+            TypeScriptCompiler.AssertCompile("import * as dayjs from 'dayjs';" + Environment.NewLine + code);
         }
         
         [Theory]
@@ -114,7 +117,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(convertDateToLocalTimezone);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -133,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -171,7 +174,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

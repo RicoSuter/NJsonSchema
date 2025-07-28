@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Generation.SchemaProcessors;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -431,9 +431,7 @@ namespace NJsonSchema.Tests.Generation
             var data = schema.ToJson();
 
             // Assert
-            Assert.NotNull(data);
-            Assert.Contains(@"""a"": """, data);
-            Assert.Contains(@"""o"": """, data);
+            await VerifyHelper.Verify(data);
         }
     }
 }

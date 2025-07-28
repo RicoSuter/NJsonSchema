@@ -32,4 +32,8 @@
         <None Update="Templates2\*.liquid" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Include="..\NJsonSchema.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+    </ItemGroup>
+
 </Project>

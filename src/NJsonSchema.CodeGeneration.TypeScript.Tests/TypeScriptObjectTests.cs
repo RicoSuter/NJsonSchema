@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         public class DictionaryObjectTest
@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

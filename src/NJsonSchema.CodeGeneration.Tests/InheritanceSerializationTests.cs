@@ -1,12 +1,10 @@
 ﻿using System.Runtime.Serialization;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.TypeScript;
-using System.Reflection;
-using System.CodeDom.Compiler;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
+using NJsonSchema.CodeGeneration.TypeScript.Tests;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -128,8 +126,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var deserializedContainer = JsonConvert.DeserializeObject<Container>(json);
 
             // Assert
-            Assert.Contains("prop3", json);
-            Assert.DoesNotContain("Prop3", json);
+            await VerifyHelper.Verify(json);
         }
 
         public class A
@@ -240,9 +237,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.DoesNotContain("public string Discriminator {", code); // discriminator property is not generated
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), \"discriminator\")]", code); // attribute is generated
-            Assert.Contains("class JsonInheritanceConverter", code); // converter is generated
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -260,18 +256,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             var code = generator.GenerateFile("Container");
 
             // Assert
-            Assert.Contains("export class Container", code);
-            Assert.Contains("export class Animal", code);
-            Assert.Contains("export class Dog", code);
-
-            // discriminator is available for deserialization
-            Assert.Contains("protected _discriminator: string;", code); // discriminator must be private
-            Assert.Contains("new Dog();", code); // type is chosen by discriminator 
-            Assert.Contains("new Animal();", code); // type is chosen by discriminator 
-
-            // discriminator is assign for serialization
-            Assert.Contains("this._discriminator = \"Animal\"", code);
-            Assert.Contains("this._discriminator = \"Dog\"", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
 #if !NETFRAMEWORK
@@ -285,49 +271,20 @@ namespace NJsonSchema.CodeGeneration.Tests
             var json = await JsonSchema.FromJsonAsync(@"{""title"":""foo"",""type"":""object"",""discriminator"":""discriminator"",""properties"":{""discriminator"":{""type"":""string""}},""definitions"":{""bar"":{""type"":""object"",""allOf"":[{""$ref"":""#""}]}}}");
             var data = json.ToJson();
 
-            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings() { ClassStyle = CSharpClassStyle.Poco, Namespace = "foo" });
+            var generator = new CSharpGenerator(json, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco, Namespace = "foo"
+            });
 
             // Act
             var code = generator.GenerateFile();
 
-            var assembly = Compile(code);
+            var assembly = CSharpCompiler.AssertCompile(code, returnAssembly: true);
             var type = assembly.GetType("foo.Foo") ?? throw new Exception("Foo not found in " + String.Join(", ", assembly.GetTypes().Select(t => t.Name)));
             var bar = JsonConvert.DeserializeObject(@"{""discriminator"":""bar""}", type);
 
             // Assert
             Assert.Contains(@"""bar""", JsonConvert.SerializeObject(bar));
-        }
-
-        private Assembly Compile(string code)
-        {
-            CSharpCompilation compilation = CSharpCompilation.Create("assemblyName")
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
-
-            var coreDir = Directory.GetParent(typeof(Enumerable).Assembly.Location);            
-            compilation = compilation.AddReferences(
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(GeneratedCodeAttribute).Assembly.Location),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Dynamic.Runtime.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.IO.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Linq.Expressions.dll"),
-                MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll"));
-
-            using var stream = new MemoryStream();
-            var result = compilation.Emit(stream);
-
-            if (!result.Success)
-            {
-                throw new Exception(String.Join(", ", result.Diagnostics
-                    .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
-                    .Select(d => d.Location.GetLineSpan().StartLinePosition + " - " + d.GetMessage())) + "\n" + code);
-            }
-
-            return Assembly.Load(stream.GetBuffer());
         }
     }
 }

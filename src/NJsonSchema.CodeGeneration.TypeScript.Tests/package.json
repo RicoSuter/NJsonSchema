@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "@types/moment": "^2.13.0",
+    "dayjs": "^1.11.13",
     "typescript": "^5.8.3"
   }
 }

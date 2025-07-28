@@ -1,6 +1,7 @@
 ﻿using NBench;
 using NJsonSchema.Tests.Generation;
 using Pro.NBench.xUnit.XunitExtensions;
+using Counter = NBench.Counter;
 
 namespace NJsonSchema.Benchmark
 {

@@ -67,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Xunit;
-using NJsonSchema.NewtonsoftJson.Generation;
+﻿using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
 {
