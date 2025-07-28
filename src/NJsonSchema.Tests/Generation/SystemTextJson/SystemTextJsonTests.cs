@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using NJsonSchema.Annotations;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Generation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation.SystemTextJson
 {
@@ -31,9 +31,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson();
 
             // Assert
-            Assert.NotNull(data);
-            Assert.Contains(@"Name", data);
-            Assert.Contains(@"Description", data);
+            await VerifyHelper.Verify(data);
         }
         
         public class ContainerType1
@@ -58,9 +56,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson();
             
             // Assert
-            Assert.NotNull(data);
-            Assert.DoesNotContain(@"NestedType1", data);
-            Assert.Contains(@"Property", data);
+            await VerifyHelper.Verify(data);
         }
         
         public class ContainerType2
@@ -84,9 +80,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson();
             
             // Assert
-            Assert.NotNull(data);
-            Assert.DoesNotContain(@"NestedType2", data);
-            Assert.Contains(@"Property", data);
+            await VerifyHelper.Verify(data);
         }
 
         [Fact]

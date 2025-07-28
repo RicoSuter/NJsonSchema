@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
             await VerifyHelper.Verify(output);
-            CodeCompiler.AssertCompile(output);
+            CSharpCompiler.AssertCompile(output);
         }
     }
 }

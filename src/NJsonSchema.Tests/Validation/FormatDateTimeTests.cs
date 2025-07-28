@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {

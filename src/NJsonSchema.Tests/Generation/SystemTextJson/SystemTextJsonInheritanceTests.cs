@@ -1,11 +1,10 @@
 ﻿using NJsonSchema.Converters;
 using System.Text.Json;
+using NJsonSchema.CodeGeneration.Tests;
 
 #if !NETFRAMEWORK
 using System.Text.Json.Serialization;
 #endif
-
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation.SystemTextJson
 {
@@ -52,19 +51,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson().ReplaceLineEndings();
 
             // Assert
-            Assert.NotNull(data);
-            Assert.Contains(@"""a"": """, data);
-            Assert.Contains(@"""o"": """, data);
-            Assert.Contains(
-                """
-                      "discriminator": {
-                        "propertyName": "k",
-                        "mapping": {
-                          "a": "#/definitions/Apple",
-                          "o": "#/definitions/Orange"
-                        }
-                      },
-                    """.ReplaceLineEndings(), data);
+            await VerifyHelper.Verify(data);
         }
 
         [Fact]
@@ -105,19 +92,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson().ReplaceLineEndings();
 
             // Assert
-            Assert.NotNull(data);
-            Assert.Contains(@"""a"": """, data);
-            Assert.Contains(@"""o"": """, data);
-            Assert.Contains(
-                """
-                      "discriminator": {
-                        "propertyName": "k",
-                        "mapping": {
-                          "a": "#/definitions/Apple2",
-                          "o": "#/definitions/Orange2"
-                        }
-                      },
-                    """.ReplaceLineEndings(), data);
+            await VerifyHelper.Verify(data);
         }
 
         public class Dalmation : Dog
@@ -146,19 +121,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             var data = schema.ToJson().ReplaceLineEndings();
 
             // Assert
-            Assert.NotNull(data);
-            Assert.Contains(@"""1"": """, data);
-            Assert.Contains(@"""2"": """, data);
-            Assert.Contains(
-                """
-                      "discriminator": {
-                        "propertyName": "breed",
-                        "mapping": {
-                          "1": "#/definitions/Dalmation",
-                          "2": "#/definitions/Poodle"
-                        }
-                      },
-                    """.ReplaceLineEndings(), data);
+            await VerifyHelper.Verify(data);
         }
 #endif
     }

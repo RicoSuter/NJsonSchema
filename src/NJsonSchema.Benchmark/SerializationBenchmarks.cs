@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using NBench;
 using Pro.NBench.xUnit.XunitExtensions;
-using Xunit;
+using Counter = NBench.Counter;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 

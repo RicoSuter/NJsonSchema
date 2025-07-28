@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NJsonSchema.Tests.Validation
+﻿namespace NJsonSchema.Tests.Validation
 {
     public class NumberTests
     {

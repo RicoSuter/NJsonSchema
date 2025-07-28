@@ -35,7 +35,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Null(schema.Properties["Property2"].MinLength);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         public class ClassWithoutRequiredObject
@@ -83,7 +83,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

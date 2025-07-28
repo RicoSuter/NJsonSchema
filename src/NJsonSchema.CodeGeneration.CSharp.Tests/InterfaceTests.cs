@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // Assert
             Assert.Equal(2, schema.Properties.Count);
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // Assert
             Assert.Equal(2, schema.Properties.Count);
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 

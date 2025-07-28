@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.Generation;
-using Xunit;
 using Namotion.Reflection;
 using NJsonSchema.NewtonsoftJson.Generation;
 

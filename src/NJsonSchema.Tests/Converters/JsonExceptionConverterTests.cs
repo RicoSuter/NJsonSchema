@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.NewtonsoftJson.Converters;
-using Xunit;
 
 namespace NSwag.Core.Tests.Converters
 {

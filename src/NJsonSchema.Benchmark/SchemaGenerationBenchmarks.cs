@@ -2,6 +2,7 @@
 using NBench;
 using NJsonSchema.NewtonsoftJson.Generation;
 using Pro.NBench.xUnit.XunitExtensions;
+using Counter = NBench.Counter;
 
 namespace NJsonSchema.Benchmark
 {

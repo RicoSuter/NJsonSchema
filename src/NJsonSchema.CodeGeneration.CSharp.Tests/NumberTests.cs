@@ -26,7 +26,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
-        CodeCompiler.AssertCompile(code);
+        CSharpCompiler.AssertCompile(code);
     }
    
     [Fact]

@@ -28,7 +28,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Include="..\NJsonSchema.CodeGeneration.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+      <Compile Include="..\NJsonSchema.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+      <Compile Include="..\NJsonSchema.CodeGeneration.Tests\TypeScriptCompiler.cs" Link="TypeScriptCompiler.cs" />
     </ItemGroup>
 
 </Project>

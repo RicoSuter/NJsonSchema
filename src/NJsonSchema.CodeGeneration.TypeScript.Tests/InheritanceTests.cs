@@ -27,7 +27,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [InlineData(true, true)]
         [InlineData(false, false)]
         [InlineData(true, false)]
-        public void When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
+        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
@@ -49,28 +49,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Empty(dschema.AllOf);
             Assert.True(dschema.IsDictionary);
 
-            if (inlineNamedDictionaries)
-            {
-                Assert.Contains("customDictionary: { [key: string]: any; } | undefined;", code);
-                Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
-            }
-            else
-            {
-                Assert.Contains("Foobar.", data);
-                Assert.Contains("Foobar.", code);
-
-                Assert.Contains("customDictionary: EmptyClassInheritingDictionary", code);
-                Assert.Contains("[key: string]: any;", code);
-
-                if (convertConstructorInterfaceData)
-                {
-                    Assert.Contains("this.customDictionary = data.customDictionary && !(data.customDictionary as any).toJSON ? new EmptyClassInheritingDictionary(data.customDictionary) : this.customDictionary as EmptyClassInheritingDictionary;", code);
-                }
-                else
-                {
-                    Assert.DoesNotContain("new EmptyClassInheritingDictionary(data.customDictionary)", code);
-                }
-            }
+            await VerifyHelper.Verify(code).UseParameters(inlineNamedDictionaries, convertConstructorInterfaceData);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [KnownType(typeof(MyException))]
@@ -107,9 +87,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = generator.GenerateFile();
 
             // Assert
-            Assert.Contains("Foobar.", data);
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -131,7 +110,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -152,7 +131,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 #endif
 
@@ -240,7 +219,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(schemaType);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -329,7 +308,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code).UseParameters(schemaType);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
 

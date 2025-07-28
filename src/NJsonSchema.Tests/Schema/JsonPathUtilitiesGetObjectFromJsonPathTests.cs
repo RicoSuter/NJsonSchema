@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Serialization;
-using Xunit;
 
 namespace NJsonSchema.Tests.Schema
 {

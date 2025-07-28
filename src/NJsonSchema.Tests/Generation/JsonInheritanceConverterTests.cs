@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Converters;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -21,7 +21,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
-        public void When_serializing_discriminator_property_is_set()
+        public async Task When_serializing_discriminator_property_is_set()
         {
             // Arrange
             var objA = new ClassA();
@@ -32,14 +32,11 @@ namespace NJsonSchema.Tests.Generation
             new JsonInheritanceConverter("discriminator").WriteJson(textWriter, objA, DefaultSerializer);
 
             // Assert
-            var json = stringWriter.ToString();
-            Assert.Contains("\"discriminator\":\"ClassA\"", json);
-            Assert.Contains("\"PropertyA\":\"defaultA\"", json);
-            Assert.Contains("\"PropertyB\":\"defaultB\"", json);
+            await VerifyHelper.Verify(stringWriter.ToString());
         }
 
         [Fact]
-        public void When_serializing_discriminator_property_is_overwritten_if_already_present()
+        public async Task When_serializing_discriminator_property_is_overwritten_if_already_present()
         {
             // Arrange
             var objA = new ClassA();
@@ -50,9 +47,7 @@ namespace NJsonSchema.Tests.Generation
             new JsonInheritanceConverter("PropertyA").WriteJson(jsonWriter, objA, DefaultSerializer);
 
             // Assert
-            var json = stringWriter.ToString();
-            Assert.Contains("\"PropertyA\":\"ClassA\"", json);
-            Assert.Contains("\"PropertyB\":\"defaultB\"", json);
+            await VerifyHelper.Verify(stringWriter.ToString());
         }
 
         [Fact]

@@ -24,7 +24,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]

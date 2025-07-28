@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -161,9 +161,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.Contains("resource: any;", code);
-            Assert.DoesNotContain("this.resource[key] = _data[\"resource\"][key];", code);
-            Assert.DoesNotContain(" : new any();", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -197,7 +196,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            Assert.Contains("(this.resource as any)[key] = _data[\"resource\"][key];", code);
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         public class DictionaryContainer
@@ -214,7 +214,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [InlineData(true, true)]
         [InlineData(false, false)]
         [InlineData(true, false)]
-        public void When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
+        public async Task When_property_uses_custom_dictionary_class_then_class_is_generated(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
         {
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionaryContainer>();
@@ -232,34 +232,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             // Assert
-            if (inlineNamedDictionaries)
-            {
-                Assert.Contains("foo: { [key: string]: string; };", code);
-                Assert.Contains(@"data[""Foo""] = {};", code);
-                Assert.Contains(@"this.foo = {} as any;", code);
-
-                // for convertConstructorInterfaceData == true or false
-                Assert.DoesNotContain("new DisplayValueDictionary", code);
-            }
-            else
-            {
-                Assert.DoesNotContain("this.foo = {};", code);
-                Assert.DoesNotContain("data[\"Foo\"] = {};", code);
-
-                Assert.Contains(@"this.foo = _data[""Foo""] ? DisplayValueDictionary.fromJS(_data[""Foo""]) : undefined as any;", code);
-                Assert.Contains(@"data[""Foo""] = this.foo ? this.foo.toJSON() : undefined as any;", code);
-
-                Assert.Contains("foo: DisplayValueDictionary", code);
-
-                if (convertConstructorInterfaceData)
-                {
-                    Assert.Contains("this.foo = data.foo && !(data.foo as any).toJSON ? new DisplayValueDictionary(data.foo) : this.foo as DisplayValueDictionary;", code);
-                }
-                else
-                {
-                    Assert.DoesNotContain("new DisplayValueDictionary(data.foo)", code);
-                }
-            }
+            await VerifyHelper.Verify(code).UseParameters(inlineNamedDictionaries, convertConstructorInterfaceData);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -305,7 +279,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             // Assert
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

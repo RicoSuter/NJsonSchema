@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Xunit;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -67,14 +67,12 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_output_schema_contains_reference_then_schema_reference_path_is_human_readable()
         {
-            // Arrange
-
             // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Foo>();
             var schemaData = schema.ToJson();
 
             // Assert
-            Assert.Contains("#/definitions/Bar", schemaData);
+            await VerifyHelper.Verify(schemaData);
         }
 
         public class DefaultTests

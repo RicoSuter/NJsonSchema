@@ -38,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(50, schema.Properties["value"].ActualSchema.MaxLength);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(40, schema.Properties["value"].ActualSchema.MinLength);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(20, schema.Properties["value"].ActualSchema.Maximum);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10, schema.Properties["value"].ActualSchema.Minimum);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -264,7 +264,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("Message");
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -308,7 +308,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -353,7 +353,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -393,7 +393,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // expect the integer to be converted to an int64
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -433,7 +433,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(100.50m, schema.Properties["value"].ActualSchema.Maximum);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -471,7 +471,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(regularExpression, schema.Properties["value"].ActualSchema.Pattern);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -511,7 +511,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MaxItems);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -552,7 +552,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Equal(10, schema.Properties["value"].ActualSchema.MinItems);
 
             await VerifyHelper.Verify(code);
-            CodeCompiler.AssertCompile(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

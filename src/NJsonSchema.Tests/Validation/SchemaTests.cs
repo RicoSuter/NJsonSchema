@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.Validation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Validation
 {

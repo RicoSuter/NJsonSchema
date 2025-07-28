@@ -1,0 +1,1 @@
+﻿{"$schema":"http://json-schema.org/draft-04/schema#","title":"AbstractClass","type":"object","description":"Foobar.","x-abstract":true,"x-example":{"foo":"bar"},"additionalProperties":false,"properties":{"Foo":{"type":["null","string"],"x-example":{"abc":"def"}},"Bar":{"type":["null","string"],"x-example":"Bar."}}}

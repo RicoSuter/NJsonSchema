@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NJsonSchema.Tests.Generation
+﻿namespace NJsonSchema.Tests.Generation
 {
     public class RecordTests
     {

@@ -1,0 +1,26 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "foo": {
+      "$ref": "#/definitions/Animal"
+    }
+  },
+  "definitions": {
+    "Animal": {
+      "type": "object",
+      "properties": {
+        "bar": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "definitions": {
+        "SubAnimal": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
