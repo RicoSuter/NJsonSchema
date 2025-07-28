@@ -6,6 +6,7 @@
         <IsPackable>false</IsPackable>
         <Nullable>disable</Nullable>
         <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -21,7 +22,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
         <PackageReference Include="NodaTime" />
     </ItemGroup>

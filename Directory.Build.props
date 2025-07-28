@@ -41,6 +41,9 @@
           [CA1720] Identifier 'xxx' contains type name
         -->
         <NoWarn>$(NoWarn);CA1200;CA1510;CA1716;CA1720</NoWarn>
+
+        <!-- Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken -->
+        <NoWarn>$(NoWarn);xUnit1051</NoWarn>
     </PropertyGroup>
 
 </Project>

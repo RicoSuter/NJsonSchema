@@ -27,3 +27,7 @@ _ReSharper.Caches
 /artifacts
 
 node_modules
+
+# Verify
+*.received.*
+*.received/
