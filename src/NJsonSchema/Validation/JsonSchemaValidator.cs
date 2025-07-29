@@ -518,15 +518,20 @@ namespace NJsonSchema.Validation
 
         private void ValidateAdditionalItems(JToken item, JsonSchema schema, SchemaType schemaType, int index, string? propertyPath, List<ValidationError> errors)
         {
-            if (schema.Items.Count > 0)
+            var items = schema._items;
+            if (items.Count > 0)
             {
                 var propertyIndex = $"[{index}]";
-                if (schema.Items.Count > index)
+                if (items.Count > index)
                 {
-                    var error = TryCreateChildSchemaError(item,
-                        schema.Items.ElementAt(index),
+                    var error = TryCreateChildSchemaError(
+                        item,
+                        items[index],
                         schemaType,
-                        ValidationErrorKind.ArrayItemNotValid, propertyIndex, propertyPath + propertyIndex);
+                        ValidationErrorKind.ArrayItemNotValid,
+                        propertyIndex,
+                        propertyPath + propertyIndex);
+
                     if (error != null)
                     {
                         errors.Add(error);

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -97,9 +96,9 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
-            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
+            var index = actualSchema.Enumeration.IndexOf(schema.Default);
             var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
-                ? actualSchema.EnumerationNames.ElementAt(index)
+                ? actualSchema.EnumerationNames[index]
                 : schema.Default?.ToString();
 
             return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);

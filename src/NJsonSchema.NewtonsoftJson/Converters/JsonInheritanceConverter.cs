@@ -253,10 +253,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var type = objectType;
             do
             {
-                var knownTypeAttributes = type.GetCustomAttributes(false)
-                    .Where(a => a.GetType().Name == "KnownTypeAttribute");
-                foreach (dynamic attribute in knownTypeAttributes)
+                foreach (dynamic attribute in type.GetCustomAttributes(inherit: false))
                 {
+                    if (attribute.GetType().Name != "KnownTypeAttribute")
+                    {
+                        continue;
+                    }
+
                     if (attribute.Type != null && attribute.Type.Name == discriminator)
                     {
                         return attribute.Type;
@@ -286,22 +289,28 @@ namespace NJsonSchema.NewtonsoftJson.Converters
 
         private static Type? GetObjectSubtype(Type baseType, string discriminatorName)
         {
-            var jsonInheritanceAttributes = baseType
-                
-                .GetCustomAttributes(true)
-                .OfType<JsonInheritanceAttribute>();
+            foreach (var a in baseType.GetCustomAttributes<JsonInheritanceAttribute>(inherit: true))
+            {
+                if (a.Key == discriminatorName)
+                {
+                    return a.Type;
+                }
+            }
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
+            return null;
         }
 
         private static string? GetSubtypeDiscriminator(Type objectType)
         {
-            var jsonInheritanceAttributes = objectType
-                
-                .GetCustomAttributes(true)
-                .OfType<JsonInheritanceAttribute>();
+            foreach (var a in objectType.GetCustomAttributes<JsonInheritanceAttribute>(inherit: true))
+            {
+                if (a.Type == objectType)
+                {
+                    return a.Key;
+                }
+            }
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Type == objectType)?.Key;
+            return null;
         }
     }
 }
