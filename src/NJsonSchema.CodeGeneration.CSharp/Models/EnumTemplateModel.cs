@@ -66,12 +66,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     var value = _schema.Enumeration.ElementAt(i);
                     if (value != null)
                     {
-                        var description = _schema.EnumerationDescriptions.Count > i ?
-                            _schema.EnumerationDescriptions.ElementAt(i) : null;
+                        var description = _schema.EnumerationDescriptions.Count > i
+                            ? _schema.EnumerationDescriptions[i]
+                            : null;
+
                         if (_schema.Type.IsInteger())
                         {
-                            var name = _schema.EnumerationNames.Count > i ?
-                                _schema.EnumerationNames.ElementAt(i) : "_" + value;
+                            var name = _schema.EnumerationNames.Count > i
+                                ? _schema.EnumerationNames[i]
+                                : "_" + value;
 
                             if (_schema.IsFlagEnumerable && TryGetInt64(value, out long valueInt64))
                             {
@@ -100,8 +103,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         }
                         else
                         {
-                            var name = _schema.EnumerationNames.Count > i ?
-                                _schema.EnumerationNames.ElementAt(i) : value.ToString();
+                            var name = _schema.EnumerationNames.Count > i
+                                ? _schema.EnumerationNames[i]
+                                : value.ToString();
 
                             entries.Add(new EnumerationItemModel
                             {
