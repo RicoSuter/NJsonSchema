@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -149,6 +151,111 @@ namespace NJsonSchema.Tests.Generation
             // Assert
             Assert.False(schema.IsFlagEnumerable);
             Assert.DoesNotContain("x-enumFlags", json);
+        }
+
+        public enum EnumWithDescriptions
+        {
+            [Description("First value description")]
+            FirstValue,
+
+            [Description("Second value description")]
+            SecondValue,
+
+            // No description for this one
+            ThirdValue
+        }
+
+        [Fact]
+        public async Task When_enum_has_description_attributes_then_descriptions_are_included_in_schema()
+        {
+            // Arrange
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithDescriptions>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Equal(3, schema.EnumerationDescriptions.Count);
+            Assert.Equal("First value description", schema.EnumerationDescriptions[0]);
+            Assert.Equal("Second value description", schema.EnumerationDescriptions[1]);
+            Assert.Null(schema.EnumerationDescriptions[2]); // No description for ThirdValue
+
+            // Verify the JSON output contains the x-enumDescriptions property
+            await VerifyHelper.Verify(json);
+        }
+
+        [Fact]
+        public async Task When_schema_has_x_enum_names_then_backward_compatibility_works()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+
+            schema.Enumeration.Clear();
+            schema.Enumeration.Add("value1");
+            schema.Enumeration.Add("value2");
+
+            schema.EnumerationNames.Clear();
+            schema.EnumerationNames.Add("Name1");
+            schema.EnumerationNames.Add("Name2");
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            await VerifyHelper.Verify(json);
+        }
+
+        [Fact]
+        public async Task When_schema_has_x_enum_varnames_then_backward_compatibility_works()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+
+            schema.Enumeration.Clear();
+            schema.Enumeration.Add("value1");
+            schema.Enumeration.Add("value2");
+
+            schema.EnumerationNames.Clear();
+            schema.EnumerationNames.Add("VarName1");
+            schema.EnumerationNames.Add("VarName2");
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            await VerifyHelper.Verify(json);
+        }
+
+        [Fact]
+        public async Task When_schema_has_x_enum_descriptions_then_backward_compatibility_works()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+
+            schema.Enumeration.Clear();
+            schema.Enumeration.Add("value1");
+            schema.Enumeration.Add("value2");
+            schema.Enumeration.Add("value3");
+
+            schema.EnumerationDescriptions.Clear();
+            schema.EnumerationDescriptions.Add("Desc1");
+            schema.EnumerationDescriptions.Add("Desc2");
+            schema.EnumerationDescriptions.Add(null);
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            await VerifyHelper.Verify(json);
         }
     }
 }
