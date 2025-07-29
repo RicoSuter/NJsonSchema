@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "string",
+  "x-enum-descriptions": [
+    "Desc1",
+    "Desc2",
+    null
+  ],
+  "x-enumDescriptions": [
+    "Desc1",
+    "Desc2",
+    null
+  ],
+  "enum": [
+    "value1",
+    "value2",
+    "value3"
+  ]
+}

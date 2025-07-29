@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -186,9 +187,7 @@ namespace NJsonSchema.Tests.Generation
             Assert.Null(schema.EnumerationDescriptions[2]); // No description for ThirdValue
 
             // Verify the JSON output contains the x-enumDescriptions property
-            Assert.Contains("\"x-enumDescriptions\"", json);
-            Assert.Contains("\"First value description\"", json);
-            Assert.Contains("\"Second value description\"", json);
+            await VerifyHelper.Verify(json);
         }
 
         [Fact]
@@ -210,9 +209,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Contains("\"x-enum-names\"", json);
-            Assert.Contains("\"Name1\"", json);
-            Assert.Contains("\"Name2\"", json);
+            await VerifyHelper.Verify(json);
         }
 
         [Fact]
@@ -234,9 +231,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Contains("\"x-enum-varnames\"", json);
-            Assert.Contains("\"VarName1\"", json);
-            Assert.Contains("\"VarName2\"", json);
+            await VerifyHelper.Verify(json);
         }
 
         [Fact]
@@ -260,9 +255,7 @@ namespace NJsonSchema.Tests.Generation
             var json = schema.ToJson();
 
             // Assert
-            Assert.Contains("\"x-enum-descriptions\"", json);
-            Assert.Contains("\"Desc1\"", json);
-            Assert.Contains("\"Desc2\"", json);
+            await VerifyHelper.Verify(json);
         }
     }
 }

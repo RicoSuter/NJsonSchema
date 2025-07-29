@@ -1,0 +1,20 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "string",
+  "x-enum-names": [
+    "Name1",
+    "Name2"
+  ],
+  "x-enum-varnames": [
+    "Name1",
+    "Name2"
+  ],
+  "x-enumNames": [
+    "Name1",
+    "Name2"
+  ],
+  "enum": [
+    "value1",
+    "value2"
+  ]
+}
