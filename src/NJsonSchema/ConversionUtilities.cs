@@ -8,7 +8,6 @@
 
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -18,32 +17,29 @@ namespace NJsonSchema
     /// <summary>Provides name conversion utility methods.</summary>
     public class ConversionUtilities
     {
+        private static readonly char[] _camelCaseCleanupChars = [' ', '/'];
+
+#if NET8_0_OR_GREATER
+        private static readonly System.Buffers.SearchValues<char> CamelCaseCleanupChars = System.Buffers.SearchValues.Create(_camelCaseCleanupChars);
+#else
+        private static readonly char[] CamelCaseCleanupChars = _camelCaseCleanupChars;
+#endif
+
+        /// <summary>Converts the input to a camel case identifier.</summary>
+        /// <param name="input">The input.</param>
+        /// <returns>The converted input. </returns>
+        public static string ConvertToCamelCase(string input)
+        {
+            return ConvertToCamelCase(input, firstCharacterMustBeAlpha: false, CamelCaseMode.None);
+        }
+
         /// <summary>Converts the first letter to lower case and dashes to camel case.</summary>
         /// <param name="input">The input.</param>
         /// <param name="firstCharacterMustBeAlpha">Specifies whether to add an _ when the first character is not alpha.</param>
         /// <returns>The converted input.</returns>
         public static string ConvertToLowerCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
-            if (string.IsNullOrEmpty(input))
-            {
-                return string.Empty;
-            }
-
-            var lowered = char.ToLowerInvariant(input[0]) + (input.Length > 1 ? input.Substring(1) : "");
-            var cleaned = lowered.Replace(' ', '_').Replace('/', '_');
-            input = ConvertDashesToCamelCase(cleaned);
-
-            if (string.IsNullOrEmpty(input))
-            {
-                return string.Empty;
-            }
-
-            if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
-            {
-                return "_" + input;
-            }
-
-            return input;
+            return ConvertToCamelCase(input, firstCharacterMustBeAlpha, CamelCaseMode.FirstLower);
         }
 
         /// <summary>Converts the first letter to upper case and dashes to camel case.</summary>
@@ -52,34 +48,97 @@ namespace NJsonSchema
         /// <returns>The converted input.</returns>
         public static string ConvertToUpperCamelCase(string input, bool firstCharacterMustBeAlpha)
         {
+            return ConvertToCamelCase(input, firstCharacterMustBeAlpha, CamelCaseMode.FirstUpper);
+        }
+
+        private static string ConvertToCamelCase(string input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
+        {
             if (string.IsNullOrEmpty(input))
             {
                 return string.Empty;
             }
 
-            var cleaned = Capitalize(input).Replace(' ', '_').Replace('/', '_');
-            input = ConvertDashesToCamelCase(cleaned);
-
-            if (firstCharacterMustBeAlpha && char.IsNumber(input[0]))
+            if (input.AsSpan().IndexOfAny(CamelCaseCleanupChars) != -1)
             {
-                return "_" + input;
+                input = input.Replace(' ', '_').Replace('/', '_');
             }
 
-            return input;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string Capitalize(string input)
-        {
-            if (char.IsUpper(input[0]))
+            if (input.AsSpan().IndexOf('-') == -1)
             {
+                // no need for expensive conversion
+                var c = input[0];
+                if (char.IsNumber(c))
+                {
+                    return firstCharacterMustBeAlpha ?  "_" + input : input;
+                }
+
+                var newFirst = mode switch
+                {
+                    CamelCaseMode.FirstUpper => char.ToUpperInvariant(c),
+                    CamelCaseMode.FirstLower => char.ToLowerInvariant(c),
+                    _ => c
+                };
+
+                if (newFirst != c)
+                {
+                    return newFirst + input[1..];
+                }
+
                 return input;
             }
-            if (input.Length == 1)
+
+            return DoFullCamelCaseConversion(input, firstCharacterMustBeAlpha, mode);
+        }
+
+        private static string DoFullCamelCaseConversion(string input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
+        {
+            var capacity = input.Length + (firstCharacterMustBeAlpha ? 1 : 0);
+            var buffer = capacity < 2 ? stackalloc char[capacity] : new char[capacity];
+
+            var sb = new ValueStringBuilder(buffer);
+
+            var caseFlag = false;
+            for (var i = 0; i < input.Length; i++)
             {
-                return char.ToUpperInvariant(input[0]).ToString();
+                var c = input[i];
+                if (c == '-')
+                {
+                    caseFlag = true;
+                }
+                else if (caseFlag)
+                {
+                    sb.Append(char.ToUpperInvariant(c));
+                    caseFlag = false;
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        if (firstCharacterMustBeAlpha && char.IsNumber(c))
+                        {
+                            sb.Append('_');
+                        }
+                        else if (mode == CamelCaseMode.FirstUpper)
+                        {
+                            c = char.ToUpperInvariant(c);
+                        }
+                        else if (mode == CamelCaseMode.FirstLower)
+                        {
+                            c = char.ToLowerInvariant(c);
+                        }
+                    }
+                    sb.Append(c);
+                }
             }
-            return char.ToUpperInvariant(input[0]) + input.Substring(1);
+
+            return sb.ToString();
+        }
+
+        private enum CamelCaseMode
+        {
+            None,
+            FirstLower,
+            FirstUpper,
         }
 
         /// <summary>Converts the string to a string literal which can be used in C# or TypeScript code.</summary>
@@ -135,7 +194,7 @@ namespace NJsonSchema
                         break;
                     default:
                         // ASCII printable character
-                        if (c is >= (char)0x20 and <= (char)0x7e)
+                        if (c is >= (char) 0x20 and <= (char) 0x7e)
                         {
                             literal.Append(c);
                             // As UTF16 escaped character
@@ -157,20 +216,6 @@ namespace NJsonSchema
 
             return literal.ToString();
         }
-
-        /// <summary>Converts the input to a camel case identifier.</summary>
-        /// <param name="input">The input.</param>
-        /// <returns>The converted input. </returns>
-        public static string ConvertToCamelCase(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return string.Empty;
-            }
-
-            return ConvertDashesToCamelCase(input.Replace(" ", "_").Replace("/", "_"));
-        }
-
 
         private static readonly char[] _whiteSpaceChars = ['\n', '\r', '\t', ' '];
 
@@ -353,37 +398,6 @@ namespace NJsonSchema
 
             var tabString = new string(' ', 4 * tabCount);
             return tabString;
-        }
-
-        private static string ConvertDashesToCamelCase(string input)
-        {
-            if (!input.Contains('-'))
-            {
-                // no conversion necessary
-                return input;
-            }
-
-            // we are removing at least one character
-            var sb = new ValueStringBuilder(input.Length - 1);
-            var caseFlag = false;
-            foreach (var c in input)
-            {
-                if (c == '-')
-                {
-                    caseFlag = true;
-                }
-                else if (caseFlag)
-                {
-                    sb.Append(char.ToUpperInvariant(c));
-                    caseFlag = false;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-
-            return sb.ToString();
         }
     }
 }
