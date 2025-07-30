@@ -10,22 +10,22 @@
 
 
 export interface Base {
-    Type: EBase;
+    type: EBase;
 }
 
 export type EBase = "OneChild" | "SecondChild";
 
 export interface OneChild extends Base {
-    A: string;
-    Type: 'OneChild';
+    a: string;
+    type: EBase;
 }
 
 export interface SecondChild extends Base {
-    B: string;
-    Type: 'SecondChild';
+    b: string;
+    type: EBase;
 }
 
 export interface MyClass {
-    Child: Base;
-    Children: Base[];
+    child: Base;
+    children: Base[];
 }

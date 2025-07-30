@@ -10,7 +10,7 @@
 
 
 export interface MetadataDictionary {
-    Foo: string;
+    foo: string;
 
     [key: string]: string | any;
 }

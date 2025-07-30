@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
-        public string InterfaceName => _validPropertyNameRegex.Value.IsMatch(_property.Name) ? _property.Name : $"\"{_property.Name}\"";
+        public string InterfaceName => _validPropertyNameRegex.Value.IsMatch(PropertyName) ? PropertyName : $"\"{PropertyName}\"";
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);

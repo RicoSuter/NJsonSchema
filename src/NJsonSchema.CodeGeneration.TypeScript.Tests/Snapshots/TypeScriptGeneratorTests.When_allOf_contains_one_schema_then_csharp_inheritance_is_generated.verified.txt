@@ -10,17 +10,17 @@
 
 
 export interface Person {
-    FirstName: string;
+    firstName: string;
     lastName: string;
-    Birthday: Date;
-    TimeSpan: string;
-    TimeSpanOrNull: string;
-    Gender: Gender;
-    GenderOrNull: Gender;
+    birthday: Date;
+    timeSpan: string;
+    timeSpanOrNull: string;
+    gender: Gender;
+    genderOrNull: Gender;
     address: Address;
-    AddressOrNull: Address;
-    Array: string[];
-    Dictionary: { [key: string]: number; };
+    addressOrNull: Address;
+    array: string[];
+    dictionary: { [key: string]: number; };
 }
 
 export enum Gender {
@@ -29,10 +29,10 @@ export enum Gender {
 }
 
 export interface Address {
-    Street: string;
-    City: string;
+    street: string;
+    city: string;
 }
 
 export interface Teacher extends Person {
-    Class: string;
+    class: string;
 }
