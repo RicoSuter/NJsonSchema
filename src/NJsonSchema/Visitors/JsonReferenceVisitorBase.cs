@@ -243,19 +243,25 @@ namespace NJsonSchema.Visitors
 
         private static void ReplaceOrDelete<T>(ObservableCollection<T> collection, int index, T obj)
         {
-            collection.RemoveAt(index);
-            if (obj != null)
+            if (obj is not null)
             {
-                collection.Insert(index, obj);
+                collection[index] = obj;
+            }
+            else
+            {
+                collection.RemoveAt(index);
             }
         }
 
         private static void ReplaceOrDelete(IList collection, int index, object obj)
         {
-            collection.RemoveAt(index);
-            if (obj != null)
+            if (obj is not null)
             {
-                collection.Insert(index, obj);
+                collection[index] = obj;
+            }
+            else
+            {
+                collection.RemoveAt(index);
             }
         }
     }
