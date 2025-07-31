@@ -378,27 +378,31 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
-        [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(TolerantStringArrayConverter))]
         internal Collection<string>? EnumerationNamesDashedRaw
         {
-            get => EnumerationNamesRaw;
+            get => null;
             set
             {
-                if (EnumerationNamesRaw?.Count == 0 && value != null) {
-                    EnumerationNamesRaw = value;
+                if (EnumerationNamesRaw?.Count == 0 && value?.Count > 0)
+                {
+                    EnumerationNamesRaw = new Collection<string>(value);
                 }
             }
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
-        [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(TolerantStringArrayConverter))]
         internal Collection<string>? EnumerationVarnamesRaw
         {
-            get => EnumerationNamesRaw;
+            get => null;
             set
             {
-                if (EnumerationNamesRaw?.Count == 0 && value != null) {
-                    EnumerationNamesRaw = value;
+                if (EnumerationNamesRaw?.Count == 0 && value?.Count > 0)
+                {
+                    EnumerationNamesRaw = new Collection<string>(value);
                 }
             }
         }
@@ -412,20 +416,23 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
-        [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(TolerantStringArrayConverter))]
         internal Collection<string?>? EnumerationDescriptionsDashedRaw
         {
-            get => EnumerationDescriptionsRaw;
+            get => null;
             set
             {
-                if (EnumerationDescriptionsRaw?.Count == 0 && value != null) {
-                    EnumerationDescriptionsRaw = value;
+                if (EnumerationDescriptionsRaw?.Count == 0 && value?.Count > 0)
+                {
+                    EnumerationDescriptionsRaw = new Collection<string?>(value);
                 }
             }
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
-        [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonConverter(typeof(TolerantStringArrayConverter))]
         internal Collection<string?>? EnumerationDescriptionsRaw
         {
             get => EnumerationDescriptions != null && EnumerationDescriptions.Count > 0 ? EnumerationDescriptions : null;
@@ -544,6 +551,52 @@ namespace NJsonSchema
                         collection.Remove(key);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Converter that tries to read string arrays but will not throw if array contains objects for example.
+        /// </summary>
+        private sealed class TolerantStringArrayConverter : JsonConverter<Collection<string?>>
+        {
+            public override Collection<string?>? ReadJson(JsonReader reader, Type objectType, Collection<string?>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+            {
+                var token = JToken.Load(reader);
+
+                if (token.Type == JTokenType.Array)
+                {
+                    var array = (JArray) token;
+                    if (array.Count > 0)
+                    {
+                        var result = new List<string?>(array.Count);
+                        for (var i = 0; i < array.Count; i++)
+                        {
+                            var item = array[i];
+                            if (item.Type is JTokenType.String)
+                            {
+                                result.Add(null);
+                            }
+                            else if (item.Type is JTokenType.Null)
+                            {
+                                result.Add(null);
+                            }
+                            else
+                            {
+                                // we stop processing as we don't to trust the content
+                                return null;
+                            }
+                        }
+
+                        return new Collection<string?>(result);
+                    }
+                }
+
+                return null;
+            }
+
+            public override void WriteJson(JsonWriter writer, Collection<string?>? value, JsonSerializer serializer)
+            {
+                serializer.Serialize(writer, value);
             }
         }
     }

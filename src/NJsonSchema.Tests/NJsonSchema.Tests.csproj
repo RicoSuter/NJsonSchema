@@ -14,7 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="References\**\*.json" CopyToOutputDirectory="Always" />
+        <Content Include="References\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="**\TestData\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

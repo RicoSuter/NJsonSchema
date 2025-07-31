@@ -3,27 +3,12 @@
   "title": "EnumWithDescriptions",
   "type": "string",
   "description": "",
-  "x-enum-names": [
-    "FirstValue",
-    "SecondValue",
-    "ThirdValue"
-  ],
-  "x-enum-varnames": [
-    "FirstValue",
-    "SecondValue",
-    "ThirdValue"
-  ],
   "x-enumNames": [
     "FirstValue",
     "SecondValue",
     "ThirdValue"
   ],
   "x-enum-descriptions": [
-    "First value description",
-    "Second value description",
-    null
-  ],
-  "x-enumDescriptions": [
     "First value description",
     "Second value description",
     null
