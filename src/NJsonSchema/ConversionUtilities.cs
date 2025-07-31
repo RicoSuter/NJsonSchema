@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -93,7 +92,7 @@ namespace NJsonSchema
         private static string DoFullCamelCaseConversion(string input, bool firstCharacterMustBeAlpha, CamelCaseMode mode)
         {
             var capacity = input.Length + (firstCharacterMustBeAlpha ? 1 : 0);
-            var buffer = capacity < 2 ? stackalloc char[capacity] : new char[capacity];
+            var buffer = capacity <= 256 ? stackalloc char[256] : new char[capacity];
 
             var sb = new ValueStringBuilder(buffer);
 
@@ -363,20 +362,29 @@ namespace NJsonSchema
             }
         }
 
+        private static readonly char [] _cSharpDocLineBreakChars = ['\r', '\n'];
+        private static readonly Lazy<Regex> _cSharpDocLineBreakRegex = new(static () => new Regex("^( *)/// ", RegexOptions.Multiline | RegexOptions.Compiled));
+
         /// <summary>Converts all line breaks in a string into '\n' and removes white spaces.</summary>
         /// <param name="input">The input.</param>
         /// <param name="tabCount">The tab count.</param>
         /// <returns>The output.</returns>
         public static string ConvertCSharpDocs(string input, int tabCount)
         {
-            input = input?
-                        .Replace("\r", string.Empty)
-                        .Replace("\n", "\n" + string.Join("", Enumerable.Repeat("    ", tabCount)) + "/// ")
-                    ?? string.Empty;
+            input ??= "";
+
+            var needsCleanup = input.IndexOfAny(_cSharpDocLineBreakChars) != -1;
+
+            if (needsCleanup)
+            {
+                input = input
+                    .Replace("\r", string.Empty)
+                    .Replace("\n", "\n" + CreateTabString(tabCount) + "/// ");
+            }
 
             // TODO: Support more markdown features here
             var xml = new XText(input).ToString();
-            return Regex.Replace(xml, @"^( *)/// ", m => m.Groups[1] + "/// <br/>", RegexOptions.Multiline);
+            return _cSharpDocLineBreakRegex.Value.Replace(xml, static m => m.Groups[1] + "/// <br/>");
         }
 
         private static string CreateTabString(int tabCount)
