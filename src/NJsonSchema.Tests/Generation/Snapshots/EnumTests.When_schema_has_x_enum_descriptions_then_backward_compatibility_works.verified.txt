@@ -6,11 +6,6 @@
     "Desc2",
     null
   ],
-  "x-enumDescriptions": [
-    "Desc1",
-    "Desc2",
-    null
-  ],
   "enum": [
     "value1",
     "value2",

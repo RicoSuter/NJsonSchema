@@ -378,27 +378,29 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
-        [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         internal Collection<string>? EnumerationNamesDashedRaw
         {
-            get => EnumerationNamesRaw;
+            get => null;
             set
             {
-                if (EnumerationNamesRaw?.Count == 0 && value != null) {
-                    EnumerationNamesRaw = value;
+                if (EnumerationNamesRaw?.Count == 0 && value?.Count > 0)
+                {
+                    EnumerationNamesRaw = new Collection<string>(value);
                 }
             }
         }
 
         /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
-        [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         internal Collection<string>? EnumerationVarnamesRaw
         {
-            get => EnumerationNamesRaw;
+            get => null;
             set
             {
-                if (EnumerationNamesRaw?.Count == 0 && value != null) {
-                    EnumerationNamesRaw = value;
+                if (EnumerationNamesRaw?.Count == 0 && value?.Count > 0)
+                {
+                    EnumerationNamesRaw = new Collection<string>(value);
                 }
             }
         }
@@ -412,24 +414,26 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
-        [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal Collection<string?>? EnumerationDescriptionsDashedRaw
+        [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        internal JArray? EnumerationDescriptionsRaw
         {
-            get => EnumerationDescriptionsRaw;
-            set
-            {
-                if (EnumerationDescriptionsRaw?.Count == 0 && value != null) {
-                    EnumerationDescriptionsRaw = value;
-                }
-            }
+            get => null;
+            set => EnumerationDescriptionsDashedRaw = value;
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
-        [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal Collection<string?>? EnumerationDescriptionsRaw
+        [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        internal JArray? EnumerationDescriptionsDashedRaw
         {
-            get => EnumerationDescriptions != null && EnumerationDescriptions.Count > 0 ? EnumerationDescriptions : null;
-            set => EnumerationDescriptions = value != null ? new ObservableCollection<string?>(value) : [];
+            get => EnumerationDescriptions is { Count: > 0 } ? new JArray(EnumerationDescriptions) : null;
+            set
+            {
+                var converted = ConvertPossibleStringArray(value);
+                if (converted != null)
+                {
+                    EnumerationDescriptions = new ObservableCollection<string?>(converted);
+                }
+            }
         }
 
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -545,6 +549,40 @@ namespace NJsonSchema
                     }
                 }
             }
+        }
+
+        private static List<string?>? ConvertPossibleStringArray(JArray? array)
+        {
+            if (array is null || array.Count == 0)
+            {
+                return null;
+            }
+
+            if (array.Count > 0)
+            {
+                var result = new List<string?>(array.Count);
+                for (var i = 0; i < array.Count; i++)
+                {
+                    var item = array[i];
+                    if (item.Type is JTokenType.String)
+                    {
+                        result.Add(null);
+                    }
+                    else if (item.Type is JTokenType.Null)
+                    {
+                        result.Add(null);
+                    }
+                    else
+                    {
+                        // we stop processing as we don't to trust the content
+                        return null;
+                    }
+                }
+
+                return result;
+            }
+
+            return null;
         }
     }
 }

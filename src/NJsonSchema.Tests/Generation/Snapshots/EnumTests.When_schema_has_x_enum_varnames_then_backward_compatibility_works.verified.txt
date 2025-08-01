@@ -1,14 +1,6 @@
 ﻿{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "string",
-  "x-enum-names": [
-    "VarName1",
-    "VarName2"
-  ],
-  "x-enum-varnames": [
-    "VarName1",
-    "VarName2"
-  ],
   "x-enumNames": [
     "VarName1",
     "VarName2"
