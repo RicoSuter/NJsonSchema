@@ -3075,8 +3075,12 @@
       },
       "application_context": {
         "title": "Application Context",
-        "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
         "type": "object",
+        "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
+        "required": [
+          "return_url",
+          "cancel_url"
+        ],
         "properties": {
           "brand_name": {
             "type": "string",
@@ -3092,25 +3096,10 @@
           "shipping_preference": {
             "type": "string",
             "description": "The location from which the shipping address is derived.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "GET_FROM_FILE",
-            "x-enumDescriptions": [
-              {
-                "value": "GET_FROM_FILE",
-                "description": "Get the customer-provided shipping address on the PayPal site.",
-                "default": true
-              },
-              {
-                "value": "NO_SHIPPING",
-                "description": "Redacts the shipping address from the PayPal site. Recommended for digital goods."
-              },
-              {
-                "value": "SET_PROVIDED_ADDRESS",
-                "description": "Get the merchant-provided address. The customer cannot change this address on the PayPal site. If merchant does not pass an address, customer can choose the address on PayPal pages."
-              }
-            ],
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "enum": [
               "GET_FROM_FILE",
               "NO_SHIPPING",
@@ -3120,21 +3109,10 @@
           "user_action": {
             "type": "string",
             "description": "Configures the label name to `Continue` or `Subscribe Now` for subscription consent experience.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "SUBSCRIBE_NOW",
-            "x-enumDescriptions": [
-              {
-                "value": "CONTINUE",
-                "description": "After you redirect the customer to the PayPal subscription consent page, a <strong>Continue</strong> button appears. Use this option when you want to control the activation of the subscription and do not want PayPal to activate the subscription.",
-                "default": true
-              },
-              {
-                "value": "SUBSCRIBE_NOW",
-                "description": "After you redirect the customer to the PayPal subscription consent page, a <strong>Subscribe Now</strong> button appears. Use this option when you want PayPal to activate the subscription."
-              }
-            ],
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "enum": [
               "CONTINUE",
               "SUBSCRIBE_NOW"
@@ -3164,11 +3142,7 @@
             "maxLength": 4000,
             "minLength": 10
           }
-        },
-        "required": [
-          "return_url",
-          "cancel_url"
-        ]
+        }
       },
       "authentication_response": {
         "title": "Authentication Response",
@@ -3185,8 +3159,13 @@
       },
       "billing_cycle": {
         "title": "Billing Cycle",
-        "description": "The billing cycle details.",
         "type": "object",
+        "description": "The billing cycle details.",
+        "required": [
+          "frequency",
+          "tenure_type",
+          "sequence"
+        ],
         "properties": {
           "pricing_scheme": {
             "description": "The active pricing scheme for this billing cycle. A free trial billing cycle does not require a pricing scheme.",
@@ -3199,19 +3178,9 @@
           "tenure_type": {
             "type": "string",
             "description": "The tenure type of the billing cycle. In case of a plan having trial cycle, only 2 trial cycles are allowed per plan.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "REGULAR",
-                "description": "A regular billing cycle."
-              },
-              {
-                "value": "TRIAL",
-                "description": "A trial billing cycle."
-              }
-            ],
             "enum": [
               "REGULAR",
               "TRIAL"
@@ -3230,12 +3199,7 @@
             "maximum": 999.0,
             "minimum": 0.0
           }
-        },
-        "required": [
-          "frequency",
-          "tenure_type",
-          "sequence"
-        ]
+        }
       },
       "billing_cycle_list": {
         "type": "array",
@@ -3337,110 +3301,12 @@
         }
       },
       "card_brand": {
-        "type": "string",
         "title": "Card Brand",
+        "type": "string",
         "description": "The card network or brand. Applies to credit, debit, gift, and payment cards.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[A-Z_]+$",
-        "x-enumDescriptions": [
-          {
-            "value": "VISA",
-            "description": "Visa card."
-          },
-          {
-            "value": "MASTERCARD",
-            "description": "Mastecard card."
-          },
-          {
-            "value": "DISCOVER",
-            "description": "Discover card."
-          },
-          {
-            "value": "AMEX",
-            "description": "American Express card."
-          },
-          {
-            "value": "SOLO",
-            "description": "Solo debit card."
-          },
-          {
-            "value": "JCB",
-            "description": "Japan Credit Bureau card."
-          },
-          {
-            "value": "STAR",
-            "description": "Military Star card."
-          },
-          {
-            "value": "DELTA",
-            "description": "Delta Airlines card."
-          },
-          {
-            "value": "SWITCH",
-            "description": "Switch credit card."
-          },
-          {
-            "value": "MAESTRO",
-            "description": "Maestro credit card."
-          },
-          {
-            "value": "CB_NATIONALE",
-            "description": "Carte Bancaire (CB) credit card."
-          },
-          {
-            "value": "CONFIGOGA",
-            "description": "Configoga credit card."
-          },
-          {
-            "value": "CONFIDIS",
-            "description": "Confidis credit card."
-          },
-          {
-            "value": "ELECTRON",
-            "description": "Visa Electron credit card."
-          },
-          {
-            "value": "CETELEM",
-            "description": "Cetelem credit card."
-          },
-          {
-            "value": "CHINA_UNION_PAY",
-            "description": "China union pay credit card."
-          },
-          {
-            "value": "DINERS",
-            "description": "The Diners Club International banking and payment services capability network owned by Discover Financial Services (DFS), one of the most recognized brands in US financial services."
-          },
-          {
-            "value": "ELO",
-            "description": "The Brazilian Elo card payment network."
-          },
-          {
-            "value": "HIPER",
-            "description": "The Hiper - Ingenico ePayment network."
-          },
-          {
-            "value": "HIPERCARD",
-            "description": "The Brazilian Hipercard payment network that's widely accepted in the retail market."
-          },
-          {
-            "value": "RUPAY",
-            "description": "The RuPay payment network."
-          },
-          {
-            "value": "GE",
-            "description": "The GE Credit Union 3Point card payment network."
-          },
-          {
-            "value": "SYNCHRONY",
-            "description": "The Synchrony Financial (SYF) payment network."
-          },
-          {
-            "value": "UNKNOWN",
-            "description": "UNKNOWN payment network."
-          }
-        ],
         "enum": [
           "VISA",
           "MASTERCARD",
@@ -3614,34 +3480,12 @@
         ]
       },
       "card_type": {
-        "type": "string",
         "title": "Card Type",
+        "type": "string",
         "description": "Type of card. i.e Credit, Debit and so on.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[A-Z_]+$",
-        "x-enumDescriptions": [
-          {
-            "value": "CREDIT",
-            "description": "A credit card."
-          },
-          {
-            "value": "DEBIT",
-            "description": "A debit card."
-          },
-          {
-            "value": "PREPAID",
-            "description": "A Prepaid card."
-          },
-          {
-            "value": "STORE",
-            "description": "A store card."
-          },
-          {
-            "value": "UNKNOWN",
-            "description": "Card type cannot be determined."
-          }
-        ],
         "enum": [
           "CREDIT",
           "DEBIT",
@@ -3651,37 +3495,17 @@
         ]
       },
       "card_verification": {
-        "type": "object",
         "title": "Card Verification",
+        "type": "object",
         "description": "The API caller can opt in to verify the card through PayPal offered verification services (e.g. Smart Dollar Auth, 3DS).",
         "properties": {
           "method": {
-            "description": "The method used for card verification.",
             "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "pattern": "^[0-9A-Z_]+$",
+            "description": "The method used for card verification.",
             "default": "SCA_WHEN_REQUIRED",
-            "x-enumDescriptions": [
-              {
-                "value": "SCA_ALWAYS",
-                "description": "Selecting this option will attempt to force a strong customer authentication for the authorization/transaction. In countries where SCA has been defined and implemented it will result in a contingency and HATEOAS link being returned.  The API caller should redirect the payer to that link so that they can authenticate themselves against their issuing bank or other entity. As noted, the HATEOAS link is only available in all regions where strong authentication is supported, (e.g. in European countries where 3DS is live). Merchants can use this setting as an additional layer of security if they choose to. In all cases, when an authorization is requested the AVS/CVV results will be returned in the response."
-              },
-              {
-                "value": "SCA_WHEN_REQUIRED",
-                "description": "This is the default. When an authorization or transaction is attempted this option will return a contingency and HATEOAS link only when local regulations require strong customer authentication, (e.g. 3DS in countries and use cases where it is mandated). The API caller should redirect the payer to the link so that they can authenticate themselves. In all cases, when an authorization is requested the AVS/CVV results will be returned in the response."
-              },
-              {
-                "value": "3D_SECURE",
-                "description": "The contingency surfaced as an additional security layer that helps prevent unauthorized card-not-present transactions and protects the merchant from exposure to fraud.",
-                "deprecated": true
-              },
-              {
-                "value": "AVS_CVV",
-                "description": "Places a temporary hold on the card to ensure its validity. This process protects the merchant from exposure to fraud. This verification method will confirm that the address information or CVV included matches what the issuing bank has on file for the associated card, ensuring that only authorized card users are able to make purchases from you.",
-                "deprecated": true
-              }
-            ],
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^[0-9A-Z_]+$",
             "enum": [
               "SCA_ALWAYS",
               "SCA_WHEN_REQUIRED",
@@ -3734,26 +3558,21 @@
       },
       "cycle_execution": {
         "title": "Billing Cycle Execution Details",
-        "description": "The regular and trial execution details for a billing cycle.",
         "type": "object",
+        "description": "The regular and trial execution details for a billing cycle.",
+        "required": [
+          "tenure_type",
+          "sequence",
+          "cycles_completed"
+        ],
         "properties": {
           "tenure_type": {
             "type": "string",
+            "readonly": true,
             "description": "The type of the billing cycle.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "REGULAR",
-                "description": "A regular billing cycle."
-              },
-              {
-                "value": "TRIAL",
-                "description": "A trial billing cycle."
-              }
-            ],
-            "readOnly": true,
             "enum": [
               "REGULAR",
               "TRIAL"
@@ -3767,38 +3586,33 @@
           },
           "cycles_completed": {
             "type": "integer",
+            "readonly": true,
             "description": "The number of billing cycles that have completed.",
             "maximum": 9999.0,
-            "minimum": 0.0,
-            "readOnly": true
+            "minimum": 0.0
           },
           "cycles_remaining": {
             "type": "integer",
+            "readonly": true,
             "description": "For a finite billing cycle, cycles_remaining is the number of remaining cycles. For an infinite billing cycle, cycles_remaining is set as 0.",
             "maximum": 9999.0,
-            "minimum": 0.0,
-            "readOnly": true
+            "minimum": 0.0
           },
           "current_pricing_scheme_version": {
             "type": "integer",
+            "readonly": true,
             "description": "The active pricing scheme version for the billing cycle.",
             "maximum": 99.0,
-            "minimum": 1.0,
-            "readOnly": true
+            "minimum": 1.0
           },
           "total_cycles": {
             "type": "integer",
+            "readonly": true,
             "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>). Regular billing cycles can be executed infinite times (value of <code>0</code> for <code>total_cycles</code>) or a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>).",
             "maximum": 999.0,
-            "minimum": 0.0,
-            "readOnly": true
+            "minimum": 0.0
           }
-        },
-        "required": [
-          "tenure_type",
-          "sequence",
-          "cycles_completed"
-        ]
+        }
       },
       "cycle_execution_list": {
         "type": "array",
@@ -3852,28 +3666,10 @@
       },
       "enrolled": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Status of Authentication eligibility.",
-        "x-enumDescriptions": [
-          {
-            "value": "Y",
-            "description": "Yes. The bank is participating in 3-D Secure protocol and will return the ACSUrl."
-          },
-          {
-            "value": "N",
-            "description": "No. The bank is not participating in 3-D Secure protocol."
-          },
-          {
-            "value": "U",
-            "description": "Unavailable. The DS or ACS is not available for authentication at the time of the request."
-          },
-          {
-            "value": "B",
-            "description": "Bypass. The merchant authentication rule is triggered to bypass authentication."
-          }
-        ],
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "enum": [
           "Y",
           "N",
@@ -4331,60 +4127,30 @@
       },
       "failed_payment_details": {
         "title": "Failed Payment Details",
-        "description": "The details for the failed payment of the subscription.",
         "type": "object",
+        "description": "The details for the failed payment of the subscription.",
+        "required": [
+          "amount",
+          "time"
+        ],
         "properties": {
           "amount": {
+            "readonly": true,
             "description": "The failed payment amount.",
-            "readOnly": true,
             "$ref": "#/components/schemas/money"
           },
           "time": {
+            "readonly": true,
             "description": "The date and time when the failed payment was made, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           },
           "reason_code": {
             "type": "string",
+            "readonly": true,
             "description": "The reason code for the payment failure.",
-            "minLength": 1,
             "maxLength": 120,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "PAYMENT_DENIED",
-                "description": "PayPal declined the payment due to one or more customer issues."
-              },
-              {
-                "value": "INTERNAL_SERVER_ERROR",
-                "description": "An internal server error has occurred."
-              },
-              {
-                "value": "PAYEE_ACCOUNT_RESTRICTED",
-                "description": "The payee account is not in good standing and cannot receive payments."
-              },
-              {
-                "value": "PAYER_ACCOUNT_RESTRICTED",
-                "description": "The payer account is not in good standing and cannot make payments."
-              },
-              {
-                "value": "PAYER_CANNOT_PAY",
-                "description": "Payer cannot pay for this transaction."
-              },
-              {
-                "value": "SENDING_LIMIT_EXCEEDED",
-                "description": "The transaction exceeds the payer's sending limit."
-              },
-              {
-                "value": "TRANSACTION_RECEIVING_LIMIT_EXCEEDED",
-                "description": "The transaction exceeds the receiver's receiving limit."
-              },
-              {
-                "value": "CURRENCY_MISMATCH",
-                "description": "The transaction is declined due to a currency mismatch."
-              }
-            ],
-            "readOnly": true,
             "enum": [
               "PAYMENT_DENIED",
               "INTERNAL_SERVER_ERROR",
@@ -4397,45 +4163,26 @@
             ]
           },
           "next_payment_retry_time": {
+            "readonly": true,
             "description": "The time when the retry attempt for the failed payment occurs, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           }
-        },
-        "required": [
-          "amount",
-          "time"
-        ]
+        }
       },
       "frequency": {
         "title": "Billing Cycle Frequency",
-        "description": "The frequency of the billing cycle.",
         "type": "object",
+        "description": "The frequency of the billing cycle.",
+        "required": [
+          "interval_unit"
+        ],
         "properties": {
           "interval_unit": {
             "type": "string",
             "description": "The interval at which the subscription is charged or billed.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "DAY",
-                "description": "A daily billing cycle."
-              },
-              {
-                "value": "WEEK",
-                "description": "A weekly billing cycle."
-              },
-              {
-                "value": "MONTH",
-                "description": "A monthly billing cycle."
-              },
-              {
-                "value": "YEAR",
-                "description": "A yearly billing cycle."
-              }
-            ],
             "enum": [
               "DAY",
               "WEEK",
@@ -4450,10 +4197,7 @@
             "maximum": 365.0,
             "minimum": 1.0
           }
-        },
-        "required": [
-          "interval_unit"
-        ]
+        }
       },
       "language": {
         "type": "string",
@@ -4490,24 +4234,10 @@
       },
       "liability_shift": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Liability shift indicator. The outcome of the issuer's authentication.",
-        "x-enumDescriptions": [
-          {
-            "value": "NO",
-            "description": "Liability is with the merchant."
-          },
-          {
-            "value": "POSSIBLE",
-            "description": "Liability may shift to the card issuer."
-          },
-          {
-            "value": "UNKNOWN",
-            "description": "The authentication system is not available."
-          }
-        ],
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "enum": [
           "NO",
           "POSSIBLE",
@@ -4624,44 +4354,10 @@
       },
       "pares_status": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Transactions status result identifier. The outcome of the issuer's authentication.",
-        "x-enumDescriptions": [
-          {
-            "value": "Y",
-            "description": "Successful authentication."
-          },
-          {
-            "value": "N",
-            "description": "Failed authentication / account not verified / transaction denied."
-          },
-          {
-            "value": "U",
-            "description": "Unable to complete authentication."
-          },
-          {
-            "value": "A",
-            "description": "Successful attempts transaction."
-          },
-          {
-            "value": "C",
-            "description": "Challenge required for authentication."
-          },
-          {
-            "value": "R",
-            "description": "Authentication rejected (merchant must not submit for authorization)."
-          },
-          {
-            "value": "D",
-            "description": "Challenge required; decoupled authentication confirmed."
-          },
-          {
-            "value": "I",
-            "description": "Informational only; 3DS requestor challenge preference acknowledged."
-          }
-        ],
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "enum": [
           "Y",
           "N",
@@ -4674,39 +4370,16 @@
         ]
       },
       "patch": {
-        "type": "object",
         "title": "Patch",
+        "type": "object",
         "description": "The JSON patch object to apply partial updates to resources.",
+        "required": [
+          "op"
+        ],
         "properties": {
           "op": {
             "type": "string",
             "description": "The operation.",
-            "x-enumDescriptions": [
-              {
-                "value": "add",
-                "description": "Depending on the target location reference, completes one of these functions:<ul><li><strong>The target location is an array index</strong>. Inserts a new value into the array at the specified index.</li><li><strong>The target location is an object parameter that does not already exist</strong>. Adds a new parameter to the object.</li><li><strong>The target location is an object parameter that does exist</strong>. Replaces that parameter's value.</li></ul>The <code>value</code> parameter defines the value to add. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.1\">4.1. add</a>."
-              },
-              {
-                "value": "remove",
-                "description": "Removes the value at the target location. For the operation to succeed, the target location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.2\">4.2. remove</a>."
-              },
-              {
-                "value": "replace",
-                "description": "Replaces the value at the target location with a new value. The operation object must contain a <code>value</code> parameter that defines the replacement value. For the operation to succeed, the target location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.3\">4.3. replace</a>."
-              },
-              {
-                "value": "move",
-                "description": "Removes the value at a specified location and adds it to the target location. The operation object must contain a <code>from</code> parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to move the value. For the operation to succeed, the <code>from</code> location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.4\">4.4. move</a>."
-              },
-              {
-                "value": "copy",
-                "description": "Copies the value at a specified location to the target location. The operation object must contain a <code>from</code> parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to copy the value. For the operation to succeed, the <code>from</code> location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.5\">4.5. copy</a>."
-              },
-              {
-                "value": "test",
-                "description": "Tests that a value at the target location is equal to a specified value. The operation object must contain a <code>value</code> parameter that defines the value to compare to the target location's value. For the operation to succeed, the target location must be equal to the <code>value</code> value. For test, <code>equal</code> indicates that the value at the target location and the value that <code>value</code> defines are of the same JSON type. The data type of the value determines how equality is defined:<table><thead align=\"left\"><tr><th>Type</th><th>Considered equal if both values</th></tr></thead><tbody align=\"left\"><tr><td><strong>strings</strong></td><td>Contain the same number of Unicode characters and their code points are byte-by-byte equal.</td></tr><tr><td><strong>numbers</strong></td><td>Are numerically equal.</td></tr><tr><td><strong>arrays</strong></td><td>Contain the same number of values, and each value is equal to the value at the corresponding position in the other array, by using these type-specific rules.</td></tr><tr><td><strong>objects</strong></td><td>Contain the same number of parameters, and each parameter is equal to a parameter in the other object, by comparing their keys (as strings) and their values (by using these type-specific rules).</td></tr><tr><td><strong>literals (<code>false</code>, <code>true</code>, and <code>null</code>)</strong></td><td>Are the same. The comparison is a logical comparison. For example, whitespace between the parameter values of an array is not significant. Also, ordering of the serialization of object parameters is not significant.</td></tr></tbody></table>For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.6\">4.6. test</a>."
-              }
-            ],
             "enum": [
               "add",
               "remove",
@@ -4728,10 +4401,7 @@
             "type": "string",
             "description": "The <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the target document location from which to move the value. Required for the <code>move</code> operation."
           }
-        },
-        "required": [
-          "op"
-        ]
+        }
       },
       "patch_request": {
         "title": "Patch Request",
@@ -4744,21 +4414,10 @@
       "payee_payment_method_preference": {
         "type": "string",
         "description": "The merchant-preferred payment methods.",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "default": "UNRESTRICTED",
-        "x-enumDescriptions": [
-          {
-            "value": "UNRESTRICTED",
-            "description": "Accepts any type of payment from the customer.",
-            "default": true
-          },
-          {
-            "value": "IMMEDIATE_PAYMENT_REQUIRED",
-            "description": "Accepts only immediate payment from the customer. For example, credit card, PayPal balance, or instant ACH. Ensures that at the time of capture, the payment does not have the `pending` status."
-          }
-        ],
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "enum": [
           "UNRESTRICTED",
           "IMMEDIATE_PAYMENT_REQUIRED"
@@ -4782,8 +4441,8 @@
       },
       "payment_preferences": {
         "title": "Payment Preferences",
-        "description": "The payment preferences for a subscription.",
         "type": "object",
+        "description": "The payment preferences for a subscription.",
         "properties": {
           "auto_bill_outstanding": {
             "type": "boolean",
@@ -4797,20 +4456,10 @@
           "setup_fee_failure_action": {
             "type": "string",
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "CANCEL",
-            "x-enumDescriptions": [
-              {
-                "value": "CONTINUE",
-                "description": "Continues the subscription if the initial payment for the setup fails."
-              },
-              {
-                "value": "CANCEL",
-                "description": "Cancels the subscription if the initial payment for the setup fails."
-              }
-            ],
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "enum": [
               "CONTINUE",
               "CANCEL"
@@ -4827,8 +4476,8 @@
       },
       "payment_preferences_override": {
         "title": "Payment Preferences Override",
-        "description": "The payment preferences to override at subscription level.",
         "type": "object",
+        "description": "The payment preferences to override at subscription level.",
         "properties": {
           "auto_bill_outstanding": {
             "type": "boolean",
@@ -4841,19 +4490,9 @@
           "setup_fee_failure_action": {
             "type": "string",
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "CONTINUE",
-                "description": "Continues the subscription if the initial payment for the setup fails."
-              },
-              {
-                "value": "CANCEL",
-                "description": "Cancels the subscription if the initial payment for the setup fails."
-              }
-            ],
             "enum": [
               "CONTINUE",
               "CANCEL"
@@ -5016,16 +4655,16 @@
       },
       "plan": {
         "title": "Plan",
-        "description": "The plan details.",
         "type": "object",
+        "description": "The plan details.",
         "properties": {
           "id": {
             "type": "string",
+            "readonly": true,
             "description": "The unique PayPal-generated ID for the plan.",
             "maxLength": 26,
             "minLength": 26,
-            "pattern": "^P-[A-Z0-9]*$",
-            "readOnly": true
+            "pattern": "^P-[A-Z0-9]*$"
           },
           "product_id": {
             "type": "string",
@@ -5044,23 +4683,9 @@
           "status": {
             "type": "string",
             "description": "The plan status.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "CREATED",
-                "description": "The plan was created. You cannot create subscriptions for a plan in this state."
-              },
-              {
-                "value": "INACTIVE",
-                "description": "The plan is inactive."
-              },
-              {
-                "value": "ACTIVE",
-                "description": "The plan is active. You can only create subscriptions for a plan in this state."
-              }
-            ],
             "enum": [
               "CREATED",
               "INACTIVE",
@@ -5089,13 +4714,13 @@
             "default": false
           },
           "create_time": {
+            "readonly": true,
             "description": "The date and time when the plan was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           },
           "update_time": {
+            "readonly": true,
             "description": "The date and time when the plan was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           },
           "links": {
@@ -5154,8 +4779,14 @@
       },
       "plan_request_POST": {
         "title": "Create Plan Request",
-        "description": "The create plan request details.",
         "type": "object",
+        "description": "The create plan request details.",
+        "required": [
+          "name",
+          "billing_cycles",
+          "payment_preferences",
+          "product_id"
+        ],
         "properties": {
           "product_id": {
             "type": "string",
@@ -5174,24 +4805,10 @@
           "status": {
             "type": "string",
             "description": "The initial state of the plan. Allowed input values are CREATED and ACTIVE.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "ACTIVE",
-            "x-enumDescriptions": [
-              {
-                "value": "CREATED",
-                "description": "The plan was created. You cannot create subscriptions for a plan in this state."
-              },
-              {
-                "value": "INACTIVE",
-                "description": "The plan is inactive."
-              },
-              {
-                "value": "ACTIVE",
-                "description": "The plan is active. You can only create subscriptions for a plan in this state."
-              }
-            ],
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "enum": [
               "CREATED",
               "INACTIVE",
@@ -5219,13 +4836,7 @@
             "description": "Indicates whether you can subscribe to this plan by providing a quantity for the goods or service.",
             "default": false
           }
-        },
-        "required": [
-          "name",
-          "billing_cycles",
-          "payment_preferences",
-          "product_id"
-        ]
+        }
       },
       "plans.activate-422": {
         "properties": {
@@ -5833,15 +5444,15 @@
       },
       "pricing_scheme": {
         "title": "Pricing Scheme",
-        "description": "The pricing scheme details.",
         "type": "object",
+        "description": "The pricing scheme details.",
         "properties": {
           "version": {
             "type": "integer",
+            "readonly": true,
             "description": "The version of the pricing scheme.",
             "maximum": 999.0,
-            "minimum": 0.0,
-            "readOnly": true
+            "minimum": 0.0
           },
           "fixed_price": {
             "description": "The fixed amount to charge for the subscription. The changes to fixed amount are applicable to both existing and future subscriptions. For existing subscriptions, payments within 10 days of price change are not affected.",
@@ -5850,19 +5461,9 @@
           "pricing_model": {
             "type": "string",
             "description": "The pricing model for tiered plan. The `tiers` parameter is required.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "VOLUME",
-                "description": "A volume pricing model."
-              },
-              {
-                "value": "TIERED",
-                "description": "A tiered pricing model."
-              }
-            ],
             "enum": [
               "VOLUME",
               "TIERED"
@@ -5872,13 +5473,13 @@
             "$ref": "#/components/schemas/pricing_tier_list"
           },
           "create_time": {
+            "readonly": true,
             "description": "The date and time when this pricing scheme was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           },
           "update_time": {
+            "readonly": true,
             "description": "The date and time when this pricing scheme was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           }
         }
@@ -5937,9 +5538,9 @@
         }
       },
       "shipping_detail": {
+        "title": "Shipping Details",
         "type": "object",
         "description": "The shipping details.",
-        "title": "Shipping Details",
         "properties": {
           "name": {
             "title": "Name",
@@ -5952,6 +5553,20 @@
                 "maxLength": 300
               }
             }
+          },
+          "type": {
+            "title": "Fullfillment Type",
+            "type": "string",
+            "description": "A classification for the method of purchase fulfillment (e.g shipping, in-store pickup, etc). Either `type` or `options` may be present, but not both.",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^[0-9A-Z_]+$",
+            "enum": [
+              "SHIPPING",
+              "PICKUP_IN_PERSON",
+              "PICKUP_IN_STORE",
+              "PICKUP_FROM_PERSON"
+            ]
           },
           "options": {
             "$ref": "#/components/schemas/shipping_option_list"
@@ -6039,28 +5654,9 @@
         }
       },
       "shipping_type": {
-        "type": "string",
         "title": "Shipping Type",
+        "type": "string",
         "description": "A classification for the method of purchase fulfillment.",
-        "x-enumDescriptions": [
-          {
-            "value": "SHIPPING",
-            "description": "The payer intends to receive the items at a specified address.",
-            "default": true
-          },
-          {
-            "value": "PICKUP",
-            "description": "DEPRECATED. To ensure that seller protection is correctly assigned, please use 'PICKUP_IN_STORE' or 'PICKUP_FROM_PERSON' instead. Currently, this field indicates that the payer intends to pick up the items at a specified address (ie. a store address). "
-          },
-          {
-            "value": "PICKUP_IN_STORE",
-            "description": "The payer intends to pick up the item(s) from the payee's physical store. Also termed as BOPIS, \"Buy Online, Pick-up in Store\". Seller protection is provided with this option."
-          },
-          {
-            "value": "PICKUP_FROM_PERSON",
-            "description": "The payer intends to pick up the item(s) from the payee in person. Also termed as BOPIP, \"Buy Online, Pick-up in Person\". Seller protection is not available, since the payer is receiving the item from the payee in person, and can validate the item prior to payment."
-          }
-        ],
         "enum": [
           "SHIPPING",
           "PICKUP",
@@ -6071,15 +5667,9 @@
       "store_in_vault_instruction": {
         "type": "string",
         "description": "Defines how and when the payment source gets vaulted.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[0-9A-Z_]+$",
-        "x-enumDescriptions": [
-          {
-            "value": "ON_SUCCESS",
-            "description": "Defines that the payment_source will be vaulted only when at least one authorization or capture using that payment_source is successful."
-          }
-        ],
         "enum": [
           "ON_SUCCESS"
         ]
@@ -6383,8 +5973,13 @@
       },
       "subscription_capture_request": {
         "title": "Charge Amount from Subscriber",
-        "description": "The charge amount from the subscriber.",
         "type": "object",
+        "description": "The charge amount from the subscriber.",
+        "required": [
+          "note",
+          "capture_type",
+          "amount"
+        ],
         "properties": {
           "note": {
             "type": "string",
@@ -6396,29 +5991,18 @@
           "capture_type": {
             "type": "string",
             "description": "The type of capture.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "OUTSTANDING_BALANCE",
-                "description": "The outstanding balance that the subscriber must clear."
-              }
-            ],
             "enum": [
               "OUTSTANDING_BALANCE"
             ]
           },
           "amount": {
-            "$ref": "#/components/schemas/money",
-            "description": "The amount of the outstanding balance. This value cannot be greater than the current outstanding balance amount."
+            "description": "The amount of the outstanding balance. This value cannot be greater than the current outstanding balance amount.",
+            "$ref": "#/components/schemas/money"
           }
-        },
-        "required": [
-          "note",
-          "capture_type",
-          "amount"
-        ]
+        }
       },
       "subscription_request_post": {
         "title": "Create Subscription Request",
@@ -6482,8 +6066,8 @@
       },
       "subscription_revise_request": {
         "title": "Subscription Modify Plan Request",
-        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "type": "object",
+        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "properties": {
           "plan_id": {
             "type": "string",
@@ -6509,8 +6093,12 @@
           },
           "application_context": {
             "title": "Application Context",
-            "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
             "type": "object",
+            "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
+            "required": [
+              "return_url",
+              "cancel_url"
+            ],
             "properties": {
               "brand_name": {
                 "type": "string",
@@ -6526,25 +6114,10 @@
               "shipping_preference": {
                 "type": "string",
                 "description": "The location from which the shipping address is derived.",
-                "minLength": 1,
-                "maxLength": 24,
-                "pattern": "^[A-Z_]+$",
                 "default": "GET_FROM_FILE",
-                "x-enumDescriptions": [
-                  {
-                    "value": "GET_FROM_FILE",
-                    "description": "Get the customer-provided shipping address on the PayPal site.",
-                    "default": true
-                  },
-                  {
-                    "value": "NO_SHIPPING",
-                    "description": "Redacts the shipping address from the PayPal site. Recommended for digital goods."
-                  },
-                  {
-                    "value": "SET_PROVIDED_ADDRESS",
-                    "description": "Get the merchant-provided address. The customer cannot change this address on the PayPal site. If merchant does not pass an address, customer can choose the address on PayPal pages."
-                  }
-                ],
+                "maxLength": 24,
+                "minLength": 1,
+                "pattern": "^[A-Z_]+$",
                 "enum": [
                   "GET_FROM_FILE",
                   "NO_SHIPPING",
@@ -6575,11 +6148,7 @@
                 "maxLength": 4000,
                 "minLength": 10
               }
-            },
-            "required": [
-              "return_url",
-              "cancel_url"
-            ]
+            }
           },
           "plan": {
             "description": "An inline plan object to customise the subscription. You can override plan level default attributes by providing customised values for the subscription in this object. Any existing overrides will not be carried forward during subscription revise.",
@@ -6638,41 +6207,15 @@
       },
       "subscription_status": {
         "title": "Subscription Status",
-        "description": "The subscription status details.",
         "type": "object",
+        "description": "The subscription status details.",
         "properties": {
           "status": {
             "type": "string",
             "description": "The status of the subscription.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "APPROVAL_PENDING",
-                "description": "The subscription is created but not yet approved by the buyer."
-              },
-              {
-                "value": "APPROVED",
-                "description": "The buyer has approved the subscription."
-              },
-              {
-                "value": "ACTIVE",
-                "description": "The subscription is active."
-              },
-              {
-                "value": "SUSPENDED",
-                "description": "The subscription is suspended."
-              },
-              {
-                "value": "CANCELLED",
-                "description": "The subscription is cancelled."
-              },
-              {
-                "value": "EXPIRED",
-                "description": "The subscription is expired."
-              }
-            ],
             "enum": [
               "APPROVAL_PENDING",
               "APPROVED",
@@ -6690,7 +6233,7 @@
             "pattern": "^.*$"
           },
           "status_update_time": {
-            "readOnly": true,
+            "readonly": true,
             "$ref": "#/components/schemas/date_time"
           }
         }
@@ -8536,41 +8079,20 @@
         }
       },
       "transaction": {
-        "type": "object",
         "title": "Transaction Details",
+        "type": "object",
         "description": "The transaction details.",
+        "required": [
+          "id",
+          "amount_with_breakdown",
+          "time"
+        ],
         "properties": {
           "status": {
             "title": "Capture Status",
-            "description": "The status of the captured payment.",
             "type": "string",
-            "x-enumDescriptions": [
-              {
-                "value": "COMPLETED",
-                "description": "The funds for this captured payment were credited to the payee's PayPal account."
-              },
-              {
-                "value": "DECLINED",
-                "description": "The funds could not be captured."
-              },
-              {
-                "value": "PARTIALLY_REFUNDED",
-                "description": "An amount less than this captured payment's amount was partially refunded to the payer."
-              },
-              {
-                "value": "PENDING",
-                "description": "The funds for this captured payment was not yet credited to the payee's PayPal account. For more information, see <code>status.details</code>."
-              },
-              {
-                "value": "REFUNDED",
-                "description": "An amount greater than or equal to this captured payment's amount was refunded to the payer."
-              },
-              {
-                "value": "FAILED",
-                "description": "There was an error while capturing payment."
-              }
-            ],
-            "readOnly": true,
+            "readonly": true,
+            "description": "The status of the captured payment.",
             "enum": [
               "COMPLETED",
               "DECLINED",
@@ -8582,35 +8104,30 @@
           },
           "id": {
             "type": "string",
+            "readonly": true,
             "description": "The PayPal-generated transaction ID.",
             "maxLength": 50,
-            "minLength": 3,
-            "readOnly": true
+            "minLength": 3
           },
           "amount_with_breakdown": {
             "$ref": "#/components/schemas/amount_with_breakdown"
           },
           "payer_name": {
+            "readonly": true,
             "description": "The name of the customer.",
-            "readOnly": true,
             "$ref": "#/components/schemas/name"
           },
           "payer_email": {
+            "readonly": true,
             "description": "The email ID of the customer.",
-            "readOnly": true,
             "$ref": "#/components/schemas/email_address"
           },
           "time": {
+            "readonly": true,
             "description": "The date and time when the transaction was processed, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
             "$ref": "#/components/schemas/date_time"
           }
-        },
-        "required": [
-          "id",
-          "amount_with_breakdown",
-          "time"
-        ]
+        }
       },
       "transaction_list": {
         "type": "array",
@@ -8698,8 +8215,8 @@
         }
       },
       "vault_response": {
-        "type": "object",
         "title": "Vault Response",
+        "type": "object",
         "description": "The details about a saved payment source.",
         "properties": {
           "id": {
@@ -8712,29 +8229,15 @@
             "title": "Vault Status",
             "type": "string",
             "description": "The vault status.",
-            "minLength": 1,
             "maxLength": 255,
+            "minLength": 1,
             "pattern": "^[0-9A-Z_]+$",
-            "x-enumDescriptions": [
-              {
-                "value": "VAULTED",
-                "description": "The payment source has been saved in your customer's vault. This vault status reflects `/v3/vault` status."
-              },
-              {
-                "value": "CREATED",
-                "description": "DEPRECATED. The payment source has been saved in your customer's vault. This status applies to deprecated integration patterns and will not be returned for v3/vault integrations."
-              },
-              {
-                "value": "APPROVED",
-                "description": "Customer has approved the action of saving the specified payment_source into their vault. Use v3/vault/payment-tokens with given setup_token to save the payment source in the vault"
-              }
-            ],
-            "deprecated": true,
             "enum": [
               "VAULTED",
               "CREATED",
               "APPROVED"
-            ]
+            ],
+            "deprecated": true
           },
           "customer": {
             "title": "Customer Information",
