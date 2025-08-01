@@ -191,6 +191,29 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
+        public async Task When_enum_has_no_description_attributes_then_descriptions_are_not_included_in_schema()
+        {
+            // Arrange
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumWithFlags>(new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                SerializerSettings =
+                {
+                    Converters = { new StringEnumConverter() }
+                }
+            });
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.Empty(schema.EnumerationDescriptions);
+
+            // Verify the JSON output does not contain the x-enumDescriptions property
+            await VerifyHelper.Verify(json);
+        }
+
+
+        [Fact]
         public async Task When_schema_has_x_enum_names_then_backward_compatibility_works()
         {
             // Arrange
