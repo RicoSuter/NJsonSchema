@@ -702,6 +702,7 @@ namespace NJsonSchema.Generation
             schema.EnumerationDescriptions.Clear();
             schema.IsFlagEnumerable = contextualType.IsAttributeDefined<FlagsAttribute>(true);
 
+            var allDescriptionsEmpty = true;
             Func<object, string?>? enumValueConverter = null;
             var underlyingType = Enum.GetUnderlyingType(contextualType.Type);
             foreach (var enumName in Enum.GetNames(contextualType.Type))
@@ -739,6 +740,13 @@ namespace NJsonSchema.Generation
 
                 schema.EnumerationNames.Add(enumName);
                 schema.EnumerationDescriptions.Add(enumDescription);
+                allDescriptionsEmpty &= string.IsNullOrWhiteSpace(enumDescription);
+            }
+
+            if (allDescriptionsEmpty)
+            {
+                // don't output empty descriptions
+                schema.EnumerationDescriptions.Clear();
             }
 
             if (typeDescription.Type == JsonObjectType.Integer && Settings.GenerateEnumMappingDescription)
