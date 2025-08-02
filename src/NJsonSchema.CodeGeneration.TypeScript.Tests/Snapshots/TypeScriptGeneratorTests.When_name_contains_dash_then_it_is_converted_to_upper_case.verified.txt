@@ -10,7 +10,7 @@
 
 
 export interface MyClass {
-    "foo-bar": string;
+    fooBar: string;
 
     [key: string]: any;
 }

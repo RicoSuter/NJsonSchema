@@ -15,6 +15,6 @@ export enum PropertyName {
 }
 
 export interface MyClass {
-    Mapping: { [key in keyof typeof PropertyName]?: string; } | undefined;
-    Mapping2: { [key in keyof typeof PropertyName]?: string; } | undefined;
+    mapping: { [key in keyof typeof PropertyName]?: string; } | undefined;
+    mapping2: { [key in keyof typeof PropertyName]?: string; } | undefined;
 }
