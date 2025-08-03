@@ -10,7 +10,7 @@
 
 
 export class MyItem implements IMyItem {
-    x: number;
+    x!: number;
 
     [key: string]: any;
 
@@ -58,7 +58,7 @@ export interface IMyItem {
 }
 
 export class Test implements ITest {
-    resource: { [key: string]: MyItem; };
+    resource!: { [key: string]: MyItem; };
 
     [key: string]: any;
 
@@ -84,7 +84,7 @@ export class Test implements ITest {
                 this.resource = {} as any;
                 for (let key in _data["resource"]) {
                     if (_data["resource"].hasOwnProperty(key))
-                        (this.resource as any)[key] = _data["resource"][key] ? MyItem.fromJS(_data["resource"][key]) : new MyItem();
+                        (this.resource as any)![key] = _data["resource"][key] ? MyItem.fromJS(_data["resource"][key]) : new MyItem();
                 }
             }
             else {

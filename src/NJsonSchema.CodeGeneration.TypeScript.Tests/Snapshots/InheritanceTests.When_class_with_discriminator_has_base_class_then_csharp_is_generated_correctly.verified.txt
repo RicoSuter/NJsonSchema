@@ -10,10 +10,10 @@
 
 
 export class Exception implements IException {
-    message: string;
-    innerException: Exception | undefined;
-    source: string | undefined;
-    stackTrace: string | undefined;
+    message!: string;
+    innerException!: Exception | undefined;
+    source!: string | undefined;
+    stackTrace!: string | undefined;
 
     constructor(data?: IException) {
         if (data) {
@@ -58,7 +58,7 @@ export interface IException {
 }
 
 export class ExceptionBase extends Exception implements IExceptionBase {
-    foo: string | undefined;
+    foo!: string | undefined;
 
     protected _discriminator: string;
 
@@ -67,14 +67,14 @@ export class ExceptionBase extends Exception implements IExceptionBase {
         this._discriminator = "ExceptionBase";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.foo = _data["Foo"];
         }
     }
 
-    static fromJS(data: any): ExceptionBase {
+    static override fromJS(data: any): ExceptionBase {
         data = typeof data === 'object' ? data : {};
         if (data["kind"] === "MyException") {
             let result = new MyException();
@@ -86,7 +86,7 @@ export class ExceptionBase extends Exception implements IExceptionBase {
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["kind"] = this._discriminator;
         data["Foo"] = this.foo;
@@ -101,28 +101,28 @@ export interface IExceptionBase extends IException {
 
 /** Foobar. */
 export class MyException extends ExceptionBase implements IMyException {
-    bar: string | undefined;
+    bar!: string | undefined;
 
     constructor(data?: IMyException) {
         super(data);
         this._discriminator = "MyException";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.bar = _data["Bar"];
         }
     }
 
-    static fromJS(data: any): MyException {
+    static override fromJS(data: any): MyException {
         data = typeof data === 'object' ? data : {};
         let result = new MyException();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Bar"] = this.bar;
         super.toJSON(data);
@@ -136,7 +136,7 @@ export interface IMyException extends IExceptionBase {
 }
 
 export class ExceptionContainer implements IExceptionContainer {
-    exception: ExceptionBase | undefined;
+    exception!: ExceptionBase | undefined;
 
     constructor(data?: IExceptionContainer) {
         if (data) {

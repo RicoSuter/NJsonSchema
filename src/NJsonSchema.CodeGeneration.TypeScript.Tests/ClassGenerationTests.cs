@@ -45,28 +45,18 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Theory]
-        [InlineData(TypeScriptTypeStyle.Class, 1.8)]
-        [InlineData(TypeScriptTypeStyle.Class, 2.1)]
-        [InlineData(TypeScriptTypeStyle.Class, 2.7)]
-        [InlineData(TypeScriptTypeStyle.Class, 4.3)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 1.8)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.1)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.7)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 4.3)]
-        [InlineData(TypeScriptTypeStyle.Interface, 1.8)]
-        [InlineData(TypeScriptTypeStyle.Interface, 2.1)]
-        [InlineData(TypeScriptTypeStyle.Interface, 2.7)]
-        [InlineData(TypeScriptTypeStyle.Interface, 4.3)]
-        public async Task Verify_output(TypeScriptTypeStyle style, decimal version)
+        [InlineData(TypeScriptTypeStyle.Class)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass)]
+        [InlineData(TypeScriptTypeStyle.Interface)]
+        public async Task Verify_output(TypeScriptTypeStyle style)
         {
             var settings = new TypeScriptGeneratorSettings
             {
-                TypeStyle = style,
-                TypeScriptVersion = version
+                TypeStyle = style
             };
             var output = await PrepareAsync(settings);
 
-            await VerifyHelper.Verify(output).UseParameters(style, version);
+            await VerifyHelper.Verify(output).UseParameters(style);
         }
 
         private static Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
@@ -115,8 +105,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -160,8 +149,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -213,8 +201,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -262,8 +249,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.KnockoutClass,
-                GenerateConstructorInterface = false,
-                TypeScriptVersion = 2.0m
+                GenerateConstructorInterface = false
             });
 
             // Assert

@@ -18,7 +18,7 @@ public class PropertyNameTests
     {
         var schema = NewtonsoftJsonSchemaGenerator.FromType<TypeWithRestrictedProperties>();
 
-        var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 4.3m });
+        var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
         var output = generator.GenerateFile(nameof(TypeWithRestrictedProperties));
 
         await VerifyHelper.Verify(output);

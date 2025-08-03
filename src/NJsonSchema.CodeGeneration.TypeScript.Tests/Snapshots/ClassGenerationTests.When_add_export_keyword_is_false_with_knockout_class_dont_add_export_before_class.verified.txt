@@ -51,7 +51,7 @@ class Student extends Person {
 
 
 
-    init(data?: any) {
+    override init(data?: any) {
         super.init(data);
         if (data !== undefined) {
             var study_: any;
@@ -61,13 +61,13 @@ class Student extends Person {
         }
     }
 
-    static fromJS(data: any): Student {
+    static override fromJS(data: any): Student {
         let result = new Student();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         let study_: any = this.study();
         data["Study"] = study_;

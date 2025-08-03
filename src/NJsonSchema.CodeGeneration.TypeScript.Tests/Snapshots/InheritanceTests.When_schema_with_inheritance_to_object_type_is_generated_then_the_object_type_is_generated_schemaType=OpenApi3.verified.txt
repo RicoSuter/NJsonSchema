@@ -10,7 +10,7 @@
 
 
 export class GenericRequestBaseOfRequestBodyBase implements IGenericRequestBaseOfRequestBodyBase {
-    request: RequestBodyBase;
+    request!: RequestBodyBase;
 
     [key: string]: any;
 
@@ -68,7 +68,7 @@ export class GenericRequest1 extends GenericRequestBaseOfRequestBodyBase impleme
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             for (var property in _data) {
@@ -78,14 +78,14 @@ export class GenericRequest1 extends GenericRequestBaseOfRequestBodyBase impleme
         }
     }
 
-    static fromJS(data: any): GenericRequest1 {
+    static override fromJS(data: any): GenericRequest1 {
         data = typeof data === 'object' ? data : {};
         let result = new GenericRequest1();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         for (var property in this) {
             if (this.hasOwnProperty(property))
@@ -146,7 +146,7 @@ export interface IRequestBodyBase {
 }
 
 export class GenericRequestBaseOfRequestBody implements IGenericRequestBaseOfRequestBody {
-    request: RequestBody;
+    request!: RequestBody;
 
     [key: string]: any;
 
@@ -204,7 +204,7 @@ export class GenericRequest2 extends GenericRequestBaseOfRequestBody implements 
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             for (var property in _data) {
@@ -214,14 +214,14 @@ export class GenericRequest2 extends GenericRequestBaseOfRequestBody implements 
         }
     }
 
-    static fromJS(data: any): GenericRequest2 {
+    static override fromJS(data: any): GenericRequest2 {
         data = typeof data === 'object' ? data : {};
         let result = new GenericRequest2();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         for (var property in this) {
             if (this.hasOwnProperty(property))
@@ -245,7 +245,7 @@ export class RequestBody extends RequestBodyBase implements IRequestBody {
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             for (var property in _data) {
@@ -255,14 +255,14 @@ export class RequestBody extends RequestBodyBase implements IRequestBody {
         }
     }
 
-    static fromJS(data: any): RequestBody {
+    static override fromJS(data: any): RequestBody {
         data = typeof data === 'object' ? data : {};
         let result = new RequestBody();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         for (var property in this) {
             if (this.hasOwnProperty(property))
@@ -279,8 +279,8 @@ export interface IRequestBody extends IRequestBodyBase {
 }
 
 export class Anonymous implements IAnonymous {
-    request1: GenericRequest1;
-    request2: GenericRequest2;
+    request1!: GenericRequest1;
+    request2!: GenericRequest2;
 
     [key: string]: any;
 

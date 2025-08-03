@@ -56,7 +56,7 @@ export interface IEmptyClassInheritingDictionary {
 }
 
 export class ContainerClass implements IContainerClass {
-    customDictionary: EmptyClassInheritingDictionary | undefined;
+    customDictionary!: EmptyClassInheritingDictionary | undefined;
 
     constructor(data?: IContainerClass) {
         if (data) {

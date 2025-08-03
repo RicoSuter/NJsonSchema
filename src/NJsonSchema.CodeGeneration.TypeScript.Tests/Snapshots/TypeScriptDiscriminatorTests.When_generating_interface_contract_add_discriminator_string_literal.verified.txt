@@ -16,16 +16,16 @@ export interface Base {
 export type EBase = "OneChild" | "SecondChild";
 
 export interface OneChild extends Base {
-    A: string;
+    A: string | undefined;
     Type: 'OneChild';
 }
 
 export interface SecondChild extends Base {
-    B: string;
+    B: string | undefined;
     Type: 'SecondChild';
 }
 
 export interface MyClass {
-    Child: Base;
-    Children: Base[];
+    Child: Base | undefined;
+    Children: Base[] | undefined;
 }

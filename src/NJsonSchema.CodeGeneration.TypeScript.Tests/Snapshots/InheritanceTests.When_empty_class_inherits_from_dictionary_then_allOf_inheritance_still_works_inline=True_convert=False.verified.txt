@@ -10,7 +10,7 @@
 
 
 export class ContainerClass implements IContainerClass {
-    customDictionary: { [key: string]: any; } | undefined;
+    customDictionary!: { [key: string]: any; } | undefined;
 
     constructor(data?: IContainerClass) {
         if (data) {
@@ -27,7 +27,7 @@ export class ContainerClass implements IContainerClass {
                 this.customDictionary = {} as any;
                 for (let key in _data["CustomDictionary"]) {
                     if (_data["CustomDictionary"].hasOwnProperty(key))
-                        (this.customDictionary as any)[key] = _data["CustomDictionary"][key];
+                        (this.customDictionary as any)![key] = _data["CustomDictionary"][key];
                 }
             }
         }

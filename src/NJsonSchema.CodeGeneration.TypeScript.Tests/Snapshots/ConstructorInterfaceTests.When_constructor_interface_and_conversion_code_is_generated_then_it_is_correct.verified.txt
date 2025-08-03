@@ -10,7 +10,7 @@
 
 
 export class Address implements IAddress {
-    foo: string;
+    foo!: string | undefined;
 
     constructor(data?: IAddress) {
         if (data) {
@@ -42,11 +42,11 @@ export class Address implements IAddress {
 }
 
 export interface IAddress {
-    foo: string;
+    foo: string | undefined;
 }
 
 export class Car implements ICar {
-    foo: string;
+    foo!: string | undefined;
 
     constructor(data?: ICar) {
         if (data) {
@@ -78,11 +78,11 @@ export class Car implements ICar {
 }
 
 export interface ICar {
-    foo: string;
+    foo: string | undefined;
 }
 
 export class Skill implements ISkill {
-    foo: string;
+    foo!: string | undefined;
 
     constructor(data?: ISkill) {
         if (data) {
@@ -114,16 +114,16 @@ export class Skill implements ISkill {
 }
 
 export interface ISkill {
-    foo: string;
+    foo: string | undefined;
 }
 
 export abstract class MyClass implements IMyClass {
-    supervisor: MyClass;
-    address: Address;
-    cars: Car[];
-    skills: { [key: string]: Skill; };
-    foo: Car[][];
-    bar: { [key: string]: Skill[]; };
+    supervisor!: MyClass | undefined;
+    address!: Address | undefined;
+    cars!: Car[] | undefined;
+    skills!: { [key: string]: Skill; } | undefined;
+    foo!: Car[][] | undefined;
+    bar!: { [key: string]: Skill[]; } | undefined;
 
     protected _discriminator: string;
 
@@ -161,25 +161,25 @@ export abstract class MyClass implements IMyClass {
             if (Array.isArray(_data["Cars"])) {
                 this.cars = [] as any;
                 for (let item of _data["Cars"])
-                    this.cars.push(Car.fromJS(item));
+                    this.cars!.push(Car.fromJS(item));
             }
             if (_data["Skills"]) {
                 this.skills = {} as any;
                 for (let key in _data["Skills"]) {
                     if (_data["Skills"].hasOwnProperty(key))
-                        (this.skills as any)[key] = _data["Skills"][key] ? Skill.fromJS(_data["Skills"][key]) : new Skill();
+                        (this.skills as any)![key] = _data["Skills"][key] ? Skill.fromJS(_data["Skills"][key]) : new Skill();
                 }
             }
             if (Array.isArray(_data["Foo"])) {
                 this.foo = [] as any;
                 for (let item of _data["Foo"])
-                    this.foo.push(item);
+                    this.foo!.push(item);
             }
             if (_data["Bar"]) {
                 this.bar = {} as any;
                 for (let key in _data["Bar"]) {
                     if (_data["Bar"].hasOwnProperty(key))
-                        (this.bar as any)[key] = _data["Bar"][key] ? _data["Bar"][key].map((i: any) => Skill.fromJS(i)) : [];
+                        (this.bar as any)![key] = _data["Bar"][key] ? _data["Bar"][key].map((i: any) => Skill.fromJS(i)) : [];
                 }
             }
         }
@@ -229,17 +229,17 @@ export abstract class MyClass implements IMyClass {
 }
 
 export interface IMyClass {
-    supervisor: MyClass;
-    address: IAddress;
-    cars: ICar[];
-    skills: { [key: string]: ISkill; };
-    foo: Car[][];
-    bar: { [key: string]: Skill[]; };
+    supervisor: MyClass | undefined;
+    address: IAddress | undefined;
+    cars: ICar[] | undefined;
+    skills: { [key: string]: ISkill; } | undefined;
+    foo: Car[][] | undefined;
+    bar: { [key: string]: Skill[]; } | undefined;
 }
 
 export class Student extends MyClass implements IStudent {
-    course: string;
-    car: Car;
+    course!: string | undefined;
+    car!: Car | undefined;
 
     constructor(data?: IStudent) {
         super(data);
@@ -249,7 +249,7 @@ export class Student extends MyClass implements IStudent {
         this._discriminator = "Student";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.course = _data["Course"];
@@ -257,14 +257,14 @@ export class Student extends MyClass implements IStudent {
         }
     }
 
-    static fromJS(data: any): Student {
+    static override fromJS(data: any): Student {
         data = typeof data === 'object' ? data : {};
         let result = new Student();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Course"] = this.course;
         data["Car"] = this.car ? this.car.toJSON() : undefined as any;
@@ -274,6 +274,6 @@ export class Student extends MyClass implements IStudent {
 }
 
 export interface IStudent extends IMyClass {
-    course: string;
-    car: ICar;
+    course: string | undefined;
+    car: ICar | undefined;
 }

@@ -59,8 +59,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m,
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -83,7 +82,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m,
                 EnumStyle = TypeScriptEnumStyle.StringLiteral,
             });
             var code = generator.GenerateFile("MyClass");
@@ -104,8 +102,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -125,8 +122,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Class
             });
             var code = generator.GenerateFile("MyClass");
 

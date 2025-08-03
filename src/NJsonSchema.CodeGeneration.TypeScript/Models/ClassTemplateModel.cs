@@ -140,12 +140,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
         public bool HasDefaultValues => Properties.Exists(p => p.HasDefaultValue);
 
-        /// <summary>Gets a value indicating whether </summary>
-        public bool RequiresStrictPropertyInitialization => _settings.RequiresStrictPropertyInitialization;
-
-        /// <summary>Gets a value indicating whether </summary>
-        public bool SupportsOverrideKeyword => _settings.SupportsOverrideKeyword;
-
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;
 

@@ -10,7 +10,7 @@
 
 
 export class GenericRequestBaseOfRequestBodyBase implements IGenericRequestBaseOfRequestBodyBase {
-    request: RequestBodyBase;
+    request!: RequestBodyBase;
 
     constructor(data?: IGenericRequestBaseOfRequestBodyBase) {
         if (data) {
@@ -54,18 +54,18 @@ export class GenericRequest1 extends GenericRequestBaseOfRequestBodyBase impleme
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
     }
 
-    static fromJS(data: any): GenericRequest1 {
+    static override fromJS(data: any): GenericRequest1 {
         data = typeof data === 'object' ? data : {};
         let result = new GenericRequest1();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         super.toJSON(data);
         return data;
@@ -106,7 +106,7 @@ export interface IRequestBodyBase {
 }
 
 export class GenericRequestBaseOfRequestBody implements IGenericRequestBaseOfRequestBody {
-    request: RequestBody;
+    request!: RequestBody;
 
     constructor(data?: IGenericRequestBaseOfRequestBody) {
         if (data) {
@@ -150,18 +150,18 @@ export class GenericRequest2 extends GenericRequestBaseOfRequestBody implements 
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
     }
 
-    static fromJS(data: any): GenericRequest2 {
+    static override fromJS(data: any): GenericRequest2 {
         data = typeof data === 'object' ? data : {};
         let result = new GenericRequest2();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         super.toJSON(data);
         return data;
@@ -177,18 +177,18 @@ export class RequestBody extends RequestBodyBase implements IRequestBody {
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
     }
 
-    static fromJS(data: any): RequestBody {
+    static override fromJS(data: any): RequestBody {
         data = typeof data === 'object' ? data : {};
         let result = new RequestBody();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         super.toJSON(data);
         return data;
@@ -199,8 +199,8 @@ export interface IRequestBody extends IRequestBodyBase {
 }
 
 export class Anonymous implements IAnonymous {
-    request1: GenericRequest1 | undefined;
-    request2: GenericRequest2 | undefined;
+    request1!: GenericRequest1 | undefined;
+    request2!: GenericRequest2 | undefined;
 
     constructor(data?: IAnonymous) {
         if (data) {

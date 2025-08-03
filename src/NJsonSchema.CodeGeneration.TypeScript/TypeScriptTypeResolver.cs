@@ -155,7 +155,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
                 if (resolvedType != defaultType)
                 {
-                    var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
+                    var keyType = prefix + resolvedType;
                     if (keyType != defaultType && schema.DictionaryKey?.ActualTypeSchema.IsEnumeration == true)
                     {
                         if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
@@ -342,7 +342,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private string GetNullableItemType(JsonSchema schema, string itemType)
         {
-            if (Settings.SupportsStrictNullChecks && schema.Item?.IsNullable(Settings.SchemaType) == true)
+            if (schema.Item?.IsNullable(Settings.SchemaType) == true)
             {
                 return $"({itemType} | {Settings.NullValue.ToString().ToLowerInvariant()})";
             }

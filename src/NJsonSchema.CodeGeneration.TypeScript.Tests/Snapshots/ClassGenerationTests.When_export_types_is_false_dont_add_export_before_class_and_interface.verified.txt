@@ -56,21 +56,21 @@ class Student extends Person implements IStudent {
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.study = _data["Study"];
         }
     }
 
-    static fromJS(data: any): Student {
+    static override fromJS(data: any): Student {
         data = typeof data === 'object' ? data : {};
         let result = new Student();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Study"] = this.study;
         super.toJSON(data);

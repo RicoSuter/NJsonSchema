@@ -54,7 +54,7 @@ export interface IDisplayValueDictionary {
 }
 
 export class Test implements ITest {
-    foo: DisplayValueDictionary;
+    foo!: DisplayValueDictionary | undefined;
 
     constructor(data?: ITest) {
         if (data) {
@@ -87,5 +87,5 @@ export class Test implements ITest {
 }
 
 export interface ITest {
-    foo: IDisplayValueDictionary;
+    foo: IDisplayValueDictionary | undefined;
 }

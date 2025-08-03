@@ -15,8 +15,8 @@ export enum Gender {
 }
 
 export class Address implements IAddress {
-    street: string;
-    city: string;
+    street!: string;
+    city!: string;
 
     constructor(data?: IAddress) {
         if (data) {
@@ -55,17 +55,17 @@ export interface IAddress {
 }
 
 export class MyClass implements IMyClass {
-    firstName: string;
-    lastName: string;
-    readonly birthday: Date;
-    timeSpan: string;
-    timeSpanOrNull: string | undefined;
-    gender: Gender;
-    genderOrNull: Gender | undefined;
-    address: Address;
-    addressOrNull: Address | undefined;
-    array: string[];
-    dictionary: { [key: string]: number; };
+    firstName!: string;
+    lastName!: string;
+    readonly birthday!: Date;
+    timeSpan!: string;
+    timeSpanOrNull!: string | undefined;
+    gender!: Gender;
+    genderOrNull!: Gender | undefined;
+    address!: Address;
+    addressOrNull!: Address | undefined;
+    array!: string[];
+    dictionary!: { [key: string]: number; };
 
     constructor(data?: IMyClass) {
         if (data) {
@@ -93,13 +93,13 @@ export class MyClass implements IMyClass {
             if (Array.isArray(_data["Array"])) {
                 this.array = [] as any;
                 for (let item of _data["Array"])
-                    this.array.push(item);
+                    this.array!.push(item);
             }
             if (_data["Dictionary"]) {
                 this.dictionary = {} as any;
                 for (let key in _data["Dictionary"]) {
                     if (_data["Dictionary"].hasOwnProperty(key))
-                        (this.dictionary as any)[key] = _data["Dictionary"][key];
+                        (this.dictionary as any)![key] = _data["Dictionary"][key];
                 }
             }
         }

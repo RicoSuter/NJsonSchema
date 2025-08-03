@@ -54,7 +54,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile();
         }
 
@@ -64,7 +64,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>();
             var schemaJsonData = schema.ToJson();
             var errors = schema.Validate("{}");
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             var code = generator.GenerateFile();
         }
 

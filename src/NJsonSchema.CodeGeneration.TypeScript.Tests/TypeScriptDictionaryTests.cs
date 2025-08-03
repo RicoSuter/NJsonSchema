@@ -30,8 +30,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -48,7 +47,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var data = schema.ToJson();
 
             // Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.1m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
             var code = generator.GenerateFile("MyClass");
 
             // Assert
@@ -68,8 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 EnumNameGenerator = new DefaultEnumNameGenerator(),
-                EnumStyle = TypeScriptEnumStyle.StringLiteral, 
-                TypeScriptVersion = 2.1m,
+                EnumStyle = TypeScriptEnumStyle.StringLiteral
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -102,8 +100,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -154,7 +151,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 2.7m,
                 ConvertConstructorInterfaceData = true,
                 GenerateConstructorInterface = true
             });

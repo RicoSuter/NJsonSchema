@@ -10,7 +10,7 @@
 
 
 export class Test implements ITest {
-    foo: { [key: string]: string; };
+    foo!: { [key: string]: string; } | undefined;
 
     constructor(data?: ITest) {
         if (data) {
@@ -27,7 +27,7 @@ export class Test implements ITest {
                 this.foo = {} as any;
                 for (let key in _data["Foo"]) {
                     if (_data["Foo"].hasOwnProperty(key))
-                        (this.foo as any)[key] = _data["Foo"][key];
+                        (this.foo as any)![key] = _data["Foo"][key];
                 }
             }
         }
@@ -54,5 +54,5 @@ export class Test implements ITest {
 }
 
 export interface ITest {
-    foo: { [key: string]: string; };
+    foo: { [key: string]: string; } | undefined;
 }

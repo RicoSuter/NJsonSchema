@@ -10,7 +10,7 @@
 
 
 export class ParentDto implements IParentDto {
-    child: ChildDto;
+    child!: ChildDto;
 
     [key: string]: any;
 
@@ -61,7 +61,7 @@ export interface IParentDto {
 }
 
 export class ChildDto implements IChildDto {
-    property: string;
+    property!: string;
 
     [key: string]: any;
 
@@ -109,7 +109,7 @@ export interface IChildDto {
 }
 
 export class MyClass implements IMyClass {
-    parent: ParentDto;
+    parent!: ParentDto;
 
     [key: string]: any;
 
