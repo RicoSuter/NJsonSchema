@@ -22,7 +22,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var json = schema.ToJson();
 
             // Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
             var code = generator.GenerateFile("AbstractClass");
 
             // Assert
@@ -44,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var json = schema.ToJson();
 
             // Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
             var code = generator.GenerateFile("ContainerClass");
 
             // Assert
@@ -72,7 +72,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractClass>();
 
             // Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
             var code = generator.GenerateFile("AbstractClass");
 
             // Assert

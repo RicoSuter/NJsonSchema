@@ -153,7 +153,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schemaData = schema.ToJson();
 
             // Act
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 1.8m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
             var code = generator.GenerateFile("MyClass");
 
             // Assert

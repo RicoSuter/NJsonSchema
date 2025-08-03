@@ -10,7 +10,7 @@
 
 
 export class BaseClass implements IBaseClass {
-    base: string | undefined;
+    base!: string | undefined;
 
     protected _discriminator: string;
 
@@ -58,21 +58,21 @@ export interface IBaseClass {
 }
 
 export abstract class AbstractClass extends BaseClass implements IAbstractClass {
-    foo: string | undefined;
+    foo!: string | undefined;
 
     constructor(data?: IAbstractClass) {
         super(data);
         this._discriminator = "AbstractClass";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.foo = _data["Foo"];
         }
     }
 
-    static fromJS(data: any): AbstractClass {
+    static override fromJS(data: any): AbstractClass {
         data = typeof data === 'object' ? data : {};
         if (data["discriminator"] === "SuperClass") {
             let result = new SuperClass();
@@ -82,7 +82,7 @@ export abstract class AbstractClass extends BaseClass implements IAbstractClass 
         throw new Error("The abstract class 'AbstractClass' cannot be instantiated.");
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Foo"] = this.foo;
         super.toJSON(data);
@@ -95,28 +95,28 @@ export interface IAbstractClass extends IBaseClass {
 }
 
 export class SuperClass extends AbstractClass implements ISuperClass {
-    super: string | undefined;
+    super!: string | undefined;
 
     constructor(data?: ISuperClass) {
         super(data);
         this._discriminator = "SuperClass";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.super = _data["Super"];
         }
     }
 
-    static fromJS(data: any): SuperClass {
+    static override fromJS(data: any): SuperClass {
         data = typeof data === 'object' ? data : {};
         let result = new SuperClass();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Super"] = this.super;
         super.toJSON(data);

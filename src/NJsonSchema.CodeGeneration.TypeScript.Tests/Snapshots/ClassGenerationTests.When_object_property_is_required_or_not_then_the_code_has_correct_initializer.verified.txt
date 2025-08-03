@@ -10,8 +10,8 @@
 
 
 export class MyClass implements IMyClass {
-    a: A;
-    b: B;
+    a!: A;
+    b!: B | undefined;
 
     [key: string]: any;
 
@@ -59,13 +59,13 @@ export class MyClass implements IMyClass {
 
 export interface IMyClass {
     a: A;
-    b: B;
+    b: B | undefined;
 
     [key: string]: any;
 }
 
 export class A implements IA {
-    a: string;
+    a!: string | undefined;
 
     [key: string]: any;
 
@@ -107,13 +107,13 @@ export class A implements IA {
 }
 
 export interface IA {
-    a: string;
+    a: string | undefined;
 
     [key: string]: any;
 }
 
 export class B implements IB {
-    a: string;
+    a!: string | undefined;
 
     [key: string]: any;
 
@@ -155,7 +155,7 @@ export class B implements IB {
 }
 
 export interface IB {
-    a: string;
+    a: string | undefined;
 
     [key: string]: any;
 }

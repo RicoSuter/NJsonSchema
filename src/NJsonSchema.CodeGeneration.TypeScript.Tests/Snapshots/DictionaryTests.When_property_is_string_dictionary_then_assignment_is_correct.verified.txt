@@ -10,7 +10,7 @@
 
 
 export class Test implements ITest {
-    resource: { [key: string]: string; };
+    resource!: { [key: string]: string; };
 
     [key: string]: any;
 
@@ -33,7 +33,7 @@ export class Test implements ITest {
                 this.resource = {} as any;
                 for (let key in _data["resource"]) {
                     if (_data["resource"].hasOwnProperty(key))
-                        (this.resource as any)[key] = _data["resource"][key];
+                        (this.resource as any)![key] = _data["resource"][key];
                 }
             }
         }

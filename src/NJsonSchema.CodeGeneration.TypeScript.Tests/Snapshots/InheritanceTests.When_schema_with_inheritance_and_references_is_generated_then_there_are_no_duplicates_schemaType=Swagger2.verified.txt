@@ -10,7 +10,7 @@
 
 
 export class Person implements IPerson {
-    skills: { [key: string]: SkillLevel; } | undefined;
+    skills!: { [key: string]: SkillLevel; } | undefined;
 
     protected _discriminator: string;
 
@@ -30,7 +30,7 @@ export class Person implements IPerson {
                 this.skills = {} as any;
                 for (let key in _data["Skills"]) {
                     if (_data["Skills"].hasOwnProperty(key))
-                        (this.skills as any)[key] = _data["Skills"][key];
+                        (this.skills as any)![key] = _data["Skills"][key];
                 }
             }
         }
@@ -73,8 +73,8 @@ export enum SkillLevel {
 }
 
 export class Teacher extends Person implements ITeacher {
-    course: string | undefined;
-    skillLevel: SkillLevel;
+    course!: string | undefined;
+    skillLevel!: SkillLevel;
 
     constructor(data?: ITeacher) {
         super(data);
@@ -84,7 +84,7 @@ export class Teacher extends Person implements ITeacher {
         this._discriminator = "Teacher";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.course = _data["Course"];
@@ -92,14 +92,14 @@ export class Teacher extends Person implements ITeacher {
         }
     }
 
-    static fromJS(data: any): Teacher {
+    static override fromJS(data: any): Teacher {
         data = typeof data === 'object' ? data : {};
         let result = new Teacher();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Course"] = this.course;
         data["SkillLevel"] = this.skillLevel;
@@ -114,7 +114,7 @@ export interface ITeacher extends IPerson {
 }
 
 export class Anonymous implements IAnonymous {
-    foo: Teacher | undefined;
+    foo!: Teacher | undefined;
 
     constructor(data?: IAnonymous) {
         if (data) {

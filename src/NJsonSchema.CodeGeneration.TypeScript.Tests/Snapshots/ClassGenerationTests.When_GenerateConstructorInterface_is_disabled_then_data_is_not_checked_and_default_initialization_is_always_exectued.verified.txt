@@ -76,18 +76,18 @@ export class MyDerivedClass extends MyBaseClass {
         this._discriminator = "MyDerivedClass";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
     }
 
-    static fromJS(data: any): MyDerivedClass {
+    static override fromJS(data: any): MyDerivedClass {
         data = typeof data === 'object' ? data : {};
         let result = new MyDerivedClass();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         super.toJSON(data);
         return data;

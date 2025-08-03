@@ -52,15 +52,15 @@ export interface IBase {
 }
 
 export class OneChild extends Base implements IOneChild {
-    a: string;
-    type: EBase;
+    a!: string | undefined;
+    type!: EBase;
 
     constructor(data?: IOneChild) {
         super(data);
         this._discriminator = "OneChild";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.a = _data["A"];
@@ -68,14 +68,14 @@ export class OneChild extends Base implements IOneChild {
         }
     }
 
-    static fromJS(data: any): OneChild {
+    static override fromJS(data: any): OneChild {
         data = typeof data === 'object' ? data : {};
         let result = new OneChild();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["A"] = this.a;
         data["Type"] = this.type;
@@ -85,7 +85,7 @@ export class OneChild extends Base implements IOneChild {
 }
 
 export interface IOneChild extends IBase {
-    a: string;
+    a: string | undefined;
     type: EBase;
 }
 
@@ -95,15 +95,15 @@ export enum EBase {
 }
 
 export class SecondChild extends Base implements ISecondChild {
-    b: string;
-    type: EBase;
+    b!: string | undefined;
+    type!: EBase;
 
     constructor(data?: ISecondChild) {
         super(data);
         this._discriminator = "SecondChild";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.b = _data["B"];
@@ -111,14 +111,14 @@ export class SecondChild extends Base implements ISecondChild {
         }
     }
 
-    static fromJS(data: any): SecondChild {
+    static override fromJS(data: any): SecondChild {
         data = typeof data === 'object' ? data : {};
         let result = new SecondChild();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["B"] = this.b;
         data["Type"] = this.type;
@@ -128,13 +128,13 @@ export class SecondChild extends Base implements ISecondChild {
 }
 
 export interface ISecondChild extends IBase {
-    b: string;
+    b: string | undefined;
     type: EBase;
 }
 
 export class MyClass implements IMyClass {
-    child: OneChild | SecondChild;
-    children: (OneChild | SecondChild)[];
+    child!: OneChild | SecondChild | undefined;
+    children!: (OneChild | SecondChild)[] | undefined;
 
     constructor(data?: IMyClass) {
         if (data) {
@@ -151,7 +151,7 @@ export class MyClass implements IMyClass {
             if (Array.isArray(_data["Children"])) {
                 this.children = [] as any;
                 for (let item of _data["Children"])
-                    this.children.push(OneChild | SecondChild.fromJS(item));
+                    this.children!.push(OneChild | SecondChild.fromJS(item));
             }
         }
     }
@@ -176,6 +176,6 @@ export class MyClass implements IMyClass {
 }
 
 export interface IMyClass {
-    child: OneChild | SecondChild;
-    children: (OneChild | SecondChild)[];
+    child: OneChild | SecondChild | undefined;
+    children: (OneChild | SecondChild)[] | undefined;
 }

@@ -10,5 +10,5 @@
 
 
 export interface MyClass {
-    Test: { [key: string]: any; };
+    Test: { [key: string]: any; } | undefined;
 }

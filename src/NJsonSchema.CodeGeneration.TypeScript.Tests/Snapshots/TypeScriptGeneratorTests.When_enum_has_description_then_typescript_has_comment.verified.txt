@@ -162,21 +162,21 @@ export class MyClass extends Person implements IMyClass {
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.class = _data["Class"];
         }
     }
 
-    static fromJS(data: any): MyClass {
+    static override fromJS(data: any): MyClass {
         data = typeof data === 'object' ? data : {};
         let result = new MyClass();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Class"] = this.class;
         super.toJSON(data);

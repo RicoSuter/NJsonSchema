@@ -129,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                if (IsNullable && _settings.SupportsStrictNullChecks)
+                if (IsNullable)
                 {
                     return " | " + _settings.NullValue.ToString().ToLowerInvariant();
                 }
@@ -141,7 +141,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets a value indicating whether the property is read only.</summary>
-        public bool IsReadOnly => _property.IsReadOnly && _settings.TypeScriptVersion >= 2.0m;
+        public bool IsReadOnly => _property.IsReadOnly;
 
         /// <summary>Gets a value indicating whether the property is optional.</summary>
         public bool IsOptional => !_property.IsRequired && _settings.MarkOptionalProperties;

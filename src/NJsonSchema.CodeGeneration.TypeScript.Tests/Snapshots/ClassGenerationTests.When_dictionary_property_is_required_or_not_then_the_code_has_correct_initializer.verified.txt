@@ -10,8 +10,8 @@
 
 
 export class MyClass implements IMyClass {
-    a: { [key: string]: string; };
-    b: { [key: string]: string; };
+    a!: { [key: string]: string; };
+    b!: { [key: string]: string; } | undefined;
 
     [key: string]: any;
 
@@ -37,14 +37,14 @@ export class MyClass implements IMyClass {
                 this.a = {} as any;
                 for (let key in _data["A"]) {
                     if (_data["A"].hasOwnProperty(key))
-                        (this.a as any)[key] = _data["A"][key];
+                        (this.a as any)![key] = _data["A"][key];
                 }
             }
             if (_data["B"]) {
                 this.b = {} as any;
                 for (let key in _data["B"]) {
                     if (_data["B"].hasOwnProperty(key))
-                        (this.b as any)[key] = _data["B"][key];
+                        (this.b as any)![key] = _data["B"][key];
                 }
             }
         }
@@ -83,7 +83,7 @@ export class MyClass implements IMyClass {
 
 export interface IMyClass {
     a: { [key: string]: string; };
-    b: { [key: string]: string; };
+    b: { [key: string]: string; } | undefined;
 
     [key: string]: any;
 }

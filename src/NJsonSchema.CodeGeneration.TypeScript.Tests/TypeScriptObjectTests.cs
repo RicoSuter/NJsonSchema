@@ -20,8 +20,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
@@ -45,8 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 

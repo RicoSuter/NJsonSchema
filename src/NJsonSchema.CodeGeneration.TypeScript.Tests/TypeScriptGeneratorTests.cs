@@ -35,8 +35,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Class
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
@@ -163,8 +162,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                EnumStyle = TypeScriptEnumStyle.StringLiteral,
-                TypeScriptVersion = 5m,
+                EnumStyle = TypeScriptEnumStyle.StringLiteral
             });
 
             // Act
@@ -216,8 +214,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 2.0m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
 
             // Act
@@ -270,8 +267,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schemaData = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             return Task.FromResult(generator);
         }
@@ -423,7 +419,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 NullValue = TypeScriptNullValue.Null,
-                TypeScriptVersion = 4,
                 MarkOptionalProperties = false,
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
@@ -459,7 +454,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 NullValue = TypeScriptNullValue.Null,
-                TypeScriptVersion = 4,
                 MarkOptionalProperties = false,
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");

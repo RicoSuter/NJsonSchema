@@ -230,7 +230,7 @@ The previously generated JSON Schema would generate the following TypeScript int
 
 **Settings:** 
 
-    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 2.0m }
+    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface, TypeScriptVersion = 4.3m }
     
 **Output:** 
 
@@ -265,7 +265,7 @@ export interface Person {
 
 **Settings:** 
 
-    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 2.0m }
+    new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, TypeScriptVersion = 4.3m }
 
 **Output:**
 

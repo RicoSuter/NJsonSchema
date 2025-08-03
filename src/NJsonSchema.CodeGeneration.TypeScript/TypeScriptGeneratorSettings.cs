@@ -25,7 +25,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             EnumStyle = TypeScriptEnumStyle.Enum;
             UseLeafType = false;
             ExtensionCode = string.Empty;
-            TypeScriptVersion = 2.7m;
+            TypeScriptVersion = 4.3m;
             GenerateConstructorInterface = true;
             ConvertConstructorInterfaceData = false;
             ExportTypes = true;
@@ -45,15 +45,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the target TypeScript version (default: 2.7).</summary>
         public decimal TypeScriptVersion { get; set; }
-
-        /// <summary>Gets a value indicating whether the target TypeScript version supports strict null checks.</summary>
-        public bool SupportsStrictNullChecks => TypeScriptVersion >= 2.0m;
-
-        /// <summary>Gets a value indicating whether the target TypeScript version requires strict property initialization.</summary>
-        public bool RequiresStrictPropertyInitialization => TypeScriptVersion >= 2.7m;
-
-        /// <summary>Gets a value indicating whether the target TypeScript version supports override keyword.</summary>
-        public bool SupportsOverrideKeyword => TypeScriptVersion >= 4.3m;
 
         /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
         public bool MarkOptionalProperties { get; set; }

@@ -10,8 +10,8 @@
 
 
 export class MyClass implements IMyClass {
-    a: string[];
-    b: string[];
+    a!: string[];
+    b!: string[] | undefined;
 
     [key: string]: any;
 
@@ -36,12 +36,12 @@ export class MyClass implements IMyClass {
             if (Array.isArray(_data["A"])) {
                 this.a = [] as any;
                 for (let item of _data["A"])
-                    this.a.push(item);
+                    this.a!.push(item);
             }
             if (Array.isArray(_data["B"])) {
                 this.b = [] as any;
                 for (let item of _data["B"])
-                    this.b.push(item);
+                    this.b!.push(item);
             }
         }
     }
@@ -75,7 +75,7 @@ export class MyClass implements IMyClass {
 
 export interface IMyClass {
     a: string[];
-    b: string[];
+    b: string[] | undefined;
 
     [key: string]: any;
 }

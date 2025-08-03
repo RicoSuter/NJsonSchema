@@ -10,7 +10,7 @@
 
 
 export class Anonymous implements IAnonymous {
-    baseProperty: string;
+    baseProperty!: string;
 
     [key: string]: any;
 
@@ -58,8 +58,8 @@ export interface IAnonymous {
 }
 
 export class Foo extends Anonymous implements IFoo {
-    prop1: string;
-    prop2: string;
+    prop1!: string;
+    prop2!: string;
 
     [key: string]: any;
 
@@ -67,7 +67,7 @@ export class Foo extends Anonymous implements IFoo {
         super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             for (var property in _data) {
@@ -79,14 +79,14 @@ export class Foo extends Anonymous implements IFoo {
         }
     }
 
-    static fromJS(data: any): Foo {
+    static override fromJS(data: any): Foo {
         data = typeof data === 'object' ? data : {};
         let result = new Foo();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         for (var property in this) {
             if (this.hasOwnProperty(property))

@@ -129,8 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Null,
-                TypeScriptVersion = 1.8m
+                NullValue = TypeScriptNullValue.Null
             });
             var code = codeGenerator.GenerateFile("Test");
 
@@ -190,8 +189,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                NullValue = TypeScriptNullValue.Undefined,
-                TypeScriptVersion = 1.8m
+                NullValue = TypeScriptNullValue.Undefined
             });
             var code = codeGenerator.GenerateFile("Test");
 
@@ -226,8 +224,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 TypeStyle = TypeScriptTypeStyle.Class,
                 NullValue = TypeScriptNullValue.Undefined,
                 ConvertConstructorInterfaceData = convertConstructorInterfaceData,
-                InlineNamedDictionaries = inlineNamedDictionaries,
-                TypeScriptVersion = 1.8m
+                InlineNamedDictionaries = inlineNamedDictionaries
             });
             var code = codeGenerator.GenerateFile("Test");
 
@@ -271,8 +268,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var codeGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 ConvertConstructorInterfaceData = true,
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 2.7m
+                TypeStyle = TypeScriptTypeStyle.Class
             });
 
             var code = codeGenerator.GenerateFile("Test");

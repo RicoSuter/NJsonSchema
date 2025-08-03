@@ -63,7 +63,7 @@ export class Dog extends Animal implements IDog {
         this._discriminator = "Dog";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.bar = _data["Bar"];
@@ -75,14 +75,14 @@ export class Dog extends Animal implements IDog {
         }
     }
 
-    static fromJS(data: any): Dog {
+    static override fromJS(data: any): Dog {
         data = typeof data === 'object' ? data : {};
         let result = new Dog();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Bar"] = this.bar;
         if (Array.isArray(this.subElements)) {
@@ -157,21 +157,21 @@ export class SubClass1 extends SubClass implements ISubClass1 {
         this._discriminator = "SubClass1";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.prop1 = _data["Prop1"];
         }
     }
 
-    static fromJS(data: any): SubClass1 {
+    static override fromJS(data: any): SubClass1 {
         data = typeof data === 'object' ? data : {};
         let result = new SubClass1();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Prop1"] = this.prop1;
         super.toJSON(data);
@@ -191,14 +191,14 @@ export class SubClass2 extends SubClass implements ISubClass2 {
         this._discriminator = "SubClass2";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.prop2 = _data["Prop2"];
         }
     }
 
-    static fromJS(data: any): SubClass2 {
+    static override fromJS(data: any): SubClass2 {
         data = typeof data === 'object' ? data : {};
         if (data["discriminator"] === "SubClass3") {
             let result = new SubClass3();
@@ -210,7 +210,7 @@ export class SubClass2 extends SubClass implements ISubClass2 {
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Prop2"] = this.prop2;
         super.toJSON(data);
@@ -230,21 +230,21 @@ export class SubClass3 extends SubClass2 implements ISubClass3 {
         this._discriminator = "SubClass3";
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
         super.init(_data);
         if (_data) {
             this.prop3 = _data["Prop3"];
         }
     }
 
-    static fromJS(data: any): SubClass3 {
+    static override fromJS(data: any): SubClass3 {
         data = typeof data === 'object' ? data : {};
         let result = new SubClass3();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["Prop3"] = this.prop3;
         super.toJSON(data);

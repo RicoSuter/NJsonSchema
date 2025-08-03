@@ -35,7 +35,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.0m,
                 InlineNamedDictionaries = inline,
                 ConvertConstructorInterfaceData = convert
             });
@@ -81,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
 
             // Act
             var code = generator.GenerateFile();
@@ -100,7 +99,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.0m,
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 GenerateTypeCheckFunctions = true
             });
@@ -124,7 +122,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping.Remove("MyException");
 
             var data = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
 
             // Act
             var code = generator.GenerateFile();
@@ -212,7 +210,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
             // Act
             var code = generator.GenerateFile();
@@ -301,7 +299,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
             var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
             // Act
             var code = generator.GenerateFile();

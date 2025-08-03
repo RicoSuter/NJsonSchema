@@ -18,7 +18,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 });
 
             var json = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2 });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
 
             var output = generator.GenerateFile("MyClass");
 
@@ -58,7 +58,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }");
 
             var generator = new TypeScriptGenerator(schema,
-               new TypeScriptGeneratorSettings { TypeScriptVersion = 2, SchemaType = SchemaType.OpenApi3 });
+               new TypeScriptGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
 
             // Act
             var output = generator.GenerateFile("MyClass");
@@ -101,7 +101,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }");
 
             var generator = new TypeScriptGenerator(schema,
-               new TypeScriptGeneratorSettings { TypeScriptVersion = 2, SchemaType = SchemaType.OpenApi3 });
+               new TypeScriptGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
 
             // Act
             var output = generator.GenerateFile("MyClass");
@@ -148,7 +148,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }");
 
             var generator = new TypeScriptGenerator(schema,
-               new TypeScriptGeneratorSettings { TypeScriptVersion = 2, SchemaType = SchemaType.OpenApi3 });
+               new TypeScriptGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
 
             // Act
             var output = generator.GenerateFile("MyClass");
@@ -173,7 +173,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var json = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.7m,
                 NullValue = TypeScriptNullValue.Null
             });
 
@@ -206,7 +205,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var json = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.7m,
                 NullValue = TypeScriptNullValue.Null
             });
 
