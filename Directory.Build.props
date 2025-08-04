@@ -3,7 +3,7 @@
         <VersionPrefix>11.5.0</VersionPrefix>
 
         <Authors>Rico Suter</Authors>
-        <Copyright>Copyright © Rico Suter, 2022</Copyright>
+        <Copyright>Copyright © Rico Suter, 2025</Copyright>
 
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
