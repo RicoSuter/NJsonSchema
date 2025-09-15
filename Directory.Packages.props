@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="Namotion.Reflection" Version="3.4.2" />
+    <PackageVersion Include="Namotion.Reflection" Version="3.4.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NodaTime" Version="3.2.2" />
     <PackageVersion Include="NSwag.Core.Yaml" Version="14.0.0" />
