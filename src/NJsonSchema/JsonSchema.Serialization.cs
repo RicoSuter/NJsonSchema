@@ -377,7 +377,7 @@ namespace NJsonSchema
             set => Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value!) : [];
         }
 
-        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        /// <summary>Gets or sets the enumeration names (used for deserialization only).</summary>
         [JsonProperty("x-enum-names", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         internal Collection<string>? EnumerationNamesDashedRaw
         {
@@ -391,9 +391,9 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        /// <summary>Gets or sets the enumeration names (used for deserialization only).</summary>
         [JsonProperty("x-enum-varnames", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
-        internal Collection<string>? EnumerationVarnamesRaw
+        internal Collection<string>? EnumerationVarNamesRaw
         {
             get => null;
             set
@@ -405,7 +405,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets or sets the enumeration names (optional, draft v5). </summary>
+        /// <summary>Gets or sets the enumeration names (optional, draft v5).</summary>
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal Collection<string>? EnumerationNamesRaw
         {
@@ -413,7 +413,7 @@ namespace NJsonSchema
             set => EnumerationNames = value != null ? new ObservableCollection<string>(value) : [];
         }
 
-        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
+        /// <summary>Gets or sets the enumeration descriptions (used for deserialization only).</summary>
         [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
         internal JArray? EnumerationDescriptionsRaw
         {

@@ -25,6 +25,16 @@ namespace NJsonSchema.Tests.Generation
             B = 5,
             C = 6,
         }
+        
+        /// <summary>
+        /// Foo bar.
+        /// </summary>
+        public enum BarByte : byte
+        {
+            A = 0,
+            B = 5,
+            C = 6,
+        }
 
         [Fact]
         public async Task When_property_is_integer_enum_then_schema_has_enum()
@@ -115,24 +125,29 @@ namespace NJsonSchema.Tests.Generation
         {
             [DefaultValue(Bar.C)]
             public Bar Bar { get; set; }
+            
+            [DefaultValue(BarByte.C)]
+            public BarByte BarByte { get; set; }
         }
 
         [Fact]
         public async Task When_enum_property_is_generated_then_enum_is_referenced()
         {
-            // Arrange
-
-
-            // Act
-            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumProperty>(new NewtonsoftJsonSchemaGeneratorSettings
+            // Arrange & Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<EnumProperty>(
+                new NewtonsoftJsonSchemaGeneratorSettings
             {
                 SchemaType = SchemaType.Swagger2
             });
+
             var json = schema.ToJson();
 
             // Assert
             Assert.Equal(Bar.C, schema.Properties["Bar"].Default);
             Assert.True(schema.Properties["Bar"].HasReference);
+
+            Assert.Equal(BarByte.C, schema.Properties["BarByte"].Default);
+            Assert.True(schema.Properties["BarByte"].HasReference);
         }
 
         public class EnumPropertyWithDefaultClass

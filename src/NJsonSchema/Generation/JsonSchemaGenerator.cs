@@ -452,7 +452,7 @@ namespace NJsonSchema.Generation
                 }
                 else
                 {
-                    return (int)defaultValue;
+                    return Convert.ChangeType(defaultValue, Enum.GetUnderlyingType(type.Type), CultureInfo.InvariantCulture);
                 }
             }
             else
