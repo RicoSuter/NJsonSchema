@@ -702,16 +702,17 @@ namespace NJsonSchema.Generation
             schema.EnumerationDescriptions.Clear();
             schema.IsFlagEnumerable = contextualType.IsAttributeDefined<FlagsAttribute>(true);
 
-            var allDescriptionsEmpty = true;
             Func<object, string?>? enumValueConverter = null;
+
+            var allDescriptionsEmpty = true;
             var underlyingType = Enum.GetUnderlyingType(contextualType.Type);
             foreach (var enumName in Enum.GetNames(contextualType.Type))
             {
-                string? enumDescription = null;
                 var field = contextualType.Type.GetRuntimeField(enumName);
-                // Retrieve the Description attribute value, if present.
-                var descriptionAttribute = field?.GetCustomAttribute<DescriptionAttribute>();
 
+                // Retrieve the Description attribute value, if present.
+                string? enumDescription = null;
+                var descriptionAttribute = field?.GetCustomAttribute<DescriptionAttribute>();
                 if (descriptionAttribute != null)
                 {
                     enumDescription = descriptionAttribute.Description;
@@ -785,7 +786,7 @@ namespace NJsonSchema.Generation
         {
             var extensionDataProperty = type.GetContextualProperties()
                 .FirstOrDefault(p => p.GetAttributes(true).Any(a =>
-                    Namotion.Reflection.TypeExtensions.IsAssignableToTypeName(a.GetType(), "JsonExtensionDataAttribute", TypeNameStyle.Name)));
+                    a.GetType().IsAssignableToTypeName("JsonExtensionDataAttribute", TypeNameStyle.Name)));
 
             if (extensionDataProperty != null)
             {

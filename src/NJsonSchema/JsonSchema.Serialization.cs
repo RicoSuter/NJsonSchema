@@ -125,9 +125,9 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is string)
+                if (value is string stringValue)
                 {
-                    Discriminator = (string) value;
+                    Discriminator = stringValue;
                 }
                 else if (value != null)
                 {
@@ -151,9 +151,9 @@ namespace NJsonSchema
             get => ExclusiveMaximum ?? (IsExclusiveMaximum ? (object) true : null);
             set
             {
-                if (value is bool)
+                if (value is bool boolValue)
                 {
-                    IsExclusiveMaximum = (bool) value;
+                    IsExclusiveMaximum = boolValue;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -173,9 +173,9 @@ namespace NJsonSchema
             get => ExclusiveMinimum ?? (IsExclusiveMinimum ? (object) true : null);
             set
             {
-                if (value is bool)
+                if (value is bool boolValue)
                 {
-                    IsExclusiveMinimum = (bool) value;
+                    IsExclusiveMinimum = boolValue;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -207,9 +207,9 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is bool)
+                if (value is bool boolValue)
                 {
-                    AllowAdditionalItems = (bool) value;
+                    AllowAdditionalItems = boolValue;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -261,9 +261,9 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is bool)
+                if (value is bool boolValue)
                 {
-                    AllowAdditionalProperties = (bool) value;
+                    AllowAdditionalProperties = boolValue;
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -295,9 +295,9 @@ namespace NJsonSchema
             }
             set
             {
-                if (value is JArray)
+                if (value is JArray array)
                 {
-                    Items = new ObservableCollection<JsonSchema>(((JArray) value).Select(FromJsonWithCurrentSettings));
+                    Items = new ObservableCollection<JsonSchema>(array.Select(FromJsonWithCurrentSettings));
                 }
                 else if (value != null)
                 {
@@ -350,14 +350,14 @@ namespace NJsonSchema
         [JsonProperty("required", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<string>? RequiredPropertiesRaw
         {
-            get => RequiredProperties != null && RequiredProperties.Count > 0 ? RequiredProperties : null;
+            get => RequiredProperties is { Count: > 0 } ? RequiredProperties : null;
             set => RequiredProperties = value ?? [];
         }
 
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchemaProperty>? PropertiesRaw
         {
-            get => _properties != null && _properties.Count > 0 ? Properties : null;
+            get => _properties is { Count: > 0 } ? Properties : null;
             set => Properties = value != null ? new ObservableDictionary<string, JsonSchemaProperty>(value!) : [];
         }
 
@@ -373,7 +373,7 @@ namespace NJsonSchema
         [JsonProperty("definitions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal IDictionary<string, JsonSchema>? DefinitionsRaw
         {
-            get => Definitions != null && Definitions.Count > 0 ? Definitions : null;
+            get => Definitions is { Count: > 0 } ? Definitions : null;
             set => Definitions = value != null ? new ObservableDictionary<string, JsonSchema>(value!) : [];
         }
 
@@ -409,7 +409,7 @@ namespace NJsonSchema
         [JsonProperty("x-enumNames", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal Collection<string>? EnumerationNamesRaw
         {
-            get => EnumerationNames != null && EnumerationNames.Count > 0 ? EnumerationNames : null;
+            get => EnumerationNames is { Count: > 0 } ? EnumerationNames : null;
             set => EnumerationNames = value != null ? new ObservableCollection<string>(value) : [];
         }
 
@@ -421,7 +421,7 @@ namespace NJsonSchema
             set => EnumerationDescriptionsDashedRaw = value;
         }
 
-        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5). </summary>
+        /// <summary>Gets or sets the enumeration descriptions (optional, draft v5).</summary>
         [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal JArray? EnumerationDescriptionsDashedRaw
         {
@@ -439,28 +439,28 @@ namespace NJsonSchema
         [JsonProperty("enum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<object?>? EnumerationRaw
         {
-            get => Enumeration != null && Enumeration.Count > 0 ? Enumeration : null;
+            get => Enumeration is { Count: > 0 } ? Enumeration : null;
             set => Enumeration = value != null ? new ObservableCollection<object?>(value) : [];
         }
 
         [JsonProperty("allOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? AllOfRaw
         {
-            get => _allOf != null && _allOf.Count > 0 ? AllOf : null;
+            get => _allOf is { Count: > 0 } ? AllOf : null;
             set => AllOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
         [JsonProperty("anyOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? AnyOfRaw
         {
-            get => _anyOf != null && _anyOf.Count > 0 ? AnyOf : null;
+            get => _anyOf is { Count: > 0 } ? AnyOf : null;
             set => AnyOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
         [JsonProperty("oneOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         internal ICollection<JsonSchema>? OneOfRaw
         {
-            get => _oneOf != null && _oneOf.Count > 0 ? OneOf : null;
+            get => _oneOf is { Count: > 0 } ? OneOf : null;
             set => OneOf = value != null ? new ObservableCollection<JsonSchema>(value) : [];
         }
 
@@ -542,9 +542,8 @@ namespace NJsonSchema
 
                 if (keysToRemove != null)
                 {
-                    for (var i = 0; i < keysToRemove.Count; i++)
+                    foreach (var key in keysToRemove)
                     {
-                        var key = keysToRemove[i];
                         collection.Remove(key);
                     }
                 }
@@ -553,32 +552,23 @@ namespace NJsonSchema
 
         private static List<string?>? ConvertPossibleStringArray(JArray? array)
         {
-            if (array is null || array.Count == 0)
-            {
-                return null;
-            }
-
-            if (array.Count > 0)
+            if (array?.Count > 0)
             {
                 var result = new List<string?>(array.Count);
-                for (var i = 0; i < array.Count; i++)
+                foreach (var item in array)
                 {
-                    var item = array[i];
-                    if (item.Type is JTokenType.String)
+                    switch (item.Type)
                     {
-                        result.Add(null);
-                    }
-                    else if (item.Type is JTokenType.Null)
-                    {
-                        result.Add(null);
-                    }
-                    else
-                    {
-                        // we stop processing as we don't to trust the content
-                        return null;
+                        case JTokenType.String:
+                            result.Add(item.Value<string>());
+                            break;
+                        case JTokenType.Null:
+                            result.Add(null);
+                            break;
+                        default:
+                            return null; // unsupported token type, abort
                     }
                 }
-
                 return result;
             }
 
