@@ -115,6 +115,41 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             CSharpCompiler.AssertCompile(code);
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_enum_is_string_then_generic_StringEnumConverter_is_used(bool nullable)
+        {
+            // Arrange
+            var json =
+                $$"""
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "size" : {
+                            "type": [ "string"{{(nullable ? ", \"null\"" : "")}} ],
+                            "enum" : [
+                                "small",
+                                "medium",
+                                "large"
+                            ]
+                        }
+                    }
+                }
+                """;
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { JsonLibrary = CSharpJsonLibrary.SystemTextJson });
+
+            // Act
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
         public class MyStringEnumListTest
         {
             public List<MyStringEnum> Enums { get; set; }

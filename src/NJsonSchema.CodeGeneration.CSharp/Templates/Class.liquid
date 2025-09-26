@@ -91,7 +91,7 @@
 {%-   endif -%}
 {%-   if property.IsStringEnum -%}
 {%-     if UseSystemTextJson -%}
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<{{ property.Type | rtrimquestionmark }}>))]
 {%-     else -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%-     endif -%}
