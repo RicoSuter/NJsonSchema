@@ -47,6 +47,7 @@ namespace NJsonSchema.CodeGeneration
             templateOptions.Filters.AddFilter("lowercamelcase", LiquidFilters.Lowercamelcase);
             templateOptions.Filters.AddFilter("uppercamelcase", LiquidFilters.Uppercamelcase);
             templateOptions.Filters.AddFilter("literal", LiquidFilters.Literal);
+            templateOptions.Filters.AddFilter("rtrimquestionmark", LiquidFilters.RightTrimQuestionMark);
 
             TemplateOptions = templateOptions;
         }
@@ -329,6 +330,12 @@ namespace NJsonSchema.CodeGeneration
             public static ValueTask<FluidValue> Literal(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
                 var converted = ConversionUtilities.ConvertToStringLiteral(input.ToStringValue(), "\"", "\"");
+                return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
+            }
+
+            public static ValueTask<FluidValue> RightTrimQuestionMark(FluidValue input, FilterArguments arguments, TemplateContext context)
+            {
+                var converted = input.ToStringValue().TrimEnd('?');
                 return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
             }
         }
