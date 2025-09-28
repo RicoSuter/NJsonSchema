@@ -12,7 +12,11 @@
 {
 {%- for enum in Enums %}
 {%-   if IsStringEnum -%}
+{%-       if UseSystemTextJson -%}
+    [System.Text.Json.Serialization.JsonStringEnumMemberName(@"{{ enum.Value | replace: '"', '""' }}")]
+{%-       else -%}
     [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
+{%-       endif -%}
 {%-   endif -%}
 {%- template Enum.Member.Annotations -%}
 {%- if IsEnumAsBitFlags -%}

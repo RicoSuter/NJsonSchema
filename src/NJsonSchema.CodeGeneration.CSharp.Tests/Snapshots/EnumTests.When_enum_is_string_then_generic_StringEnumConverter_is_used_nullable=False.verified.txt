@@ -20,15 +20,15 @@ namespace MyNamespace
     public enum MyClassSize
     {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"small")]
+        [System.Text.Json.Serialization.JsonStringEnumMemberName(@"small")]
         Small = 0,
 
 
-        [System.Runtime.Serialization.EnumMember(Value = @"medium")]
+        [System.Text.Json.Serialization.JsonStringEnumMemberName(@"medium")]
         Medium = 1,
 
 
-        [System.Runtime.Serialization.EnumMember(Value = @"large")]
+        [System.Text.Json.Serialization.JsonStringEnumMemberName(@"large")]
         Large = 2,
 
 
