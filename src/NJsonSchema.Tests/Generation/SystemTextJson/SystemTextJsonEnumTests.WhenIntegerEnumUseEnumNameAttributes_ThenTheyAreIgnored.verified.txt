@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "IntegerEnumContainer",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "IntegerCloudCover": {
+      "$ref": "#/definitions/IntegerCloudCover"
+    }
+  },
+  "definitions": {
+    "IntegerCloudCover": {
+      "type": "integer",
+      "description": "",
+      "x-enumNames": [
+        "Clear",
+        "Partial",
+        "Overcast"
+      ],
+      "enum": [
+        0,
+        1,
+        2
+      ]
+    }
+  }
+}
