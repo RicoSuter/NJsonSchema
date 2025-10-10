@@ -72,6 +72,9 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
 
             [JsonConverter(typeof(JsonStringEnumConverter))]
             public MyEnum StringEnum { get; set; }
+           
+            [JsonConverter(typeof(JsonStringEnumConverter<MyEnum>))]
+            public MyEnum StringEnum2 { get; set; }
 
             public MyEnum IntEnum { get; set; }
         }
@@ -103,6 +106,7 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.True(schema.Properties.ContainsKey("NameLast"));
 
             Assert.True(schema.Properties["stringEnum"].ActualSchema.Type.HasFlag(JsonObjectType.String));
+            Assert.True(schema.Properties["stringEnum2"].ActualSchema.Type.HasFlag(JsonObjectType.String));
             Assert.True(schema.Properties["intEnum"].ActualSchema.Type.HasFlag(JsonObjectType.Integer));
         }
     }
