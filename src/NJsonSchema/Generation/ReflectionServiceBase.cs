@@ -379,7 +379,8 @@ namespace NJsonSchema.Generation
                 if (jsonConverterAttribute?.ConverterType is Type converterType)
                 {
                     return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||
-                           converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName);
+                           converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName) ||
+                           converterType.IsAssignableToTypeName($"System.Text.Json.Serialization.JsonStringEnumConverter`1[[{contextualType.OriginalType.AssemblyQualifiedName}]]", TypeNameStyle.FullName);
                 }
             }
 
