@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "StringJsonStringEnumMemberNameContainer",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "CloudCover": {
+      "$ref": "#/definitions/CloudCoverWithJsonStringEnumMemberName"
+    }
+  },
+  "definitions": {
+    "CloudCoverWithJsonStringEnumMemberName": {
+      "type": "string",
+      "description": "",
+      "x-enumNames": [
+        "Clear",
+        "Partial",
+        "Overcast"
+      ],
+      "enum": [
+        "Clear",
+        "Partly cloudy",
+        "Overcast"
+      ]
+    }
+  }
+}

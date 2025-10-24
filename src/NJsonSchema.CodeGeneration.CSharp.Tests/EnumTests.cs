@@ -182,6 +182,27 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set_for_STJ_target()
+        {
+            // Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
+            var data = schema.ToJson();
+            var generator =
+                new CSharpGenerator(schema, new CSharpGeneratorSettings
+                {
+                    ClassStyle = CSharpClassStyle.Poco, 
+                    JsonLibrary = CSharpJsonLibrary.SystemTextJson
+                });
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
             // Arrange
