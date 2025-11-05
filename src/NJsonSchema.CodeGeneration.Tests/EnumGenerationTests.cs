@@ -52,7 +52,7 @@ namespace NJsonSchema.CodeGeneration.Tests
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
 
-            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
+            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings
             {
                 ExportTypes = true
             };
@@ -72,8 +72,8 @@ namespace NJsonSchema.CodeGeneration.Tests
             // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<StringAndIntegerEnumTestClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var data = schema.ToJson();
-
-            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings()
+            
+            TypeScriptGeneratorSettings typeScriptGeneratorSettings = new TypeScriptGeneratorSettings
             {
                 ExportTypes = false
             };
@@ -144,6 +144,30 @@ namespace NJsonSchema.CodeGeneration.Tests
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+        
+#if NET9_0_OR_GREATER
+
+        [Fact]
+        public async Task When_enum_has_string_value_then_CS_code_has_JsonStringEnumMemberName_attribute()
+        {
+            // Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithStringEnum>();
+            var schemaData = schema.ToJson();
+            
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                JsonLibraryVersion = 9.0m,
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+#endif
 
         [Fact]
         public async Task When_enum_has_string_value_then_TS_code_has_string_value()

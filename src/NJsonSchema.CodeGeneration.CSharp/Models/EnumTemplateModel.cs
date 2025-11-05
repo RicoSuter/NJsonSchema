@@ -55,6 +55,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether to use System.Text.Json</summary>
         public bool UseSystemTextJson => _settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
 
+        /// <summary>Gets or sets the CSharp JSON library version to use.</summary>
+        public decimal JsonLibraryVersion => _settings.JsonLibraryVersion;
+
         /// <summary>Gets a value indicating whether the enum needs another base type to representing an extended value range.</summary>
         public bool HasExtendedValueRange => _schema.Format == JsonFormatStrings.Long;
 

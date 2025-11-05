@@ -28,8 +28,6 @@ public class SystemTextJsonEnumTests
         return Verify(schema.ToJson()); // should have "Partly cloudy" in "enum" but "Partial" in "x-enumNames"
     }
     
-#endif
-
     public class StringEnumMemberContainer
     {
         public CloudCoverWithEnumMember CloudCover { get; set; }
@@ -72,4 +70,6 @@ public class SystemTextJsonEnumTests
         var schema = JsonSchema.FromType<IntegerEnumContainer>();
         return Verify(schema.ToJson()); // should have 1 and no "Partly cloudy"
     }
+
+#endif
 }

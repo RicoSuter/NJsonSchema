@@ -11,19 +11,11 @@ namespace MyNamespace
     public enum MyStringEnum
     {
 
-    #if NET9_0_OR_GREATER
-        [System.Text.Json.Serialization.JsonStringEnumMemberName(@"Foo")]
-    #else
         [System.Runtime.Serialization.EnumMember(Value = @"Foo")]
-    #endif
         Foo = 0,
 
 
-    #if NET9_0_OR_GREATER
-        [System.Text.Json.Serialization.JsonStringEnumMemberName(@"Bar")]
-    #else
         [System.Runtime.Serialization.EnumMember(Value = @"Bar")]
-    #endif
         Bar = 1,
 
 
