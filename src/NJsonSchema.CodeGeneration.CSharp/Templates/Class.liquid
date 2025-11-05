@@ -62,7 +62,7 @@
 {%- if UseSystemTextJson -%}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
 {%-   if property.IsStringEnumArray -%}
-    // TODO(system.text.json): Add string enum item converter
+    // TODO(system.text.json): Add ItemConverterType with enum converter when supported
 {%-   endif -%}
 {%- else -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]

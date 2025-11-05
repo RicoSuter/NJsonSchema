@@ -120,6 +120,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
         public CSharpJsonLibrary JsonLibrary { get; set; }
 
+        /// <summary>Gets or sets the CSharp JSON library version to use (applies only to System.Text.Json, default: 8.0).</summary>
+        public decimal JsonLibraryVersion { get; set; } = 8.0m;
+
         /// <summary>Gets or sets the CSharp JSON polymorphic serialization style (default: 'NJsonSchema', 'SystemTextJson' is experimental/not complete).</summary>
         public CSharpJsonPolymorphicSerializationStyle JsonPolymorphicSerializationStyle { get; set; }
 
