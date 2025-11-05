@@ -157,7 +157,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether the C# 11 "required" keyword should be used for required properties (default: false). </summary>
         public bool UseRequiredKeyword { get; set; }
         
-        /// <summary> Gets the read accessor of properties ('set' | 'init').</summary>
+        /// <summary>Gets the read accessor of properties ('set' | 'init').</summary>
         public string WriteAccessor { get; set; }
 
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.</summary>
