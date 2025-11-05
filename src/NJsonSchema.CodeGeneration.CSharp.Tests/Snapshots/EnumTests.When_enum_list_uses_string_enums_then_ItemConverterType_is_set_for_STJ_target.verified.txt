@@ -25,7 +25,7 @@ namespace MyNamespace
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("Enums")]
-        // TODO(system.text.json): Add string enum item converter
+        // TODO(system.text.json): Add ItemConverterType with enum converter when supported
         public System.Collections.Generic.ICollection<MyStringEnum> Enums { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("NullableEnum")]
