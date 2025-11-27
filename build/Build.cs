@@ -31,7 +31,7 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Solution(GenerateProjects = true)] readonly Solution Solution;
+    [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
@@ -106,16 +106,18 @@ partial class Build : NukeBuild
                 .SetProjectFile(Solution)
             );
 
+            var directory = Solution.AllProjects.First(x => x.Name == "NJsonSchema.CodeGeneration.TypeScript.Tests").Directory;
+
             if (IsServerBuild)
             {
                 NpmTasks.NpmCi(_ => _
-                    .SetProcessWorkingDirectory(Solution._2_CodeGeneration.NJsonSchema_CodeGeneration_TypeScript_Tests.Directory)
+                    .SetProcessWorkingDirectory(directory)
                 );
             }
             else
             {
                 NpmTasks.NpmInstall(_ => _
-                    .SetProcessWorkingDirectory(Solution._2_CodeGeneration.NJsonSchema_CodeGeneration_TypeScript_Tests.Directory)
+                    .SetProcessWorkingDirectory(directory)
                 );
             }
         });
