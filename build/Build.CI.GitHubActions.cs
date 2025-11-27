@@ -46,7 +46,7 @@ class CustomGitHubActionsAttribute : GitHubActionsAttribute
         var newSteps = new List<GitHubActionsStep>(job.Steps);
 
         // only need to list the ones that are missing from default image
-        newSteps.Insert(0, new GitHubActionsSetupDotNetStep(["9.0"]));
+        newSteps.Insert(0, new GitHubActionsSetupDotNetStep(["10.0"]));
 
         var onWindows = image.ToString().StartsWith("windows", StringComparison.OrdinalIgnoreCase);
         if (onWindows)
@@ -71,7 +71,7 @@ class GitHubActionsSetupDotNetStep : GitHubActionsStep
 
     public override void Write(CustomFileWriter writer)
     {
-        writer.WriteLine("- uses: actions/setup-dotnet@v4");
+        writer.WriteLine("- uses: actions/setup-dotnet@v5");
 
         using (writer.Indent())
         {
