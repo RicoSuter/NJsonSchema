@@ -6,14 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Namotion.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -25,8 +21,12 @@ namespace NJsonSchema
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
+        private static readonly List<ContextualAccessorInfo> JsonSchemaContextualAccessors = typeof(JsonSchema).GetContextualAccessors()
+            .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true))
+            .ToList();
+
         private readonly JsonSchemaAppender _schemaAppender;
-        private readonly Dictionary<string, IJsonReference> _resolvedObjects = new Dictionary<string, IJsonReference>();
+        private readonly Dictionary<string, IJsonReference> _resolvedObjects = [];
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
         /// <param name="schemaAppender">The schema appender.</param>
@@ -40,8 +40,10 @@ namespace NJsonSchema
         /// <returns>The factory.</returns>
         public static Func<JsonSchema, JsonReferenceResolver> CreateJsonReferenceResolverFactory(ITypeNameGenerator typeNameGenerator)
         {
-            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema) =>
-                new JsonReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            JsonReferenceResolver ReferenceResolverFactory(JsonSchema schema)
+            {
+                return new JsonReferenceResolver(new JsonSchemaAppender(schema, typeNameGenerator));
+            }
 
             return ReferenceResolverFactory;
         }
@@ -84,6 +86,12 @@ namespace NJsonSchema
             return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false, cancellationToken).ConfigureAwait(false);
         }
 
+        private static string UnescapeReferenceSegment(string segment)
+        {
+            var urlDecoded = WebUtility.UrlDecode(segment);
+            return urlDecoded.Replace("~1", "/").Replace("~0", "~");
+        }
+
         /// <summary>Resolves a document reference.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path to resolve.</param>
@@ -94,11 +102,13 @@ namespace NJsonSchema
         public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
-            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, new HashSet<object>());
-            if (schema == null)
+            for (var i = 0; i < allSegments.Count; i++)
             {
-                throw new InvalidOperationException("Could not resolve the path '" + jsonPath + "'.");
+                allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
             }
+
+            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, [])
+                         ?? throw new InvalidOperationException($"Could not resolve the path '{jsonPath}'.");
 
             return schema;
         }
@@ -289,8 +299,7 @@ namespace NJsonSchema
             }
             else if (obj is IEnumerable)
             {
-                int index;
-                if (int.TryParse(firstSegment, out index))
+                if (int.TryParse(firstSegment, out var index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (enumerable.Length > index)
@@ -307,10 +316,19 @@ namespace NJsonSchema
                     return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
                 }
 
-                foreach (var member in obj
-                    .GetType()
-                    .GetContextualAccessors()
-                    .Where(p => p.IsAttributeDefined<JsonIgnoreAttribute>(true) == false))
+                IEnumerable<ContextualAccessorInfo> properties;
+                if (obj.GetType() == typeof(JsonSchema))
+                {
+                    properties = JsonSchemaContextualAccessors;
+                }
+                else
+                {
+                    properties = obj.GetType()
+                        .GetContextualAccessors()
+                        .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true));
+                }
+
+                foreach (var member in properties)
                 {
                     var pathSegment = member.GetName();
                     if (pathSegment == firstSegment)

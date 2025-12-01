@@ -6,11 +6,12 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
 using System.Linq;
-using NJsonSchema.Annotations;
 using System.Reflection;
+
+using NJsonSchema.Annotations;
+
 using Namotion.Reflection;
 
 namespace NJsonSchema.Generation
@@ -70,7 +71,7 @@ namespace NJsonSchema.Generation
         /// <returns>The <see cref="JsonTypeDescription"/>. </returns>
         protected virtual JsonTypeDescription GetDescription(ContextualType contextualType, TSettings settings, Type originalType, bool isNullable, ReferenceTypeNullHandling defaultReferenceTypeNullHandling)
         {
-            if (originalType.GetTypeInfo().IsEnum)
+            if (originalType.IsEnum)
             {
                 var isStringEnum = IsStringEnum(contextualType, settings);
                 return JsonTypeDescription.CreateForEnumeration(contextualType,
@@ -154,14 +155,12 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Duration);
             }
 
-            if (originalType.FullName == "NodaTime.LocalDate" ||
-                originalType.FullName == "System.DateOnly")
+            if (originalType.FullName is "NodaTime.LocalDate" or "System.DateOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Date);
             }
 
-            if (originalType.FullName == "NodaTime.LocalTime" ||
-                originalType.FullName == "System.TimeOnly")
+            if (originalType.FullName is "NodaTime.LocalTime" or "System.TimeOnly")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Time);
             }
@@ -253,8 +252,7 @@ namespace NJsonSchema.Generation
             var isValueType = contextualType.Type != typeof(string) &&
                               contextualType.TypeInfo.IsValueType;
 
-            return isValueType == false &&
-                   defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
+            return !isValueType && defaultReferenceTypeNullHandling != ReferenceTypeNullHandling.NotNull;
         }
 
         /// <summary>Checks whether the give type is a string enum.</summary>
@@ -283,11 +281,38 @@ namespace NJsonSchema.Generation
         {
             // TODO: Move all file handling to NSwag. How?
 
-            var parameterTypeName = contextualType.Name;
-            return parameterTypeName == "IFormFile" ||
-                   contextualType.IsAssignableToTypeName("HttpPostedFile", TypeNameStyle.Name) ||
-                   contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name) ||
-                   contextualType.TypeInfo.ImplementedInterfaces.Any(i => i.Name == "IFormFile");
+            if (contextualType.Name == "IFormFile")
+            {
+                return true;
+            }
+
+            var typeInfo = contextualType.TypeInfo;
+            if (typeInfo.IsArray || typeInfo.IsPrimitive)
+            {
+                // cannot be posted file or implement interface
+                return false;
+            }
+
+            // HttpPostedFile is sealed
+            if (contextualType.Name == "HttpPostedFile")
+            {
+                return true;
+            }
+
+            if (contextualType.IsAssignableToTypeName("HttpPostedFileBase", TypeNameStyle.Name))
+            {
+                return true;
+            }
+
+            foreach (var i in typeInfo.GetInterfaces())
+            {
+                if (i.Name == "IFormFile")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Checks whether the given type is an IAsyncEnumerable type.</summary>
@@ -327,7 +352,7 @@ namespace NJsonSchema.Generation
         /// <returns>true or false.</returns>
         protected virtual bool IsDictionaryType(ContextualType contextualType)
         {
-            if (contextualType.Name == "IDictionary`2" || contextualType.Name == "IReadOnlyDictionary`2")
+            if (contextualType.Name is "IDictionary`2" or "IReadOnlyDictionary`2")
             {
                 return true;
             }
@@ -339,17 +364,23 @@ namespace NJsonSchema.Generation
 
         private static bool HasStringEnumConverter(ContextualType contextualType)
         {
-            dynamic? jsonConverterAttribute = contextualType
-                .GetContextOrTypeAttributes(true)?
-                .FirstOrDefault(a => a.GetType().Name == "JsonConverterAttribute");
+            dynamic? jsonConverterAttribute = null;
+            foreach (var a in contextualType.GetContextOrTypeAttributes(true))
+            {
+                if (a.GetType().Name == "JsonConverterAttribute")
+                {
+                    jsonConverterAttribute = a;
+                    break;
+                }
+            }
 
             if (jsonConverterAttribute != null && ObjectExtensions.HasProperty(jsonConverterAttribute, "ConverterType"))
             {
-                var converterType = jsonConverterAttribute?.ConverterType as Type;
-                if (converterType != null)
+                if (jsonConverterAttribute?.ConverterType is Type converterType)
                 {
                     return converterType.IsAssignableToTypeName("StringEnumConverter", TypeNameStyle.Name) ||
-                           converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName);
+                           converterType.IsAssignableToTypeName("System.Text.Json.Serialization.JsonStringEnumConverter", TypeNameStyle.FullName) ||
+                           converterType.IsAssignableToTypeName($"System.Text.Json.Serialization.JsonStringEnumConverter`1[[{contextualType.OriginalType.AssemblyQualifiedName}]]", TypeNameStyle.FullName);
                 }
             }
 

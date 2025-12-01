@@ -19,16 +19,16 @@ export enum EBase {
 }
 
 export interface OneChild extends Base {
-    A: string;
+    A: string | undefined;
     Type: EBase.OneChild;
 }
 
 export interface SecondChild extends Base {
-    B: string;
+    B: string | undefined;
     Type: EBase.SecondChild;
 }
 
 export interface MyClass {
-    Child: Base;
-    Children: Base[];
+    Child: Base | undefined;
+    Children: Base[] | undefined;
 }

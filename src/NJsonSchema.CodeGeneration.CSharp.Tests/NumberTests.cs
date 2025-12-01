@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
-using NJsonSchema.CodeGeneration.CSharp;
-using Xunit;
+﻿using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp;
 
@@ -9,7 +8,7 @@ public class NumberTests
     [Fact]
     public async Task When_number_has_no_format_then_default_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -22,17 +21,18 @@ public class NumberTests
         var schema = await JsonSchema.FromJsonAsync(json);
         var generator = new CSharpGenerator(schema);
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public double Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
     public async Task When_number_has_decimal_format_then_decimal_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -46,17 +46,18 @@ public class NumberTests
         var schema = await JsonSchema.FromJsonAsync(json);
         var generator = new CSharpGenerator(schema);
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public decimal Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
     public async Task When_number_has_double_format_then_double_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -70,17 +71,18 @@ public class NumberTests
         var schema = await JsonSchema.FromJsonAsync(json);
         var generator = new CSharpGenerator(schema);
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public double Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
     public async Task When_number_has_float_format_then_float_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -94,17 +96,18 @@ public class NumberTests
         var schema = await JsonSchema.FromJsonAsync(json);
         var generator = new CSharpGenerator(schema);
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public float Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
     public async Task When_number_type_setting_is_defined_then_setting_type_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -120,17 +123,17 @@ public class NumberTests
             NumberType = "customNumberType"
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public customNumberType Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
     public async Task When_number_type_setting_is_whitespace_then_double_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -146,17 +149,18 @@ public class NumberTests
             NumberType = " \t\n"
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public double Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
 
     [Fact]
     public async Task When_number_type_setting_is_null_then_double_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -173,17 +177,18 @@ public class NumberTests
             NumberType = null!
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public double? Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
     }
    
     [Fact]
     public async Task When_number_float_type_setting_is_defined_then_setting_type_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -200,17 +205,17 @@ public class NumberTests
             NumberFloatType = "customFloatType"
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public customFloatType Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
     public async Task When_number_double_type_setting_is_defined_then_setting_type_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -227,17 +232,17 @@ public class NumberTests
             NumberDoubleType = "customDoubleType"
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public customDoubleType Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
     }
 
     [Fact]
     public async Task When_number_decimal_type_setting_is_defined_then_setting_type_is_generated()
     {
-        //// Arrange
+        // Arrange
         var json =
             @"{
                 ""type"": ""object"", 
@@ -254,10 +259,10 @@ public class NumberTests
             NumberDecimalType = "customDecimalType"
         });
 
-        //// Act
+        // Act
         var code = generator.GenerateFile("MyClass");
 
-        //// Assert
-        Assert.Contains("public customDecimalType Amount", code);
+        // Assert
+        await VerifyHelper.Verify(code);
     }
 }

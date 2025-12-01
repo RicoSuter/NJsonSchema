@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -16,7 +14,7 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ExtensionCode
     {
         /// <summary>Gets the code of the class extension.</summary>
-        public Dictionary<string, string> ExtensionClasses { get; protected set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> ExtensionClasses { get; protected set; } = [];
 
         /// <summary>Gets or sets the imports.</summary>
         public string ImportCode { get; protected set; } = string.Empty;

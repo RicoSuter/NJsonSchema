@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -20,7 +18,21 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The result.</returns>
         public static string Concatenate(this IEnumerable<CodeArtifact> artifacts)
         {
-            return ConversionUtilities.TrimWhiteSpaces(string.Join("\n\n", artifacts.Select(p => p.Code)));
+            using var stringBuilder = new ValueStringBuilder();
+            foreach (var artifact in artifacts)
+            {
+                stringBuilder.Append(artifact.Code);
+                stringBuilder.Append("\n\n");
+            }
+
+            var span = stringBuilder.AsSpan();
+            if (span.Length > 0)
+            {
+                // remove extra
+                span = span[..^2];
+            }
+
+            return ConversionUtilities.TrimWhiteSpaces(span).ToString();
         }
 
         /// <summary>Reorders the results so that base classes are always before child classes.</summary>
@@ -31,7 +43,7 @@ namespace NJsonSchema.CodeGeneration
             var newResults = new List<CodeArtifact>(results);
 
             // we need new list to iterate as we modify the original
-            var resultIterator = results as List<CodeArtifact> ?? newResults.ToList();
+            var resultIterator = results as List<CodeArtifact> ?? [.. newResults];
             foreach (var result in resultIterator)
             {
                 if (!string.IsNullOrEmpty(GetActualBaseName(result.BaseTypeName)))

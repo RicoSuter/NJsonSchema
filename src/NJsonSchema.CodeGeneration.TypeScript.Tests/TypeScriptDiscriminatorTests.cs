@@ -1,16 +1,12 @@
-﻿using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Runtime.Serialization;
-using Xunit;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using VerifyXunit;
 using Newtonsoft.Json.Converters;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
-    [UsesVerify]
     public class TypeScriptDiscriminatorTests
     {
         [JsonConverter(typeof(JsonInheritanceConverter), nameof(Type))]
@@ -52,7 +48,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
@@ -60,89 +56,80 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var data = schema.ToJson();
             var json = JsonConvert.SerializeObject(new OneChild());
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m,
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            // Assert
             await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_generating_interface_contract_add_discriminator_string_literal()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>(new NewtonsoftJsonSchemaGeneratorSettings
             {
                 GenerateAbstractProperties = true,
             });
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m,
                 EnumStyle = TypeScriptEnumStyle.StringLiteral,
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("export interface Base {\n    Type: EBase;\n}", code);
+            // Assert
             await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_interface()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("export interface OneChild extends Base", code);
-            Assert.Contains("export interface SecondChild extends Base", code);
-            Assert.Contains("Child: OneChild | SecondChild;", code);
-            Assert.Contains("Children: (OneChild | SecondChild)[];", code);
+            // Assert
             await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_parameter_is_abstract_then_generate_union_class()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Nested>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 UseLeafType = true,
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Class
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("export class OneChild extends Base", code);
-            Assert.Contains("export class SecondChild extends Base", code);
-            Assert.Contains("child: OneChild | SecondChild;", code);
-            Assert.Contains("children: (OneChild | SecondChild)[];", code);
+            // Assert
             await VerifyHelper.Verify(code);
+            // TODO this fails
+            // TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

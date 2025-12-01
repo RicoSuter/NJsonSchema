@@ -7,8 +7,6 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
-using System;
 using System.Globalization;
 
 namespace NJsonSchema.Validation.FormatValidators

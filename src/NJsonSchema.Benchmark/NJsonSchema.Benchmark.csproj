@@ -3,10 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateProgramFile>false</GenerateProgramFile>
-        <NoWarn>$(NoWarn),xUnit1013</NoWarn>
+        <NoWarn>$(NoWarn),xUnit1013;CS1591</NoWarn>
         <SignAssembly>false</SignAssembly>
         <Nullable>disable</Nullable>
         <EnableNETAnalyzers>false</EnableNETAnalyzers>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <OutputType>exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,22 +17,12 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="NBench" />
-        <PackageReference Include="Pro.NBench.xUnit" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
         <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
         <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
-        <ProjectReference Include="..\NJsonSchema.Tests\NJsonSchema.Tests.csproj" />
         <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
     </ItemGroup>
 

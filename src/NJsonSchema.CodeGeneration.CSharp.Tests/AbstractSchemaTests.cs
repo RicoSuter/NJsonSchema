@@ -1,7 +1,6 @@
 ﻿using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
 {
@@ -15,15 +14,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp.Generation
         [Fact]
         public async Task When_class_is_abstract_then_is_abstract_CSharp_keyword_is_generated()
         {
-            /// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractClass>();
 
-            /// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
             var code = generator.GenerateFile("AbstractClass");
 
-            /// Assert
-            Assert.Contains("public abstract partial class AbstractClass", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

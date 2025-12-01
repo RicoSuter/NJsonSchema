@@ -6,22 +6,19 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System.Collections.Generic;
-
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
     public class TypeScriptValueGenerator : ValueGeneratorBase
     {
-        private readonly List<string> _supportedFormatStrings = new List<string>()
-        {
+        private readonly List<string> _supportedFormatStrings =
+        [
             JsonFormatStrings.Uri,
             JsonFormatStrings.Guid,
 #pragma warning disable CS0618 // Type or member is obsolete
             JsonFormatStrings.Uuid
 #pragma warning restore CS0618 // Type or member is obsolete
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="TypeScriptValueGenerator"/> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -70,8 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     }
                 }
 
-                var isOptional = (schema as JsonSchemaProperty)?.IsRequired == false;
-                if (schema != null && allowsNull == false && isOptional == false)
+                if (!allowsNull && schema is not JsonSchemaProperty { IsRequired: false })
                 {
                     if (typeResolver.GeneratesType(schema) &&
                         !schema.ActualTypeSchema.IsEnumeration &&

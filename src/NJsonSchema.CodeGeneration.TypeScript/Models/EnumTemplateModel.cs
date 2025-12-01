@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -33,7 +32,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string Name { get; }
 
         /// <summary>Gets a value indicating whether the enum has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) && !string.IsNullOrEmpty(_schema.Description);
+        public bool HasDescription => _schema is not JsonSchemaProperty && !string.IsNullOrEmpty(_schema.Description);
 
         /// <summary>Gets the description.</summary>
         public string Description => ConversionUtilities.RemoveLineBreaks(_schema.Description);
@@ -55,14 +54,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     var value = _schema.Enumeration.ElementAt(i);
                     if (value != null)
                     {
-                        var name = _schema.EnumerationNames.Count > i ?
-                            _schema.EnumerationNames.ElementAt(i) :
-                            _schema.Type.IsInteger() ? "_" + value : value.ToString();
+                        var name = _schema.EnumerationNames.Count > i
+                            ? _schema.EnumerationNames[i]
+                            : _schema.Type.IsInteger() ? "_" + value : value.ToString()!;
+
+                        var description = _schema.EnumerationDescriptions.Count > i
+                            ? _schema.EnumerationDescriptions[i]
+                            : null;
 
                         entries.Add(new EnumerationItemModel
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
-                            Value = _schema.Type.IsInteger() ? value.ToString() : "\"" + value + "\"",
+                            OriginalName = name,
+                            Value = _schema.Type.IsInteger() ? value.ToString()! : "\"" + value + "\"",
+                            Description = description,
                         });
                     }
                 }

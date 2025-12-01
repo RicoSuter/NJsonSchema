@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-
 namespace NJsonSchema.Annotations;
 
 /// <summary>Attribute to set the multipleOf parameter of a JSON Schema.</summary>

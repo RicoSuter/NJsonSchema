@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using NSwag;
-using System.Threading.Tasks;
 using Xunit;
 
 #pragma warning disable SYSLIB0012
@@ -20,14 +15,14 @@ namespace NJsonSchema.Yaml.Tests.References
         [InlineData("/References/YamlReferencesTest/json_schema_with_yaml_reference.json", "./collection.yaml")]
         public async Task When_yaml_schema_has_references_it_works(string relativePath, string documentPath)
         {
-            //// Arrange
+            // Arrange
             var path = GetTestDirectory() + relativePath;
 
-            //// Act
+            // Act
             var schema = await JsonSchemaYaml.FromFileAsync(path);
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Equal(JsonObjectType.Integer, schema.Properties["foo"].ActualTypeSchema.Type);
             Assert.Single(schema.Definitions);
             Assert.Equal(documentPath, schema.Definitions["collection"].DocumentPath);
@@ -39,7 +34,7 @@ namespace NJsonSchema.Yaml.Tests.References
         {
             var path = GetTestDirectory() + relativePath;
 
-            //// Act
+            // Act
             OpenApiDocument doc = await OpenApiYamlDocument.FromFileAsync(path);
             IDictionary<string, OpenApiPathItem> docPaths = doc.Paths;
             OpenApiPathItem pathItem = docPaths[docPath];
@@ -68,7 +63,7 @@ namespace NJsonSchema.Yaml.Tests.References
         [InlineData("https://developer.zuora.com/yaml/swagger.yaml", "https://rest.zuora.com/")]
         public async Task When_yaml_OpenAPI_spec_is__served_with_gzip_compression__it_works(string inputYamlUrl, string expectedBaseUrl)
         {
-            //// Act
+            // Act
             OpenApiDocument doc = await OpenApiYamlDocument.FromUrlAsync(inputYamlUrl);
 
             ////Assert
@@ -94,7 +89,7 @@ namespace NJsonSchema.Yaml.Tests.References
             var schema = OK.Content["application/json"];
             JsonSchemaProperty items = schema.Schema.ActualSchema.ActualProperties["items"];
             var innerProperties = items.Item.ActualSchema.ActualProperties;
-            string[] expectedProperties = new string[] { "id", "systemName", "name", "smallImageID", "helpText" };
+            string[] expectedProperties = ["id", "systemName", "name", "smallImageID", "helpText"];
 
             foreach (string property in expectedProperties)
             {
@@ -112,7 +107,7 @@ namespace NJsonSchema.Yaml.Tests.References
             Assert.Equal(2, schema.Schema.ActualSchema.ActualProperties["status"].ActualSchema.Enumeration.Count);
         }
 
-        private string GetTestDirectory()
+        private static string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase;
             var uri = new UriBuilder(codeBase);

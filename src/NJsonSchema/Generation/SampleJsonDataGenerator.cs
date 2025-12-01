@@ -7,9 +7,6 @@
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 

@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-
 namespace NJsonSchema
 {
     /// <summary>The base JSON interface with extension data.</summary>

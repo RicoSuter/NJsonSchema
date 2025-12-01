@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Threading.Tasks;
-
 namespace NJsonSchema.Generation.TypeMappers
 {
     /// <summary>Maps .NET type to a generated JSON Schema describing a primitive value.</summary>

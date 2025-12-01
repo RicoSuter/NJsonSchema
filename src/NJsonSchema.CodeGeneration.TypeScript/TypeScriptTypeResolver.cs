@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
@@ -157,7 +155,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 var resolvedType = ResolveDictionaryKeyType(schema, defaultType);
                 if (resolvedType != defaultType)
                 {
-                    var keyType = Settings.TypeScriptVersion >= 2.1m ? prefix + resolvedType : defaultType;
+                    var keyType = prefix + resolvedType;
                     if (keyType != defaultType && schema.DictionaryKey?.ActualTypeSchema.IsEnumeration == true)
                     {
                         if (Settings.EnumStyle == TypeScriptEnumStyle.Enum)
@@ -223,8 +221,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "string";
                 }
             }
-            else if (Settings.DateTimeType == TypeScriptDateTimeType.MomentJS ||
-                     Settings.DateTimeType == TypeScriptDateTimeType.OffsetMomentJS)
+            else if (Settings.DateTimeType is TypeScriptDateTimeType.MomentJS or TypeScriptDateTimeType.OffsetMomentJS)
             {
                 if (schema.Format == JsonFormatStrings.Date)
                 {
@@ -303,14 +300,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Item != null)
             {
-                var isObject = schema.Item.ActualSchema.Type.IsObject() == true;
-                var isDictionary = schema.Item.ActualSchema.IsDictionary == true;
+                var isObject = schema.Item.ActualSchema.Type.IsObject();
+                var isDictionary = schema.Item.ActualSchema.IsDictionary;
                 var prefix = addInterfacePrefix && SupportsConstructorConversion(schema.Item) && isObject && !isDictionary ? "I" : "";
 
                 if (Settings.UseLeafType)
                 {
                     var itemTypes = Resolve(schema.Item, true, typeNameHint) // TODO: Make typeNameHint singular if possible
-                        .Split(new[] { UnionPipe }, StringSplitOptions.RemoveEmptyEntries)
+                        .Split([UnionPipe], StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => GetNullableItemType(schema, prefix + x))
                         .ToList();
 
@@ -345,7 +342,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         private string GetNullableItemType(JsonSchema schema, string itemType)
         {
-            if (Settings.SupportsStrictNullChecks && schema.Item?.IsNullable(Settings.SchemaType) == true)
+            if (schema.Item?.IsNullable(Settings.SchemaType) == true)
             {
                 return $"({itemType} | {Settings.NullValue.ToString().ToLowerInvariant()})";
             }

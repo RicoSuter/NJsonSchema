@@ -5,17 +5,18 @@
 // <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
+
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
-using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace NJsonSchema.Validation.FormatValidators
 {
     /// <summary>Validator for DateTime format.</summary>
     public class DateTimeFormatValidator : IFormatValidator
     {
-        private readonly string[] _acceptableFormats = new [] {
+        private readonly string[] _acceptableFormats =
+        [
             "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFK",
             "yyyy-MM-dd' 'HH:mm:ss.FFFFFFFK",
             "yyyy-MM-dd'T'HH:mm:ssK",
@@ -27,11 +28,13 @@ namespace NJsonSchema.Validation.FormatValidators
             "yyyy-MM-dd'T'HH",
             "yyyy-MM-dd' 'HH",
             "yyyy-MM-dd",
-            "yyyy-MM-dd",
+            "yyyy-MM-dd'Z'",
             "yyyyMMdd",
             "yyyy-MM",
             "yyyy"
-        };
+        ];
+
+        private static readonly Lazy<Regex> DateTimeRegexPattern = new(static () => new(@"^((?:(\d{4}-\d{2}-\d{2})([Tt_]| )(\d{2}:\d{2}:\d{2}(?:\.\d+)?))([Zz]|[\+-]\d{2}:\d{2}))$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250)));
 
         /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.DateTime;
@@ -45,8 +48,9 @@ namespace NJsonSchema.Validation.FormatValidators
         /// <returns></returns>
         public bool IsValid(string value, JTokenType tokenType)
         {
-            return tokenType == JTokenType.Date 
-                || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dateTimeResult);
+            return tokenType == JTokenType.Date
+                   || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
+                   || DateTimeRegexPattern.Value.IsMatch(value);
         }
     }
 }

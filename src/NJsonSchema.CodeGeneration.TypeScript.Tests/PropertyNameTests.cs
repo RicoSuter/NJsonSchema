@@ -1,14 +1,8 @@
-﻿using System.Threading.Tasks;
-using NJsonSchema.Annotations;
+﻿using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using VerifyXunit;
-using Xunit;
-
-using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests;
 
-[UsesVerify]
 public class PropertyNameTests
 {
     private class TypeWithRestrictedProperties
@@ -24,9 +18,10 @@ public class PropertyNameTests
     {
         var schema = NewtonsoftJsonSchemaGenerator.FromType<TypeWithRestrictedProperties>();
 
-        var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 4.3m });
+        var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
         var output = generator.GenerateFile(nameof(TypeWithRestrictedProperties));
 
-        await Verify(output);
+        await VerifyHelper.Verify(output);
+        TypeScriptCompiler.AssertCompile(output);
     }
 }

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using System;
 
 namespace NJsonSchema.Generation
 {

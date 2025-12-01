@@ -6,9 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -85,7 +82,7 @@ namespace NJsonSchema.Converters
         /// <inheritdoc />
         public override void Write(Utf8JsonWriter writer, TBase? value, JsonSerializerOptions options)
         {
-            if (value is not null)
+            if (value != null)
             {
                 writer.WriteStartObject();
                 writer.WriteString(_discriminatorName, GetDiscriminatorValue(value.GetType()));
@@ -157,7 +154,7 @@ namespace NJsonSchema.Converters
                 }
 
                 var typeName = objectType.Namespace + "." + discriminatorValue;
-                var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+                var subtype = objectType.Assembly.GetType(typeName);
                 if (subtype != null)
                 {
                     return subtype;
@@ -173,7 +170,7 @@ namespace NJsonSchema.Converters
             do
             {
                 var knownTypeAttributes = type
-                    .GetTypeInfo()
+                    
                     .GetCustomAttributes(false)
                     .Where(a => a.GetType().Name == "KnownTypeAttribute");
 
@@ -188,7 +185,7 @@ namespace NJsonSchema.Converters
                         var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            if (method.Invoke(null, Array.Empty<object>()) is IEnumerable<Type> types)
+                            if (method.Invoke(null, []) is IEnumerable<Type> types)
                             {
                                 foreach (var knownType in types)
                                 {
@@ -203,7 +200,7 @@ namespace NJsonSchema.Converters
                     }
                 }
 
-                type = type.GetTypeInfo().BaseType;
+                type = type.BaseType;
             } while (type != null);
 
             return null;
@@ -212,7 +209,7 @@ namespace NJsonSchema.Converters
         private static Type? GetObjectSubtype(Type baseType, string discriminatorValue)
         {
             var jsonInheritanceAttributes = baseType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 
@@ -222,7 +219,7 @@ namespace NJsonSchema.Converters
         private static string? GetSubtypeDiscriminator(Type objectType)
         {
             var jsonInheritanceAttributes = objectType
-                .GetTypeInfo()
+                
                 .GetCustomAttributes(true)
                 .OfType<JsonInheritanceAttribute>();
 

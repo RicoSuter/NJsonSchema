@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -40,7 +38,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         private static List<string> GetJsonConverters(CSharpGeneratorSettings settings, IEnumerable<string>? additionalJsonConverters)
         {
-            return (settings.JsonConverters ?? Array.Empty<string>()).Concat(additionalJsonConverters ?? Array.Empty<string>()).ToList();
+            return [.. settings.JsonConverters ?? [], .. additionalJsonConverters ?? []];
         }
 
         private static string GenerateForJsonLibrary(CSharpGeneratorSettings settings, List<string> jsonConverters, bool hasJsonConverters)

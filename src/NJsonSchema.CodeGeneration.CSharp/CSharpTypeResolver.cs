@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -197,12 +196,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
-            if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
+            if (schema.Format is JsonFormatStrings.Guid or JsonFormatStrings.Uuid)
             {
                 return isNullable ? "System.Guid?" : "System.Guid";
             }
 
-            if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
+            if (schema.Format is JsonFormatStrings.Base64 or JsonFormatStrings.Byte)
             {
                 return "byte[]" + nullableReferenceType;
             }
@@ -224,17 +223,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable ? "byte?" : "byte";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.ULong || schema.Format == "ulong")
+            if (schema.Format is JsonFormatStrings.ULong or "ulong")
             {
                 return isNullable ? "ulong?" : "ulong";
             }
@@ -268,7 +267,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             };
 
             if (string.IsNullOrWhiteSpace(numberType))
+            {
                 numberType = "double";
+            }
 
             return isNullable ? numberType + "?" : numberType;
         }

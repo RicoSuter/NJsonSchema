@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Xunit;
-
-namespace NJsonSchema.Tests.Validation
+﻿namespace NJsonSchema.Tests.Validation
 {
     public class OneOfValidationTests
     {
@@ -35,7 +32,7 @@ namespace NJsonSchema.Tests.Validation
             {
                 var errors = schema.Validate(match);
 
-                Assert.Equal(0, errors.Count);
+                Assert.Empty(errors);
             }
         }
 
@@ -46,7 +43,7 @@ namespace NJsonSchema.Tests.Validation
 
             var errors = schema.Validate(@"{ ""A"": ""string"" }");
 
-            Assert.Equal(1, errors.Count);
+            Assert.Single(errors);
         }
 
         [Fact]
@@ -56,7 +53,7 @@ namespace NJsonSchema.Tests.Validation
 
             var errors = schema.Validate(@"{ ""A"": ""string"", ""B"": 1, ""C"": 2 }");
 
-            Assert.Equal(1, errors.Count);
+            Assert.Single(errors);
         }
     }
 }

@@ -1,14 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -27,7 +22,7 @@ namespace NJsonSchema.Tests.Generation
 
             var data = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.True(schema.Properties.ContainsKey("firstName"));
             Assert.Equal("firstName", schema.Properties["firstName"].Name);
 
@@ -69,10 +64,15 @@ namespace NJsonSchema.Tests.Generation
                 return contract;
             }
 
-            static HashSet<string> _systemConverters = new HashSet<string>(new[] {
-                "System.ComponentModel.ComponentConverter",
-                "System.ComponentModel.ReferenceConverter",
-                "System.ComponentModel.CollectionConverter" });
+            private static HashSet<string> _systemConverters =
+            [
+                ..new[]
+                {
+                    "System.ComponentModel.ComponentConverter",
+                    "System.ComponentModel.ReferenceConverter",
+                    "System.ComponentModel.CollectionConverter"
+                }
+            ];
 
             public static bool CanNonSystemTypeDescriptorConvertString(Type type)
             {
@@ -110,7 +110,7 @@ namespace NJsonSchema.Tests.Generation
 
             public string StringValue
             {
-                get { return string.Join("/", Path); ; }
+                get { return string.Join("/", Path); }
                 set { Path = new List<string>(value.Split('/')); }
             }
 
@@ -120,13 +120,13 @@ namespace NJsonSchema.Tests.Generation
             public override string ToString() => StringValue;
         }
 
-        interface IStringConvertable
+        private interface IStringConvertable
         {
             string StringValue { get; set; }
             string ToString();
         }
 
-        class StringConverter<T> : TypeConverter where T : IStringConvertable, new()
+        private sealed class StringConverter<T> : TypeConverter where T : IStringConvertable, new()
         {
             public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
                 => sourceType == typeof(string) ? true : base.CanConvertFrom(context, sourceType);

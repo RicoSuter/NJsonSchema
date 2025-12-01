@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Reflection;
-
 namespace NJsonSchema.CodeGeneration.CSharp
 {
     /// <summary>The generator settings.</summary>
@@ -39,6 +37,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             ClassStyle = CSharpClassStyle.Poco;
             JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
+            JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.NJsonSchema;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
@@ -46,17 +45,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
             PropertySetterAccessModifier = string.Empty;
             GenerateJsonMethods = false;
             EnforceFlagEnums = false;
+            UseRequiredKeyword = false;
+            WriteAccessor = "set";
 
             ValueGenerator = new CSharpValueGenerator(this);
             PropertyNameGenerator = new CSharpPropertyNameGenerator();
-            TemplateFactory = new DefaultTemplateFactory(this, new Assembly[]
-            {
-                typeof(CSharpGeneratorSettings).GetTypeInfo().Assembly
-            });
+            TemplateFactory = new DefaultTemplateFactory(this, [
+                typeof(CSharpGeneratorSettings).Assembly
+            ]);
 
             InlineNamedArrays = false;
             InlineNamedDictionaries = false;
             InlineNamedTuples = true;
+            SortConstructorParameters = true;
         }
 
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
@@ -120,6 +121,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
         public CSharpJsonLibrary JsonLibrary { get; set; }
 
+        /// <summary>Gets or sets the CSharp JSON library version to use (applies only to System.Text.Json, default: 8.0).</summary>
+        public decimal JsonLibraryVersion { get; set; } = 8.0m;
+
+        /// <summary>Gets or sets the CSharp JSON polymorphic serialization style (default: 'NJsonSchema', 'SystemTextJson' is experimental/not complete).</summary>
+        public CSharpJsonPolymorphicSerializationStyle JsonPolymorphicSerializationStyle { get; set; }
+
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }
 
@@ -147,6 +154,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
         public bool EnforceFlagEnums { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether the C# 11 "required" keyword should be used for required properties (default: false). </summary>
+        public bool UseRequiredKeyword { get; set; }
+        
+        /// <summary>Gets the read accessor of properties ('set' | 'init').</summary>
+        public string WriteAccessor { get; set; }
+
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with dictionary inheritance.</summary>
         public bool InlineNamedDictionaries { get; set; }
 
@@ -164,5 +177,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Generate C# 9.0 record types instead of record-like classes.</summary>
         public bool GenerateNativeRecords { get; set; }
+
+        /// <summary>
+        /// The prefix appended when generating a field based on the property name. Default is "_";
+        /// </summary>
+        public string FieldNamePrefix { get; set; } = "_";
+        
+        /// <summary>Gets a value indicating whether the constructor parameters should be sorted alphabetically (default: true).</summary>
+        public bool SortConstructorParameters { get; set; }
     }
 }

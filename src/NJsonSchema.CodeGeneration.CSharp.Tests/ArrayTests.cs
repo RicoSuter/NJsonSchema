@@ -1,9 +1,7 @@
 ﻿using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using Xunit;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
@@ -18,11 +16,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [Fact]
         public async Task When_array_property_is_required_then_array_instance_can_be_changed()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ArrayTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
                 ClassStyle = CSharpClassStyle.Poco,
@@ -31,8 +29,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("public Foo<string> ArrayProperty { get; set; } = new Bar<string>();", code);
+            // Assert
+            await VerifyHelper.Verify(code);
         }
 
         public class ClassWithNullableArrayItems
@@ -55,7 +53,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
 
             // Assert
             Assert.True(schema.Properties["Items"].Item.IsNullable(SchemaType.JsonSchema));
-            Assert.Contains("System.Collections.Generic.ICollection<int?> Items", output);
+            await VerifyHelper.Verify(output);
+            CSharpCompiler.AssertCompile(output);
         }
     }
 }

@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -23,8 +21,8 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Initializes a new instance of the <see cref="PropertyRenameAndIgnoreSerializerContractResolver"/> class.</summary>
         public PropertyRenameAndIgnoreSerializerContractResolver()
         {
-            _ignores = new Dictionary<string, HashSet<string>>();
-            _renames = new Dictionary<string, Dictionary<string, string>>();
+            _ignores = [];
+            _renames = [];
         }
 
         /// <summary>Ignore the given property/properties of the given type.</summary>
@@ -34,7 +32,7 @@ namespace NJsonSchema.Infrastructure
         {
             if (!_ignores.TryGetValue(type.FullName!, out HashSet<string>? value))
             {
-                value = new HashSet<string>();
+                value = [];
                 _ignores[type.FullName!] = value;
             }
 
@@ -52,7 +50,7 @@ namespace NJsonSchema.Infrastructure
         {
             if (!_renames.TryGetValue(type.FullName!, out Dictionary<string, string>? value))
             {
-                value = new Dictionary<string, string>();
+                value = [];
                 _renames[type.FullName!] = value;
             }
 

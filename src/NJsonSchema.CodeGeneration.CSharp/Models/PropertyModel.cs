@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp.Models
@@ -15,6 +15,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
     /// <summary>The CSharp property template model.</summary>
     public class PropertyModel : PropertyModelBase
     {
+        private static readonly HashSet<string?> RangeFormats =
+        [
+            JsonFormatStrings.Integer,
+            JsonFormatStrings.Float,
+            JsonFormatStrings.Double,
+            JsonFormatStrings.Long,
+            JsonFormatStrings.ULong,
+            JsonFormatStrings.Decimal
+        ];
+
         private readonly JsonSchemaProperty _property;
         private readonly CSharpGeneratorSettings _settings;
         private readonly CSharpTypeResolver _resolver;
@@ -49,7 +59,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string? Description => _property.Description;
 
         /// <summary>Gets the name of the field.</summary>
-        public string FieldName => "_" + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
+        public string FieldName => _settings.FieldNamePrefix + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
@@ -61,10 +71,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether this is an array property which cannot be null.</summary>
         public bool HasSetter =>
-            (_property.IsNullable(_settings.SchemaType) == false && (
-                (_property.ActualTypeSchema.IsArray && _settings.GenerateImmutableArrayProperties) ||
-                (_property.ActualTypeSchema.IsDictionary && _settings.GenerateImmutableDictionaryProperties)
-            )) == false;
+            _property.IsNullable(_settings.SchemaType) || (!_property.ActualTypeSchema.IsArray || !_settings.GenerateImmutableArrayProperties) &&
+                (!_property.ActualTypeSchema.IsDictionary || !_settings.GenerateImmutableDictionaryProperties);
 
         /// <summary>Gets the json property required.</summary>
         public string JsonPropertyRequiredCode
@@ -132,6 +140,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
+        private bool IsDecimalRange => GetSchemaFormat(_property.ActualSchema) is JsonFormatStrings.Decimal;
+
+        /// <summary>
+        /// The type of range attribute, used when the value is not double or integer.
+        /// </summary>
+        public string? RangeType => IsDecimalRange ? "decimal" : null;
+
         /// <summary>Gets the minimum value of the range attribute.</summary>
         public string RangeMinimumValue
         {
@@ -139,13 +154,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 var schema = _property.ActualSchema;
                 var propertyFormat = GetSchemaFormat(schema);
-                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
-                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
+                var format = GetRangeFormat(propertyFormat);
+                var type = GetRangeType(propertyFormat);
 
                 var minimum = schema.Minimum;
                 if (minimum.HasValue && schema.IsExclusiveMinimum)
                 {
-                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    if (propertyFormat is JsonFormatStrings.Integer or JsonFormatStrings.Long)
                     {
                         minimum++;
                     }
@@ -158,8 +173,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         // TODO - add support for doubles, singles and decimals here
                     }
                 }
+
+                if (IsDecimalRange)
+                {
+                    // special case decimals
+                    return ValueGeneratorBase.ConvertToNumberToStringCore(minimum.GetValueOrDefault(decimal.MinValue));
+                }
+
                 return minimum.HasValue
-                    ? ValueGenerator.GetNumericValue(schema.Type, minimum.Value, format)
+                    ? ValueGenerator.GetNumericValue(schema.Type, EnsureBounds(propertyFormat, minimum.Value), format)
                     : type + "." + nameof(double.MinValue);
             }
         }
@@ -171,13 +193,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             {
                 var schema = _property.ActualSchema;
                 var propertyFormat = GetSchemaFormat(schema);
-                var format = propertyFormat == JsonFormatStrings.Integer ? JsonFormatStrings.Integer : JsonFormatStrings.Double;
-                var type = propertyFormat == JsonFormatStrings.Integer ? "int" : "double";
+                var format = GetRangeFormat(propertyFormat);
+                var type = GetRangeType(propertyFormat);
 
                 var maximum = schema.Maximum;
                 if (maximum.HasValue && schema.IsExclusiveMaximum)
                 {
-                    if (propertyFormat == JsonFormatStrings.Integer || propertyFormat == JsonFormatStrings.Long)
+                    if (propertyFormat is JsonFormatStrings.Integer or JsonFormatStrings.Long)
                     {
                         maximum--;
                     }
@@ -191,10 +213,39 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                 }
 
+                if (IsDecimalRange)
+                {
+                    // special case decimals
+                    return ValueGeneratorBase.ConvertToNumberToStringCore(maximum.GetValueOrDefault(decimal.MaxValue));
+                }
+
                 return maximum.HasValue
-                    ? ValueGenerator.GetNumericValue(schema.Type, maximum.Value, format)
+                    ? ValueGenerator.GetNumericValue(schema.Type, EnsureBounds(propertyFormat, maximum.Value), format)
                     : type + "." + nameof(double.MaxValue);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static decimal EnsureBounds(string? propertyFormat, decimal value)
+        {
+            return propertyFormat switch
+            {
+                JsonFormatStrings.Integer => Clamp(value, int.MinValue, int.MaxValue),
+                JsonFormatStrings.Long => Clamp(value, long.MinValue, long.MaxValue),
+                JsonFormatStrings.ULong => Clamp(value, ulong.MinValue, ulong.MaxValue),
+                _ => value,
+            };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static decimal Clamp(decimal value, decimal min, decimal max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            return value > max ? max : value;
         }
 
         /// <summary>Gets a value indicating whether to render a string length attribute.</summary>
@@ -292,7 +343,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         private string? GetSchemaFormat(JsonSchema schema)
         {
-            if (Type == "long" || Type == "long?")
+            if (Type is "long" or "long?")
             {
                 return JsonFormatStrings.Long;
             }
@@ -311,5 +362,20 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
             return schema.Format;
         }
+
+        private static string GetRangeFormat(string? propertyFormat) =>
+            RangeFormats.Contains(propertyFormat) ? propertyFormat! : JsonFormatStrings.Double;
+        
+        private static string GetRangeType(string? propertyFormat) =>
+            propertyFormat switch
+            {
+                JsonFormatStrings.Integer => "int",
+                JsonFormatStrings.Float => "float",
+                JsonFormatStrings.Double => "double",
+                JsonFormatStrings.Long => "long",
+                JsonFormatStrings.ULong => "ulong",
+                JsonFormatStrings.Decimal => "decimal",
+                _ => "double",
+            };
     }
 }

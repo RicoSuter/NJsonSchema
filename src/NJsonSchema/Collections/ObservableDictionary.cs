@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -29,7 +27,7 @@ namespace NJsonSchema.Collections
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
         public ObservableDictionary()
         {
-            _dictionary = new Dictionary<TKey, TValue?>();
+            _dictionary = [];
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObservableDictionary{TKey, TValue}"/> class. </summary>
@@ -107,8 +105,7 @@ namespace NJsonSchema.Collections
         /// <param name="add">If true and key already exists then an exception is thrown. </param>
         private void Insert(TKey key, TValue? value, bool add)
         {
-            TValue? item;
-            if (_dictionary.TryGetValue(key, out item))
+            if (_dictionary.TryGetValue(key, out TValue? item))
             {
                 if (add)
                 {
@@ -134,30 +131,21 @@ namespace NJsonSchema.Collections
         private void OnPropertyChanged(string propertyName)
         {
             var copy = PropertyChanged;
-            if (copy != null)
-            {
-                copy(this, new PropertyChangedEventArgs(propertyName));
-            }
+            copy?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void OnCollectionChanged()
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> changedItem)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, changedItem, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem, 0));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue?> newItem,
@@ -165,20 +153,14 @@ namespace NJsonSchema.Collections
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem, 0));
         }
 
         private void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
         {
             OnPropertyChanged();
             var copy = CollectionChanged;
-            if (copy != null)
-            {
-                copy(this, new NotifyCollectionChangedEventArgs(action, newItems, 0));
-            }
+            copy?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItems, 0));
         }
 
         private void OnPropertyChanged()
@@ -215,9 +197,6 @@ namespace NJsonSchema.Collections
             {
                 throw new ArgumentNullException(nameof(key));
             }
-
-            TValue? value;
-            _dictionary.TryGetValue(key, out value);
 
             var removed = _dictionary.Remove(key);
             if (removed)

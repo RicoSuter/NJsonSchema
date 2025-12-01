@@ -9,7 +9,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using NJsonSchema.Converters;
-using System;
 
 namespace NJsonSchema.Generation.SchemaProcessors
 {

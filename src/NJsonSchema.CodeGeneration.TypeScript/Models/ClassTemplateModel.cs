@@ -6,7 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -39,8 +38,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
             ClassName = typeName;
             Properties = _schema.ActualProperties.Values
-                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface ||
-                            v.IsInheritanceDiscriminator == false)
+                .Where(v => settings.TypeStyle == TypeScriptTypeStyle.Interface || !v.IsInheritanceDiscriminator)
                 .Select(property => new PropertyModel(this, property, ClassName, _resolver, _settings))
                 .ToList();
         }
@@ -63,7 +61,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string? BaseDiscriminator => _schema.ResponsibleDiscriminatorObject?.PropertyName;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
+        public bool HasDescription => _schema is not JsonSchemaProperty &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
@@ -141,12 +139,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether any property has a default value.</summary>
         public bool HasDefaultValues => Properties.Exists(p => p.HasDefaultValue);
-
-        /// <summary>Gets a value indicating whether </summary>
-        public bool RequiresStrictPropertyInitialization => _settings.RequiresStrictPropertyInitialization;
-
-        /// <summary>Gets a value indicating whether </summary>
-        public bool SupportsOverrideKeyword => _settings.SupportsOverrideKeyword;
 
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;

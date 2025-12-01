@@ -6,20 +6,36 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 
 namespace NJsonSchema
 {
     /// <summary>Generates a JSON Schema from sample JSON data.</summary>
     public class SampleJsonSchemaGenerator
     {
+        private readonly SampleJsonSchemaGeneratorSettings _settings;
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public SampleJsonSchemaGenerator()
+        {
+            _settings = new SampleJsonSchemaGeneratorSettings();
+        }
+
+        /// <summary>
+        /// Constructor with settings
+        /// </summary>
+        /// <param name="settings"></param>
+        public SampleJsonSchemaGenerator(SampleJsonSchemaGeneratorSettings settings)
+        {
+            _settings = settings;
+        }
+
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
         /// <param name="json">The JSON data.</param>
         /// <returns>The JSON Schema.</returns>
@@ -160,6 +176,35 @@ namespace NJsonSchema
             if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
             {
                 schema.Format = JsonFormatStrings.Duration;
+            }
+
+            if (_settings.SchemaType == SchemaType.OpenApi3)
+            {
+                if (schema.Type == JsonObjectType.Integer)
+                {
+                    var value = token.Value<long?>();
+                    if (value is < int.MinValue or > int.MaxValue)
+                    {
+                        schema.Format = JsonFormatStrings.Long;
+                    }
+                    else
+                    {
+                        schema.Format = JsonFormatStrings.Integer;
+                    }
+                }
+
+                if (schema.Type == JsonObjectType.Number)
+                {
+                    var value = token.Value<double?>();
+                    if (value is < float.MinValue or > float.MaxValue)
+                    {
+                        schema.Format = JsonFormatStrings.Double;
+                    }
+                    else
+                    {
+                        schema.Format = JsonFormatStrings.Float;
+                    }
+                }
             }
         }
 

@@ -6,9 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Collections.Concurrent;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using NJsonSchema.Generation;
@@ -18,12 +16,13 @@ namespace NJsonSchema.NewtonsoftJson.Generation
     /// <inheritdoc />
     public class NewtonsoftJsonSchemaGeneratorSettings : JsonSchemaGeneratorSettings
     {
-        private Dictionary<string, JsonContract?> _cachedContracts = new Dictionary<string, JsonContract?>();
+        private readonly ConcurrentDictionary<string, JsonContract?> _cachedContracts = [];
 
         private JsonSerializerSettings _serializerSettings;
+        private readonly DefaultContractResolver _defaultContractResolver = new();
 
         /// <summary>Initializes a new instance of the <see cref="JsonSchemaGeneratorSettings"/> class.</summary>
-        public NewtonsoftJsonSchemaGeneratorSettings() 
+        public NewtonsoftJsonSchemaGeneratorSettings()
             : base(new NewtonsoftJsonReflectionService())
         {
             _serializerSettings = new JsonSerializerSettings();
@@ -33,7 +32,8 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         [JsonIgnore]
         public JsonSerializerSettings SerializerSettings
         {
-            get => _serializerSettings; set
+            get => _serializerSettings;
+            set
             {
                 _serializerSettings = value;
                 _cachedContracts.Clear();
@@ -44,7 +44,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         /// <returns>The contract resolver.</returns>
         /// <exception cref="InvalidOperationException">A setting is misconfigured.</exception>
         [JsonIgnore]
-        public IContractResolver ActualContractResolver => SerializerSettings?.ContractResolver ?? new DefaultContractResolver();
+        public IContractResolver ActualContractResolver => SerializerSettings?.ContractResolver ?? _defaultContractResolver;
 
         /// <summary>Gets the contract for the given type.</summary>
         /// <param name="type">The type.</param>
@@ -57,20 +57,14 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 return null;
             }
 
-            if (!_cachedContracts.ContainsKey(key))
-            {
-                lock (_cachedContracts)
-                {
-                    if (!_cachedContracts.ContainsKey(key))
-                    {
-                        _cachedContracts[key] = !type.GetTypeInfo().IsGenericTypeDefinition ?
-                            ActualContractResolver.ResolveContract(type) :
-                            null;
-                    }
-                }
-            }
-
-            return _cachedContracts[key];
+#if NET8_0_OR_GREATER
+            return _cachedContracts.GetOrAdd(
+                key, static (_, state) => !state.type.IsGenericTypeDefinition ? state.ActualContractResolver.ResolveContract(state.type) : null,
+                (type, ActualContractResolver)
+            );
+#else
+            return _cachedContracts.GetOrAdd(key, s => !type.IsGenericTypeDefinition ? ActualContractResolver.ResolveContract(type) : null);
+#endif
         }
     }
 }

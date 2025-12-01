@@ -6,8 +6,6 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -19,6 +17,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         private readonly CSharpTypeResolver _resolver;
         private readonly JsonSchema _schema;
         private readonly CSharpGeneratorSettings _settings;
+        internal readonly List<PropertyModel> _properties;
+        private readonly List<PropertyModel> _allProperties;
 
         /// <summary>Initializes a new instance of the <see cref="ClassTemplateModel"/> class.</summary>
         /// <param name="typeName">Name of the type.</param>
@@ -35,24 +35,35 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             _settings = settings;
 
             ClassName = typeName;
-            Properties = _schema.ActualProperties.Values
-                .Where(p => !p.IsInheritanceDiscriminator)
-                .Select(property => new PropertyModel(this, property, _resolver, _settings))
-                .ToArray();
+
+            var actualProperties = _schema.ActualProperties;
+            _properties = new List<PropertyModel>(actualProperties.Count);
+            foreach (var property in actualProperties.Values)
+            {
+                if (!property.IsInheritanceDiscriminator)
+                {
+                    _properties.Add(new PropertyModel(this, property, _resolver, _settings));
+                }
+            }
 
             if (schema.InheritedSchema != null)
             {
                 BaseClass = new ClassTemplateModel(BaseClassName!, settings, resolver, schema.InheritedSchema, rootObject);
-                AllProperties = Properties.Concat(BaseClass.AllProperties).ToArray();
+                _allProperties = new List<PropertyModel>(_properties.Count + BaseClass._allProperties.Count);
+                _allProperties.AddRange(BaseClass._allProperties);
+                _allProperties.AddRange(_properties);
             }
             else
             {
-                AllProperties = Properties;
+                _allProperties = _properties;
             }
         }
 
         /// <summary>Gets a value indicating whether to use System.Text.Json</summary>
         public bool UseSystemTextJson => _settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
+
+        /// <summary>Gets a value indicating whether to use System.Text.Json polymorphic serialization</summary>
+        public bool UseSystemTextJsonPolymorphicSerialization => _settings.JsonPolymorphicSerializationStyle == CSharpJsonPolymorphicSerializationStyle.SystemTextJson;
 
         /// <summary>Gets or sets the class name.</summary>
         public override string ClassName { get; }
@@ -87,13 +98,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         //    string.Empty) : null;
 
         /// <summary>Gets the property models.</summary>
-        public IEnumerable<PropertyModel> Properties { get; }
+        public IEnumerable<PropertyModel> Properties => _properties;
 
         /// <summary>Gets the property models with inherited properties.</summary>
-        public IEnumerable<PropertyModel> AllProperties { get; }
+        public IEnumerable<PropertyModel> AllProperties => _allProperties;
 
         /// <summary>Gets a value indicating whether the class has description.</summary>
-        public bool HasDescription => !(_schema is JsonSchemaProperty) &&
+        public bool HasDescription => _schema is not JsonSchemaProperty &&
             (!string.IsNullOrEmpty(_schema.Description) ||
              !string.IsNullOrEmpty(_schema.ActualTypeSchema.Description));
 
@@ -109,6 +120,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class style is Record.</summary>
         public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
+
+        /// <summary>Gets the class type.</summary>
+        public string ClassType => _settings.GenerateNativeRecords ? "record" : "class";
 
         /// <summary>Gets a value indicating whether to generate records as C# 9.0 records.</summary>
         public bool GenerateNativeRecords => _settings.GenerateNativeRecords;
@@ -133,6 +147,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the class has a parent class.</summary>
         public bool HasInheritance => _schema.InheritedTypeSchema != null;
 
+        /// <summary>Gets a value indicating whether the constructor parameters should be sorted.</summary>
+        public bool SortConstructorParameters => _settings.SortConstructorParameters;
+
         /// <summary>Gets the base class name.</summary>
         public string? BaseClassName => HasInheritance ? _resolver.Resolve(_schema.InheritedTypeSchema!, false, string.Empty, false)
             .Replace(_settings.ArrayType + "<", _settings.ArrayBaseType + "<")
@@ -150,6 +167,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets or sets the access modifier of generated classes and interfaces.</summary>
         public string TypeAccessModifier => _settings.TypeAccessModifier;
+
+        /// <summary>Gets a value indicating whether to use the C# 11 "required" keyword.</summary>
+        public bool UseRequiredKeyword => _settings.UseRequiredKeyword;
+        
+        /// <summary> Gets the read accessor of properties ('set' | 'init').</summary>
+        public string WriteAccessor => _settings.WriteAccessor;
 
         /// <summary>Gets the access modifier of property setters (default: '').</summary>
         public string PropertySetterAccessModifier => !string.IsNullOrEmpty(_settings.PropertySetterAccessModifier) ? _settings.PropertySetterAccessModifier + " " : "";

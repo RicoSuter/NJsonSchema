@@ -26,7 +26,7 @@ namespace NJsonSchema.References
                 return obj;
             }
 
-            while ((parent as IJsonReference)?.PossibleRoot != null)
+            while (parent is IJsonReference { PossibleRoot: not null })
             {
                 parent = ((IJsonReference)parent!).PossibleRoot;
                 if (parent is IDocumentPathProvider pathProvider && pathProvider.DocumentPath != null)

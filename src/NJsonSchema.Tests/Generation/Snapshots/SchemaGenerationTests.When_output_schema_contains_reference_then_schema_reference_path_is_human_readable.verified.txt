@@ -1,0 +1,45 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Foo",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "Dictionary": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Bar": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/Bar"
+        }
+      ]
+    },
+    "Time": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "definitions": {
+    "Bar": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    }
+  }
+}

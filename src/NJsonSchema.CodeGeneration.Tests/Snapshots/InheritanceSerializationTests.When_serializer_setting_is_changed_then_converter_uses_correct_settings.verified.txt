@@ -1,0 +1,18 @@
+﻿{
+  "animal": {
+    "bar": "bar",
+    "subElements": [
+      {
+        "prop1": "x",
+        "discriminator": "SubClass1"
+      },
+      {
+        "prop3": "y",
+        "prop2": "x",
+        "discriminator": "SubClass3"
+      }
+    ],
+    "foo": "foo",
+    "discriminator": "Dog"
+  }
+}

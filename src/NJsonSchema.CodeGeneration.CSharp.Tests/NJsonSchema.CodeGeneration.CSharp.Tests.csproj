@@ -1,29 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn),1587,1998,1591,618,SYSLIB0012</NoWarn>
         <Nullable>disable</Nullable>
-        <EnableNETAnalyzers>false</EnableNETAnalyzers>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="References\*.json" CopyToOutputDirectory="Always" />
+        <Content Include="References\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="System.Text.Json" />
+        <PackageReference Include="Verify.XunitV3" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Condition="'$(TargetFramework)' == 'net8.0'" />
-        <PackageReference Condition="'$(TargetFramework)' == 'net8.0'" Include="System.ComponentModel.Annotations" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Condition="'$(TargetFramework)' == 'net472'" Include="System.ComponentModel.DataAnnotations" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\NJsonSchema.CodeGeneration.CSharp\NJsonSchema.CodeGeneration.CSharp.csproj" />
         <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\NJsonSchema.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+        <Compile Include="..\NJsonSchema.CodeGeneration.Tests\CSharpCompiler.cs" Link="CSharpCompiler.cs" />
     </ItemGroup>
 
 </Project>

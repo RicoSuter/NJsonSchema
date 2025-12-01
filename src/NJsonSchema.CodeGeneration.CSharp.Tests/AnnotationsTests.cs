@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using NJsonSchema.CodeGeneration.CSharp;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -23,7 +21,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_array_property_is_not_nullable_then_it_does_not_have_a_setter()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyRequiredTest>();
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
             {
@@ -33,12 +31,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 GenerateDefaultValues = false
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("public System.Collections.Generic.ICollection<string> Collection { get; } = new System.Collections.ObjectModel.Collection<string>();", code);
-            Assert.Contains("public System.Collections.Generic.IDictionary<string, object> Dictionary { get; } = new System.Collections.Generic.Dictionary<string, object>();", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }
