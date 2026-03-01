@@ -43,7 +43,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             GenerateTypeCheckFunctions = false;
         }
 
-        /// <summary>Gets or sets the target TypeScript version (minimum, default: 4.3).</summary>
+        /// <summary>Gets or sets the target TypeScript version (default: 4.3, minimum: 4.3).
+        /// Accepts any decimal version number greater than or equal to 4.3 (e.g. 4.3, 4.9, 5.0).
+        /// The version is used to determine which TypeScript language features are available and may be used in the generated code.</summary>
         public decimal TypeScriptVersion { get; set; }
 
         /// <summary>Gets or sets a value indicating whether to mark optional properties with ? (default: false).</summary>
