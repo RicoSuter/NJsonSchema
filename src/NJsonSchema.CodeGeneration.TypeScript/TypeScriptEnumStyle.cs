@@ -2,7 +2,7 @@
 // <copyright file="CSharpGeneratorSettings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------
 
 namespace NJsonSchema.CodeGeneration.TypeScript
