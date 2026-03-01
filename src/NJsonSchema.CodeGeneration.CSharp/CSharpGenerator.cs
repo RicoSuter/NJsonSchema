@@ -140,6 +140,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 while (properties.Exists(p => p.PropertyName == candidate))
                 {
                     number++;
+                    candidate = typeName + number;
                 }
 
                 propertyWithSameNameAsClass.PropertyName += number;
