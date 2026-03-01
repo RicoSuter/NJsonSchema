@@ -7,7 +7,7 @@
 {%- if IsEnumAsBitFlags -%}
 [System.Flags]
 {%- endif -%}
-{%- template Enum.Annotations -%}
+{%- template Enum.Annotations %}
 {{ TypeAccessModifier }} enum {{ Name }}{%- if HasExtendedValueRange %} : long{% endif %}
 {
 {%- for enum in Enums %}

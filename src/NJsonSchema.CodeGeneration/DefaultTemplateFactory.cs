@@ -261,7 +261,8 @@ namespace NJsonSchema.CodeGeneration
                     var withoutEmptyWhiteSpace = _emptyTemplateCleanupRegex.Replace(trimmed, string.Empty);
 
                     // just to make sure we don't leak out marker
-                    return withoutEmptyWhiteSpace.Replace("__EMPTY-TEMPLATE__", "");
+                    // also handle case where empty annotation template marker is on its own line (e.g. when annotation templates are empty)
+                    return withoutEmptyWhiteSpace.Replace("\n__EMPTY-TEMPLATE__\n", "\n").Replace("__EMPTY-TEMPLATE__", "");
                 }
                 catch (Exception exception)
                 {
