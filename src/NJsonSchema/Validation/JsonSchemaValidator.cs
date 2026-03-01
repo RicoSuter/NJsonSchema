@@ -82,6 +82,7 @@ namespace NJsonSchema.Validation
             ValidateNot(token, schema, propertyName, propertyPath, errors);
             ValidateType(token, schema, schemaType, propertyName, propertyPath, errors);
             JsonSchemaValidator.ValidateEnum(token, schema, schemaType, propertyName, propertyPath, errors);
+            JsonSchemaValidator.ValidateConst(token, schema, schemaType, propertyName, propertyPath, errors);
             ValidateProperties(token, schema, schemaType, propertyName, propertyPath, errors);
 
             return errors;
@@ -194,6 +195,19 @@ namespace NJsonSchema.Validation
             if (schema.Enumeration.Count > 0 && schema.Enumeration.All(v => v?.ToString() != token?.ToString()))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath, token, schema));
+            }
+        }
+
+        private static void ValidateConst(JToken token, JsonSchema schema, SchemaType schemaType, string? propertyName, string propertyPath, List<ValidationError> errors)
+        {
+            if (!schema.HasConstValue)
+            {
+                return;
+            }
+
+            if (schema.Const?.ToString() != token?.ToString())
+            {
+                errors.Add(new ValidationError(ValidationErrorKind.ConstantValueMismatch, propertyName, propertyPath, token, schema));
             }
         }
 
