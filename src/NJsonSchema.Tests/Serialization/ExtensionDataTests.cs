@@ -95,6 +95,50 @@ namespace NJsonSchema.Tests.Serialization
             Assert.Equal(123, schema.ExtensionData["MyClass"]);
         }
 
+        [JsonSchemaExtensionData("x-tag", "my-enum")]
+        public enum MyTaggedEnum
+        {
+            Value1,
+            Value2
+        }
+
+        [Fact]
+        public async Task When_extension_data_attribute_is_used_on_enum_then_extension_data_property_is_set()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyTaggedEnum>();
+
+            // Assert
+            Assert.Equal("my-enum", schema.ExtensionData["x-tag"]);
+        }
+
+        [JsonSchemaExtensionData("x-attribute", "from-attribute")]
+        public class MyMergeTest { }
+
+        private class AddExtensionDataProcessor : NJsonSchema.Generation.ISchemaProcessor
+        {
+            public void Process(NJsonSchema.Generation.SchemaProcessorContext context)
+            {
+                context.Schema.ExtensionData ??= new Dictionary<string, object>();
+                context.Schema.ExtensionData["x-processor"] = "from-processor";
+            }
+        }
+
+        [Fact]
+        public async Task When_schema_processor_and_extension_data_attribute_are_used_together_then_both_are_preserved()
+        {
+            // Arrange
+            var settings = new NJsonSchema.NewtonsoftJson.Generation.NewtonsoftJsonSchemaGeneratorSettings();
+            settings.SchemaProcessors.Add(new AddExtensionDataProcessor());
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyMergeTest>(settings);
+
+            // Assert
+            Assert.Equal("from-attribute", schema.ExtensionData["x-attribute"]);
+            Assert.Equal("from-processor", schema.ExtensionData["x-processor"]);
+        }
+
         [Fact]
         public async Task When_extension_data_attribute_is_used_on_property_then_extension_data_property_is_set()
         {

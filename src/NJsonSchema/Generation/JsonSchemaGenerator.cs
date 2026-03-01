@@ -1382,14 +1382,12 @@ namespace NJsonSchema.Generation
         {
             if (extensionAttributes.Length > 0)
             {
-                var extensionData = new Dictionary<string, object?>();
+                schema.ExtensionData ??= new Dictionary<string, object?>();
                 foreach (var kvp in extensionAttributes
                     .SelectMany(attribute => attribute.ExtensionData))
                 {
-                    extensionData[kvp.Key] = kvp.Value;
+                    schema.ExtensionData[kvp.Key] = kvp.Value;
                 }
-
-                schema.ExtensionData = extensionData;
             }
         }
     }
