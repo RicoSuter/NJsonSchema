@@ -12,6 +12,7 @@
         <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
         <Description>JSON Schema reader, generator and validator for .NET</Description>
         <PackageIcon>NuGetIcon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Company />
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -29,6 +30,10 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <PropertyGroup Label="Analyzer settings">
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
