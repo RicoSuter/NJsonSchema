@@ -114,7 +114,8 @@ The generated JSON schema data stored in the `schemaData` variable:
   ],
   "properties": {
     "FirstName": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "MiddleName": {
       "type": [
@@ -123,14 +124,11 @@ The generated JSON schema data stored in the `schemaData` variable:
       ]
     },
     "LastName": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "Gender": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/Gender"
-        }
-      ]
+      "$ref": "#/definitions/Gender"
     },
     "NumberWithRange": {
       "type": "integer",
@@ -145,10 +143,10 @@ The generated JSON schema data stored in the `schemaData` variable:
     "Company": {
       "oneOf": [
         {
-          "$ref": "#/definitions/Company"
+          "type": "null"
         },
         {
-          "type": "null"
+          "$ref": "#/definitions/Company"
         }
       ]
     },
@@ -200,10 +198,10 @@ The generated JSON schema data stored in the `schemaData` variable:
         "Manufacturer": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Company"
+              "type": "null"
             },
             {
-              "type": "null"
+              "$ref": "#/definitions/Company"
             }
           ]
         }
