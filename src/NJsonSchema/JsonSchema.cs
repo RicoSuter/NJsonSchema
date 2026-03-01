@@ -885,7 +885,10 @@ namespace NJsonSchema
         public string ToJson(Formatting formatting)
         {
             var oldSchema = SchemaVersion;
-            SchemaVersion = "http://json-schema.org/draft-04/schema#";
+            if (SchemaVersion == null)
+            {
+                SchemaVersion = "http://json-schema.org/draft-04/schema#";
+            }
 
             var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value, formatting);
 
