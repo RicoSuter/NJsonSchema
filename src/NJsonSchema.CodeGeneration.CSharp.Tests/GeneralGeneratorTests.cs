@@ -604,6 +604,32 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         }
 
         [Fact]
+        public async Task When_property_has_same_name_as_class_and_suffixed_name_is_taken_then_it_is_renamed_without_infinite_loop()
+        {
+            // Arrange
+            var schemaJson = @"{
+  ""type"": ""object"",
+  ""properties"": {
+    ""Foo"": {
+      ""type"": ""string""
+    },
+    ""Foo1"": {
+      ""type"": ""string""
+    }
+  }
+}";
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile("Foo");
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
         {
             // Arrange
