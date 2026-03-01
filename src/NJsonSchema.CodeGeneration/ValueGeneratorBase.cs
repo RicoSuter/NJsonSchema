@@ -140,7 +140,7 @@ namespace NJsonSchema.CodeGeneration
 
             if (constType.IsInteger() || constType.IsNumber())
             {
-                return schema.Const!.ToString();
+                return ConvertToNumberToStringCore(schema.Const!);
             }
 
             return ConversionUtilities.ConvertToStringLiteral(schema.Const!.ToString() ?? string.Empty, "\"", "\"");

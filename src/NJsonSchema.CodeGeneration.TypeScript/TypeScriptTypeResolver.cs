@@ -312,7 +312,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
             if (constType.IsInteger() || constType.IsNumber())
             {
-                return schema.Const!.ToString()!;
+                return ValueGeneratorBase.ConvertToNumberToStringCore(schema.Const!);
             }
 
             return ConversionUtilities.ConvertToStringLiteral(schema.Const!.ToString() ?? string.Empty, "\"", "\"");

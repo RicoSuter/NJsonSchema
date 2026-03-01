@@ -205,7 +205,8 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            if (schema.Const?.ToString() != token?.ToString())
+            var constToken = schema.Const is JToken jt ? jt : new JValue(schema.Const);
+            if (!JToken.DeepEquals(constToken, token))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.ConstantValueMismatch, propertyName, propertyPath, token, schema));
             }
