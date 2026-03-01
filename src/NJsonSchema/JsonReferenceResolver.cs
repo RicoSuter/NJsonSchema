@@ -8,7 +8,6 @@
 
 using System.Collections;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using Newtonsoft.Json;
@@ -88,7 +87,7 @@ namespace NJsonSchema
 
         private static string UnescapeReferenceSegment(string segment)
         {
-            var urlDecoded = WebUtility.UrlDecode(segment);
+            var urlDecoded = Uri.UnescapeDataString(segment);
             return urlDecoded.Replace("~1", "/").Replace("~0", "~");
         }
 
