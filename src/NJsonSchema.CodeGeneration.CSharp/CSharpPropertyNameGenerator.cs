@@ -50,6 +50,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     .Replace("|", "_");
             }
 
+            if (name.StartsWith('-'))
+            {
+                name = "minus" + name[1..];
+            }
+
             name = ConversionUtilities.ConvertToUpperCamelCase(name, true);
 
             if (name.AsSpan().IndexOfAny(_reservedSecondPassChars) != -1)
