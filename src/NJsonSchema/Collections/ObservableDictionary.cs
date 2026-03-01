@@ -2,7 +2,7 @@
 // <copyright file="ObservableDictionary.cs" company="MyToolkit">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>http://mytoolkit.codeplex.com/license</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
