@@ -30,6 +30,32 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [Fact]
+        public async Task When_schema_has_custom_schema_version_then_ToJson_preserves_it()
+        {
+            // Arrange
+            var json = @"{
+  ""$schema"": ""https://json-schema.org/draft/2020-12/schema"",
+  ""type"": ""object"",
+  ""properties"": {
+    ""foo"": {
+      ""anyOf"": [
+        { ""type"": ""string"" },
+        { ""type"": ""null"" }
+      ]
+    }
+  }
+}";
+
+            // Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var output = schema.ToJson();
+
+            // Assert
+            Assert.Equal("https://json-schema.org/draft/2020-12/schema", schema.SchemaVersion);
+            Assert.Contains(@"""$schema"": ""https://json-schema.org/draft/2020-12/schema""", output);
+        }
+
+        [Fact]
         public async Task When_schema_contains_refs_then_they_should_be_resolved()
         {
             // Arrange
