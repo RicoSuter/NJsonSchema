@@ -395,6 +395,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         [InlineData("foo+bar", "Fooplusbar")]
         [InlineData("foo*bar", "FooStarbar")]
         [InlineData("foo:bar", "Foo_bar")]
+        [InlineData("-1", "Minus1")]
+        [InlineData("-foo", "Minusfoo")]
         public async Task When_name_contains_unallowed_characters_then_they_are_converted_to_valid_csharp(string jsonPropertyName, string testCaseName)
         {
             // Arrange
