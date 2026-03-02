@@ -51,6 +51,18 @@ namespace NJsonSchema.Generation
                 }
             }
 
+            dynamic? enumDataTypeAttribute = contextualType.GetContextAttributes(true)
+                .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.EnumDataTypeAttribute");
+            if (enumDataTypeAttribute != null)
+            {
+                var enumType = (Type)enumDataTypeAttribute.EnumType;
+                if (enumType != null && enumType.IsEnum)
+                {
+                    type = enumType;
+                    contextualType = enumType.ToContextualType();
+                }
+            }
+
             var jsonSchemaAttribute = contextualType.GetContextOrTypeAttribute<JsonSchemaAttribute>(true); ;
             if (jsonSchemaAttribute != null)
             {

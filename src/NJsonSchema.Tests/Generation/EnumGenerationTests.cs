@@ -231,5 +231,39 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Properties["Bar"].OneOf.Count == 0);
             Assert.True(schema.Properties["Bar"].Reference != null);
         }
+
+        public class ClassWithEnumDataTypeOnString
+        {
+            [EnumDataType(typeof(Bar))]
+            public string BarValue { get; set; }
+        }
+
+        public class ClassWithEnumDataTypeOnInt
+        {
+            [EnumDataType(typeof(Bar))]
+            public int BarValue { get; set; }
+        }
+
+        [Fact]
+        public async Task When_string_property_has_EnumDataType_annotation_then_schema_has_enum()
+        {
+            // Arrange & Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithEnumDataTypeOnString>(new NewtonsoftJsonSchemaGeneratorSettings());
+
+            // Assert
+            Assert.True(schema.Properties["BarValue"].ActualTypeSchema.IsEnumeration);
+            Assert.Equal(3, schema.Properties["BarValue"].ActualTypeSchema.Enumeration.Count);
+        }
+
+        [Fact]
+        public async Task When_int_property_has_EnumDataType_annotation_then_schema_has_enum()
+        {
+            // Arrange & Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithEnumDataTypeOnInt>(new NewtonsoftJsonSchemaGeneratorSettings());
+
+            // Assert
+            Assert.True(schema.Properties["BarValue"].ActualTypeSchema.IsEnumeration);
+            Assert.Equal(3, schema.Properties["BarValue"].ActualTypeSchema.Enumeration.Count);
+        }
     }
 }
