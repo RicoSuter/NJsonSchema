@@ -22,7 +22,8 @@ namespace NJsonSchema.Generation
         /// <inheritdoc />
         public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
-            foreach (var accessorInfo in contextualType.Properties.OfType<ContextualAccessorInfo>().Concat(contextualType.Fields))
+            foreach (var accessorInfo in contextualType.Properties.OfType<ContextualAccessorInfo>().Concat(contextualType.Fields)
+                .OrderBy(a => GetPropertyOrder(a)))
             {
                 if (accessorInfo.MemberInfo.DeclaringType != contextualType.Type ||
                     (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute)))))
@@ -132,6 +133,13 @@ namespace NJsonSchema.Generation
         public override string GetPropertyName(ContextualAccessorInfo accessorInfo, JsonSchemaGeneratorSettings settings)
         {
             return GetPropertyNameInternal(accessorInfo, (SystemTextJsonSchemaGeneratorSettings)settings);
+        }
+
+        private static int GetPropertyOrder(ContextualAccessorInfo accessorInfo)
+        {
+            dynamic? orderAttribute = accessorInfo.GetAttributes(true)
+                .FirstAssignableToTypeNameOrDefault("System.Text.Json.Serialization.JsonPropertyOrderAttribute", TypeNameStyle.FullName);
+            return (int?)orderAttribute?.Order ?? 0;
         }
 
         private static string GetPropertyNameInternal(ContextualAccessorInfo accessorInfo, SystemTextJsonSchemaGeneratorSettings settings)

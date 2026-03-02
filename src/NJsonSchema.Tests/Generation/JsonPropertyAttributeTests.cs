@@ -85,5 +85,29 @@ namespace NJsonSchema.Tests.Generation
             [JsonProperty(Required = Newtonsoft.Json.Required.Always)]
             public string Required { get; set; }
         }
+
+        public class PropertyOrderTestClass
+        {
+            [JsonProperty(Order = 2)]
+            public string B { get; set; }
+
+            [JsonProperty(Order = 1)]
+            public string A { get; set; }
+
+            public string C { get; set; }
+        }
+
+        [Fact]
+        public void When_JsonProperty_Order_is_set_then_properties_are_sorted_in_schema()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<PropertyOrderTestClass>();
+
+            // Assert
+            var keys = schema.Properties.Keys.ToList();
+            Assert.Equal("C", keys[0]); // no order specified, comes first
+            Assert.Equal("A", keys[1]); // order 1
+            Assert.Equal("B", keys[2]); // order 2
+        }
     }
 }

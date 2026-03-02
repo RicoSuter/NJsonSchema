@@ -108,5 +108,29 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.False(data.Contains("PublicReadOnlyStaticProperty"), data);
             Assert.False(data.Contains("PrivateReadOnlyStaticProperty"), data);
         }
+
+        public class PropertyOrderClass
+        {
+            [System.Text.Json.Serialization.JsonPropertyOrder(2)]
+            public string B { get; set; }
+
+            [System.Text.Json.Serialization.JsonPropertyOrder(1)]
+            public string A { get; set; }
+
+            public string C { get; set; }
+        }
+
+        [Fact]
+        public void When_JsonPropertyOrder_is_set_then_properties_are_sorted_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<PropertyOrderClass>();
+
+            // Assert
+            var keys = schema.Properties.Keys.ToList();
+            Assert.Equal("C", keys[0]); // default order (0)
+            Assert.Equal("A", keys[1]); // order 1
+            Assert.Equal("B", keys[2]); // order 2
+        }
     }
 }
