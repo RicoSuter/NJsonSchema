@@ -38,5 +38,39 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_custom_class_and_property_annotation_templates_are_used_then_annotations_are_on_separate_lines()
+        {
+            // Arrange
+            var json = @"{ 'properties': { 'name': { 'type': 'string' } } }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            var tempDir = Path.Combine(Path.GetTempPath(), "NJsonSchema_AnnotationTest_" + Guid.NewGuid());
+            Directory.CreateDirectory(tempDir);
+            try
+            {
+                File.WriteAllText(Path.Combine(tempDir, "Class.Annotations.liquid"), "[System.Runtime.Serialization.DataContract]");
+                File.WriteAllText(Path.Combine(tempDir, "Class.Property.Annotations.liquid"), "[System.Runtime.Serialization.DataMember]");
+
+                var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+                {
+                    ClassStyle = CSharpClassStyle.Poco,
+                    Namespace = "TestNs",
+                    TemplateDirectory = tempDir
+                });
+
+                // Act
+                var code = generator.GenerateFile("MyClass");
+
+                // Assert - annotations should be on their own lines, not on the same line as class/property declarations
+                Assert.Contains("[System.Runtime.Serialization.DataContract]\n    public partial class MyClass", code);
+                Assert.Contains("[System.Runtime.Serialization.DataMember]\n        public string Name", code);
+            }
+            finally
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
     }
 }
