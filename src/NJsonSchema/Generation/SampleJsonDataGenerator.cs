@@ -174,6 +174,12 @@ namespace NJsonSchema.Generation
             {
                 return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
             }
+#pragma warning disable CS0618 // Type or member is obsolete
+            else if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+                return JToken.FromObject(Guid.NewGuid().ToString());
+            }
             else if (property != null)
             {
                 return JToken.FromObject(property.Name);

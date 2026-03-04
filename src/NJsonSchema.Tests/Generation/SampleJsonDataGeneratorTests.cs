@@ -452,6 +452,38 @@ namespace NJsonSchema.Tests.Generation
 
         //exclusiveMaximum
 
+        [Theory]
+        [InlineData("uuid")]
+        [InlineData("guid")]
+        public async Task PropertyWithGuidOrUuidFormatGeneratesGuid(string format)
+        {
+            // Arrange
+            var data = $@"{{
+                ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+                ""title"": ""test schema"",
+                ""type"": ""object"",
+                ""required"": [
+                  ""identifier""
+                ],
+                ""properties"": {{
+                  ""identifier"": {{
+                    ""type"": ""string"",
+                    ""format"": ""{format}""
+                  }}
+                }}
+              }}";
+            var generator = new SampleJsonDataGenerator();
+            var schema = await JsonSchema.FromJsonAsync(data);
+
+            // Act
+            var testJson = generator.Generate(schema);
+
+            // Assert
+            var identifierValue = testJson.SelectToken("identifier")?.Value<string>();
+            Assert.NotNull(identifierValue);
+            Assert.True(System.Guid.TryParse(identifierValue, out _), $"Expected a GUID but got: {identifierValue}");
+        }
+
         [Fact]
         public async Task PropertyExclusiveMinimumDefiniton()
         {
