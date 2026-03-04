@@ -174,6 +174,10 @@ namespace NJsonSchema.Generation
             {
                 return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
             }
+            else if (schema.Format == JsonFormatStrings.Guid || schema.Format == "uuid")
+            {
+                return JToken.FromObject(Guid.NewGuid().ToString());
+            }
             else if (property != null)
             {
                 return JToken.FromObject(property.Name);
