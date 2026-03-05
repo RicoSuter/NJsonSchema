@@ -48,12 +48,19 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code.</returns>
         public virtual string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
+            var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
+
+            // Const values are always used as default values (they define the only valid value)
+            if (actualSchema.HasConstValue)
+            {
+                return GetConstantValue(actualSchema, targetType);
+            }
+
             if (schema.Default == null || !useSchemaDefault)
             {
                 return null;
             }
 
-            var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.IsObject() && actualSchema.Type != JsonObjectType.None)
             {
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
@@ -112,6 +119,31 @@ namespace NJsonSchema.CodeGeneration
 #pragma warning restore CA1822
         {
             return ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty, "\"", "\"");
+        }
+
+        /// <summary>Gets the constant value code for a schema with a const value.</summary>
+        /// <param name="schema">The schema with a const value.</param>
+        /// <param name="targetType">The target type name.</param>
+        /// <returns>The code representing the constant value, or null if not applicable.</returns>
+        protected virtual string? GetConstantValue(JsonSchema schema, string targetType)
+        {
+            if (!schema.HasConstValue)
+            {
+                return null;
+            }
+
+            var constType = schema.ConstValueType;
+            if (constType.IsBoolean())
+            {
+                return schema.Const!.ToString()!.ToLowerInvariant();
+            }
+
+            if (constType.IsInteger() || constType.IsNumber())
+            {
+                return ConvertToNumberToStringCore(schema.Const!);
+            }
+
+            return ConversionUtilities.ConvertToStringLiteral(schema.Const!.ToString() ?? string.Empty, "\"", "\"");
         }
 
         /// <summary>Converts a number to its string representation.</summary>

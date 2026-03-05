@@ -425,6 +425,55 @@ namespace NJsonSchema
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object? Default { get; set; }
 
+        /// <summary>Gets or sets the const value (JSON Schema draft 6). </summary>
+        [JsonProperty("const", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        public object? Const { get; set; }
+
+        /// <summary>Gets a value indicating whether the schema contains a const value.</summary>
+        [JsonIgnore]
+        public bool HasConstValue => Const != null;
+
+        /// <summary>Gets the inferred JSON object type for the const value.</summary>
+        [JsonIgnore]
+        public JsonObjectType ConstValueType
+        {
+            get
+            {
+                if (Const is null)
+                {
+                    return JsonObjectType.None;
+                }
+
+                if (Const is JValue jv)
+                {
+                    return jv.Type switch
+                    {
+                        JTokenType.Boolean => JsonObjectType.Boolean,
+                        JTokenType.Integer => JsonObjectType.Integer,
+                        JTokenType.Float => JsonObjectType.Number,
+                        _ => JsonObjectType.String,
+                    };
+                }
+
+                if (Const is bool)
+                {
+                    return JsonObjectType.Boolean;
+                }
+
+                if (Const is int or long or short)
+                {
+                    return JsonObjectType.Integer;
+                }
+
+                if (Const is double or float or decimal)
+                {
+                    return JsonObjectType.Number;
+                }
+
+                return JsonObjectType.String;
+            }
+        }
+
         /// <summary>Gets or sets the required multiple of for the number value.</summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public decimal? MultipleOf { get; set; }
