@@ -22,6 +22,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             TimeType = "System.TimeSpan";
             TimeSpanType = "System.TimeSpan";
             
+            IntegerType = "int";
+
             NumberType = "double";
             NumberFloatType = "float";
             NumberDoubleType = "double";
@@ -84,6 +86,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
         public string TimeSpanType { get; set; }
+        
+        /// <summary>Gets or sets the integer .NET type (default: "int"). This setting applies only to integer properties without an explicit format (e.g., not byte, long, or ulong).</summary>
+        public string IntegerType { get; set; }
         
         /// <summary>Gets or sets the number .NET type (default: "double").</summary>
         public string NumberType { get; set; }
