@@ -509,6 +509,14 @@ namespace NJsonSchema
         [JsonProperty("x-enumFlags", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool IsFlagEnumerable { get; set; }
 
+        /// <summary>Gets or sets the constant value of this schema (JSON Schema 'const' keyword).</summary>
+        [JsonIgnore]
+        public object? Const { get; set; }
+
+        /// <summary>Gets a value indicating whether a const value has been set.</summary>
+        [JsonIgnore]
+        public bool HasConst { get; set; }
+
         /// <summary>Gets the collection of required properties. </summary>
         [JsonIgnore]
         public ICollection<object?> Enumeration { get; internal set; }
