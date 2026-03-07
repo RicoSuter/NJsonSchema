@@ -535,5 +535,77 @@ namespace NJsonSchema.Tests.Generation
             Assert.Empty(validationResult);
             Assert.Equal(1.1, testJson.SelectToken("body.numberContent.value").Value<double>());
         }
+
+        [Fact]
+        public async Task When_integer_has_long_minimum_then_sample_does_not_overflow()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""bigInt"": {
+                        ""type"": ""integer"",
+                        ""minimum"": 3000000000
+                    }
+                },
+                ""required"": [""bigInt""]
+            }";
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var generator = new SampleJsonDataGenerator();
+
+            // Act
+            var testJson = generator.Generate(schema);
+
+            // Assert
+            Assert.Equal(3000000000L, testJson.SelectToken("bigInt")!.Value<long>());
+        }
+
+        [Fact]
+        public async Task When_integer_has_long_exclusive_minimum_then_sample_does_not_overflow()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""bigInt"": {
+                        ""type"": ""integer"",
+                        ""exclusiveMinimum"": 5000000000
+                    }
+                },
+                ""required"": [""bigInt""]
+            }";
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var generator = new SampleJsonDataGenerator();
+
+            // Act
+            var testJson = generator.Generate(schema);
+
+            // Assert
+            Assert.Equal(5000000000L, testJson.SelectToken("bigInt")!.Value<long>());
+        }
+
+        [Fact]
+        public async Task When_integer_has_negative_long_minimum_then_sample_does_not_overflow()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""bigNegative"": {
+                        ""type"": ""integer"",
+                        ""minimum"": -9223372036854775808
+                    }
+                },
+                ""required"": [""bigNegative""]
+            }";
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var generator = new SampleJsonDataGenerator();
+
+            // Act
+            var testJson = generator.Generate(schema);
+
+            // Assert
+            Assert.Equal(long.MinValue, testJson.SelectToken("bigNegative")!.Value<long>());
+        }
     }
 }

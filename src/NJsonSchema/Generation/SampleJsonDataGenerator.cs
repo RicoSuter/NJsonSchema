@@ -151,15 +151,15 @@ namespace NJsonSchema.Generation
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
+                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
+                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
             }
             else if (schema.Minimum.HasValue)
             {
-                return Convert.ToInt32(schema.Minimum, CultureInfo.InvariantCulture);
+                return Convert.ToInt64(schema.Minimum, CultureInfo.InvariantCulture);
             }
             return JToken.FromObject(0);
         }
