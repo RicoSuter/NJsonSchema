@@ -299,5 +299,41 @@ namespace NJsonSchema.Tests.Generation
             Assert.Null(schema.Properties["Versions"].Pattern);
             Assert.NotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
         }
+
+        public class ClassWithRequiredDateTimeProperties
+        {
+            [Required]
+            public DateTime RequiredDateTime { get; set; }
+
+            [Required]
+            public DateTimeOffset RequiredDateTimeOffset { get; set; }
+
+#if NET6_0_OR_GREATER
+            [Required]
+            public DateOnly RequiredDateOnly { get; set; }
+
+            [Required]
+            public TimeOnly RequiredTimeOnly { get; set; }
+#endif
+
+            [Required]
+            public string RequiredString { get; set; }
+        }
+
+        [Fact]
+        public void When_required_DateTime_then_MinLength_is_not_set()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredDateTimeProperties>();
+
+            // Assert
+            Assert.Null(schema.Properties["RequiredDateTime"].MinLength);
+            Assert.Null(schema.Properties["RequiredDateTimeOffset"].MinLength);
+#if NET6_0_OR_GREATER
+            Assert.Null(schema.Properties["RequiredDateOnly"].MinLength);
+            Assert.Null(schema.Properties["RequiredTimeOnly"].MinLength);
+#endif
+            Assert.Equal(1, schema.Properties["RequiredString"].MinLength);
+        }
     }
 }

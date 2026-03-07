@@ -1205,7 +1205,8 @@ namespace NJsonSchema.Generation
                 if (hasRequiredAttribute &&
                     !propertyTypeDescription.IsEnum &&
                     propertyTypeDescription.Type == JsonObjectType.String &&
-                    !requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false))
+                    !requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) &&
+                    !IsDateTimeFormat(propertyTypeDescription.Format))
                 {
                     propertySchema.MinLength = 1;
                 }
@@ -1304,6 +1305,12 @@ namespace NJsonSchema.Generation
             }
 
             return accessorInfo.GetAttributes(true).FirstAssignableToTypeNameOrDefault("DataMemberAttribute", TypeNameStyle.Name);
+        }
+
+        private static bool IsDateTimeFormat(string? format)
+        {
+            return format is JsonFormatStrings.DateTime or JsonFormatStrings.Date or JsonFormatStrings.Time
+                or JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan;
         }
 
         private static bool HasDataContractAttribute(Type parentType)
