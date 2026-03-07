@@ -308,11 +308,13 @@ namespace NJsonSchema.Tests.Generation
             [Required]
             public DateTimeOffset RequiredDateTimeOffset { get; set; }
 
+#if NET6_0_OR_GREATER
             [Required]
             public DateOnly RequiredDateOnly { get; set; }
 
             [Required]
             public TimeOnly RequiredTimeOnly { get; set; }
+#endif
 
             [Required]
             public string RequiredString { get; set; }
@@ -327,8 +329,10 @@ namespace NJsonSchema.Tests.Generation
             // Assert
             Assert.Null(schema.Properties["RequiredDateTime"].MinLength);
             Assert.Null(schema.Properties["RequiredDateTimeOffset"].MinLength);
+#if NET6_0_OR_GREATER
             Assert.Null(schema.Properties["RequiredDateOnly"].MinLength);
             Assert.Null(schema.Properties["RequiredTimeOnly"].MinLength);
+#endif
             Assert.Equal(1, schema.Properties["RequiredString"].MinLength);
         }
     }
