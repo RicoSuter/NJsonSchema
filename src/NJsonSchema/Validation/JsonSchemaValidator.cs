@@ -397,7 +397,7 @@ namespace NJsonSchema.Validation
 
                 var additionalProperties = properties.Where(p => !schemaPropertyKeys.Contains(p.Name)).ToList();
 
-                ValidatePatternProperties(additionalProperties, schema, schemaType, errors);
+                ValidatePatternProperties(properties, additionalProperties, schema, schemaType, errors);
                 ValidateAdditionalProperties(token, additionalProperties, schema, schemaType, propertyName, propertyPath, errors);
             }
         }
@@ -423,9 +423,9 @@ namespace NJsonSchema.Validation
             }
         }
 
-        private void ValidatePatternProperties(List<JProperty> additionalProperties, JsonSchema schema, SchemaType schemaType, List<ValidationError> errors)
+        private void ValidatePatternProperties(List<JProperty> allProperties, List<JProperty> additionalProperties, JsonSchema schema, SchemaType schemaType, List<ValidationError> errors)
         {
-            foreach (var property in additionalProperties.ToArray())
+            foreach (var property in allProperties)
             {
                 var patternPropertySchema = schema.PatternProperties.FirstOrDefault(p => Regex.IsMatch(property.Name, p.Key));
                 if (patternPropertySchema.Value != null)
