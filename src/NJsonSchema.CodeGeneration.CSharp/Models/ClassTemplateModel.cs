@@ -184,12 +184,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string JsonConvertersArrayCode => CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(_settings, null);
 
         /// <summary>Gets a value indicating whether the class is deprecated.</summary>
-        public bool IsDeprecated => _schema.IsDeprecated;
+        public bool IsDeprecated => _schema.IsDeprecated || _schema.AllOf.Any(s => s.IsDeprecated);
 
         /// <summary>Gets a value indicating whether the class has a deprecated message.</summary>
-        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(_schema.DeprecatedMessage);
+        public bool HasDeprecatedMessage => !string.IsNullOrEmpty(DeprecatedMessage);
 
         /// <summary>Gets the deprecated message.</summary>
-        public string? DeprecatedMessage => _schema.DeprecatedMessage;
+        public string? DeprecatedMessage => _schema.DeprecatedMessage ??
+            _schema.AllOf.Select(s => s.DeprecatedMessage).FirstOrDefault(m => !string.IsNullOrEmpty(m));
     }
 }

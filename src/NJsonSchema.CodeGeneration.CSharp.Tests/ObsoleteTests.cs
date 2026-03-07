@@ -93,5 +93,88 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_class_with_base_class_has_deprecated_in_allOf_then_obsolete_attribute_is_rendered()
+        {
+            // Arrange - simulates the schema structure where deprecated is in an allOf sub-schema
+            var json = @"{
+                ""type"": ""object"",
+                ""definitions"": {
+                    ""BaseDto"": {
+                        ""type"": ""object"",
+                        ""properties"": {
+                            ""id"": { ""type"": ""string"" }
+                        }
+                    },
+                    ""DerivedDto"": {
+                        ""allOf"": [
+                            { ""$ref"": ""#/definitions/BaseDto"" },
+                            {
+                                ""type"": ""object"",
+                                ""x-deprecated"": true,
+                                ""x-deprecatedMessage"": ""Has been replaced by flows."",
+                                ""properties"": {
+                                    ""url"": { ""type"": ""string"" }
+                                }
+                            }
+                        ]
+                    }
+                },
+                ""properties"": {
+                    ""item"": { ""$ref"": ""#/definitions/DerivedDto"" }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.Contains("[System.Obsolete(\"Has been replaced by flows.\")]", code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
+        public async Task When_class_with_base_class_has_deprecated_without_message_in_allOf_then_obsolete_attribute_is_rendered()
+        {
+            // Arrange
+            var json = @"{
+                ""type"": ""object"",
+                ""definitions"": {
+                    ""BaseDto"": {
+                        ""type"": ""object"",
+                        ""properties"": {
+                            ""id"": { ""type"": ""string"" }
+                        }
+                    },
+                    ""DeprecatedDto"": {
+                        ""allOf"": [
+                            { ""$ref"": ""#/definitions/BaseDto"" },
+                            {
+                                ""type"": ""object"",
+                                ""x-deprecated"": true,
+                                ""properties"": {
+                                    ""name"": { ""type"": ""string"" }
+                                }
+                            }
+                        ]
+                    }
+                },
+                ""properties"": {
+                    ""item"": { ""$ref"": ""#/definitions/DeprecatedDto"" }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings());
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            Assert.Contains("[System.Obsolete]", code);
+            CSharpCompiler.AssertCompile(code);
+        }
     }
 }
