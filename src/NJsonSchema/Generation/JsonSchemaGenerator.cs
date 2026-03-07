@@ -986,7 +986,7 @@ namespace NJsonSchema.Generation
                         if (!typeDescription.IsDictionary && !type.Type.IsArray)
                         {
                             Settings.ReflectionService.GenerateProperties(schema, baseType, Settings, this, schemaResolver);
-                            var actualSchema = GenerateInheritance(baseType, schema, schemaResolver);
+                            var actualSchema = FlattenAncestorProperties(baseType, schema, schemaResolver);
 
                             GenerateInheritanceDiscriminator(baseType, schema, actualSchema ?? schema);
                         }
@@ -1051,6 +1051,27 @@ namespace NJsonSchema.Generation
                         var actualSchema = GenerateInheritance(contextualType, schema, schemaResolver);
 
                         GenerateInheritanceDiscriminator(implementedInterface, schema, actualSchema ?? schema);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private JsonSchema? FlattenAncestorProperties(ContextualType type, JsonSchema schema, JsonSchemaResolver schemaResolver)
+        {
+            var baseType = type.BaseType;
+            if (baseType != null && baseType.Type != typeof(object) && baseType.Type != typeof(ValueType))
+            {
+                if (baseType.GetContextOrTypeAttributes(false).FirstAssignableToTypeNameOrDefault("JsonSchemaIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    baseType.GetContextOrTypeAttributes(false).FirstAssignableToTypeNameOrDefault("SwaggerIgnoreAttribute", TypeNameStyle.Name) == null &&
+                    Settings.ExcludedTypeNames?.Contains(baseType.Type.FullName) != true)
+                {
+                    var typeDescription = Settings.ReflectionService.GetDescription(baseType, Settings);
+                    if (!typeDescription.IsDictionary && !type.Type.IsArray)
+                    {
+                        Settings.ReflectionService.GenerateProperties(schema, baseType, Settings, this, schemaResolver);
+                        return FlattenAncestorProperties(baseType, schema, schemaResolver);
                     }
                 }
             }

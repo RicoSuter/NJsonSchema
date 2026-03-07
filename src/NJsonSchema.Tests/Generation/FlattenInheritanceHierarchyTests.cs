@@ -171,6 +171,61 @@ namespace NJsonSchema.Tests.Generation
             Assert.True(schema.Definitions["B"].Properties.ContainsKey("Ccc"));
         }
 
+        [JsonSchemaFlatten]
+        public class FlattenedChild : MiddleClass
+        {
+            public string Name { get; set; }
+        }
+
+        public class MiddleClass : BaseClass
+        {
+            public string FirstName { get; set; }
+        }
+
+        public class BaseClass
+        {
+            public string LastName { get; set; }
+        }
+
+        [Fact]
+        public async Task When_JsonSchemaFlattenAttribute_with_multiple_inheritance_levels_then_no_duplicate_properties()
+        {
+            // Arrange
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings();
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<FlattenedChild>(settings);
+            var data = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.Properties.ContainsKey("Name"));
+            Assert.True(schema.Properties.ContainsKey("FirstName"));
+            Assert.True(schema.Properties.ContainsKey("LastName"));
+            Assert.Empty(schema.AllOf);
+            Assert.False(schema.Definitions.ContainsKey("MiddleClass"));
+            Assert.False(schema.Definitions.ContainsKey("BaseClass"));
+        }
+
+        [Fact]
+        public async Task When_FlattenInheritanceHierarchy_setting_with_multiple_levels_then_no_duplicate_properties()
+        {
+            // Arrange
+            var settings = new NewtonsoftJsonSchemaGeneratorSettings
+            {
+                FlattenInheritanceHierarchy = true
+            };
+
+            // Act - Note: FlattenedChild also has the attribute, but we test with the setting too
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<FlattenedChild>(settings);
+            var data = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.Properties.ContainsKey("Name"));
+            Assert.True(schema.Properties.ContainsKey("FirstName"));
+            Assert.True(schema.Properties.ContainsKey("LastName"));
+            Assert.Empty(schema.AllOf);
+        }
+
         [Fact]
         public async Task When_class_inherited_and_json_flattened_then_ignore_base_property_with_same_name()
         {
