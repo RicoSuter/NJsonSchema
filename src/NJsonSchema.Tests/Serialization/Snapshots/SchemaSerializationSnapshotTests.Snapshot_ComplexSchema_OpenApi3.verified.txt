@@ -1,0 +1,48 @@
+﻿{
+  "title": "Person",
+  "type": "object",
+  "description": "A person object",
+  "required": [
+    "name",
+    "age"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z ]+$"
+    },
+    "age": {
+      "type": "integer",
+      "maximum": 150.0,
+      "minimum": 0.0
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "address": {
+      "$ref": "#/definitions/Address"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
