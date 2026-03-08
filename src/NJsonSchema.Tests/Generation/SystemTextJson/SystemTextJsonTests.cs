@@ -169,5 +169,56 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
         }
 #endif
+
+        public class ClassWithPublicField
+        {
+            public string MyField;
+            public string MyProperty { get; set; }
+        }
+
+        [Fact]
+        public void When_IncludeFields_is_true_then_public_fields_are_in_schema()
+        {
+            // Act
+            var settings = new SystemTextJsonSchemaGeneratorSettings
+            {
+                SerializerOptions = new System.Text.Json.JsonSerializerOptions { IncludeFields = true }
+            };
+            var schema = JsonSchema.FromType<ClassWithPublicField>(settings);
+
+            // Assert
+            Assert.True(schema.Properties.ContainsKey("MyField"));
+            Assert.True(schema.Properties.ContainsKey("MyProperty"));
+        }
+
+        [Fact]
+        public void When_IncludeFields_is_false_then_public_fields_are_not_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithPublicField>();
+
+            // Assert
+            Assert.False(schema.Properties.ContainsKey("MyField"));
+            Assert.True(schema.Properties.ContainsKey("MyProperty"));
+        }
+
+        public class ClassWithJsonIncludeField
+        {
+            [System.Text.Json.Serialization.JsonInclude]
+            public string IncludedField;
+
+            public string ExcludedField;
+        }
+
+        [Fact]
+        public void When_field_has_JsonInclude_then_it_is_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithJsonIncludeField>();
+
+            // Assert
+            Assert.True(schema.Properties.ContainsKey("IncludedField"));
+            Assert.False(schema.Properties.ContainsKey("ExcludedField"));
+        }
     }
 }
