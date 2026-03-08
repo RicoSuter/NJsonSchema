@@ -56,6 +56,7 @@ Templates are in `src/NJsonSchema.CodeGeneration.CSharp/Templates/` and `src/NJs
 - Uses **XUnit v3** with **Verify** for snapshot testing
 - Snapshot files are in `Snapshots/` directories with `.verified.txt` extension
 - Snapshots use UTF-8 with BOM and LF line endings (see `.editorconfig`)
+- Always use AAA (Arrange/Act/Assert) pattern with `// Arrange`, `// Act`, `// Assert` comments, matching existing test style
 
 ## Code Style
 
