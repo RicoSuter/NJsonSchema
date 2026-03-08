@@ -15,6 +15,7 @@
 {%-       if UseSystemTextJson -%}
 {%-           if JsonLibraryVersion >= 9.0 -%}
     [System.Text.Json.Serialization.JsonStringEnumMemberName(@"{{ enum.Value | replace: '"', '""' }}")]
+    [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
 {%-           else -%}
     [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
 {%-           endif -%}
