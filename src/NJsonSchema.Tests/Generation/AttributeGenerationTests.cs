@@ -354,5 +354,24 @@ namespace NJsonSchema.Tests.Generation
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
         }
 #endif
+
+#if NET6_0_OR_GREATER
+        [Display(Name = "My Title", Description = "My Description")]
+        public class ClassWithDisplayAttribute
+        {
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public void When_class_has_Display_Name_then_schema_title_is_set()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDisplayAttribute>();
+
+            // Assert
+            Assert.Equal("My Title", schema.Title);
+            Assert.Equal("My Description", schema.Description);
+        }
+#endif
     }
 }
