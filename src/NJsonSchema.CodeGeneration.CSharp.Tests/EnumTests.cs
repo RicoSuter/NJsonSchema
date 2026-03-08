@@ -648,5 +648,44 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_nullable_enum_array_then_IsStringEnumArray_is_true()
+        {
+            // Arrange - schema with a nullable string enum array (items uses oneOf with null + $ref)
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""colors"": {
+            ""type"": ""array"",
+            ""items"": {
+                ""oneOf"": [
+                    { ""type"": ""null"" },
+                    { ""$ref"": ""#/definitions/Color"" }
+                ]
+            }
+        }
+    },
+    ""definitions"": {
+        ""Color"": {
+            ""type"": ""string"",
+            ""enum"": [""Red"", ""Green"", ""Blue""]
+        }
+    }
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert - should have StringEnumConverter for the nullable enum array
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
     }
 }
