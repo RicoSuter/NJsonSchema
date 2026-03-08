@@ -61,8 +61,8 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool IsStringEnumArray =>
             _property.ActualTypeSchema.IsArray &&
             _property.ActualTypeSchema.Item != null &&
-            _property.ActualTypeSchema.Item.ActualSchema.IsEnumeration &&
-            _property.ActualTypeSchema.Item.ActualSchema.Type.IsString();
+            _property.ActualTypeSchema.Item.ActualTypeSchema.IsEnumeration &&
+            _property.ActualTypeSchema.Item.ActualTypeSchema.Type.IsString();
 
         /// <summary>Gets the property extension data.</summary>
         public IDictionary<string, object?>? ExtensionData => _property.ExtensionData;
