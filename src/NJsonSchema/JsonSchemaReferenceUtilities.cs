@@ -100,7 +100,7 @@ namespace NJsonSchema
                 {
                     if (_replaceRefsRound)
                     {
-                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
+                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/$defs/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver

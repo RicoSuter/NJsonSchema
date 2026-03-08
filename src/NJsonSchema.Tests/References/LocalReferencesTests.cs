@@ -184,6 +184,83 @@ namespace NJsonSchema.Tests.References
             Assert.Equal(JsonObjectType.Integer, schema.ActualTypeSchema.Type);
         }
 
+        [Fact]
+        public async Task When_schema_uses_defs_keyword_then_references_are_resolved()
+        {
+            //// Arrange
+            var json = @"{
+    ""type"": ""object"",
+    ""$defs"": {
+        ""address"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""street"": { ""type"": ""string"" },
+                ""city"": { ""type"": ""string"" }
+            }
+        }
+    },
+    ""properties"": {
+        ""home"": { ""$ref"": ""#/$defs/address"" },
+        ""work"": { ""$ref"": ""#/$defs/address"" }
+    }
+}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Assert
+            Assert.NotNull(schema.Properties["home"].ActualTypeSchema);
+            Assert.True(schema.Properties["home"].ActualTypeSchema.Properties.ContainsKey("street"));
+            Assert.True(schema.Properties["home"].ActualTypeSchema.Properties.ContainsKey("city"));
+            Assert.Equal(schema.Properties["home"].ActualTypeSchema, schema.Properties["work"].ActualTypeSchema);
+        }
+
+        [Fact]
+        public async Task When_schema_uses_defs_keyword_then_definitions_are_populated()
+        {
+            //// Arrange
+            var json = @"{
+    ""type"": ""object"",
+    ""$defs"": {
+        ""myType"": {
+            ""type"": ""string""
+        }
+    }
+}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            //// Assert
+            Assert.True(schema.Definitions.ContainsKey("myType"));
+            Assert.Equal(JsonObjectType.String, schema.Definitions["myType"].Type);
+        }
+
+        [Fact]
+        public async Task When_schema_uses_defs_keyword_then_serialized_as_definitions()
+        {
+            //// Arrange
+            var json = @"{
+    ""type"": ""object"",
+    ""$defs"": {
+        ""myType"": {
+            ""type"": ""string""
+        }
+    },
+    ""properties"": {
+        ""foo"": { ""$ref"": ""#/$defs/myType"" }
+    }
+}";
+
+            //// Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var outputJson = schema.ToJson();
+
+            //// Assert
+            Assert.Contains("\"definitions\"", outputJson);
+            Assert.DoesNotContain("\"$defs\"", outputJson);
+        }
+
         private string GetTestDirectory()
         {
             var codeBase = Assembly.GetExecutingAssembly().CodeBase.Replace("#", "%23");

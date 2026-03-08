@@ -279,6 +279,13 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
 
+            // Map "$defs" (draft 2019-09+) to "definitions" since $defs content
+            // is merged into the Definitions dictionary during deserialization
+            if (firstSegment == "$defs")
+            {
+                firstSegment = "definitions";
+            }
+
             if (obj is IDictionary dictionary)
             {
                 if (dictionary.Contains(firstSegment))

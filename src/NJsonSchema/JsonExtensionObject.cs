@@ -37,6 +37,7 @@ namespace NJsonSchema
                 var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType)!;
                 serializer.Populate(reader, obj);
                 DeserializeExtensionDataSchemas(obj, serializer);
+                MergeDefsIntoDefinitions(obj);
                 return obj;
             }
             else
@@ -54,6 +55,29 @@ namespace NJsonSchema
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>Merges $defs entries from extension data into the Definitions dictionary
+        /// to support JSON Schema draft 2019-09+ $defs keyword.</summary>
+        private static void MergeDefsIntoDefinitions(IJsonExtensionObject extensionObject)
+        {
+            if (extensionObject is JsonSchema schema &&
+                extensionObject.ExtensionData != null &&
+                extensionObject.ExtensionData.TryGetValue("$defs", out var defsValue))
+            {
+                extensionObject.ExtensionData.Remove("$defs");
+
+                if (defsValue is IDictionary<string, object?> defsDict)
+                {
+                    foreach (var pair in defsDict)
+                    {
+                        if (pair.Value is JsonSchema defSchema)
+                        {
+                            schema.Definitions[pair.Key] = defSchema;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>Transforms the extension data so that contained schemas are correctly deserialized.</summary>
