@@ -545,6 +545,17 @@ namespace NJsonSchema.Generation
             schema.Description = type.ToCachedType().GetDescription(Settings);
             schema.Example = GenerateExample(type.ToContextualType());
 
+            dynamic? displayAttribute = type.GetCustomAttributes(false)
+                .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.DisplayAttribute");
+            if (displayAttribute != null)
+            {
+                string? name = displayAttribute.GetName();
+                if (name != null)
+                {
+                    schema.Title = name;
+                }
+            }
+
             dynamic? obsoleteAttribute = type.GetCustomAttributes(false).FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
             if (obsoleteAttribute != null)
             {
