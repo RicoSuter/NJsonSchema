@@ -26,10 +26,10 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Duration,
             JsonFormatStrings.TimeSpan,
             JsonFormatStrings.Uri,
-            JsonFormatStrings.Guid,
+            JsonFormatStrings.Uuid,
             JsonFormatStrings.Byte,
 #pragma warning disable CS0618 // Type or member is obsolete
-            JsonFormatStrings.Uuid,
+            JsonFormatStrings.Guid,
             JsonFormatStrings.Base64,
 #pragma warning restore CS0618 // Type or member is obsolete
         };

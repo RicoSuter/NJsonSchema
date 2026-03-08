@@ -138,7 +138,7 @@ namespace NJsonSchema
 
                 case JTokenType.Guid:
                     schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.Guid;
+                    schema.Format = JsonFormatStrings.Uuid;
                     break;
 
                 case JTokenType.Uri:

@@ -28,11 +28,11 @@ public static class JsonFormatStrings
     /// <summary>Format for an URI. </summary>
     public const string Uri = "uri";
 
-    /// <summary>Format for an GUID. </summary>
+    /// <summary>Format for a GUID. </summary>
+    [Obsolete("Use Uuid instead to match JSON Schema/OpenAPI standard.")]
     public const string Guid = "guid";
 
-    /// <summary>Format for an UUID (same as GUID). </summary>
-    [Obsolete("Now made redundant. Use \"guid\" instead.")]
+    /// <summary>Format for a UUID (same as GUID). </summary>
     public const string Uuid = "uuid";
 
     /// <summary>Format for an integer. </summary>
