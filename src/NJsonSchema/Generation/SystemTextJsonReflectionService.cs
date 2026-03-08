@@ -26,7 +26,10 @@ namespace NJsonSchema.Generation
                 .OrderBy(a => GetPropertyOrder(a)))
             {
                 if (accessorInfo.MemberInfo.DeclaringType != contextualType.Type ||
-                    (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic || !fieldInfo.IsDefined(typeof(DataMemberAttribute)))))
+                    (accessorInfo.MemberInfo is FieldInfo fieldInfo && (fieldInfo.IsPrivate || fieldInfo.IsStatic ||
+                        (!fieldInfo.IsDefined(typeof(DataMemberAttribute)) &&
+                         !settings.SerializerOptions.IncludeFields &&
+                         !fieldInfo.IsDefined(typeof(JsonIncludeAttribute))))))
                 {
                     continue;
                 }
