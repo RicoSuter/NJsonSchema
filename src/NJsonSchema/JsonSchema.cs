@@ -189,6 +189,41 @@ namespace NJsonSchema
             return JsonSchemaSerialization.FromJsonAsync(stream, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
         }
 
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/> (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="data">The JSON string.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromJson(string data)
+        {
+            return FromJson(data, null);
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema"/> (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="data">The JSON string.</param>
+        /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromJson(string data, string? documentPath)
+        {
+            var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
+            return FromJson(data, documentPath, factory);
+        }
+
+        /// <summary>Deserializes a JSON string to a <see cref="JsonSchema" /> (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="data">The JSON string.</param>
+        /// <param name="documentPath">The document path (URL or file path) for resolving relative document references.</param>
+        /// <param name="referenceResolverFactory">The JSON reference resolver factory.</param>
+        /// <returns>The JSON Schema.</returns>
+        public static JsonSchema FromJson(string data, string? documentPath, Func<JsonSchema,
+            JsonReferenceResolver> referenceResolverFactory)
+        {
+            return JsonSchemaSerialization.FromJson(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value);
+        }
+
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type (using System.Text.Json rules).</summary>
         /// <typeparam name="TType">The type to create the schema for.</typeparam>
         /// <returns>The <see cref="JsonSchema" />.</returns>

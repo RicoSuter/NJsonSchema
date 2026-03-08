@@ -41,6 +41,29 @@ namespace NJsonSchema
             await updater.VisitAsync(rootObject, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
+        /// available <see cref="IJsonReferenceBase.Reference"/> properties (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="referenceResolver">The JSON document resolver.</param>
+        public static void UpdateSchemaReferences(object rootObject, JsonReferenceResolver referenceResolver) =>
+            UpdateSchemaReferences(rootObject, referenceResolver, new DefaultContractResolver());
+
+        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
+        /// available <see cref="IJsonReferenceBase.Reference"/> properties (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="referenceResolver">The JSON document resolver.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        public static void UpdateSchemaReferences(object rootObject, JsonReferenceResolver referenceResolver,
+                IContractResolver contractResolver)
+        {
+            var updater = new JsonReferenceUpdaterSync(rootObject, referenceResolver, contractResolver);
+            updater.Visit(rootObject);
+        }
+
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
         /// from the available <see cref="IJsonReferenceBase.Reference" /> properties with inlining external references.</summary>
         /// <param name="rootObject">The root object.</param>
@@ -114,6 +137,54 @@ namespace NJsonSchema
                         reference.Reference = await _referenceResolver
                             .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver)
                             .ConfigureAwait(false);
+                    }
+                }
+
+                return reference;
+            }
+        }
+
+        private sealed class JsonReferenceUpdaterSync : JsonReferenceVisitorBase
+        {
+            private readonly object _rootObject;
+            private readonly JsonReferenceResolver _referenceResolver;
+            private readonly IContractResolver _contractResolver;
+            private bool _replaceRefsRound;
+
+            public JsonReferenceUpdaterSync(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
+                : base(contractResolver)
+            {
+                _rootObject = rootObject;
+                _referenceResolver = referenceResolver;
+                _contractResolver = contractResolver;
+            }
+
+            public override void Visit(object obj)
+            {
+                _replaceRefsRound = true;
+                base.Visit(obj);
+                _replaceRefsRound = false;
+                base.Visit(obj);
+            }
+
+            protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint)
+            {
+                if (reference.ReferencePath != null && reference.Reference == null)
+                {
+                    if (_replaceRefsRound)
+                    {
+                        if (path.EndsWith("/definitions/" + typeNameHint) || path.EndsWith("/schemas/" + typeNameHint))
+                        {
+                            // inline $refs in "definitions"
+                            return _referenceResolver
+                                .ResolveReferenceWithoutAppend(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver);
+                        }
+                    }
+                    else
+                    {
+                        // load $refs and add them to "definitions"
+                        reference.Reference = _referenceResolver
+                            .ResolveReference(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver);
                     }
                 }
 

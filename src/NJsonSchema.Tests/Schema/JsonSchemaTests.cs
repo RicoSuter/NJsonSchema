@@ -428,6 +428,114 @@ namespace NJsonSchema.Tests.Schema
         }
 
         [Fact]
+        public void When_FromJson_is_called_with_simple_schema_then_it_is_deserialized()
+        {
+            //// Arrange
+            var data =
+@"{
+    ""title"": ""Test Schema"",
+    ""type"": ""object"",
+    ""properties"": {
+        ""name"": {
+            ""type"": ""string""
+        },
+        ""age"": {
+            ""type"": ""integer""
+        }
+    },
+    ""required"": [""name""]
+}";
+
+            //// Act
+            var schema = JsonSchema.FromJson(data);
+
+            //// Assert
+            Assert.Equal("Test Schema", schema.Title);
+            Assert.Equal(JsonObjectType.Object, schema.Type);
+            Assert.Equal(2, schema.Properties.Count);
+            Assert.True(schema.Properties.ContainsKey("name"));
+            Assert.True(schema.Properties.ContainsKey("age"));
+            Assert.Contains("name", schema.RequiredProperties);
+        }
+
+        [Fact]
+        public void When_FromJson_is_called_with_internal_refs_then_they_are_resolved()
+        {
+            //// Arrange
+            var data =
+@"{
+    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+    ""type"": ""object"",
+    ""properties"": {
+        ""address"": {
+            ""$ref"": ""#/definitions/Address""
+        }
+    },
+    ""definitions"": {
+        ""Address"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""street"": { ""type"": ""string"" },
+                ""city"": { ""type"": ""string"" }
+            }
+        }
+    }
+}";
+
+            //// Act
+            var schema = JsonSchema.FromJson(data);
+
+            //// Assert
+            Assert.NotNull(schema.Definitions["Address"]);
+            Assert.NotNull(schema.Properties["address"].Reference);
+            Assert.Equal(schema.Definitions["Address"], schema.Properties["address"].Reference);
+        }
+
+        [Fact]
+        public async Task When_FromJson_is_called_then_result_matches_FromJsonAsync()
+        {
+            //// Arrange
+            var data =
+@"{
+    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+    ""type"": ""object"",
+    ""properties"": {
+        ""storage"": {
+            ""type"": ""object"",
+            ""oneOf"": [
+                { ""$ref"": ""#/definitions/diskDevice"" },
+                { ""$ref"": ""#/definitions/diskUUID"" }
+            ]
+        },
+        ""fstype"": {
+            ""enum"": [ ""ext3"", ""ext4"", ""btrfs"" ]
+        }
+    },
+    ""definitions"": {
+        ""diskDevice"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""device"": { ""type"": ""string"" }
+            }
+        },
+        ""diskUUID"": {
+            ""type"": ""object"",
+            ""properties"": {
+                ""uuid"": { ""type"": ""string"" }
+            }
+        }
+    }
+}";
+
+            //// Act
+            var syncSchema = JsonSchema.FromJson(data);
+            var asyncSchema = await JsonSchema.FromJsonAsync(data);
+
+            //// Assert
+            Assert.Equal(asyncSchema.ToJson(), syncSchema.ToJson());
+        }
+
+        [Fact]
         public void When_there_are_multiple_empty_objects_in_json_sample_data_generate_different_type_definitions_foreach()
         {
             //https://github.com/RicoSuter/NJsonSchema/issues/1415

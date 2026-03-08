@@ -124,6 +124,49 @@ namespace NJsonSchema.Infrastructure
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
         }
 
+        /// <summary>Deserializes JSON data to a schema with reference handling (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="json">The JSON data.</param>
+        /// <param name="schemaType">The schema type.</param>
+        /// <param name="documentPath">The document path.</param>
+        /// <param name="referenceResolverFactory">The reference resolver factory.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <returns>The deserialized schema.</returns>
+        public static T FromJson<T>(string json, SchemaType schemaType, string? documentPath,
+            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
+            where T : notnull
+        {
+            CurrentSchemaType = schemaType;
+
+            T schema;
+            try
+            {
+                schema = FromJson<T>(json, contractResolver)!;
+                if (schema is IDocumentPathProvider documentPathProvider)
+                {
+                    documentPathProvider.DocumentPath = documentPath;
+                }
+
+                var referenceResolver = referenceResolverFactory.Invoke(schema);
+                if (schema is IJsonReference referenceSchema)
+                {
+                    if (!string.IsNullOrEmpty(documentPath))
+                    {
+                        referenceResolver.AddDocumentReference(documentPath!, referenceSchema);
+                    }
+                }
+
+                JsonSchemaReferenceUtilities.UpdateSchemaReferences(schema, referenceResolver, contractResolver);
+            }
+            finally
+            {
+                CurrentSchemaType = SchemaType.JsonSchema;
+            }
+
+            return schema;
+        }
+
         private static async Task<T> FromJsonWithLoaderAsync<T>(
             Func<T> loader,
             SchemaType schemaType,

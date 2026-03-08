@@ -103,6 +103,59 @@ namespace NJsonSchema
             return schema;
         }
 
+        /// <summary>Gets the object from the given JSON path (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="jsonPath">The JSON path.</param>
+        /// <param name="targetType">The target type to resolve.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <returns>The JSON Schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        /// <exception cref="NotSupportedException">External file or URL references are not supported in synchronous mode.</exception>
+        public IJsonReference ResolveReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
+        {
+            return ResolveReference(rootObject, jsonPath, targetType, contractResolver, true);
+        }
+
+        /// <summary>Gets the object from the given JSON path without appending (synchronous version).
+        /// Only supports document-internal references (# and #/...). External file or URL
+        /// references will throw <see cref="NotSupportedException"/>.</summary>
+        /// <param name="rootObject">The root object.</param>
+        /// <param name="jsonPath">The JSON path.</param>
+        /// <param name="targetType">The target type to resolve.</param>
+        /// <param name="contractResolver">The contract resolver.</param>
+        /// <returns>The JSON Schema.</returns>
+        /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
+        /// <exception cref="NotSupportedException">External file or URL references are not supported in synchronous mode.</exception>
+        public IJsonReference ResolveReferenceWithoutAppend(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
+        {
+            return ResolveReference(rootObject, jsonPath, targetType, contractResolver, false);
+        }
+
+        private IJsonReference ResolveReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver, bool append)
+        {
+            if (jsonPath == "#")
+            {
+                if (rootObject is IJsonReference)
+                {
+                    return (IJsonReference)rootObject;
+                }
+
+                throw new InvalidOperationException("Could not resolve the JSON path '#' because the root object is not a JsonSchema4.");
+            }
+            else if (jsonPath.StartsWith("#/"))
+            {
+                return ResolveDocumentReference(rootObject, jsonPath, targetType, contractResolver);
+            }
+            else
+            {
+                throw new NotSupportedException(
+                    "Could not resolve the JSON path '" + jsonPath + "' synchronously. " +
+                    "External file and URL references require the async FromJsonAsync method.");
+            }
+        }
+
         /// <summary>Resolves a file reference.</summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="cancellationToken">The cancellation token</param>
