@@ -132,5 +132,42 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.Equal("A", keys[1]); // order 1
             Assert.Equal("B", keys[2]); // order 2
         }
+
+#if NET7_0_OR_GREATER
+        public class ClassWithRequiredKeyword
+        {
+            public required string Name { get; set; }
+            public string Optional { get; set; }
+        }
+
+        [Fact]
+        public void When_property_has_required_keyword_then_it_is_required_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithRequiredKeyword>();
+
+            // Assert
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+        }
+
+        public class ClassWithJsonRequired
+        {
+            [System.Text.Json.Serialization.JsonRequired]
+            public string Name { get; set; }
+            public string Optional { get; set; }
+        }
+
+        [Fact]
+        public void When_property_has_JsonRequired_then_it_is_required_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithJsonRequired>();
+
+            // Assert
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+        }
+#endif
     }
 }

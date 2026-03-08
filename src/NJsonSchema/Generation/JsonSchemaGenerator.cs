@@ -1205,7 +1205,7 @@ namespace NJsonSchema.Generation
                 if (hasRequiredAttribute &&
                     !propertyTypeDescription.IsEnum &&
                     propertyTypeDescription.Type == JsonObjectType.String &&
-                    !requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) &&
+                    (requiredAttribute == null || !requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false)) &&
                     !IsDateTimeFormat(propertyTypeDescription.Format))
                 {
                     propertySchema.MinLength = 1;

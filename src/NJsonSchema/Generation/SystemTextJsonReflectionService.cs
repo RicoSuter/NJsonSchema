@@ -88,10 +88,14 @@ namespace NJsonSchema.Generation
                     }
 
                     var requiredAttribute = attributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                    var hasRequiredMemberAttribute = attributes.FirstAssignableToTypeNameOrDefault(
+                        "System.Runtime.CompilerServices.RequiredMemberAttribute") != null;
+                    var hasJsonRequiredAttribute = attributes.FirstAssignableToTypeNameOrDefault(
+                        "System.Text.Json.Serialization.JsonRequiredAttribute") != null;
 
                     var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
-                    var hasRequiredAttribute = requiredAttribute != null;
+                    var hasRequiredAttribute = requiredAttribute != null || hasRequiredMemberAttribute || hasJsonRequiredAttribute;
                     if (hasRequiredAttribute || isDataContractMemberRequired)
                     {
                         schema.RequiredProperties.Add(propertyName);
