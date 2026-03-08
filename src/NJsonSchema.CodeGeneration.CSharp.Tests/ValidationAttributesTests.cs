@@ -480,5 +480,26 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             Assert.Contains("[System.ComponentModel.DataAnnotations.MinLength(10)]\n" +
                             "        public System.Collections.Generic.ICollection<string> Value { get; set; } = new System.Collections.ObjectModel.Collection<string>();\n", code);
         }
+
+        [Fact]
+        public async Task When_date_time_property_has_min_max_length_then_no_string_length_attribute_is_generated()
+        {
+            var json = @"{
+                'type': 'object',
+                'properties': {
+                    'myDateTime': {
+                        'type': 'string',
+                        'format': 'date-time',
+                        'minLength': 1,
+                        'maxLength': 50
+                    }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            Assert.DoesNotContain("StringLength", code);
+        }
     }
 }
