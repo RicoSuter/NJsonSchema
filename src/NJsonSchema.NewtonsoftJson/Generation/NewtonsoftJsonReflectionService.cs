@@ -171,14 +171,16 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     }
                 }
 
-                var requiredAttribute = accessorInfo
-                    .GetAttributes(true)
+                var attributes = accessorInfo.GetAttributes(true);
+                var requiredAttribute = attributes
                     .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                var hasRequiredMemberAttribute = attributes.FirstAssignableToTypeNameOrDefault(
+                    "System.Runtime.CompilerServices.RequiredMemberAttribute") != null;
 
                 var hasJsonNetAttributeRequired = jsonProperty.Required is Required.Always or Required.AllowNull;
                 var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
 
-                var hasRequiredAttribute = requiredAttribute != null;
+                var hasRequiredAttribute = requiredAttribute != null || hasRequiredMemberAttribute;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
                 {
                     parentSchema.RequiredProperties.Add(propertyName);

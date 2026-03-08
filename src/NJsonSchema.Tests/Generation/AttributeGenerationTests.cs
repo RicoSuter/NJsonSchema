@@ -335,5 +335,24 @@ namespace NJsonSchema.Tests.Generation
 #endif
             Assert.Equal(1, schema.Properties["RequiredString"].MinLength);
         }
+
+#if NET7_0_OR_GREATER
+        public class ClassWithRequiredKeyword
+        {
+            public required string Name { get; set; }
+            public string Optional { get; set; }
+        }
+
+        [Fact]
+        public void When_property_has_required_keyword_then_it_is_required_in_Newtonsoft_schema()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredKeyword>();
+
+            // Assert
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+        }
+#endif
     }
 }
