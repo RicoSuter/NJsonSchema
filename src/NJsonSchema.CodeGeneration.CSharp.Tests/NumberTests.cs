@@ -265,4 +265,55 @@ public class NumberTests
         // Assert
         await VerifyHelper.Verify(code);
     }
+
+    [Fact]
+    public async Task When_integer_has_no_format_then_default_int_is_generated()
+    {
+        // Arrange
+        var json =
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""count"" : {
+                        ""type"":""integer""
+                    }
+                }
+            }";
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var generator = new CSharpGenerator(schema);
+
+        // Act
+        var code = generator.GenerateFile("MyClass");
+
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
+    }
+
+    [Fact]
+    public async Task When_integer_type_setting_is_defined_then_setting_type_is_generated()
+    {
+        // Arrange
+        var json =
+            @"{
+                ""type"": ""object"", 
+                ""properties"": {
+                    ""count"" : {
+                        ""type"":""integer""
+                    }
+                }
+            }";
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+        {
+            IntegerType = "long"
+        });
+
+        // Act
+        var code = generator.GenerateFile("MyClass");
+
+        // Assert
+        await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
+    }
 }
