@@ -38,5 +38,56 @@ namespace NJsonSchema.Tests.Validation
             // Assert
             Assert.Empty(errors);
         }
+
+        [Fact]
+        public void When_format_ipv4_has_colons_instead_of_dots_then_validation_fails()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.IpV4;
+
+            var token = new JValue("00:45:00.0");
+
+            // Act
+            var errors = schema.Validate(token);
+
+            // Assert
+            Assert.Equal(ValidationErrorKind.IpV4Expected, errors.First().Kind);
+        }
+
+        [Fact]
+        public void When_format_ipv4_has_colons_as_separators_then_validation_fails()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.IpV4;
+
+            var token = new JValue("1:2:3:4");
+
+            // Act
+            var errors = schema.Validate(token);
+
+            // Assert
+            Assert.Equal(ValidationErrorKind.IpV4Expected, errors.First().Kind);
+        }
+
+        [Fact]
+        public void When_format_ipv4_octet_exceeds_255_then_validation_fails()
+        {
+            // Arrange
+            var schema = new JsonSchema();
+            schema.Type = JsonObjectType.String;
+            schema.Format = JsonFormatStrings.IpV4;
+
+            var token = new JValue("256.1.1.1");
+
+            // Act
+            var errors = schema.Validate(token);
+
+            // Assert
+            Assert.Equal(ValidationErrorKind.IpV4Expected, errors.First().Kind);
+        }
     }
 }
