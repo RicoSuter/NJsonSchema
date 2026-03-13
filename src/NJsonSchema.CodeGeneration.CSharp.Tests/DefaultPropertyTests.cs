@@ -200,5 +200,59 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_property_has_const_string_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""const"": ""person""
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_integer_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""myNumber"": {
+                        ""const"": 42
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CSharpCompiler.AssertCompile(output);
+        }
     }
 }
