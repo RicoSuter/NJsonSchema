@@ -1,6 +1,8 @@
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace NJsonSchema.Tests.Validation
 {
     public class FormatGuidTests
@@ -30,7 +32,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Guid;
 
-            var guid = Guid.NewGuid().ToString(); 
+            var guid = Guid.NewGuid().ToString();
             var token = new JValue(guid);
 
             // Act
@@ -41,3 +43,5 @@ namespace NJsonSchema.Tests.Validation
         }
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

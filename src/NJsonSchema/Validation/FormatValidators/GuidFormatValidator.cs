@@ -14,7 +14,9 @@ namespace NJsonSchema.Validation.FormatValidators
     public class GuidFormatValidator : IFormatValidator
     {
         /// <summary>Gets the format attribute's value.</summary>
+#pragma warning disable CS0618 // Type or member is obsolete
         public string Format { get; } = JsonFormatStrings.Guid;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <summary>Gets the kind of error produced by validator.</summary>
         public ValidationErrorKind ValidationErrorKind { get; } = ValidationErrorKind.GuidExpected;
