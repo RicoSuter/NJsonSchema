@@ -7,8 +7,9 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
@@ -307,7 +308,7 @@ namespace NJsonSchema.Generation
 
             // See https://github.com/RicoSuter/NJsonSchema/issues/531
             var useDirectReference = Settings.AllowReferencesWithProperties ||
-                JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(referencingSchema))?.Properties()?.Any() == false; // TODO: Improve performance
+                JsonNode.Parse(JsonSerializer.Serialize(referencingSchema))?.AsObject().Count == 0; // TODO: Improve performance
 
             if (useDirectReference && referencingSchema._oneOf.Count == 0)
             {
@@ -506,7 +507,7 @@ namespace NJsonSchema.Generation
             try
             {
                 return !string.IsNullOrEmpty(xmlDocs) ?
-                    JsonConvert.DeserializeObject<JToken>(xmlDocs) :
+                    JsonNode.Parse(xmlDocs) :
                     null;
             }
             catch
@@ -849,8 +850,8 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
-            if (!contextualType.OriginalType.IsAssignableToTypeName(nameof(JArray), TypeNameStyle.Name) &&
-                (contextualType.OriginalType.IsAssignableToTypeName(nameof(JToken), TypeNameStyle.Name) ||
+            if (!contextualType.OriginalType.IsAssignableToTypeName(nameof(JsonArray), TypeNameStyle.Name) &&
+                (contextualType.OriginalType.IsAssignableToTypeName(nameof(JsonNode), TypeNameStyle.Name) ||
                  contextualType.OriginalType == typeof(object)))
             {
                 if (Settings.SchemaType == SchemaType.Swagger2)
@@ -1264,12 +1265,12 @@ namespace NJsonSchema.Generation
         /// <returns>The result.</returns>
         public virtual bool IsPropertyIgnored(ContextualAccessorInfo accessorInfo, Type parentType)
         {
-            if (accessorInfo.IsAttributeDefined<JsonIgnoreAttribute>(true))
+            if (accessorInfo.IsAttributeDefined<System.Text.Json.Serialization.JsonIgnoreAttribute>(true))
             {
                 return true;
             }
 
-            if (!accessorInfo.IsAttributeDefined<JsonPropertyAttribute>(true) &&
+            if (!accessorInfo.IsAttributeDefined<JsonPropertyNameAttribute>(true) &&
                 HasDataContractAttribute(parentType) &&
                 GetDataMemberAttribute(accessorInfo, parentType) == null)
             {

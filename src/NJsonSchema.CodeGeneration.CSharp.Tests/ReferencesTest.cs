@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json.Serialization;
-using NJsonSchema.CodeGeneration.CSharp;
+﻿using System.Reflection;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Infrastructure;
-using System.Reflection;
-using NJsonSchema.CodeGeneration.CSharp.Tests;
 
-namespace NJsonSchema.CodeGeneration.Tests.CSharp
+namespace NJsonSchema.CodeGeneration.CSharp.Tests
 {
     public class ReferencesTest
     {
@@ -121,7 +119,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.OpenApi3, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.OpenApi3, null, factory, null, CancellationToken.None);
 
             // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.OpenApi3 });
@@ -165,7 +163,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.Swagger2, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, SchemaType.Swagger2, null, factory, null, CancellationToken.None);
 
             // Act
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });

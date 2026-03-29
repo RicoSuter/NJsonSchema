@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using NJsonSchema.CodeGeneration.Tests;
+﻿using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.Tests.Generation
@@ -26,7 +25,7 @@ namespace NJsonSchema.Tests.Generation
         {
             // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AbstractClass>();
-            var json = schema.ToJson(Formatting.None);
+            var json = schema.ToJson(false);
 
             // Assert
             await VerifyHelper.Verify(json);

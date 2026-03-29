@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -13,7 +13,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Uri;
 
-            var token = new JValue("test");
+            var token = JsonValue.Create("test");
 
             // Act
             var errors = schema.Validate(token);
@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Uri;
 
-            var token = new JValue("http://rsuter.com");
+            var token = JsonValue.Create("http://rsuter.com");
 
             // Act
             var errors = schema.Validate(token);
@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Uri;
 
-            var token = new JValue(new Uri("http://rsuter.com"));
+            var token = JsonValue.Create(new Uri("http://rsuter.com"));
 
             // Act
             var errors = schema.Validate(token);

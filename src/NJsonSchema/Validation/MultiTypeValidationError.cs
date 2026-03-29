@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="MultiTypeValidationError.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace NJsonSchema.Validation
 {
@@ -20,7 +20,7 @@ namespace NJsonSchema.Validation
         /// <param name="errors">The error list. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-        public MultiTypeValidationError(ValidationErrorKind kind, string? property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JToken token, JsonSchema schema)
+        public MultiTypeValidationError(ValidationErrorKind kind, string? property, string path, IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> errors, JsonNode? token, JsonSchema schema)
 
             : base(kind, property, path, token, schema)
         {

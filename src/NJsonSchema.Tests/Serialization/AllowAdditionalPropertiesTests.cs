@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using NJsonSchema.Infrastructure;
+﻿using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Tests.Serialization
 {
@@ -21,7 +19,7 @@ namespace NJsonSchema.Tests.Serialization
         {
             // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, null);
 
             // Assert
             Assert.Equal(expectedAllowAdditionalProperties, schema.AllowAdditionalProperties);
@@ -37,7 +35,7 @@ namespace NJsonSchema.Tests.Serialization
 
             // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var json = JsonSchemaSerialization.ToJson(new JsonSchema(), schemaType, new DefaultContractResolver(), Formatting.None);
+            var json = JsonSchemaSerialization.ToJson(new JsonSchema(), schemaType, null, false);
 
             // Assert
             Assert.Equal(expectedJson, json);
@@ -54,7 +52,7 @@ namespace NJsonSchema.Tests.Serialization
         {
             // Act
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var json = JsonSchemaSerialization.ToJson(new JsonSchema { AllowAdditionalProperties = allowAdditionalProperties }, schemaType, new DefaultContractResolver(), Formatting.None);
+            var json = JsonSchemaSerialization.ToJson(new JsonSchema { AllowAdditionalProperties = allowAdditionalProperties }, schemaType, null, false);
 
             // Assert
             Assert.Equal(expectedJson, json);

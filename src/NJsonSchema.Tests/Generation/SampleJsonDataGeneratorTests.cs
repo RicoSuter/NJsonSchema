@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 using System.ComponentModel;
@@ -44,13 +45,13 @@ namespace NJsonSchema.Tests.Generation
 
             // Act
             var token = generator.Generate(schema);
-            var obj = token as JObject;
+            var obj = token as JsonObject;
 
             // Assert
-            Assert.NotNull(obj.Property(nameof(Person.FirstName)));
-            Assert.NotNull(obj.Property(nameof(Person.LastName)));
-            Assert.NotNull(obj.Property(nameof(Person.MainAddress)));
-            Assert.NotNull(obj.Property(nameof(Person.Addresses)));
+            Assert.NotNull(obj[nameof(Person.FirstName)]);
+            Assert.NotNull(obj[nameof(Person.LastName)]);
+            Assert.NotNull(obj[nameof(Person.MainAddress)]);
+            Assert.NotNull(obj[nameof(Person.Addresses)]);
         }
 
         [Fact]
@@ -62,14 +63,14 @@ namespace NJsonSchema.Tests.Generation
 
             // Act
             var token = generator.Generate(schema);
-            var obj = token as JObject;
+            var obj = token as JsonObject;
 
             // Assert
-            Assert.NotNull(obj.Property(nameof(Student.Course)));
-            Assert.NotNull(obj.Property(nameof(Person.FirstName)));
-            Assert.NotNull(obj.Property(nameof(Person.LastName)));
-            Assert.NotNull(obj.Property(nameof(Person.MainAddress)));
-            Assert.NotNull(obj.Property(nameof(Person.Addresses)));
+            Assert.NotNull(obj[nameof(Student.Course)]);
+            Assert.NotNull(obj[nameof(Person.FirstName)]);
+            Assert.NotNull(obj[nameof(Person.LastName)]);
+            Assert.NotNull(obj[nameof(Person.MainAddress)]);
+            Assert.NotNull(obj[nameof(Person.Addresses)]);
         }
 
         [Fact]
@@ -81,10 +82,13 @@ namespace NJsonSchema.Tests.Generation
 
             // Act
             var token = generator.Generate(schema);
-            var obj = token as JObject;
+            var obj = token as JsonObject;
 
             // Assert
-            Assert.Equal(new JArray(new int[] { 1, 2, 3 }), obj.GetValue(nameof(Measurements.Weights)));
+            var weightsNode = obj![nameof(Measurements.Weights)] as JsonArray;
+            Assert.NotNull(weightsNode);
+            var actual = weightsNode!.Select(x => x!.GetValue<int>()).ToArray();
+            Assert.Equal(new int[] { 1, 2, 3 }, actual);
         }
 
         [Fact]
@@ -126,11 +130,11 @@ namespace NJsonSchema.Tests.Generation
 
             // Act
             var token = generator.Generate(schema);
-            var obj = token as JObject;
+            var obj = token as JsonObject;
 
             // Assert
-            Assert.NotNull(obj.Property("isrequired"));
-            Assert.Null(obj.Property("isoptional"));
+            Assert.NotNull(obj!["isrequired"]);
+            Assert.Null(obj["isoptional"]);
         }
 
         [Fact]
@@ -178,10 +182,10 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1, testJson.SelectToken("body.numberContent.value").Value<int>());
+            Assert.Equal(1, testJson!["body"]!["numberContent"]!["value"]!.GetValue<int>());
         }
 
         [Fact]
@@ -235,12 +239,12 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var footerToken = testJson.SelectToken("body.numberContent.data.numberContent.value");
+            var footerToken = testJson!["body"]!["numberContent"]!["data"]!["numberContent"]!["value"];
             Assert.NotNull(footerToken);
 
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
-            Assert.Equal(1.000012, testJson.SelectToken("footer.value").Value<double>());
+            Assert.Equal(1.000012, testJson!["footer"]!["value"]!.GetValue<double>());
             Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
         }
 
@@ -279,14 +283,15 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var secondBodyToken = testJson.SelectToken("body.body");
+            var secondBodyToken = testJson!["body"]!["body"];
             Assert.NotNull(secondBodyToken);
 
-            var thirdBodyToken = testJson.SelectToken("body.body.body") as JValue;
+            var thirdBodyToken = testJson!["body"]!["body"]!["body"];
             Assert.NotNull(thirdBodyToken);
-            Assert.Equal(JTokenType.Null, thirdBodyToken.Type);
+            Assert.True(thirdBodyToken is JsonValue jsonVal && jsonVal.GetValueKind() == JsonValueKind.Null
+                      || thirdBodyToken is null);
 
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
         }
@@ -340,13 +345,13 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var footerToken = testJson.SelectToken("footer.value");
+            var footerToken = testJson!["footer"]!["value"];
             Assert.NotNull(footerToken);
 
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
+            Assert.Equal(1.000012, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
         }
 
         [Fact]
@@ -394,10 +399,10 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.000012, testJson.SelectToken("body.numberContent.value").Value<double>());
+            Assert.Equal(1.000012, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
         }
 
         [Fact]
@@ -444,10 +449,10 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(42, testJson.SelectToken("body.numberContent.value").Value<int>());
+            Assert.Equal(42, testJson!["body"]!["numberContent"]!["value"]!.GetValue<int>());
         }
 
         //exclusiveMaximum
@@ -479,7 +484,7 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var identifierValue = testJson.SelectToken("identifier")?.Value<string>();
+            var identifierValue = testJson!["identifier"]?.GetValue<string>();
             Assert.NotNull(identifierValue);
             Assert.True(System.Guid.TryParse(identifierValue, out _), $"Expected a GUID but got: {identifierValue}");
         }
@@ -530,10 +535,10 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            var validationResult = schema.Validate(testJson);
+            var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.1, testJson.SelectToken("body.numberContent.value").Value<double>());
+            Assert.Equal(1.1, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
         }
 
         [Fact]
@@ -557,7 +562,7 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            Assert.Equal(3000000000L, testJson.SelectToken("bigInt")!.Value<long>());
+            Assert.Equal(3000000000L, testJson!["bigInt"]!.GetValue<long>());
         }
 
         [Fact]
@@ -581,7 +586,7 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            Assert.Equal(5000000000L, testJson.SelectToken("bigInt")!.Value<long>());
+            Assert.Equal(5000000000L, testJson!["bigInt"]!.GetValue<long>());
         }
 
         [Fact]
@@ -605,7 +610,7 @@ namespace NJsonSchema.Tests.Generation
             var testJson = generator.Generate(schema);
 
             // Assert
-            Assert.Equal(long.MinValue, testJson.SelectToken("bigNegative")!.Value<long>());
+            Assert.Equal(long.MinValue, testJson!["bigNegative"]!.GetValue<long>());
         }
     }
 }

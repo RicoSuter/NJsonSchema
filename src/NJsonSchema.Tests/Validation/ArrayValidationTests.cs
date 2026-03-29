@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -12,8 +12,8 @@ namespace NJsonSchema.Tests.Validation
             var svc = await JsonSchema.FromJsonAsync(@"{ ""type"": ""array"", ""items"": { ""type"":""string"" } }");
 
             // Assert
-            Assert.Empty(svc.Validate(JToken.Parse("[]")));
-            Assert.Empty(svc.Validate(JToken.Parse(@"[""test""]")));
+            Assert.Empty(svc.Validate(JsonNode.Parse("[]")));
+            Assert.Empty(svc.Validate(JsonNode.Parse(@"[""test""]")));
             Assert.Empty(svc.Validate("[]"));
             Assert.Empty(svc.Validate(@"[""test""]"));
         }
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Array;
 
-            var token = new JValue(10);
+            var token = JsonValue.Create(10);
 
             // Act
             var errors = schema.Validate(token);
@@ -64,9 +64,9 @@ namespace NJsonSchema.Tests.Validation
             schema.Items.Add(new JsonSchema { Type = JsonObjectType.String });
             schema.Items.Add(new JsonSchema { Type = JsonObjectType.Integer });
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue(5));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create(5));
 
             // Act
             var errors = schema.Validate(token);
@@ -85,10 +85,10 @@ namespace NJsonSchema.Tests.Validation
             schema.Items.Add(new JsonSchema { Type = JsonObjectType.Integer });
             schema.AllowAdditionalItems = false;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue(5));
-            token.Add(new JValue(5));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create(5));
+            token.Add(JsonValue.Create(5));
 
             // Act
             var errors = schema.Validate(token);
@@ -108,9 +108,9 @@ namespace NJsonSchema.Tests.Validation
             schema.Item = new JsonSchema();
             schema.Item.Type = JsonObjectType.String;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue("Bar"));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create("Bar"));
 
             // Act
             var errors = schema.Validate(token);
@@ -128,9 +128,9 @@ namespace NJsonSchema.Tests.Validation
             schema.Item = new JsonSchema();
             schema.Item.Type = JsonObjectType.String;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue(10));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create(10));
 
             // Act
             var errors = schema.Validate(token);
@@ -156,9 +156,9 @@ namespace NJsonSchema.Tests.Validation
             schema.Item = new JsonSchema();
             schema.Item.Type = JsonObjectType.String;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue("Bar"));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create("Bar"));
 
             // Act
             var errors = schema.Validate(token);
@@ -179,8 +179,8 @@ namespace NJsonSchema.Tests.Validation
             schema.Item = new JsonSchema();
             schema.Item.Type = JsonObjectType.String;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
 
             // Act
             var errors = schema.Validate(token);
@@ -201,9 +201,9 @@ namespace NJsonSchema.Tests.Validation
             schema.Item = new JsonSchema();
             schema.Item.Type = JsonObjectType.String;
 
-            var token = new JArray();
-            token.Add(new JValue("Foo"));
-            token.Add(new JValue("Foo"));
+            var token = new JsonArray();
+            token.Add(JsonValue.Create("Foo"));
+            token.Add(JsonValue.Create("Foo"));
 
             // Act
             var errors = schema.Validate(token);
@@ -212,6 +212,24 @@ namespace NJsonSchema.Tests.Validation
             Assert.Single(errors);
             Assert.Equal(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
             Assert.Same(schema, errors.First().Schema);
+        }
+
+        [Fact]
+        public async Task When_unique_items_has_mathematically_equal_numbers_then_it_should_fail()
+        {
+            // Arrange
+            var json = @"{
+                ""type"": ""array"",
+                ""uniqueItems"": true
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var errors = schema.Validate("[1.0, 1.00, 1]");
+
+            // Assert
+            Assert.Single(errors);
+            Assert.Equal(ValidationErrorKind.ItemsNotUnique, errors.First().Kind);
         }
 
         [Fact]

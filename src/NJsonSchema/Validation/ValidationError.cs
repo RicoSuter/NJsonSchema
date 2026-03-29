@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="ValidationError.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,8 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace NJsonSchema.Validation
 {
@@ -20,25 +19,16 @@ namespace NJsonSchema.Validation
         /// <param name="propertyPath">The property path. </param>
         /// <param name="token">The token that failed to validate. </param>
         /// <param name="schema">The schema that contains the validation rule.</param>
-        public ValidationError(ValidationErrorKind errorKind, string? propertyName, string? propertyPath, JToken? token, JsonSchema schema)
+        public ValidationError(ValidationErrorKind errorKind, string? propertyName, string? propertyPath, object? token, JsonSchema schema)
         {
             Kind = errorKind;
             Property = propertyName;
             Path = propertyPath != null ? "#/" + propertyPath : "#";
             Token = token;
 
-            var lineInfo = token as IJsonLineInfo;
-            HasLineInfo = lineInfo != null && lineInfo.HasLineInfo();
-            if (HasLineInfo)
-            {
-                LineNumber = lineInfo!.LineNumber;
-                LinePosition = lineInfo.LinePosition;
-            }
-            else
-            {
-                LineNumber = 0;
-                LinePosition = 0;
-            }
+            HasLineInfo = false;
+            LineNumber = 0;
+            LinePosition = 0;
 
             Schema = schema;
         }
@@ -53,19 +43,20 @@ namespace NJsonSchema.Validation
         public string? Path { get; private set; }
 
         /// <summary>Indicates whether or not the error contains line information.</summary>
-        public bool HasLineInfo { get; private set; }
+        public bool HasLineInfo { get; internal set; }
 
         /// <summary>Gets the line number the validation failed on. </summary>
-        public int LineNumber { get; private set; }
+        public int LineNumber { get; internal set; }
 
         /// <summary>Gets the line position the validation failed on. </summary>
-        public int LinePosition { get; private set; }
+        public int LinePosition { get; internal set; }
 
         /// <summary>Gets the schema element that contains the validation rule. </summary>
         public JsonSchema Schema { get; private set; }
 
-        /// <summary>Gets the JToken of the element failed the validation. </summary>
-        public JToken? Token { get; private set; }
+        /// <summary>Gets the token that failed to validate. This may be a <see cref="JsonNode"/>
+        /// or, for property-level errors, an internal wrapper with a descriptive <c>ToString()</c>. </summary>
+        public object? Token { get; private set; }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

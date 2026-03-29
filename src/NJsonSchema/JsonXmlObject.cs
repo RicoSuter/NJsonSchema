@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonProperty.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace NJsonSchema
 {
@@ -18,23 +18,28 @@ namespace NJsonSchema
         public JsonSchema? ParentSchema { get; internal set; }
 
         /// <summary>Gets or sets the name of the xml object. </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Name { get; internal set; }
 
         /// <summary>Gets or sets if the array elements are going to be wrapped or not. </summary>
-        [JsonProperty("wrapped", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("wrapped")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Wrapped { get; internal set; }
 
         /// <summary>Gets or sets the URL of the namespace definition. </summary>
-        [JsonProperty("namespace", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("namespace")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Namespace { get; internal set; }
 
         /// <summary>Gets or sets the prefix for the name. </summary>
-        [JsonProperty("prefix", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("prefix")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Prefix { get; internal set; }
 
         /// <summary>Gets or sets if the property definition translates into an attribute instead of an element. </summary>
-        [JsonProperty("attribute", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("attribute")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Attribute { get; internal set; }
     }
 }

@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Infrastructure;
 
@@ -61,10 +60,10 @@ public class SchemaSerializationSnapshotTests
     {
         // Arrange
         var schema = CreateComplexSchema();
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.JsonSchema);
 
         // Act
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.JsonSchema, resolver, Formatting.Indented);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.JsonSchema, resolver, true);
 
         // Assert
         await VerifyHelper.Verify(json);
@@ -75,10 +74,10 @@ public class SchemaSerializationSnapshotTests
     {
         // Arrange
         var schema = CreateComplexSchema();
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.OpenApi3);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.OpenApi3);
 
         // Act
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, Formatting.Indented);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, true);
 
         // Assert
         await VerifyHelper.Verify(json);
@@ -89,10 +88,10 @@ public class SchemaSerializationSnapshotTests
     {
         // Arrange
         var schema = CreateComplexSchema();
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.Swagger2);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.Swagger2);
 
         // Act
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, Formatting.Indented);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, true);
 
         // Assert
         await VerifyHelper.Verify(json);

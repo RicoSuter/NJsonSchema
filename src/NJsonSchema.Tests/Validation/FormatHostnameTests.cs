@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -13,7 +13,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Hostname;
 
-            var token = new JValue("foo:bar");
+            var token = JsonValue.Create("foo:bar");
 
             // Act
             var errors = schema.Validate(token);
@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Hostname;
 
-            var token = new JValue("rsuter.com");
+            var token = JsonValue.Create("rsuter.com");
 
             // Act
             var errors = schema.Validate(token);

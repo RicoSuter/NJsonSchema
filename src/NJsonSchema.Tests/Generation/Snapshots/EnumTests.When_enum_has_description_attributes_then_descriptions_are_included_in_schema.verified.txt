@@ -8,11 +8,6 @@
     "SecondValue",
     "ThirdValue"
   ],
-  "x-enum-descriptions": [
-    "First value description",
-    "Second value description",
-    null
-  ],
   "enum": [
     "FirstValue",
     "SecondValue",

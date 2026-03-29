@@ -1,4 +1,5 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using NJsonSchema.Generation;
 
 namespace NJsonSchema.Tests.Generation;
@@ -17,9 +18,10 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        Assert.IsType<JObject>(token);
-        Assert.NotNull(((JObject)token)["name"]);
-        Assert.Equal(JTokenType.String, ((JObject)token)["name"]!.Type);
+        Assert.IsType<JsonObject>(token);
+        var obj = (JsonObject)token!;
+        Assert.NotNull(obj["name"]);
+        Assert.Equal(JsonValueKind.String, obj["name"]!.GetValueKind());
     }
 
     [Fact]
@@ -34,7 +36,8 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        Assert.Equal(JTokenType.Integer, ((JObject)token)["count"]!.Type);
+        var obj = (JsonObject)token!;
+        Assert.Equal(JsonValueKind.Number, obj["count"]!.GetValueKind());
     }
 
     [Fact]
@@ -49,9 +52,10 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        var val = ((JObject)token)["value"];
+        var obj = (JsonObject)token!;
+        var val = obj["value"];
         Assert.NotNull(val);
-        Assert.True(val!.Type == JTokenType.Float || val.Type == JTokenType.Integer);
+        Assert.Equal(JsonValueKind.Number, val!.GetValueKind());
     }
 
     [Fact]
@@ -66,7 +70,9 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        Assert.Equal(JTokenType.Boolean, ((JObject)token)["active"]!.Type);
+        var obj = (JsonObject)token!;
+        var kind = obj["active"]!.GetValueKind();
+        Assert.True(kind == JsonValueKind.True || kind == JsonValueKind.False);
     }
 
     [Fact]
@@ -85,7 +91,8 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        Assert.Equal(JTokenType.Array, ((JObject)token)["items"]!.Type);
+        var obj = (JsonObject)token!;
+        Assert.IsType<JsonArray>(obj["items"]);
     }
 
     [Fact]
@@ -101,10 +108,11 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        var address = ((JObject)token)["address"];
+        var obj = (JsonObject)token!;
+        var address = obj["address"];
         Assert.NotNull(address);
-        Assert.Equal(JTokenType.Object, address!.Type);
-        Assert.NotNull(((JObject)address)["city"]);
+        Assert.IsType<JsonObject>(address);
+        Assert.NotNull(((JsonObject)address!)["city"]);
     }
 
     [Fact]
@@ -123,7 +131,8 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        var color = ((JObject)token)["color"]?.Value<string>();
+        var obj = (JsonObject)token!;
+        var color = obj["color"]?.GetValue<string>();
         Assert.Contains(color, new[] { "red", "green", "blue" });
     }
 
@@ -143,7 +152,8 @@ public class SampleJsonDataGeneratorRegressionTests
         var token = generator.Generate(schema);
 
         // Assert
-        Assert.Equal("active", ((JObject)token)["status"]?.Value<string>());
+        var obj = (JsonObject)token!;
+        Assert.Equal("active", obj["status"]?.GetValue<string>());
     }
 
     [Fact]
@@ -158,11 +168,11 @@ public class SampleJsonDataGeneratorRegressionTests
 
         // Act
         var token = generator.Generate(schema);
-        var jsonString = token.ToString();
+        var jsonString = token!.ToJsonString();
 
         // Assert
         Assert.NotEmpty(jsonString);
-        var reparsed = JToken.Parse(jsonString);
+        var reparsed = JsonNode.Parse(jsonString);
         Assert.NotNull(reparsed);
     }
 }

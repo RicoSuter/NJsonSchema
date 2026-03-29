@@ -65,6 +65,7 @@ Templates are in `src/NJsonSchema.CodeGeneration.CSharp/Templates/` and `src/NJs
 - 4-space indentation, CRLF line endings (except `.verified.txt` files)
 - Prefer System.Text.Json over Newtonsoft.Json for new code
 - Consider AOT compatibility (use generic converters like `JsonStringEnumConverter<T>`)
+- Do not use abbreviations in variable/field names (e.g. use `attribute` not `attr`, `property` not `prop`, `parameter` not `param`)
 
 ## Version Management
 

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 
@@ -18,22 +17,12 @@ namespace NJsonSchema
     {
         /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
         /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
-        /// <param name="referenceResolver">The JSON document resolver.</param>
         /// <param name="rootObject">The root object.</param>
-        /// <param name="cancellationToken">The cancellation token</param>
-        public static Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, CancellationToken cancellationToken = default) =>
-            UpdateSchemaReferencesAsync(rootObject, referenceResolver, new DefaultContractResolver(), cancellationToken);
-
-        /// <summary>Updates all <see cref="IJsonReferenceBase.Reference"/> properties from the
-        /// available <see cref="IJsonReferenceBase.Reference"/> properties.</summary>
         /// <param name="referenceResolver">The JSON document resolver.</param>
-        /// <param name="rootObject">The root object.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver,
-                IContractResolver contractResolver, CancellationToken cancellationToken = default)
+        public static async Task UpdateSchemaReferencesAsync(object rootObject, JsonReferenceResolver referenceResolver, CancellationToken cancellationToken = default)
         {
-            var updater = new JsonReferenceUpdater(rootObject, referenceResolver, contractResolver);
+            var updater = new JsonReferenceUpdater(rootObject, referenceResolver);
             await updater.VisitAsync(rootObject, cancellationToken).ConfigureAwait(false);
         }
 
@@ -42,23 +31,22 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         public static void UpdateSchemaReferencePaths(object rootObject)
         {
-            UpdateSchemaReferencePaths(rootObject, false, new DefaultContractResolver());
+            UpdateSchemaReferencePaths(rootObject, false);
         }
 
         /// <summary>Updates the <see cref="IJsonReferenceBase.Reference" /> properties
         /// from the available <see cref="IJsonReferenceBase.Reference" /> properties.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="removeExternalReferences">Specifies whether to remove external references (otherwise they are inlined).</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences, IContractResolver contractResolver)
+        public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences)
         {
             var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
 
-            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences, contractResolver);
+            var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences);
             updater.Visit(rootObject);
 
             var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
-            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas, contractResolver);
+            var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
 
             foreach (var p in schemaReferences)
             {
@@ -70,15 +58,12 @@ namespace NJsonSchema
         {
             private readonly object _rootObject;
             private readonly JsonReferenceResolver _referenceResolver;
-            private readonly IContractResolver _contractResolver;
             private bool _replaceRefsRound;
 
-            public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver, IContractResolver contractResolver)
-                : base(contractResolver)
+            public JsonReferenceUpdater(object rootObject, JsonReferenceResolver referenceResolver)
             {
                 _rootObject = rootObject;
                 _referenceResolver = referenceResolver;
-                _contractResolver = contractResolver;
             }
 
             public override async Task VisitAsync(object obj, CancellationToken cancellationToken = default)
@@ -100,7 +85,7 @@ namespace NJsonSchema
                         {
                             // inline $refs in "definitions"
                             return await _referenceResolver
-                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
+                                .ResolveReferenceWithoutAppendAsync(_rootObject, reference.ReferencePath, reference.GetType(), cancellationToken)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -108,7 +93,7 @@ namespace NJsonSchema
                     {
                         // load $refs and add them to "definitions"
                         reference.Reference = await _referenceResolver
-                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), _contractResolver, cancellationToken)
+                            .ResolveReferenceAsync(_rootObject, reference.ReferencePath, reference.GetType(), cancellationToken)
                             .ConfigureAwait(false);
                     }
                 }
@@ -122,15 +107,12 @@ namespace NJsonSchema
             private readonly object _rootObject;
             private readonly Dictionary<IJsonReference, IJsonReference> _schemaReferences;
             private readonly bool _removeExternalReferences;
-            private readonly IContractResolver _contractResolver;
 
-            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences, IContractResolver contractResolver)
-                : base(contractResolver)
+            public JsonReferencePathUpdater(object rootObject, Dictionary<IJsonReference, IJsonReference> schemaReferences, bool removeExternalReferences)
             {
                 _rootObject = rootObject;
                 _schemaReferences = schemaReferences;
                 _removeExternalReferences = removeExternalReferences;
-                _contractResolver = contractResolver;
             }
 
             protected override IJsonReference VisitJsonReference(IJsonReference reference, string path, string? typeNameHint)
@@ -148,7 +130,7 @@ namespace NJsonSchema
                         if (externalReferenceRoot != null)
                         {
                             var jsonPath = JsonPathUtilities.GetJsonPath(
-                                externalReferenceRoot, externalReference, _contractResolver)?.TrimEnd('#');
+                                externalReferenceRoot, externalReference)?.TrimEnd('#');
 
                             reference.ReferencePath = externalReference.DocumentPath + jsonPath;
                         }
@@ -157,7 +139,6 @@ namespace NJsonSchema
                 else if (_removeExternalReferences && _rootObject != reference && reference.DocumentPath != null)
                 {
                     throw new NotSupportedException("removeExternalReferences not supported");
-                    //return new JsonSchema4 { ReferencePath = reference.DocumentPath };
                 }
 
                 return reference;

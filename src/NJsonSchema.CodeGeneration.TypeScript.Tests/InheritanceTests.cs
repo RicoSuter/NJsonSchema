@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
@@ -209,7 +208,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, null, CancellationToken.None);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
             // Act
@@ -298,7 +297,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 ";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, null, CancellationToken.None);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
             // Act

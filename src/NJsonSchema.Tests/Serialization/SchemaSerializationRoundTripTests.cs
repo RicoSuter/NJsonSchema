@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Tests.Serialization;
@@ -55,8 +54,8 @@ public class SchemaSerializationRoundTripTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(schemaType);
-        var json = JsonSchemaSerialization.ToJson(schema, schemaType, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(schemaType);
+        var json = JsonSchemaSerialization.ToJson(schema, schemaType, resolver, true);
         var deserialized = JsonSchemaSerialization.FromJson<JsonSchema>(json, resolver);
 
         // Assert

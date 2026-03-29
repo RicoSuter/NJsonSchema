@@ -12,12 +12,12 @@
       "type": "string",
       "maxLength": 200,
       "minLength": 1,
-      "pattern": "^[a-zA-Z ]+$"
+      "pattern": "^[a-zA-Z ]\u002B$"
     },
     "age": {
       "type": "integer",
-      "maximum": 150.0,
-      "minimum": 0.0
+      "maximum": 150,
+      "minimum": 0
     },
     "email": {
       "type": "string",

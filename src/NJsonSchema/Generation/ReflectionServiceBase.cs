@@ -194,12 +194,15 @@ namespace NJsonSchema.Generation
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.String, isNullable, JsonFormatStrings.Byte);
             }
 
-            if (originalType.FullName == "Newtonsoft.Json.Linq.JArray")
+            if (originalType.FullName == "System.Text.Json.Nodes.JsonArray" ||
+                originalType.FullName == "Newtonsoft.Json.Linq.JArray")
             {
                 return JsonTypeDescription.Create(contextualType, JsonObjectType.Array, isNullable, null);
             }
 
-            if (originalType.FullName == "Newtonsoft.Json.Linq.JToken" ||
+            if (originalType.FullName == "System.Text.Json.Nodes.JsonNode" ||
+                originalType.FullName == "System.Text.Json.Nodes.JsonObject" ||
+                originalType.FullName == "Newtonsoft.Json.Linq.JToken" ||
                 originalType.FullName == "Newtonsoft.Json.Linq.JObject" ||
                 originalType.FullName == "System.Dynamic.ExpandoObject" ||
                 originalType.FullName == "System.Text.Json.JsonElement" ||

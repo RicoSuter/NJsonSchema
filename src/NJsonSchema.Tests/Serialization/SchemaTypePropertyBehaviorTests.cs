@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Tests.Serialization;
@@ -16,8 +15,8 @@ public class SchemaTypePropertyBehaviorTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.Swagger2);
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.Swagger2);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, true);
 
         // Assert
         Assert.Contains("\"additionalProperties\": {}", json);
@@ -34,8 +33,8 @@ public class SchemaTypePropertyBehaviorTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.JsonSchema);
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.JsonSchema, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.JsonSchema);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.JsonSchema, resolver, true);
 
         // Assert
         Assert.DoesNotContain("additionalProperties", json);
@@ -52,8 +51,8 @@ public class SchemaTypePropertyBehaviorTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.OpenApi3);
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.OpenApi3);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, true);
 
         // Assert
         Assert.DoesNotContain("additionalProperties", json);
@@ -131,8 +130,8 @@ public class SchemaTypePropertyBehaviorTests
         schema.Discriminator = "type";
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.Swagger2);
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.Swagger2);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, resolver, true);
 
         // Assert
         Assert.Contains("\"discriminator\": \"type\"", json);
@@ -149,8 +148,8 @@ public class SchemaTypePropertyBehaviorTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(SchemaType.OpenApi3);
-        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(SchemaType.OpenApi3);
+        var json = JsonSchemaSerialization.ToJson(schema, SchemaType.OpenApi3, resolver, true);
 
         // Assert
         Assert.Contains("\"propertyName\"", json);
@@ -170,8 +169,8 @@ public class SchemaTypePropertyBehaviorTests
         };
 
         // Act
-        var resolver = JsonSchema.CreateJsonSerializerContractResolver(schemaType);
-        var json = JsonSchemaSerialization.ToJson(schema, schemaType, resolver, Formatting.Indented);
+        var resolver = JsonSchema.CreateSchemaSerializationConverter(schemaType);
+        var json = JsonSchemaSerialization.ToJson(schema, schemaType, resolver, true);
 
         // Assert
         if (schemaType == SchemaType.Swagger2)
