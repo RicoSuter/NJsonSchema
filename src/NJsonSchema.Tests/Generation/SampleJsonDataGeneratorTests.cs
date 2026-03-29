@@ -244,7 +244,7 @@ namespace NJsonSchema.Tests.Generation
 
             var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
-            Assert.Equal(1.000012, testJson!["footer"]!["value"]!.GetValue<double>());
+            Assert.Equal(1.000012m, testJson!["footer"]!["value"]!.GetValue<decimal>());
             Assert.True(validationResult.Count > 0); // It is expected to fail validating the recursive properties (because of max recursion level)
         }
 
@@ -351,7 +351,7 @@ namespace NJsonSchema.Tests.Generation
             var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.000012, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
+            Assert.Equal(1.000012m, testJson!["body"]!["numberContent"]!["value"]!.GetValue<decimal>());
         }
 
         [Fact]
@@ -402,7 +402,7 @@ namespace NJsonSchema.Tests.Generation
             var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.000012, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
+            Assert.Equal(1.000012m, testJson!["body"]!["numberContent"]!["value"]!.GetValue<decimal>());
         }
 
         [Fact]
@@ -538,7 +538,7 @@ namespace NJsonSchema.Tests.Generation
             var validationResult = schema.Validate(testJson!.ToJsonString());
             Assert.NotNull(validationResult);
             Assert.Empty(validationResult);
-            Assert.Equal(1.1, testJson!["body"]!["numberContent"]!["value"]!.GetValue<double>());
+            Assert.Equal(1.1m, testJson!["body"]!["numberContent"]!["value"]!.GetValue<decimal>());
         }
 
         [Fact]

@@ -185,15 +185,15 @@ namespace NJsonSchema.Generation
         {
             if (schema.ExclusiveMinimumRaw?.Equals(true) == true && schema.Minimum != null)
             {
-                return JsonValue.Create((double)(schema.Minimum.Value + 0.1m));
+                return JsonValue.Create(schema.Minimum.Value + 0.1m);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JsonValue.Create((double)schema.ExclusiveMinimum.Value);
+                return JsonValue.Create(schema.ExclusiveMinimum.Value);
             }
             else if (schema.Minimum.HasValue)
             {
-                return JsonValue.Create((double)schema.Minimum.Value);
+                return JsonValue.Create(schema.Minimum.Value);
             }
             return JsonValue.Create(0.0);
         }
