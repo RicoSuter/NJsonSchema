@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.IpV4;
 
-            var token = new JValue("00:45:00.0");
+            var token = JsonValue.Create("00:45:00.0");
 
             // Act
             var errors = schema.Validate(token);
@@ -64,7 +64,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.IpV4;
 
-            var token = new JValue("1:2:3:4");
+            var token = JsonValue.Create("1:2:3:4");
 
             // Act
             var errors = schema.Validate(token);
@@ -81,7 +81,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.IpV4;
 
-            var token = new JValue("256.1.1.1");
+            var token = JsonValue.Create("256.1.1.1");
 
             // Act
             var errors = schema.Validate(token);
