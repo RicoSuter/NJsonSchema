@@ -3,8 +3,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Subscriptions",
-    "description": "You can use billing plans and subscriptions to create subscriptions that process recurring PayPal payments for physical or digital goods, or services. A plan includes pricing and billing cycle information that defines the amount and frequency of charge for a subscription. You can also define a fixed plan, such as a $5 basic plan or a volume- or graduated-based plan with pricing tiers based on the quantity purchased. For more information, see \u003Ca href=\u0022/docs/subscriptions/\u0022\u003ESubscriptions Overview\u003C/a\u003E.",
-    "version": "2026-01-08T00:00:00",
+    "description": "You can use billing plans and subscriptions to create subscriptions that process recurring PayPal payments for physical or digital goods, or services. A plan includes pricing and billing cycle information that defines the amount and frequency of charge for a subscription. You can also define a fixed plan, such as a $5 basic plan or a volume- or graduated-based plan with pricing tiers based on the quantity purchased. For more information, see <a href=\"/docs/subscriptions/\">Subscriptions Overview</a>.",
+    "version": "1.8",
     "contact": {}
   },
   "servers": [
@@ -20,15 +20,15 @@
   "tags": [
     {
       "name": "plans",
-      "description": "Use the \u0060/billing/plans\u0060 resource to create and manage plans."
+      "description": "Use the `/billing/plans` resource to create and manage plans."
     },
     {
       "name": "subscriptions",
-      "description": "Use the \u0060/billing/subscriptions\u0060 resource to create and manage subscriptions."
+      "description": "Use the `/billing/subscriptions` resource to create and manage subscriptions."
     },
     {
       "name": "subscriptions-buyer-consent",
-      "description": "Use the \u0060/billing/subscriptions/approval-tokens\u0060 resource for subscriptions buyer consent flow."
+      "description": "Use the `/billing/subscriptions/approval-tokens` resource for subscriptions buyer consent flow."
     }
   ],
   "externalDocs": {
@@ -42,7 +42,7 @@
         "operationId": "plans.create",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows billing plan details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows billing plan details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -156,7 +156,7 @@
             }
           },
           "201": {
-            "description": "A successful request returns the HTTP \u0060201 Created\u0060 status code and a JSON response body that shows billing plan details.",
+            "description": "A successful request returns the HTTP `201 Created` status code and a JSON response body that shows billing plan details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -351,7 +351,7 @@
         "operationId": "plans.list",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that lists billing plans.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that lists billing plans.",
             "content": {
               "application/json": {
                 "schema": {
@@ -471,7 +471,7 @@
         "operationId": "plans.get",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows plan details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows plan details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -563,11 +563,11 @@
       },
       "patch": {
         "summary": "Update plan",
-        "description": "Updates a plan with the \u0060CREATED\u0060 or \u0060ACTIVE\u0060 status. For an \u0060INACTIVE\u0060 plan, you can make only status updates.\u003Cbr/\u003EYou can patch these attributes and objects:\u003Ctable\u003E\u003Cthead\u003E\u003Ctr\u003E\u003Cth\u003EAttribute or object\u003C/th\u003E\u003Cth\u003EOperations\u003C/th\u003E\u003C/tr\u003E\u003C/thead\u003E\u003Ctbody\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Edescription\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Epayment_preferences.auto_bill_outstanding\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Etaxes.percentage\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Epayment_preferences.payment_failure_threshold\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Epayment_preferences.setup_fee\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Epayment_preferences.setup_fee_failure_action\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003C/tbody\u003E\u003C/table\u003E",
+        "description": "Updates a plan with the `CREATED` or `ACTIVE` status. For an `INACTIVE` plan, you can make only status updates.<br/>You can patch these attributes and objects:<table><thead><tr><th>Attribute or object</th><th>Operations</th></tr></thead><tbody><tr><td><code>description</code></td><td>replace</td></tr><tr><td><code>payment_preferences.auto_bill_outstanding</code></td><td>replace</td></tr><tr><td><code>taxes.percentage</code></td><td>replace</td></tr><tr><td><code>payment_preferences.payment_failure_threshold</code></td><td>replace</td></tr><tr><td><code>payment_preferences.setup_fee</code></td><td>replace</td></tr><tr><td><code>payment_preferences.setup_fee_failure_action</code></td><td>replace</td></tr><tr><td><code>name</code></td><td>replace</td></tr></tbody></table>",
         "operationId": "plans.patch",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -695,7 +695,7 @@
         "operationId": "plans.activate",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "401": {
             "description": "Authentication failed due to missing authorization header, or invalid authentication credentials.",
@@ -803,7 +803,7 @@
         "operationId": "plans.deactivate",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "401": {
             "description": "Authentication failed due to missing authorization header, or invalid authentication credentials.",
@@ -911,7 +911,7 @@
         "operationId": "plans.update-pricing-schemes",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Bad Request. Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -1089,7 +1089,7 @@
         "operationId": "subscriptions.create",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1155,7 +1155,7 @@
             }
           },
           "201": {
-            "description": "A successful request returns the HTTP \u0060201 Created\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `201 Created` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1383,7 +1383,7 @@
         "operationId": "subscriptions.get",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1478,11 +1478,11 @@
       },
       "patch": {
         "summary": "Update subscription",
-        "description": "Updates a subscription which could be in \u003Ccode\u003EACTIVE\u003C/code\u003E or \u003Ccode\u003ESUSPENDED\u003C/code\u003E status. You can override plan level default attributes by providing customised values for plan path in the patch request.\u003Cbr /\u003E \u003Cul\u003E \u003Cli\u003EYou cannot update attributes that have already completed (Example - trial cycles can\u2019t be updated if completed).\u003C/li\u003E \u003Cli\u003EOnce overridden, changes to plan resource will not impact subscription.\u003C/li\u003E \u003Cli\u003EAny price update will not impact billing cycles within next 10 days (Applicable only for subscriptions funded by PayPal account).\u003C/li\u003E \u003C/ul\u003E Following are the fields eligible for patch.\u003Ctable\u003E\u003Cthead\u003E\u003Ctr\u003E\u003Cth\u003EAttribute or object\u003C/th\u003E\u003Cth\u003EOperations\u003C/th\u003E\u003C/tr\u003E\u003C/thead\u003E\u003Ctbody\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Ebilling_info.outstanding_balance\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Ecustom_id\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.billing_cycles[@sequence==n].\u003Cbr/\u003Epricing_scheme.fixed_price\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.billing_cycles[@sequence==n].\u003Cbr/\u003Epricing_scheme.tiers\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.billing_cycles[@sequence==n].\u003Cbr/\u003Etotal_cycles\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.payment_preferences.\u003Cbr/\u003Eauto_bill_outstanding\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.payment_preferences.\u003Cbr/\u003Epayment_failure_threshold\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.taxes.inclusive\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eplan.taxes.percentage\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Eshipping_amount\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Estart_time\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Esubscriber.shipping_address\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Eadd,replace\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003Esubscriber.payment_source (for subscriptions funded\u003Cbr/\u003Eby card payments)\u003C/code\u003E\u003C/td\u003E\u003Ctd\u003Ereplace\u003C/td\u003E\u003C/tr\u003E\u003C/tbody\u003E\u003C/table\u003E",
+        "description": "Updates a subscription which could be in <code>ACTIVE</code> or <code>SUSPENDED</code> status. You can override plan level default attributes by providing customised values for plan path in the patch request.<br /> <ul> <li>You cannot update attributes that have already completed (Example - trial cycles can’t be updated if completed).</li> <li>Once overridden, changes to plan resource will not impact subscription.</li> <li>Any price update will not impact billing cycles within next 10 days (Applicable only for subscriptions funded by PayPal account).</li> </ul> Following are the fields eligible for patch.<table><thead><tr><th>Attribute or object</th><th>Operations</th></tr></thead><tbody><tr><td><code>billing_info.outstanding_balance</code></td><td>replace</td></tr><tr><td><code>custom_id</code></td><td>add,replace</td></tr><tr><td><code>plan.billing_cycles[@sequence==n].<br/>pricing_scheme.fixed_price</code></td><td>add,replace</td></tr><tr><td><code>plan.billing_cycles[@sequence==n].<br/>pricing_scheme.tiers</code></td><td>replace</td></tr><tr><td><code>plan.billing_cycles[@sequence==n].<br/>total_cycles</code></td><td>replace</td></tr><tr><td><code>plan.payment_preferences.<br/>auto_bill_outstanding</code></td><td>replace</td></tr><tr><td><code>plan.payment_preferences.<br/>payment_failure_threshold</code></td><td>replace</td></tr><tr><td><code>plan.taxes.inclusive</code></td><td>add,replace</td></tr><tr><td><code>plan.taxes.percentage</code></td><td>add,replace</td></tr><tr><td><code>shipping_amount</code></td><td>add,replace</td></tr><tr><td><code>start_time</code></td><td>replace</td></tr><tr><td><code>subscriber.shipping_address</code></td><td>add,replace</td></tr><tr><td><code>subscriber.payment_source (for subscriptions funded<br/>by card payments)</code></td><td>replace</td></tr></tbody></table>",
         "operationId": "subscriptions.patch",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -1606,11 +1606,11 @@
     "/v1/billing/subscriptions/{id}/revise": {
       "post": {
         "summary": "Revise plan or quantity of subscription",
-        "description": "Updates the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the \u0060shipping_amount\u0060, \u0060shipping_address\u0060 values for the subscription. This type of update requires the buyer\u0027s consent.",
+        "description": "Updates the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount`, `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "operationId": "subscriptions.revise",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1843,7 +1843,7 @@
         "operationId": "subscriptions.suspend",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Bad Request. Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -1984,7 +1984,7 @@
         "operationId": "subscriptions.cancel",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Bad Request. Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -2125,7 +2125,7 @@
         "operationId": "subscriptions.activate",
         "responses": {
           "204": {
-            "description": "A successful request returns the HTTP \u0060204 No Content\u0060 status code with no JSON response body."
+            "description": "A successful request returns the HTTP `204 No Content` status code with no JSON response body."
           },
           "400": {
             "description": "Bad Request. Request is not well-formed, syntactically incorrect, or violates schema.",
@@ -2266,7 +2266,7 @@
         "operationId": "subscriptions.capture",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2425,7 +2425,7 @@
         "operationId": "subscriptions.transactions",
         "responses": {
           "200": {
-            "description": "A successful request returns the HTTP \u0060200 OK\u0060 status code and a JSON response body that shows subscription details.",
+            "description": "A successful request returns the HTTP `200 OK` status code and a JSON response body that shows subscription details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2559,7 +2559,7 @@
           "clientCredentials": {
             "tokenUrl": "/v1/oauth2/token",
             "scopes": {
-              "https://uri.paypal.com/services/subscriptions": "Manage plan \u0026 subscription"
+              "https://uri.paypal.com/services/subscriptions": "Manage plan & subscription"
             }
           }
         }
@@ -2810,7 +2810,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Billing cycle sequence should start with \u00601\u0060 and be consecutive."
+                        "Billing cycle sequence should start with `1` and be consecutive."
                       ]
                     }
                   }
@@ -2844,7 +2844,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Total cycles for trial billing must be greater than \u00270\u0027."
+                        "Total cycles for trial billing must be greater than '0'."
                       ]
                     }
                   }
@@ -2980,7 +2980,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "This currency cannot be accepted for this recipient\u2019s account."
+                        "This currency cannot be accepted for this recipient’s account."
                       ]
                     }
                   }
@@ -3067,7 +3067,7 @@
             "readOnly": true
           },
           "net_amount": {
-            "description": "The net amount that the payee receives for this transaction in their PayPal account. The net amount is computed as \u003Ccode\u003Egross_amount\u003C/code\u003E minus the \u003Ccode\u003Epaypal_fee\u003C/code\u003E.",
+            "description": "The net amount that the payee receives for this transaction in their PayPal account. The net amount is computed as <code>gross_amount</code> minus the <code>paypal_fee</code>.",
             "$ref": "#/components/schemas/money",
             "readOnly": true
           }
@@ -3086,7 +3086,7 @@
             "pattern": "^.*$"
           },
           "locale": {
-            "description": "The BCP 47-formatted locale of pages that the PayPal payment experience shows. PayPal supports a five-character code. For example, \u0060da-DK\u0060, \u0060he-IL\u0060, \u0060id-ID\u0060, \u0060ja-JP\u0060, \u0060no-NO\u0060, \u0060pt-BR\u0060, \u0060ru-RU\u0060, \u0060sv-SE\u0060, \u0060th-TH\u0060, \u0060zh-CN\u0060, \u0060zh-HK\u0060, or \u0060zh-TW\u0060.",
+            "description": "The BCP 47-formatted locale of pages that the PayPal payment experience shows. PayPal supports a five-character code. For example, `da-DK`, `he-IL`, `id-ID`, `ja-JP`, `no-NO`, `pt-BR`, `ru-RU`, `sv-SE`, `th-TH`, `zh-CN`, `zh-HK`, or `zh-TW`.",
             "$ref": "#/components/schemas/language"
           },
           "shipping_preference": {
@@ -3094,7 +3094,7 @@
             "description": "The location from which the shipping address is derived.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "default": "GET_FROM_FILE",
             "x-enumDescriptions": [
               {
@@ -3119,20 +3119,20 @@
           },
           "user_action": {
             "type": "string",
-            "description": "Configures the label name to \u0060Continue\u0060 or \u0060Subscribe Now\u0060 for subscription consent experience.",
+            "description": "Configures the label name to `Continue` or `Subscribe Now` for subscription consent experience.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "default": "SUBSCRIBE_NOW",
             "x-enumDescriptions": [
               {
                 "value": "CONTINUE",
-                "description": "After you redirect the customer to the PayPal subscription consent page, a \u003Cstrong\u003EContinue\u003C/strong\u003E button appears. Use this option when you want to control the activation of the subscription and do not want PayPal to activate the subscription.",
+                "description": "After you redirect the customer to the PayPal subscription consent page, a <strong>Continue</strong> button appears. Use this option when you want to control the activation of the subscription and do not want PayPal to activate the subscription.",
                 "default": true
               },
               {
                 "value": "SUBSCRIBE_NOW",
-                "description": "After you redirect the customer to the PayPal subscription consent page, a \u003Cstrong\u003ESubscribe Now\u003C/strong\u003E button appears. Use this option when you want PayPal to activate the subscription."
+                "description": "After you redirect the customer to the PayPal subscription consent page, a <strong>Subscribe Now</strong> button appears. Use this option when you want PayPal to activate the subscription."
               }
             ],
             "enum": [
@@ -3201,7 +3201,7 @@
             "description": "The tenure type of the billing cycle. In case of a plan having trial cycle, only 2 trial cycles are allowed per plan.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "REGULAR",
@@ -3219,13 +3219,13 @@
           },
           "sequence": {
             "type": "integer",
-            "description": "The order in which this cycle is to run among other billing cycles. For example, a trial billing cycle has a \u0060sequence\u0060 of \u00601\u0060 while a regular billing cycle has a \u0060sequence\u0060 of \u00602\u0060, so that trial cycle runs before the regular cycle.",
+            "description": "The order in which this cycle is to run among other billing cycles. For example, a trial billing cycle has a `sequence` of `1` while a regular billing cycle has a `sequence` of `2`, so that trial cycle runs before the regular cycle.",
             "maximum": 99,
             "minimum": 1
           },
           "total_cycles": {
             "type": "integer",
-            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E). Regular billing cycles can be executed infinite times (value of \u003Ccode\u003E0\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E) or a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E).",
+            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>). Regular billing cycles can be executed infinite times (value of <code>0</code> for <code>total_cycles</code>) or a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>).",
             "default": 1,
             "maximum": 999,
             "minimum": 0
@@ -3260,13 +3260,13 @@
           },
           "sequence": {
             "type": "integer",
-            "description": "The order in which this cycle is to run among other billing cycles. For example, a trial billing cycle has a \u0060sequence\u0060 of \u00601\u0060 while a regular billing cycle has a \u0060sequence\u0060 of \u00602\u0060, so that trial cycle runs before the regular cycle.",
+            "description": "The order in which this cycle is to run among other billing cycles. For example, a trial billing cycle has a `sequence` of `1` while a regular billing cycle has a `sequence` of `2`, so that trial cycle runs before the regular cycle.",
             "maximum": 99,
             "minimum": 1
           },
           "total_cycles": {
             "type": "integer",
-            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E). Regular billing cycles can be executed infinite times (value of \u003Ccode\u003E0\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E) or a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E).",
+            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>). Regular billing cycles can be executed infinite times (value of <code>0</code> for <code>total_cycles</code>) or a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>).",
             "maximum": 999,
             "minimum": 0
           }
@@ -3291,7 +3291,7 @@
             "description": "The Bank Identification Number (BIN) signifies the number that is being used to identify the granular level details (except the PII information) of the card.",
             "maxLength": 25,
             "minLength": 1,
-            "pattern": "^[0-9]\u002B$"
+            "pattern": "^[0-9]+$"
           },
           "issuing_bank": {
             "type": "string",
@@ -3342,7 +3342,7 @@
         "description": "The card network or brand. Applies to credit, debit, gift, and payment cards.",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[A-Z_]\u002B$",
+        "pattern": "^[A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "VISA",
@@ -3422,7 +3422,7 @@
           },
           {
             "value": "HIPERCARD",
-            "description": "The Brazilian Hipercard payment network that\u0027s widely accepted in the retail market."
+            "description": "The Brazilian Hipercard payment network that's widely accepted in the retail market."
           },
           {
             "value": "RUPAY",
@@ -3504,7 +3504,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The card holder\u0027s name as it appears on the card.",
+            "description": "The card holder's name as it appears on the card.",
             "maxLength": 300,
             "minLength": 2
           },
@@ -3554,7 +3554,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "The card holder\u0027s name as it appears on the card.",
+                "description": "The card holder's name as it appears on the card.",
                 "maxLength": 300,
                 "minLength": 2
               },
@@ -3568,7 +3568,7 @@
                 "properties": {
                   "address_line_1": {
                     "type": "string",
-                    "description": "The first line of the address, such as number and street, for example, \u0060173 Drury Lane\u0060. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
+                    "description": "The first line of the address, such as number and street, for example, `173 Drury Lane`. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
                     "maxLength": 300
                   },
                   "address_line_2": {
@@ -3578,12 +3578,12 @@
                   },
                   "admin_area_2": {
                     "type": "string",
-                    "description": "A city, town, or village. Smaller than \u0060admin_area_level_1\u0060.",
+                    "description": "A city, town, or village. Smaller than `admin_area_level_1`.",
                     "maxLength": 120
                   },
                   "admin_area_1": {
                     "type": "string",
-                    "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, \u0060CA\u0060 and not \u0060California\u0060. Value, by country, is:\u003Cul\u003E\u003Cli\u003EUK. A county.\u003C/li\u003E\u003Cli\u003EUS. A state.\u003C/li\u003E\u003Cli\u003ECanada. A province.\u003C/li\u003E\u003Cli\u003EJapan. A prefecture.\u003C/li\u003E\u003Cli\u003ESwitzerland. A *kanton*.\u003C/li\u003E\u003C/ul\u003E",
+                    "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, `CA` and not `California`. Value, by country, is:<ul><li>UK. A county.</li><li>US. A state.</li><li>Canada. A province.</li><li>Japan. A prefecture.</li><li>Switzerland. A *kanton*.</li></ul>",
                     "maxLength": 300
                   },
                   "postal_code": {
@@ -3619,7 +3619,7 @@
         "description": "Type of card. i.e Credit, Debit and so on.",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[A-Z_]\u002B$",
+        "pattern": "^[A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "CREDIT",
@@ -3660,7 +3660,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
-            "pattern": "^[0-9A-Z_]\u002B$",
+            "pattern": "^[0-9A-Z_]+$",
             "default": "SCA_WHEN_REQUIRED",
             "x-enumDescriptions": [
               {
@@ -3693,7 +3693,7 @@
       },
       "country_code": {
         "type": "string",
-        "description": "The [2-character ISO 3166-1 code](/api/rest/reference/country-codes/) that identifies the country or region.\u003Cblockquote\u003E\u003Cstrong\u003ENote:\u003C/strong\u003E The country code for Great Britain is \u003Ccode\u003EGB\u003C/code\u003E and not \u003Ccode\u003EUK\u003C/code\u003E as used in the top-level domain names for that country. Use the \u0060C2\u0060 country code for China worldwide for comparable uncontrolled price (CUP) method, bank card, and cross-border transactions.\u003C/blockquote\u003E",
+        "description": "The [2-character ISO 3166-1 code](/api/rest/reference/country-codes/) that identifies the country or region.<blockquote><strong>Note:</strong> The country code for Great Britain is <code>GB</code> and not <code>UK</code> as used in the top-level domain names for that country. Use the `C2` country code for China worldwide for comparable uncontrolled price (CUP) method, bank card, and cross-border transactions.</blockquote>",
         "format": "ppaas_common_country_code_v2",
         "maxLength": 2,
         "minLength": 2,
@@ -3701,7 +3701,7 @@
       },
       "country_code-2": {
         "type": "string",
-        "description": "The [two-character ISO 3166-1 code](/api/rest/reference/country-codes/) that identifies the country or region.\u003Cblockquote\u003E\u003Cstrong\u003ENote:\u003C/strong\u003E The country code for Great Britain is \u003Ccode\u003EGB\u003C/code\u003E and not \u003Ccode\u003EUK\u003C/code\u003E as used in the top-level domain names for that country. Use the \u0060C2\u0060 country code for China worldwide for comparable uncontrolled price (CUP) method, bank card, and cross-border transactions.\u003C/blockquote\u003E",
+        "description": "The [two-character ISO 3166-1 code](/api/rest/reference/country-codes/) that identifies the country or region.<blockquote><strong>Note:</strong> The country code for Great Britain is <code>GB</code> and not <code>UK</code> as used in the top-level domain names for that country. Use the `C2` country code for China worldwide for comparable uncontrolled price (CUP) method, bank card, and cross-border transactions.</blockquote>",
         "format": "ppaas_common_country_code_v2",
         "maxLength": 2,
         "minLength": 2,
@@ -3717,7 +3717,7 @@
       "customer": {
         "title": "Customer Information",
         "type": "object",
-        "description": "The details about a customer in PayPal\u0027s system of record.",
+        "description": "The details about a customer in PayPal's system of record.",
         "properties": {
           "id": {
             "$ref": "#/components/schemas/merchant_partner_customer_id"
@@ -3727,7 +3727,7 @@
             "$ref": "#/components/schemas/email"
           },
           "phone": {
-            "description": "The phone number of the buyer as provided to the merchant or on file with the merchant. The \u0060phone.phone_number\u0060 supports only \u0060national_number\u0060.",
+            "description": "The phone number of the buyer as provided to the merchant or on file with the merchant. The `phone.phone_number` supports only `national_number`.",
             "$ref": "#/components/schemas/phone_with_type"
           }
         }
@@ -3742,7 +3742,7 @@
             "description": "The type of the billing cycle.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "REGULAR",
@@ -3788,7 +3788,7 @@
           },
           "total_cycles": {
             "type": "integer",
-            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E). Regular billing cycles can be executed infinite times (value of \u003Ccode\u003E0\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E) or a finite number of times (value between \u003Ccode\u003E1\u003C/code\u003E and \u003Ccode\u003E999\u003C/code\u003E for \u003Ccode\u003Etotal_cycles\u003C/code\u003E).",
+            "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>). Regular billing cycles can be executed infinite times (value of <code>0</code> for <code>total_cycles</code>) or a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>).",
             "maximum": 999,
             "minimum": 0,
             "readOnly": true
@@ -3811,15 +3811,15 @@
       },
       "date_time": {
         "type": "string",
-        "description": "The date and time, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6). Seconds are required while fractional seconds are optional.\u003Cblockquote\u003E\u003Cstrong\u003ENote:\u003C/strong\u003E The regular expression provides guidance but does not reject all invalid dates.\u003C/blockquote\u003E",
+        "description": "The date and time, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6). Seconds are required while fractional seconds are optional.<blockquote><strong>Note:</strong> The regular expression provides guidance but does not reject all invalid dates.</blockquote>",
         "format": "ppaas_date_time_v3",
         "maxLength": 64,
         "minLength": 20,
-        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]\u002B)?([Zz]|[\u002B-][0-9]{2}:[0-9]{2})$"
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]+)?([Zz]|[+-][0-9]{2}:[0-9]{2})$"
       },
       "date_year_month": {
         "type": "string",
-        "description": "The year and month, in ISO-8601 \u0060YYYY-MM\u0060 date format. See [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
+        "description": "The year and month, in ISO-8601 `YYYY-MM` date format. See [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
         "maxLength": 7,
         "minLength": 7,
         "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
@@ -3836,25 +3836,25 @@
       },
       "email": {
         "type": "string",
-        "description": "The internationalized email address.\u003Cblockquote\u003E\u003Cstrong\u003ENote:\u003C/strong\u003E Up to 64 characters are allowed before and 255 characters are allowed after the \u003Ccode\u003E@\u003C/code\u003E sign. However, the generally accepted maximum length for an email address is 254 characters. The pattern verifies that an unquoted \u003Ccode\u003E@\u003C/code\u003E sign exists.\u003C/blockquote\u003E",
+        "description": "The internationalized email address.<blockquote><strong>Note:</strong> Up to 64 characters are allowed before and 255 characters are allowed after the <code>@</code> sign. However, the generally accepted maximum length for an email address is 254 characters. The pattern verifies that an unquoted <code>@</code> sign exists.</blockquote>",
         "format": "merchant_common_email_address_v2",
         "maxLength": 254,
         "minLength": 3,
-        "pattern": "(?:[a-zA-Z0-9!#$%\u0026\u0027*\u002B/=?^_\u0060{|}~-]\u002B(?:\\.[a-zA-Z0-9!#$%\u0026\u0027*\u002B/=?^_\u0060{|}~-]\u002B)*|(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\u0022)@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)\u002B[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])\u002B)\\])"
+        "pattern": "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
       },
       "email_address": {
         "type": "string",
-        "description": "The internationalized email address.\u003Cblockquote\u003E\u003Cstrong\u003ENote:\u003C/strong\u003E Up to 64 characters are allowed before and 255 characters are allowed after the \u003Ccode\u003E@\u003C/code\u003E sign. However, the generally accepted maximum length for an email address is 254 characters. The pattern verifies that an unquoted \u003Ccode\u003E@\u003C/code\u003E sign exists.\u003C/blockquote\u003E",
+        "description": "The internationalized email address.<blockquote><strong>Note:</strong> Up to 64 characters are allowed before and 255 characters are allowed after the <code>@</code> sign. However, the generally accepted maximum length for an email address is 254 characters. The pattern verifies that an unquoted <code>@</code> sign exists.</blockquote>",
         "format": "ppaas_common_email_address_v2",
         "maxLength": 254,
         "minLength": 3,
-        "pattern": "^(?:[A-Za-z0-9!#$%\u0026\u0027*\u002B/=?^_\u0060{|}~-]\u002B(?:\\.[A-Za-z0-9!#$%\u0026\u0027*\u002B/=?^_\u0060{|}~-]\u002B)*|\u0022(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\u0022)@(?:(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)\u002B[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[A-Za-z0-9-]*[A-Za-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])\u002B)\\])$"
+        "pattern": "^(?:[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[A-Za-z0-9-]*[A-Za-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$"
       },
       "enrolled": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[0-9A-Z_]\u002B$",
+        "pattern": "^[0-9A-Z_]+$",
         "description": "Status of Authentication eligibility.",
         "x-enumDescriptions": [
           {
@@ -4069,7 +4069,7 @@
       "error_415": {
         "title": "Unsupported Media Type Error",
         "type": "object",
-        "description": "The server does not support the request payload\u0027s media type.",
+        "description": "The server does not support the request payload's media type.",
         "properties": {
           "name": {
             "type": "string",
@@ -4080,7 +4080,7 @@
           "message": {
             "type": "string",
             "enum": [
-              "The server does not support the request payload\u0027s media type."
+              "The server does not support the request payload's media type."
             ]
           },
           "details": {
@@ -4254,14 +4254,14 @@
       "error_details": {
         "title": "Error Details",
         "type": "object",
-        "description": "The error details. Required for client-side \u00604XX\u0060 errors.",
+        "description": "The error details. Required for client-side `4XX` errors.",
         "required": [
           "issue"
         ],
         "properties": {
           "field": {
             "type": "string",
-            "description": "The field that caused the error. If this field is in the body, set this value to the field\u0027s JSON pointer value. Required for client-side errors."
+            "description": "The field that caused the error. If this field is in the body, set this value to the field's JSON pointer value. Required for client-side errors."
           },
           "value": {
             "type": "string",
@@ -4291,7 +4291,7 @@
         "properties": {
           "href": {
             "type": "string",
-            "description": "The complete target URL. To make the related call, combine the method with this [URI Template-formatted](https://tools.ietf.org/html/rfc6570) link. For pre-processing, include the \u0060$\u0060, \u0060(\u0060, and \u0060)\u0060 characters. The \u0060href\u0060 is the key HATEOAS component that links a completed call with a subsequent call.",
+            "description": "The complete target URL. To make the related call, combine the method with this [URI Template-formatted](https://tools.ietf.org/html/rfc6570) link. For pre-processing, include the `$`, `(`, and `)` characters. The `href` is the key HATEOAS component that links a completed call with a subsequent call.",
             "maxLength": 20000,
             "minLength": 0,
             "pattern": "^.*$"
@@ -4321,7 +4321,7 @@
       },
       "error_location": {
         "type": "string",
-        "description": "The location of the field that caused the error. Value is \u0060body\u0060, \u0060path\u0060, or \u0060query\u0060.",
+        "description": "The location of the field that caused the error. Value is `body`, `path`, or `query`.",
         "default": "body",
         "enum": [
           "body",
@@ -4349,7 +4349,7 @@
             "description": "The reason code for the payment failure.",
             "minLength": 1,
             "maxLength": 120,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "PAYMENT_DENIED",
@@ -4373,11 +4373,11 @@
               },
               {
                 "value": "SENDING_LIMIT_EXCEEDED",
-                "description": "The transaction exceeds the payer\u0027s sending limit."
+                "description": "The transaction exceeds the payer's sending limit."
               },
               {
                 "value": "TRANSACTION_RECEIVING_LIMIT_EXCEEDED",
-                "description": "The transaction exceeds the receiver\u0027s receiving limit."
+                "description": "The transaction exceeds the receiver's receiving limit."
               },
               {
                 "value": "CURRENCY_MISMATCH",
@@ -4417,7 +4417,7 @@
             "description": "The interval at which the subscription is charged or billed.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "DAY",
@@ -4445,7 +4445,7 @@
           },
           "interval_count": {
             "type": "integer",
-            "description": "The number of intervals after which a subscriber is billed. For example, if the \u0060interval_unit\u0060 is \u0060DAY\u0060 with an \u0060interval_count\u0060 of  \u00602\u0060, the subscription is billed once every two days. The following table lists the maximum allowed values for the \u0060interval_count\u0060 for each \u0060interval_unit\u0060:\u003Ctable\u003E\u003Cthead\u003E\u003Ctr\u003E\u003Cth\u003E\u003Ccode\u003EInterval unit\u003C/code\u003E\u003C/th\u003E\u003Cth\u003EMaximum interval count\u003C/th\u003E\u003C/tr\u003E\u003C/thead\u003E\u003Ctbody\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003EDAY\u003C/code\u003E\u003C/td\u003E\u003Ctd align=\u0022right\u0022\u003E365\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003EWEEK\u003C/code\u003E\u003C/td\u003E\u003Ctd align=\u0022right\u0022\u003E52\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003EMONTH\u003C/code\u003E\u003C/td\u003E\u003Ctd align=\u0022right\u0022\u003E12\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Ccode\u003EYEAR\u003C/code\u003E\u003C/td\u003E\u003Ctd align=\u0022right\u0022\u003E1\u003C/td\u003E\u003C/tr\u003E\u003C/tbody\u003E\u003C/table\u003E",
+            "description": "The number of intervals after which a subscriber is billed. For example, if the `interval_unit` is `DAY` with an `interval_count` of  `2`, the subscription is billed once every two days. The following table lists the maximum allowed values for the `interval_count` for each `interval_unit`:<table><thead><tr><th><code>Interval unit</code></th><th>Maximum interval count</th></tr></thead><tbody><tr><td><code>DAY</code></td><td align=\"right\">365</td></tr><tr><td><code>WEEK</code></td><td align=\"right\">52</td></tr><tr><td><code>MONTH</code></td><td align=\"right\">12</td></tr><tr><td><code>YEAR</code></td><td align=\"right\">1</td></tr></tbody></table>",
             "default": 1,
             "maximum": 365,
             "minimum": 1
@@ -4492,8 +4492,8 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[0-9A-Z_]\u002B$",
-        "description": "Liability shift indicator. The outcome of the issuer\u0027s authentication.",
+        "pattern": "^[0-9A-Z_]+$",
+        "description": "Liability shift indicator. The outcome of the issuer's authentication.",
         "x-enumDescriptions": [
           {
             "value": "NO",
@@ -4525,7 +4525,7 @@
         "properties": {
           "href": {
             "type": "string",
-            "description": "The complete target URL. To make the related call, combine the method with this [URI Template-formatted](https://tools.ietf.org/html/rfc6570) link. For pre-processing, include the \u0060$\u0060, \u0060(\u0060, and \u0060)\u0060 characters. The \u0060href\u0060 is the key HATEOAS component that links a completed call with a subsequent call."
+            "description": "The complete target URL. To make the related call, combine the method with this [URI Template-formatted](https://tools.ietf.org/html/rfc6570) link. For pre-processing, include the `$`, `(`, and `)` characters. The `href` is the key HATEOAS component that links a completed call with a subsequent call."
           },
           "rel": {
             "type": "string",
@@ -4563,7 +4563,7 @@
         "description": "The unique ID for a customer generated by PayPal.",
         "maxLength": 22,
         "minLength": 1,
-        "pattern": "^[0-9a-zA-Z_-]\u002B$"
+        "pattern": "^[0-9a-zA-Z_-]+$"
       },
       "money": {
         "title": "Money",
@@ -4579,9 +4579,9 @@
           },
           "value": {
             "type": "string",
-            "description": "The value, which might be:\u003Cul\u003E\u003Cli\u003EAn integer for currencies like \u0060JPY\u0060 that are not typically fractional.\u003C/li\u003E\u003Cli\u003EA decimal fraction for currencies like \u0060TND\u0060 that are subdivided into thousandths.\u003C/li\u003E\u003C/ul\u003EFor the required number of decimal places for a currency code, see [Currency Codes](/api/rest/reference/currency-codes/).",
+            "description": "The value, which might be:<ul><li>An integer for currencies like `JPY` that are not typically fractional.</li><li>A decimal fraction for currencies like `TND` that are subdivided into thousandths.</li></ul>For the required number of decimal places for a currency code, see [Currency Codes](/api/rest/reference/currency-codes/).",
             "maxLength": 32,
-            "pattern": "^((-?[0-9]\u002B)|(-?([0-9]\u002B)?[.][0-9]\u002B))$"
+            "pattern": "^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$"
           }
         }
       },
@@ -4592,32 +4592,32 @@
         "properties": {
           "prefix": {
             "type": "string",
-            "description": "The prefix, or title, to the party\u0027s name.",
+            "description": "The prefix, or title, to the party's name.",
             "maxLength": 140
           },
           "given_name": {
             "type": "string",
-            "description": "When the party is a person, the party\u0027s given, or first, name.",
+            "description": "When the party is a person, the party's given, or first, name.",
             "maxLength": 140
           },
           "surname": {
             "type": "string",
-            "description": "When the party is a person, the party\u0027s surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother\u0027s, surname.",
+            "description": "When the party is a person, the party's surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother's, surname.",
             "maxLength": 140
           },
           "middle_name": {
             "type": "string",
-            "description": "When the party is a person, the party\u0027s middle name. Use also to store multiple middle names including the patronymic, or father\u0027s, middle name.",
+            "description": "When the party is a person, the party's middle name. Use also to store multiple middle names including the patronymic, or father's, middle name.",
             "maxLength": 140
           },
           "suffix": {
             "type": "string",
-            "description": "The suffix for the party\u0027s name.",
+            "description": "The suffix for the party's name.",
             "maxLength": 140
           },
           "full_name": {
             "type": "string",
-            "description": "When the party is a person, the party\u0027s full name.",
+            "description": "When the party is a person, the party's full name.",
             "maxLength": 300
           }
         }
@@ -4626,8 +4626,8 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[0-9A-Z_]\u002B$",
-        "description": "Transactions status result identifier. The outcome of the issuer\u0027s authentication.",
+        "pattern": "^[0-9A-Z_]+$",
+        "description": "Transactions status result identifier. The outcome of the issuer's authentication.",
         "x-enumDescriptions": [
           {
             "value": "Y",
@@ -4684,27 +4684,27 @@
             "x-enumDescriptions": [
               {
                 "value": "add",
-                "description": "Depending on the target location reference, completes one of these functions:\u003Cul\u003E\u003Cli\u003E\u003Cstrong\u003EThe target location is an array index\u003C/strong\u003E. Inserts a new value into the array at the specified index.\u003C/li\u003E\u003Cli\u003E\u003Cstrong\u003EThe target location is an object parameter that does not already exist\u003C/strong\u003E. Adds a new parameter to the object.\u003C/li\u003E\u003Cli\u003E\u003Cstrong\u003EThe target location is an object parameter that does exist\u003C/strong\u003E. Replaces that parameter\u0027s value.\u003C/li\u003E\u003C/ul\u003EThe \u003Ccode\u003Evalue\u003C/code\u003E parameter defines the value to add. For more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.1\u0022\u003E4.1. add\u003C/a\u003E."
+                "description": "Depending on the target location reference, completes one of these functions:<ul><li><strong>The target location is an array index</strong>. Inserts a new value into the array at the specified index.</li><li><strong>The target location is an object parameter that does not already exist</strong>. Adds a new parameter to the object.</li><li><strong>The target location is an object parameter that does exist</strong>. Replaces that parameter's value.</li></ul>The <code>value</code> parameter defines the value to add. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.1\">4.1. add</a>."
               },
               {
                 "value": "remove",
-                "description": "Removes the value at the target location. For the operation to succeed, the target location must exist. For more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.2\u0022\u003E4.2. remove\u003C/a\u003E."
+                "description": "Removes the value at the target location. For the operation to succeed, the target location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.2\">4.2. remove</a>."
               },
               {
                 "value": "replace",
-                "description": "Replaces the value at the target location with a new value. The operation object must contain a \u003Ccode\u003Evalue\u003C/code\u003E parameter that defines the replacement value. For the operation to succeed, the target location must exist. For more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.3\u0022\u003E4.3. replace\u003C/a\u003E."
+                "description": "Replaces the value at the target location with a new value. The operation object must contain a <code>value</code> parameter that defines the replacement value. For the operation to succeed, the target location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.3\">4.3. replace</a>."
               },
               {
                 "value": "move",
-                "description": "Removes the value at a specified location and adds it to the target location. The operation object must contain a \u003Ccode\u003Efrom\u003C/code\u003E parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to move the value. For the operation to succeed, the \u003Ccode\u003Efrom\u003C/code\u003E location must exist. For more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.4\u0022\u003E4.4. move\u003C/a\u003E."
+                "description": "Removes the value at a specified location and adds it to the target location. The operation object must contain a <code>from</code> parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to move the value. For the operation to succeed, the <code>from</code> location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.4\">4.4. move</a>."
               },
               {
                 "value": "copy",
-                "description": "Copies the value at a specified location to the target location. The operation object must contain a \u003Ccode\u003Efrom\u003C/code\u003E parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to copy the value. For the operation to succeed, the \u003Ccode\u003Efrom\u003C/code\u003E location must exist. For more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.5\u0022\u003E4.5. copy\u003C/a\u003E."
+                "description": "Copies the value at a specified location to the target location. The operation object must contain a <code>from</code> parameter, which is a string that contains a JSON pointer value that references the location in the target document from which to copy the value. For the operation to succeed, the <code>from</code> location must exist. For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.5\">4.5. copy</a>."
               },
               {
                 "value": "test",
-                "description": "Tests that a value at the target location is equal to a specified value. The operation object must contain a \u003Ccode\u003Evalue\u003C/code\u003E parameter that defines the value to compare to the target location\u0027s value. For the operation to succeed, the target location must be equal to the \u003Ccode\u003Evalue\u003C/code\u003E value. For test, \u003Ccode\u003Eequal\u003C/code\u003E indicates that the value at the target location and the value that \u003Ccode\u003Evalue\u003C/code\u003E defines are of the same JSON type. The data type of the value determines how equality is defined:\u003Ctable\u003E\u003Cthead align=\u0022left\u0022\u003E\u003Ctr\u003E\u003Cth\u003EType\u003C/th\u003E\u003Cth\u003EConsidered equal if both values\u003C/th\u003E\u003C/tr\u003E\u003C/thead\u003E\u003Ctbody align=\u0022left\u0022\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Cstrong\u003Estrings\u003C/strong\u003E\u003C/td\u003E\u003Ctd\u003EContain the same number of Unicode characters and their code points are byte-by-byte equal.\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Cstrong\u003Enumbers\u003C/strong\u003E\u003C/td\u003E\u003Ctd\u003EAre numerically equal.\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Cstrong\u003Earrays\u003C/strong\u003E\u003C/td\u003E\u003Ctd\u003EContain the same number of values, and each value is equal to the value at the corresponding position in the other array, by using these type-specific rules.\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Cstrong\u003Eobjects\u003C/strong\u003E\u003C/td\u003E\u003Ctd\u003EContain the same number of parameters, and each parameter is equal to a parameter in the other object, by comparing their keys (as strings) and their values (by using these type-specific rules).\u003C/td\u003E\u003C/tr\u003E\u003Ctr\u003E\u003Ctd\u003E\u003Cstrong\u003Eliterals (\u003Ccode\u003Efalse\u003C/code\u003E, \u003Ccode\u003Etrue\u003C/code\u003E, and \u003Ccode\u003Enull\u003C/code\u003E)\u003C/strong\u003E\u003C/td\u003E\u003Ctd\u003EAre the same. The comparison is a logical comparison. For example, whitespace between the parameter values of an array is not significant. Also, ordering of the serialization of object parameters is not significant.\u003C/td\u003E\u003C/tr\u003E\u003C/tbody\u003E\u003C/table\u003EFor more information, see \u003Ca href=\u0022https://tools.ietf.org/html/rfc6902#section-4.6\u0022\u003E4.6. test\u003C/a\u003E."
+                "description": "Tests that a value at the target location is equal to a specified value. The operation object must contain a <code>value</code> parameter that defines the value to compare to the target location's value. For the operation to succeed, the target location must be equal to the <code>value</code> value. For test, <code>equal</code> indicates that the value at the target location and the value that <code>value</code> defines are of the same JSON type. The data type of the value determines how equality is defined:<table><thead align=\"left\"><tr><th>Type</th><th>Considered equal if both values</th></tr></thead><tbody align=\"left\"><tr><td><strong>strings</strong></td><td>Contain the same number of Unicode characters and their code points are byte-by-byte equal.</td></tr><tr><td><strong>numbers</strong></td><td>Are numerically equal.</td></tr><tr><td><strong>arrays</strong></td><td>Contain the same number of values, and each value is equal to the value at the corresponding position in the other array, by using these type-specific rules.</td></tr><tr><td><strong>objects</strong></td><td>Contain the same number of parameters, and each parameter is equal to a parameter in the other object, by comparing their keys (as strings) and their values (by using these type-specific rules).</td></tr><tr><td><strong>literals (<code>false</code>, <code>true</code>, and <code>null</code>)</strong></td><td>Are the same. The comparison is a logical comparison. For example, whitespace between the parameter values of an array is not significant. Also, ordering of the serialization of object parameters is not significant.</td></tr></tbody></table>For more information, see <a href=\"https://tools.ietf.org/html/rfc6902#section-4.6\">4.6. test</a>."
               }
             ],
             "enum": [
@@ -4718,15 +4718,15 @@
           },
           "path": {
             "type": "string",
-            "description": "The \u003Ca href=\u0022https://tools.ietf.org/html/rfc6901\u0022\u003EJSON Pointer\u003C/a\u003E to the target document location at which to complete the operation."
+            "description": "The <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the target document location at which to complete the operation."
           },
           "value": {
             "title": "Patch Value",
-            "description": "The value to apply. The \u003Ccode\u003Eremove\u003C/code\u003E, \u003Ccode\u003Ecopy\u003C/code\u003E, and \u003Ccode\u003Emove\u003C/code\u003E operations do not require a value. Since \u003Ca href=\u0022https://www.rfc-editor.org/rfc/rfc69021\u0022\u003EJSON Patch\u003C/a\u003E allows any type for \u003Ccode\u003Evalue\u003C/code\u003E, the \u003Ccode\u003Etype\u003C/code\u003E property is not specified."
+            "description": "The value to apply. The <code>remove</code>, <code>copy</code>, and <code>move</code> operations do not require a value. Since <a href=\"https://www.rfc-editor.org/rfc/rfc69021\">JSON Patch</a> allows any type for <code>value</code>, the <code>type</code> property is not specified."
           },
           "from": {
             "type": "string",
-            "description": "The \u003Ca href=\u0022https://tools.ietf.org/html/rfc6901\u0022\u003EJSON Pointer\u003C/a\u003E to the target document location from which to move the value. Required for the \u003Ccode\u003Emove\u003C/code\u003E operation."
+            "description": "The <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the target document location from which to move the value. Required for the <code>move</code> operation."
           }
         },
         "required": [
@@ -4746,7 +4746,7 @@
         "description": "The merchant-preferred payment methods.",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[0-9A-Z_]\u002B$",
+        "pattern": "^[0-9A-Z_]+$",
         "default": "UNRESTRICTED",
         "x-enumDescriptions": [
           {
@@ -4756,7 +4756,7 @@
           },
           {
             "value": "IMMEDIATE_PAYMENT_REQUIRED",
-            "description": "Accepts only immediate payment from the customer. For example, credit card, PayPal balance, or instant ACH. Ensures that at the time of capture, the payment does not have the \u0060pending\u0060 status."
+            "description": "Accepts only immediate payment from the customer. For example, credit card, PayPal balance, or instant ACH. Ensures that at the time of capture, the payment does not have the `pending` status."
           }
         ],
         "enum": [
@@ -4799,7 +4799,7 @@
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "default": "CANCEL",
             "x-enumDescriptions": [
               {
@@ -4818,7 +4818,7 @@
           },
           "payment_failure_threshold": {
             "type": "integer",
-            "description": "The maximum number of payment failures before a subscription is suspended. For example, if \u0060payment_failure_threshold\u0060 is \u00602\u0060, the subscription automatically updates to the \u0060SUSPEND\u0060 state if two consecutive payments fail.",
+            "description": "The maximum number of payment failures before a subscription is suspended. For example, if `payment_failure_threshold` is `2`, the subscription automatically updates to the `SUSPEND` state if two consecutive payments fail.",
             "default": 0,
             "maximum": 999,
             "minimum": 0
@@ -4843,7 +4843,7 @@
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "CONTINUE",
@@ -4861,7 +4861,7 @@
           },
           "payment_failure_threshold": {
             "type": "integer",
-            "description": "The maximum number of payment failures before a subscription is suspended. For example, if \u0060payment_failure_threshold\u0060 is \u00602\u0060, the subscription automatically updates to the \u0060SUSPEND\u0060 state if two consecutive payments fail.",
+            "description": "The maximum number of payment failures before a subscription is suspended. For example, if `payment_failure_threshold` is `2`, the subscription automatically updates to the `SUSPEND` state if two consecutive payments fail.",
             "maximum": 999,
             "minimum": 0
           }
@@ -4879,7 +4879,7 @@
             "properties": {
               "name": {
                 "type": "string",
-                "description": "The card holder\u0027s name as it appears on the card.",
+                "description": "The card holder's name as it appears on the card.",
                 "maxLength": 300,
                 "minLength": 1,
                 "pattern": "^.{1,300}$"
@@ -4897,7 +4897,7 @@
               },
               "security_code": {
                 "type": "string",
-                "description": "The three- or four-digit security code of the card. Also known as the CVV, CVC, CVN, CVE, or CID. This parameter cannot be present in the request when \u0060payment_initiator=MERCHANT\u0060.",
+                "description": "The three- or four-digit security code of the card. Also known as the CVV, CVC, CVN, CVE, or CID. This parameter cannot be present in the request when `payment_initiator=MERCHANT`.",
                 "maxLength": 4,
                 "minLength": 3,
                 "pattern": "^[0-9]{3,4}$"
@@ -4920,7 +4920,7 @@
                 "properties": {
                   "address_line_1": {
                     "type": "string",
-                    "description": "The first line of the address, such as number and street, for example, \u0060173 Drury Lane\u0060. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
+                    "description": "The first line of the address, such as number and street, for example, `173 Drury Lane`. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
                     "maxLength": 300
                   },
                   "address_line_2": {
@@ -4930,12 +4930,12 @@
                   },
                   "admin_area_2": {
                     "type": "string",
-                    "description": "A city, town, or village. Smaller than \u0060admin_area_level_1\u0060.",
+                    "description": "A city, town, or village. Smaller than `admin_area_level_1`.",
                     "maxLength": 120
                   },
                   "admin_area_1": {
                     "type": "string",
-                    "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, \u0060CA\u0060 and not \u0060California\u0060. Value, by country, is:\u003Cul\u003E\u003Cli\u003EUK. A county.\u003C/li\u003E\u003Cli\u003EUS. A state.\u003C/li\u003E\u003Cli\u003ECanada. A province.\u003C/li\u003E\u003Cli\u003EJapan. A prefecture.\u003C/li\u003E\u003Cli\u003ESwitzerland. A *kanton*.\u003C/li\u003E\u003C/ul\u003E",
+                    "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, `CA` and not `California`. Value, by country, is:<ul><li>UK. A county.</li><li>US. A state.</li><li>Canada. A province.</li><li>Japan. A prefecture.</li><li>Switzerland. A *kanton*.</li></ul>",
                     "maxLength": 300
                   },
                   "postal_code": {
@@ -4968,9 +4968,9 @@
       },
       "percentage": {
         "type": "string",
-        "description": "The percentage, as a fixed-point, signed decimal number. For example, define a 19.99% interest rate as \u006019.99\u0060.",
+        "description": "The percentage, as a fixed-point, signed decimal number. For example, define a 19.99% interest rate as `19.99`.",
         "format": "ppaas_common_percentage_v2",
-        "pattern": "^((-?[0-9]\u002B)|(-?([0-9]\u002B)?[.][0-9]\u002B))$"
+        "pattern": "^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$"
       },
       "phone_type": {
         "title": "Phone Type",
@@ -5046,7 +5046,7 @@
             "description": "The plan status.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "CREATED",
@@ -5176,7 +5176,7 @@
             "description": "The initial state of the plan. Allowed input values are CREATED and ACTIVE.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "default": "ACTIVE",
             "x-enumDescriptions": [
               {
@@ -5550,7 +5550,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The field is not eligible for \u0027$value\u0027 patch operation."
+                        "The field is not eligible for '$value' patch operation."
                       ]
                     }
                   }
@@ -5668,7 +5668,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The currency code is different from the plan\u0027s currency code."
+                        "The currency code is different from the plan's currency code."
                       ]
                     }
                   }
@@ -5849,10 +5849,10 @@
           },
           "pricing_model": {
             "type": "string",
-            "description": "The pricing model for tiered plan. The \u0060tiers\u0060 parameter is required.",
+            "description": "The pricing model for tiered plan. The `tiers` parameter is required.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "VOLUME",
@@ -5897,14 +5897,14 @@
             "description": "The starting quantity for the tier.",
             "maxLength": 32,
             "minLength": 1,
-            "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+            "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
           },
           "ending_quantity": {
             "type": "string",
             "description": "The ending quantity for the tier. Optional for the last tier.",
             "maxLength": 32,
             "minLength": 1,
-            "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+            "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
           },
           "amount": {
             "description": "The pricing amount for the tier.",
@@ -5948,18 +5948,18 @@
             "properties": {
               "full_name": {
                 "type": "string",
-                "description": "When the party is a person, the party\u0027s full name.",
+                "description": "When the party is a person, the party's full name.",
                 "maxLength": 300
               }
             }
           },
           "type": {
             "title": "Fullfillment Type",
-            "description": "A classification for the method of purchase fulfillment (e.g shipping, in-store pickup, etc). Either \u0060type\u0060 or \u0060options\u0060 may be present, but not both.",
+            "description": "A classification for the method of purchase fulfillment (e.g shipping, in-store pickup, etc). Either `type` or `options` may be present, but not both.",
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
-            "pattern": "^[0-9A-Z_]\u002B$",
+            "pattern": "^[0-9A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "SHIPPING",
@@ -5968,15 +5968,15 @@
               },
               {
                 "value": "PICKUP_IN_PERSON",
-                "description": "DEPRECATED. Please use \u0022PICKUP_FROM_PERSON\u0022 instead."
+                "description": "DEPRECATED. Please use \"PICKUP_FROM_PERSON\" instead."
               },
               {
                 "value": "PICKUP_IN_STORE",
-                "description": "The payer intends to pick up the item(s) from the payee\u0027s physical store. Also termed as BOPIS, \u0022Buy Online, Pick-up in Store\u0022. Seller protection is provided with this option."
+                "description": "The payer intends to pick up the item(s) from the payee's physical store. Also termed as BOPIS, \"Buy Online, Pick-up in Store\". Seller protection is provided with this option."
               },
               {
                 "value": "PICKUP_FROM_PERSON",
-                "description": "The payer intends to pick up the item(s) from the payee in person. Also termed as BOPIP, \u0022Buy Online, Pick-up in Person\u0022. Seller protection is not available, since the payer is receiving the item from the payee in person, and can validate the item prior to payment."
+                "description": "The payer intends to pick up the item(s) from the payee in person. Also termed as BOPIP, \"Buy Online, Pick-up in Person\". Seller protection is not available, since the payer is receiving the item from the payee in person, and can validate the item prior to payment."
               }
             ],
             "enum": [
@@ -5999,7 +5999,7 @@
             "properties": {
               "address_line_1": {
                 "type": "string",
-                "description": "The first line of the address, such as number and street, for example, \u0060173 Drury Lane\u0060. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
+                "description": "The first line of the address, such as number and street, for example, `173 Drury Lane`. Needed for data entry, and Compliance and Risk checks. This field needs to pass the full address.",
                 "maxLength": 300
               },
               "address_line_2": {
@@ -6009,12 +6009,12 @@
               },
               "admin_area_2": {
                 "type": "string",
-                "description": "A city, town, or village. Smaller than \u0060admin_area_level_1\u0060.",
+                "description": "A city, town, or village. Smaller than `admin_area_level_1`.",
                 "maxLength": 120
               },
               "admin_area_1": {
                 "type": "string",
-                "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, \u0060CA\u0060 and not \u0060California\u0060. Value, by country, is:\u003Cul\u003E\u003Cli\u003EUK. A county.\u003C/li\u003E\u003Cli\u003EUS. A state.\u003C/li\u003E\u003Cli\u003ECanada. A province.\u003C/li\u003E\u003Cli\u003EJapan. A prefecture.\u003C/li\u003E\u003Cli\u003ESwitzerland. A *kanton*.\u003C/li\u003E\u003C/ul\u003E",
+                "description": "The highest-level sub-division in a country, which is usually a province, state, or ISO-3166-2 subdivision. This data is formatted for postal delivery, for example, `CA` and not `California`. Value, by country, is:<ul><li>UK. A county.</li><li>US. A state.</li><li>Canada. A province.</li><li>Japan. A prefecture.</li><li>Switzerland. A *kanton*.</li></ul>",
                 "maxLength": 300
               },
               "postal_code": {
@@ -6046,7 +6046,7 @@
           },
           "label": {
             "type": "string",
-            "description": "A description that the payer sees, which helps them choose an appropriate shipping option. For example, \u0060Free Shipping\u0060, \u0060USPS Priority Shipping\u0060, \u0060Exp\u00E9dition prioritaire USPS\u0060, or \u0060USPS y\u014Duxi\u0101n f\u0101 hu\u00F2\u0060. Localize this description to the payer\u0027s locale.",
+            "description": "A description that the payer sees, which helps them choose an appropriate shipping option. For example, `Free Shipping`, `USPS Priority Shipping`, `Expédition prioritaire USPS`, or `USPS yōuxiān fā huò`. Localize this description to the payer's locale.",
             "maxLength": 127
           },
           "type": {
@@ -6059,7 +6059,7 @@
           },
           "selected": {
             "type": "boolean",
-            "description": "If the API request sets \u0060selected = true\u0060, it represents the shipping option that the payee or merchant expects to be pre-selected for the payer when they first view the \u0060shipping.options\u0060 in the PayPal Checkout experience. As part of the response if a \u0060shipping.option\u0060 contains \u0060selected=true\u0060, it represents the shipping option that the payer selected during the course of checkout with PayPal. Only one \u0060shipping.option\u0060 can be set to \u0060selected=true\u0060."
+            "description": "If the API request sets `selected = true`, it represents the shipping option that the payee or merchant expects to be pre-selected for the payer when they first view the `shipping.options` in the PayPal Checkout experience. As part of the response if a `shipping.option` contains `selected=true`, it represents the shipping option that the payer selected during the course of checkout with PayPal. Only one `shipping.option` can be set to `selected=true`."
           }
         }
       },
@@ -6083,15 +6083,15 @@
           },
           {
             "value": "PICKUP",
-            "description": "DEPRECATED. To ensure that seller protection is correctly assigned, please use \u0027PICKUP_IN_STORE\u0027 or \u0027PICKUP_FROM_PERSON\u0027 instead. Currently, this field indicates that the payer intends to pick up the items at a specified address (ie. a store address). "
+            "description": "DEPRECATED. To ensure that seller protection is correctly assigned, please use 'PICKUP_IN_STORE' or 'PICKUP_FROM_PERSON' instead. Currently, this field indicates that the payer intends to pick up the items at a specified address (ie. a store address). "
           },
           {
             "value": "PICKUP_IN_STORE",
-            "description": "The payer intends to pick up the item(s) from the payee\u0027s physical store. Also termed as BOPIS, \u0022Buy Online, Pick-up in Store\u0022. Seller protection is provided with this option."
+            "description": "The payer intends to pick up the item(s) from the payee's physical store. Also termed as BOPIS, \"Buy Online, Pick-up in Store\". Seller protection is provided with this option."
           },
           {
             "value": "PICKUP_FROM_PERSON",
-            "description": "The payer intends to pick up the item(s) from the payee in person. Also termed as BOPIP, \u0022Buy Online, Pick-up in Person\u0022. Seller protection is not available, since the payer is receiving the item from the payee in person, and can validate the item prior to payment."
+            "description": "The payer intends to pick up the item(s) from the payee in person. Also termed as BOPIP, \"Buy Online, Pick-up in Person\". Seller protection is not available, since the payer is receiving the item from the payee in person, and can validate the item prior to payment."
           }
         ],
         "enum": [
@@ -6106,7 +6106,7 @@
         "description": "Defines how and when the payment source gets vaulted.",
         "minLength": 1,
         "maxLength": 255,
-        "pattern": "^[0-9A-Z_]\u002B$",
+        "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "ON_SUCCESS",
@@ -6131,18 +6131,18 @@
                 "properties": {
                   "given_name": {
                     "type": "string",
-                    "description": "When the party is a person, the party\u0027s given, or first, name.",
+                    "description": "When the party is a person, the party's given, or first, name.",
                     "maxLength": 140
                   },
                   "surname": {
                     "type": "string",
-                    "description": "When the party is a person, the party\u0027s surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother\u0027s, surname.",
+                    "description": "When the party is a person, the party's surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother's, surname.",
                     "maxLength": 140
                   }
                 }
               },
               "phone": {
-                "description": "The phone number of the customer. Available only when you enable the **Contact Telephone Number** option in the \u003Ca href=\u0022https://www.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-website-payments\u0022\u003E**Profile \u0026 Settings**\u003C/a\u003E for the merchant\u0027s PayPal account. The \u0060phone.phone_number\u0060 supports only \u0060national_number\u0060.",
+                "description": "The phone number of the customer. Available only when you enable the **Contact Telephone Number** option in the <a href=\"https://www.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-website-payments\">**Profile & Settings**</a> for the merchant's PayPal account. The `phone.phone_number` supports only `national_number`.",
                 "$ref": "#/components/schemas/phone_with_type"
               }
             }
@@ -6184,18 +6184,18 @@
                 "properties": {
                   "given_name": {
                     "type": "string",
-                    "description": "When the party is a person, the party\u0027s given, or first, name.",
+                    "description": "When the party is a person, the party's given, or first, name.",
                     "maxLength": 140
                   },
                   "surname": {
                     "type": "string",
-                    "description": "When the party is a person, the party\u0027s surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother\u0027s, surname.",
+                    "description": "When the party is a person, the party's surname or family name. Also known as the last name. Required when the party is a person. Use also to store multiple surnames including the matronymic, or mother's, surname.",
                     "maxLength": 140
                   }
                 }
               },
               "phone": {
-                "description": "The phone number of the customer. Available only when you enable the **Contact Telephone Number** option in the \u003Ca href=\u0022https://www.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-website-payments\u0022\u003E**Profile \u0026 Settings**\u003C/a\u003E for the merchant\u0027s PayPal account. The \u0060phone.phone_number\u0060 supports only \u0060national_number\u0060.",
+                "description": "The phone number of the customer. Available only when you enable the **Contact Telephone Number** option in the <a href=\"https://www.paypal.com/cgi-bin/customerprofileweb?cmd=_profile-website-payments\">**Profile & Settings**</a> for the merchant's PayPal account. The `phone.phone_number` supports only `national_number`.",
                 "$ref": "#/components/schemas/phone_with_type"
               }
             }
@@ -6252,7 +6252,7 @@
                 "description": "The quantity of the product in the subscription.",
                 "maxLength": 32,
                 "minLength": 1,
-                "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+                "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
               },
               "shipping_amount": {
                 "$ref": "#/components/schemas/money"
@@ -6277,7 +6277,7 @@
                 "description": "The custom id for the subscription. Can be invoice id.",
                 "maxLength": 127,
                 "minLength": 1,
-                "pattern": "^[\\x20-\\x7E]\u002B"
+                "pattern": "^[\\x20-\\x7E]+"
               },
               "plan_overridden": {
                 "type": "boolean",
@@ -6385,7 +6385,7 @@
           },
           "failed_payments_count": {
             "type": "integer",
-            "description": "The number of consecutive payment failures. Resets to \u00600\u0060 after a successful payment. If this reaches the \u0060payment_failure_threshold\u0060 value, the subscription updates to the \u0060SUSPENDED\u0060 state.",
+            "description": "The number of consecutive payment failures. Resets to `0` after a successful payment. If this reaches the `payment_failure_threshold` value, the subscription updates to the `SUSPENDED` state.",
             "maximum": 999,
             "minimum": 0,
             "readOnly": true
@@ -6431,7 +6431,7 @@
             "description": "The type of capture.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "OUTSTANDING_BALANCE",
@@ -6478,7 +6478,7 @@
             "description": "The quantity of the product in the subscription.",
             "maxLength": 32,
             "minLength": 1,
-            "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+            "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
           },
           "shipping_amount": {
             "description": "The shipping charges.",
@@ -6501,21 +6501,21 @@
             "description": "The custom id for the subscription. Can be invoice id.",
             "maxLength": 127,
             "minLength": 1,
-            "pattern": "^[\\x20-\\x7E]\u002B"
+            "pattern": "^[\\x20-\\x7E]+"
           },
           "plan": {
             "description": "An inline plan object to customise the subscription. You can override plan level default attributes by providing customised values for the subscription in this object.",
             "$ref": "#/components/schemas/plan_override"
           },
           "merchant_inventory": {
-            "description": "Merchant\u0027s inventory identifier details for the WPS hosted button.",
+            "description": "Merchant's inventory identifier details for the WPS hosted button.",
             "$ref": "#/components/schemas/merchant_inventory"
           }
         }
       },
       "subscription_revise_request": {
         "title": "Subscription Modify Plan Request",
-        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the \u0060shipping_amount\u0060 and \u0060shipping_address\u0060 values for the subscription. This type of update requires the buyer\u0027s consent.",
+        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "type": "object",
         "properties": {
           "plan_id": {
@@ -6530,7 +6530,7 @@
             "description": "The quantity of the product or service in the subscription.",
             "maxLength": 32,
             "minLength": 1,
-            "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+            "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
           },
           "shipping_amount": {
             "description": "The shipping charges.",
@@ -6553,7 +6553,7 @@
                 "pattern": "^.*$"
               },
               "locale": {
-                "description": "The BCP 47-formatted locale of pages that the PayPal payment experience shows. PayPal supports a five-character code. For example, \u0060da-DK\u0060, \u0060he-IL\u0060, \u0060id-ID\u0060, \u0060ja-JP\u0060, \u0060no-NO\u0060, \u0060pt-BR\u0060, \u0060ru-RU\u0060, \u0060sv-SE\u0060, \u0060th-TH\u0060, \u0060zh-CN\u0060, \u0060zh-HK\u0060, or \u0060zh-TW\u0060.",
+                "description": "The BCP 47-formatted locale of pages that the PayPal payment experience shows. PayPal supports a five-character code. For example, `da-DK`, `he-IL`, `id-ID`, `ja-JP`, `no-NO`, `pt-BR`, `ru-RU`, `sv-SE`, `th-TH`, `zh-CN`, `zh-HK`, or `zh-TW`.",
                 "$ref": "#/components/schemas/language"
               },
               "shipping_preference": {
@@ -6561,7 +6561,7 @@
                 "description": "The location from which the shipping address is derived.",
                 "minLength": 1,
                 "maxLength": 24,
-                "pattern": "^[A-Z_]\u002B$",
+                "pattern": "^[A-Z_]+$",
                 "default": "GET_FROM_FILE",
                 "x-enumDescriptions": [
                   {
@@ -6623,7 +6623,7 @@
       "subscription_revise_response": {
         "title": "Update Product Quantity in Subscription Response",
         "type": "object",
-        "description": "The response to a request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the \u0060shipping_amount\u0060 and \u0060shipping_address\u0060 values for the subscription. This type of update requires the buyer\u0027s consent.",
+        "description": "The response to a request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "properties": {
           "plan_id": {
             "type": "string",
@@ -6637,7 +6637,7 @@
             "description": "The quantity of the product or service in the subscription.",
             "maxLength": 32,
             "minLength": 1,
-            "pattern": "^([0-9]\u002B|([0-9]\u002B)?[.][0-9]\u002B)$"
+            "pattern": "^([0-9]+|([0-9]+)?[.][0-9]+)$"
           },
           "shipping_amount": {
             "description": "The shipping charges.",
@@ -6679,7 +6679,7 @@
             "description": "The status of the subscription.",
             "minLength": 1,
             "maxLength": 24,
-            "pattern": "^[A-Z_]\u002B$",
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "APPROVAL_PENDING",
@@ -7141,7 +7141,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The currency code is different from the subscription\u0027s currency code."
+                        "The currency code is different from the subscription's currency code."
                       ]
                     }
                   }
@@ -7384,7 +7384,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "Subscription can\u0027t have quantity as the plan does not support quantity."
+                        "Subscription can't have quantity as the plan does not support quantity."
                       ]
                     }
                   }
@@ -7571,7 +7571,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The currency code is different from the plan\u0027s currency code."
+                        "The currency code is different from the plan's currency code."
                       ]
                     }
                   }
@@ -8035,7 +8035,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The currency code is different from the subscription\u0027s currency code."
+                        "The currency code is different from the subscription's currency code."
                       ]
                     }
                   }
@@ -8374,7 +8374,7 @@
                     "description": {
                       "type": "string",
                       "enum": [
-                        "The currency code is different from the plan\u0027s currency code."
+                        "The currency code is different from the plan's currency code."
                       ]
                     }
                   }
@@ -8559,7 +8559,7 @@
         "description": "Results of 3D Secure Authentication.",
         "properties": {
           "authentication_status": {
-            "description": "The outcome of the issuer\u0027s authentication.",
+            "description": "The outcome of the issuer's authentication.",
             "$ref": "#/components/schemas/pares_status"
           },
           "enrollment_status": {
@@ -8580,7 +8580,7 @@
             "x-enumDescriptions": [
               {
                 "value": "COMPLETED",
-                "description": "The funds for this captured payment were credited to the payee\u0027s PayPal account."
+                "description": "The funds for this captured payment were credited to the payee's PayPal account."
               },
               {
                 "value": "DECLINED",
@@ -8588,15 +8588,15 @@
               },
               {
                 "value": "PARTIALLY_REFUNDED",
-                "description": "An amount less than this captured payment\u0027s amount was partially refunded to the payer."
+                "description": "An amount less than this captured payment's amount was partially refunded to the payer."
               },
               {
                 "value": "PENDING",
-                "description": "The funds for this captured payment was not yet credited to the payee\u0027s PayPal account. For more information, see \u003Ccode\u003Estatus.details\u003C/code\u003E."
+                "description": "The funds for this captured payment was not yet credited to the payee's PayPal account. For more information, see <code>status.details</code>."
               },
               {
                 "value": "REFUNDED",
-                "description": "An amount greater than or equal to this captured payment\u0027s amount was refunded to the payer."
+                "description": "An amount greater than or equal to this captured payment's amount was refunded to the payer."
               },
               {
                 "value": "FAILED",
@@ -8747,15 +8747,15 @@
             "description": "The vault status.",
             "minLength": 1,
             "maxLength": 255,
-            "pattern": "^[0-9A-Z_]\u002B$",
+            "pattern": "^[0-9A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "VAULTED",
-                "description": "The payment source has been saved in your customer\u0027s vault. This vault status reflects \u0060/v3/vault\u0060 status."
+                "description": "The payment source has been saved in your customer's vault. This vault status reflects `/v3/vault` status."
               },
               {
                 "value": "CREATED",
-                "description": "DEPRECATED. The payment source has been saved in your customer\u0027s vault. This status applies to deprecated integration patterns and will not be returned for v3/vault integrations."
+                "description": "DEPRECATED. The payment source has been saved in your customer's vault. This status applies to deprecated integration patterns and will not be returned for v3/vault integrations."
               },
               {
                 "value": "APPROVED",
@@ -8772,7 +8772,7 @@
           "customer": {
             "title": "Customer Information",
             "type": "object",
-            "description": "The details about a customer in PayPal\u0027s system of record.",
+            "description": "The details about a customer in PayPal's system of record.",
             "properties": {
               "id": {
                 "$ref": "#/components/schemas/merchant_partner_customer_id"
@@ -8789,7 +8789,7 @@
       "prefer": {
         "name": "Prefer",
         "in": "header",
-        "description": "The preferred server response upon successful completion of the request. Value is:\u003Cul\u003E\u003Cli\u003E\u003Ccode\u003Ereturn=minimal\u003C/code\u003E. The server returns a minimal response to optimize communication between the API caller and the server. A minimal response includes the \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Estatus\u003C/code\u003E and HATEOAS links.\u003C/li\u003E\u003Cli\u003E\u003Ccode\u003Ereturn=representation\u003C/code\u003E. The server returns a complete resource representation, including the current state of the resource.\u003C/li\u003E\u003C/ul\u003E",
+        "description": "The preferred server response upon successful completion of the request. Value is:<ul><li><code>return=minimal</code>. The server returns a minimal response to optimize communication between the API caller and the server. A minimal response includes the <code>id</code>, <code>status</code> and HATEOAS links.</li><li><code>return=representation</code>. The server returns a complete resource representation, including the current state of the resource.</li></ul>",
         "required": false,
         "schema": {
           "type": "string",
@@ -8830,7 +8830,7 @@
       "page": {
         "name": "page",
         "in": "query",
-        "description": "A non-zero integer which is the start index of the entire list of items to return in the response. The combination of \u0060page=1\u0060 and \u0060page_size=20\u0060 returns the first 20 items. The combination of \u0060page=2\u0060 and \u0060page_size=20\u0060 returns the next 20 items.",
+        "description": "A non-zero integer which is the start index of the entire list of items to return in the response. The combination of `page=1` and `page_size=20` returns the first 20 items. The combination of `page=2` and `page_size=20` returns the next 20 items.",
         "schema": {
           "type": "integer",
           "default": 1,
@@ -8875,7 +8875,7 @@
           "type": "string",
           "maxLength": 64,
           "minLength": 20,
-          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]\u002B)?([Zz]|[\u002B-][0-9]{2}:[0-9]{2})$"
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]+)?([Zz]|[+-][0-9]{2}:[0-9]{2})$"
         }
       },
       "end_time": {
@@ -8887,7 +8887,7 @@
           "type": "string",
           "maxLength": 64,
           "minLength": 20,
-          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]\u002B)?([Zz]|[\u002B-][0-9]{2}:[0-9]{2})$"
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])[T,t]([0-1][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)([.][0-9]+)?([Zz]|[+-][0-9]{2}:[0-9]{2})$"
         }
       }
     }

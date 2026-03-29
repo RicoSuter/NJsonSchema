@@ -554,9 +554,10 @@ namespace NJsonSchema
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5).</summary>
         [JsonPropertyName("x-enum-descriptions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        internal string[]? EnumerationDescriptionsDashedRaw
+        [JsonInclude]
+        internal string?[]? EnumerationDescriptionsDashedRaw
         {
-            get => EnumerationDescriptions is { Count: > 0 } ? EnumerationDescriptions.Select(s => s ?? string.Empty).ToArray() : null;
+            get => EnumerationDescriptions is { Count: > 0 } ? EnumerationDescriptions.ToArray() : null;
             set
             {
                 var converted = ConvertPossibleStringArray(value);
@@ -689,7 +690,7 @@ namespace NJsonSchema
             }
         }
 
-        private static List<string?>? ConvertPossibleStringArray(string[]? array)
+        private static List<string?>? ConvertPossibleStringArray(string?[]? array)
         {
             if (array is { Length: > 0 })
             {

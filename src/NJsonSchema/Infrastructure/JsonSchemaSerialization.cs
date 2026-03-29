@@ -57,12 +57,12 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, SchemaSerializationConverter? converter, bool writeIndented)
         {
-            IsWriting = false;
+            IsWriting = true;
             CurrentSchemaType = schemaType;
 
             JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
 
-            IsWriting = false;
+            IsWriting = true;
             var options = CreateSerializerOptions(converter, writeIndented);
             CurrentSerializerOptions = options;
 
@@ -158,7 +158,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The deserialized schema.</returns>
         public static T? FromJson<T>(string json, SchemaSerializationConverter? converter)
         {
-            IsWriting = true;
+            IsWriting = false;
             var options = CreateSerializerOptions(converter, false);
             CurrentSerializerOptions = options;
 
@@ -186,7 +186,7 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The deserialized schema.</returns>
         public static T? FromJson<T>(Stream stream, SchemaSerializationConverter? converter)
         {
-            IsWriting = true;
+            IsWriting = false;
             var options = CreateSerializerOptions(converter, false);
             CurrentSerializerOptions = options;
 
@@ -209,6 +209,8 @@ namespace NJsonSchema.Infrastructure
                 MaxDepth = 128,
                 AllowTrailingCommas = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString,
             };
 
             if (converter != null)
@@ -243,6 +245,32 @@ namespace NJsonSchema.Infrastructure
 
             if (obj is JsonSchema schema)
             {
+                // Unwrap JsonElement values in schema properties that hold object?
+                // STJ deserializes these as JsonElement instead of primitive types
+                if (schema.Default is JsonElement defaultElement)
+                {
+                    schema.Default = ConvertJsonElement(defaultElement);
+                }
+
+                if (schema.ExclusiveMinimumRaw is JsonElement exMinElement)
+                {
+                    schema.ExclusiveMinimumRaw = ConvertJsonElement(exMinElement);
+                }
+
+                if (schema.ExclusiveMaximumRaw is JsonElement exMaxElement)
+                {
+                    schema.ExclusiveMaximumRaw = ConvertJsonElement(exMaxElement);
+                }
+
+                for (var i = 0; i < schema.Enumeration.Count; i++)
+                {
+                    var items = schema.Enumeration as IList<object?>;
+                    if (items != null && items[i] is JsonElement enumElement)
+                    {
+                        items[i] = ConvertJsonElement(enumElement);
+                    }
+                }
+
                 foreach (var prop in schema.Properties.Values)
                 {
                     PostProcessExtensionData(prop, visited);
@@ -341,18 +369,13 @@ namespace NJsonSchema.Infrastructure
                     return element.EnumerateArray().Select(ConvertJsonElement).ToArray();
 
                 case JsonValueKind.String:
-                {
-                    var stringValue = element.GetString();
-                    if (stringValue != null &&
-                        DateTime.TryParse(stringValue, System.Globalization.CultureInfo.InvariantCulture,
-                            System.Globalization.DateTimeStyles.RoundtripKind, out var dateTime))
-                    {
-                        return dateTime;
-                    }
-                    return stringValue;
-                }
+                    return element.GetString();
 
                 case JsonValueKind.Number:
+                    if (element.TryGetInt32(out var intValue))
+                    {
+                        return intValue;
+                    }
                     if (element.TryGetInt64(out var longValue))
                     {
                         return longValue;
@@ -374,7 +397,9 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Fixes lenient JSON (single quotes, unquoted property names) to be valid JSON.</summary>
         internal static string FixLenientJson(string json)
         {
-            var fixedJson = json.Replace('\'', '"');
+            // Replace non-breaking spaces (U+00A0) with regular spaces — Newtonsoft tolerated them, STJ does not
+            var fixedJson = json.Replace('\u00A0', ' ');
+            fixedJson = fixedJson.Replace('\'', '"');
             fixedJson = Regex.Replace(fixedJson, @"(?<=[\{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:", "\"$1\":");
             return fixedJson;
         }

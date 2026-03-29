@@ -188,7 +188,8 @@ namespace NJsonSchema.Tests.Schema
             var x = schema.ToJson();
 
             // Assert
-            Assert.True(schema.ExtensionData.First().Value is DateTime);
+            Assert.True(schema.ExtensionData.First().Value is string);
+            Assert.Equal("2016-07-28T14:39:37.937Z", schema.ExtensionData.First().Value);
         }
 
         [Fact]

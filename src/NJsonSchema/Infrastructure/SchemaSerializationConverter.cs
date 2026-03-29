@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -108,6 +109,8 @@ namespace NJsonSchema.Infrastructure
 
         private sealed class PropertyFilterConverter<T> : JsonConverter<T>
         {
+            private static readonly ConcurrentDictionary<JsonSerializerOptions, JsonSerializerOptions> StrippedOptionsCache = new();
+
             private readonly SchemaSerializationConverter _factory;
             private readonly HashSet<string>? _ignores;
             private readonly Dictionary<string, string>? _renames;
@@ -148,13 +151,13 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
-                var optionsWithout = CreateOptionsWithout(options);
+                var optionsWithout = GetOrCreateOptionsWithout(options);
                 return node.Deserialize<T>(optionsWithout);
             }
 
             public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
             {
-                var optionsWithout = CreateOptionsWithout(options);
+                var optionsWithout = GetOrCreateOptionsWithout(options);
                 var node = JsonSerializer.SerializeToNode(value, optionsWithout);
 
                 if (node is JsonObject obj)
@@ -186,17 +189,20 @@ namespace NJsonSchema.Infrastructure
                 node?.WriteTo(writer, options);
             }
 
-            private static JsonSerializerOptions CreateOptionsWithout(JsonSerializerOptions options)
+            private static JsonSerializerOptions GetOrCreateOptionsWithout(JsonSerializerOptions options)
             {
-                var newOptions = new JsonSerializerOptions(options);
-                for (var i = newOptions.Converters.Count - 1; i >= 0; i--)
+                return StrippedOptionsCache.GetOrAdd(options, static parentOptions =>
                 {
-                    if (newOptions.Converters[i] is SchemaSerializationConverter)
+                    var newOptions = new JsonSerializerOptions(parentOptions);
+                    for (var i = newOptions.Converters.Count - 1; i >= 0; i--)
                     {
-                        newOptions.Converters.RemoveAt(i);
+                        if (newOptions.Converters[i] is SchemaSerializationConverter)
+                        {
+                            newOptions.Converters.RemoveAt(i);
+                        }
                     }
-                }
-                return newOptions;
+                    return newOptions;
+                });
             }
         }
     }

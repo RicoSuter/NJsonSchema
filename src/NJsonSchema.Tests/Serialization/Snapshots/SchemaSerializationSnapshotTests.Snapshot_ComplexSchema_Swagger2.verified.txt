@@ -12,7 +12,7 @@
       "type": "string",
       "maxLength": 200,
       "minLength": 1,
-      "pattern": "^[a-zA-Z ]\u002B$"
+      "pattern": "^[a-zA-Z ]+$"
     },
     "age": {
       "type": "integer",
