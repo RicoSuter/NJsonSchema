@@ -14,7 +14,7 @@ namespace NJsonSchema.Validation.FormatValidators
     /// <summary>Validator for "IpV4" format.</summary>
     public class IpV4FormatValidator : IFormatValidator
     {
-        private const string IpV4RegexExpression = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        private const string IpV4RegexExpression = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
 
         /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.IpV4;
