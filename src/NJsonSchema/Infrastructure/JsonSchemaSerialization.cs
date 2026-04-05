@@ -9,6 +9,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using NJsonSchema.References;
 
@@ -60,11 +61,10 @@ namespace NJsonSchema.Infrastructure
             IsWriting = true;
             CurrentSchemaType = schemaType;
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
-
-            IsWriting = true;
             var options = CreateSerializerOptions(converter, writeIndented);
             CurrentSerializerOptions = options;
+
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
 
             var json = JsonSerializer.Serialize(obj, obj.GetType(), options);
 
@@ -118,6 +118,9 @@ namespace NJsonSchema.Infrastructure
             CurrentSchemaType = schemaType;
 
             T schema;
+            // Save/restore CurrentSerializerOptions to handle nested calls
+            // (external file resolution triggers nested FromJsonAsync)
+            var previousOptions = CurrentSerializerOptions;
             try
             {
                 schema = loader();
@@ -142,10 +145,16 @@ namespace NJsonSchema.Infrastructure
                     PostProcessExtensionData(schema);
                 }
 
+                // Ensure CurrentSerializerOptions is available during reference resolution
+                // (FromJson clears it, but the resolver needs it to deserialize external refs
+                // with the Populate modifier for getter-only collection properties)
+                CurrentSerializerOptions ??= CreateSerializerOptions(null, false);
+
                 await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
+                CurrentSerializerOptions = previousOptions;
                 CurrentSchemaType = SchemaType.JsonSchema;
             }
 
@@ -211,10 +220,48 @@ namespace NJsonSchema.Infrastructure
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 NumberHandling = JsonNumberHandling.AllowReadingFromString,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver().WithAddedModifier(static typeInfo =>
+                {
+                    // Enable Populate handling for getter-only collection properties so they are
+                    // populated during deserialization. This matches Newtonsoft.Json behavior for
+                    // types like OpenApiDocument.Paths, OpenApiComponents.Schemas, etc.
+                    if (typeInfo.Kind != JsonTypeInfoKind.Object || typeInfo.CreateObject == null)
+                    {
+                        return;
+                    }
+
+                    foreach (var property in typeInfo.Properties)
+                    {
+                        if (property.ObjectCreationHandling != null || property.Set != null)
+                        {
+                            continue;
+                        }
+
+                        var propertyType = property.PropertyType;
+
+                        // Only apply to collection/enumerable types (not strings, value types, or complex objects)
+                        if (propertyType == typeof(string) || propertyType.IsValueType)
+                        {
+                            continue;
+                        }
+
+                        if (typeof(System.Collections.IEnumerable).IsAssignableFrom(propertyType))
+                        {
+                            property.ObjectCreationHandling = JsonObjectCreationHandling.Populate;
+                        }
+                    }
+                }),
+
             };
 
             if (converter != null)
             {
+                // Add additional converters first (they take precedence over the factory)
+                foreach (var additionalConverter in converter.AdditionalConverters)
+                {
+                    options.Converters.Add(additionalConverter);
+                }
+
                 options.Converters.Add(converter);
             }
 
@@ -250,6 +297,11 @@ namespace NJsonSchema.Infrastructure
                 if (schema.Default is JsonElement defaultElement)
                 {
                     schema.Default = ConvertJsonElement(defaultElement);
+                }
+
+                if (schema.Example is JsonElement exampleElement)
+                {
+                    schema.Example = ConvertJsonElement(exampleElement);
                 }
 
                 if (schema.ExclusiveMinimumRaw is JsonElement exMinElement)
@@ -399,7 +451,16 @@ namespace NJsonSchema.Infrastructure
         {
             // Replace non-breaking spaces (U+00A0) with regular spaces — Newtonsoft tolerated them, STJ does not
             var fixedJson = json.Replace('\u00A0', ' ');
-            fixedJson = fixedJson.Replace('\'', '"');
+
+            // Convert string booleans to real booleans (common in real-world Swagger specs,
+            // e.g., "readOnly": "true" instead of "readOnly": true).
+            // Only match at end of line or before comma/brace to avoid matching inside strings.
+            fixedJson = Regex.Replace(fixedJson, @":\s*""(true|false)""(?=\s*[,}\]\r\n])", m =>
+                ": " + m.Groups[1].Value);
+
+            // Replace single-quoted strings with double-quoted, but only at JSON value positions.
+            // Uses a positive lookbehind to only match at positions after JSON structural characters.
+            fixedJson = Regex.Replace(fixedJson, @"(?<=[:,\[\{]\s*)'([^']*)'(?=\s*[,}\]\r\n:])", "\"$1\"");
             fixedJson = Regex.Replace(fixedJson, @"(?<=[\{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:", "\"$1\":");
             return fixedJson;
         }

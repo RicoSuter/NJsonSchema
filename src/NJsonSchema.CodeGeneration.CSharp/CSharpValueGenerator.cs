@@ -88,6 +88,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The C# number literal.</returns>
         public override string GetNumericValue(JsonObjectType type, object value, string? format)
         {
+            // Unwrap JsonElement values that may not have been converted during post-processing
+            if (value is System.Text.Json.JsonElement element)
+            {
+                value = element.ValueKind switch
+                {
+                    System.Text.Json.JsonValueKind.Number when element.TryGetInt64(out var longValue) => longValue,
+                    System.Text.Json.JsonValueKind.Number => element.GetDouble(),
+                    System.Text.Json.JsonValueKind.String => element.GetString()!,
+                    _ => value,
+                };
+            }
+
             switch (format)
             {
                 case JsonFormatStrings.Byte:

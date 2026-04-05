@@ -185,7 +185,7 @@ namespace NJsonSchema.Visitors
                     {
                         foreach (var property in contextualType.Type.GetContextualProperties()
                             .Where(p => p.MemberInfo.DeclaringType == contextualType.Type &&
-                                        !p.IsAttributeDefined<JsonIgnoreAttribute>(true)))
+                                        !(p.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always })))
                         {
                             var value = property.GetValue(obj);
                             if (value != null)

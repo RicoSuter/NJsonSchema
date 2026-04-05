@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Namotion.Reflection;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -129,6 +130,10 @@ namespace NJsonSchema
             {
                 var isExtensionObject = obj is IJsonExtensionObject;
 
+                // Look up the converter once for this object's properties (not per-property)
+                var converter = JsonSchemaSerialization.CurrentSerializerOptions?.Converters
+                    .OfType<SchemaSerializationConverter>().FirstOrDefault();
+
                 // Order properties so that settable properties (with a setter) are processed before
                 // getter-only properties. This ensures that when two properties return the same object
                 // (e.g., an alias like "Definitions1 => Definitions2"), the canonical settable property
@@ -146,6 +151,14 @@ namespace NJsonSchema
                         continue;
                     }
 
+                    // Check if the property is ignored by the current SchemaSerializationConverter
+                    // (e.g., "components" is ignored for Swagger2, "definitions" for OpenApi3)
+                    var jsonName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                    if (converter != null && converter.IsPropertyIgnored(type, jsonName))
+                    {
+                        continue;
+                    }
+
                     // Skip ExtensionData property — it's handled separately below with correct path resolution
                     if (isExtensionObject && property.MemberInfo.GetCustomAttribute<JsonExtensionDataAttribute>() != null)
                     {
@@ -155,7 +168,6 @@ namespace NJsonSchema
                     var value = property.GetValue(obj);
                     if (value != null)
                     {
-                        var jsonName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
                         if (FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonName, checkedObjects))
                         {
                             return true;

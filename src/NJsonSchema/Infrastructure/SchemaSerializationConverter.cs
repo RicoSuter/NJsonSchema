@@ -8,10 +8,10 @@
 
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace NJsonSchema.Infrastructure
 {
@@ -21,7 +21,34 @@ namespace NJsonSchema.Infrastructure
     {
         private readonly Dictionary<string, HashSet<string>> _ignores = [];
         private readonly Dictionary<string, Dictionary<string, string>> _renames = [];
+        private readonly List<JsonConverter> _additionalConverters = [];
         private readonly bool _ignoreEmptyCollections;
+
+        private Dictionary<string, string>? _allReverseRenamesCache;
+
+        /// <summary>Gets all reverse renames (newName → originalName) across all types.
+        /// Used by Read to recursively fix property names before deserialization.</summary>
+        internal Dictionary<string, string> GetAllReverseRenames()
+        {
+            if (_allReverseRenamesCache != null)
+            {
+                return _allReverseRenamesCache;
+            }
+
+            var result = new Dictionary<string, string>();
+            foreach (var typeRenames in _renames.Values)
+            {
+                foreach (var kvp in typeRenames)
+                {
+                    if (!result.ContainsKey(kvp.Value))
+                    {
+                        result[kvp.Value] = kvp.Key;
+                    }
+                }
+            }
+            _allReverseRenamesCache = result;
+            return result;
+        }
 
         /// <summary>Initializes a new instance of the <see cref="SchemaSerializationConverter"/> class.</summary>
         /// <param name="ignoreEmptyCollections">Whether to skip empty collections during serialization.</param>
@@ -30,7 +57,9 @@ namespace NJsonSchema.Infrastructure
             _ignoreEmptyCollections = ignoreEmptyCollections;
         }
 
-        /// <summary>Ignore the given property/properties of the given type.</summary>
+        /// <summary>Ignore the given property/properties of the given type.
+        /// Also registers the type with the converter (CanConvert returns true).
+        /// Call with no property names to just register the type for empty collection filtering.</summary>
         /// <param name="type">The type.</param>
         /// <param name="jsonPropertyNames">One or more JSON properties to ignore.</param>
         public void IgnoreProperty(Type type, params string[] jsonPropertyNames)
@@ -60,11 +89,45 @@ namespace NJsonSchema.Infrastructure
             }
 
             value[propertyName] = newJsonPropertyName;
+            _allReverseRenamesCache = null;
+        }
+
+        /// <summary>Adds a converter that will be included in the serializer options alongside this factory.
+        /// These converters are added to both the full and stripped options, and take precedence
+        /// over this factory for types they handle.</summary>
+        /// <param name="converter">The converter to add.</param>
+        public void AddConverter(JsonConverter converter)
+        {
+            _additionalConverters.Add(converter);
+        }
+
+        /// <summary>Gets the additional converters registered with this factory.</summary>
+        internal IReadOnlyList<JsonConverter> AdditionalConverters => _additionalConverters;
+
+        /// <summary>Checks whether a JSON property is ignored for the given type (used by JsonPathUtilities).</summary>
+        public bool IsPropertyIgnored(Type type, string jsonPropertyName)
+        {
+            for (var t = type; t != null; t = t.BaseType)
+            {
+                if (t.FullName != null && _ignores.TryGetValue(t.FullName, out var ignored) && ignored.Contains(jsonPropertyName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Determines whether this converter can convert the specified type.</summary>
         public override bool CanConvert(Type typeToConvert)
         {
+            // Don't override types that have their own [JsonConverter] attribute —
+            // attribute converters should handle their own serialization.
+            if (typeToConvert.IsDefined(typeof(JsonConverterAttribute), false))
+            {
+                return false;
+            }
+
             for (var type = typeToConvert; type != null; type = type.BaseType)
             {
                 if (type.FullName != null && (_ignores.ContainsKey(type.FullName) || _renames.ContainsKey(type.FullName)))
@@ -130,63 +193,174 @@ namespace NJsonSchema.Infrastructure
 
             public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                // For read, parse to JsonNode, apply reverse renames, then deserialize without this converter
+                // Parse to JsonNode, apply ALL reverse renames recursively through the
+                // entire tree, then deserialize with stripped options. The recursive rename
+                // ensures nested objects (e.g., nested JsonSchema within allOf/properties)
+                // also get their property names fixed.
                 var node = JsonNode.Parse(ref reader);
                 if (node is not JsonObject obj)
                 {
                     return default;
                 }
 
-                // Apply reverse renames (new name -> original name)
-                if (_renames != null)
+                // Apply ALL reverse renames from the factory (not just this type's renames)
+                // so that nested types (e.g., JsonSchema within OpenApiDocument) also get
+                // their property names fixed (e.g., "nullable" → "x-nullable").
+                var allReverseRenames = _factory.GetAllReverseRenames();
+                if (allReverseRenames.Count > 0)
                 {
-                    foreach (var kvp in _renames)
-                    {
-                        if (obj.ContainsKey(kvp.Value) && !obj.ContainsKey(kvp.Key))
-                        {
-                            var value = obj[kvp.Value];
-                            obj.Remove(kvp.Value);
-                            obj[kvp.Key] = value?.DeepClone();
-                        }
-                    }
+                    ApplyReverseRenamesRecursively(obj, allReverseRenames);
                 }
 
                 var optionsWithout = GetOrCreateOptionsWithout(options);
                 return node.Deserialize<T>(optionsWithout);
             }
 
-            public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+            /// <summary>Recursively applies reverse renames to all JSON objects in the tree.
+            /// The renames dict maps renamedName → originalName.</summary>
+            private static void ApplyReverseRenamesRecursively(JsonObject obj, Dictionary<string, string> reverseRenames)
             {
-                var optionsWithout = GetOrCreateOptionsWithout(options);
-                var node = JsonSerializer.SerializeToNode(value, optionsWithout);
-
-                if (node is JsonObject obj)
+                // Apply reverse renames at this level
+                foreach (var kvp in reverseRenames)
                 {
-                    // Apply ignores
-                    if (_ignores != null)
+                    // kvp.Key = renamed name (in JSON), kvp.Value = original name (in code)
+                    if (obj.ContainsKey(kvp.Key) && !obj.ContainsKey(kvp.Value))
                     {
-                        foreach (var prop in _ignores)
-                        {
-                            obj.Remove(prop);
-                        }
+                        var value = obj[kvp.Key];
+                        obj.Remove(kvp.Key);
+                        obj[kvp.Value] = value?.DeepClone();
                     }
+                }
 
-                    // Apply renames
-                    if (_renames != null)
+                // Recurse into nested objects and arrays
+                foreach (var property in obj)
+                {
+                    if (property.Value is JsonObject childObj)
                     {
-                        foreach (var kvp in _renames)
+                        ApplyReverseRenamesRecursively(childObj, reverseRenames);
+                    }
+                    else if (property.Value is JsonArray childArr)
+                    {
+                        foreach (var item in childArr)
                         {
-                            if (obj.ContainsKey(kvp.Key))
+                            if (item is JsonObject arrObj)
                             {
-                                var val = obj[kvp.Key];
-                                obj.Remove(kvp.Key);
-                                obj[kvp.Value] = val?.DeepClone();
+                                ApplyReverseRenamesRecursively(arrObj, reverseRenames);
                             }
                         }
                     }
                 }
+            }
 
-                node?.WriteTo(writer, options);
+            public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+            {
+                // Get the type info from stripped options to enumerate properties
+                // without re-entering this converter for type T.
+                var optionsWithout = GetOrCreateOptionsWithout(options);
+                var typeInfo = (JsonTypeInfo<T>)optionsWithout.GetTypeInfo(typeof(T));
+
+                writer.WriteStartObject();
+
+                JsonPropertyInfo? extensionDataProperty = null;
+
+                foreach (var property in typeInfo.Properties)
+                {
+                    // Defer extension data to write after all regular properties
+                    if (property.IsExtensionData)
+                    {
+                        extensionDataProperty = property;
+                        continue;
+                    }
+
+                    var jsonName = property.Name;
+
+                    // Apply ignores
+                    if (_ignores?.Contains(jsonName) == true)
+                    {
+                        continue;
+                    }
+
+                    // Skip properties without getter
+                    if (property.Get == null)
+                    {
+                        continue;
+                    }
+
+                    var propValue = property.Get(value!);
+
+                    // Respect STJ's ShouldSerialize (handles [JsonIgnore(Condition = ...)])
+                    if (property.ShouldSerialize != null && !property.ShouldSerialize(value!, propValue))
+                    {
+                        continue;
+                    }
+
+                    // Skip null values
+                    if (propValue == null)
+                    {
+                        continue;
+                    }
+
+                    // Skip empty collections/dictionaries when configured.
+                    // Exclude JsonNode subtypes (JsonObject/JsonArray) — they represent
+                    // JSON values, not .NET collections (e.g., "additionalProperties": {}).
+                    if (_ignoreEmptyCollections && propValue is not string && propValue is not JsonNode && propValue is IEnumerable enumerable)
+                    {
+                        if (propValue is ICollection { Count: 0 })
+                        {
+                            continue;
+                        }
+
+                        var enumerator = enumerable.GetEnumerator();
+                        try
+                        {
+                            if (!enumerator.MoveNext())
+                            {
+                                continue;
+                            }
+                        }
+                        finally
+                        {
+                            (enumerator as IDisposable)?.Dispose();
+                        }
+                    }
+
+                    // Apply renames
+                    if (_renames?.TryGetValue(jsonName, out var renamed) == true)
+                    {
+                        jsonName = renamed;
+                    }
+
+                    writer.WritePropertyName(jsonName);
+
+                    // Serialize the property value using FULL options so nested types
+                    // get their own SchemaSerializationConverter filters applied.
+                    // Use runtime type for object-typed properties so values like int/string
+                    // serialize correctly (STJ would serialize declared type 'object' as {}).
+                    var serializeType = property.PropertyType == typeof(object)
+                        ? propValue.GetType()
+                        : property.PropertyType;
+                    JsonSerializer.Serialize(writer, propValue, serializeType, options);
+                }
+
+                // Write extension data AFTER all regular properties
+                if (extensionDataProperty?.Get != null &&
+                    extensionDataProperty.Get(value!) is IEnumerable<KeyValuePair<string, object?>> extDict)
+                {
+                    foreach (var pair in extDict)
+                    {
+                        writer.WritePropertyName(pair.Key);
+                        if (pair.Value == null)
+                        {
+                            writer.WriteNullValue();
+                        }
+                        else
+                        {
+                            JsonSerializer.Serialize(writer, pair.Value, pair.Value.GetType(), options);
+                        }
+                    }
+                }
+
+                writer.WriteEndObject();
             }
 
             private static JsonSerializerOptions GetOrCreateOptionsWithout(JsonSerializerOptions options)

@@ -464,10 +464,33 @@ namespace NJsonSchema
         [JsonPropertyName("required")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonInclude]
-        internal ICollection<string>? RequiredPropertiesRaw
+        internal object? RequiredPropertiesRaw
         {
             get => RequiredProperties is { Count: > 0 } ? RequiredProperties : null;
-            set => RequiredProperties = value ?? [];
+            set
+            {
+                // Handle both JSON Schema "required" (string array) and OpenAPI parameter
+                // "required" (boolean) which share the same JSON property name. When loaded
+                // as a plain JsonSchema (e.g., external file references), the boolean value
+                // should be silently ignored.
+                if (value is ICollection<string> stringCollection)
+                {
+                    RequiredProperties = stringCollection;
+                }
+                else if (value is System.Text.Json.JsonElement element && element.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    RequiredProperties = element.EnumerateArray().Select(e => e.GetString()!).ToList();
+                }
+                else if (value is IEnumerable<object?> objects)
+                {
+                    RequiredProperties = objects.Select(o => o?.ToString() ?? "").ToList();
+                }
+                else
+                {
+                    // Boolean or other non-array value — silently ignore (parameter "required": true)
+                    RequiredProperties = [];
+                }
+            }
         }
 
         [JsonPropertyName("properties")]

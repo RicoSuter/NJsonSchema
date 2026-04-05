@@ -67,6 +67,10 @@ Templates are in `src/NJsonSchema.CodeGeneration.CSharp/Templates/` and `src/NJs
 - Consider AOT compatibility (use generic converters like `JsonStringEnumConverter<T>`)
 - Do not use abbreviations in variable/field names (e.g. use `attribute` not `attr`, `property` not `prop`, `parameter` not `param`)
 
+## Git Rules
+
+- Never include "Claude", "Co-Authored-By", or AI attribution in commit messages, PR descriptions, or GitHub comments.
+
 ## Version Management
 
 - Version defined in `Directory.Build.props`
