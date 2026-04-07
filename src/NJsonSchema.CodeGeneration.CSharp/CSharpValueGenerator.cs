@@ -91,13 +91,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             // Unwrap JsonElement values that may not have been converted during post-processing
             if (value is System.Text.Json.JsonElement element)
             {
-                value = element.ValueKind switch
-                {
-                    System.Text.Json.JsonValueKind.Number when element.TryGetInt64(out var longValue) => longValue,
-                    System.Text.Json.JsonValueKind.Number => element.GetDouble(),
-                    System.Text.Json.JsonValueKind.String => element.GetString()!,
-                    _ => value,
-                };
+                value = NJsonSchema.Infrastructure.JsonSchemaSerialization.ConvertJsonElement(element) ?? value;
             }
 
             switch (format)

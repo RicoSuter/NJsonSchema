@@ -165,6 +165,14 @@ namespace NJsonSchema
                         continue;
                     }
 
+                    // Skip string, value type, and indexer properties
+                    if (property.PropertyType.Type == typeof(string) ||
+                        property.PropertyType.Type.IsValueType ||
+                        property.PropertyInfo.GetIndexParameters().Length > 0)
+                    {
+                        continue;
+                    }
+
                     var value = property.GetValue(obj);
                     if (value != null)
                     {

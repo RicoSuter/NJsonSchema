@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------
 
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -172,7 +171,10 @@ namespace NJsonSchema.Infrastructure
 
         private sealed class PropertyFilterConverter<T> : JsonConverter<T>
         {
-            private static readonly ConcurrentDictionary<JsonSerializerOptions, JsonSerializerOptions> StrippedOptionsCache = new();
+            [ThreadStatic]
+            private static JsonSerializerOptions? _cachedParentOptions;
+            [ThreadStatic]
+            private static JsonSerializerOptions? _cachedStrippedOptions;
 
             private readonly SchemaSerializationConverter _factory;
             private readonly HashSet<string>? _ignores;
@@ -212,6 +214,11 @@ namespace NJsonSchema.Infrastructure
                     ApplyReverseRenamesRecursively(obj, allReverseRenames);
                 }
 
+                // Remove null values for properties that STJ cannot assign null to
+                // (e.g., non-nullable IDictionary/ICollection). This handles YAML documents
+                // where empty keys (e.g., "paths:") deserialize as "paths": null in JSON.
+                RemoveNullCollectionProperties(obj, typeToConvert);
+
                 var optionsWithout = GetOrCreateOptionsWithout(options);
                 return node.Deserialize<T>(optionsWithout);
             }
@@ -220,7 +227,6 @@ namespace NJsonSchema.Infrastructure
             /// The renames dict maps renamedName → originalName.</summary>
             private static void ApplyReverseRenamesRecursively(JsonObject obj, Dictionary<string, string> reverseRenames)
             {
-                // Apply reverse renames at this level
                 foreach (var kvp in reverseRenames)
                 {
                     // kvp.Key = renamed name (in JSON), kvp.Value = original name (in code)
@@ -232,7 +238,6 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
-                // Recurse into nested objects and arrays
                 foreach (var property in obj)
                 {
                     if (property.Value is JsonObject childObj)
@@ -305,22 +310,27 @@ namespace NJsonSchema.Infrastructure
                     // JSON values, not .NET collections (e.g., "additionalProperties": {}).
                     if (_ignoreEmptyCollections && propValue is not string && propValue is not JsonNode && propValue is IEnumerable enumerable)
                     {
-                        if (propValue is ICollection { Count: 0 })
+                        if (propValue is ICollection collection)
                         {
-                            continue;
-                        }
-
-                        var enumerator = enumerable.GetEnumerator();
-                        try
-                        {
-                            if (!enumerator.MoveNext())
+                            if (collection.Count == 0)
                             {
                                 continue;
                             }
                         }
-                        finally
+                        else
                         {
-                            (enumerator as IDisposable)?.Dispose();
+                            var enumerator = enumerable.GetEnumerator();
+                            try
+                            {
+                                if (!enumerator.MoveNext())
+                                {
+                                    continue;
+                                }
+                            }
+                            finally
+                            {
+                                (enumerator as IDisposable)?.Dispose();
+                            }
                         }
                     }
 
@@ -363,20 +373,61 @@ namespace NJsonSchema.Infrastructure
                 writer.WriteEndObject();
             }
 
+            private static void RemoveNullCollectionProperties(JsonObject obj, Type targetType)
+            {
+                var nullKeys = new List<string>();
+                foreach (var property in obj)
+                {
+                    if (property.Value == null)
+                    {
+                        nullKeys.Add(property.Key);
+                    }
+                }
+
+                if (nullKeys.Count == 0)
+                {
+                    return;
+                }
+
+                foreach (var key in nullKeys)
+                {
+                    // Find the CLR property (case-insensitive to handle naming policies)
+                    var clrProp = targetType.GetProperty(key,
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+                    if (clrProp == null)
+                    {
+                        continue;
+                    }
+
+                    // Remove null for getter-only collection properties (e.g., Paths, Definitions)
+                    // that are initialized in the constructor — STJ can't assign null to them.
+                    var hasSetter = clrProp.GetSetMethod(true) != null;
+                    if (!hasSetter && typeof(IEnumerable).IsAssignableFrom(clrProp.PropertyType) && clrProp.PropertyType != typeof(string))
+                    {
+                        obj.Remove(key);
+                    }
+                }
+            }
+
             private static JsonSerializerOptions GetOrCreateOptionsWithout(JsonSerializerOptions options)
             {
-                return StrippedOptionsCache.GetOrAdd(options, static parentOptions =>
+                if (ReferenceEquals(_cachedParentOptions, options) && _cachedStrippedOptions != null)
                 {
-                    var newOptions = new JsonSerializerOptions(parentOptions);
-                    for (var i = newOptions.Converters.Count - 1; i >= 0; i--)
+                    return _cachedStrippedOptions;
+                }
+
+                var newOptions = new JsonSerializerOptions(options);
+                for (var i = newOptions.Converters.Count - 1; i >= 0; i--)
+                {
+                    if (newOptions.Converters[i] is SchemaSerializationConverter)
                     {
-                        if (newOptions.Converters[i] is SchemaSerializationConverter)
-                        {
-                            newOptions.Converters.RemoveAt(i);
-                        }
+                        newOptions.Converters.RemoveAt(i);
                     }
-                    return newOptions;
-                });
+                }
+
+                _cachedParentOptions = options;
+                _cachedStrippedOptions = newOptions;
+                return newOptions;
             }
         }
     }

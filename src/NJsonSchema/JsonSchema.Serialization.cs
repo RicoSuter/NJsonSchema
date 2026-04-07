@@ -477,7 +477,7 @@ namespace NJsonSchema
                 {
                     RequiredProperties = stringCollection;
                 }
-                else if (value is System.Text.Json.JsonElement element && element.ValueKind == System.Text.Json.JsonValueKind.Array)
+                else if (value is JsonElement element && element.ValueKind == JsonValueKind.Array)
                 {
                     RequiredProperties = element.EnumerateArray().Select(e => e.GetString()!).ToList();
                 }

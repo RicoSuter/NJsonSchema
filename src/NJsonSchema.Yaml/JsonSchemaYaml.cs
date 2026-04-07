@@ -7,8 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Dynamic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Nodes;
 using NJsonSchema.Infrastructure;
 using YamlDotNet.Serialization;
 
@@ -44,7 +43,9 @@ namespace NJsonSchema.Yaml
         /// <returns>The JSON Schema.</returns>
         public static async Task<JsonSchema> FromYamlAsync(string data, string? documentPath, Func<JsonSchema, JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            var deserializer = new DeserializerBuilder().Build();
+            var deserializer = new DeserializerBuilder()
+                .WithAttemptingUnquotedStringTypeDeserialization()
+                .Build();
             var yamlObject = deserializer.Deserialize(new StringReader(data));
             var serializer = new SerializerBuilder()
                 .JsonCompatible()
@@ -59,11 +60,11 @@ namespace NJsonSchema.Yaml
         public static string ToYaml(this JsonSchema document)
         {
             var json = document.ToJson()!;
-            var expConverter = new ExpandoObjectConverter();
-            dynamic? deserializedObject = JsonConvert.DeserializeObject<ExpandoObject>(json, expConverter);
+            var jsonNode = JsonNode.Parse(json);
+            var expandoObject = ConvertJsonNodeToExpandoObject(jsonNode);
 
             var serializer = new Serializer();
-            return serializer.Serialize(deserializedObject);
+            return serializer.Serialize(expandoObject);
         }
 
         /// <summary>Creates a JSON Schema from a JSON file.</summary>
@@ -97,9 +98,38 @@ namespace NJsonSchema.Yaml
             return await FromYamlAsync(data, url, referenceResolverFactory, cancellationToken).ConfigureAwait(false);
         }
 
+        private static object? ConvertJsonNodeToExpandoObject(JsonNode? node)
+        {
+            if (node is JsonObject jsonObject)
+            {
+                var expando = new ExpandoObject();
+                var dict = (IDictionary<string, object?>)expando;
+                foreach (var property in jsonObject)
+                {
+                    dict[property.Key] = property.Value != null ? ConvertJsonNodeToExpandoObject(property.Value) : null;
+                }
+                return expando;
+            }
+            else if (node is JsonArray jsonArray)
+            {
+                return jsonArray.Select(item => item != null ? ConvertJsonNodeToExpandoObject(item) : null).ToList();
+            }
+            else if (node is JsonValue jsonValue)
+            {
+                if (jsonValue.TryGetValue<bool>(out var boolValue)) return boolValue;
+                if (jsonValue.TryGetValue<long>(out var longValue)) return longValue;
+                if (jsonValue.TryGetValue<double>(out var doubleValue)) return doubleValue;
+                if (jsonValue.TryGetValue<string>(out var stringValue)) return stringValue;
+                return node.ToJsonString();
+            }
+            return null;
+        }
+
         private static string ConvertYamlToJson(string data)
         {
-            var deserializer = new DeserializerBuilder().Build();
+            var deserializer = new DeserializerBuilder()
+                .WithAttemptingUnquotedStringTypeDeserialization()
+                .Build();
             var yamlObject = deserializer.Deserialize(new StringReader(data));
 
             var serializer = new SerializerBuilder()

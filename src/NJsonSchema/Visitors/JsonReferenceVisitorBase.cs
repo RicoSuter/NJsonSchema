@@ -185,7 +185,10 @@ namespace NJsonSchema.Visitors
                         foreach (var property in contextualType.Type.GetContextualProperties())
                         {
                             if (property.MemberInfo.DeclaringType == contextualType.Type &&
-                                !(property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always }))
+                                !(property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always }) &&
+                                property.PropertyType.Type != typeof(string) &&
+                                !property.PropertyType.Type.IsValueType &&
+                                property.PropertyInfo.GetIndexParameters().Length == 0)
                             {
                                 var value = property.GetValue(obj);
                                 if (value != null)
@@ -224,7 +227,9 @@ namespace NJsonSchema.Visitors
                             || (ignoreAttr != null && ignoreAttr.Condition == JsonIgnoreCondition.Always)
                             || property.PropertyInfo.GetMethod?.IsStatic == true
                             || property.PropertyType.Type == typeof(string)
-                            || property.PropertyType.Type.IsPrimitive)
+                            || property.PropertyType.Type.IsPrimitive
+                            || property.PropertyType.Type.IsValueType
+                            || property.PropertyInfo.GetIndexParameters().Length > 0)
                         {
                             continue;
                         }

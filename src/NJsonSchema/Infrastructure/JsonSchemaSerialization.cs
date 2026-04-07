@@ -20,6 +20,35 @@ namespace NJsonSchema.Infrastructure
     {
         internal static readonly JsonSerializerOptions DefaultSerializerOptions = new JsonSerializerOptions();
 
+        /// <summary>Cached type info resolver that enables Populate for getter-only collection properties,
+        /// matching Newtonsoft.Json's default behavior of populating existing collections.</summary>
+        private static readonly IJsonTypeInfoResolver PopulateTypeInfoResolver =
+            new DefaultJsonTypeInfoResolver().WithAddedModifier(static typeInfo =>
+            {
+                if (typeInfo.Kind != JsonTypeInfoKind.Object || typeInfo.CreateObject == null)
+                {
+                    return;
+                }
+
+                foreach (var property in typeInfo.Properties)
+                {
+                    if (property.ObjectCreationHandling != null || property.Set != null)
+                    {
+                        continue;
+                    }
+
+                    if (property.PropertyType == typeof(string) || property.PropertyType.IsValueType)
+                    {
+                        continue;
+                    }
+
+                    if (typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType))
+                    {
+                        property.ObjectCreationHandling = JsonObjectCreationHandling.Populate;
+                    }
+                }
+            });
+
         [ThreadStatic]
         private static SchemaType _currentSchemaType;
 
@@ -220,37 +249,7 @@ namespace NJsonSchema.Infrastructure
                 ReadCommentHandling = JsonCommentHandling.Skip,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 NumberHandling = JsonNumberHandling.AllowReadingFromString,
-                TypeInfoResolver = new DefaultJsonTypeInfoResolver().WithAddedModifier(static typeInfo =>
-                {
-                    // Enable Populate handling for getter-only collection properties so they are
-                    // populated during deserialization. This matches Newtonsoft.Json behavior for
-                    // types like OpenApiDocument.Paths, OpenApiComponents.Schemas, etc.
-                    if (typeInfo.Kind != JsonTypeInfoKind.Object || typeInfo.CreateObject == null)
-                    {
-                        return;
-                    }
-
-                    foreach (var property in typeInfo.Properties)
-                    {
-                        if (property.ObjectCreationHandling != null || property.Set != null)
-                        {
-                            continue;
-                        }
-
-                        var propertyType = property.PropertyType;
-
-                        // Only apply to collection/enumerable types (not strings, value types, or complex objects)
-                        if (propertyType == typeof(string) || propertyType.IsValueType)
-                        {
-                            continue;
-                        }
-
-                        if (typeof(System.Collections.IEnumerable).IsAssignableFrom(propertyType))
-                        {
-                            property.ObjectCreationHandling = JsonObjectCreationHandling.Populate;
-                        }
-                    }
-                }),
+                TypeInfoResolver = PopulateTypeInfoResolver,
 
             };
 
@@ -380,7 +379,7 @@ namespace NJsonSchema.Infrastructure
             return value;
         }
 
-        private static object? ConvertJsonElement(JsonElement element)
+        internal static object? ConvertJsonElement(JsonElement element)
         {
             switch (element.ValueKind)
             {
