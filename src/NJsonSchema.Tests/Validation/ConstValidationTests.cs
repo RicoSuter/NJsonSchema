@@ -97,5 +97,70 @@ namespace NJsonSchema.Tests.Validation
             Assert.True(schema.Properties["cmdType"].HasConstValue);
             Assert.Equal("person", schema.Properties["cmdType"].Const?.ToString());
         }
+
+        [Fact]
+        public void When_schema_has_no_const_then_const_is_not_serialized()
+        {
+            // Arrange
+            var schema = new JsonSchema { Type = JsonObjectType.String };
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.False(schema.HasConstValue);
+            Assert.DoesNotContain("\"const\"", json);
+        }
+
+        [Fact]
+        public async Task When_schema_has_const_null_then_round_trip_preserves_it()
+        {
+            // Arrange
+            var json = @"{ ""const"": null }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Assert deserialization
+            Assert.True(schema.HasConstValue);
+
+            // Act - serialize back
+            var serialized = schema.ToJson();
+
+            // Assert round-trip
+            Assert.Contains("\"const\"", serialized);
+
+            // Act - deserialize again
+            var schema2 = await JsonSchema.FromJsonAsync(serialized);
+
+            // Assert second round-trip
+            Assert.True(schema2.HasConstValue);
+        }
+
+        [Fact]
+        public void When_const_is_set_programmatically_then_serialization_includes_it()
+        {
+            // Arrange
+            var schema = new JsonSchema { Const = "hello" };
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.True(schema.HasConstValue);
+            Assert.Contains("\"const\": \"hello\"", json);
+        }
+
+        [Fact]
+        public void When_const_is_cleared_then_serialization_excludes_it()
+        {
+            // Arrange
+            var schema = new JsonSchema { Const = "hello" };
+            schema.HasConstValue = false;
+
+            // Act
+            var json = schema.ToJson();
+
+            // Assert
+            Assert.DoesNotContain("\"const\"", json);
+        }
     }
 }

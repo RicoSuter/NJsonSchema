@@ -8,6 +8,7 @@
 
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -133,17 +134,23 @@ namespace NJsonSchema.CodeGeneration
             }
 
             var constType = schema.ConstValueType;
+
+            if (schema.Const is null || constType == JsonObjectType.Null)
+            {
+                return "null";
+            }
+
             if (constType.IsBoolean())
             {
-                return schema.Const!.ToString()!.ToLowerInvariant();
+                return schema.Const.ToString()!.ToLowerInvariant();
             }
 
             if (constType.IsInteger() || constType.IsNumber())
             {
-                return ConvertToNumberToStringCore(schema.Const!);
+                return ConvertToNumberToStringCore(schema.Const);
             }
 
-            return ConversionUtilities.ConvertToStringLiteral(schema.Const!.ToString() ?? string.Empty, "\"", "\"");
+            return ConversionUtilities.ConvertToStringLiteral(schema.Const.ToString() ?? string.Empty, "\"", "\"");
         }
 
         /// <summary>Converts a number to its string representation.</summary>
@@ -158,6 +165,11 @@ namespace NJsonSchema.CodeGeneration
 
         internal static string ConvertToNumberToStringCore(object value)
         {
+            if (value is JValue jv && jv.Value != null)
+            {
+                value = jv.Value;
+            }
+
             return value switch
             {
                 byte b => b.ToString(CultureInfo.InvariantCulture),

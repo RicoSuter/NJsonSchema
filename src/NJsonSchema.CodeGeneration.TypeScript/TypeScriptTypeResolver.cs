@@ -305,17 +305,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static string ResolveConst(JsonSchema schema)
         {
             var constType = schema.ConstValueType;
+
+            if (schema.Const is null || constType == JsonObjectType.Null)
+            {
+                return "null";
+            }
+
             if (constType.IsBoolean())
             {
-                return schema.Const!.ToString()!.ToLowerInvariant();
+                return schema.Const.ToString()!.ToLowerInvariant();
             }
 
             if (constType.IsInteger() || constType.IsNumber())
             {
-                return ValueGeneratorBase.ConvertToNumberToStringCore(schema.Const!);
+                return ValueGeneratorBase.ConvertToNumberToStringCore(schema.Const);
             }
 
-            return ConversionUtilities.ConvertToStringLiteral(schema.Const!.ToString() ?? string.Empty, "\"", "\"");
+            return ConversionUtilities.ConvertToStringLiteral(schema.Const.ToString() ?? string.Empty, "\"", "\"");
         }
 
         private string ResolveArrayOrTuple(JsonSchema schema, string? typeNameHint, bool addInterfacePrefix)
