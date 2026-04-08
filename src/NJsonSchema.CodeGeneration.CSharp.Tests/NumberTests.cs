@@ -296,7 +296,7 @@ public class NumberTests
         // Arrange
         var json =
             @"{
-                ""type"": ""object"", 
+                ""type"": ""object"",
                 ""properties"": {
                     ""count"" : {
                         ""type"":""integer""
@@ -314,6 +314,86 @@ public class NumberTests
 
         // Assert
         await VerifyHelper.Verify(code);
+        CSharpCompiler.AssertCompile(code);
+    }
+
+    [Fact]
+    public async Task When_integer_has_int32_format_and_integer_type_is_long_then_int_is_generated()
+    {
+        // Arrange
+        var json =
+            @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""count"" : {
+                        ""type"":""integer"",
+                        ""format"":""int32""
+                    }
+                }
+            }";
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+        {
+            IntegerType = "long"
+        });
+
+        // Act
+        var code = generator.GenerateFile("MyClass");
+
+        // Assert
+        Assert.Contains("public int Count", code);
+        CSharpCompiler.AssertCompile(code);
+    }
+
+    [Fact]
+    public async Task When_integer_has_int64_format_and_integer_type_is_int_then_long_is_generated()
+    {
+        // Arrange
+        var json =
+            @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""count"" : {
+                        ""type"":""integer"",
+                        ""format"":""int64""
+                    }
+                }
+            }";
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var generator = new CSharpGenerator(schema);
+
+        // Act
+        var code = generator.GenerateFile("MyClass");
+
+        // Assert
+        Assert.Contains("public long Count", code);
+        CSharpCompiler.AssertCompile(code);
+    }
+
+    [Fact]
+    public async Task When_integer_type_setting_is_null_then_int_is_generated()
+    {
+        // Arrange
+        var json =
+            @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""count"" : {
+                        ""type"":""integer""
+                    }
+                }
+            }";
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+        {
+            IntegerType = null
+        });
+
+        // Act
+        var code = generator.GenerateFile("MyClass");
+
+        // Assert
+        Assert.Contains("public int Count", code);
         CSharpCompiler.AssertCompile(code);
     }
 }

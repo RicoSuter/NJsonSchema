@@ -233,6 +233,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable ? "ulong?" : "ulong";
             }
 
+            if (schema.Format == JsonFormatStrings.Integer)
+            {
+                return isNullable ? "int?" : "int";
+            }
+
             if (schema.Minimum.HasValue || schema.Maximum.HasValue)
             {
                 if (string.IsNullOrEmpty(schema.Format) && schema.Type == JsonObjectType.Integer)
