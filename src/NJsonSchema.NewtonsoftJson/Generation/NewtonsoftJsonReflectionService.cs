@@ -186,11 +186,15 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                var isNullable = propertyTypeDescription.IsNullable && !hasRequiredAttribute && jsonProperty.Required is Required.Default or Required.AllowNull;
+                // The C# required keyword marks a property as required in the schema's required array
+                // but does not imply a non-nullable value. Only [Required] carries the semantic meaning
+                // of "non-null value required" and should suppress nullability and trigger MinLength = 1
+                // on strings.
+                var isNullable = propertyTypeDescription.IsNullable && requiredAttribute == null && jsonProperty.Required is Required.Default or Required.AllowNull;
 
                 var defaultValue = jsonProperty.DefaultValue;
 
-                schemaGenerator.AddProperty(parentSchema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, hasRequiredAttribute, isNullable, defaultValue, schemaResolver);
+                schemaGenerator.AddProperty(parentSchema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, requiredAttribute != null, isNullable, defaultValue, schemaResolver);
             }
         }
 

@@ -151,6 +151,28 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
         }
 
+#nullable enable
+        public class ClassWithRequiredNullableKeyword
+        {
+            public required string? Name { get; set; }
+            public string? Optional { get; set; }
+        }
+#nullable restore
+
+        [Fact]
+        public void When_property_has_required_keyword_and_nullable_type_then_it_is_required_and_nullable_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithRequiredNullableKeyword>();
+
+            // Assert: required keyword adds to required array
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: nullable type is preserved — required keyword alone must not suppress nullability
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.JsonSchema));
+            Assert.Null(schema.Properties["Name"].MinLength);
+        }
+
         public class ClassWithJsonRequired
         {
             [System.Text.Json.Serialization.JsonRequired]
