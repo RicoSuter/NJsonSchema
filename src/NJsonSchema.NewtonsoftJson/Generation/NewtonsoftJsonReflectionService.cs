@@ -180,16 +180,18 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 var hasJsonNetAttributeRequired = jsonProperty.Required is Required.Always or Required.AllowNull;
                 var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
 
-                var hasRequiredAttribute = requiredAttribute != null || hasRequiredMemberAttribute;
-                if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
+                // Any of these markers places the property in the schema's required array.
+                var hasAnyRequiredMarker = requiredAttribute != null || hasRequiredMemberAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired;
+                if (hasAnyRequiredMarker)
                 {
                     parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                // The C# required keyword marks a property as required in the schema's required array
-                // but does not imply a non-nullable value. Only [Required] carries the semantic meaning
-                // of "non-null value required" and should suppress nullability and trigger MinLength = 1
-                // on strings.
+                // Only [Required] from DataAnnotations carries the "non-null value required" semantic
+                // that suppresses nullability and triggers MinLength = 1 on strings. The C# required
+                // keyword and DataMember.IsRequired are presence-only markers. Newtonsoft's
+                // Required.Always / Required.DisallowNull also suppress nullability because the
+                // Newtonsoft runtime rejects null in those modes.
                 var isNullable = propertyTypeDescription.IsNullable && requiredAttribute == null && jsonProperty.Required is Required.Default or Required.AllowNull;
 
                 var defaultValue = jsonProperty.DefaultValue;

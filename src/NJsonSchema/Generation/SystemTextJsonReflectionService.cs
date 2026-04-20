@@ -98,16 +98,16 @@ namespace NJsonSchema.Generation
 
                     var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, contextualType.Type)?.IsRequired == true;
 
-                    var hasRequiredAttribute = requiredAttribute != null || hasRequiredMemberAttribute || hasJsonRequiredAttribute;
-                    if (hasRequiredAttribute || isDataContractMemberRequired)
+                    // Any of these markers places the property in the schema's required array.
+                    var hasAnyRequiredMarker = requiredAttribute != null || hasRequiredMemberAttribute || hasJsonRequiredAttribute || isDataContractMemberRequired;
+                    if (hasAnyRequiredMarker)
                     {
                         schema.RequiredProperties.Add(propertyName);
                     }
 
-                    // Presence markers (C# required keyword, [JsonRequired], DataMember.IsRequired) only
-                    // mark a property as required in the schema's required array. Only [Required] carries
-                    // the semantic meaning of "non-null value required" and should suppress nullability
-                    // and trigger MinLength = 1 on strings.
+                    // Only [Required] from DataAnnotations carries the "non-null value required" semantic
+                    // that suppresses nullability and triggers MinLength = 1 on strings. The C# required
+                    // keyword, [JsonRequired], and DataMember.IsRequired are presence-only markers.
                     var isNullable = propertyTypeDescription.IsNullable && requiredAttribute == null;
 
                     // TODO: Add default value
