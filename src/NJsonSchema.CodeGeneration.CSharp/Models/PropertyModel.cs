@@ -264,7 +264,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                 }
 
                 return _property.ActualTypeSchema.Type.IsString() &&
-                       (_property.ActualSchema.MinLength.HasValue || _property.ActualSchema.MaxLength.HasValue);
+                       (_property.ActualSchema.MinLength.HasValue || _property.ActualSchema.MaxLength.HasValue) &&
+                       _property.ActualSchema.Format is not JsonFormatStrings.DateTime
+                           and not JsonFormatStrings.Date
+                           and not JsonFormatStrings.Time;
             }
         }
 
