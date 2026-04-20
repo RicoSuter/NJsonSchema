@@ -149,6 +149,9 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             // Assert
             Assert.Contains("Name", schema.RequiredProperties);
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: required keyword is a presence marker only — it must not trigger MinLength = 1
+            // on the string type. That is reserved for [Required] from DataAnnotations.
+            Assert.Null(schema.Properties["Name"].MinLength);
         }
 
 #nullable enable
@@ -189,6 +192,8 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             // Assert
             Assert.Contains("Name", schema.RequiredProperties);
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: [JsonRequired] is a presence marker only — it must not trigger MinLength = 1.
+            Assert.Null(schema.Properties["Name"].MinLength);
         }
 
 #nullable enable
