@@ -200,5 +200,257 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_property_has_const_string_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""const"": ""person""
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_integer_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""myNumber"": {
+                        ""const"": 42
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_boolean_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""isActive"": {
+                        ""const"": true
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public bool IsActive { get; } = true;", output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_with_type_then_type_is_used()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""type"": ""string"",
+                        ""const"": ""person""
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public string CmdType { get; } = \"person\";", output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_double_value_then_property_is_readonly_with_default_value()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""rate"": {
+                        ""const"": 3.14
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public double Rate { get; } = 3.14", output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_both_const_and_default_then_const_wins()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""type"": ""string"",
+                        ""const"": ""person"",
+                        ""default"": ""other""
+                    }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public string CmdType { get; } = \"person\";", output);
+            Assert.DoesNotContain("\"other\"", output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_null_value_then_property_compiles()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""nothing"": { ""const"": null }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_inside_multi_allOf_then_const_is_honored()
+        {
+            // Only ActualTypeSchema dives into multi-item allOf to find const;
+            // ActualSchema stops at a plain self-schema with allOf.
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""allOf"": [
+                            { ""$ref"": ""#/definitions/Base"" },
+                            { ""const"": ""person"" }
+                        ]
+                    }
+                },
+                ""definitions"": {
+                    ""Base"": { ""type"": ""string"" }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public string CmdType { get; } = \"person\";", output);
+            CSharpCompiler.AssertCompile(output);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_via_ref_then_const_is_honored()
+        {
+            // Arrange
+            var data = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": { ""$ref"": ""#/definitions/Cmd"" }
+                },
+                ""definitions"": {
+                    ""Cmd"": { ""const"": ""person"" }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(data);
+            var settings = new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                Namespace = "ns"
+            };
+            var gen = new CSharpGenerator(schema, settings);
+            var output = gen.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public string CmdType { get; } = \"person\";", output);
+            CSharpCompiler.AssertCompile(output);
+        }
     }
 }
