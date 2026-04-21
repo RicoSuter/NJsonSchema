@@ -9,7 +9,7 @@ v12 bundles the breaking improvements that were deferred during the v11.x series
 - **STJ core migration** (PR [#1914](https://github.com/RicoSuter/NJsonSchema/pull/1914)) — replace Newtonsoft.Json with System.Text.Json in the NJsonSchema core. Newtonsoft.Json support stays in `NJsonSchema.NewtonsoftJson`. Multiple breaking API changes (documented in the PR body).
 - **JsonTypeInfo-based property discovery** (PR [#1917](https://github.com/RicoSuter/NJsonSchema/pull/1917)) — on net8.0+, use STJ's `JsonTypeInfo` for reflection instead of the custom reflection code. Performance and AOT friendliness.
 - **`SchemaType` enum expansion** — differentiate OpenAPI 3.0 and 3.1 (3.1 = JSON Schema 2020-12). Currently `OpenApi3` conflates both, which blocks 3.1-specific behavior (`$ref` siblings, native `const`, type-array nullability).
-- **Reference resolution fixes** — close the sibling-keyword gaps documented in [`docs/references.md`](./references.md): `$ref + const`, `$ref + enum`. Mirror the existing `!IsEnumeration` guard with `!HasConstValue` on `HasAllOfSchemaReference` / `HasOneOfSchemaReference` / `HasAnyOfSchemaReference`.
+- **Reference resolution fixes** — close the `$ref` sibling-keyword gaps documented in [`docs/references.md`](./references.md). Generalize the existing `!IsEnumeration` guard on `HasAllOfSchemaReference` / `HasOneOfSchemaReference` / `HasAnyOfSchemaReference` so that `description`, `default`, `readOnly`, `title`, etc. (and `const` once it lands) are preserved rather than dropped when a schema is classified as a wrapper reference.
 - **Opportunistic cleanups** deferred for being breaking — deprecated API removal, rename-risk members, consolidation of access paths.
 
 ## Branch model

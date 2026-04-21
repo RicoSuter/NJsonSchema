@@ -17,7 +17,7 @@ Planned (not yet merged — track via linked PRs):
 - **STJ core migration** — PR [#1914](https://github.com/RicoSuter/NJsonSchema/pull/1914). Multiple breaking API changes; see the PR body for the authoritative list.
 - **JsonTypeInfo-based property discovery** for net8.0+ — PR [#1917](https://github.com/RicoSuter/NJsonSchema/pull/1917).
 - **`SchemaType` enum expansion** — differentiate OpenAPI 3.0 from 3.1 (currently both map to `SchemaType.OpenApi3`).
-- **Reference resolution fixes** — close the `$ref + const` / `$ref + enum` sibling gaps documented in [`references.md`](./references.md) (add `!HasConstValue` to `HasAllOfSchemaReference` / `HasOneOfSchemaReference` / `HasAnyOfSchemaReference`).
+- **Reference resolution fixes** — close the `$ref` sibling-keyword gaps documented in [`references.md`](./references.md) by generalizing the current `!IsEnumeration` wrapper-reference guard so other sibling keywords (`description`, `default`, `readOnly`, `title`, and `const` once it lands) are preserved on resolution.
 
 ### New features
 
